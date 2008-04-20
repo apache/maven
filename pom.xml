@@ -248,7 +248,7 @@ under the License.
   </dependencies>
 
   <dependencyManagement>
-    <!--end-->  
+    <!--end-->
     <dependencies>
       <!-- Maven -->
       <!--start-->
@@ -311,7 +311,7 @@ under the License.
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-toolchain</artifactId>
         <version>${mavenVersion}</version>
-      </dependency>      
+      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-parameter-documenter</artifactId>
@@ -453,8 +453,14 @@ under the License.
     </profile>
 
     <profile>
-      <!-- To generate aggregate reports, calling twice mvn site -Preporting,  mvn site -Preporting-aggregate -->
       <id>reporting-aggregate</id>
+      <!-- To generate aggregate reports -->
+      <!-- To deploy both aggregate reports for top-level project and standalone reports for modules, call
+           mvn site -Preporting
+           mvn site:deploy
+           mvn site -Preporting-aggregate
+           mvn -N site:deploy
+      -->
       <reporting>
         <plugins>
           <plugin>
