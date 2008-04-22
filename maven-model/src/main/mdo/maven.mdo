@@ -3008,12 +3008,18 @@
         return executionMap;
     }
 
+    //TODO we shall reset key variable when groupId/artifactId change
+    private String key = null;
     /**
      * @return the key of the plugin, ie <code>groupId:artifactId</code>
      */
     public String getKey()
     {
-        return constructKey( groupId, artifactId );
+        if ( key == null ) 
+        {
+            key = constructKey( groupId, artifactId );
+        }
+        return key;
     }
 
     /**
