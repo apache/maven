@@ -609,7 +609,7 @@ public class DefaultPluginManager
             if ( getLogger().isFatalErrorEnabled() )
             {
                 getLogger().fatalError(
-                                        mojo.getClass().getName() + "#execute() caused a linkage error ("
+                                        mojoDescriptor.getImplementation() + "#execute() caused a linkage error ("
                                             + e.getClass().getName() + ") and may be out-of-date. Check the realms:" );
 
                 StringBuffer sb = new StringBuffer();
