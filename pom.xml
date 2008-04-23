@@ -465,7 +465,13 @@ under the License.
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>2.0.1</version>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jxr-plugin</artifactId>
+            <version>2.1</version>
             <configuration>
               <aggregate>true</aggregate>
             </configuration>
@@ -473,6 +479,7 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.3</version>
             <configuration>
               <links>
                 <link>http://java.sun.com/j2se/1.4.2/docs/api</link>
