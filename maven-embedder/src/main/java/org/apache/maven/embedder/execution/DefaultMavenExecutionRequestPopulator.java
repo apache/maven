@@ -206,6 +206,13 @@ public class DefaultMavenExecutionRequestPopulator
             request.setProperties( requestProperties );
         }
 
+        if ( requestProperties.getProperty( MavenEmbedder.STANDALONE_MODE ) == null )
+        {
+            // TODO: Remove this!
+            System.setProperty( MavenEmbedder.STANDALONE_MODE, "true" );
+            requestProperties.setProperty( MavenEmbedder.STANDALONE_MODE, "true" );
+        }
+
         Properties userProperties = request.getUserProperties();
         if ( userProperties != null )
         {
