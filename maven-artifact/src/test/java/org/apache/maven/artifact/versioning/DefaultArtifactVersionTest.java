@@ -168,10 +168,10 @@ public class DefaultArtifactVersionTest
 
     public void testVersionComparingWithBuildNumberZero()
     {
-        DefaultArtifactVersion v1 = new DefaultArtifactVersion( "2.0" );
-        DefaultArtifactVersion v2 = new DefaultArtifactVersion( "2.0-0" );
-        DefaultArtifactVersion v3 = new DefaultArtifactVersion( "2.0-alpha1" );
-        DefaultArtifactVersion v4 = new DefaultArtifactVersion( "2.0-1" );
+        ArtifactVersion v1 = newArtifactVersion( "2.0" );
+        ArtifactVersion v2 = newArtifactVersion( "2.0-0" );
+        ArtifactVersion v3 = newArtifactVersion( "2.0-alpha1" );
+        ArtifactVersion v4 = newArtifactVersion( "2.0-1" );
 
         // v1 and v2 are equal
         assertTrue( v1.compareTo( v2 ) == 0 );
@@ -196,44 +196,44 @@ public class DefaultArtifactVersionTest
 
     public void testCompareToEqualsHashCodeConsistency()
     {
-        DefaultArtifactVersion v1;
-        DefaultArtifactVersion v2;
+        ArtifactVersion v1;
+        ArtifactVersion v2;
 
         // equal to itself
-        v1 = new DefaultArtifactVersion( "1.3" );
+        v1 = newArtifactVersion( "1.3" );
         v2 = v1;
-        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() ) && ( v1.compareTo( v2 ) == 0 )
-                    && ( v2.compareTo( v1 ) == 0 ) );
+        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() )
+                        && ( v1.compareTo( v2 ) == 0 ) && ( v2.compareTo( v1 ) == 0 ) );
 
         // equal to something that means the same
-        v1 = new DefaultArtifactVersion( "1" );
-        v2 = new DefaultArtifactVersion( "1.0.0-0" );
-        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() ) && ( v1.compareTo( v2 ) == 0 )
-                    && ( v2.compareTo( v1 ) == 0 ) );
+        v1 = newArtifactVersion( "1" );
+        v2 = newArtifactVersion( "1.0.0-0" );
+        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() )
+                        && ( v1.compareTo( v2 ) == 0 ) && ( v2.compareTo( v1 ) == 0 ) );
 
         // equal with qualifier
-        v1 = new DefaultArtifactVersion( "1.3-alpha1" );
-        v2 = new DefaultArtifactVersion( "1.3-alpha1" );
-        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() ) && ( v1.compareTo( v2 ) == 0 )
-                    && ( v2.compareTo( v1 ) == 0 ) );
+        v1 = newArtifactVersion( "1.3-alpha1" );
+        v2 = newArtifactVersion( "1.3-alpha1" );
+        assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.hashCode() == v2.hashCode() )
+                        && ( v1.compareTo( v2 ) == 0 ) && ( v2.compareTo( v1 ) == 0 ) );
 
         // longer qualifier with same start is *newer*
-        v1 = new DefaultArtifactVersion( "1.3-alpha1" );
-        v2 = new DefaultArtifactVersion( "1.3-alpha1-1" );
+        v1 = newArtifactVersion( "1.3-alpha1" );
+        v2 = newArtifactVersion( "1.3-alpha1-1" );
         assertTrue( !v1.equals( v2 ) && !v2.equals( v1 ) && ( v1.compareTo( v2 ) > 0 ) && ( v2.compareTo( v1 ) < 0 ) );
 
         // different qualifiers alpha compared
-        v1 = new DefaultArtifactVersion( "1.3-alpha1" );
-        v2 = new DefaultArtifactVersion( "1.3-beta1" );
+        v1 = newArtifactVersion( "1.3-alpha1" );
+        v2 = newArtifactVersion( "1.3-beta1" );
         assertTrue( !v1.equals( v2 ) && !v2.equals( v1 ) && ( v1.compareTo( v2 ) < 0 ) && ( v2.compareTo( v1 ) > 0 ) );
     }
 
     public void testTransitivity()
     {
-        DefaultArtifactVersion v1 = new DefaultArtifactVersion( "1" );
-        DefaultArtifactVersion v2 = new DefaultArtifactVersion( "1.0-0" );
-        DefaultArtifactVersion v3 = new DefaultArtifactVersion( "1.0.1" );
-        DefaultArtifactVersion v4 = new DefaultArtifactVersion( "1.0-beta1" );
+        ArtifactVersion v1 = newArtifactVersion( "1" );
+        ArtifactVersion v2 = newArtifactVersion( "1.0-0" );
+        ArtifactVersion v3 = newArtifactVersion( "1.0.1" );
+        ArtifactVersion v4 = newArtifactVersion( "1.0-beta1" );
 
         // v1 and v2 are equal
         assertTrue( v1.equals( v2 ) && v2.equals( v1 ) && ( v1.compareTo( v2 ) == 0 ) && ( v2.compareTo( v1 ) == 0 ) );
@@ -253,7 +253,7 @@ public class DefaultArtifactVersionTest
 
     private void testInterfaceCompare( String version )
     {
-        final DefaultArtifactVersion dav = new DefaultArtifactVersion( version );
+        final ArtifactVersion dav = newArtifactVersion( version );
 
         // create an anonymous instance to compare the big daddy to
         ArtifactVersion av = new ArtifactVersion()
