@@ -256,7 +256,7 @@ public class DefaultLifecycleBindingManagerTest
 
         mockManager.replayAll();
 
-        realmManager.createExtensionRealm( extensionArtifact, Collections.EMPTY_SET );
+        realmManager.createExtensionRealm( extensionArtifact, Collections.EMPTY_LIST );
         realmManager.importExtensionsIntoProjectRealm( "group", "project", "1", extensionArtifact );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setRealmManager( realmManager );

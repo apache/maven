@@ -63,6 +63,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -370,7 +371,7 @@ public class DefaultExtensionManager
             {
                 try
                 {
-                    realmManager.createExtensionRealm( extensionArtifact, resultArtifacts );
+                    realmManager.createExtensionRealm( extensionArtifact, new ArrayList( resultArtifacts ) );
                 }
                 catch ( RealmManagementException e )
                 {

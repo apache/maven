@@ -115,7 +115,7 @@ public class DefaultMavenRealmManager
     }
 
     public ClassRealm createExtensionRealm( Artifact extensionArtifact,
-                                            Collection artifacts )
+                                            List artifacts )
         throws RealmManagementException
     {
         String id = RealmUtils.createExtensionRealmId( extensionArtifact );
@@ -268,7 +268,7 @@ public class DefaultMavenRealmManager
 
     public ClassRealm createPluginRealm( Plugin plugin,
                                           Artifact pluginArtifact,
-                                          Collection artifacts,
+                                          List artifacts,
                                           ArtifactFilter coreArtifactFilter )
         throws RealmManagementException
     {
@@ -299,7 +299,7 @@ public class DefaultMavenRealmManager
     private void populateRealm( String id,
                                 ClassRealm realm,
                                 Artifact mainArtifact,
-                                Collection artifacts,
+                                List artifacts,
                                 ArtifactFilter coreArtifactFilter )
         throws RealmManagementException
     {
@@ -362,7 +362,7 @@ public class DefaultMavenRealmManager
     }
 
     public void setPluginArtifacts( Plugin plugin,
-                                    Collection artifacts )
+                                    List artifacts )
     {
         String id = RealmUtils.createPluginRealmId( plugin );
 

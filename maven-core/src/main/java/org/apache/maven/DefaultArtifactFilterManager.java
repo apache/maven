@@ -39,6 +39,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager
     {
         Set artifacts = new HashSet();
 
+        artifacts.add( "classworlds" );
         artifacts.add( "plexus-classworlds" );
         artifacts.add( "commons-cli" );
         artifacts.add( "doxia-sink-api" );

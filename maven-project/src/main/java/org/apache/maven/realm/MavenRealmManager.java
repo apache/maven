@@ -5,7 +5,6 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface MavenRealmManager
@@ -16,7 +15,7 @@ public interface MavenRealmManager
     boolean hasExtensionRealm( Artifact extensionArtifact );
 
     ClassRealm createExtensionRealm( Artifact extensionArtifact,
-                                     Collection artifacts )
+                                     List artifacts )
         throws RealmManagementException;
 
     void importExtensionsIntoProjectRealm( String projectGroupId,
@@ -35,12 +34,12 @@ public interface MavenRealmManager
 
     ClassRealm createPluginRealm( Plugin plugin,
                                   Artifact pluginArtifact,
-                                  Collection artifacts,
+                                  List artifacts,
                                   ArtifactFilter coreArtifactFilter )
         throws RealmManagementException;
 
     void disposePluginRealm( Plugin plugin );
 
     void setPluginArtifacts( Plugin plugin,
-                             Collection artifacts );
+                             List artifacts );
 }

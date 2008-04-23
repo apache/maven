@@ -274,7 +274,7 @@ public class DefaultPluginManager
             projectPlugin.setVersion( plugin.getVersion() );
         }
 
-        Set artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project,
+        List artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project,
                                             session.getLocalRepository() );
 
         getLogger().debug( "Got plugin artifacts:\n\n" + artifacts );
@@ -354,7 +354,7 @@ public class DefaultPluginManager
         }
     }
 
-    private Set getPluginArtifacts( Artifact pluginArtifact,
+    private List getPluginArtifacts( Artifact pluginArtifact,
                                     Plugin plugin,
                                     MavenProject project,
                                     ArtifactRepository localRepository )
@@ -443,7 +443,7 @@ public class DefaultPluginManager
                                                                                 artifactMetadataSource,
                                                                                 filter );
 
-        Set resolved = new HashSet( result.getArtifacts() );
+        List resolved = new ArrayList( result.getArtifacts() );
 
         for ( Iterator it = resolved.iterator(); it.hasNext(); )
         {

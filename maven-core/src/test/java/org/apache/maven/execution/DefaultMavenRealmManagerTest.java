@@ -46,7 +46,7 @@ public class DefaultMavenRealmManagerTest
 
         assertFalse( mgr1.hasExtensionRealm( ext1 ) );
 
-        mgr1.createExtensionRealm( ext1, Collections.EMPTY_SET );
+        mgr1.createExtensionRealm( ext1, Collections.EMPTY_LIST );
 
         assertTrue( mgr1.hasExtensionRealm( ext1 ) );
 
