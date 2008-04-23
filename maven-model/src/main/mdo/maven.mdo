@@ -3208,7 +3208,7 @@
     /**
      * Reset the <code>reportPluginMap</code> field to <code>null</code>
      */
-    public void flushReportPluginMap()
+    public synchronized void flushReportPluginMap()
     {
         this.reportPluginMap = null;
     }
@@ -3217,7 +3217,7 @@
      * @return a Map of plugins field with <code>ReportPlugin#getKey()</code> as key
      * @see org.apache.maven.model.ReportPlugin#getKey()
      */
-    public java.util.Map getReportPluginsAsMap()
+    public synchronized java.util.Map getReportPluginsAsMap()
     {
         if ( reportPluginMap == null )
         {
