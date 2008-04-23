@@ -453,6 +453,22 @@ under the License.
     </profile>
 
     <profile>
+      <id>reporting</id>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>clirr-maven-plugin</artifactId>
+            <configuration>
+              <!-- needed for release: default value "(,${project.version})" for 2.0.10 is 2.0.10-SNAPSHOT -->
+              <comparisonVersion>2.0.9</comparisonVersion>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+
+    <profile>
       <id>reporting-aggregate</id>
       <!-- To generate aggregate reports -->
       <!-- To deploy both aggregate reports for top-level project and standalone reports for modules, call
