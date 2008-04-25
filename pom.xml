@@ -136,10 +136,6 @@ under the License.
           <version>2.0.2</version>
         </plugin>
         <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.2-beta-1</version>
         </plugin>
@@ -495,7 +491,7 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.3</version>
+            <version>2.4</version>
             <configuration>
               <links>
                 <link>http://java.sun.com/j2se/1.4.2/docs/api</link>
