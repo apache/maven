@@ -60,7 +60,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * Very simple stub of <code>MavenProject<code> object, going to take a lot of work to make it
+ * Very simple stub of <code>MavenProject</code> object, going to take a lot of work to make it
  * useful as a stub though.
  *
  * @author jesse
