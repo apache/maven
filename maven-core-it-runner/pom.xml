@@ -30,7 +30,7 @@ under the License.
     <dependencies>
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>apache-maven</artifactId>
+            <artifactId>maven-distribution</artifactId>
             <version>${project.version}</version>
             <classifier>bin</classifier>
             <type>tar.gz</type>
@@ -53,7 +53,7 @@ under the License.
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.apache.maven</groupId>
-                                    <artifactId>apache-maven</artifactId>
+                                    <artifactId>maven-distribution</artifactId>
                                     <version>${project.version}</version>
                                     <classifier>bin</classifier>
                                     <type>tar.gz</type>
