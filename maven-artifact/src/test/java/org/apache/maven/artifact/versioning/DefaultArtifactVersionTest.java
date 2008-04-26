@@ -39,12 +39,14 @@ public class DefaultArtifactVersionTest
                                       String qualifier )
     {
         ArtifactVersion artifactVersion = newArtifactVersion( version );
-        assertEquals( "check " + version + " major version", major, artifactVersion.getMajorVersion() );
-        assertEquals( "check " + version + " minor version", minor, artifactVersion.getMinorVersion() );
-        assertEquals( "check " + version + " incremental version", incremental,
-                      artifactVersion.getIncrementalVersion() );
-        assertEquals( "check " + version + " build number", buildnumber, artifactVersion.getBuildNumber() );
-        assertEquals( "check " + version + " qualifier", qualifier, artifactVersion.getQualifier() );
+        String parsed = "'" + version + "' parsed as ('" + artifactVersion.getMajorVersion() + "', '"
+            + artifactVersion.getMinorVersion() + "', '" + artifactVersion.getIncrementalVersion() + "', '"
+            + artifactVersion.getBuildNumber() + "', '" + artifactVersion.getQualifier() + "'), ";
+        assertEquals( parsed + "check major version", major, artifactVersion.getMajorVersion() );
+        assertEquals( parsed + "check minor version", minor, artifactVersion.getMinorVersion() );
+        assertEquals( parsed + "check incremental version", incremental, artifactVersion.getIncrementalVersion() );
+        assertEquals( parsed + "check build number", buildnumber, artifactVersion.getBuildNumber() );
+        assertEquals( parsed + "check qualifier", qualifier, artifactVersion.getQualifier() );
         assertEquals( "check " + version + " string value", version, artifactVersion.toString() );
     }
 
@@ -60,12 +62,18 @@ public class DefaultArtifactVersionTest
         checkVersionParsing( "RELEASE" , 0, 0, 0, 0, "RELEASE" );
         checkVersionParsing( "2.0-1" , 2, 0, 0, 1, null );
 
+        // 0 at the beginning of a number has a special handling
+        checkVersionParsing( "02" , 0, 0, 0, 0, "02" );
+        checkVersionParsing( "0.09" , 0, 0, 0, 0, "0.09" );
+        checkVersionParsing( "0.2.09" , 0, 0, 0, 0, "0.2.09" );
+        checkVersionParsing( "2.0-01" , 2, 0, 0, 0, "01" );
+
         // version schemes not really supported: fully transformed as qualifier
         checkVersionParsing( "1.0.1b" , 0, 0, 0, 0, "1.0.1b" );
+        checkVersionParsing( "1.0M2" , 0, 0, 0, 0, "1.0M2" );
         checkVersionParsing( "1.0RC2" , 0, 0, 0, 0, "1.0RC2" );
         checkVersionParsing( "1.7.3.0" , 0, 0, 0, 0, "1.7.3.0" );
-        checkVersionParsing( "0.09" , 0, 0, 0, 0, "0.09" );
-        checkVersionParsing( "02" , 0, 0, 0, 0, "02" );
+        checkVersionParsing( "1.7.3.0-1" , 0, 0, 0, 0, "1.7.3.0-1" );
         checkVersionParsing( "PATCH-1193602" , 0, 0, 0, 0, "PATCH-1193602" );
         checkVersionParsing( "5.0.0alpha-2006020117" , 0, 0, 0, 0, "5.0.0alpha-2006020117" );
     }
