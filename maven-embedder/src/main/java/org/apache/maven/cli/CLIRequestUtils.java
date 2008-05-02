@@ -146,26 +146,32 @@ public final class CLIRequestUtils
 
         if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
-            String profilesLine = commandLine.getOptionValue( CLIManager.ACTIVATE_PROFILES );
+            String [] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
 
-            StringTokenizer profileTokens = new StringTokenizer( profilesLine, "," );
-
-            while ( profileTokens.hasMoreTokens() )
+            if ( profileOptionValues != null )
             {
-                String profileAction = profileTokens.nextToken().trim();
+                for ( int i=0; i < profileOptionValues.length; ++i )
+                {
+                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValues[i] , "," );
 
-                if ( profileAction.startsWith( "-" ) )
-                {
-                    activeProfiles.add( profileAction.substring( 1 ) );
-                }
-                else if ( profileAction.startsWith( "+" ) )
-                {
-                    inactiveProfiles.add( profileAction.substring( 1 ) );
-                }
-                else
-                {
-                    // TODO: deprecate this eventually!
-                    activeProfiles.add( profileAction );
+                    while ( profileTokens.hasMoreTokens() )
+                    {
+                        String profileAction = profileTokens.nextToken().trim();
+
+                        if ( profileAction.startsWith( "-" ) )
+                        {
+                            activeProfiles.add( profileAction.substring( 1 ) );
+                        }
+                        else if ( profileAction.startsWith( "+" ) )
+                        {
+                            inactiveProfiles.add( profileAction.substring( 1 ) );
+                        }
+                        else
+                        {
+                            // TODO: deprecate this eventually!
+                            activeProfiles.add( profileAction );
+                        }
+                    }
                 }
             }
         }
