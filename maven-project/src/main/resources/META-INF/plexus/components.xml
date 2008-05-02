@@ -183,17 +183,6 @@ under the License.
     </component>
     
     <component>
-      <role>org.apache.maven.project.ModelResolver</role>
-      <role-hint>default</role-hint>
-      <implementation>org.apache.maven.project.ModelResolver</implementation>
-      <requirements>
-        <requirement>
-		      <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-        </requirement>
-      </requirements>
-    </component>
-    
-    <component>
       <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
       <role-hint>maven</role-hint>
       <implementation>org.apache.maven.project.artifact.MavenMetadataSource</implementation>
