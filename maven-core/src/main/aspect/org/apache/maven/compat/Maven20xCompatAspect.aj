@@ -240,7 +240,7 @@ public privileged aspect Maven20xCompatAspect
         && this( manager );
 
     private pointcut pluginRealmCreation( Plugin plugin, DefaultPluginManager manager ):
-        call( ClassRealm MavenRealmManager+.createPluginRealm( Plugin, Artifact, Collection, .. ) )
+        call( ClassRealm MavenRealmManager+.createPluginRealm( Plugin, Artifact, List, .. ) )
         && cflow( pluginManager( manager ) )
         && args( plugin, .. );
 
