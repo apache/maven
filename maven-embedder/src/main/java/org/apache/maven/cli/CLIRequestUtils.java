@@ -147,7 +147,6 @@ public final class CLIRequestUtils
         if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
             String [] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
-
             if ( profileOptionValues != null )
             {
                 for ( int i=0; i < profileOptionValues.length; ++i )
@@ -160,11 +159,19 @@ public final class CLIRequestUtils
 
                         if ( profileAction.startsWith( "-" ) )
                         {
-                            activeProfiles.add( profileAction.substring( 1 ) );
+                            inactiveProfiles.add( profileAction.substring( 1 ) );
+                        }
+                        else if ( profileAction.startsWith( "D:" ) )
+                        {
+                            inactiveProfiles.add( profileAction.substring( 2 ) );
                         }
                         else if ( profileAction.startsWith( "+" ) )
                         {
-                            inactiveProfiles.add( profileAction.substring( 1 ) );
+                            activeProfiles.add( profileAction.substring( 1 ) );
+                        }
+                        else if ( profileAction.startsWith( "E:" ) )
+                        {
+                            activeProfiles.add( profileAction.substring( 2 ) );
                         }
                         else
                         {
