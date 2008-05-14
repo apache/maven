@@ -65,6 +65,7 @@ public class IntegrationTestSuite
          * a fail fast technique as well.
          */
 
+        suite.addTestSuite( MavenITmng3545ProfileDeactivation.class );
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
         suite.addTestSuite( MavenITmng3482DependencyPomInterpolationTest.class );
