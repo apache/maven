@@ -219,12 +219,12 @@ public class DefaultProfileManager
                 {
                     shouldAdd = true;
                 }
-                else if ( !profileActivationContext.isExplicitlyInactive( profileId ) && isActive( profile, profileActivationContext ) )
+                else if ( isActive( profile, profileActivationContext ) )
                 {
                     shouldAdd = true;
                 }
 
-                if ( shouldAdd )
+                if ( !profileActivationContext.isExplicitlyInactive( profileId ) && shouldAdd )
                 {
                     if ( "pom".equals( profile.getSource() ) )
                     {
@@ -241,10 +241,18 @@ public class DefaultProfileManager
             {
                 List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
 
+				List deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
+				
                 for ( Iterator it = defaultIds.iterator(); it.hasNext(); )
                 {
                     String profileId = (String) it.next();
-
+					
+					// If this profile was excluded, don't add it back in
+					// Fixes MNG-3545
+					if (deactivatedIds.contains(profileId)) 
+					{
+						continue;
+					}
                     Profile profile = (Profile) profilesById.get( profileId );
 
                     if ( profile != null )
