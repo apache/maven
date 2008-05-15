@@ -293,14 +293,11 @@ public class DefaultProfileManager
 
                 if ( activator.canDetermineActivation( profile, context ) )
                 {
-                    boolean result = activator.isActive( profile, context );
-
-                    if ( result )
+                    if ( activator.isActive( profile, context ) )
                     {
                         container.getLogger().debug( "Profile: " + profile.getId() + " is active. (source: " + profile.getSource() + ")" );
+                        return true;
                     }
-
-                    return result;
                 }
             }
 
