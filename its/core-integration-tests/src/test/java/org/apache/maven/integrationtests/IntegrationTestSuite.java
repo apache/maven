@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3221InfiniteForking.class );
         suite.addTestSuite( MavenITmng3268MultipleDashPCommandLine.class );
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
+        suite.addTestSuite( MavenITmng3106ProfileMultipleActivators.class );
         suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPOM.class );
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
