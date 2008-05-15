@@ -55,7 +55,7 @@ public class MavenITmng3545ProfileDeactivation
      * Test command line deactivation of active by default profiles.
      * 
      */
-    public void testDeactivateDefaultProfiles()
+    public void testDeactivateDefaultProfilesDash()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
@@ -78,6 +78,31 @@ public class MavenITmng3545ProfileDeactivation
         verifier.assertFileNotPresent( "target/profile2/touch.txt" );
         verifier.resetStreams();
 
+    }
+
+    public void testDeactivateDefaultProfilesExclamation()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
+    
+        Verifier verifier;
+    
+        verifier = new Verifier( testDir.getAbsolutePath() );
+    
+        List cliOptions = new ArrayList();
+    
+        // Deactivate active by default profiles
+        cliOptions.add( "-P!profile1" );
+        cliOptions.add( "-P !profile2" );
+    
+        verifier.setCliOptions( cliOptions );
+        verifier.executeGoal( "package" );
+    
+        verifier.verifyErrorFreeLog();
+        verifier.assertFileNotPresent( "target/profile1/touch.txt" );
+        verifier.assertFileNotPresent( "target/profile2/touch.txt" );
+        verifier.resetStreams();
+    
     }
 
     /**
