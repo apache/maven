@@ -157,25 +157,16 @@ public final class CLIRequestUtils
                     {
                         String profileAction = profileTokens.nextToken().trim();
 
-                        if ( profileAction.startsWith( "-" ) )
+                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
                         {
                             inactiveProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else if ( profileAction.startsWith( "D:" ) )
-                        {
-                            inactiveProfiles.add( profileAction.substring( 2 ) );
                         }
                         else if ( profileAction.startsWith( "+" ) )
                         {
                             activeProfiles.add( profileAction.substring( 1 ) );
                         }
-                        else if ( profileAction.startsWith( "E:" ) )
-                        {
-                            activeProfiles.add( profileAction.substring( 2 ) );
-                        }
                         else
                         {
-                            // TODO: deprecate this eventually!
                             activeProfiles.add( profileAction );
                         }
                     }
