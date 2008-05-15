@@ -3394,7 +3394,8 @@
           <version>4.0.0</version>
           <type>boolean</type>
           <description>
-            Flag specifying whether this profile is active by default.
+            If set to true, this profile will be active unless another profile in this pom is 
+            activated using the command line -P option or by one of that profile's activators.
           </description>
         </field>
         <field>
