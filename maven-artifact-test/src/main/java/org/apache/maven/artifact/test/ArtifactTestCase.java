@@ -26,9 +26,9 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.ReaderFactory;
 
 import java.io.File;
-import java.io.FileReader;
 
 /**
  * Test case that builds standard artifact stuff like repositories.
@@ -51,12 +51,16 @@ public abstract class ArtifactTestCase
     {
         super.setUp();
 
-        File settingsFile = new File( System.getProperty( "user.home" ), ".m2/settings.xml" );
-        String localRepo = null;
-        if ( settingsFile.exists() )
+        String localRepo = System.getProperty( "maven.repo.local" );
+
+        if ( localRepo == null )
         {
-            Settings settings = new SettingsXpp3Reader().read( new FileReader( settingsFile ) );
-            localRepo = settings.getLocalRepository();
+            File settingsFile = new File( System.getProperty( "user.home" ), ".m2/settings.xml" );
+            if ( settingsFile.exists() )
+            {
+                Settings settings = new SettingsXpp3Reader().read( ReaderFactory.newXmlReader( settingsFile ) );
+                localRepo = settings.getLocalRepository();
+            }
         }
         if ( localRepo == null )
         {
