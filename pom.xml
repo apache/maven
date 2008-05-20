@@ -230,7 +230,7 @@ under the License.
 
   <properties>
     <mavenVersion>2.0.10-SNAPSHOT</mavenVersion>
-    <!-- Can't use. bootstrap-mini isn't smart enough: <wagonVersion>1.0-beta-2</wagonVersion> -->
+    <wagonVersion>1.0-beta-2</wagonVersion>
   </properties>
 
   <!--start-->
@@ -363,32 +363,32 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
-        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-file</artifactId>
-        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav</artifactId>
-        <version>1.0-beta-2</version>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http-lightweight</artifactId>
-        <version>1.0-beta-2</version> <!-- Can't use. bootstrap-mini isn't smart enough: <version>${wagonVersion}</version> -->
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>easymock</groupId>
