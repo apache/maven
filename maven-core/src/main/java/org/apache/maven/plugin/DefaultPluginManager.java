@@ -269,7 +269,9 @@ public class DefaultPluginManager
         {
             projectPlugin = plugin;
         }
-        else if ( projectPlugin.getVersion() == null )
+        else if ( projectPlugin.getVersion() == null || 
+                  Artifact.RELEASE_VERSION.equals(projectPlugin.getVersion()) || 
+                  Artifact.LATEST_VERSION.equals(projectPlugin.getVersion()))
         {
             projectPlugin.setVersion( plugin.getVersion() );
         }
