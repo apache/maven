@@ -24,7 +24,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -619,7 +618,7 @@ public class DefaultMavenProjectBuilder
                     normalized.add( item );
                     normalizationNeeded = true;
                 }
-                catch ( UnknownRepositoryLayoutException e )
+                catch ( InvalidRepositoryException e )
                 {
                     throw new ProjectBuildingException( projectId, "Error building artifact repository for id: " + repo.getId(), e );
                 }

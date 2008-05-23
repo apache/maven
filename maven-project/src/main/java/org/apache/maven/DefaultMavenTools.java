@@ -19,13 +19,14 @@ package org.apache.maven;
  * under the License.
  */
 
-import org.apache.maven.artifact.UnknownRepositoryLayoutException;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
+import org.apache.maven.project.MissingRepositoryElementException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,7 +44,7 @@ public class DefaultMavenTools
     // ----------------------------------------------------------------------------
 
     public List buildArtifactRepositories( List repositories )
-        throws UnknownRepositoryLayoutException
+        throws InvalidRepositoryException
     {
         List repos = new ArrayList();
 
@@ -62,7 +63,7 @@ public class DefaultMavenTools
     }
 
     public ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo )
-        throws UnknownRepositoryLayoutException
+        throws InvalidRepositoryException
     {
         if ( repo != null )
         {
@@ -79,12 +80,22 @@ public class DefaultMavenTools
     }
 
     public ArtifactRepository buildArtifactRepository( Repository repo )
-        throws UnknownRepositoryLayoutException
+        throws InvalidRepositoryException
     {
         if ( repo != null )
         {
             String id = repo.getId();
             String url = repo.getUrl();
+
+            if ( id == null || id.trim().length() < 1 )
+            {
+                throw new MissingRepositoryElementException( "Repository ID must not be empty (URL is: " + url + ")." );
+            }
+
+            if ( url == null || url.trim().length() < 1 )
+            {
+                throw new MissingRepositoryElementException( "Repository URL must not be empty (ID is: " + id + ").", id );
+            }
 
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
 

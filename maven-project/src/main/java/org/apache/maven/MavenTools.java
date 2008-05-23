@@ -19,7 +19,7 @@ package org.apache.maven;
  * under the License.
  */
 
-import org.apache.maven.artifact.UnknownRepositoryLayoutException;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
@@ -38,11 +38,11 @@ public interface MavenTools
     // ----------------------------------------------------------------------------
 
     List buildArtifactRepositories( List repositories )
-        throws UnknownRepositoryLayoutException;
+        throws InvalidRepositoryException;
 
     ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo )
-        throws UnknownRepositoryLayoutException;
+        throws InvalidRepositoryException;
 
     ArtifactRepository buildArtifactRepository( Repository repo )
-        throws UnknownRepositoryLayoutException;
+        throws InvalidRepositoryException;
 }

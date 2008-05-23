@@ -19,7 +19,7 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.artifact.UnknownRepositoryLayoutException;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -41,7 +41,7 @@ public final class ProjectUtils
     public static List buildArtifactRepositories( List repositories,
                                                   ArtifactRepositoryFactory artifactRepositoryFactory,
                                                   PlexusContainer container )
-        throws UnknownRepositoryLayoutException
+        throws InvalidRepositoryException
     {
 
         List repos = new ArrayList();
@@ -64,7 +64,7 @@ public final class ProjectUtils
     public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
                                                                         ArtifactRepositoryFactory artifactRepositoryFactory,
                                                                         PlexusContainer container )
-        throws UnknownRepositoryLayoutException
+        throws InvalidRepositoryException
     {
         if ( repo != null )
         {
@@ -83,12 +83,22 @@ public final class ProjectUtils
     public static ArtifactRepository buildArtifactRepository( Repository repo,
                                                               ArtifactRepositoryFactory artifactRepositoryFactory,
                                                               PlexusContainer container )
-        throws UnknownRepositoryLayoutException
+        throws InvalidRepositoryException
     {
         if ( repo != null )
         {
             String id = repo.getId();
             String url = repo.getUrl();
+
+            if ( id == null || id.trim().length() < 1 )
+            {
+                throw new MissingRepositoryElementException( "Repository ID must not be empty (URL is: " + url + ")." );
+            }
+
+            if ( url == null || url.trim().length() < 1 )
+            {
+                throw new MissingRepositoryElementException( "Repository URL must not be empty (ID is: " + id + ").", id );
+            }
 
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
             ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );

@@ -2574,6 +2574,7 @@
         <field>
           <name>id</name>
           <version>4.0.0</version>
+          <required>true</required>
           <description>
             <![CDATA[
             A unique identifier for a repository. This is used to match the repository
@@ -2595,6 +2596,7 @@
         <field>
           <name>url</name>
           <version>4.0.0</version>
+          <required>true</required>
           <description>
             <![CDATA[
             The url of the repository, in the form <code>protocol://hostname/path</code>.

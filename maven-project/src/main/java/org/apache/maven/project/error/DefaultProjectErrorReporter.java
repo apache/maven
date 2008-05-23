@@ -1,7 +1,6 @@
 package org.apache.maven.project.error;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
@@ -343,7 +342,7 @@ public class DefaultProjectErrorReporter
     public void reportErrorCreatingArtifactRepository( String projectId,
                                                        File pomFile,
                                                        Repository repo,
-                                                       UnknownRepositoryLayoutException cause )
+                                                       InvalidRepositoryException cause )
     {
         StringWriter writer = new StringWriter();
 
@@ -352,7 +351,7 @@ public class DefaultProjectErrorReporter
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Repository-Id: " );
-        writer.write( ((InvalidRepositoryException)cause).getRepositoryId() );
+        writer.write( cause.getRepositoryId() );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Reason: " );
@@ -369,7 +368,7 @@ public class DefaultProjectErrorReporter
     public void reportErrorCreatingDeploymentArtifactRepository( MavenProject project,
                                                                  File pomFile,
                                                                  DeploymentRepository repo,
-                                                                 UnknownRepositoryLayoutException cause )
+                                                                 InvalidRepositoryException cause )
     {
         StringWriter writer = new StringWriter();
 
@@ -378,7 +377,7 @@ public class DefaultProjectErrorReporter
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Repository-Id: " );
-        writer.write( ((InvalidRepositoryException)cause).getRepositoryId() );
+        writer.write( cause.getRepositoryId() );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
         writer.write( "Reason: " );

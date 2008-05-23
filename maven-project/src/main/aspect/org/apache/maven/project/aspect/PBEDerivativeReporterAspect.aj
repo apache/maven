@@ -6,12 +6,13 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
-import org.apache.maven.artifact.UnknownRepositoryLayoutException;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.MavenTools;
+import org.apache.maven.DefaultMavenTools;
 import org.apache.maven.project.build.model.DefaultModelLineageBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.DefaultMavenProjectBuilder;
@@ -57,7 +58,8 @@ public privileged aspect PBEDerivativeReporterAspect
     //             <-- UnknownRepositoryLayoutException
     // <---------- ProjectBuildingException
     // =========================================================================
-    after( MavenProject project, File pomFile, DeploymentRepository repo ) throwing( UnknownRepositoryLayoutException cause ):
+
+    after( MavenProject project, File pomFile, DeploymentRepository repo ) throwing( InvalidRepositoryException cause ):
         mavenTools_buildDeploymentArtifactRepository( repo ) &&
         cflow( pbldr_processProjectLogic( project, pomFile ) )
         && within_DefaultMavenProjectBuilder()
@@ -83,7 +85,7 @@ public privileged aspect PBEDerivativeReporterAspect
     //             <------ UnknownRepositoryLayoutException
     // <---------- ProjectBuildingException
     // =========================================================================
-    after( MavenProject project, File pomFile, Repository repo ) throwing( UnknownRepositoryLayoutException cause ):
+    after( MavenProject project, File pomFile, Repository repo ) throwing( InvalidRepositoryException cause ):
         mavenTools_buildArtifactRepository( repo )
         && cflow( pbldr_processProjectLogic( project, pomFile ) )
     {
@@ -106,7 +108,7 @@ public privileged aspect PBEDerivativeReporterAspect
     //         <------ UnknownRepositoryLayoutException
     // <------ ProjectBuildingException
     // =========================================================================
-    after( Model model, File pomFile, Repository repo ) throwing( UnknownRepositoryLayoutException cause ):
+    after( Model model, File pomFile, Repository repo ) throwing( InvalidRepositoryException cause ):
         mavenTools_buildArtifactRepository( repo )
         && cflow( mlbldr_updateRepositorySet( model, pomFile ) )
     {

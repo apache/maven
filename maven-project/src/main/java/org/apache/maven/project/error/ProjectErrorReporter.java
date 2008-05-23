@@ -1,7 +1,6 @@
 package org.apache.maven.project.error;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.DeploymentRepository;
@@ -158,7 +157,7 @@ public interface ProjectErrorReporter
     void reportErrorCreatingDeploymentArtifactRepository( MavenProject project,
                                                           File pomFile,
                                                           DeploymentRepository repo,
-                                                          UnknownRepositoryLayoutException cause );
+                                                          InvalidRepositoryException cause );
 
     /**
      * <b>Call Stack:</b>
@@ -179,7 +178,7 @@ public interface ProjectErrorReporter
     void reportErrorCreatingArtifactRepository( String projectId,
                                                 File pomFile,
                                                 Repository repo,
-                                                UnknownRepositoryLayoutException cause );
+                                                InvalidRepositoryException cause );
 
     /**
      * <b>Call Stack:</b>
