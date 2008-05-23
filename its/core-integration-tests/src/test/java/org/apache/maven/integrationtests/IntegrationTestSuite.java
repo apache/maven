@@ -90,6 +90,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
+        suite.addTestSuite( MavenITmng2739RequiredRepositoryElements.class );
         suite.addTestSuite( MavenITmng2339BadProjectInterpolationTest.class );
         suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
