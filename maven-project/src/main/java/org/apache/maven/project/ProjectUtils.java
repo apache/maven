@@ -96,6 +96,16 @@ public final class ProjectUtils
             String id = repo.getId();
             String url = repo.getUrl();
 
+            if ( id == null || id.trim().length() < 1 )
+            {
+                throw new InvalidRepositoryException( "Repository ID must not be empty (URL is: " + url + ").", new IllegalArgumentException( "repository.id" ) );
+            }
+
+            if ( url == null || url.trim().length() < 1 )
+            {
+                throw new InvalidRepositoryException( "Repository URL must not be empty (ID is: " + id + ").", new IllegalArgumentException( "repository.url" ) );
+            }
+
             // TODO: make this a map inside the factory instead, so no lookup needed
             ArtifactRepositoryLayout layout = getRepositoryLayout( repo, container );
 
