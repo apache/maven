@@ -1423,7 +1423,7 @@ public class DefaultPluginManager
     // Artifact resolution
     // ----------------------------------------------------------------------
 
-    private void resolveTransitiveDependencies( MavenSession context,
+    protected void resolveTransitiveDependencies( MavenSession context,
                                                 ArtifactResolver artifactResolver,
                                                 String scope,
                                                 ArtifactFactory artifactFactory,

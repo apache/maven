@@ -251,7 +251,7 @@ public class DefaultMaven
         return result;
     }
 
-    private List getProjects( MavenExecutionRequest request )
+    protected List getProjects( MavenExecutionRequest request )
         throws MavenExecutionException
     {
         List projects;
