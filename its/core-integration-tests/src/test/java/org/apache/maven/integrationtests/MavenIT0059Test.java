@@ -4,6 +4,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class MavenIT0059Test
@@ -19,12 +21,15 @@ public class MavenIT0059Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0059" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        List cliOptions = new ArrayList();
+        cliOptions.add( "--settings settings.xml" );
+        verifier.setCliOptions( cliOptions );
         Properties verifierProperties = new Properties();
         verifierProperties.put( "failOnErrorOutput", "false" );
         verifier.setVerifierProperties( verifierProperties );
         verifier.executeGoal( "package" );
         verifier.assertFilePresent( "target/maven-it-it0059-1.0.jar" );
-// don't verify error free log
+        // don't verify error free log
         verifier.resetStreams();
 
     }
