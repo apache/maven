@@ -12,10 +12,11 @@ import java.util.ArrayList;
 public class MavenIT0031Test
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0031Test()                                                                                                                                    
-        throws InvalidVersionSpecificationException                                                                                                             
-    {                                                                                                                                                           
-        super( "[,2.1-SNAPSHOT)" );                                                                                                                             
+    public MavenIT0031Test()
+        throws InvalidVersionSpecificationException
+    {
+        // we still support pluginGroups in 2.1-SNAPSHOT
+        //super( "[,2.1-SNAPSHOT)" );
     }            
 
     /**
