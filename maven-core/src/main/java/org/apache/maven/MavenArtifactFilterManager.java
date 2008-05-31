@@ -34,6 +34,29 @@ public class MavenArtifactFilterManager
 {
     public static ArtifactFilter createStandardFilter()
     {
+        Set artifacts = createBaseArtifactSet();
+
+        artifacts.add( "wagon-file" );
+        artifacts.add( "wagon-http-lightweight" );
+        artifacts.add( "wagon-webdav" );
+        artifacts.add( "wagon-ssh" );
+        artifacts.add( "wagon-ssh-external" );
+
+        return new ExclusionSetFilter( artifacts );
+    }
+
+    public static ArtifactFilter createExtensionFilter()
+    {
+        Set artifacts = createBaseArtifactSet();
+
+        // It should be safe to include wagon implementations, and since this is used by the extension manager they would
+        // get filtered out otherwise
+        
+        return new ExclusionSetFilter( artifacts );
+    }
+
+    private static Set createBaseArtifactSet()
+    {
         // TODO: configure this from bootstrap or scan lib
         Set artifacts = new HashSet();
 
@@ -63,15 +86,6 @@ public class MavenArtifactFilterManager
         artifacts.add( "maven-toolchain" );
         //artifacts.add( "plexus-utils" );
         artifacts.add( "wagon-provider-api" );
-
-        // It should be safe to include implementations, and since this is used by the extension manager they would
-        // get filtered out otherwise
-        //artifacts.add( "wagon-file" );
-        //artifacts.add( "wagon-http-lightweight" );
-        //artifacts.add( "wagon-webdav" );
-        //artifacts.add( "wagon-ssh" );
-        //artifacts.add( "wagon-ssh-external" );
-
-        return new ExclusionSetFilter( artifacts );
+        return artifacts;
     }
 }

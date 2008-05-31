@@ -82,7 +82,7 @@ public class DefaultExtensionManager
 
     private DefaultPlexusContainer container;
 
-    private ArtifactFilter artifactFilter = MavenArtifactFilterManager.createStandardFilter();
+    private ArtifactFilter artifactFilter = MavenArtifactFilterManager.createExtensionFilter();
 
     private WagonManager wagonManager;
 
@@ -270,7 +270,7 @@ public class DefaultExtensionManager
             }
             catch ( ComponentLookupException e )
             {
-                // now wagons found in the extension
+                // no wagons found in the extension
             }
         }
     }
@@ -332,7 +332,7 @@ public class DefaultExtensionManager
         }
         catch( Exception e )
         {
-            // do nothingls
+            // do nothing
         }
 
         return false;
