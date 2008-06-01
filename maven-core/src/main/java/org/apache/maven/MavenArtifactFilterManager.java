@@ -41,6 +41,8 @@ public class MavenArtifactFilterManager
         artifacts.add( "wagon-webdav" );
         artifacts.add( "wagon-ssh" );
         artifacts.add( "wagon-ssh-external" );
+        artifacts.add( "wagon-ssh-common" );
+        artifacts.add( "wagon-http-shared" );
 
         return new ExclusionSetFilter( artifacts );
     }
