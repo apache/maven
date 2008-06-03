@@ -67,6 +67,7 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependency.class );
         suite.addTestSuite( MavenITmng3545ProfileDeactivation.class );
+        suite.addTestSuite( MavenITmng3530ChangedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
         suite.addTestSuite( MavenITmng3482DependencyPomInterpolationTest.class );
@@ -83,6 +84,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
+        suite.addTestSuite( MavenITmng3314OfflineSnapshotsTest.class );
         suite.addTestSuite( MavenITmng3221InfiniteForking.class );
         suite.addTestSuite( MavenITmng3268MultipleDashPCommandLine.class );
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
@@ -92,6 +94,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         suite.addTestSuite( MavenITmng2739RequiredRepositoryElements.class );
+        suite.addTestSuite( MavenITmng2695OfflinePluginSnapshotsTest.class );
         suite.addTestSuite( MavenITmng2339BadProjectInterpolationTest.class );
         suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
