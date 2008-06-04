@@ -47,10 +47,38 @@ public class MavenITmng3530ChangedPathInterpolationTest
         super( "(2.0.9,)" ); // only test in 2.0.9+
     }
 
-    public void testitMNG3530 ()
+    public void testitMNG3530_BuildPath()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3530-changedPathInterpolation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
+                                                                 "/mng-3530-changedPathInterpolation/build-path" );
+        File pluginDir = new File( testDir, "plugin" );
+        File projectDir = new File( testDir, "project" );
+
+        // First, install the plugin that modifies the project.build.directory and
+        // validates that the modification propagated into the validation-mojo
+        // configuration. Once this is installed, we can run a project build that
+        // uses it to see how Maven will respond to a modification in the project build directory.
+        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        verifier.executeGoal( "install" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        // Now, build the project. If the plugin configuration doesn't recognize
+        // the update to the project.build.directory, it will fail the build.
+        verifier = new Verifier( projectDir.getAbsolutePath() );
+
+        verifier.executeGoal( "package" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    public void testitMNG3530_POMProperty()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
+                                                                 "/mng-3530-changedPathInterpolation/pom-property" );
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "project" );
 
