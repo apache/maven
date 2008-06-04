@@ -28,20 +28,18 @@ import java.io.File;
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3530">MNG-3530</a>.
  *
- * Tests that a modification by one plugin of the project.build.directory (in the project instance)
- * will be reflected in the value given to subsequent plugins that use ${project.build.directory}
- * in their configuration sections within the POM. If the changes are not propagated,
- * it represents an inconsistency between the project instance and the plugin configuration,
- * which is meant to reference that instance's state.
+ * Contains various tests for dynamism of interpolation expressions within the POM.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
  *
  */
-public class MavenITmng3530ChangedPathInterpolationTest
+public class MavenITmng3530DynamicPOMInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3530ChangedPathInterpolationTest()
+    private static final String BASEDIR = "/mng-3530-dynamicPOMInterpolation/";
+
+    public MavenITmng3530DynamicPOMInterpolationTest()
         throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,)" ); // only test in 2.0.9+
@@ -50,8 +48,7 @@ public class MavenITmng3530ChangedPathInterpolationTest
     public void testitMNG3530_BuildPath()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3530-changedPathInterpolation/build-path" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR + "build-path" );
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "project" );
 
@@ -77,15 +74,15 @@ public class MavenITmng3530ChangedPathInterpolationTest
     public void testitMNG3530_POMProperty()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3530-changedPathInterpolation/pom-property" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR
+                                                                             + "pom-property" );
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "project" );
 
-        // First, install the plugin that modifies the project.build.directory and
+        // First, install the plugin that modifies the myDirectory and
         // validates that the modification propagated into the validation-mojo
         // configuration. Once this is installed, we can run a project build that
-        // uses it to see how Maven will respond to a modification in the project build directory.
+        // uses it to see how Maven will respond to a modification in the POM property.
         Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
 
@@ -93,7 +90,32 @@ public class MavenITmng3530ChangedPathInterpolationTest
         verifier.resetStreams();
 
         // Now, build the project. If the plugin configuration doesn't recognize
-        // the update to the project.build.directory, it will fail the build.
+        // the update to the myDirectory, it will fail the build.
+        verifier = new Verifier( projectDir.getAbsolutePath() );
+
+        verifier.executeGoal( "package" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    public void testitMNG3530_ResourceDirectoryInterpolation()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR
+                                                                             + "resource-object" );
+        File pluginDir = new File( testDir, "plugin" );
+        File projectDir = new File( testDir, "project" );
+
+        // First, install the plugin which validates that all resource directory
+        // specifications have been interpolated.
+        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        verifier.executeGoal( "install" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        // Now, build the project. If the plugin finds an uninterpolated resource
+        // directory, it will fail the build.
         verifier = new Verifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "package" );

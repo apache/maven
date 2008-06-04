@@ -67,7 +67,7 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependency.class );
         suite.addTestSuite( MavenITmng3545ProfileDeactivation.class );
-        suite.addTestSuite( MavenITmng3530ChangedPathInterpolationTest.class );
+        suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
         suite.addTestSuite( MavenITmng3482DependencyPomInterpolationTest.class );
