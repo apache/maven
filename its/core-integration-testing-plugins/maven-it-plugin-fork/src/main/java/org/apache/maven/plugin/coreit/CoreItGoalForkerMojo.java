@@ -22,7 +22,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @goal fork-goal
- * 
+ *
  * @execute goal="touch"
  */
 public class CoreItGoalForkerMojo
@@ -43,12 +43,12 @@ public class CoreItGoalForkerMojo
     {
         if ( !executedProject.getBuild().getFinalName().equals( "coreitified" ) )
         {
-            throw new MojoExecutionException( "Unexpected result, final name of executed project is " + executedProject.getBuild().getFinalName() );
+            throw new MojoExecutionException( "Unexpected result, final name of executed project is " + executedProject.getBuild().getFinalName() + " (should be: \'coreitified\')." );
         }
 
         if ( project.getBuild().getFinalName().equals( "coreitified" ) )
         {
-            throw new MojoExecutionException( "forked project was polluted" );
+            throw new MojoExecutionException( "forked project was polluted. (should NOT be: \'coreitified\')." );
         }
     }
 }

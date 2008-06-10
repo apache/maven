@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * @goal touch
- * 
+ *
  * @phase process-sources
  *
  * @description Goal which cleans the build
@@ -67,12 +67,12 @@ public class CoreItMojo
      * @parameter
      */
     private String goalItem = "bar";
-    
+
     /**
      * @parameter expression="${artifactToFile}"
      */
     private String artifactToFile;
-    
+
     /**
      * @parameter expression="${fail}"
      */
@@ -85,7 +85,7 @@ public class CoreItMojo
         {
             throw new MojoExecutionException( "Failing per \'fail\' parameter (specified in pom or system properties)" );
         }
-        
+
         touch( new File( outputDirectory ), "touch.txt" );
 
         // This parameter should be aligned to the basedir as the parameter type is specified
@@ -95,9 +95,9 @@ public class CoreItMojo
         {
             throw new MojoExecutionException( "basedirAlignmentDirectory not aligned" );
         }
-        
+
         touch( basedirAlignmentDirectory, "touch.txt" );
-        
+
         File outDir = new File( outputDirectory );
 
         // Test parameter setting
@@ -110,22 +110,22 @@ public class CoreItMojo
         {
             touch( outDir, goalItem );
         }
-        
+
         if ( artifactToFile != null )
         {
             Artifact artifact = (Artifact) pluginArtifacts.get( artifactToFile );
-            
+
             File artifactFile = artifact.getFile();
-            
+
             String filename = artifactFile.getAbsolutePath().replace('/', '_').replace(':', '_') + ".txt";
-            
+
             touch( outDir, filename );
         }
 
         project.getBuild().setFinalName( "coreitified" );
     }
 
-    private static void touch( File dir, String file )
+    private void touch( File dir, String file )
         throws MojoExecutionException
     {
         try
@@ -134,13 +134,15 @@ public class CoreItMojo
              {
                  dir.mkdirs();
              }
-             
+
              File touch = new File( dir, file );
-     
+
+             getLog().info( "Touching file: " + touch.getAbsolutePath() );
+
              FileWriter w = new FileWriter( touch );
-             
+
              w.write( file );
-             
+
              w.close();
         }
         catch ( IOException e )
