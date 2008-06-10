@@ -17,7 +17,7 @@ public class MavenITmng3268MultipleDashPCommandLine
         super( "(2.0.9,)" );
     }
 
-    public void testitMNG2234 ()
+    public void testMultipleProfileParams ()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3268-MultipleDashPCommandLine" );
