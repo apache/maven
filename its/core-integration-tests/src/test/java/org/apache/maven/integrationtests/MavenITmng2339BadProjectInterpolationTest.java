@@ -73,6 +73,9 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        File logFile = new File( testDir, "log.txt" );
+        logFile.renameTo( new File( testDir, "log-pom-specified.txt" ) );
+
         verifier = new Verifier( testDir.getAbsolutePath() );
 
         List cliOptions = new ArrayList();
@@ -80,11 +83,13 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "initialize" );
 
-        assertTrue( "Touchfile using CLI-specified ${version} does not exist.",
-                    new File( testDir, "target/touch-2.txt" ).exists() );
-
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        logFile.renameTo( new File( testDir, "log-cli-specified.txt" ) );
+
+        assertTrue( "Touchfile using CLI-specified ${version} does not exist.",
+                    new File( testDir, "target/touch-2.txt" ).exists() );
     }
 
 }
