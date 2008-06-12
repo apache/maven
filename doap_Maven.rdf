@@ -33,6 +33,11 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2008-04-10</created>
+        <revision>2.0.9</revision>
+      </Version>
+      <Version>
+        <name>Apache Maven 2.0.8</name>
         <created>2007-11-27</created>
         <revision>2.0.8</revision>
       </Version>
