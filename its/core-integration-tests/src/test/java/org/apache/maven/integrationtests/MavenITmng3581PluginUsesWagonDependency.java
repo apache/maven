@@ -13,7 +13,7 @@ public class MavenITmng3581PluginUsesWagonDependency
         throws InvalidVersionSpecificationException
     {
         // Not 2.0.9
-        super( "(,2.0.9),(2.0.9,2.1-SNAPSHOT)" );
+        super( "(,2.0.9),(2.0.9,)" );
     }
 
     /**
