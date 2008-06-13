@@ -67,7 +67,6 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependency.class );
         suite.addTestSuite( MavenITmng3545ProfileDeactivation.class );
-        suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
         suite.addTestSuite( MavenITmng3482DependencyPomInterpolationTest.class );
@@ -76,10 +75,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRanges.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
-
-        // Pending resolution of MNG-3391
-//        suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
-
         suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
         suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
@@ -197,9 +192,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0023Test.class );
         suite.addTestSuite( MavenIT0022Test.class );
         suite.addTestSuite( MavenIT0021Test.class );
-
         suite.addTestSuite( MavenIT0019Test.class );
-
         suite.addTestSuite( MavenIT0017Test.class );
         suite.addTestSuite( MavenIT0016Test.class );
         suite.addTestSuite( MavenIT0014Test.class );
@@ -222,32 +215,35 @@ public class IntegrationTestSuite
          * Add tests in reverse alpha order above.
          */
 
-        // not fixed in the code yet. Test is correct.
-        // suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
-
         // ----------------------------------------------------------------------------------------------------
         // Tests that need to be fixed.
         // ----------------------------------------------------------------------------------------------------
-        /*
-         *Test 18 always fails because it is trying to delete a
-         *commonly used artifact (commons-logging-1.0.3) that is in use
-         *in the repo. It should be redone using fake artifacts.
-         */
-        //suite.addTestSuite( MavenIT0018Test.class );
 
-        //this test is flakey on windows and isn't a test of the core.
-        //   suite.addTestSuite( MavenIT0020Test.class );
+        // Pending resolution in code
+        // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
+        // suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
+        // suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
 
-        // suite.addTestSuite(MavenIT0091Test.class);
-        // suite.addTestSuite(MavenIT0106Test.class);
-        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3158
+        // Test 18 always fails because it is trying to delete a
+        // commonly used artifact (commons-logging-1.0.3) that is in use
+        // in the repo. It should be redone using fake artifacts.
+        // suite.addTestSuite( MavenIT0018Test.class );
+
+        // this test is flakey on windows and isn't a test of the core.
+        // suite.addTestSuite( MavenIT0020Test.class );
+
+        // -- not passing for 2.0.7 either, looks to be 2.1+ ?
+        // suite.addTestSuite( MavenIT0120EjbClientDependency.class );
+
+        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
         // suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-3038
         // suite.addTestSuite( MavenIT0122ReactorDependencyResolutionTest.class ); -- MNG-3023
         // suite.addTestSuite( MavenIT0123SnapshotRangeRepositoryTest.class ); -- MNG-2994
         // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
+
         // suite.addTestSuite( MavenIT0126TestJarDependency.class ); // MJAR-75 / MNG-3160
-        // suite.addTestSuite( MavenIT0120EjbClientDependency.class ); // -- not passing for 2.0.7 either, looks to be
-        // 2.1+ ?
+        // suite.addTestSuite(MavenIT0091Test.class); // MNG-3160
+        // suite.addTestSuite(MavenIT0106Test.class); // MNG-3160
 
         return suite;
     }
