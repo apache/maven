@@ -65,6 +65,12 @@ public class IntegrationTestSuite
          * a fail fast technique as well.
          */
 
+         // TODO: Move these into their proper positions!
+        suite.addTestSuite( MavenITmng3536AppendedAbsolutePaths.class );
+        suite.addTestSuite( MavenITmng3535SelfReferentialProperties.class );
+        suite.addTestSuite( MavenITmng2562Timestamp.class );
+        suite.addTestSuite( MavenITmng3475BaseAlignedDir.class );
+
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependency.class );
         suite.addTestSuite( MavenITmng3545ProfileDeactivation.class );
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
