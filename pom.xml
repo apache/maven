@@ -143,23 +143,19 @@ under the License.
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>2.0.2</version>
-          <!-- Maybe someday...
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
           </configuration>
-          -->
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>aspectj-maven-plugin</artifactId>
           <version>1.0-beta-2</version>
-          <!-- Maybe someday...
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
           </configuration>
-          -->
         </plugin>
         <plugin>
           <artifactId>maven-release-plugin</artifactId>
@@ -475,7 +471,7 @@ under the License.
              <version>1.0-alpha-3</version>
              <executions>
                <execution>
-                 <id>enforce-jdk-14</id>
+                 <id>enforce-jdk-15</id>
                  <goals>
                    <goal>enforce</goal>
                  </goals>
@@ -488,23 +484,6 @@ under the License.
                  </configuration>
                </execution>
              </executions>
-           </plugin>
-           <plugin>
-             <artifactId>maven-compiler-plugin</artifactId>
-             <version>2.0.2</version>
-             <configuration>
-               <source>1.4</source>
-               <target>1.4</target>
-             </configuration>
-           </plugin>
-           <plugin>
-             <groupId>org.codehaus.mojo</groupId>
-             <artifactId>aspectj-maven-plugin</artifactId>
-             <version>1.0-beta-2</version>
-             <configuration>
-               <source>1.4</source>
-               <target>1.4</target>
-             </configuration>
            </plugin>
         </plugins>
       </build>
