@@ -33,6 +33,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -441,8 +442,8 @@ public class MavenMetadataSource
         return projectArtifacts;
     }
 
-    public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                           List remoteRepositories )
+    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                            List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
@@ -455,21 +456,43 @@ public class MavenMetadataSource
             throw new ArtifactMetadataRetrievalException( e.getMessage(), e );
         }
 
-        List versions;
-        Metadata repoMetadata = metadata.getMetadata();
+        return retrieveAvailableVersionsFromMetadata( metadata.getMetadata() );
+    }
+
+    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+                                                                                    Artifact artifact,
+                                                                                    ArtifactRepository localRepository,
+                                                                                    ArtifactRepository deploymentRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
+        try
+        {
+            repositoryMetadataManager.resolveAlways( metadata, localRepository, deploymentRepository );
+        }
+        catch ( RepositoryMetadataResolutionException e )
+        {
+            throw new ArtifactMetadataRetrievalException( e.getMessage(), e );
+        }
+
+        return retrieveAvailableVersionsFromMetadata( metadata.getMetadata() );
+    }
+
+    private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata )
+    {
+        List<ArtifactVersion> versions;
         if ( ( repoMetadata != null ) && ( repoMetadata.getVersioning() != null ) )
         {
-            List metadataVersions = repoMetadata.getVersioning().getVersions();
-            versions = new ArrayList( metadataVersions.size() );
-            for ( Iterator i = metadataVersions.iterator(); i.hasNext(); )
+            List<String> metadataVersions = repoMetadata.getVersioning().getVersions();
+            versions = new ArrayList<ArtifactVersion>( metadataVersions.size() );
+            for ( String version : metadataVersions )
             {
-                String version = (String) i.next();
                 versions.add( new DefaultArtifactVersion( version ) );
             }
         }
         else
         {
-            versions = Collections.EMPTY_LIST;
+            versions = Collections.<ArtifactVersion> emptyList();
         }
 
         return versions;

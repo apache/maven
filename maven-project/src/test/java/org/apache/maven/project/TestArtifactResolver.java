@@ -32,6 +32,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
@@ -82,7 +83,7 @@ public class TestArtifactResolver
         }
 
         public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                         List remoteRepositories )
+                                         List<ArtifactRepository> remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             Model model = null;
@@ -141,8 +142,18 @@ public class TestArtifactResolver
             return new ResolutionGroup( artifact, artifacts, artifactRepositories );
         }
 
-        public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                               List remoteRepositories )
+        public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                                List<ArtifactRepository> remoteRepositories )
+            throws ArtifactMetadataRetrievalException
+        {
+            throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+        }
+
+        public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+                                                                                        Artifact artifact,
+                                                                                        ArtifactRepository localRepository,
+                                                                                        ArtifactRepository remoteRepository )
+            throws ArtifactMetadataRetrievalException
         {
             throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
         }
