@@ -181,7 +181,7 @@ public abstract class AbstractMojoTestCase
 
         Mojo mojo = (Mojo) lookup( Mojo.ROLE, groupId + ":" + artifactId + ":" + version + ":" + goal );
 
-        Log mojoLogger = new DefaultLog( container.getLoggerManager().getLoggerForComponent( Mojo.ROLE ) );
+        Log mojoLogger = new DefaultLog( getContainer().getLoggerManager().getLoggerForComponent( Mojo.ROLE ) );
 
         mojo.setLog( mojoLogger );
 
@@ -445,7 +445,7 @@ public abstract class AbstractMojoTestCase
     private void validateContainerStatus()
         throws Exception
     {
-        if ( container != null )
+        if ( getContainer() != null )
         {
             return;
         }
