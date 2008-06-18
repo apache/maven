@@ -19,6 +19,8 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
+import java.io.File;
+
 import org.codehaus.plexus.PlexusTestCase;
 
 public abstract class AbstractEmbedderTestCase

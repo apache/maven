@@ -46,7 +46,7 @@ public class EmbedderUsingScmPluginTest
 
             p.setProperty( "connectionUrl", "scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder" );
 
-            File basedir = runWithProject( "scm:diff", p );
+            File basedir = runWithProject( "org.apache.maven.plugins:maven-scm-plugin:1.0:diff", p );
         }
     }
 }

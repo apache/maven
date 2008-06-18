@@ -40,7 +40,7 @@ under the License.
           <plugin>
              <!-- it's here just for the extensions tag -->
              <artifactId>maven-surefire-plugin</artifactId>
-             <version>RELEASE</version>
+             <version>2.3</version>
              <extensions>true</extensions>
           </plugin>
       </plugins>

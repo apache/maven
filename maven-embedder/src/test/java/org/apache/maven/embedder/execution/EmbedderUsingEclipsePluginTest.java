@@ -33,7 +33,7 @@ public class EmbedderUsingEclipsePluginTest
     public void testRunningEclipsePlugin()
         throws Exception
     {
-        File basedir = runWithProject( "eclipse:eclipse" );
+        File basedir = runWithProject( "org.apache.maven.plugins:maven-eclipse-plugin:2.3:eclipse" );
 
         assertFileExists( new File( basedir, ".classpath" ) );
 
