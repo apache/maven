@@ -30,6 +30,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -485,9 +486,11 @@ public class ModelUtilsTest
 
         Xpp3Dom[] item = items.getChildren();
 
-        assertEquals( "one", item[0].getValue() );
-        assertEquals( "two", item[1].getValue() );
-        assertEquals( "three", item[2].getValue() );
+        List<String> actual = Arrays.asList( item[0].getValue(), item[1].getValue(), item[2].getValue() );
+        List<String> expected = Arrays.asList( "one", "two", "three" );
+        Collections.sort( actual );
+        Collections.sort( expected );
+        assertEquals( expected, actual );
     }
 
     public void testShouldMergeTwoPluginDependenciesOnMergeDupePluginDefs()
