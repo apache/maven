@@ -230,7 +230,7 @@ under the License.
 
   <properties>
     <mavenVersion>2.0.10-SNAPSHOT</mavenVersion>
-    <wagonVersion>1.0-beta-2</wagonVersion>
+    <wagonVersion>1.0-beta-3</wagonVersion>
   </properties>
 
   <!--start-->
@@ -383,7 +383,7 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav</artifactId>
-        <version>${wagonVersion}</version>
+        <version>1.0-beta-2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
