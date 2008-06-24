@@ -289,83 +289,89 @@ public class DefaultModelInheritanceAssembler
                 child.setBuild( childBuild );
             }
 
-            // The build has been set but we want to step in here and fill in
-            // values that have not been set by the child.
+            assembleBuildInheritance( childBuild, parentBuild );
+        }
+    }
 
-            if ( childBuild.getSourceDirectory() == null )
-            {
-                childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
-            }
+    public void assembleBuildInheritance( Build childBuild,
+                                           Build parentBuild )
+    {
+        // The build has been set but we want to step in here and fill in
+        // values that have not been set by the child.
 
-            if ( childBuild.getScriptSourceDirectory() == null )
-            {
-                childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
-            }
+        if ( childBuild.getSourceDirectory() == null )
+        {
+            childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
+        }
 
-            if ( childBuild.getTestSourceDirectory() == null )
-            {
-                childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
-            }
+        if ( childBuild.getScriptSourceDirectory() == null )
+        {
+            childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
+        }
 
-            if ( childBuild.getOutputDirectory() == null )
-            {
-                childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
-            }
+        if ( childBuild.getTestSourceDirectory() == null )
+        {
+            childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
+        }
 
-            if ( childBuild.getTestOutputDirectory() == null )
-            {
-                childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
-            }
+        if ( childBuild.getOutputDirectory() == null )
+        {
+            childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
+        }
 
-            // Extensions are accumlated
-            ModelUtils.mergeExtensionLists( childBuild, parentBuild );
+        if ( childBuild.getTestOutputDirectory() == null )
+        {
+            childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
+        }
 
-            if ( childBuild.getDirectory() == null )
-            {
-                childBuild.setDirectory( parentBuild.getDirectory() );
-            }
+        // Extensions are accumlated
+        ModelUtils.mergeExtensionLists( childBuild, parentBuild );
 
-            if ( childBuild.getDefaultGoal() == null )
-            {
-                childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
-            }
+        if ( childBuild.getDirectory() == null )
+        {
+            childBuild.setDirectory( parentBuild.getDirectory() );
+        }
 
-            if ( childBuild.getFinalName() == null )
-            {
-                childBuild.setFinalName( parentBuild.getFinalName() );
-            }
+        if ( childBuild.getDefaultGoal() == null )
+        {
+            childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
+        }
 
-            ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
+        if ( childBuild.getFinalName() == null )
+        {
+            childBuild.setFinalName( parentBuild.getFinalName() );
+        }
 
-            List resources = childBuild.getResources();
-            if ( ( resources == null ) || resources.isEmpty() )
-            {
-                childBuild.setResources( parentBuild.getResources() );
-            }
+        ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
 
-            resources = childBuild.getTestResources();
-            if ( ( resources == null ) || resources.isEmpty() )
-            {
-                childBuild.setTestResources( parentBuild.getTestResources() );
-            }
+        List resources = childBuild.getResources();
+        if ( ( resources == null ) || resources.isEmpty() )
+        {
+            childBuild.setResources( parentBuild.getResources() );
+        }
 
-            // Plugins are aggregated if Plugin.inherit != false
-            ModelUtils.mergePluginLists( childBuild, parentBuild, true );
+        resources = childBuild.getTestResources();
+        if ( ( resources == null ) || resources.isEmpty() )
+        {
+            childBuild.setTestResources( parentBuild.getTestResources() );
+        }
 
-            // Plugin management :: aggregate
-            PluginManagement dominantPM = childBuild.getPluginManagement();
-            PluginManagement recessivePM = parentBuild.getPluginManagement();
+        // Plugins are aggregated if Plugin.inherit != false
+        ModelUtils.mergePluginLists( childBuild, parentBuild, true );
 
-            if ( ( dominantPM == null ) && ( recessivePM != null ) )
-            {
-                // FIXME: Filter out the inherited == false stuff!
-                childBuild.setPluginManagement( recessivePM );
-            }
-            else
-            {
-                ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(),
-                                             false );
-            }
+        // Plugin management :: aggregate
+        PluginManagement dominantPM = childBuild.getPluginManagement();
+        PluginManagement recessivePM = parentBuild.getPluginManagement();
+
+        if ( ( dominantPM == null ) && ( recessivePM != null ) )
+        {
+            // FIXME: Filter out the inherited == false stuff!
+            childBuild.setPluginManagement( recessivePM );
+        }
+        else
+        {
+            ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(),
+                                         false );
         }
     }
 

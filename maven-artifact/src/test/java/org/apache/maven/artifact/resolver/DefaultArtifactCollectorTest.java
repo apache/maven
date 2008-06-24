@@ -19,17 +19,6 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -44,6 +33,17 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Test the default artifact collector.
@@ -69,11 +69,11 @@ public class DefaultArtifactCollectorTest
     {
         super.setUp();
 
-        this.source = new Source();
-        this.artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        this.artifactCollector = new DefaultArtifactCollector();
+        source = new Source();
+        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        artifactCollector = new DefaultArtifactCollector();
 
-        this.projectArtifact = createArtifactSpec( "project", "1.0", null );
+        projectArtifact = createArtifactSpec( "project", "1.0", null );
     }
 
     // works, but we don't fail on cycles presently
@@ -945,7 +945,7 @@ public class DefaultArtifactCollectorTest
         private ArtifactSpec addDependency( String id, String version, String scope, boolean optional )
             throws InvalidVersionSpecificationException
         {
-            ArtifactSpec dep = createArtifactSpec( id, version, scope, this.artifact.getScope(), optional );
+            ArtifactSpec dep = createArtifactSpec( id, version, scope, artifact.getScope(), optional );
             return addDependency( dep );
         }
 
@@ -993,7 +993,7 @@ public class DefaultArtifactCollectorTest
                                      ArtifactFilter dependencyFilter )
             throws InvalidVersionSpecificationException
         {
-            Set projectArtifacts = new HashSet();
+            Set projectArtifacts = new LinkedHashSet();
 
             for ( Iterator i = dependencies.iterator(); i.hasNext(); )
             {

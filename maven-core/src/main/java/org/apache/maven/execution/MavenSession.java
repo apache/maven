@@ -22,7 +22,9 @@ package org.apache.maven.execution;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -57,13 +59,22 @@ public class MavenSession
 
     private final Properties executionProperties;
 
+    private Properties userProperties;
+
     private final Date startTime;
-    
+
     private MavenProject currentProject;
 
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
                          EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
                          String executionRootDir, Properties executionProperties, Date startTime )
+    {
+        this( container, settings, localRepository, eventDispatcher, reactorManager, goals, executionRootDir, executionProperties, null, startTime );
+    }
+
+    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
+                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
+                         String executionRootDir, Properties executionProperties, Properties userProperties, Date startTime )
     {
         this.container = container;
 
@@ -80,6 +91,8 @@ public class MavenSession
         this.executionRootDir = executionRootDir;
 
         this.executionProperties = executionProperties;
+
+        this.userProperties = userProperties;
 
         this.startTime = startTime;
     }
@@ -171,7 +184,7 @@ public class MavenSession
     {
         return startTime;
     }
-    
+
     public void setCurrentProject( MavenProject currentProject )
     {
         this.currentProject = currentProject;
@@ -184,5 +197,29 @@ public class MavenSession
     {
         return currentProject;
     }
-    
+
+
+    public Properties getUserProperties()
+    {
+        return userProperties;
+    }
+
+    public void setUserProperties( Properties userProperties )
+    {
+        this.userProperties = userProperties;
+    }
+
+    /**
+     * NOTE: This varies from {@link DefaultMavenExecutionRequest#getProjectBuilderConfiguration()} in that
+     * it doesn't supply a global profile manager.
+     */
+    public ProjectBuilderConfiguration getProjectBuilderConfiguration()
+    {
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+        config.setLocalRepository( getLocalRepository() )
+              .setExecutionProperties( getExecutionProperties() )
+              .setUserProperties( getUserProperties() );
+
+        return config;
+    }
 }

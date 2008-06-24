@@ -24,6 +24,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.wagon.events.TransferListener;
 
 import java.io.File;
@@ -113,4 +114,14 @@ public interface MavenProjectBuilder
                         ProjectBuilderConfiguration config,
                         boolean checkDistributionManagementStatus )
         throws ProjectBuildingException;
+
+ // ----------------------------------------------------------------------------
+ // API BELOW IS USED TO PRESERVE DYNAMISM IN THE BUILD SECTION OF THE POM.
+ // ----------------------------------------------------------------------------
+
+    void calculateConcreteState( MavenProject project, ProjectBuilderConfiguration config )
+        throws ModelInterpolationException;
+
+    void restoreDynamicState( MavenProject project, ProjectBuilderConfiguration config )
+        throws ModelInterpolationException;
 }

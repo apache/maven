@@ -180,6 +180,7 @@ public class DefaultMavenProjectBuilderTest
          File pom = getTestFile( "src/test/resources/projects/build-path-expression-pom.xml" );
 
          MavenProject project = getProject( pom );
+         projectBuilder.calculateConcreteState( project, new DefaultProjectBuilderConfiguration() );
 
          Build build = project.getBuild();
          assertNotNull( "Project should have a build section containing the test resource.", build );

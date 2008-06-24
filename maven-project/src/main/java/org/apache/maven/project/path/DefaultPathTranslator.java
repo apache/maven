@@ -31,7 +31,13 @@ import java.util.List;
 public class DefaultPathTranslator
     implements PathTranslator
 {
-    private String FILE_SEPARATOR = "/";
+    private static final String FILE_SEPARATOR = "/";
+
+    private static final String[] BASEDIR_NAMES = {
+        "${basedir}",
+        "${pom.basedir}",
+        "${project.basedir}"
+    };
 
     public void alignToBaseDirectory( Model model, File basedir )
     {
@@ -91,13 +97,25 @@ public class DefaultPathTranslator
 
     private String stripBasedirToken( String s )
     {
-        String basedirExpr = "${basedir}";
-
         if ( s != null )
         {
             s = s.trim();
 
-            if ( s.startsWith( basedirExpr ) )
+            String basedirExpr = null;
+            for ( int i = 0; i < BASEDIR_NAMES.length; i++ )
+            {
+                basedirExpr = BASEDIR_NAMES[i];
+                if ( s.startsWith( basedirExpr ) )
+                {
+                    break;
+                }
+                else
+                {
+                    basedirExpr = null;
+                }
+            }
+
+            if ( basedirExpr != null )
             {
                 if ( s.length() > basedirExpr.length() )
                 {
