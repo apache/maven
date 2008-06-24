@@ -143,7 +143,7 @@ under the License.
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <classpath refid="maven.classpath"/>
       <arg value="-B"/>
-      <arg value="-X"/>
+      <arg value="-e"/>
       <arg value="clean"/>
       <arg value="install"/>
     </java>

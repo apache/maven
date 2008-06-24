@@ -48,9 +48,9 @@ public class RegexBasedModelInterpolator
     extends AbstractLogEnabled
     implements ModelInterpolator
 {
-    private static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom\\.|project\\.|env\\.)?([^}]+)\\}" );
+    static final Pattern EXPRESSION_PATTERN = Pattern.compile( "\\$\\{(pom\\.|project\\.|env\\.)?([^}]+)\\}" );
 
-    private Properties envars;
+    Properties envars;
 
     public RegexBasedModelInterpolator( Properties envars )
     {
@@ -95,7 +95,7 @@ public class RegexBasedModelInterpolator
         }
 
         String serializedModel = sWriter.toString();
-        serializedModel = interpolateInternal( serializedModel, model, context );
+        serializedModel = interpolate( serializedModel, model, context );
 
         StringReader sReader = new StringReader( serializedModel );
 
@@ -118,7 +118,7 @@ public class RegexBasedModelInterpolator
         return model;
     }
 
-    private String interpolateInternal( String src, Model model, Map context )
+    public String interpolate( String src, Model model, Map context )
         throws ModelInterpolationException
     {
         String result = src;

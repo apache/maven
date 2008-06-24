@@ -1131,7 +1131,6 @@ public class DefaultMavenProjectBuilder
             Properties userProps = config.getUserProperties();
             if ( userProps != null )
             {
-                getLogger().debug( "Using user-defined properties for interpolation:\n" + String.valueOf( userProps ).replace( ',', '\n' ) );
                 context.putAll( userProps );
             }
         }

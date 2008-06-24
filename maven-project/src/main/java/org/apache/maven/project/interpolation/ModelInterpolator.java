@@ -37,4 +37,9 @@ public interface ModelInterpolator
 
     Model interpolate( Model model, Map context, boolean strict )
         throws ModelInterpolationException;
+
+    String interpolate( String src,
+                        Model model,
+                        Map context )
+        throws ModelInterpolationException;
 }
