@@ -144,7 +144,7 @@ public class DefaultMavenExecutionRequest
 
     public void setSession( MavenSession session )
     {
-        this.session = session;
+        session = session;
     }
 
     public void addEventMonitor( EventMonitor monitor )
@@ -213,7 +213,8 @@ public class DefaultMavenExecutionRequest
         config.setLocalRepository( getLocalRepository() )
               .setGlobalProfileManager( getGlobalProfileManager() )
               .setExecutionProperties( getExecutionProperties() )
-              .setUserProperties( getUserProperties() );
+              .setUserProperties( getUserProperties() )
+              .setBuildStartTime( startTime );
 
         return config;
     }

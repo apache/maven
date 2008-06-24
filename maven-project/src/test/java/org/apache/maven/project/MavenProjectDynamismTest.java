@@ -233,7 +233,7 @@ public class MavenProjectDynamismTest
                       compileSourceRoots.size() );
 
         assertEquals( "Restored compile-source roots should contain uninterpolated source-directory value.",
-                      "src/main/java",
+                      "${pom.basedir}/src/main/java",
                       compileSourceRoots.get( 0 ) );
 
         testCompileSourceRoots = project.getTestCompileSourceRoots();
@@ -246,7 +246,7 @@ public class MavenProjectDynamismTest
                       testCompileSourceRoots.size() );
 
         assertEquals( "Restored test-compile-source roots should contain uninterpolated test-source-directory value.",
-                      "src/test/java",
+                      "${pom.basedir}/src/test/java",
                       testCompileSourceRoots.get( 0 ) );
 
         scriptSourceRoots = project.getScriptSourceRoots();
@@ -258,7 +258,7 @@ public class MavenProjectDynamismTest
                       scriptSourceRoots.size() );
 
         assertEquals( "Restored script-source roots should contain uninterpolated script-source-directory value.",
-                      "src/main/scripts",
+                      "${pom.basedir}/src/main/scripts",
                       scriptSourceRoots.get( 0 ) );
 
         resources = build.getResources();

@@ -218,7 +218,8 @@ public class MavenSession
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
         config.setLocalRepository( getLocalRepository() )
               .setExecutionProperties( getExecutionProperties() )
-              .setUserProperties( getUserProperties() );
+              .setUserProperties( getUserProperties() )
+              .setBuildStartTime( getStartTime() );
 
         return config;
     }

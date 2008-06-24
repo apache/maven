@@ -29,6 +29,7 @@ import org.apache.maven.model.Scm;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -210,9 +211,9 @@ public class RegexBasedModelInterpolatorTest
     public void testEnvars()
         throws Exception
     {
-        Properties envars = new Properties();
+        Map context = new HashMap();
 
-        envars.setProperty( "HOME", "/path/to/home" );
+        context.put( "env.HOME", "/path/to/home" );
 
         Model model = new Model();
 
@@ -222,7 +223,7 @@ public class RegexBasedModelInterpolatorTest
 
         model.setProperties( modelProperties );
 
-        Model out = new RegexBasedModelInterpolator( envars ).interpolate( model, context );
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
 
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "/path/to/home" );
     }

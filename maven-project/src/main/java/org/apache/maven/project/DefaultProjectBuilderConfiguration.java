@@ -3,6 +3,7 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.profiles.ProfileManager;
 
+import java.util.Date;
 import java.util.Properties;
 
 public class DefaultProjectBuilderConfiguration
@@ -16,6 +17,8 @@ public class DefaultProjectBuilderConfiguration
     private Properties userProperties;
 
     private Properties executionProperties = System.getProperties();
+
+    private Date buildStartTime;
 
     public DefaultProjectBuilderConfiguration()
     {
@@ -67,6 +70,17 @@ public class DefaultProjectBuilderConfiguration
     public ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties )
     {
         this.executionProperties = executionProperties;
+        return this;
+    }
+
+    public Date getBuildStartTime()
+    {
+        return buildStartTime;
+    }
+
+    public ProjectBuilderConfiguration setBuildStartTime( Date buildStartTime )
+    {
+        this.buildStartTime = buildStartTime;
         return this;
     }
 
