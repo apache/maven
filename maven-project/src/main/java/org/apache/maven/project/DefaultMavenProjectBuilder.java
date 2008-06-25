@@ -993,7 +993,7 @@ public class DefaultMavenProjectBuilder
 
         model.setBuild( ModelUtils.cloneBuild( dynamicBuild ) );
 
-        model = modelInterpolator.interpolate( model, project.getBasedir(), config, getLogger().isDebugEnabled() );
+        model = modelInterpolator.interpolate( model, projectDir, config, getLogger().isDebugEnabled() );
 
         mergeDeterministicBuildElements( model.getBuild(), dynamicBuild );
 
@@ -1851,7 +1851,10 @@ public class DefaultMavenProjectBuilder
 
         Model model2 = ModelUtils.cloneModel( model );
 
-        pathTranslator.alignToBaseDirectory( model, basedir );
+        if ( basedir != null )
+        {
+            pathTranslator.alignToBaseDirectory( model, basedir );
+        }
 
         project.preserveBuild( model2.getBuild() );
         project.setBuild( model.getBuild() );

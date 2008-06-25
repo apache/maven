@@ -229,6 +229,11 @@ public class RegexBasedModelInterpolator
     {
         Logger logger = getLogger();
 
+        if ( logger != null && logger.isDebugEnabled() && projectDir == null )
+        {
+            logger.debug( "Null project directory from:", new Throwable() );
+        }
+
         String timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
 
         Properties modelProperties = model.getProperties();
