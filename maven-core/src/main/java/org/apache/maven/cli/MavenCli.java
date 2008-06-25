@@ -160,7 +160,7 @@ public class MavenCli
 
             return 0;
         }
-        else if ( debug )
+        else if ( debug || commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
             showVersion();
         }
@@ -692,6 +692,8 @@ public class MavenCli
 
         public static final char VERSION = 'v';
 
+        public static final char SHOW_VERSION = 'V';
+
         private Options options;
 
         public static final char NON_RECURSIVE = 'N';
@@ -786,6 +788,10 @@ public class MavenCli
 
             options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription(
                 "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
+
+            options.addOption(
+                              OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create(
+                                  SHOW_VERSION ) );
         }
 
         public CommandLine parse( String[] args )
