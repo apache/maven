@@ -120,48 +120,13 @@ public class RegexBasedModelInterpolator
     public Model interpolate( Model model, Map context, boolean strict )
         throws ModelInterpolationException
     {
-        StringWriter sWriter = new StringWriter();
-
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        try
-        {
-            writer.write( sWriter, model );
-        }
-        catch ( IOException e )
-        {
-            throw new ModelInterpolationException( "Cannot serialize project model for interpolation.", e );
-        }
-
-        String serializedModel = sWriter.toString();
-
         Properties props = new Properties();
         props.putAll( context );
 
-        serializedModel = interpolate( serializedModel,
-                                               model,
-                                               null,
-                                               new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
-                                               true );
-
-        StringReader sReader = new StringReader( serializedModel );
-
-        MavenXpp3Reader modelReader = new MavenXpp3Reader();
-        try
-        {
-            model = modelReader.read( sReader );
-        }
-        catch ( IOException e )
-        {
-            throw new ModelInterpolationException(
-                "Cannot read project model from interpolating filter of serialized version.", e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ModelInterpolationException(
-                "Cannot read project model from interpolating filter of serialized version.", e );
-        }
-
-        return model;
+        return interpolate( model,
+                            null,
+                            new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
+                            true );
     }
 
     public Model interpolate( Model model,
@@ -228,11 +193,6 @@ public class RegexBasedModelInterpolator
         throws ModelInterpolationException
     {
         Logger logger = getLogger();
-
-        if ( logger != null && logger.isDebugEnabled() && projectDir == null )
-        {
-            logger.debug( "Null project directory from:", new Throwable() );
-        }
 
         String timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
 
