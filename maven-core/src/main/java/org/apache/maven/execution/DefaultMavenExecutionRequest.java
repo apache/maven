@@ -743,6 +743,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration.setExecutionProperties( getProperties() );
             projectBuildingConfiguration.setGlobalProfileManager( getProfileManager() );
             projectBuildingConfiguration.setUserProperties( getUserProperties() );
+            projectBuildingConfiguration.setBuildStartTime( getStartTime() );
         }
 
         return projectBuildingConfiguration;

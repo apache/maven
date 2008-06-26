@@ -26,11 +26,12 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Scm;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -45,6 +46,7 @@ public class RegexBasedModelInterpolatorTest
 {
     private Map context;
 
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -66,15 +68,15 @@ public class RegexBasedModelInterpolatorTest
         dm.setRepository( repo );
         model.setDistributionManagement( dm );
 
-        Map context = new HashMap();
         String path = "path/to/project";
 
         File basedir = new File( path ).getAbsoluteFile();
 
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+
         Model out = new RegexBasedModelInterpolator().interpolate( model,
-                                                                   context,
-                                                                   Collections.EMPTY_MAP,
                                                                    basedir,
+                                                                   config,
                                                                    false );
 
         assertEquals( "http://localhost/" + basedir.getAbsolutePath() + "/target/test-repo",

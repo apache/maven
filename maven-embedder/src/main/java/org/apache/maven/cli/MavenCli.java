@@ -128,7 +128,7 @@ public class MavenCli
 
             return 0;
         }
-        else if ( debug )
+        else if ( debug || commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
             CLIReportingUtils.showVersion();
         }

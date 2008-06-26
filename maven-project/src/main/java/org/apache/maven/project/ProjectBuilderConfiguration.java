@@ -3,6 +3,7 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.profiles.ProfileManager;
 
+import java.util.Date;
 import java.util.Properties;
 
 public interface ProjectBuilderConfiguration
@@ -23,5 +24,9 @@ public interface ProjectBuilderConfiguration
     ProjectBuilderConfiguration setUserProperties( Properties userProperties );
 
     ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties );
+
+    Date getBuildStartTime();
+
+    ProjectBuilderConfiguration setBuildStartTime( Date buildStartTime );
 
 }

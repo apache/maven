@@ -11,11 +11,11 @@ public class PathTranslatingValueSource
     extends AbstractFunctionValueSourceWrapper
 {
 
-    private final List unprefixedPathKeys;
+    private final List<String> unprefixedPathKeys;
     private final File projectDir;
     private final PathTranslator pathTranslator;
 
-    protected PathTranslatingValueSource( ValueSource valueSource, List unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
+    protected PathTranslatingValueSource( ValueSource valueSource, List<String> unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
     {
         super( valueSource );
         this.unprefixedPathKeys = unprefixedPathKeys;
@@ -23,6 +23,7 @@ public class PathTranslatingValueSource
         this.pathTranslator = pathTranslator;
     }
 
+    @Override
     protected Object executeFunction( String expression,
                                       Object value )
     {

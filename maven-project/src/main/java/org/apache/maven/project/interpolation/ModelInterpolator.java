@@ -20,6 +20,7 @@ package org.apache.maven.project.interpolation;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 
 import java.io.File;
 import java.util.Map;
@@ -31,27 +32,39 @@ import java.util.Map;
  */
 public interface ModelInterpolator
 {
+    String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-hhmm";
+
+    String BUILD_TIMESTAMP_FORMAT_PROPERTY = "maven.build.timestamp.format";
+
     String ROLE = ModelInterpolator.class.getName();
 
+    /**
+     * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
+     */
+    @Deprecated
     Model interpolate( Model project,
-                       Map context )
+                       Map<String, ?> context )
         throws ModelInterpolationException;
 
+    /**
+     * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
+     */
+    @Deprecated
     Model interpolate( Model model,
-                       Map context,
+                       Map<String, ?> context,
                        boolean strict )
         throws ModelInterpolationException;
 
     Model interpolate( Model model,
-                       Map context,
-                       Map overrideContext,
-                       boolean outputDebugMessages )
+                       File projectDir,
+                       ProjectBuilderConfiguration config,
+                       boolean debugEnabled )
         throws ModelInterpolationException;
 
-    Model interpolate( Model model,
-                       Map context,
-                       Map overrideContext,
-                       File projectDir,
-                       boolean outputDebugMessages )
+    String interpolate( String src,
+                        Model model,
+                        File projectDir,
+                        ProjectBuilderConfiguration config,
+                        boolean debugEnabled )
         throws ModelInterpolationException;
 }

@@ -162,7 +162,7 @@ public class DefaultBuildExtensionScanner
                     inheritedInterpolationValues = new HashMap();
                 }
 
-                model = modelInterpolator.interpolate( model, inheritedInterpolationValues, request.getUserProperties(), false );
+                model = modelInterpolator.interpolate( model, modelPom.getParentFile(), request.getProjectBuildingConfiguration(), getLogger().isDebugEnabled() );
 
                 grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );
 

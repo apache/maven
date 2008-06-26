@@ -201,6 +201,7 @@ public class DefaultMavenProjectBuilder
     }
 
     /** @deprecated  */
+    @Deprecated
     public MavenProject buildFromRepository( Artifact artifact,
                                              List remoteArtifactRepositories,
                                              ArtifactRepository localRepository,
@@ -965,18 +966,6 @@ public class DefaultMavenProjectBuilder
 
         List activeProfiles = project.getActiveProfiles();
 
-        // TODO: Clean this up...we're using this to 'jump' the interpolation step for model properties not expressed in XML.
-        //  [BP] - Can this above comment be explained?
-        // We don't need all the project methods that are added over those in the model, but we do need basedir
-        // mkleint - using System.getProperties() is almost definitely bad for embedding.
-        Map context = new HashMap();
-
-        // [MNG-2339] ensure the system properties are still interpolated for backwards compat, but the model values must win
-        if ( config.getExecutionProperties() != null && !config.getExecutionProperties().isEmpty() )
-        {
-            context.putAll( config.getExecutionProperties() );
-        }
-
         File projectDir = null;
 
         if ( pomFile != null )
@@ -984,13 +973,7 @@ public class DefaultMavenProjectBuilder
             projectDir = pomFile.getAbsoluteFile().getParentFile();
         }
 
-        Map overrideContext = new HashMap();
-        if ( !isSuperPom && config.getUserProperties() != null && !config.getUserProperties().isEmpty() )
-        {
-            overrideContext.putAll( config.getUserProperties() );
-        }
-
-        model = modelInterpolator.interpolate( model, context, overrideContext, projectDir, true );
+        model = modelInterpolator.interpolate( model, projectDir, config, getLogger().isDebugEnabled() );
 
         // We must inject any imported dependencyManagement information ahead of the defaults injection.
         if ( !isSuperPom )
@@ -1309,6 +1292,7 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
+    @Deprecated
     protected Set createPluginArtifacts( String projectId,
                                          List plugins, String pomLocation )
         throws ProjectBuildingException
@@ -1372,6 +1356,7 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
+    @Deprecated
     protected Set createReportArtifacts( String projectId,
                                          List reports, String pomLocation )
         throws ProjectBuildingException
@@ -1431,6 +1416,7 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws ProjectBuildingException
      */
+    @Deprecated
     protected Set createExtensionArtifacts( String projectId,
                                             List extensions, String pomLocation )
         throws ProjectBuildingException
