@@ -314,7 +314,8 @@ public class RegexBasedModelInterpolatorTest
         List rDeps = result.getDependencies();
         assertNotNull( rDeps );
         assertEquals( 1, rDeps.size() );
-        assertEquals( new File( basedir, "artifact.jar" ).getPath(), ((Dependency)rDeps.get( 0 )).getSystemPath() );
+        assertEquals( new File( basedir, "artifact.jar" ).getAbsolutePath(), new File( ( (Dependency) rDeps.get( 0 ) )
+            .getSystemPath() ).getAbsolutePath() );
     }
 
 //    public void testPOMExpressionDoesNotUseSystemProperty()
