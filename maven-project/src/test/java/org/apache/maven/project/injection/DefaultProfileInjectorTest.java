@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
@@ -35,9 +36,6 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.apache.maven.model.Dependency;
-
-import junit.framework.TestCase;
 
 public class DefaultProfileInjectorTest
     extends TestCase
