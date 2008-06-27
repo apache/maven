@@ -36,21 +36,29 @@ under the License.
         <created>2008-04-10</created>
         <revision>2.0.9</revision>
       </Version>
+    </release>
+    <release>
       <Version>
         <name>Apache Maven 2.0.8</name>
         <created>2007-11-27</created>
         <revision>2.0.8</revision>
       </Version>
+    </release>
+    <release>
       <Version>
         <name>Apache Maven 2.0.7</name>
         <created>2007-06-21</created>
         <revision>2.0.7</revision>
       </Version>
+    </release>
+    <release>
       <Version>
         <name>Apache Maven 2.0.6</name>
         <created>2007-04-01</created>
         <revision>2.0.6</revision>
       </Version>
+    </release>
+    <release>
       <Version>
         <name>Apache Maven 2.0.5</name>
         <created>2007-02-14</created>
