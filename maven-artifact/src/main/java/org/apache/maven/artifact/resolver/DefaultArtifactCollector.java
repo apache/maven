@@ -24,12 +24,12 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.artifact.versioning.ManagedVersionMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -293,6 +293,7 @@ public class DefaultArtifactCollector
                 if ( !child.isResolved() && ( !child.getArtifact().isOptional() || child.isChildOfRootNode() ) )
                 {
                     Artifact artifact = child.getArtifact();
+                    List childRemoteRepositories = child.getRemoteRepositories();
                     try
                     {
                         Object childKey = child.getKey();
@@ -343,7 +344,7 @@ public class DefaultArtifactCollector
                                 if ( versions == null )
                                 {
                                     versions = source.retrieveAvailableVersions( artifact, localRepository,
-                                                                                 remoteRepositories );
+                                                                                 childRemoteRepositories );
                                     artifact.setAvailableVersions( versions );
                                 }
 
@@ -362,12 +363,12 @@ public class DefaultArtifactCollector
                                     {
                                         throw new OverConstrainedVersionException(
                                             "No versions are present in the repository for the artifact with a range " +
-                                                versionRange, artifact, remoteRepositories );
+                                                versionRange, artifact, childRemoteRepositories );
                                     }
 
                                     throw new OverConstrainedVersionException( "Couldn't find a version in " +
                                         versions + " to match range " + versionRange, artifact,
-                                                                                      remoteRepositories );
+                                        childRemoteRepositories );
                                 }
                             }
 
@@ -379,7 +380,7 @@ public class DefaultArtifactCollector
                         }
 
                         artifact.setDependencyTrail( node.getDependencyTrail() );
-                        ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
+                        ResolutionGroup rGroup = source.retrieve( artifact, localRepository, childRemoteRepositories );
 
                         //TODO might be better to have source.retrieve() throw a specific exception for this situation
                         //and catch here rather than have it return null
@@ -397,17 +398,17 @@ public class DefaultArtifactCollector
                         // would like to throw this, but we have crappy stuff in the repo
 
                         fireEvent( ResolutionListener.OMIT_FOR_CYCLE, listeners,
-                                   new ResolutionNode( e.getArtifact(), remoteRepositories, child ) );
+                                   new ResolutionNode( e.getArtifact(), childRemoteRepositories, child ) );
                     }
                     catch ( ArtifactMetadataRetrievalException e )
                     {
                         artifact.setDependencyTrail( node.getDependencyTrail() );
                         throw new ArtifactResolutionException(
-                            "Unable to get dependency information: " + e.getMessage(), artifact, remoteRepositories,
+                            "Unable to get dependency information: " + e.getMessage(), artifact, childRemoteRepositories,
                             e );
                     }
 
-                    recurse( originatingArtifact, child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source,
+                    recurse( originatingArtifact, child, resolvedArtifacts, managedVersions, localRepository, childRemoteRepositories, source,
                              filter, listeners );
                 }
             }
