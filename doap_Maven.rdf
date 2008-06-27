@@ -35,6 +35,9 @@ under the License.
         <name>Latest stable release</name>
         <created>2008-04-10</created>
         <revision>2.0.9</revision>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.zip</file-release>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.tar.gz</file-release>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
@@ -42,6 +45,9 @@ under the License.
         <name>Apache Maven 2.0.8</name>
         <created>2007-11-27</created>
         <revision>2.0.8</revision>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.zip</file-release>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.tar.gz</file-release>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
@@ -49,6 +55,9 @@ under the License.
         <name>Apache Maven 2.0.7</name>
         <created>2007-06-21</created>
         <revision>2.0.7</revision>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.7-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.7-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.7-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
@@ -56,6 +65,9 @@ under the License.
         <name>Apache Maven 2.0.6</name>
         <created>2007-04-01</created>
         <revision>2.0.6</revision>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.6-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.6-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.6-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
@@ -63,6 +75,9 @@ under the License.
         <name>Apache Maven 2.0.5</name>
         <created>2007-02-14</created>
         <revision>2.0.5</revision>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.5-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.5-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/maven-2.0.5-bin.tar.bz2</file-release>
       </Version>
     </release>
     <repository>
