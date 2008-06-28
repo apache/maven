@@ -42,8 +42,7 @@
   |   definition of these types
   |
 -->
-<model xsd.namespace="http://maven.apache.org/POM/4.0.0"
-  xsd.target-namespace="http://maven.apache.org/POM/4.0.0">
+<model xsd.namespace="http://maven.apache.org/POM/4.0.0" xsd.target-namespace="http://maven.apache.org/POM/4.0.0">
   <id>maven</id>
   <name>Maven</name>
   <description>
