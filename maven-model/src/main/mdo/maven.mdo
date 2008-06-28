@@ -20,6 +20,7 @@
 -->
 
 <!--
+  | Improvements:
   |
   | o add specification element to a field, this would be more a technical description of
   |   what is allowed in the field.
@@ -29,7 +30,7 @@
   |   dealt with by something like drools.
   |
   | o i18n: would be good to be able to have names/descriptions/specifications
-  |   in as many languages as possible.
+  |   in as many languages as possible. (see MNG-3626)
   |
   | o annotation mechanism so that changes to the model can be accurately tracked.
   |
