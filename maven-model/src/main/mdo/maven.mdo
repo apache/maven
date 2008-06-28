@@ -2481,6 +2481,22 @@
           <defaultValue>false</defaultValue>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Resource {targetPath: " + getTargetPath() + ", filtering: " + isFiltering() + ", " + super.toString() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>SourceModification</name>
