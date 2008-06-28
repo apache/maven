@@ -54,6 +54,7 @@
       <li><a href="http://maven.apache.org/maven-v3_0_0.xsd">http://maven.apache.org/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
       <li><a href="http://maven.apache.org/maven-v4_0_0.xsd">http://maven.apache.org/maven-v4_0_0.xsd</a> for Maven 2.0.</li>
     </ul>
+    <b>Note:</b> the following ordering is considered as the reference ordering.
     ]]>
   </description>
   <defaults>
@@ -74,6 +75,39 @@
       </description>
       <version>3.0.0+</version>
       <fields>
+
+        <!-- ====================================================================== -->
+        <!-- Model Version                                                          -->
+        <!-- ====================================================================== -->
+
+        <field>
+          <name>pomVersion</name>
+          <version>3.0.0</version>
+          <required>true</required>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            Declares to which version of project descriptor this POM conforms.
+            The only valid value is <code>3</code>.
+            ]]>
+          </description>
+        </field>
+        <field>
+          <name>modelVersion</name>
+          <version>4.0.0</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            Declares to which version of project descriptor this POM conforms.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+
+        <!-- ====================================================================== -->
+        <!-- Parent Model                                                           -->
+        <!-- ====================================================================== -->
+
         <field>
           <name>extend</name>
           <version>3.0.0</version>
@@ -103,29 +137,11 @@
             <type>Parent</type>
           </association>
         </field>
-        <field>
-          <name>modelVersion</name>
-          <version>4.0.0</version>
-          <required>true</required>
-          <description>
-            <![CDATA[
-            Declares to which version of project descriptor this POM conforms.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>pomVersion</name>
-          <version>3.0.0</version>
-          <required>true</required>
-          <type>String</type>
-          <description>
-            <![CDATA[
-            Declares to which version of project descriptor this POM conforms.
-            The only valid value is <code>3</code>.
-            ]]>
-          </description>
-        </field>
+
+        <!-- ====================================================================== -->
+        <!-- groupId/artifactId/Version/Packaging                                   -->
+        <!-- ====================================================================== -->
+
         <field>
           <name>groupId</name>
           <version>3.0.0+</version>
@@ -167,34 +183,6 @@
           <type>String</type>
         </field>
         <field>
-          <name>packaging</name>
-          <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The type of artifact this project produces, for example <code>jar</code>
-              <code>war</code>
-              <code>ear</code>
-              <code>pom</code>.
-            Plugins can create their own packaging, and
-            therefore their own packaging types,
-            so this list does not contain all possible types.
-            ]]>
-          </description>
-          <type>String</type>
-          <defaultValue>jar</defaultValue>
-        </field>
-        <field>
-          <name>name</name>
-          <version>3.0.0+</version>
-          <required>true</required>
-          <description>
-            <![CDATA[
-            The full name of the project.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
-        <field>
           <name>currentVersion</name>
           <description>
             <![CDATA[
@@ -212,6 +200,52 @@
           <description>
             <![CDATA[
             The current version of the artifact produced by this project.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>versions</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Contains information on previous versions of the project.
+            ]]>
+          </description>
+          <association>
+            <type>Version</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>packaging</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The type of artifact this project produces, for example <code>jar</code>
+              <code>war</code>
+              <code>ear</code>
+              <code>pom</code>.
+            Plugins can create their own packaging, and
+            therefore their own packaging types,
+            so this list does not contain all possible types.
+            ]]>
+          </description>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+        </field>
+
+        <!-- ====================================================================== -->
+        <!-- Elements which describe a project                                      -->
+        <!-- ====================================================================== -->
+
+        <field>
+          <name>name</name>
+          <version>3.0.0+</version>
+          <required>true</required>
+          <description>
+            <![CDATA[
+            The full name of the project.
             ]]>
           </description>
           <type>String</type>
@@ -253,87 +287,6 @@
           <type>String</type>
         </field>
         <field>
-          <name>logo</name>
-          <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The URL of the project's logo image.  This can be an URL relative
-            to the base directory of the generated web site,
-            (e.g., <code>/images/project-logo.png</code>) or an absolute URL
-            (e.g., <code>http://my.corp/project-logo.png</code>). This is used
-            when generating the project documentation.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>prerequisites</name>
-          <version>4.0.0</version>
-          <description>
-            Describes the prerequisites in the build environment for
-            this project.
-          </description>
-          <association>
-            <type>Prerequisites</type>
-          </association>
-        </field>
-        <field>
-          <name>issueTrackingUrl</name>
-          <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The URL of the project's issue tracking system.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>issueManagement</name>
-          <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The project's issue management system information.
-            ]]>
-          </description>
-          <association>
-            <type>IssueManagement</type>
-          </association>
-        </field>
-        <field>
-          <name>ciManagement</name>
-          <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The project's continuous integration information.
-            ]]>
-          </description>
-          <association>
-            <type>CiManagement</type>
-          </association>
-        </field>
-        <field>
-          <name>inceptionYear</name>
-          <version>3.0.0+</version>
-          <required>true</required>
-          <description>
-            <![CDATA[
-            The year of the project's inception, specified with 4 digits.
-            This value is used when generating copyright notices as well as being informational.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
-        <field>
-          <name>gumpRepositoryId</name>
-          <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            This is the repository identifier in Gump that this project is part of.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
-        <field>
           <name>siteAddress</name>
           <version>3.0.0</version>
           <description>
@@ -356,27 +309,64 @@
           <type>String</type>
         </field>
         <field>
-          <name>distributionSite</name>
-          <version>3.0.0</version>
+          <name>inceptionYear</name>
+          <version>3.0.0+</version>
+          <required>true</required>
           <description>
             <![CDATA[
-            The server where the final distributions will be published. This is used when the
-            distributions are deployed. If this isn't defined, the central repository is used instead as
-            determined by <code>maven.repo.central</code> and <code>maven.repo.central.directory</code>.
+            The year of the project's inception, specified with 4 digits.
+            This value is used when generating copyright notices as well as being informational.
             ]]>
           </description>
           <type>String</type>
         </field>
         <field>
-          <name>distributionDirectory</name>
+          <name>logo</name>
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            The directory on the web server where the final distributions will be published.
-            This is used when the distributions are deployed.
+            The URL of the project's logo image.  This can be an URL relative
+            to the base directory of the generated web site,
+            (e.g., <code>/images/project-logo.png</code>) or an absolute URL
+            (e.g., <code>http://my.corp/project-logo.png</code>). This is used
+            when generating the project documentation.
             ]]>
           </description>
           <type>String</type>
+        </field>
+        <field>
+          <name>organization</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            This element describes various attributes of the organization to
+            which the project belongs.  These attributes are utilized when
+            documentation is created (for copyright notices and links).
+            ]]>
+          </description>
+          <alias>organisation</alias>
+          <association>
+            <type>Organization</type>
+          </association>
+        </field>
+        <field>
+          <name>licenses</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            This element describes all of the licenses for this project.
+            Each license is described by a <code>license</code> element, which
+            is then described by additional elements.
+            Projects should only list the license(s) that applies to the project
+            and not the licenses that apply to dependencies.
+            If multiple licenses are listed, it is assumed that the user can select
+            any of them, not that they must accept all.
+            ]]>
+          </description>
+          <association>
+            <type>License</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
         <field>
           <name>mailingLists</name>
@@ -417,38 +407,38 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+
+        <!-- ====================================================================== -->
+        <!-- Issue Tracking                                                         -->
+        <!-- ====================================================================== -->
+
         <field>
-          <name>licenses</name>
-          <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            This element describes all of the licenses for this project.
-            Each license is described by a <code>license</code> element, which
-            is then described by additional elements.
-            Projects should only list the license(s) that applies to the project
-            and not the licenses that apply to dependencies.
-            If multiple licenses are listed, it is assumed that the user can select
-            any of them, not that they must accept all.
-            ]]>
-          </description>
-          <association>
-            <type>License</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
-          <name>versions</name>
+          <name>issueTrackingUrl</name>
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            Contains information on previous versions of the project.
+            The URL of the project's issue tracking system.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>issueManagement</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The project's issue management system information.
             ]]>
           </description>
           <association>
-            <type>Version</type>
-            <multiplicity>*</multiplicity>
+            <type>IssueManagement</type>
           </association>
         </field>
+
+        <!-- ====================================================================== -->
+        <!-- SCM                                                                    -->
+        <!-- ====================================================================== -->
+
         <field>
           <name>branches</name>
           <version>3.0.0</version>
@@ -462,6 +452,103 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>repository</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            Specification for the SCM used by the project, such as CVS, Subversion, etc.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+          </association>
+        </field>
+        <field>
+          <name>scm</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Specification for the SCM used by the project, such as CVS, Subversion, etc.
+            ]]>
+          </description>
+          <association>
+            <type>Scm</type>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
+        <!-- CI Management                                                          -->
+        <!-- ====================================================================== -->
+
+        <field>
+          <name>gumpRepositoryId</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            This is the repository identifier in Gump that this project is part of.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>ciManagement</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            The project's continuous integration information.
+            ]]>
+          </description>
+          <association>
+            <type>CiManagement</type>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
+        <!-- Distribution Management                                                -->
+        <!-- ====================================================================== -->
+
+        <field>
+          <name>distributionSite</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The server where the final distributions will be published. This is used when the
+            distributions are deployed. If this isn't defined, the central repository is used instead as
+            determined by <code>maven.repo.central</code> and <code>maven.repo.central.directory</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distributionDirectory</name>
+          <version>3.0.0</version>
+          <description>
+            <![CDATA[
+            The directory on the web server where the final distributions will be published.
+            This is used when the distributions are deployed.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>distributionManagement</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+            Distribution information for a project that enables deployment of the site
+            and artifacts to remote web servers and repositories respectively.
+            ]]>
+          </description>
+          <association>
+            <type>DistributionManagement</type>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
+        <!-- Specific version 3                                                     -->
+        <!-- ====================================================================== -->
+
         <field>
           <name>packageGroups</name>
           <version>3.0.0</version>
@@ -493,45 +580,6 @@
           </association>
         </field>
         <field>
-          <name>scm</name>
-          <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Specification for the SCM used by the project, such as CVS, Subversion, etc.
-            ]]>
-          </description>
-          <association>
-            <type>Scm</type>
-          </association>
-        </field>
-        <field>
-          <name>repository</name>
-          <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            Specification for the SCM used by the project, such as CVS, Subversion, etc.
-            ]]>
-          </description>
-          <association>
-            <type>Repository</type>
-          </association>
-        </field>
-        <field>
-          <name>organization</name>
-          <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            This element describes various attributes of the organization to
-            which the project belongs.  These attributes are utilized when
-            documentation is created (for copyright notices and links).
-            ]]>
-          </description>
-          <alias>organisation</alias>
-          <association>
-            <type>Organization</type>
-          </association>
-        </field>
-        <field>
           <name>properties</name>
           <version>3.0.0</version>
           <description>
@@ -557,6 +605,27 @@
             ]]>
           </description>
         </field>
+
+        <!-- ====================================================================== -->
+        <!-- Build prerequisites                                                    -->
+        <!-- ====================================================================== -->
+
+        <field>
+          <name>prerequisites</name>
+          <version>4.0.0</version>
+          <description>
+            Describes the prerequisites in the build environment for
+            this project.
+          </description>
+          <association>
+            <type>Prerequisites</type>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
+        <!-- Build                                                                  -->
+        <!-- ====================================================================== -->
+
         <field>
           <name>build</name>
           <version>3.0.0+</version>
@@ -570,6 +639,11 @@
             <type>Build</type>
           </association>
         </field>
+
+        <!-- ====================================================================== -->
+        <!-- Profiles                                                               -->
+        <!-- ====================================================================== -->
+
         <field>
           <name>profiles</name>
           <version>4.0.0</version>
@@ -747,19 +821,6 @@
           </description>
           <association>
             <type>DependencyManagement</type>
-          </association>
-        </field>
-        <field>
-          <name>distributionManagement</name>
-          <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Distribution information for a project that enables deployment of the site
-            and artifacts to remote web servers and repositories respectively.
-            ]]>
-          </description>
-          <association>
-            <type>DistributionManagement</type>
           </association>
         </field>
         <field>
