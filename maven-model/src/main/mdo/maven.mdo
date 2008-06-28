@@ -38,7 +38,7 @@
   |
   | o use enums where appropriate (eg dependency scope)
   |
-  | o a number of elements have a grouId/artifactId and sometimes version. It would be good to have them all extend one
+  | o a number of elements have a groupId/artifactId and sometimes version. It would be good to have them all extend one
   |   definition of these types
   |
 -->
