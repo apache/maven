@@ -42,7 +42,7 @@
   |   definition of these types
   |
 -->
-<model>
+<model xsd.namespace="http://maven.apache.org/POM/4.0.0" xsd.target-namespace="http://maven.apache.org/POM/4.0.0">
   <id>maven</id>
   <name>Maven</name>
   <description>
@@ -2176,7 +2176,7 @@
     public String toString()
     {
         StringBuffer sb = new StringBuffer();
-        
+
         sb.append("PatternSet [includes: {");
         for (java.util.Iterator i = getIncludes().iterator(); i.hasNext(); )
         {
@@ -2184,7 +2184,7 @@
             sb.append(str).append(", ");
         }
         if (sb.substring(sb.length() - 2).equals(", ")) sb.delete(sb.length() - 2, sb.length());
-        
+
         sb.append("}, excludes: {");
         for (java.util.Iterator i = getExcludes().iterator(); i.hasNext(); )
         {
@@ -2192,7 +2192,7 @@
             sb.append(str).append(", ");
         }
         if (sb.substring(sb.length() - 2).equals(", ")) sb.delete(sb.length() - 2, sb.length());
-        
+
         sb.append("}]");
         return sb.toString();
     }
@@ -2452,7 +2452,7 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            Describe the resource target path. The path is relative to the target/classes 
+            Describe the resource target path. The path is relative to the target/classes
             directory (i.e. <code>${project.build.outputDirectory}</code>).
             For example, if you want that resource to appear in a specific package
             (<code>org.apache.maven.messages</code>), you must specify this
@@ -2690,16 +2690,16 @@
     public boolean equals( Object obj )
     {
         if ( obj instanceof RepositoryBase ) {
-        
+
             final RepositoryBase other =  (RepositoryBase) obj;
-    
+
             if ( id != null )
             {
                 return id.equals( other.id );
             }
             return super.equals(obj);
-        }    
-        
+        }
+
         return false;
     }
             ]]>
@@ -3396,7 +3396,7 @@
           <version>4.0.0</version>
           <type>boolean</type>
           <description>
-            If set to true, this profile will be active unless another profile in this pom is 
+            If set to true, this profile will be active unless another profile in this pom is
             activated using the command line -P option or by one of that profile's activators.
           </description>
         </field>
