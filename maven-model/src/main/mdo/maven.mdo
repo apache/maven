@@ -38,7 +38,7 @@
   |
   | o use enums where appropriate (eg dependency scope)
   |
-  | o a number of elements have a grouId/artifactId and sometimes version. It would be good to have them all extend one
+  | o a number of elements have a groupId/artifactId and sometimes version. It would be good to have them all extend one
   |   definition of these types
   |
 -->
@@ -2406,7 +2406,7 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            Describe the resource target path. The path is relative to the target/classes 
+            Describe the resource target path. The path is relative to the target/classes
             directory (i.e. <code>${project.build.outputDirectory}</code>).
             For example, if you want that resource to appear in a specific package
             (<code>org.apache.maven.messages</code>), you must specify this
@@ -2628,16 +2628,16 @@
     public boolean equals( Object obj )
     {
         if ( obj instanceof RepositoryBase ) {
-        
+
             final RepositoryBase other =  (RepositoryBase) obj;
-    
+
             if ( id != null )
             {
                 return id.equals( other.id );
             }
             return super.equals(obj);
-        }    
-        
+        }
+
         return false;
     }
             ]]>
@@ -3017,7 +3017,7 @@
      */
     public String getKey()
     {
-        if ( key == null ) 
+        if ( key == null )
         {
             key = constructKey( groupId, artifactId );
         }
@@ -3338,7 +3338,7 @@
           <version>4.0.0</version>
           <type>boolean</type>
           <description>
-            If set to true, this profile will be active unless another profile in this pom is 
+            If set to true, this profile will be active unless another profile in this pom is
             activated using the command line -P option or by one of that profile's activators.
           </description>
         </field>
@@ -3900,9 +3900,9 @@
     public int hashCode()
     {
         int result = 17;
-        result = 37 * result + getArtifactId() != null ? getArtifactId().hashCode() : 0;                                                    
-        result = 37 * result + getGroupId() != null ? getGroupId().hashCode() : 0;                                                          
-        result = 37 * result + getVersion() != null ? getVersion().hashCode() : 0;         
+        result = 37 * result + getArtifactId() != null ? getArtifactId().hashCode() : 0;
+        result = 37 * result + getGroupId() != null ? getGroupId().hashCode() : 0;
+        result = 37 * result + getVersion() != null ? getVersion().hashCode() : 0;
         return result;
     }
             ]]>
