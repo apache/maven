@@ -96,11 +96,7 @@
           <name>modelVersion</name>
           <version>4.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            Declares to which version of project descriptor this POM conforms.
-            ]]>
-          </description>
+          <description>Declares to which version of project descriptor this POM conforms.</description>
           <type>String</type>
         </field>
 
@@ -125,14 +121,9 @@
         <field>
           <name>parent</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The location of the parent project, if one exists. Values from the
-            parent project will be the default for this project if they are
-            left unspecified. The location is given as a group ID, artifact ID
-            and version.
-            ]]>
-          </description>
+          <description>The location of the parent project, if one exists. Values from the parent
+            project will be the default for this project if they are left unspecified. The location
+            is given as a group ID, artifact ID and version.</description>
           <association>
             <type>Parent</type>
           </association>
@@ -159,15 +150,10 @@
           <name>artifactId</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            The identifier for this artifact that is unique within the group
-            given by the group ID.
-            An artifact is something that is either produced or used by a project.
-            Examples of artifacts produced by Maven for a project include: JARs,
-            source and binary distributions, and WARs.
-            ]]>
-          </description>
+          <description>The identifier for this artifact that is unique within the group given by the
+            group ID. An artifact is something that is either produced or used by a project.
+            Examples of artifacts produced by Maven for a project include: JARs, source and binary
+            distributions, and WARs.</description>
           <type>String</type>
         </field>
         <field>
@@ -184,11 +170,7 @@
         </field>
         <field>
           <name>currentVersion</name>
-          <description>
-            <![CDATA[
-            The current version of the artifact produced by this project.
-            ]]>
-          </description>
+          <description>The current version of the artifact produced by this project.</description>
           <version>3.0.0</version>
           <required>true</required>
           <type>String</type>
@@ -197,21 +179,13 @@
           <name>version</name>
           <version>4.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            The current version of the artifact produced by this project.
-            ]]>
-          </description>
+          <description>The current version of the artifact produced by this project.</description>
           <type>String</type>
         </field>
         <field>
           <name>versions</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            Contains information on previous versions of the project.
-            ]]>
-          </description>
+          <description>Contains information on previous versions of the project.</description>
           <association>
             <type>Version</type>
             <multiplicity>*</multiplicity>
@@ -243,37 +217,24 @@
           <name>name</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            The full name of the project.
-            ]]>
-          </description>
+          <description>The full name of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>shortDescription</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            A short description of the project. The short description should be
-            limited to a single line.
-            ]]>
-          </description>
+          <description>A short description of the project. The short description should be limited
+            to a single line.</description>
           <type>String</type>
         </field>
         <field>
           <name>description</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            A detailed description of the project, used by Maven whenever it needs
-            to describe the project, such as on the web site. While this element
-            can be specified as CDATA to enable the use of HTML tags within the
-            description, it is discouraged to allow plain text representation.
-            If you need to modify the index page of the generated web site, you are
-            able to specify your own instead of adjusting this text.
-            ]]>
-          </description>
+          <description>A detailed description of the project, used by Maven whenever it needs to
+            describe the project, such as on the web site. While this element can be specified as
+            CDATA to enable the use of HTML tags within the description, it is discouraged to allow
+            plain text representation. If you need to modify the index page of the generated web
+            site, you are able to specify your own instead of adjusting this text.</description>
           <type>String</type>
         </field>
         <field>
@@ -289,35 +250,23 @@
         <field>
           <name>siteAddress</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The hostname of the web server that hosts the project's web site.
-            This is used when the web site is deployed.
-            ]]>
-          </description>
+          <description>The hostname of the web server that hosts the project's web site. This is
+            used when the web site is deployed.</description>
           <type>String</type>
         </field>
         <field>
           <name>siteDirectory</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The directory on the web server where the public web site
-            for this project resides. This is used when the web site is deployed.
-            ]]>
-          </description>
+          <description>The directory on the web server where the public web site for this project
+            resides. This is used when the web site is deployed.</description>
           <type>String</type>
         </field>
         <field>
           <name>inceptionYear</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            The year of the project's inception, specified with 4 digits.
-            This value is used when generating copyright notices as well as being informational.
-            ]]>
-          </description>
+          <description>The year of the project's inception, specified with 4 digits. This value is
+            used when generating copyright notices as well as being informational.</description>
           <type>String</type>
         </field>
         <field>
@@ -337,13 +286,9 @@
         <field>
           <name>organization</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            This element describes various attributes of the organization to
-            which the project belongs.  These attributes are utilized when
-            documentation is created (for copyright notices and links).
-            ]]>
-          </description>
+          <description>This element describes various attributes of the organization to which the
+            project belongs. These attributes are utilized when documentation is created (for
+            copyright notices and links).</description>
           <alias>organisation</alias>
           <association>
             <type>Organization</type>
@@ -371,11 +316,7 @@
         <field>
           <name>mailingLists</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            Contains information about a project's mailing lists.
-            ]]>
-          </description>
+          <description>Contains information about a project's mailing lists.</description>
           <association>
             <type>MailingList</type>
             <multiplicity>*</multiplicity>
@@ -384,11 +325,7 @@
         <field>
           <name>developers</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            Describes the committers of a project.
-            ]]>
-          </description>
+          <description>Describes the committers of a project.</description>
           <association>
             <type>Developer</type>
             <multiplicity>*</multiplicity>
@@ -397,11 +334,7 @@
         <field>
           <name>contributors</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            Describes the contributors to a project that are not yet committers.
-            ]]>
-          </description>
+          <description>Describes the contributors to a project that are not yet committers.</description>
           <association>
             <type>Contributor</type>
             <multiplicity>*</multiplicity>
@@ -415,21 +348,13 @@
         <field>
           <name>issueTrackingUrl</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The URL of the project's issue tracking system.
-            ]]>
-          </description>
+          <description>The URL of the project's issue tracking system.</description>
           <type>String</type>
         </field>
         <field>
           <name>issueManagement</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The project's issue management system information.
-            ]]>
-          </description>
+          <description>The project's issue management system information.</description>
           <association>
             <type>IssueManagement</type>
           </association>
@@ -455,11 +380,7 @@
         <field>
           <name>repository</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            Specification for the SCM used by the project, such as CVS, Subversion, etc.
-            ]]>
-          </description>
+          <description>Specification for the SCM used by the project, such as CVS, Subversion, etc.</description>
           <association>
             <type>Repository</type>
           </association>
@@ -467,11 +388,7 @@
         <field>
           <name>scm</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Specification for the SCM used by the project, such as CVS, Subversion, etc.
-            ]]>
-          </description>
+          <description>Specification for the SCM used by the project, such as CVS, Subversion, etc.</description>
           <association>
             <type>Scm</type>
           </association>
@@ -484,21 +401,13 @@
         <field>
           <name>gumpRepositoryId</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            This is the repository identifier in Gump that this project is part of.
-            ]]>
-          </description>
+          <description>This is the repository identifier in Gump that this project is part of.</description>
           <type>String</type>
         </field>
         <field>
           <name>ciManagement</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The project's continuous integration information.
-            ]]>
-          </description>
+          <description>The project's continuous integration information.</description>
           <association>
             <type>CiManagement</type>
           </association>
@@ -523,23 +432,15 @@
         <field>
           <name>distributionDirectory</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The directory on the web server where the final distributions will be published.
-            This is used when the distributions are deployed.
-            ]]>
-          </description>
+          <description>The directory on the web server where the final distributions will be
+            published. This is used when the distributions are deployed.</description>
           <type>String</type>
         </field>
         <field>
           <name>distributionManagement</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Distribution information for a project that enables deployment of the site
-            and artifacts to remote web servers and repositories respectively.
-            ]]>
-          </description>
+          <description>Distribution information for a project that enables deployment of the site
+            and artifacts to remote web servers and repositories respectively.</description>
           <association>
             <type>DistributionManagement</type>
           </association>
@@ -552,11 +453,7 @@
         <field>
           <name>packageGroups</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            Package groups required for complete javadocs.
-            ]]>
-          </description>
+          <description>Package groups required for complete javadocs.</description>
           <association>
             <type>PackageGroup</type>
             <multiplicity>*</multiplicity>
@@ -598,12 +495,8 @@
           <name>packageName</name>
           <version>3.0.0</version>
           <type>String</type>
-          <description>
-            <![CDATA[
-            The Java package name of the project.  This value is used
-            when generating JavaDoc.
-            ]]>
-          </description>
+          <description>The Java package name of the project. This value is used when generating
+            JavaDoc.</description>
         </field>
 
         <!-- ====================================================================== -->
@@ -613,10 +506,7 @@
         <field>
           <name>prerequisites</name>
           <version>4.0.0</version>
-          <description>
-            Describes the prerequisites in the build environment for
-            this project.
-          </description>
+          <description>Describes the prerequisites in the build environment for this project.</description>
           <association>
             <type>Prerequisites</type>
           </association>
@@ -630,11 +520,7 @@
           <name>build</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            Information required to build the project.
-            ]]>
-          </description>
+          <description>Information required to build the project.</description>
           <association>
             <type>Build</type>
           </association>
@@ -647,12 +533,8 @@
         <field>
           <name>profiles</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            A listing of project-local build profiles which will modify
-            the build process when activated.
-            ]]>
-          </description>
+          <description>A listing of project-local build profiles which will modify the build process
+            when activated.</description>
           <association>
             <type>Profile</type>
             <multiplicity>*</multiplicity>
@@ -725,11 +607,8 @@
         <field>
           <name>modules</name>
           <version>4.0.0</version>
-          <description>
-            The modules (sometimes called subprojects) to build as a
-            part of this project. Each module listed is a relative path
-            to the directory containing the module.
-          </description>
+          <description>The modules (sometimes called subprojects) to build as a part of this
+            project. Each module listed is a relative path to the directory containing the module.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -738,12 +617,8 @@
         <field>
           <name>repositories</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The lists of the remote repositories for discovering dependencies and
-            extensions.
-            ]]>
-          </description>
+          <description>The lists of the remote repositories for discovering dependencies and
+            extensions.</description>
           <association>
             <type>Repository</type>
             <multiplicity>*</multiplicity>
@@ -752,11 +627,8 @@
         <field>
           <name>pluginRepositories</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The lists of the remote repositories for discovering plugins for builds and reports.
-            ]]>
-          </description>
+          <description>The lists of the remote repositories for discovering plugins for builds and
+            reports.</description>
           <association>
             <type>Repository</type>
             <multiplicity>*</multiplicity>
@@ -810,15 +682,11 @@
           <name>dependencyManagement</name>
           <version>4.0.0</version>
           <required>false</required>
-          <description>
-            <![CDATA[
-            Default dependency information for projects that inherit from
-            this one. The dependencies in this section are not immediately resolved.
-            Instead, when a POM derived from this one declares a dependency
-            described by a matching groupId and artifactId, the version and other values from this
-            section are used for that dependency if they were not already specified.
-            ]]>
-          </description>
+          <description>Default dependency information for projects that inherit from this one. The
+            dependencies in this section are not immediately resolved. Instead, when a POM derived
+            from this one declares a dependency described by a matching groupId and artifactId, the
+            version and other values from this section are used for that dependency if they were not
+            already specified.</description>
           <association>
             <type>DependencyManagement</type>
           </association>
@@ -844,23 +712,14 @@
     <class>
       <name>Branch</name>
       <version>3.0.0</version>
-      <description>
-        <![CDATA[
-        Contains information on the SCM branches of the project.
-        ]]>
-      </description>
+      <description>Contains information on the SCM branches of the project.</description>
       <fields>
         <field>
           <name>tag</name>
           <version>3.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            The branch tag in the version control system (e.g. cvs) used by the
-            project for the source code associated with this branch of the
-            project.
-            ]]>
-          </description>
+          <description>The branch tag in the version control system (e.g. cvs) used by the project
+            for the source code associated with this branch of the project.</description>
           <type>String</type>
         </field>
       </fields>
@@ -868,11 +727,7 @@
     <class>
       <name>PluginContainer</name>
       <version>3.0.0+</version>
-      <description>
-        <![CDATA[
-        Contains the plugins informations for the project.
-        ]]>
-      </description>
+      <description>Contains the plugins informations for the project.</description>
       <fields>
         <field>
           <name>plugins</name>
@@ -929,11 +784,7 @@
       <name>PluginConfiguration</name>
       <version>3.0.0+</version>
       <superClass>PluginContainer</superClass>
-      <description>
-        <![CDATA[
-        Contains the plugins management informations for the project.
-        ]]>
-      </description>
+      <description>Contains the plugins management informations for the project.</description>
       <fields>
         <!-- [ jdcasey:06-Mar-2005 ] Added to handle version management, etc. for
           | plugins to be used in sub-projects. -->
@@ -941,15 +792,10 @@
           <name>pluginManagement</name>
           <version>4.0.0</version>
           <required>false</required>
-          <description>
-            <![CDATA[
-            Default plugin information to be made available for reference by
-            projects derived from this one. This plugin configuration will not
-            be resolved or bound to the lifecycle unless referenced. Any local
-            configuration for a given plugin will override the plugin's entire
-            definition here.
-            ]]>
-          </description>
+          <description>Default plugin information to be made available for reference by projects
+            derived from this one. This plugin configuration will not be resolved or bound to the
+            lifecycle unless referenced. Any local configuration for a given plugin will override
+            the plugin's entire definition here.</description>
           <association>
             <type>PluginManagement</type>
           </association>
@@ -960,33 +806,21 @@
       <name>BuildBase</name>
       <version>3.0.0+</version>
       <superClass>PluginConfiguration</superClass>
-      <description>
-        <![CDATA[
-        Generic informations for a build.
-        ]]>
-      </description>
+      <description>Generic informations for a build.</description>
       <fields>
         <field>
           <name>defaultGoal</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The default goal (or phase in Maven 2) to execute when none is
-            specified for the project.
-            ]]>
-          </description>
+          <description>The default goal (or phase in Maven 2) to execute when none is specified for
+            the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>resources</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            This element describes all of the classpath resources such as
-            properties files associated with a project.
-            These resources are often included in the final package.
-            ]]>
-          </description>
+          <description>This element describes all of the classpath resources such as properties
+            files associated with a project. These resources are often included in the final
+            package.</description>
           <association>
             <type>Resource</type>
             <multiplicity>*</multiplicity>
@@ -995,12 +829,8 @@
         <field>
           <name>testResources</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            This element describes all of the classpath resources such as
-            properties files associated with a project's unit tests.
-            ]]>
-          </description>
+          <description>This element describes all of the classpath resources such as properties
+            files associated with a project's unit tests.</description>
           <association>
             <type>Resource</type>
             <multiplicity>*</multiplicity>
@@ -1009,11 +839,7 @@
         <field>
           <name>directory</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The directory where all files generated by the build are placed.
-            ]]>
-          </description>
+          <description>The directory where all files generated by the build are placed.</description>
           <type>String</type>
         </field>
         <field>
@@ -1031,11 +857,7 @@
         <field>
           <name>filters</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The list of filter properties files that are used when filtering is enabled.
-            ]]>
-          </description>
+          <description>The list of filter properties files that are used when filtering is enabled.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -1056,85 +878,55 @@
         <field>
           <name>nagEmailAddress</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            An address to which notifications regarding the status of builds
-            for this project can be sent. This is intended for use by tools
-            which do unattended builds, for example those providing for
-            continuous integration.
-            ]]>
-          </description>
+          <description>An address to which notifications regarding the status of builds for this
+            project can be sent. This is intended for use by tools which do unattended builds, for
+            example those providing for continuous integration.</description>
           <type>String</type>
         </field>
         <field>
           <name>sourceDirectory</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            This element specifies a directory containing the source
-            of the project. The generated build system will compile
-            the source in this directory when the project is built.
-            The path given is relative to the project descriptor.
-            ]]>
-          </description>
+          <description>This element specifies a directory containing the source of the project. The
+            generated build system will compile the source in this directory when the project is
+            built. The path given is relative to the project descriptor.</description>
           <type>String</type>
         </field>
         <field>
           <name>scriptSourceDirectory</name>
           <version>4.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            This element specifies a directory containing the script sources
-            of the project. This directory is meant to be different from the
-            sourceDirectory, in that its contents will be copied to the output
-            directory in most cases (since scripts are interpreted rather than
-            compiled).
-            ]]>
-          </description>
+          <description>This element specifies a directory containing the script sources of the
+            project. This directory is meant to be different from the sourceDirectory, in that its
+            contents will be copied to the output directory in most cases (since scripts are
+            interpreted rather than compiled).</description>
           <type>String</type>
         </field>
         <field>
           <name>unitTestSourceDirectory</name>
           <version>3.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            This element specifies a directory containing the unit test
-            source of the project. The generated build system will
-            compile these directories when the project is being tested.
-            The path given is relative to the project descriptor.
-            ]]>
-          </description>
+          <description>This element specifies a directory containing the unit test source of the
+            project. The generated build system will compile these directories when the project is
+            being tested. The path given is relative to the project descriptor.</description>
           <type>String</type>
         </field>
         <field>
           <name>testSourceDirectory</name>
           <version>4.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            This element specifies a directory containing the unit test
-            source of the project. The generated build system will
-            compile these directories when the project is being tested.
-            The path given is relative to the project descriptor.
-            ]]>
-          </description>
+          <description>This element specifies a directory containing the unit test source of the
+            project. The generated build system will compile these directories when the project is
+            being tested. The path given is relative to the project descriptor.</description>
           <type>String</type>
         </field>
         <field>
           <name>aspectSourceDirectory</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            This element specifies a directory containing Aspect
-            sources of the project.  The generated build system will
-            compile the Aspects in this directory when the project is
-            built if Aspects have been enabled.
-            The path given is relative to the project descriptor.
-            ]]>
-          </description>
+          <description>This element specifies a directory containing Aspect sources of the project.
+            The generated build system will compile the Aspects in this directory when the project
+            is built if Aspects have been enabled. The path given is relative to the project
+            descriptor.</description>
           <type>String</type>
         </field>
         <field>
@@ -1156,14 +948,9 @@
           <name>sourceModifications</name>
           <version>3.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            This element describes all of the sourceModifications associated
-            with a project. These modifications are used
-            to exclude or include various source depending on the environment
-            the build is running in.
-            ]]>
-          </description>
+          <description>This element describes all of the sourceModifications associated with a
+            project. These modifications are used to exclude or include various source depending on
+            the environment the build is running in.</description>
           <association>
             <type>SourceModification</type>
             <multiplicity>*</multiplicity>
@@ -1173,11 +960,7 @@
           <name>unitTest</name>
           <version>3.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            This element specifies unit tests associated with the project.
-            ]]>
-          </description>
+          <description>This element specifies unit tests associated with the project.</description>
           <defaultValue>new UnitTest()</defaultValue>
           <association>
             <type>UnitTest</type>
@@ -1186,29 +969,19 @@
         <field>
           <name>outputDirectory</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The directory where compiled application classes are placed.
-            ]]>
-          </description>
+          <description>The directory where compiled application classes are placed.</description>
           <type>String</type>
         </field>
         <field>
           <name>testOutputDirectory</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The directory where compiled test classes are placed.
-            ]]>
-          </description>
+          <description>The directory where compiled test classes are placed.</description>
           <type>String</type>
         </field>
         <field>
           <name>extensions</name>
           <version>4.0.0</version>
-          <description>
-            A set of build extensions to use from this project.
-          </description>
+          <description>A set of build extensions to use from this project.</description>
           <association>
             <type>Extension</type>
             <multiplicity>*</multiplicity>
@@ -1239,22 +1012,15 @@
         <field>
           <name>url</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            URL for the continuous integration system used by the project if it has a web interface.
-            ]]>
-          </description>
+          <description>URL for the continuous integration system used by the project if it has a web
+            interface.</description>
           <type>String</type>
         </field>
         <field>
           <name>notifiers</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Configuration for notifying developers/users when a build is
-            unsuccessful, including user information and notification mode.
-            ]]>
-          </description>
+          <description>Configuration for notifying developers/users when a build is unsuccessful,
+            including user information and notification mode.</description>
           <association>
             <multiplicity>*</multiplicity>
             <type>Notifier</type>
@@ -1264,10 +1030,7 @@
     </class>
     <class>
       <name>Notifier</name>
-      <description>
-        Configures one method for notifying users/developers when a
-        build breaks.
-      </description>
+      <description>Configures one method for notifying users/developers when a build breaks.</description>
       <version>4.0.0</version>
       <fields>
         <field>
@@ -1275,45 +1038,35 @@
           <version>4.0.0</version>
           <defaultValue>mail</defaultValue>
           <type>String</type>
-          <description>
-            The mechanism used to deliver notifications.
-          </description>
+          <description>The mechanism used to deliver notifications.</description>
         </field>
         <field>
           <name>sendOnError</name>
           <version>4.0.0</version>
           <defaultValue>true</defaultValue>
           <type>boolean</type>
-          <description>
-            Whether to send notifications on error.
-          </description>
+          <description>Whether to send notifications on error.</description>
         </field>
         <field>
           <name>sendOnFailure</name>
           <version>4.0.0</version>
           <defaultValue>true</defaultValue>
           <type>boolean</type>
-          <description>
-            Whether to send notifications on failure.
-          </description>
+          <description>Whether to send notifications on failure.</description>
         </field>
         <field>
           <name>sendOnSuccess</name>
           <version>4.0.0</version>
           <defaultValue>true</defaultValue>
           <type>boolean</type>
-          <description>
-            Whether to send notifications on success.
-          </description>
+          <description>Whether to send notifications on success.</description>
         </field>
         <field>
           <name>sendOnWarning</name>
           <version>4.0.0</version>
           <defaultValue>true</defaultValue>
           <type>boolean</type>
-          <description>
-            Whether to send notifications on warning.
-          </description>
+          <description>Whether to send notifications on warning.</description>
         </field>
         <!-- TODO: Remove it after continuum alpha-3 release -->
         <field>
@@ -1328,9 +1081,7 @@
         </field>
         <field>
           <name>configuration</name>
-          <description>
-            Extended configuration specific to this notifier goes here.
-          </description>
+          <description>Extended configuration specific to this notifier goes here.</description>
           <type>Properties</type>
           <association xml.mapStyle="inline">
             <type>String</type>
@@ -1341,41 +1092,26 @@
     </class>
     <class>
       <name>Contributor</name>
-      <description>
-        Description of a person who has contributed to the project, but
-        who does not have commit privileges. Usually, these
-        contributions come in the form of patches submitted.
-      </description>
+      <description>Description of a person who has contributed to the project, but who does not have
+        commit privileges. Usually, these contributions come in the form of patches submitted.</description>
       <version>3.0.0+</version>
       <fields>
         <field>
           <name>name</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The full name of the contributor.
-            ]]>
-          </description>
+          <description>The full name of the contributor.</description>
           <type>String</type>
         </field>
         <field>
           <name>email</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The email address of the contributor.
-            ]]>
-          </description>
+          <description>The email address of the contributor.</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The URL for the homepage of the contributor.
-            ]]>
-          </description>
+          <description>The URL for the homepage of the contributor.</description>
           <type>String</type>
         </field>
         <!-- TODO: should this just be a single Organization element -->
@@ -1383,22 +1119,14 @@
           <name>organization</name>
           <alias>organisation</alias>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The organization to which the contributor belongs.
-            ]]>
-          </description>
+          <description>The organization to which the contributor belongs.</description>
           <type>String</type>
         </field>
         <field>
           <name>organizationUrl</name>
           <alias>organisationUrl</alias>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The URL of the organization.
-            ]]>
-          </description>
+          <description>The URL of the organization.</description>
           <type>String</type>
         </field>
         <field>
@@ -1406,9 +1134,9 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            The roles the contributor plays in the project.  Each role is
-            described by a <code>role</code> element, the body of which is a
-            role name. This can also be used to describe the contribution.
+            The roles the contributor plays in the project. Each role is described by a
+            <code>role</code> element, the body of which is a role name. This can also be used to
+            describe the contribution.
             ]]>
           </description>
           <association>
@@ -1419,21 +1147,13 @@
         <field>
           <name>timezone</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The timezone the contributor is in. This is a number in the range -11 to 12.
-            ]]>
-          </description>
+          <description>The timezone the contributor is in. This is a number in the range -11 to 12.</description>
           <type>String</type>
         </field>
         <field>
           <name>properties</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            Properties about the contributor, such as an instant messenger handle.
-            ]]>
-          </description>
+          <description>Properties about the contributor, such as an instant messenger handle.</description>
           <type>Properties</type>
           <association xml.mapStyle="inline">
             <type>String</type>
@@ -1502,23 +1222,15 @@
         <field>
           <name>url</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            This url will be provided to the user if the jar file cannot be downloaded
-            from the central repository.
-            ]]>
-          </description>
+          <description>This url will be provided to the user if the jar file cannot be downloaded
+            from the central repository.</description>
           <type>String</type>
         </field>
         <field>
           <name>jar</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            Literal name of the artifact in the repository. Used to override the
-            calculated artifact name.
-            ]]>
-          </description>
+          <description>Literal name of the artifact in the repository. Used to override the
+            calculated artifact name.</description>
           <type>String</type>
         </field>
         <field>
@@ -1626,11 +1338,8 @@
         <field>
           <name>exclusions</name>
           <version>4.0.0</version>
-          <description>
-            Lists a set of artifacts that should be excluded from this
-            dependency's artifact list when it comes to calculating
-            transitive dependencies.
-          </description>
+          <description>Lists a set of artifacts that should be excluded from this dependency's
+            artifact list when it comes to calculating transitive dependencies.</description>
           <association>
             <type>Exclusion</type>
             <multiplicity>*</multiplicity>
@@ -1639,12 +1348,9 @@
         <field>
           <name>optional</name>
           <version>4.0.0</version>
-          <description>
-            Indicates the dependency is optional for use of this
-            library. While the version of the dependency will be taken
-            into account for dependency calculation if the library is
-            used elsewhere, it will not be passed on transitively.
-          </description>
+          <description>Indicates the dependency is optional for use of this library. While the
+            version of the dependency will be taken into account for dependency calculation if the
+            library is used elsewhere, it will not be passed on transitively.</description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>
         </field>
@@ -1802,21 +1508,13 @@
     <class>
       <superClass>Contributor</superClass>
       <name>Developer</name>
-      <description>
-        <![CDATA[
-        Information about one of the committers on this project.
-        ]]>
-      </description>
+      <description>Information about one of the committers on this project.</description>
       <version>3.0.0+</version>
       <fields>
         <field>
           <name>id</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The unique ID of the developer in the SCM.
-            ]]>
-          </description>
+          <description>The unique ID of the developer in the SCM.</description>
           <type>String</type>
         </field>
       </fields>
@@ -1834,22 +1532,14 @@
         <field>
           <name>artifactId</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The artifact ID of the project to exclude.
-            ]]>
-          </description>
+          <description>The artifact ID of the project to exclude.</description>
           <type>String</type>
           <required>true</required>
         </field>
         <field>
           <name>groupId</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The group ID of the project to exclude.
-            ]]>
-          </description>
+          <description>The group ID of the project to exclude.</description>
           <type>String</type>
           <required>true</required>
         </field>
@@ -1857,30 +1547,20 @@
     </class>
     <class>
       <name>IssueManagement</name>
-      <description>
-        Information about the issue tracking (or bug tracking) system
-        used to manage this project.
-      </description>
+      <description>Information about the issue tracking (or bug tracking) system used to manage this
+        project.</description>
       <version>4.0.0</version>
       <fields>
         <field>
           <name>system</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The name of the issue management system, e.g. Bugzilla
-            ]]>
-          </description>
+          <description>The name of the issue management system, e.g. Bugzilla</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            URL for the issue management system used by the project.
-            ]]>
-          </description>
+          <description>URL for the issue management system used by the project.</description>
           <type>String</type>
         </field>
       </fields>
@@ -1888,22 +1568,14 @@
     <class>
       <name>DistributionManagement</name>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        This elements describes all that pertains to distribution for a project.
-        It is primarily used for deployment of artifacts and the site
-        produced by the build.
-        ]]>
-      </description>
+      <description>This elements describes all that pertains to distribution for a project. It is
+        primarily used for deployment of artifacts and the site produced by the build.</description>
       <fields>
         <field>
           <name>repository</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Information needed to deploy the artifacts generated by the project to a remote repository.
-            ]]>
-          </description>
+          <description>Information needed to deploy the artifacts generated by the project to a
+            remote repository.</description>
           <association>
             <type>DeploymentRepository</type>
           </association>
@@ -1923,11 +1595,7 @@
         </field>
         <field>
           <name>site</name>
-          <description>
-            <![CDATA[
-            Information needed for deploying the web site of the project.
-            ]]>
-          </description>
+          <description>Information needed for deploying the web site of the project.</description>
           <version>4.0.0</version>
           <association>
             <type>Site</type>
@@ -1949,10 +1617,8 @@
         <field>
           <name>relocation</name>
           <version>4.0.0</version>
-          <description>
-            Relocation information of the artifact if it has been moved
-            to a new group ID and/or artifact ID.
-          </description>
+          <description>Relocation information of the artifact if it has been moved to a new group ID
+            and/or artifact ID.</description>
           <association>
             <type>Relocation</type>
           </association>
@@ -1978,34 +1644,22 @@
     </class>
     <class>
       <name>License</name>
-      <description>
-        <![CDATA[
-        Describes the licenses for this project.  This is used to generate
-        the license page of the project's web site, as well as being taken into
-        consideration in other reporting and validation. The licenses listed for
-        the project are that of the project itself, and not of dependencies.
-        ]]>
-      </description>
+      <description>Describes the licenses for this project. This is used to generate the license
+        page of the project's web site, as well as being taken into consideration in other reporting
+        and validation. The licenses listed for the project are that of the project itself, and not
+        of dependencies.</description>
       <version>3.0.0+</version>
       <fields>
         <field>
           <name>name</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The full legal name of the license.
-            ]]>
-          </description>
+          <description>The full legal name of the license.</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The official url for the license text.
-            ]]>
-          </description>
+          <description>The official url for the license text.</description>
           <type>String</type>
         </field>
         <field>
@@ -2026,9 +1680,7 @@
         </field>
         <field>
           <name>comments</name>
-          <description>
-            Addendum information pertaining to this license.
-          </description>
+          <description>Addendum information pertaining to this license.</description>
           <version>3.0.0+</version>
           <type>String</type>
         </field>
@@ -2037,12 +1689,8 @@
     <class>
       <name>MailingList</name>
       <version>3.0.0+</version>
-      <description>
-        <![CDATA[
-        This element describes all of the mailing lists associated with
-        a project. The auto-generated site references this information.
-        ]]>
-      </description>
+      <description>This element describes all of the mailing lists associated with a project. The
+        auto-generated site references this information.</description>
       <fields>
         <field>
           <name>name</name>
@@ -2059,10 +1707,10 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            The email address or link that can be used to subscribe to the mailing list.
-            If this is an email address, a
-            <code>mailto:</code> link will automatically be created when
-            the documentation is created.
+            The email address or link that can be used to subscribe to
+            the mailing list.  If this is an email address, a
+            <code>mailto:</code> link will automatically be created
+            when the documentation is created.
             ]]>
           </description>
           <type>String</type>
@@ -2096,59 +1744,38 @@
         <field>
           <name>archive</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The link to a URL where you can browse the mailing list archive.
-            ]]>
-          </description>
+          <description>The link to a URL where you can browse the mailing list archive.</description>
           <type>String</type>
         </field>
         <field>
           <name>otherArchives</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The link to alternate URLs where you can browse the list archive.
-            ]]>
-          </description>
+          <description>The link to alternate URLs where you can browse the list archive.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
       </fields>
-      <comment>
-        We could probably have a specific element for a dev mailing list
-        for things like CI, and maybe even a specific element for the
-        user and scm mailing lists. Then leave the more lose structure
-        for any other type of mailing list.
-      </comment>
+      <comment>We could probably have a specific element for a dev mailing list for things like CI,
+        and maybe even a specific element for the user and scm mailing lists. Then leave the more
+        lose structure for any other type of mailing list.</comment>
     </class>
     <class>
       <name>Organization</name>
-      <description>
-        Specifies the organization that produces this project.
-      </description>
+      <description>Specifies the organization that produces this project.</description>
       <version>3.0.0+</version>
       <fields>
         <field>
           <name>name</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The full name of the organization.
-            ]]>
-          </description>
+          <description>The full name of the organization.</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            The URL to the organization's home page.
-            ]]>
-          </description>
+          <description>The URL to the organization's home page.</description>
           <type>String</type>
         </field>
         <field>
@@ -2175,21 +1802,13 @@
         <field>
           <name>title</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The title to use for the package group.
-            ]]>
-          </description>
+          <description>The title to use for the package group.</description>
           <type>String</type>
         </field>
         <field>
           <name>packages</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The packages in the group
-            ]]>
-          </description>
+          <description>The packages in the group</description>
           <type>String</type>
         </field>
       </fields>
@@ -2197,11 +1816,7 @@
     <class>
       <name>PatternSet</name>
       <version>3.0.0+</version>
-      <description>
-        <![CDATA[
-        Definition of include or exclude patterns.
-        ]]>
-      </description>
+      <description>Definition of include or exclude patterns.</description>
       <fields>
         <field>
           <name>includes</name>
@@ -2278,33 +1893,21 @@
         <field>
           <name>artifactId</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The artifact id of the parent project to inherit from.
-            ]]>
-          </description>
+          <description>The artifact id of the parent project to inherit from.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>groupId</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The group id of the parent project to inherit from.
-            ]]>
-          </description>
+          <description>The group id of the parent project to inherit from.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The version of the parent project to inherit.
-            ]]>
-          </description>
+          <description>The version of the parent project to inherit.</description>
           <type>String</type>
         </field>
         <field>
@@ -2394,11 +1997,7 @@
         <field>
           <name>url</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            ]]>
-          </description>
+          <description>The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.</description>
           <type>String</type>
         </field>
       </fields>
@@ -2442,22 +2041,14 @@
         <field>
           <name>tag</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The tag of current code. By default, it's set to HEAD during development.
-            ]]>
-          </description>
+          <description>The tag of current code. By default, it's set to HEAD during development.</description>
           <type>String</type>
           <defaultValue>HEAD</defaultValue>
         </field>
         <field>
           <name>url</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            ]]>
-          </description>
+          <description>The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.</description>
           <type>String</type>
         </field>
       </fields>
@@ -2466,21 +2057,13 @@
       <name>FileSet</name>
       <version>3.0.0+</version>
       <superClass>PatternSet</superClass>
-      <description>
-        <![CDATA[
-        A PatternSet for files.
-        ]]>
-      </description>
+      <description>A PatternSet for files.</description>
       <fields>
         <field>
           <name>directory</name>
           <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            Describe the directory where the resources are stored.
-            The path is relative to the POM.
-            ]]>
-          </description>
+          <description>Describe the directory where the resources are stored. The path is relative
+            to the POM.</description>
           <type>String</type>
         </field>
       </fields>
@@ -2503,12 +2086,8 @@
     </class>
     <class>
       <name>Resource</name>
-      <description>
-        <![CDATA[
-        This element describes all of the classpath resources associated with a project or
-        unit tests.
-        ]]>
-      </description>
+      <description>This element describes all of the classpath resources associated with a project
+        or unit tests.</description>
       <version>3.0.0+</version>
       <superClass>FileSet</superClass>
       <fields>
@@ -2561,14 +2140,9 @@
     </class>
     <class>
       <name>SourceModification</name>
-      <description>
-        <![CDATA[
-        This element describes all of the source modifications associated with a
-        project. These modifications are used
-        to exclude or include various source depending on the environment
-        the build is running in.
-        ]]>
-      </description>
+      <description>This element describes all of the source modifications associated with a project.
+        These modifications are used to exclude or include various source depending on the
+        environment the build is running in.</description>
       <version>3.0.0</version>
       <superClass>FileSet</superClass>
       <fields>
@@ -2602,20 +2176,12 @@
       <name>UnitTest</name>
       <version>3.0.0</version>
       <superClass>PatternSet</superClass>
-      <description>
-        <![CDATA[
-        A PatternSet for unit tests.
-        ]]>
-      </description>
+      <description>A PatternSet for unit tests.</description>
       <fields>
         <field>
           <name>resources</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The classpath resources to use when executing the unit tests.
-            ]]>
-          </description>
+          <description>The classpath resources to use when executing the unit tests.</description>
           <association>
             <type>Resource</type>
             <multiplicity>*</multiplicity>
@@ -2651,22 +2217,14 @@
         <field>
           <name>tag</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            The name given in the SCM (e.g. CVS) used by the project for the source
-            code associated with this version of the project.
-            ]]>
-          </description>
+          <description>The name given in the SCM (e.g. CVS) used by the project for the source code
+            associated with this version of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>id</name>
           <version>3.0.0</version>
-          <description>
-            <![CDATA[
-            A unique identifier for a version. This is usually identical to the name.
-            ]]>
-          </description>
+          <description>A unique identifier for a version. This is usually identical to the name.</description>
           <type>String</type>
         </field>
       </fields>
@@ -2691,12 +2249,8 @@
     <class>
       <name>RepositoryBase</name>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        A repository contains the information needed
-        for establishing connections with remote repository.
-        ]]>
-      </description>
+      <description>A repository contains the information needed for establishing connections with
+        remote repository.</description>
       <fields>
         <field>
           <name>id</name>
@@ -2713,11 +2267,7 @@
         <field>
           <name>name</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Human readable name of the repository.
-            ]]>
-          </description>
+          <description>Human readable name of the repository.</description>
           <type>String</type>
         </field>
         <field>
@@ -2777,17 +2327,13 @@
       <name>Repository</name>
       <superClass>RepositoryBase</superClass>
       <version>4.0.0</version>
-      <description>
-        A repository contains the information needed for establishing
-        connections with remote repository.
-      </description>
+      <description>A repository contains the information needed for establishing connections with
+        remote repository.</description>
       <fields>
         <field>
           <name>releases</name>
           <version>4.0.0</version>
-          <description>
-            How to handle downloading of releases from this repository.
-          </description>
+          <description>How to handle downloading of releases from this repository.</description>
           <association>
             <type>RepositoryPolicy</type>
           </association>
@@ -2795,9 +2341,7 @@
         <field>
           <name>snapshots</name>
           <version>4.0.0</version>
-          <description>
-            How to handle downloading of snapshots from this repository.
-          </description>
+          <description>How to handle downloading of snapshots from this repository.</description>
           <association>
             <type>RepositoryPolicy</type>
           </association>
@@ -2826,18 +2370,13 @@
       <name>DeploymentRepository</name>
       <superClass>RepositoryBase</superClass>
       <version>4.0.0</version>
-      <description>
-        Repository contains the information needed for deploying to the
-        remote repository.
-      </description>
+      <description>Repository contains the information needed for deploying to the remote
+        repository.</description>
       <fields>
         <field>
           <name>uniqueVersion</name>
-          <description>
-            Whether to assign snapshots a unique version comprised of
-            the timestamp and build number, or to use the same version
-            each time
-          </description>
+          <description>Whether to assign snapshots a unique version comprised of the timestamp and
+            build number, or to use the same version each time</description>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
           <version>4.0.0</version>
@@ -2865,17 +2404,12 @@
     <class>
       <name>RepositoryPolicy</name>
       <version>4.0.0</version>
-      <description>
-        Download policy.
-      </description>
+      <description>Download policy.</description>
       <fields>
         <field>
           <name>enabled</name>
           <version>4.0.0</version>
-          <description>
-            Whether to use this repository for downloading this type of
-            artifact.
-          </description>
+          <description>Whether to use this repository for downloading this type of artifact.</description>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
         </field>
@@ -2919,11 +2453,7 @@
     <class>
       <name>Site</name>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        Contains the information needed for deploying websites.
-        ]]>
-      </description>
+      <description>Contains the information needed for deploying websites.</description>
       <fields>
         <field>
           <name>id</name>
@@ -2939,11 +2469,7 @@
         <field>
           <name>name</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Human readable name of the deployment location.
-            ]]>
-          </description>
+          <description>Human readable name of the deployment location.</description>
           <type>String</type>
         </field>
         <field>
@@ -2962,28 +2488,16 @@
     <class>
       <name>ConfigurationContainer</name>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        Contains the configuration information of the container like Plugin.
-        ]]>
-      </description>
+      <description>Contains the configuration information of the container like Plugin.</description>
       <fields>
         <field>
           <name>inherited</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Whether any configuration should be propagated to child POMs.
-            ]]>
-          </description>
+          <description>Whether any configuration should be propagated to child POMs.</description>
           <type>String</type>
         </field>
         <field>
-          <description>
-            <![CDATA[
-            The configuration as DOM object.
-            ]]>
-          </description>
+          <description>The configuration as DOM object.</description>
           <name>configuration</name>
           <type>DOM</type>
         </field>
@@ -3021,9 +2535,7 @@
       <fields>
         <field>
           <name>groupId</name>
-          <description>
-            The group ID of the plugin in the repository.
-          </description>
+          <description>The group ID of the plugin in the repository.</description>
           <version>4.0.0</version>
           <type>String</type>
           <required>true</required>
@@ -3031,9 +2543,7 @@
         </field>
         <field>
           <name>artifactId</name>
-          <description>
-            The artifact ID of the plugin in the repository.
-          </description>
+          <description>The artifact ID of the plugin in the repository.</description>
           <version>4.0.0</version>
           <type>String</type>
           <required>true</required>
@@ -3041,33 +2551,22 @@
         <field>
           <name>version</name>
           <version>4.0.0</version>
-          <required>true</required>
-          <description>
-            <![CDATA[
-            The version (or valid range of versions) of the plugin to be used.
-            ]]>
-          </description>
+          <description>The version (or valid range of versions) of the plugin to be used.</description>
           <type>String</type>
         </field>
         <field>
           <name>extensions</name>
           <version>4.0.0</version>
           <type>boolean</type>
-          <description>
-            Whether to load Maven extensions (such as packaging and type
-            handlers) from this plugin. For performance reasons, this
-            should only be enabled when necessary.
-          </description>
+          <description>Whether to load Maven extensions (such as packaging and type handlers) from
+            this plugin. For performance reasons, this should only be enabled when necessary.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>executions</name>
           <version>4.0.0</version>
-          <description>
-            Multiple specifications of a set of goals to execute during
-            the build lifecycle, each having (possibly) a different
-            configuration.
-          </description>
+          <description>Multiple specifications of a set of goals to execute during the build
+            lifecycle, each having (possibly) a different configuration.</description>
           <association>
             <type>PluginExecution</type>
             <multiplicity>*</multiplicity>
@@ -3075,10 +2574,8 @@
         </field>
         <field>
           <name>dependencies</name>
-          <description>
-            Additional dependencies that this project needs to introduce
-            to the plugin's classloader.
-          </description>
+          <description>Additional dependencies that this project needs to introduce to the plugin's
+            classloader.</description>
           <version>4.0.0</version>
           <association>
             <type>Dependency</type>
@@ -3209,28 +2706,20 @@
           <required>true</required>
           <type>String</type>
           <defaultValue>default</defaultValue>
-          <description>
-            The identifier of this execution for labelling the goals
-            during the build, and for matching executions to merge during
-            inheritance.
-          </description>
+          <description>The identifier of this execution for labelling the goals during the build,
+            and for matching executions to merge during inheritance.</description>
         </field>
         <field>
           <name>phase</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            The build lifecycle phase to bind the goals in this
-            execution to. If omitted, the goals will be bound to the
-            default phase specified in their metadata.
-          </description>
+          <description>The build lifecycle phase to bind the goals in this execution to. If omitted,
+            the goals will be bound to the default phase specified in their metadata. </description>
         </field>
         <field>
           <name>goals</name>
           <version>4.0.0</version>
-          <description>
-            The goals to execute with the given configuration.
-          </description>
+          <description>The goals to execute with the given configuration.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -3251,20 +2740,15 @@
     <class>
       <name>DependencyManagement</name>
       <version>4.0.0</version>
-      <description>
-        Section for management of default dependency information for use
-        in a group of POMs.
-      </description>
+      <description>Section for management of default dependency information for use in a group of
+        POMs.</description>
       <fields>
         <field>
           <name>dependencies</name>
           <version>4.0.0</version>
-          <description>
-            The dependencies specified here are not used until they are
-            referenced in a POM within the group. This allows the
-            specification of a "standard" version for a particular
-            dependency.
-          </description>
+          <description>The dependencies specified here are not used until they are referenced in a
+            POM within the group. This allows the specification of a "standard" version for a
+            particular dependency.</description>
           <association>
             <type>Dependency</type>
             <multiplicity>*</multiplicity>
@@ -3276,27 +2760,20 @@
       <name>PluginManagement</name>
       <version>4.0.0</version>
       <superClass>PluginContainer</superClass>
-      <description>
-        Section for management of default plugin information for use in
-        a group of POMs.
+      <description>Section for management of default plugin information for use in a group of POMs.
       </description>
     </class>
     <class>
       <name>Reporting</name>
       <version>4.0.0</version>
-      <description>
-        Section for management of reports and their configuration.
-      </description>
+      <description>Section for management of reports and their configuration.</description>
       <fields>
         <field>
           <name>excludeDefaults</name>
           <version>4.0.0</version>
           <type>boolean</type>
-          <description>
-            If true, then the default reports are not included in the
-            site generation. This includes the reports in the "Project
-            Info" menu.
-          </description>
+          <description>If true, then the default reports are not included in the site generation.
+            This includes the reports in the "Project Info" menu.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -3315,9 +2792,7 @@
         <field>
           <name>plugins</name>
           <version>4.0.0</version>
-          <description>
-            The reporting plugins to use and their configuration.
-          </description>
+          <description>The reporting plugins to use and their configuration.</description>
           <association>
             <type>ReportPlugin</type>
             <multiplicity>*</multiplicity>
@@ -3370,33 +2845,23 @@
       <name>Profile</name>
       <superClass>ModelBase</superClass>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        Modifications to the build process which is activated based on environmental
-        parameters or command line arguments.
-        ]]>
-      </description>
+      <description>Modifications to the build process which is activated based on environmental
+        parameters or command line arguments.</description>
       <fields>
         <field>
           <name>id</name>
           <required>true</required>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            The identifier of this build profile. This used both for
-            command line activation, and identifies identical profiles
-            to merge with during inheritance.
+          <description>The identifier of this build profile. This used both for command line
+            activation, and identifies identical profiles to merge with during inheritance.
           </description>
         </field>
         <field>
           <name>activation</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The conditional logic which will automatically
-            trigger the inclusion of this profile.
-            ]]>
-          </description>
+          <description>The conditional logic which will automatically trigger the inclusion of this
+            profile.</description>
           <association>
             <type>Activation</type>
           </association>
@@ -3405,11 +2870,7 @@
           <name>build</name>
           <version>4.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            Information required to build the project.
-            ]]>
-          </description>
+          <description>Information required to build the project.</description>
           <association>
             <type>BuildBase</type>
           </association>
@@ -3449,21 +2910,16 @@
     <class>
       <name>Activation</name>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        The conditions within the build runtime environment which will trigger
-        the automatic inclusion of the build profile.
-        ]]>
-      </description>
+      <description>The conditions within the build runtime environment which will trigger the
+        automatic inclusion of the build profile.</description>
       <fields>
         <field>
           <name>activeByDefault</name>
           <version>4.0.0</version>
           <type>boolean</type>
-          <description>
-            If set to true, this profile will be active unless another profile in this pom is
-            activated using the command line -P option or by one of that profile's activators.
-          </description>
+          <description>If set to true, this profile will be active unless another profile in this
+            pom is activated using the command line -P option or by one of that profile's
+            activators.</description>
         </field>
         <field>
           <name>jdk</name>
@@ -3480,12 +2936,8 @@
         <field>
           <name>os</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Specifies that this profile will be activated when matching operating
-            system attributes are detected.
-            ]]>
-          </description>
+          <description>Specifies that this profile will be activated when matching operating system
+            attributes are detected.</description>
           <association>
             <type>ActivationOS</type>
           </association>
@@ -3493,11 +2945,8 @@
         <field>
           <name>property</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Specifies that this profile will be activated when this system property is specified.
-            ]]>
-          </description>
+          <description>Specifies that this profile will be activated when this system property is
+            specified.</description>
           <association>
             <type>ActivationProperty</type>
           </association>
@@ -3505,11 +2954,7 @@
         <field>
           <name>file</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Specifies that this profile will be activated based on existence of a file.
-            ]]>
-          </description>
+          <description>Specifies that this profile will be activated based on existence of a file.</description>
           <association>
             <type>ActivationFile</type>
           </association>
@@ -3519,43 +2964,30 @@
     <class>
       <name>ActivationProperty</name>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        This is the property specification used to activate a profile.
-        If the value field is empty, then the existence of the named property
-        will activate the profile, otherwise it does a case-sensitive
-        match against the property value as well.
-        ]]>
-      </description>
+      <description>This is the property specification used to activate a profile. If the value field
+        is empty, then the existence of the named property will activate the profile, otherwise it
+        does a case-sensitive match against the property value as well.</description>
       <fields>
         <field>
           <name>name</name>
           <version>4.0.0</version>
           <type>String</type>
           <required>true</required>
-          <description>
-            The name of the property to be used to activate a profile.
-          </description>
+          <description>The name of the property to be used to activate a profile.</description>
         </field>
         <field>
           <name>value</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            The value of the property required to activate a profile.
-          </description>
+          <description>The value of the property required to activate a profile.</description>
         </field>
       </fields>
     </class>
     <class>
       <name>ActivationOS</name>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        This is an activator which will detect an operating system's attributes in order to activate
-        its profile.
-        ]]>
-      </description>
+      <description>This is an activator which will detect an operating system's attributes in order
+        to activate its profile.</description>
       <fields>
         <field>
           <name>name</name>
@@ -3583,51 +3015,38 @@
           <name>arch</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            The architecture of the operating system to be used to
-            activate the profile.
-          </description>
+          <description>The architecture of the operating system to be used to activate the
+          profile.</description>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            The version of the operating system to be used to activate
-            the profile.
-          </description>
+          <description>The version of the operating system to be used to activate the
+          profile.</description>
         </field>
       </fields>
     </class>
     <class>
       <name>ActivationFile</name>
       <version>4.0.0</version>
-      <description>
-        <![CDATA[
-        This is the file specification used to activate the profile.
-        The missing value will be the location of a file that needs to exist,
-        and if it doesn't the profile will be activated.  On the other hand exists will test
-        for the existence of the file and if it is there the profile will be activated.
-        ]]>
-      </description>
+      <description>This is the file specification used to activate the profile. The missing value
+        will be the location of a file that needs to exist, and if it doesn't the profile will be
+        activated. On the other hand exists will test for the existence of the file and if it is
+        there the profile will be activated.</description>
       <fields>
         <field>
           <name>missing</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            The name of the file that must be missing to activate the
-            profile.
-          </description>
+          <description>The name of the file that must be missing to activate the
+          profile.</description>
         </field>
         <field>
           <name>exists</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            The name of the file that must exist to activate the
-            profile.
-          </description>
+          <description>The name of the file that must exist to activate the profile.</description>
         </field>
       </fields>
     </class>
@@ -3647,45 +3066,33 @@
           <type>String</type>
           <required>true</required>
           <defaultValue>org.apache.maven.plugins</defaultValue>
-          <description>
-            The group ID of the reporting plugin in the repository.
-          </description>
+          <description>The group ID of the reporting plugin in the repository.</description>
         </field>
         <field>
           <name>artifactId</name>
           <version>4.0.0</version>
           <type>String</type>
           <required>true</required>
-          <description>
-            The artifact ID of the reporting plugin in the repository.
-          </description>
+          <description>The artifact ID of the reporting plugin in the repository.</description>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            The version of the reporting plugin to be used.
-            ]]>
-          </description>
+          <description>The version of the reporting plugin to be used.</description>
           <type>String</type>
         </field>
         <field>
           <name>inherited</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            Whether the configuration in this plugin should be made
-            available to projects that inherit from this one.
-          </description>
+          <description>Whether the configuration in this plugin should be made available to projects
+            that inherit from this one.</description>
         </field>
         <field>
           <name>configuration</name>
           <version>4.0.0</version>
           <type>DOM</type>
-          <description>
-            The configuration of the reporting plugin.
-          </description>
+          <description>The configuration of the reporting plugin.</description>
         </field>
         <field>
           <name>reportSets</name>
@@ -3776,49 +3183,32 @@
     <class>
       <name>ReportSet</name>
       <version>4.0.0</version>
-      <description>
-        Represents a set of reports and configuration to be used to
-        generate them.
-      </description>
+      <description>Represents a set of reports and configuration to be used to generate them.</description>
       <fields>
         <field>
           <name>id</name>
           <type>String</type>
           <required>true</required>
-          <description>
-            The unique id for this report set, to be used during POM
-            inheritance.
-          </description>
+          <description>The unique id for this report set, to be used during POM inheritance.</description>
           <defaultValue>default</defaultValue>
         </field>
         <field>
           <name>configuration</name>
           <version>4.0.0</version>
-          <description>
-            Configuration of the report to be used when generating this
-            set.
-          </description>
+          <description>Configuration of the report to be used when generating this set.</description>
           <type>DOM</type>
         </field>
         <field>
           <name>inherited</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>
-            <![CDATA[
-            Whether any configuration should be propagated to child POMs.
-            ]]>
-          </description>
+          <description>Whether any configuration should be propagated to child POMs.</description>
         </field>
         <field>
           <name>reports</name>
           <version>4.0.0</version>
           <required>true</required>
-          <description>
-            <![CDATA[
-            The list of reports from this plugin which should be generated from this set.
-            ]]>
-          </description>
+          <description>The list of reports from this plugin which should be generated from this set.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -3849,19 +3239,15 @@
     <class>
       <name>Prerequisites</name>
       <version>4.0.0</version>
-      <description>
-        Describes the prerequisites a project can have.
-      </description>
+      <description>Describes the prerequisites a project can have.</description>
       <fields>
         <field>
           <name>maven</name>
           <version>4.0.0</version>
           <type>String</type>
           <defaultValue>2.0</defaultValue>
-          <description>
-            The minimum version of Maven required to build the project,
-            or to use this plugin.
-          </description>
+          <description>The minimum version of Maven required to build the project, or to use this
+            plugin.</description>
           <required>false</required>
         </field>
       </fields>
@@ -3869,25 +3255,19 @@
     <class>
       <name>Relocation</name>
       <version>4.0.0</version>
-      <description>
-        Describes where an artifact has moved to. If any of the values
-        are omitted, it is assumed to be the same as it was before.
-      </description>
+      <description>Describes where an artifact has moved to. If any of the values are omitted, it is
+        assumed to be the same as it was before.</description>
       <fields>
         <field>
           <name>groupId</name>
           <version>4.0.0</version>
-          <description>
-            The group ID the artifact has moved to.
-          </description>
+          <description>The group ID the artifact has moved to.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
           <version>4.0.0</version>
-          <description>
-            The new artifact ID of the artifact.
-          </description>
+          <description>The new artifact ID of the artifact.</description>
           <type>String</type>
         </field>
         <field>
@@ -3899,10 +3279,7 @@
         <field>
           <name>message</name>
           <version>4.0.0</version>
-          <description>
-            An additional message to show the user about the move, such
-            as the reason.
-          </description>
+          <description>An additional message to show the user about the move, such as the reason.</description>
           <type>String</type>
         </field>
       </fields>
@@ -3910,16 +3287,12 @@
     <class>
       <name>Extension</name>
       <version>4.0.0</version>
-      <description>
-        Describes a build extension to utilise.
-      </description>
+      <description>Describes a build extension to utilise.</description>
       <fields>
         <field>
           <name>groupId</name>
           <version>4.0.0</version>
-          <description>
-            The group ID of the extension's artifact.
-          </description>
+          <description>The group ID of the extension's artifact.</description>
           <required>true</required>
           <type>String</type>
         </field>
