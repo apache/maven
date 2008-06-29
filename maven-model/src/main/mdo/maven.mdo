@@ -934,7 +934,7 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            This element is <strong>deprecated</strong> and should no longer be used.
+            This element is <b>deprecated</b> and should no longer be used.
             Initially it was used by the first Cactus plugin. Now
             the location of the Cactus test sources is defined
             through a plugin property. See the Cactus plugin
@@ -1178,7 +1178,7 @@
           <required>true</required>
           <description>
             <![CDATA[
-            <strong>Deprecated</strong>. Please use <code>groupId</code> and
+            <b>Deprecated</b>. Please use <code>groupId</code> and
             <code>artifactId</code> together instead.
             ]]>
           </description>
@@ -2151,7 +2151,7 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            If the class with this name can <strong>not</strong> be
+            If the class with this name can <b>not</b> be
             loaded, then the includes and excludes specified below
             will be applied to the contents of the <code>sourceDirectory</code>.
             ]]>
@@ -2163,7 +2163,7 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            If the property with this name is <strong>not</strong> set,
+            If the property with this name is <b>not</b> set,
             then the includes and excludes specified below
             will be applied to the contents of the <code>sourceDirectory</code>.
             ]]>
