@@ -581,6 +581,17 @@ public final class ModelUtils
         return newModel;
     }
 
+    public static Build cloneBuild( Build build )
+    {
+        ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
+
+        Build clone = new Build();
+
+        assembler.assembleBuildInheritance( clone, build );
+
+        return clone;
+    }
+
     private static List cloneProfiles( List profiles )
     {
         if ( profiles == null )

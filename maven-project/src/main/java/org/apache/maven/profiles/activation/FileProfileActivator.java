@@ -30,6 +30,8 @@ import org.codehaus.plexus.util.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.util.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 
+import hidden.org.codehaus.plexus.interpolation.InterpolationException;
+
 import java.io.IOException;
 
 public class FileProfileActivator
@@ -67,7 +69,21 @@ public class FileProfileActivator
 
             if ( StringUtils.isNotEmpty( fileString ) )
             {
-                fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
+                try
+                {
+                    fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
+                }
+                catch ( InterpolationException e )
+                {
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.debug( "Failed to interpolate exists file location for profile activator: " + fileString, e );
+                    }
+                    else
+                    {
+                        logger.warn( "Failed to interpolate exists file location for profile activator: " + fileString + ". Run in debug mode (-X) for more information." );
+                    }
+                }
 
                 boolean result = FileUtils.fileExists( fileString );
 
@@ -84,7 +100,21 @@ public class FileProfileActivator
 
             if ( StringUtils.isNotEmpty( fileString ) )
             {
-                fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
+                try
+                {
+                    fileString = StringUtils.replace( interpolator.interpolate( fileString, "" ), "\\", "/" );
+                }
+                catch ( InterpolationException e )
+                {
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.debug( "Failed to interpolate missing file location for profile activator: " + fileString, e );
+                    }
+                    else
+                    {
+                        logger.warn( "Failed to interpolate missing file location for profile activator: " + fileString + ". Run in debug mode (-X) for more information." );
+                    }
+                }
 
                 boolean result = !FileUtils.fileExists( fileString );
 

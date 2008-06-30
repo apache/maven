@@ -32,6 +32,8 @@ import org.codehaus.plexus.util.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import hidden.org.codehaus.plexus.interpolation.InterpolationException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -119,9 +121,19 @@ public class DefaultMavenSettingsBuilder
 
         interpolator.addValueSource( new EnvarBasedValueSource() );
 
-        serializedSettings = interpolator.interpolate(
-            serializedSettings,
-            "settings" );
+        try
+        {
+            serializedSettings = interpolator.interpolate(
+                serializedSettings,
+                "settings" );
+        }
+        catch ( InterpolationException e )
+        {
+            IOException error = new IOException( "Failed to interpolate settings." );
+            error.initCause( e );
+
+            throw error;
+        }
 
         Settings result = new SettingsXpp3Reader().read( new StringReader( serializedSettings ) );
 

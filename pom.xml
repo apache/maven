@@ -47,8 +47,24 @@ under the License.
   <!-- TODO: TAKE THIS OUT BEFORE WE RELEASE! -->
   <repositories>
     <repository>
+      <id>apache.snapshots</id>
+      <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+    <repository>
       <id>codehaus.snapshots</id>
       <url>http://snapshots.repository.codehaus.org/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
     </repository>
   </repositories>
   
@@ -221,6 +237,7 @@ under the License.
   <properties>
     <plexusVersion>1.0-alpha-48</plexusVersion>
     <wagonVersion>1.0-beta-3</wagonVersion>
+    <artifactVersion>3.0-20080627-013430-64</artifactVersion>
   </properties>
   
   <!--start-->
@@ -286,6 +303,11 @@ under the License.
       <artifactId>maven-core</artifactId>
       <version>2.1-SNAPSHOT</version>
     </dependency>  
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.5.4</version>
+    </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
@@ -295,11 +317,6 @@ under the License.
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
         <version>1.2-alpha-12</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>1.5.1</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -334,6 +351,9 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.artifact</groupId>
         <artifactId>maven-artifact</artifactId>
+        <!--
+        <version>${artifactVersion}</version>
+        -->
         <version>3.0-SNAPSHOT</version>
       </dependency>
       <dependency>
@@ -389,7 +409,7 @@ under the License.
     <!--start-->
   </dependencyManagement>
   <!--end--> 
-   
+  
   <distributionManagement>
     <site>
       <id>apache.website</id>

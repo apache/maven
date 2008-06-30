@@ -20,6 +20,7 @@ package org.apache.maven.extension;
  */
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
@@ -157,12 +158,25 @@ public class DefaultBuildExtensionScanner
 
                 String key = createKey( model );
 
-                if ( inheritedInterpolationValues == null )
+                ProjectBuilderConfiguration config = request.getProjectBuildingConfiguration();
+                Properties execProps = new Properties();
+                if ( config.getExecutionProperties() != null )
+                {
+                    execProps.putAll( config.getExecutionProperties() );
+                }
+
+                if ( inheritedInterpolationValues != null )
+                {
+                    execProps.putAll( inheritedInterpolationValues );
+                }
+                else
                 {
                     inheritedInterpolationValues = new HashMap();
                 }
 
-                model = modelInterpolator.interpolate( model, modelPom.getParentFile(), request.getProjectBuildingConfiguration(), getLogger().isDebugEnabled() );
+                config.setExecutionProperties( execProps );
+
+                model = modelInterpolator.interpolate( model, modelPom.getParentFile(), config, getLogger().isDebugEnabled() );
 
                 grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );
 
@@ -437,7 +451,7 @@ public class DefaultBuildExtensionScanner
         return lineage;
     }
 
-    private List getInitialRemoteRepositories( ProjectBuilderConfiguration config )
+    private List<ArtifactRepository> getInitialRemoteRepositories( ProjectBuilderConfiguration config )
         throws ExtensionScanningException
     {
         if ( basicSuperProject == null )

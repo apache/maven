@@ -27,6 +27,7 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reporting;
+import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
 import org.apache.maven.project.ModelUtils;
@@ -184,6 +185,8 @@ public class DefaultModelInheritanceAssembler
         child.setProperties( props );
     }
 
+    // TODO: Remove this!
+    @SuppressWarnings("unchecked")
     private void assembleDependencyManagementInheritance( Model child, Model parent )
     {
         DependencyManagement parentDepMgmt = parent.getDependencyManagement();
@@ -198,18 +201,18 @@ public class DefaultModelInheritanceAssembler
             }
             else
             {
-                List childDeps = childDepMgmt.getDependencies();
+                List<Dependency> childDeps = childDepMgmt.getDependencies();
 
-                Map mappedChildDeps = new TreeMap();
-                for ( Iterator it = childDeps.iterator(); it.hasNext(); )
+                Map<String, Dependency> mappedChildDeps = new TreeMap<String, Dependency>();
+                for ( Iterator<Dependency> it = childDeps.iterator(); it.hasNext(); )
                 {
-                    Dependency dep = (Dependency) it.next();
+                    Dependency dep = it.next();
                     mappedChildDeps.put( dep.getManagementKey(), dep );
                 }
 
-                for ( Iterator it = parentDepMgmt.getDependencies().iterator(); it.hasNext(); )
+                for ( Iterator<Dependency> it = parentDepMgmt.getDependencies().iterator(); it.hasNext(); )
                 {
-                    Dependency dep = (Dependency) it.next();
+                    Dependency dep = it.next();
                     if ( !mappedChildDeps.containsKey( dep.getManagementKey() ) )
                     {
                         childDepMgmt.addDependency( dep );
@@ -244,17 +247,19 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
+    // TODO: Remove this!
+    @SuppressWarnings("unchecked")
     private void assembleDependencyInheritance( Model child, Model parent )
     {
-        Map depsMap = new LinkedHashMap();
+        Map<String, Dependency> depsMap = new LinkedHashMap<String, Dependency>();
 
-        List deps = parent.getDependencies();
+        List<Dependency> deps = parent.getDependencies();
 
         if ( deps != null )
         {
-            for ( Iterator it = deps.iterator(); it.hasNext(); )
+            for ( Iterator<Dependency> it = deps.iterator(); it.hasNext(); )
             {
-                Dependency dependency = (Dependency) it.next();
+                Dependency dependency = it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
@@ -263,14 +268,14 @@ public class DefaultModelInheritanceAssembler
 
         if ( deps != null )
         {
-            for ( Iterator it = deps.iterator(); it.hasNext(); )
+            for ( Iterator<Dependency> it = deps.iterator(); it.hasNext(); )
             {
-                Dependency dependency = (Dependency) it.next();
+                Dependency dependency = it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
 
-        child.setDependencies( new ArrayList( depsMap.values() ) );
+        child.setDependencies( new ArrayList<Dependency>( depsMap.values() ) );
     }
 
     private void assembleBuildInheritance( Model child, Model parent )
@@ -286,83 +291,91 @@ public class DefaultModelInheritanceAssembler
                 child.setBuild( childBuild );
             }
 
-            // The build has been set but we want to step in here and fill in
-            // values that have not been set by the child.
+            assembleBuildInheritance( childBuild, parentBuild );
+        }
+    }
 
-            if ( childBuild.getSourceDirectory() == null )
-            {
-                childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
-            }
+    // TODO: Remove this!
+    @SuppressWarnings("unchecked")
+    public void assembleBuildInheritance( Build childBuild,
+                                           Build parentBuild )
+    {
+        // The build has been set but we want to step in here and fill in
+        // values that have not been set by the child.
 
-            if ( childBuild.getScriptSourceDirectory() == null )
-            {
-                childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
-            }
+        if ( childBuild.getSourceDirectory() == null )
+        {
+            childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
+        }
 
-            if ( childBuild.getTestSourceDirectory() == null )
-            {
-                childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
-            }
+        if ( childBuild.getScriptSourceDirectory() == null )
+        {
+            childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
+        }
 
-            if ( childBuild.getOutputDirectory() == null )
-            {
-                childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
-            }
+        if ( childBuild.getTestSourceDirectory() == null )
+        {
+            childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
+        }
 
-            if ( childBuild.getTestOutputDirectory() == null )
-            {
-                childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
-            }
+        if ( childBuild.getOutputDirectory() == null )
+        {
+            childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
+        }
 
-            // Extensions are accumlated
-            ModelUtils.mergeExtensionLists( childBuild, parentBuild );
+        if ( childBuild.getTestOutputDirectory() == null )
+        {
+            childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
+        }
 
-            if ( childBuild.getDirectory() == null )
-            {
-                childBuild.setDirectory( parentBuild.getDirectory() );
-            }
+        // Extensions are accumlated
+        ModelUtils.mergeExtensionLists( childBuild, parentBuild );
 
-            if ( childBuild.getDefaultGoal() == null )
-            {
-                childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
-            }
+        if ( childBuild.getDirectory() == null )
+        {
+            childBuild.setDirectory( parentBuild.getDirectory() );
+        }
 
-            if ( childBuild.getFinalName() == null )
-            {
-                childBuild.setFinalName( parentBuild.getFinalName() );
-            }
+        if ( childBuild.getDefaultGoal() == null )
+        {
+            childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
+        }
 
-            ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
+        if ( childBuild.getFinalName() == null )
+        {
+            childBuild.setFinalName( parentBuild.getFinalName() );
+        }
 
-            List resources = childBuild.getResources();
-            if ( ( resources == null ) || resources.isEmpty() )
-            {
-                childBuild.setResources( parentBuild.getResources() );
-            }
+        ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
 
-            resources = childBuild.getTestResources();
-            if ( ( resources == null ) || resources.isEmpty() )
-            {
-                childBuild.setTestResources( parentBuild.getTestResources() );
-            }
+        List<Resource> resources = childBuild.getResources();
+        if ( ( resources == null ) || resources.isEmpty() )
+        {
+            childBuild.setResources( parentBuild.getResources() );
+        }
 
-            // Plugins are aggregated if Plugin.inherit != false
-            ModelUtils.mergePluginLists( childBuild, parentBuild, true );
+        resources = childBuild.getTestResources();
+        if ( ( resources == null ) || resources.isEmpty() )
+        {
+            childBuild.setTestResources( parentBuild.getTestResources() );
+        }
 
-            // Plugin management :: aggregate
-            PluginManagement dominantPM = childBuild.getPluginManagement();
-            PluginManagement recessivePM = parentBuild.getPluginManagement();
+        // Plugins are aggregated if Plugin.inherit != false
+        ModelUtils.mergePluginLists( childBuild, parentBuild, true );
 
-            if ( ( dominantPM == null ) && ( recessivePM != null ) )
-            {
-                // FIXME: Filter out the inherited == false stuff!
-                childBuild.setPluginManagement( recessivePM );
-            }
-            else
-            {
-                ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(),
-                                             false );
-            }
+        // Plugin management :: aggregate
+        PluginManagement dominantPM = childBuild.getPluginManagement();
+        PluginManagement recessivePM = parentBuild.getPluginManagement();
+
+        if ( ( dominantPM == null ) && ( recessivePM != null ) )
+        {
+            // FIXME: Filter out the inherited == false stuff!
+            childBuild.setPluginManagement( recessivePM );
+        }
+        else
+        {
+            ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(),
+                                         false );
         }
     }
 
@@ -525,7 +538,7 @@ public class DefaultModelInheritanceAssembler
     // TODO: Move this to plexus-utils' PathTool.
     private static String resolvePath( String uncleanPath )
     {
-        LinkedList pathElements = new LinkedList();
+        LinkedList<String> pathElements = new LinkedList<String>();
 
         StringTokenizer tokenizer = new StringTokenizer( uncleanPath, "/" );
 

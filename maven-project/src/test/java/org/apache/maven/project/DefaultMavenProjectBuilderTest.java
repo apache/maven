@@ -42,6 +42,7 @@ public class DefaultMavenProjectBuilderTest
 
     private DefaultMavenProjectBuilder projectBuilder;
 
+    @Override
     public void setUp()
         throws Exception
     {
@@ -55,6 +56,7 @@ public class DefaultMavenProjectBuilderTest
         filesToDelete.add( localRepoDir );
     }
 
+    @Override
     public void tearDown()
         throws Exception
     {
@@ -114,6 +116,8 @@ public class DefaultMavenProjectBuilderTest
 
         MavenProject project = getProject( pom );
 
+        projectBuilder.calculateConcreteState( project, new DefaultProjectBuilderConfiguration() );
+
         Build build = project.getBuild();
         assertNotNull( "Project should have a build section containing the test resource.", build );
 
@@ -132,6 +136,7 @@ public class DefaultMavenProjectBuilderTest
         System.out.println( "Interpolated, translated resource directory is: " + res.getDirectory() );
     }
 
+    @Override
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {

@@ -363,15 +363,15 @@ public class MavenMetadataSource
      * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
      * @return {@link Set} &lt; {@link Artifact} >
      */
-    public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope,
                                        ArtifactFilter dependencyFilter, MavenProject project )
         throws InvalidDependencyVersionException
     {
-        Set projectArtifacts = new LinkedHashSet( dependencies.size() );
+        Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>( dependencies.size() );
 
-        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+        for ( Iterator<Dependency> i = dependencies.iterator(); i.hasNext(); )
         {
-            Dependency d = (Dependency) i.next();
+            Dependency d = i.next();
 
             String scope = d.getScope();
 
@@ -406,10 +406,10 @@ public class MavenMetadataSource
             {
                 if ( ( d.getExclusions() != null ) && !d.getExclusions().isEmpty() )
                 {
-                    List exclusions = new ArrayList();
-                    for ( Iterator j = d.getExclusions().iterator(); j.hasNext(); )
+                    List<String> exclusions = new ArrayList<String>();
+                    for ( Iterator<Exclusion> j = d.getExclusions().iterator(); j.hasNext(); )
                     {
-                        Exclusion e = (Exclusion) j.next();
+                        Exclusion e = j.next();
                         exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
                     }
 

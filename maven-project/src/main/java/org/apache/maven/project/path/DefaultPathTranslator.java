@@ -31,6 +31,12 @@ import java.util.List;
 public class DefaultPathTranslator
     implements PathTranslator
 {
+    private static final String[] BASEDIR_EXPRESSIONS = {
+        "${basedir}",
+        "${pom.basedir}",
+        "${project.basedir}"
+    };
+
     private String FILE_SEPARATOR = "/";
 
     public void alignToBaseDirectory( Model model, File basedir )
@@ -91,18 +97,28 @@ public class DefaultPathTranslator
 
     private String stripBasedirToken( String s )
     {
-        String basedirExpr = "${basedir}";
-
         if ( s != null )
         {
-            s = s.trim();
+            String basedirExpr = null;
+            for ( int i = 0; i < BASEDIR_EXPRESSIONS.length; i++ )
+            {
+                basedirExpr = BASEDIR_EXPRESSIONS[i];
+                if ( s.startsWith( basedirExpr ) )
+                {
+                    break;
+                }
+                else
+                {
+                    basedirExpr = null;
+                }
+            }
 
-            if ( s.startsWith( basedirExpr ) )
+            if ( basedirExpr != null )
             {
                 if ( s.length() > basedirExpr.length() )
                 {
-                    // Take out ${basedir} and the leading slash
-                    s = s.substring( basedirExpr.length() + 1 );
+                    // Take out basedir expression and the leading slash
+                    s = chopLeadingFileSeparator( s.substring( basedirExpr.length() ) );
                 }
                 else
                 {
@@ -112,6 +128,25 @@ public class DefaultPathTranslator
         }
 
         return s;
+    }
+
+    /**
+     * Removes the leading directory separator from the specified filesystem path (if any). For platform-independent
+     * behavior, this method accepts both the forward slash and the backward slash as separator.
+     *
+     * @param path The filesystem path, may be <code>null</code>.
+     * @return The altered filesystem path or <code>null</code> if the input path was <code>null</code>.
+     */
+    private String chopLeadingFileSeparator( String path )
+    {
+        if ( path != null )
+        {
+            if ( path.startsWith( "/" ) || path.startsWith( "\\" ) )
+            {
+                path = path.substring( 1 );
+            }
+        }
+        return path;
     }
 
     private boolean requiresBaseDirectoryAlignment( String s )

@@ -58,6 +58,7 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
@@ -269,15 +270,17 @@ public class DefaultPluginManager
         {
             projectPlugin = plugin;
         }
-        else if ( projectPlugin.getVersion() == null || 
-                  Artifact.RELEASE_VERSION.equals(projectPlugin.getVersion()) || 
+        else if ( projectPlugin.getVersion() == null ||
+                  Artifact.RELEASE_VERSION.equals(projectPlugin.getVersion()) ||
                   Artifact.LATEST_VERSION.equals(projectPlugin.getVersion()))
         {
             projectPlugin.setVersion( plugin.getVersion() );
         }
 
-        List artifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project,
-                                            session.getLocalRepository() );
+        Set<Artifact> artifactSet = getPluginArtifacts( pluginArtifact, projectPlugin, project, session.getLocalRepository() );
+
+        List<Artifact> artifacts = ( artifactSet == null || artifactSet.isEmpty() )
+                        ? new ArrayList<Artifact>() : new ArrayList<Artifact>( artifactSet );
 
         getLogger().debug( "Got plugin artifacts:\n\n" + artifacts );
 
@@ -347,7 +350,7 @@ public class DefaultPluginManager
         }
         else
         {
-            List managedPluginArtifacts = realmManager.getPluginArtifacts( projectPlugin );
+            List<Artifact> managedPluginArtifacts = realmManager.getPluginArtifacts( projectPlugin );
 
             if ( ( managedPluginArtifacts == null ) || ( managedPluginArtifacts.isEmpty() && !artifacts.isEmpty() ) )
             {
@@ -356,14 +359,14 @@ public class DefaultPluginManager
         }
     }
 
-    private List getPluginArtifacts( Artifact pluginArtifact,
+    private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact,
                                     Plugin plugin,
                                     MavenProject project,
                                     ArtifactRepository localRepository )
         throws InvalidPluginException, ArtifactNotFoundException, ArtifactResolutionException
     {
 
-        Set projectPluginDependencies;
+        Set<Artifact> projectPluginDependencies;
 
         try
         {
@@ -417,7 +420,7 @@ public class DefaultPluginManager
 
 //        checkPlexusUtils( resolutionGroup, artifactFactory );
 
-        Set dependencies = new LinkedHashSet();
+        Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
 
         // resolve the plugin dependencies specified in <plugin><dependencies> first:
         dependencies.addAll( projectPluginDependencies );
@@ -445,16 +448,18 @@ public class DefaultPluginManager
                                                                                 artifactMetadataSource,
                                                                                 filter );
 
-        List resolved = new ArrayList( result.getArtifacts() );
+        Set<Artifact> resolved = new HashSet<Artifact>();
 
-        for ( Iterator it = resolved.iterator(); it.hasNext(); )
+        for ( Iterator<Artifact> it = result.getArtifacts().iterator(); it.hasNext(); )
         {
-            Artifact artifact = (Artifact) it.next();
+            Artifact artifact = it.next();
 
             if ( !artifact.equals( pluginArtifact ) )
             {
                 artifact = project.replaceWithActiveArtifact( artifact );
             }
+
+            resolved.add( artifact );
         }
 
         getLogger().debug(
@@ -500,6 +505,18 @@ public class DefaultPluginManager
         if ( mojoDescriptor.getDeprecated() != null )
         {
             getLogger().warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
+        }
+
+        if ( !project.isConcrete() )
+        {
+            try
+            {
+                mavenProjectBuilder.calculateConcreteState( project, session.getProjectBuilderConfiguration() );
+            }
+            catch ( ModelInterpolationException e )
+            {
+                throw new PluginManagerException( mojoDescriptor, project, "Failed to calculate concrete state for project.", e );
+            }
         }
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
@@ -673,6 +690,15 @@ public class DefaultPluginManager
             }
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
+        }
+
+        try
+        {
+            mavenProjectBuilder.restoreDynamicState( project, session.getProjectBuilderConfiguration() );
+        }
+        catch ( ModelInterpolationException e )
+        {
+            throw new PluginManagerException( mojoDescriptor, project, "Failed to restore dynamic state for project.", e );
         }
     }
 
