@@ -216,7 +216,7 @@ under the License.
                 </goals>
                 <configuration>
                   <descriptor>src/main/assembly/bin.xml</descriptor>
-                  <finalName>apache-maven-${project.version}</finalName>
+                  <finalName>apache-maven-${pom.version}</finalName>
                 </configuration>
               </execution>
             </executions>
