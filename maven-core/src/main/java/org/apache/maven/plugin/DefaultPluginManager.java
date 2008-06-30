@@ -59,6 +59,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
@@ -83,7 +84,11 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -134,6 +139,8 @@ public class DefaultPluginManager
     protected RuntimeInformation runtimeInformation;
 
     protected MavenProjectBuilder mavenProjectBuilder;
+
+    protected ModelInterpolator modelInterpolator;
 
     protected PluginMappingManager pluginMappingManager;
 
@@ -556,8 +563,43 @@ public class DefaultPluginManager
         Xpp3Dom dom = mojoExecution.getConfiguration();
         if ( dom != null )
         {
-            // make a defensive copy, to keep things from getting polluted.
-            dom = new Xpp3Dom( dom );
+            try
+            {
+                String interpolatedDom = modelInterpolator.interpolate( String.valueOf( dom ),
+                                                                        project.getModel(),
+                                                                        project.getBasedir(),
+                                                                        session.getProjectBuilderConfiguration(),
+                                                                        getLogger().isDebugEnabled() );
+
+                dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
+            }
+            catch ( ModelInterpolationException e )
+            {
+                throw new PluginManagerException(
+                                                  mojoDescriptor,
+                                                  project,
+                                                  "Failed to calculate concrete state for configuration of: "
+                                                                  + mojoDescriptor.getHumanReadableKey(),
+                                                  e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new PluginManagerException(
+                                                  mojoDescriptor,
+                                                  project,
+                                                  "Failed to calculate concrete state for configuration of: "
+                                                                  + mojoDescriptor.getHumanReadableKey(),
+                                                  e );
+            }
+            catch ( IOException e )
+            {
+                throw new PluginManagerException(
+                                                  mojoDescriptor,
+                                                  project,
+                                                  "Failed to calculate concrete state for configuration of: "
+                                                                  + mojoDescriptor.getHumanReadableKey(),
+                                                  e );
+            }
         }
 
         // Event monitoring.

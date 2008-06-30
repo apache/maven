@@ -216,6 +216,9 @@ under the License.
           <role>org.apache.maven.plugin.PluginManagerSupport</role>
         </requirement>
         <requirement>
+          <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.ArtifactFilterManager</role>
         </requirement>
         <requirement>
