@@ -1946,6 +1946,7 @@
         id.append( ":" );
         id.append( getArtifactId() );
         id.append( ":" );
+        id.append( "pom" );
       //  id.append( getPackaging() );
         id.append( ":" );
         id.append( getVersion() );
