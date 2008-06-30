@@ -436,15 +436,6 @@
             published. This is used when the distributions are deployed.</description>
           <type>String</type>
         </field>
-        <field>
-          <name>distributionManagement</name>
-          <version>4.0.0</version>
-          <description>Distribution information for a project that enables deployment of the site
-            and artifacts to remote web servers and repositories respectively.</description>
-          <association>
-            <type>DistributionManagement</type>
-          </association>
-        </field>
 
         <!-- ====================================================================== -->
         <!-- Specific version 3                                                     -->
@@ -604,6 +595,15 @@
         ]]>
       </description>
       <fields>
+        <field>
+          <name>distributionManagement</name>
+          <version>4.0.0</version>
+          <description>Distribution information for a project that enables deployment of the site
+            and artifacts to remote web servers and repositories respectively.</description>
+          <association>
+            <type>DistributionManagement</type>
+          </association>
+        </field>
         <field>
           <name>modules</name>
           <version>4.0.0</version>
