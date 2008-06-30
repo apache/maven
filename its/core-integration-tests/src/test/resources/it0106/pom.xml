@@ -21,13 +21,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven.test.it0106</groupId>
+    <groupId>org.apache.maven.its.it0106</groupId>
     <artifactId>A</artifactId>
     <version>1</version>
     <relativePath>A/pom.xml</relativePath>
   </parent>
 
-  <artifactId>maven-it-it0106</artifactId>
+  <artifactId>B</artifactId>
   <description>When a project has modules and its parent is not preinstalled [MNG-2318]</description>
   <packaging>pom</packaging>
   <name>B</name>
