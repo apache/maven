@@ -237,7 +237,9 @@ under the License.
   <properties>
     <plexusVersion>1.0-alpha-48</plexusVersion>
     <wagonVersion>1.0-beta-3</wagonVersion>
-    <artifactVersion>3.0-20080627-013430-64</artifactVersion>
+    <!-- Not used, yet...
+    <artifactVersion>3.0-20080630.163621-65</artifactVersion>
+    -->
   </properties>
   
   <!--start-->
