@@ -65,6 +65,7 @@ public class IntegrationTestSuite
          * a fail fast technique as well.
          */
 
+        suite.addTestSuite( MavenITmng3642DynamicResourcesTest.class );
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependency.class );
         suite.addTestSuite( MavenITmng3545ProfileDeactivation.class );
         suite.addTestSuite( MavenITmng3536AppendedAbsolutePaths.class );

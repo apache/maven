@@ -21,12 +21,11 @@ under the License.
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>test</groupId>
-    <artifactId>mng3536-AppendedAbsolutePaths</artifactId>
+    <artifactId>mng3535-selfReferentialProperties</artifactId>
     <packaging>pom</packaging>
     <version>1.0</version>
-    <name>Apache Maven: mng3536-AppendedAbsolutePaths</name>
+    <name>Apache Maven: mng3535-selfReferentialProperties</name>
     <build>
-        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.its.plugins</groupId>

@@ -23,7 +23,15 @@ public class MavenITmng3581PluginUsesWagonDependency
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3581-useWagonDependency" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        File pluginDir = new File( testDir, "plugin" );
+        File projectDir = new File( testDir, "project" );
+
+        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier = new Verifier( projectDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

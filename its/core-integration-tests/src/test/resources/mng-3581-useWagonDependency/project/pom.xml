@@ -6,8 +6,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-uses-wagon</artifactId>
+        <groupId>org.apache.maven.its.mng3581</groupId>
+        <artifactId>maven-mng3581-plugin</artifactId>
+        <version>1</version>
         <executions>
           <execution>
             <phase>validate</phase>
