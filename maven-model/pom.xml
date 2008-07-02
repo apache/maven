@@ -68,7 +68,6 @@ under the License.
           <plugin>
             <groupId>org.codehaus.modello</groupId>
             <artifactId>modello-maven-plugin</artifactId>
-            <version>1.0-alpha-8</version>
             <executions>
               <execution>
                 <id>v3</id>
