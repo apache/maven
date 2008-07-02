@@ -1126,6 +1126,13 @@ public class DefaultMavenProjectBuilder
             return;
         }
 
+        Build build = project.getBuild();
+        if ( build != null )
+        {
+            initResourceMergeIds( build.getResources() );
+            initResourceMergeIds( build.getTestResources() );
+        }
+
         Model model = ModelUtils.cloneModel( project.getModel() );
 
         File basedir = project.getBasedir();
@@ -1176,6 +1183,17 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setConcrete( true );
+    }
+
+    private void initResourceMergeIds( List<Resource> resources )
+    {
+        if ( resources != null )
+        {
+            for ( Resource resource : resources )
+            {
+                resource.initMergeId();
+            }
+        }
     }
 
     private void calculateConcreteProjectReferences( MavenProject project,
@@ -1506,9 +1524,10 @@ public class DefaultMavenProjectBuilder
         return result;
     }
 
-    private List restoreResources( List originalResources,
-                                       List originalInterpolatedResources,
-                                       List changedResources,
+    // TODO: Convert this to use the mergeId on each resource...
+    private List restoreResources( List<Resource> originalResources,
+                                       List<Resource> originalInterpolatedResources,
+                                       List<Resource> changedResources,
                                        MavenProject project,
                                        ProjectBuilderConfiguration config )
         throws ModelInterpolationException
@@ -1518,58 +1537,86 @@ public class DefaultMavenProjectBuilder
             return originalResources;
         }
 
-        List result = new ArrayList();
+        List<Resource> result = new ArrayList<Resource>();
 
-        Map orig = new HashMap();
+        Map<String, Resource[]> originalResourcesByMergeId = new HashMap<String, Resource[]>();
         for ( int idx = 0; idx < originalResources.size(); idx++ )
         {
             Resource[] permutations = new Resource[2];
 
-            permutations[0] = (Resource) originalInterpolatedResources.get( idx );
-            permutations[1] = (Resource) originalResources.get( idx );
+            permutations[0] = originalInterpolatedResources.get( idx );
+            permutations[1] = originalResources.get( idx );
 
-            orig.put( permutations[0].getDirectory(), permutations );
+            originalResourcesByMergeId.put( permutations[0].getMergeId(), permutations );
         }
 
-        for ( Iterator it = changedResources.iterator(); it.hasNext(); )
+        for ( Resource resource : changedResources )
         {
-            Resource resource = (Resource) it.next();
-            String rDir = modelInterpolator.interpolate( resource.getDirectory(), project.getModel(), project.getBasedir(), config, getLogger().isDebugEnabled() );
-
-            String relativeDir;
-            if ( project.getBasedir() != null )
-            {
-                relativeDir = pathTranslator.unalignFromBaseDirectory( resource.getDirectory(),
-                                                                       project.getBasedir() );
-            }
-            else
-            {
-                relativeDir = resource.getDirectory();
-            }
-
-            String relativeRDir = modelInterpolator.interpolate( relativeDir, project.getModel(), project.getBasedir(), config, getLogger().isDebugEnabled() );
-
-            Resource[] original = (Resource[]) orig.get( rDir );
-            if ( original == null )
-            {
-                original = (Resource[]) orig.get( relativeRDir );
-            }
-
-            if ( original == null )
+            String mergeId = resource.getMergeId();
+            if ( mergeId == null || !originalResourcesByMergeId.containsKey( mergeId ) )
             {
                 result.add( resource );
             }
             else
             {
-                // TODO: Synchronize all non-directory fields, such as targetPath, includes, and excludes.
-//                String target = interpolator.interpolate( resource.getTargetPath(), model, context );
-//                String oTarget = interpolator.interpolate( originalResource.getTargetPath(), model, context );
+                Resource originalInterpolatedResource = originalResourcesByMergeId.get( mergeId )[0];
+                Resource originalResource = originalResourcesByMergeId.get( mergeId )[1];
 
-                result.add( original[1] );
+                String dir = modelInterpolator.interpolate( resource.getDirectory(), project.getModel(), project.getBasedir(), config, getLogger().isDebugEnabled() );
+                String oDir = originalInterpolatedResource.getDirectory();
+
+                if ( !dir.equals( oDir ) )
+                {
+                    originalResource.setDirectory( pathTranslator.unalignFromBaseDirectory( dir, project.getBasedir() ) );
+                }
+
+                if ( resource.getTargetPath() != null )
+                {
+                    String target = modelInterpolator.interpolate( resource.getTargetPath(), project.getModel(), project.getBasedir(), config, getLogger().isDebugEnabled() );
+
+                    String oTarget = originalInterpolatedResource.getTargetPath();
+
+                    if ( !target.equals( oTarget ) )
+                    {
+                        originalResource.setTargetPath( pathTranslator.unalignFromBaseDirectory( target, project.getBasedir() ) );
+                    }
+                }
+
+                originalResource.setFiltering( resource.isFiltering() );
+
+                originalResource.setExcludes( collectRestoredListOfPatterns( resource.getExcludes(),
+                                                                             originalResource.getExcludes(),
+                                                                             originalInterpolatedResource.getExcludes() ) );
+
+                originalResource.setIncludes( collectRestoredListOfPatterns( resource.getIncludes(),
+                                                                             originalResource.getIncludes(),
+                                                                             originalInterpolatedResource.getIncludes() ) );
+
+                result.add( originalResource );
             }
         }
 
         return result;
+    }
+
+    private List<String> collectRestoredListOfPatterns( List<String> patterns,
+                                                        List<String> originalPatterns,
+                                                        List<String> originalInterpolatedPatterns )
+    {
+        LinkedHashSet<String> collectedPatterns = new LinkedHashSet<String>();
+
+        collectedPatterns.addAll( originalPatterns );
+
+        for ( String pattern : patterns )
+        {
+            if ( !originalInterpolatedPatterns.contains( pattern ) )
+            {
+                collectedPatterns.add( pattern );
+            }
+        }
+
+        return (List<String>) ( collectedPatterns.isEmpty() ? Collections.emptyList()
+                        : new ArrayList<String>( collectedPatterns ) );
     }
 
     private void validateModel( Model model,

@@ -2121,12 +2121,36 @@
           <type>boolean</type>
           <defaultValue>false</defaultValue>
         </field>
+        <field>
+          <name>mergeId</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            FOR INTERNAL USE ONLY. This is a unique identifier assigned to each
+            resource to allow Maven to merge changes to this resource that take 
+            place during the execution of a plugin. This field must be managed
+            by the generated parser and formatter classes in order to allow it
+            to survive model interpolation.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    private static int mergeIdCounter = 0;
+    
+    public void initMergeId()
+    {
+        if ( getMergeId() == null )
+        {
+            setMergeId( "resource-" + (mergeIdCounter++) );
+        }
+    }
+    
     /**
      * @see java.lang.Object#toString()
      */
