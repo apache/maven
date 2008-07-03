@@ -54,7 +54,6 @@
       <li><a href="http://maven.apache.org/maven-v3_0_0.xsd">http://maven.apache.org/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
       <li><a href="http://maven.apache.org/maven-v4_0_0.xsd">http://maven.apache.org/maven-v4_0_0.xsd</a> for Maven 2.0.</li>
     </ul>
-    <b>Note:</b> the following ordering is considered as the reference ordering.
     ]]>
   </description>
   <defaults>
