@@ -101,6 +101,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
         suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
         suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
+        suite.addTestSuite( MavenITmng2068ReactorRelativeParentsTest.class );
         suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
         suite.addTestSuite( MavenITmng1493NonStandardModulePomNames.class );
         suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
