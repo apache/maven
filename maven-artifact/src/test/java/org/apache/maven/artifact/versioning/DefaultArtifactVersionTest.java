@@ -76,6 +76,13 @@ public class DefaultArtifactVersionTest
         checkVersionParsing( "1.7.3.0-1" , 0, 0, 0, 0, "1.7.3.0-1" );
         checkVersionParsing( "PATCH-1193602" , 0, 0, 0, 0, "PATCH-1193602" );
         checkVersionParsing( "5.0.0alpha-2006020117" , 0, 0, 0, 0, "5.0.0alpha-2006020117" );
+        checkVersionParsing( "1.0.0.-SNAPSHOT", 0, 0, 0, 0, "1.0.0.-SNAPSHOT" );
+        checkVersionParsing( "1..0-SNAPSHOT", 0, 0, 0, 0, "1..0-SNAPSHOT" );
+        checkVersionParsing( "1.0.-SNAPSHOT", 0, 0, 0, 0, "1.0.-SNAPSHOT" );
+        checkVersionParsing( ".1.0-SNAPSHOT", 0, 0, 0, 0, ".1.0-SNAPSHOT" );
+
+        checkVersionParsing( "1.2.3.200705301630" , 0, 0, 0, 0, "1.2.3.200705301630" );
+        checkVersionParsing( "1.2.3-200705301630" , 1, 2, 3, 0, "200705301630" );
     }
 
     public void testVersionComparing()

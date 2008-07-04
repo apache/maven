@@ -183,6 +183,7 @@ public class DefaultArtifactVersion
         else
         {
             boolean fallback = false;
+
             StringTokenizer tok = new StringTokenizer( part1, "." );
             try
             {
@@ -196,6 +197,12 @@ public class DefaultArtifactVersion
                     incrementalVersion = getNextIntegerToken( tok );
                 }
                 if ( tok.hasMoreTokens() )
+                {
+                    fallback = true;
+                }
+
+                // string tokenzier won't detect these and ignores them
+                if ( part1.indexOf( ".." ) >= 0 || part1.startsWith( "." ) || part1.endsWith( "." ) )
                 {
                     fallback = true;
                 }
