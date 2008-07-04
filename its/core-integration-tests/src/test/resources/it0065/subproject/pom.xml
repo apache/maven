@@ -13,7 +13,7 @@
       <plugin>
         <groupId>org.apache.maven.its.it0065</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
         <executions>
           <execution>
             <goals>
