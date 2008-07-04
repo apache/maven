@@ -41,6 +41,7 @@ under the License.
       </plugin>
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
+        <version>2.4</version>
         <configuration>
           <skip>true</skip>
         </configuration>
