@@ -33,6 +33,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
+        <version>1.2-SNAPSHOT</version>
         <executions>
           <execution>
             <phase>package</phase>
