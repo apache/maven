@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.maven.project;
 
 import org.apache.maven.model.Build;
@@ -123,15 +142,15 @@ public class MavenProjectDynamismTest
 
         assertEquals( "Concrete source directory should be absolute.",
                       new File( baseDir, "/src/main/java" ).getAbsolutePath(),
-                      build.getSourceDirectory() );
+                      new File( build.getSourceDirectory() ).getAbsolutePath() );
 
         assertEquals( "Concrete test-source directory should be absolute.",
                       new File( baseDir, "/src/test/java" ).getAbsolutePath(),
-                      build.getTestSourceDirectory() );
+                      new File( build.getTestSourceDirectory() ).getAbsolutePath() );
 
         assertEquals( "Concrete script-source directory should be absolute.",
                       new File( baseDir, "/src/main/scripts" ).getAbsolutePath(),
-                      build.getScriptSourceDirectory() );
+                      new File( build.getScriptSourceDirectory() ).getAbsolutePath() );
 
         List compileSourceRoots = project.getCompileSourceRoots();
 
@@ -143,7 +162,7 @@ public class MavenProjectDynamismTest
 
         assertEquals( "Concrete compile-source roots should contain interpolated source-directory value.",
                       new File( baseDir, "/src/main/java" ).getAbsolutePath(),
-                      compileSourceRoots.get( 0 ) );
+                      new File( (String) compileSourceRoots.get( 0 ) ).getAbsolutePath() );
 
         List testCompileSourceRoots = project.getTestCompileSourceRoots();
 
@@ -156,7 +175,7 @@ public class MavenProjectDynamismTest
 
         assertEquals( "Concrete test-compile-source roots should contain interpolated test-source-directory value.",
                       new File( baseDir, "/src/test/java" ).getAbsolutePath(),
-                      testCompileSourceRoots.get( 0 ) );
+                      new File( (String) testCompileSourceRoots.get( 0 ) ).getAbsolutePath() );
 
         List scriptSourceRoots = project.getScriptSourceRoots();
 
@@ -168,7 +187,7 @@ public class MavenProjectDynamismTest
 
         assertEquals( "Concrete script-source roots should contain interpolated script-source-directory value.",
                       new File( baseDir, "/src/main/scripts" ).getAbsolutePath(),
-                      scriptSourceRoots.get( 0 ) );
+                      new File( (String) scriptSourceRoots.get( 0 ) ).getAbsolutePath() );
 
         List resources = build.getResources();
 
@@ -178,7 +197,7 @@ public class MavenProjectDynamismTest
 
         assertEquals( "Concrete resource should contain absolute path.",
                       new File( buildDir, "generated-resources/plexus" ).getAbsolutePath(),
-                      ( (Resource) resources.get( 0 ) ).getDirectory() );
+                      new File( ( (Resource) resources.get( 0 ) ).getDirectory() ).getAbsolutePath() );
 
         List filters = build.getFilters();
 
@@ -188,19 +207,19 @@ public class MavenProjectDynamismTest
 
         assertEquals( "Concrete filter entry should contain absolute path.",
                       new File( buildDir, "/generated-filters.properties" ).getAbsolutePath(),
-                      filters.get( 0 ) );
+                      new File( (String) filters.get( 0 ) ).getAbsolutePath() );
 
         assertEquals( "Concrete output-directory should be absolute.",
                       new File( buildDir, "/classes" ).getAbsolutePath(),
-                      build.getOutputDirectory() );
+                      new File( build.getOutputDirectory() ).getAbsolutePath() );
 
         assertEquals( "Concrete test-output-directory should be absolute.",
                       new File( buildDir, "/test-classes" ).getAbsolutePath(),
-                      build.getTestOutputDirectory() );
+                      new File( build.getTestOutputDirectory() ).getAbsolutePath() );
 
         assertEquals( "Concrete build directory should be absolute.",
                       new File( baseDir, "target" ).getAbsolutePath(),
-                      build.getDirectory() );
+                      new File( build.getDirectory() ).getAbsolutePath() );
 
         // --------------------------------------------------------------------
         // NOW, RESTORE THE DYNAMIC STATE FOR THE BUILD SECTION AND
@@ -384,7 +403,7 @@ public class MavenProjectDynamismTest
                       build.getDirectory() );
         assertEquals( "First concrete build output-directory should be absolute and point to target/classes dir.",
                       new File( project.getBasedir(), "target/classes" ).getAbsolutePath(),
-                      build.getOutputDirectory() );
+                      new File( build.getOutputDirectory() ) .getAbsolutePath() );
 
         build.setDirectory( "target2" );
 
@@ -393,7 +412,7 @@ public class MavenProjectDynamismTest
                       build.getDirectory() );
         assertEquals( "AFTER CHANGING BUILD DIRECTORY, build output-directory should be absolute and still point to target/classes dir.",
                       new File( project.getBasedir(), "target/classes" ).getAbsolutePath(),
-                      build.getOutputDirectory() );
+                      new File( build.getOutputDirectory() ).getAbsolutePath() );
 
         projectBuilder.restoreDynamicState( project, config );
         projectBuilder.calculateConcreteState( project, config );
@@ -405,7 +424,7 @@ public class MavenProjectDynamismTest
                       build.getDirectory() );
         assertEquals( "Second concrete build output-directory should be absolute and point to target2/classes dir.",
                       new File( project.getBasedir(), "target2/classes" ).getAbsolutePath(),
-                      build.getOutputDirectory() );
+                      new File( build.getOutputDirectory() ).getAbsolutePath() );
     }
 
     public void testShouldPreserveInitialValuesForPropertiesReferencingBuildPaths()
@@ -506,7 +525,7 @@ public class MavenProjectDynamismTest
             for ( Iterator it = resources.iterator(); it.hasNext(); )
             {
                 Resource resource = (Resource) it.next();
-                if ( directory.equals( resource.getDirectory() ) )
+                if ( new File( directory ).getAbsolutePath().equals( new File( resource.getDirectory() ).getAbsolutePath() ) )
                 {
                     found = true;
                     break;
@@ -531,7 +550,7 @@ public class MavenProjectDynamismTest
             for ( Iterator it = filters.iterator(); it.hasNext(); )
             {
                 String filterPath = (String) it.next();
-                if ( path.equals( filterPath ) )
+                if ( new File( path ).getAbsolutePath().equals( new File( filterPath ).getAbsolutePath() ) )
                 {
                     found = true;
                     break;
