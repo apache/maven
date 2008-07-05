@@ -51,7 +51,10 @@ public class DefaultRuntimeInformation
 
     public void initialize()
         throws InitializationException
-    {
+    {        
+        applicationVersion = new DefaultArtifactVersion( "2.1-SNAPSHOT" );    
+
+        /*
         InputStream resourceAsStream = null;
         try
         {
@@ -80,5 +83,6 @@ public class DefaultRuntimeInformation
         {
             IOUtil.close( resourceAsStream );
         }
+        */
     }
 }
