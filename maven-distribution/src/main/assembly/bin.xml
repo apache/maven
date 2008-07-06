@@ -74,6 +74,8 @@ under the License.
         <include>m2</include>
         <include>mvn</include>
         <include>mvnDebug</include>
+        <!-- This is so that CI systems can periodically run the profiler -->
+        <include>mvnyjp</include>
       </includes>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
