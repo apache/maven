@@ -133,14 +133,7 @@ public class MavenMetadataSource
                 }
                 catch ( InvalidProjectModelException e )
                 {
-                    if ( strictlyEnforceThePresenceOfAValidMavenPOM )
-                    {
-                        throw new ArtifactMetadataRetrievalException( "Invalid POM file for artifact: '" +
-                            artifact.getDependencyConflictId() + "' Reason: " + e.getMessage(), e, artifact );
-                    }
-
-                    getLogger().warn( "POM for \'" + pomArtifact +
-                        "\' is invalid. It will be ignored for artifact resolution. Reason: " + e.getMessage() );
+                    handleInvalidOrMissingMavenPOM( artifact, e );
 
                     if ( getLogger().isDebugEnabled() )
                     {
@@ -167,11 +160,7 @@ public class MavenMetadataSource
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    if ( strictlyEnforceThePresenceOfAValidMavenPOM )
-                    {
-                        throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '" +
-                            artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
-                    }
+                    handleInvalidOrMissingMavenPOM( artifact, e );
                 }
 
                 if ( project != null )
@@ -291,6 +280,25 @@ public class MavenMetadataSource
         }
 
         return result;
+    }
+
+    private void handleInvalidOrMissingMavenPOM( Artifact artifact, ProjectBuildingException e )
+        throws ArtifactMetadataRetrievalException
+    {
+        if ( strictlyEnforceThePresenceOfAValidMavenPOM )
+        {
+            throw new ArtifactMetadataRetrievalException( "Invalid POM file for artifact: '" +
+                artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
+        }
+        else
+        {
+            getLogger().warn(
+                              "\n\tDEPRECATION: The POM for the artifact '"
+                                  + artifact.getDependencyConflictId()
+                                  + "' was invalid or not found on any repositories.\n"
+                                  + "\tThis may not be supported by future versions of Maven and should be corrected as soon as possible.\n"
+                                  + "\tError given: " + e.getMessage() + "\n" );
+        }
     }
 
     private void loadProjectBuilder()
