@@ -1,44 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements. See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to you under the Apache License, Version
+    2.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+    applicable law or agreed to in writing, software distributed under
+    the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+    OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and
+    limitations under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
     <version>8</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
-
   <artifactId>maven</artifactId>
   <version>2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-
   <name>Apache Maven</name>
-  <description>Maven is a project development management and comprehension tool. Based on the concept of a project object model: builds, dependency
-    management, documentation creation, site publication, and distribution publication are all controlled from the declarative file. Maven can be
-    extended by plugins to utilise a number of other development tools for reporting or the build process.
-  </description>
+  <description>Maven is a project development management and
+    comprehension tool. Based on the concept of a project object model:
+    builds, dependency management, documentation creation, site
+    publication, and distribution publication are all controlled from
+    the declarative file. Maven can be extended by plugins to utilise a
+    number of other development tools for reporting or the build
+    process. </description>
   <url>http://maven.apache.org/</url>
   <inceptionYear>2001</inceptionYear>
-
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
@@ -67,7 +63,6 @@ under the License.
       </releases>
     </repository>
   </repositories>
-  
   <mailingLists>
     <mailingList>
       <name>Maven Developer List</name>
@@ -115,8 +110,10 @@ under the License.
         <otherArchive>http://maven.commits.markmail.org/</otherArchive>
       </otherArchives>
     </mailingList>
-
-    <!-- duplication from parent pom - temporary until they inherit properly -->
+    <!--
+      duplication from parent pom - temporary until they inherit
+      properly
+    -->
     <mailingList>
       <name>Maven Announcements List</name>
       <post>announce@maven.apache.org</post>
@@ -141,13 +138,11 @@ under the License.
       </otherArchives>
     </mailingList>
   </mailingLists>
-
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/trunk</developerConnection>
     <url>http://svn.apache.org/viewcvs.cgi/maven/components/trunk</url>
   </scm>
-
   <build>
     <pluginManagement>
       <plugins>
@@ -219,7 +214,6 @@ under the License.
       </plugin>
     </plugins>
   </build>
-
   <modules>
     <module>maven-core</module>
     <module>maven-distribution</module>
@@ -233,13 +227,21 @@ under the License.
     <module>maven-workspace</module>
     <module>maven-toolchain</module>
   </modules>
-
+  
   <properties>
     <plexusVersion>1.0-alpha-48</plexusVersion>
     <wagonVersion>1.0-beta-3</wagonVersion>
-    <!-- Not used, yet...
-    <artifactVersion>3.0-20080630.163621-65</artifactVersion>
-    -->
+    <artifactVersion>3.0-SNAPSHOT</artifactVersion>
+    <classWorldsVersion>1.2-alpha-12</classWorldsVersion>
+    <plexusUtilsVersion>1.5.4</plexusUtilsVersion>   
+    <doxiaVersion>1.0-alpha-9</doxiaVersion>   
+    <aspectjVersion>1.5.3</aspectjVersion>
+    <junitVersion>3.8.1</junitVersion> 
+    <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
+    <plexusInterpolationVersion>1.0</plexusInterpolationVersion>
+    <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
+    <commonsCliVersion>1.0</commonsCliVersion>
+    <easyMockVersion>1.2_Java1.3</easyMockVersion>
   </properties>
   
   <!--start-->
@@ -247,69 +249,70 @@ under the License.
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>${junitVersion}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <dependencyManagement>
     <!--end-->
     <dependencies>
+      <!--  Maven Modules -->
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-workspace</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-lifecycle</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-reporting-api</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-profile</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-project</artifactId>
-        <version>2.1-SNAPSHOT</version>
-      </dependency>      
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-toolchain</artifactId>
-      <version>2.1-SNAPSHOT</version>
-    </dependency>        
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-embedder</artifactId>
-      <version>2.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
-      <version>2.1-SNAPSHOT</version>
-    </dependency>  
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>1.5.4</version>
-    </dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-toolchain</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-embedder</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!--  Plexus -->
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexusUtilsVersion}</version>
+      </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-container-default</artifactId>
@@ -318,13 +321,25 @@ under the License.
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
-        <version>1.2-alpha-12</version>
+        <version>${classWorldsVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
-        <version>1.0</version>
+        <version>${plexusInterpolationVersion}</version>
       </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-interactivity-api</artifactId>
+        <version>${plexusInteractivityVersion}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-component-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>      
+      <!--  Wagon -->
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
@@ -353,32 +368,29 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.artifact</groupId>
         <artifactId>maven-artifact</artifactId>
-        <!--
         <version>${artifactVersion}</version>
-        -->
-        <version>3.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.doxia</groupId>
         <artifactId>doxia-sink-api</artifactId>
-        <version>1.0-alpha-9</version>
+        <version>${doxiaVersion}</version>
       </dependency>
       <dependency>
         <groupId>easymock</groupId>
         <artifactId>easymock</artifactId>
-        <version>1.2_Java1.3</version>
+        <version>${easyMockVersion}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>commons-httpclient</groupId>
         <artifactId>commons-httpclient</artifactId>
-        <version>3.1</version>
+        <version>${commonsHttpClientVersion}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>commons-cli</groupId>
         <artifactId>commons-cli</artifactId>
-        <version>1.0</version>
+        <version>${commonsCliVersion}</version>
         <exclusions>
           <exclusion>
             <artifactId>commons-lang</artifactId>
@@ -394,31 +406,18 @@ under the License.
       <dependency>
         <groupId>aspectj</groupId>
         <artifactId>aspectjrt</artifactId>
-        <version>1.5.3</version>
-      </dependency>      
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-interactivity-api</artifactId>
-        <version>1.0-alpha-6</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-component-api</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>${aspectjVersion}</version>
       </dependency>
     </dependencies>
     <!--start-->
   </dependencyManagement>
-  <!--end--> 
-  
+  <!--end-->
   <distributionManagement>
     <site>
       <id>apache.website</id>
       <url>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</url>
     </site>
   </distributionManagement>
-
   <profiles>
     <profile>
       <id>osgi</id>
@@ -488,25 +487,25 @@ under the License.
       <build>
         <plugins>
           <plugin>
-             <groupId>org.apache.maven.plugins</groupId>
-             <artifactId>maven-enforcer-plugin</artifactId>
-             <version>1.0-alpha-3</version>
-             <executions>
-               <execution>
-                 <id>enforce-jdk-15</id>
-                 <goals>
-                   <goal>enforce</goal>
-                 </goals>
-                 <configuration>
-                   <rules>
-                     <requireJavaVersion>
-                       <version>1.5</version>
-                     </requireJavaVersion>
-                   </rules>    
-                 </configuration>
-               </execution>
-             </executions>
-           </plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>1.0-alpha-3</version>
+            <executions>
+              <execution>
+                <id>enforce-jdk-15</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireJavaVersion>
+                      <version>1.5</version>
+                    </requireJavaVersion>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
