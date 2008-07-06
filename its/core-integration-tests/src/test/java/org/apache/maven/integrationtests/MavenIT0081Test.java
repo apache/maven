@@ -17,6 +17,7 @@ public class MavenIT0081Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0081" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifact( "org.apache.maven.its.it0081", "test-plugin", "0.1", "maven-plugin" );
         verifier.executeGoal( "install" );
         verifier.assertFilePresent( "test-component-c/target/org.apache.maven.wagon.providers.ftp.FtpWagon" );
         verifier.verifyErrorFreeLog();
