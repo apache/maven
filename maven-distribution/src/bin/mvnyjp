@@ -35,7 +35,7 @@
 
 YJPLIB=/applications/YourKit.app/bin/mac/libyjpagent.jnilib
 
-MAVEN_OPTS=-agentpath:$YJPLIB=onexit=snapshot,onexit=memory,tracing
+MAVEN_OPTS=-agentpath:$YJPLIB=onexit=snapshot,onexit=memory,tracing,onlylocal
 
 QUOTED_ARGS=""
 while [ "$1" != "" ] ; do
