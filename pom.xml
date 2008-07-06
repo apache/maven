@@ -229,19 +229,19 @@
   </modules>
   
   <properties>
-    <plexusVersion>1.0-alpha-48</plexusVersion>
-    <wagonVersion>1.0-beta-3</wagonVersion>
     <artifactVersion>3.0-SNAPSHOT</artifactVersion>
-    <classWorldsVersion>1.2-alpha-12</classWorldsVersion>
-    <plexusUtilsVersion>1.5.4</plexusUtilsVersion>   
-    <doxiaVersion>1.0-alpha-9</doxiaVersion>   
     <aspectjVersion>1.5.3</aspectjVersion>
+    <classWorldsVersion>1.2-alpha-12</classWorldsVersion>
+    <commonsCliVersion>1.0</commonsCliVersion>
+    <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
+    <doxiaVersion>1.0-alpha-9</doxiaVersion>   
+    <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.1</junitVersion> 
+    <plexusVersion>1.0-alpha-48</plexusVersion>
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.0</plexusInterpolationVersion>
-    <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
-    <commonsCliVersion>1.0</commonsCliVersion>
-    <easyMockVersion>1.2_Java1.3</easyMockVersion>
+    <plexusUtilsVersion>1.5.4</plexusUtilsVersion>   
+    <wagonVersion>1.0-beta-3</wagonVersion>
   </properties>
   
   <!--start-->
