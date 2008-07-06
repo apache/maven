@@ -202,6 +202,21 @@
           <artifactId>maven-bundle-plugin</artifactId>
           <version>1.0.0</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <artifactId>shade-maven-plugin</artifactId>
+          <groupId>org.codehaus.mojo</groupId>
+          <version>1.0-alpha-12</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2-beta-2</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -227,20 +242,19 @@
     <module>maven-workspace</module>
     <module>maven-toolchain</module>
   </modules>
-  
   <properties>
     <artifactVersion>3.0-SNAPSHOT</artifactVersion>
     <aspectjVersion>1.5.3</aspectjVersion>
     <classWorldsVersion>1.2-alpha-12</classWorldsVersion>
     <commonsCliVersion>1.0</commonsCliVersion>
     <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
-    <doxiaVersion>1.0-alpha-9</doxiaVersion>   
+    <doxiaVersion>1.0-alpha-9</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
-    <junitVersion>3.8.1</junitVersion> 
+    <junitVersion>3.8.1</junitVersion>
     <plexusVersion>1.0-alpha-48</plexusVersion>
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.0</plexusInterpolationVersion>
-    <plexusUtilsVersion>1.5.4</plexusUtilsVersion>   
+    <plexusUtilsVersion>1.5.4</plexusUtilsVersion>
     <wagonVersion>1.0-beta-3</wagonVersion>
   </properties>
   
