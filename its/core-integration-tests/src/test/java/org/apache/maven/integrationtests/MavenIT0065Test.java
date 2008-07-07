@@ -17,6 +17,7 @@ public class MavenIT0065Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0065" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifact( "org.apache.maven.its.it0065", "plugin", "1.0", "maven-plugin" );
         verifier.executeGoal( "install" );
         verifier.assertFilePresent( "subproject/target/child-basedir" );
         verifier.assertFilePresent( "parent-basedir" );
