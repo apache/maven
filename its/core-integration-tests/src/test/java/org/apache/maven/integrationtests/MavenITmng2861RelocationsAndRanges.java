@@ -35,10 +35,10 @@ public class MavenITmng2861RelocationsAndRanges
          * makes it easy to do this.
          */
         verifier = new Verifier( new File(testDir,"MNG-2861").getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2123", "MNG-2861", "1.0-SNAPSHOT", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2123", "A", "1.0-SNAPSHOT", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2123", "B", "1.0-SNAPSHOT", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2123", "C", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2861", "MNG-2861", "1.0-SNAPSHOT", "pom" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2861", "A", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2861", "B", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2861", "C", "1.0-SNAPSHOT", "jar" );
 
         verifier.executeGoal( "install" );
 

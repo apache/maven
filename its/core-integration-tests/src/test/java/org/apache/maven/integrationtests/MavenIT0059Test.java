@@ -21,9 +21,6 @@ public class MavenIT0059Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0059" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
-        verifier.setCliOptions( cliOptions );
         Properties verifierProperties = new Properties();
         verifierProperties.put( "failOnErrorOutput", "false" );
         verifier.setVerifierProperties( verifierProperties );

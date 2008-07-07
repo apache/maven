@@ -63,13 +63,10 @@ public class MavenITmng3372DirectInvocationOfPlugins
         // The testdir is computed from the location of this
         // file.
         File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372-directInvocationOfPlugins/dependency-tree" );
-        File settingsFile = new File( testBaseDir, "settings.xml" );
 
         Verifier verifier = new Verifier( testBaseDir.getAbsolutePath() );
 
         List cliOptions = new ArrayList();
-        cliOptions.add( "-s" );
-        cliOptions.add( settingsFile.getAbsolutePath() );
         cliOptions.add( "-U" );
 
         verifier.setCliOptions( cliOptions );

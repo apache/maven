@@ -31,9 +31,6 @@ public class MavenITmng2744checksumVerificationTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2744-checksumVerification" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
-        verifier.setCliOptions( cliOptions );
 
         verifier.deleteArtifact( "org.apache.maven.its.mng2744", "a", "1", "pom" );
         verifier.deleteArtifact( "org.apache.maven.its.mng2744", "a", "1", "jar" );

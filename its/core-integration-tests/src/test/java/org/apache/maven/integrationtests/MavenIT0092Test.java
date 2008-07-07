@@ -25,9 +25,6 @@ public class MavenIT0092Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0092" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
-        verifier.setCliOptions( cliOptions );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
         verifier.executeGoal( "compile" );
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
