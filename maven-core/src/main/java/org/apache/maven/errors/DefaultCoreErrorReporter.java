@@ -131,6 +131,7 @@ public class DefaultCoreErrorReporter
             writer.write( NEWLINE );
             writer.write( NEWLINE );
             writer.write( "Please see:" );
+            writer.write( NEWLINE );
             for ( Iterator it = tips.iterator(); it.hasNext(); )
             {
                 String tip = (String) it.next();
