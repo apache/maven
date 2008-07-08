@@ -468,6 +468,16 @@ public class DefaultWagonManager
 
                     if ( downloaded )
                     {
+                        if ( sha1ChecksumObserver != null )
+                        {
+                            wagon.removeTransferListener( sha1ChecksumObserver );
+                        }
+
+                        if ( md5ChecksumObserver != null )
+                        {
+                            wagon.removeTransferListener( md5ChecksumObserver );
+                        }
+
                         // keep the checksum files from showing up on the download monitor...
                         if ( downloadMonitor != null )
                         {
