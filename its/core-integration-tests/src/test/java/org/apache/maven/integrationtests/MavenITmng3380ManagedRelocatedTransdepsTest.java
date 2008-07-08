@@ -38,7 +38,8 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
 		installDependencies( testDir );
 
         String path = testDir.getAbsolutePath() //
-                + "/projects/root-groupId/root-artifactId/1";
+                + "/consumer";
+
         verifier = new Verifier(path);
         verifier.executeGoal("package");
 
@@ -52,37 +53,37 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
     {
         // install projects
         String path = testDir.getAbsolutePath() //
-                + "/projects/other-groupId/other-artifactId-c/1";
+                + "/other-c";
         Verifier verifier = new Verifier(path);
         verifier.executeGoal("install");
 
         path = testDir.getAbsolutePath() //
-                + "/projects/other-groupId/other-artifactId-b/1";
+                + "/other-b";
         verifier = new Verifier(path);
         verifier.executeGoal("install");
 
         path = testDir.getAbsolutePath() //
-                + "/projects/other-groupId/other-artifactId-a/1";
+                + "/other-a";
         verifier = new Verifier(path);
         verifier.executeGoal("install");
 
         path = testDir.getAbsolutePath() //
-                + "/projects/transitive-dependency-old-groupId/transitive-dependency-artifactId/1";
+                + "/transdep-old";
         verifier = new Verifier(path);
         verifier.executeGoal("install");
 
         path = testDir.getAbsolutePath() //
-                + "/projects/transitive-dependency-new-groupId/transitive-dependency-artifactId/1";
+                + "/transdep-new-1";
         verifier = new Verifier(path);
         verifier.executeGoal("install");
 
         path = testDir.getAbsolutePath() //
-                + "/projects/transitive-dependency-new-groupId/transitive-dependency-artifactId/2";
+                + "/transdep-new-2";
         verifier = new Verifier(path);
         verifier.executeGoal("install");
 
         path = testDir.getAbsolutePath() //
-                + "/projects/direct-dependency-groupId/direct-dependency-artifactId/1";
+                + "/direct-dep";
         verifier = new Verifier(path);
         verifier.executeGoal("install");
     }
