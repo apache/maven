@@ -35,7 +35,8 @@ public interface ModelInheritanceAssembler
     void assembleModelInheritance( Model child, Model parent );
 
     void assembleBuildInheritance( Build childBuild,
-                                          Build parentBuild );
+                                          Build parentBuild,
+                                          boolean handleAsInheriance );
 
     void copyModel( Model dest, Model source );
 }

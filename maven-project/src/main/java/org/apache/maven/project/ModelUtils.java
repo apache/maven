@@ -587,7 +587,7 @@ public final class ModelUtils
 
         Build clone = new Build();
 
-        assembler.assembleBuildInheritance( clone, build );
+        assembler.assembleBuildInheritance( clone, build, false );
 
         return clone;
     }

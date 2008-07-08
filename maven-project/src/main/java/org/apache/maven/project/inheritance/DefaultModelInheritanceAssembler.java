@@ -291,14 +291,15 @@ public class DefaultModelInheritanceAssembler
                 child.setBuild( childBuild );
             }
 
-            assembleBuildInheritance( childBuild, parentBuild );
+            assembleBuildInheritance( childBuild, parentBuild, true );
         }
     }
 
     // TODO: Remove this!
     @SuppressWarnings("unchecked")
     public void assembleBuildInheritance( Build childBuild,
-                                           Build parentBuild )
+                                           Build parentBuild,
+                                           boolean handleAsInheritance )
     {
         // The build has been set but we want to step in here and fill in
         // values that have not been set by the child.
@@ -361,7 +362,7 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Plugins are aggregated if Plugin.inherit != false
-        ModelUtils.mergePluginLists( childBuild, parentBuild, true );
+        ModelUtils.mergePluginLists( childBuild, parentBuild, handleAsInheritance );
 
         // Plugin management :: aggregate
         PluginManagement dominantPM = childBuild.getPluginManagement();
