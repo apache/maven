@@ -125,7 +125,27 @@ public class DefaultLifecycleExecutor
 
         if ( ( goals == null ) || goals.isEmpty() )
         {
-            throw new NoGoalsSpecifiedException( "\n\nYou must specify at least one goal. Try 'install' to build or mvn -? for other options.\n See http://maven.apache.org for more information.\n\n" );
+            StringBuffer buffer = new StringBuffer( 1024 );
+
+            buffer.append( "\n\n" );
+            buffer.append( "You must specify at least one goal or lifecycle phase to perform build steps.\n" );
+            buffer.append( "The following list illustrates some commonly used build commands:\n\n" );
+            buffer.append( "  mvn clean\n" );
+            buffer.append( "    Deletes any build output (e.g. class files or JARs).\n" );
+            buffer.append( "  mvn test\n" );
+            buffer.append( "    Runs the unit tests for the project.\n" );
+            buffer.append( "  mvn install\n" );
+            buffer.append( "    Copies the project artifacts into your local repository.\n" );
+            buffer.append( "  mvn deploy\n" );
+            buffer.append( "    Copies the project artifacts into the remote repository.\n" );
+            buffer.append( "  mvn site\n" );
+            buffer.append( "    Creates project documentation (e.g. reports or Javadoc).\n\n" );
+            buffer.append( "Please see\n" );
+            buffer.append( "http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html\n" );
+            buffer.append( "for a complete description of available lifecycle phases.\n\n" );
+            buffer.append( "Use \"mvn -?\" to show general usage information about Maven's command line.\n\n" );
+
+            throw new NoGoalsSpecifiedException( buffer.toString() );
         }
 
         List taskSegments = segmentTaskListByAggregationNeeds(
@@ -889,6 +909,7 @@ public class DefaultLifecycleExecutor
             this.aggregate = aggregate;
         }
 
+        @Override
         public String toString()
         {
             StringBuffer message = new StringBuffer();

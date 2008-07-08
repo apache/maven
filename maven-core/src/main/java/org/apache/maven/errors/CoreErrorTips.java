@@ -41,6 +41,7 @@ public final class CoreErrorTips
 {
 
     private static final List NO_GOALS_TIPS = Arrays.asList( new String[] {
+        "Introduction to the Build Lifecycle", "\t(http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)",
         "Maven in 5 Minutes guide (http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)",
         "Maven User's documentation (http://maven.apache.org/users/)",
         "Maven Plugins page (http://maven.apache.org/plugins/)",

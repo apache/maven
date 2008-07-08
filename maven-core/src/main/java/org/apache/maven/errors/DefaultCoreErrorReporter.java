@@ -86,25 +86,39 @@ public class DefaultCoreErrorReporter
         StringWriter writer = new StringWriter();
 
         writer.write( NEWLINE );
-        writer.write( "You have not specified any goals or lifecycle phases for Maven to execute." );
+        writer.write( NEWLINE );
+        writer.write( "You must specify at least one goal or lifecycle phase to perform build steps." );
+        writer.write( NEWLINE );
+        writer.write( "The following list illustrates some commonly used build commands:" );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
-        writer.write( "Either specify a goal or lifecycle phase on the command line" );
+        writer.write( "  mvn clean" );
         writer.write( NEWLINE );
-        writer.write( "(you may want to try \'package\' to get started), or configure the " );
+        writer.write( "    Deletes any build output (e.g. class files or JARs)." );
         writer.write( NEWLINE );
-        writer.write( "<defaultGoal/> element in the build section of your project POM." );
+        writer.write( "  mvn test" );
+        writer.write( NEWLINE );
+        writer.write( "    Runs the unit tests for the project." );
+        writer.write( NEWLINE );
+        writer.write( "  mvn install" );
+        writer.write( NEWLINE );
+        writer.write( "    Copies the project artifacts into your local repository." );
+        writer.write( NEWLINE );
+        writer.write( "  mvn deploy" );
+        writer.write( NEWLINE );
+        writer.write( "    Copies the project artifacts into the remote repository." );
+        writer.write( NEWLINE );
+        writer.write( "  mvn site" );
+        writer.write( NEWLINE );
+        writer.write( "    Creates project documentation (e.g. reports or Javadoc)." );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "NOTE: You can also chain multiple goals/phases together, as in the following example:" );
-        writer.write( NEWLINE );
-        writer.write( "mvn clean package" );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-
         addTips( CoreErrorTips.getNoGoalsTips(), writer );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
+        writer.write( "Use \"mvn -?\" to show general usage information about Maven's command line." );
+        writer.write( NEWLINE );
+        writer.write( NEWLINE );
 
         registerBuildError( error, writer.toString() );
     }
@@ -116,7 +130,7 @@ public class DefaultCoreErrorReporter
         {
             writer.write( NEWLINE );
             writer.write( NEWLINE );
-            writer.write( "Some tips:" );
+            writer.write( "Please see:" );
             for ( Iterator it = tips.iterator(); it.hasNext(); )
             {
                 String tip = (String) it.next();
@@ -125,6 +139,9 @@ public class DefaultCoreErrorReporter
                 writer.write( "\t- " );
                 writer.write( tip );
             }
+            writer.write( NEWLINE );
+            writer.write( NEWLINE );
+            writer.write( "for more information." );
         }
     }
 
