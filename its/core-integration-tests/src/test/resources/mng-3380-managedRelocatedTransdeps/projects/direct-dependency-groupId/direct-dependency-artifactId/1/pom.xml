@@ -1,0 +1,13 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>direct-dependency-groupId</groupId>
+  <artifactId>direct-dependency-artifactId</artifactId>
+  <version>1</version>
+  <dependencies>
+    <dependency>
+      <groupId>transitive-dependency-old-groupId</groupId>
+      <artifactId>transitive-dependency-artifactId</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+</project>

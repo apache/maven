@@ -1,0 +1,6 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>other-groupId</groupId>
+  <artifactId>other-artifactId-a</artifactId>
+  <version>1</version>
+</project>

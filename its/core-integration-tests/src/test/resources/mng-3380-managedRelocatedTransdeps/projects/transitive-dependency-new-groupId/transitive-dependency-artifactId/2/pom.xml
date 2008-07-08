@@ -1,0 +1,18 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>transitive-dependency-new-groupId</groupId>
+  <artifactId>transitive-dependency-artifactId</artifactId>
+  <version>2</version>
+  <dependencies>
+    <dependency>
+      <groupId>other-groupId</groupId>
+      <artifactId>other-artifactId-a</artifactId>
+      <version>1</version>
+    </dependency>
+    <dependency>
+      <groupId>other-groupId</groupId>
+      <artifactId>other-artifactId-b</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+</project>
