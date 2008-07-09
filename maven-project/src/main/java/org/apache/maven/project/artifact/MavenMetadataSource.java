@@ -89,16 +89,59 @@ public class MavenMetadataSource
     private boolean strictlyEnforceThePresenceOfAValidMavenPOM = false;
 
     /**
-     * Retrieve the metadata for the project from the repository.
-     * Uses the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
-     * associated artifacts.
+     * Resolve all relocations in the POM for this artifact, and return the new artifact coordinate.
      */
-    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                               ArtifactRepository localRepository,
+                                               List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        if ( artifact instanceof ActiveProjectArtifact )
+        {
+            return artifact;
+        }
+
+        ProjectRelocation res = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
+        MavenProject project = res.project;
+
+        if ( project == null || getRelocationKey( artifact ).equals( getRelocationKey( project.getArtifact() ) ) )
+        {
+            return artifact;
+        }
+
+        Artifact result = null;
+        if ( artifact.getClassifier() != null )
+        {
+            result = artifactFactory.createArtifactWithClassifier( project.getGroupId(), project.getArtifactId(), project.getVersion(), artifact.getType(), artifact.getClassifier() );
+        }
+        else
+        {
+            result = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), artifact.getScope(), artifact.getType() );
+        }
+
+        result.setScope( artifact.getScope() );
+        result.setArtifactHandler( artifact.getArtifactHandler() );
+        result.setDependencyFilter( artifact.getDependencyFilter() );
+        result.setDependencyTrail( artifact.getDependencyTrail() );
+        result.setOptional( artifact.isOptional() );
+        result.setRelease( artifact.isRelease() );
+
+        return result;
+    }
+
+    private String getRelocationKey( Artifact artifact )
+    {
+        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
+    }
+
+    private ProjectRelocation retrieveRelocatedProject( Artifact artifact,
+                                                   ArtifactRepository localRepository,
+                                                   List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         if ( remoteRepositories == null )
         {
-            remoteRepositories = Collections.EMPTY_LIST;
+            remoteRepositories = Collections.emptyList();
         }
 
         try
@@ -111,7 +154,6 @@ public class MavenMetadataSource
         }
 
         MavenProject project = null;
-
         Artifact pomArtifact;
 
         boolean done = false;
@@ -181,14 +223,17 @@ public class MavenMetadataSource
                         if ( relocation.getGroupId() != null )
                         {
                             artifact.setGroupId( relocation.getGroupId() );
+                            project.setGroupId( relocation.getGroupId() );
                         }
                         if ( relocation.getArtifactId() != null )
                         {
                             artifact.setArtifactId( relocation.getArtifactId() );
+                            project.setArtifactId( relocation.getArtifactId() );
                         }
                         if ( relocation.getVersion() != null )
                         {
                             artifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
+                            project.setVersion( relocation.getVersion() );
                         }
 
                         if ( ( artifact.getDependencyFilter() != null ) &&
@@ -238,6 +283,25 @@ public class MavenMetadataSource
             }
         }
         while ( !done );
+
+        ProjectRelocation res = new ProjectRelocation();
+        res.project = project;
+        res.pomArtifact = pomArtifact;
+
+        return res;
+    }
+
+    /**
+     * Retrieve the metadata for the project from the repository.
+     * Uses the ProjectBuilder, to enable post-processing and inheritance calculation before retrieving the
+     * associated artifacts.
+     */
+    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        ProjectRelocation res = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
+        MavenProject project = res.project;
+        Artifact pomArtifact = res.pomArtifact;
 
         // last ditch effort to try to get this set...
         if ( artifact.getDownloadUrl() == null )
@@ -511,4 +575,11 @@ public class MavenMetadataSource
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
+
+    private static final class ProjectRelocation
+    {
+        private MavenProject project;
+        private Artifact pomArtifact;
+    }
+
 }

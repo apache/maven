@@ -189,6 +189,14 @@ public class TestArtifactResolver
 
             return projectArtifacts;
         }
+
+        public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                   ArtifactRepository localRepository,
+                                                   List<ArtifactRepository> remoteRepositories )
+            throws ArtifactMetadataRetrievalException
+        {
+            return artifact;
+        }
     }
 
     public Source source()
@@ -199,12 +207,14 @@ public class TestArtifactResolver
     /**
      * @noinspection RefusedBequest
      */
+    @Override
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         artifact.setFile( new File( "dummy" ) );
     }
 
+    @Override
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
                                                          ArtifactRepository localRepository, List remoteRepositories,
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
@@ -214,6 +224,7 @@ public class TestArtifactResolver
                                           new Source( artifactFactory, repositoryFactory, container ), filter );
     }
 
+    @Override
     public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
                                                          List remoteRepositories, ArtifactRepository localRepository,
                                                          ArtifactMetadataSource source )
@@ -226,7 +237,7 @@ public class TestArtifactResolver
     public void contextualize( Context context )
         throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
 }
