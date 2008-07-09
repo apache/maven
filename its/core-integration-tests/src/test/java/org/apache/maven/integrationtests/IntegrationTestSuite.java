@@ -79,6 +79,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRanges.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
+        suite.addTestSuite( MavenITmng3380ManagedRelocatedTransdepsTest.class );
         suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
         suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
