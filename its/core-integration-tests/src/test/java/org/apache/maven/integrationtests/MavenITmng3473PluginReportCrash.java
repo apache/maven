@@ -7,6 +7,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,6 +30,8 @@ public class MavenITmng3473PluginReportCrash
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
 
+        File logFile = new File( testDir, "log.txt" );
+
         // force the use of the 2.4.1 plugin version via a profile here...
         List cliOptions = new ArrayList();
         cliOptions.add( "-Pplugin-2.4.1" );
@@ -38,12 +41,16 @@ public class MavenITmng3473PluginReportCrash
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        logFile.renameTo( new File( testDir, "log-2.4.1-preinstall.txt" ) );
+
         //should succeed with 2.4.1
-        verifier.executeGoal( "site" );
+        verifier.executeGoals( Arrays.asList( new String[]{ "org.apache.maven.plugins:maven-help-plugin:2.0.2:effective-pom", "site" } ) );
 
         // NOTE: Velocity prints an [ERROR] line pertaining to an incorrect macro usage when run in 2.1, so this doesn't work.
 //        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        logFile.renameTo( new File( testDir, "log-2.4.1.txt" ) );
 
         //should fail with 2.4
         cliOptions.clear();
@@ -60,5 +67,7 @@ public class MavenITmng3473PluginReportCrash
         }
         verifier.verifyTextInLog( "org/apache/maven/doxia/module/site/manager/SiteModuleNotFoundException" );
         verifier.resetStreams();
+
+        logFile.renameTo( new File( testDir, "log-2.4.txt" ) );
     }
 }
