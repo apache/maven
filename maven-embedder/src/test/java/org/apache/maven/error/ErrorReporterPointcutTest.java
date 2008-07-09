@@ -19,16 +19,6 @@ package org.apache.maven.error;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-
-import junit.framework.TestCase;
-
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.DefaultConfiguration;
@@ -44,6 +34,16 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.easymock.MockControl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
+import junit.framework.TestCase;
+
 public class ErrorReporterPointcutTest
     extends TestCase
 {
@@ -55,6 +55,7 @@ public class ErrorReporterPointcutTest
 
     private String basedir;
 
+    @Override
     public void setUp()
         throws Exception
     {
@@ -81,6 +82,7 @@ public class ErrorReporterPointcutTest
         maven = new MavenEmbedder( configuration );
     }
 
+    @Override
     public void tearDown()
         throws Exception
     {
@@ -341,7 +343,7 @@ public class ErrorReporterPointcutTest
 
         reporter.reportErrorInterpolatingModel( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
-        reporterCtl.setVoidCallable();
+        reporterCtl.setVoidCallable( MockControl.ONE_OR_MORE );
 
         reporterCtl.replay();
 
@@ -1170,18 +1172,14 @@ public class ErrorReporterPointcutTest
 
         buildTestAccessory( plugin );
 
-        Settings settings = new Settings();
-        settings.addPluginGroup( "org.apache.maven.errortest" );
-
         reporter.reportInvalidPluginForDirectInvocation( null, null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 
         reporterCtl.replay();
 
-        MavenExecutionRequest request =
-            createRequest( projectDir, reporter ).setSettings( settings ).setGoals(
-                                                                                    Arrays.asList( "missing-direct-invoke-mojo:test" ) );
+        MavenExecutionRequest request = createRequest( projectDir, reporter ).setGoals( Arrays.asList( "org.apache.maven.errortest:missing-direct-invoke-mojo-maven-plugin:1:test" ) )
+                                                                             .setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
 
         MavenExecutionResult result = maven.execute( request );
 
@@ -1201,18 +1199,13 @@ public class ErrorReporterPointcutTest
 
         buildTestAccessory( plugin );
 
-        Settings settings = new Settings();
-        settings.addPluginGroup( "org.apache.maven.errortest" );
-
         reporter.reportDuplicateAttachmentException( null, null, null );
         reporterCtl.setMatcher( MockControl.ALWAYS_MATCHER );
         reporterCtl.setVoidCallable();
 
         reporterCtl.replay();
 
-        MavenExecutionRequest request =
-            createRequest( project, reporter ).setSettings( settings ).setGoals(
-                                                                                 Arrays.asList( "duplicated-attachments:test" ) );
+        MavenExecutionRequest request = createRequest( project, reporter ).setGoals( Arrays.asList( "org.apache.maven.errortest:duplicated-attachments-maven-plugin:1:test" ) );
 
         MavenExecutionResult result = maven.execute( request );
 
