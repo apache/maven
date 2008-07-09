@@ -88,8 +88,14 @@ public class MavenMetadataSource
             return artifact;
         }
 
-        MavenProject project = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
-
+        ProjectRelocation rel = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
+        
+        if ( rel == null )
+        {
+            return null;
+        }
+        
+        MavenProject project = rel.project;
         if ( project == null || getRelocationKey( artifact ).equals( getRelocationKey( project.getArtifact() ) ) )
         {
             return artifact;
@@ -123,7 +129,7 @@ public class MavenMetadataSource
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
 
-    private MavenProject retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         MavenProject project = null;
@@ -257,7 +263,11 @@ public class MavenMetadataSource
         }
         while ( !done );
 
-        return project;
+        ProjectRelocation rel = new ProjectRelocation();
+        rel.project = project;
+        rel.pomArtifact = pomArtifact;
+        
+        return rel;
     }
 
     /**
@@ -268,20 +278,15 @@ public class MavenMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        MavenProject project = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
-        Artifact pomArtifact;
-        if ( project != null )
+        ProjectRelocation rel = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
+        
+        if ( rel == null )
         {
-            pomArtifact = project.getArtifact();
+            return null;
         }
-        else
-        {
-            pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(),
-                                                   artifact.getArtifactId(),
-                                                   artifact.getVersion(),
-                                                   artifact.getScope() );
-        }
-
+        
+        MavenProject project = rel.project;
+        Artifact pomArtifact = rel.pomArtifact;
 
         // last ditch effort to try to get this set...
         if ( artifact.getDownloadUrl() == null && pomArtifact != null )
@@ -497,4 +502,11 @@ public class MavenMetadataSource
 
         return versions;
     }
+    
+    private static final class ProjectRelocation
+    {
+        private MavenProject project;
+        private Artifact pomArtifact;
+    }
+
 }
