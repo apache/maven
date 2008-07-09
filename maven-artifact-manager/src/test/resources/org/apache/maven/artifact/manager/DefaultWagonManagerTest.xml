@@ -41,13 +41,8 @@ under the License.
     </component>
     <component>
       <role>org.apache.maven.wagon.Wagon</role>
-      <role-hint>noop</role-hint>
-      <implementation>org.apache.maven.artifact.manager.StringWagon</implementation>
-    </component>
-    <component>
-      <role>org.apache.maven.wagon.Wagon</role>
       <role-hint>string</role-hint>
-      <implementation>org.apache.maven.artifact.manager.WagonString</implementation>
+      <implementation>org.apache.maven.artifact.manager.StringWagon</implementation>
     </component>
     <component>
       <role>org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider</role>

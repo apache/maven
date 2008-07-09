@@ -19,6 +19,8 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +33,7 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringOutputStream;
 
@@ -46,7 +49,7 @@ public class StringWagon
 
     public String[] getSupportedProtocols()
     {
-        return new String[] { "noop" };
+        return new String[] { "string" };
     }
 
     public void closeConnection()
@@ -64,6 +67,7 @@ public class StringWagon
         if ( content != null )
         {
             resource.setContentLength( content.length() );
+            resource.setLastModified( System.currentTimeMillis() );
 
             inputData.setInputStream( new StringInputStream( content ) );
         }
@@ -82,5 +86,10 @@ public class StringWagon
     protected void openConnectionInternal()
         throws ConnectionException, AuthenticationException
     {
+    }
+
+    public void clearExpectedContent()
+    {
+        expectedContent.clear();        
     }
 }
