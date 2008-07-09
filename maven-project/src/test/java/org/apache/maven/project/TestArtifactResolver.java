@@ -178,6 +178,14 @@ public class TestArtifactResolver
 
             return projectArtifacts;
         }
+
+        public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                   ArtifactRepository localRepository,
+                                                   List remoteRepositories )
+            throws ArtifactMetadataRetrievalException
+        {
+            return artifact;
+        }
     }
 
     public Source source()
@@ -215,7 +223,7 @@ public class TestArtifactResolver
     public void contextualize( Context context )
         throws ContextException
     {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
 }

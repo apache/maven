@@ -1061,5 +1061,13 @@ public class DefaultArtifactCollectorTest
                 artifactVersions.add( new DefaultArtifactVersion( spec.artifact.getVersion() ) );
             }
         }
+
+        public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                   ArtifactRepository localRepository,
+                                                   List remoteRepositories )
+            throws ArtifactMetadataRetrievalException
+        {
+            return artifact;
+        }
     }
 }

@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Provides some metadata operations, like querying the remote repository for a list of versions available for an
  * artifact.
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
@@ -40,10 +40,16 @@ public interface ArtifactMetadataSource
         throws ArtifactMetadataRetrievalException;
 
     /**
+     * Resolve all relocations in the POM for this artifact, and return the new artifact coordinate.
+     */
+    Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+        throws ArtifactMetadataRetrievalException;
+
+    /**
      * Get a list of available versions for an artifact in the remote repository
-     * 
+     *
      * @param artifact artifact we are interested in. Only <code>groupid</code> and <code>artifactId</code>
-     *                 are needed, for instance the following code will work 
+     *                 are needed, for instance the following code will work
      *                 <code>artifactFactory.createProjectArtifact( "org.apache.maven", "maven", "" )</code>
      * @param localRepository local repository
      * @param remoteRepositories remote repositories, {@link List} $lt; {@link ArtifactRepository} >

@@ -130,6 +130,14 @@ public class ArtifactResolverTest
             {
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }
+
+            public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                       ArtifactRepository localRepository,
+                                                       List remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                return artifact;
+            }
         };
 
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( g ),
@@ -185,6 +193,14 @@ public class ArtifactResolverTest
                                                    List remoteRepositories )
             {
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+            }
+
+            public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                       ArtifactRepository localRepository,
+                                                       List remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                return artifact;
             }
         };
 
