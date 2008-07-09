@@ -123,6 +123,19 @@ under the License.
   </scm>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -201,6 +214,14 @@ under the License.
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>clirr-maven-plugin</artifactId>
+          <configuration>
+            <!-- needed for release: default value "(,${project.version})" for 2.0.10 is 2.0.10-SNAPSHOT -->
+            <comparisonVersion>2.0.9</comparisonVersion>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -460,10 +481,6 @@ under the License.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <!-- needed for release: default value "(,${project.version})" for 2.0.10 is 2.0.10-SNAPSHOT -->
-              <comparisonVersion>2.0.9</comparisonVersion>
-            </configuration>
           </plugin>
         </plugins>
       </reporting>
