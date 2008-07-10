@@ -21,6 +21,7 @@ package org.apache.maven.artifact.manager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -368,6 +369,7 @@ public class DefaultWagonManagerTest
             fail( "Checksum verification did not pass: " + e.getMessage() );
         }
 
+        artifact.getFile().delete();
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "upper-case-checksum" );
         wagon.addExpectedContent( "path.sha1", "B7BB97D7D0B9244398D9B47296907F73313663E6" );
@@ -381,6 +383,7 @@ public class DefaultWagonManagerTest
             fail( "Checksum verification did not pass: " + e.getMessage() );
         }
 
+        artifact.getFile().delete();
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "expected-failure" );
         wagon.addExpectedContent( "path.sha1", "b7bb97d7d0b9244398d9b47296907f73313663e6" );
@@ -395,6 +398,7 @@ public class DefaultWagonManagerTest
             // expected
         }
 
+        artifact.getFile().delete();
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "lower-case-checksum" );
         wagon.addExpectedContent( "path.md5", "50b2cf50a103a965efac62b983035cac" );
@@ -408,6 +412,7 @@ public class DefaultWagonManagerTest
             fail( "Checksum verification did not pass: " + e.getMessage() );
         }
 
+        artifact.getFile().delete();
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "upper-case-checksum" );
         wagon.addExpectedContent( "path.md5", "842F568FCCFEB7E534DC72133D42FFDC" );
@@ -421,6 +426,7 @@ public class DefaultWagonManagerTest
             fail( "Checksum verification did not pass: " + e.getMessage() );
         }
 
+        artifact.getFile().delete();
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "expected-failure" );
         wagon.addExpectedContent( "path.md5", "b7bb97d7d0b9244398d9b47296907f73313663e6" );
