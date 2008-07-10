@@ -231,7 +231,7 @@ public class MavenProjectDynamismTest
 
         build = project.getBuild();
 
-        assertEquals( "Restored source directory should be expressed in terms of the basedir.",
+        assertEquals( "Restored source directory should be expressed in terms of the basedir.\nWas: " + build.getSourceDirectory() + "\nShould be: " + basedirExpr + "/src/main/java\n",
                       basedirExpr + "/src/main/java",
                       build.getSourceDirectory() );
 

@@ -2143,18 +2143,24 @@ public class DefaultMavenProjectBuilder
                                                                      project.getBasedir(),
                                                                      config,
                                                                      debugMessages );
+        
+        interpolatedOriginal = pathTranslator.unalignFromBaseDirectory( interpolatedOriginal, project.getBasedir() );
 
         String interpolatedOriginal2 = modelInterpolator.interpolate( originalInterpolatedString,
                                                                       model,
                                                                       project.getBasedir(),
                                                                       config,
                                                                       debugMessages );
+        
+        interpolatedOriginal2 = pathTranslator.alignToBaseDirectory( interpolatedOriginal2, project.getBasedir() );
 
         String interpolatedChanged = modelInterpolator.interpolate( changedString,
                                                                     model,
                                                                     project.getBasedir(),
                                                                     config,
                                                                     debugMessages );
+        
+        interpolatedChanged = pathTranslator.alignToBaseDirectory( interpolatedChanged, project.getBasedir() );
 
         String relativeInterpolatedChanged = modelInterpolator.interpolate( relativeChangedString,
                                                                             model,
@@ -2162,16 +2168,15 @@ public class DefaultMavenProjectBuilder
                                                                             config,
                                                                             debugMessages );
 
-        if ( interpolatedOriginal.equals( interpolatedChanged )
-             || interpolatedOriginal2.equals( interpolatedChanged ) )
+        if ( interpolatedOriginal.equals( interpolatedChanged ) || interpolatedOriginal2.equals( interpolatedChanged ) )
         {
             return originalString;
         }
         else if ( interpolatedOriginal.equals( relativeInterpolatedChanged )
-                        || interpolatedOriginal2.equals( relativeInterpolatedChanged ) )
-       {
-           return originalString;
-       }
+            || interpolatedOriginal2.equals( relativeInterpolatedChanged ) )
+        {
+            return originalString;
+        }
 
         return relativeChangedString;
     }
@@ -2200,7 +2205,7 @@ public class DefaultMavenProjectBuilder
         {
             String[] permutations = new String[2];
 
-            permutations[0] = (String) originalInterpolatedStrings.get( idx );
+            permutations[0] = pathTranslator.alignToBaseDirectory( (String) originalInterpolatedStrings.get( idx ), project.getBasedir() );
             permutations[1] = (String) originalStrings.get( idx );
 
             orig.put( permutations[0], permutations );
@@ -2224,13 +2229,15 @@ public class DefaultMavenProjectBuilder
                                                                  project.getBasedir(),
                                                                  config,
                                                                  debugMessages );
+            
+            interpolated = pathTranslator.alignToBaseDirectory( interpolated, project.getBasedir() );
 
             String relativeInterpolated = modelInterpolator.interpolate( relativeChangedString,
                                                                          project.getModel(),
                                                                          project.getBasedir(),
                                                                          config,
                                                                          debugMessages );
-
+            
             String[] original = (String[]) orig.get( interpolated );
             if ( original == null )
             {
