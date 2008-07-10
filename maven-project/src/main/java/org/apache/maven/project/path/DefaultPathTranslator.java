@@ -41,7 +41,7 @@ public class DefaultPathTranslator
         "${project.basedir}"
     };
 
-    private static final String FILE_SEPARATOR = "/";
+    private static final String FILE_SEPARATOR = File.separator;
 
     public void alignToBaseDirectory( Model model, File basedir )
     {
