@@ -46,10 +46,11 @@ public class Mojo3475
     private void testDirectoryAbsolutePath( String directory, List failed )
         throws MojoExecutionException
     {
-        if ( !directory.equals( new File( directory ).getAbsolutePath() ) )
+        if ( !new File( directory ).isAbsolute() )
         {
             failed.add( directory );
         }
+        
         System.out.println( directory );
     }
 }
