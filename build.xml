@@ -58,7 +58,10 @@ having a set of builds converge on the same repository for integration purposes.
 
   <target name="pull" depends="init" unless="skip.pull">    
     <property name="verbose" value="false"/>
+    
+    <!-- Initialize properties -->
     <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
+    <property name="surefire.useFile" value="true"/>
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
@@ -151,6 +154,7 @@ having a set of builds converge on the same repository for integration purposes.
       <arg value="clean"/>
       <arg value="install"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
+      <arg value="-Dsurefire.useFile=${surefire.useFile}"/>
     </java>
   </target>
 
