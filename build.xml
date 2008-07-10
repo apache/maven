@@ -46,25 +46,21 @@ under the License.
 
   <target name="pull" depends="init" unless="skip.pull">    
     <property name="verbose" value="false"/>
-    <property name="bootstrap.repository" value="${basedir}/bootstrap-repository"/>
+    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
     <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>                                                                                                     
     <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}">
-       <!--
-       <localRepository path="${bootstrap.repository}"/>
-       -->
+       <localRepository path="${maven.repo.local}"/>
        <pom refid="pom"/>                                                                                                                                       
     </artifact:dependencies>      
     <delete file="${basedir}/dependencies.xml"/>
     
     <!-- Pull the dependencies for Modello -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
-       <!--
-       <localRepository path="${bootstrap.repository}"/>
-       -->
+       <localRepository path="${maven.repo.local}"/>
        <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-17"/>                                                                                                                                      
     </artifact:dependencies>          
   </target>
@@ -142,6 +138,7 @@ under the License.
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
+      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </java>
   </target>
 
@@ -175,7 +172,6 @@ under the License.
     <chmod perm="+x">
       <fileset dir="${maven.home}/bin">
         <include name="mvn"/>
-        <include name="m2"/>
       </fileset>
     </chmod>
   </target>
