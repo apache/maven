@@ -47,7 +47,7 @@ public class DefaultPathTranslator
     {
         if ( basedir == null )
         {
-            throw new IllegalArgumentException( "Cannot align model to null basedir." );
+            return;
         }
 
         Build build = model.getBuild();
@@ -107,7 +107,7 @@ public class DefaultPathTranslator
     {
         if ( basedir == null )
         {
-            throw new IllegalArgumentException( "Cannot align path to null basedir." );
+            return path;
         }
 
         if ( path == null )
