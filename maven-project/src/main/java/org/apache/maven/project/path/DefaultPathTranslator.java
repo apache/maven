@@ -120,9 +120,10 @@ public class DefaultPathTranslator
         if ( requiresBaseDirectoryAlignment( s ) )
         {
             s = new File( new File( basedir, s ).toURI().normalize() ).getAbsolutePath();
-            s = s.replace( '/', File.separatorChar );
-            s = s.replace( '\\', File.separatorChar );
         }
+        
+        s = s.replace( '/', File.separatorChar );
+        s = s.replace( '\\', File.separatorChar );
 
         return s;
     }
