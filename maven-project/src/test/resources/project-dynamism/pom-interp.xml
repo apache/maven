@@ -9,9 +9,9 @@
   <version>1</version>
   
   <build>
-    <sourceDirectory>/${project.groupId}/src/main/java</sourceDirectory>
-    <testSourceDirectory>/${pom.groupId}/src/test/java</testSourceDirectory>
-    <scriptSourceDirectory>/${groupId}/src/main/scripts</scriptSourceDirectory>
+    <sourceDirectory>${project.groupId}/src/main/java</sourceDirectory>
+    <testSourceDirectory>${pom.groupId}/src/test/java</testSourceDirectory>
+    <scriptSourceDirectory>${groupId}/src/main/scripts</scriptSourceDirectory>
     
     <plugins>
       <plugin>

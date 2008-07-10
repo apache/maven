@@ -37,7 +37,7 @@ import java.util.List;
 public class MavenProjectDynamismTest
     extends PlexusTestCase
 {
-
+    
     private MavenProjectBuilder projectBuilder;
 
     public void setUp()
@@ -56,13 +56,13 @@ public class MavenProjectDynamismTest
 
         projectBuilder.calculateConcreteState( project, new DefaultProjectBuilderConfiguration() );
 
-        String basepath = "/" + project.getGroupId();
+        String basepath = new File( project.getBasedir(), project.getGroupId() ).getAbsolutePath();
 
         Build build = project.getBuild();
 
-        assertTrue( build.getSourceDirectory().startsWith( basepath ) );
-        assertTrue( build.getTestSourceDirectory().startsWith( basepath ) );
-        assertTrue( build.getScriptSourceDirectory().startsWith( basepath ) );
+        assertTrue( build.getSourceDirectory() + " doesn't start with base-path: " + basepath, build.getSourceDirectory().startsWith( basepath ) );
+        assertTrue( build.getTestSourceDirectory() + " doesn't start with base-path: " + basepath, build.getTestSourceDirectory().startsWith( basepath ) );
+        assertTrue( build.getScriptSourceDirectory() + " doesn't start with base-path: " + basepath, build.getScriptSourceDirectory().startsWith( basepath ) );
 
         List plugins = build.getPlugins();
         assertNotNull( plugins );
@@ -93,10 +93,10 @@ public class MavenProjectDynamismTest
         String nakedGidExpr = "${groupId}";
 
         build = project.getBuild();
-
-        assertTrue( build.getSourceDirectory().startsWith( "/" + projectGidExpr ) );
-        assertTrue( build.getTestSourceDirectory().startsWith( "/" + pomGidExpr ) );
-        assertTrue( build.getScriptSourceDirectory().startsWith( "/" + nakedGidExpr ) );
+        
+        assertTrue( build.getSourceDirectory() + " didn't start with: " + projectGidExpr, build.getSourceDirectory().startsWith( projectGidExpr ) );
+        assertTrue( build.getTestSourceDirectory() + " didn't start with: " + pomGidExpr, build.getTestSourceDirectory().startsWith( pomGidExpr ) );
+        assertTrue( build.getScriptSourceDirectory() + " didn't start with: " + nakedGidExpr, build.getScriptSourceDirectory().startsWith( nakedGidExpr ) );
 
         plugins = build.getPlugins();
         assertNotNull( plugins );
