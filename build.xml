@@ -17,6 +17,18 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+<!--
+
+By default the bootstrap will use ~/.m2/repository as the integration repository but you can define the integration repository by 
+specifying a property on the command line:
+
+ant -Dmaven.repo.local=/my/integration/repository
+
+Those familiar with Maven will note this is the same way the local repository can be set from the command-line. This facilitates
+having a set of builds converge on the same repository for integration purposes.
+
+-->
+
 <project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
   <target name="initTaskDefs">
