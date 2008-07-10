@@ -31,6 +31,15 @@ under the License.
       <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x/maven-core-it-runner</developerConnection>
       <url>https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x/maven-core-it-runner</url>
     </scm>
+    
+    <repositories>
+      <repository>
+        <id>test-plugins</id>
+        <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+        <releases><enabled>false</enabled></releases>
+        <snapshots><enabled>true</enabled></snapshots>
+      </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
