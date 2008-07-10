@@ -87,7 +87,6 @@ public class MavenITmng3052DepRepoAggregationTest
 
         // First, build the two levels of dependencies that will be resolved.
 
-        System.out.println( "Building transitive dependency: " + foo);
         // This one is a transitive dependency, and will be deployed to a
         // repository that is NOT listed in the main project's POM (wombat).
         verifier = new Verifier( foo.getAbsolutePath() );
@@ -96,7 +95,6 @@ public class MavenITmng3052DepRepoAggregationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        System.out.println( "Building direct dependency: " + bar);
         // This one is a direct dependency that will be deployed to a repository
         // that IS listed in the main project's POM (wombat). It lists its own
         // repository entry that should enable resolution of the transitive
@@ -111,10 +109,8 @@ public class MavenITmng3052DepRepoAggregationTest
         File artifact = new File( artifactPath );
 
         File dir = artifact.getParentFile().getParentFile().getParentFile();
-        System.out.println( "Deleting: " + dir + " (from local repository).");
         FileUtils.deleteDirectory( dir );
 
-        System.out.println( "Building consumer: " + wombat);
         // This is the main project, which lists a repository where the bar
         // project (above) was deployed. It should be able to use the
         // repositories declared in the bar POM to find the transitive dependency
@@ -154,7 +150,5 @@ public class MavenITmng3052DepRepoAggregationTest
         {
             IOUtil.close( writer );
         }
-
-        System.out.println( "Rewrote POM: " + pomFile + "\n\nReplaced: @testDir@\nwith: " + testDir.getAbsolutePath() );
     }
 }
