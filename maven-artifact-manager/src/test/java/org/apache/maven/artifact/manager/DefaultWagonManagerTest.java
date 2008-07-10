@@ -81,6 +81,19 @@ public class DefaultWagonManagerTest
         return artifact;
     }
     
+    private Artifact createTestArtifact( String directory, String type )
+        throws IOException
+    {
+        File testData = getTestFile( directory );
+        FileUtils.deleteDirectory( testData );
+        testData.mkdirs();
+
+        Artifact artifact = artifactFactory.createBuildArtifact( "test", "test", "1.0", type );
+        artifact.setFile( new File( testData, "test-1.0." + artifact.getArtifactHandler().getExtension() ) );
+        assertFalse( artifact.getFile().exists() );
+        return artifact;
+    }
+    
     public void testGetArtifactSha1MissingMd5Present()
         throws IOException, UnsupportedProtocolException, TransferFailedException, ResourceDoesNotExistException
     {
@@ -338,10 +351,7 @@ public class DefaultWagonManagerTest
         ArtifactRepository repo =
             new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
 
-        Artifact artifact =
-            new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ), "scope",
-                                 "jar", "classifier", null );
-        artifact.setFile( getTestFile( "target/sample-art" ) );            
+        Artifact artifact = createTestArtifact( "sample-art", "jar" );
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         
