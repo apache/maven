@@ -5,6 +5,24 @@
   <version>1.0</version>
   <artifactId>maven-it-it0086</artifactId>
   <description>Verify that a plugin dependency class can be loaded from both the plugin classloader and the context classloader available to the plugin.</description>
+  
+  <repositories>
+    <repository>
+      <id>test-plugins</id>
+      <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+      <releases><enabled>false</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>test-plugins</id>
+      <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+      <releases><enabled>false</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+  
   <build>
     <plugins>
       <plugin>
