@@ -119,7 +119,7 @@ under the License.
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</developerConnection>
-    <url>https://svn.apache.org/repos/asf/maven/components/branches/maven-2.0.x</url>
+    <url>http://svn.apache.org/viewvc/maven/components/branches/maven-2.0.x</url>
   </scm>
 
   <build>
