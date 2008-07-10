@@ -208,7 +208,7 @@ public class DefaultPathTranslator
     {
         if ( basedir == null )
         {
-            throw new IllegalArgumentException( "Cannot relativize model from null basedir." );
+            return;
         }
 
         Build build = model.getBuild();
@@ -268,7 +268,7 @@ public class DefaultPathTranslator
     {
         if ( basedir == null )
         {
-            throw new IllegalArgumentException( "Cannot relativize path from null basedir." );
+            return path;
         }
 
         if ( path == null )
