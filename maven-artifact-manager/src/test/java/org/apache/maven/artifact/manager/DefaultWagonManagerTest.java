@@ -352,7 +352,7 @@ public class DefaultWagonManagerTest
         ArtifactRepository repo =
             new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
 
-        Artifact artifact = createTestArtifact( "sample-art", "jar" );
+        Artifact artifact = createTestArtifact( "target/test-data/sample-art", "jar" );
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         
