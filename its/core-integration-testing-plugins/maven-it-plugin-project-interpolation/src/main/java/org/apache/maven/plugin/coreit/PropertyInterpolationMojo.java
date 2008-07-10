@@ -16,6 +16,8 @@ package org.apache.maven.plugin.coreit;
  * limitations under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,6 +31,9 @@ import org.apache.maven.project.MavenProject;
 public class PropertyInterpolationMojo
     extends AbstractMojo
 {
+    
+    private static final String FS = File.separator;
+    
     /** @parameter */
     private String myDirectory;
 
@@ -39,7 +44,7 @@ public class PropertyInterpolationMojo
         throws MojoExecutionException
     {
         String value = project.getProperties().getProperty( "myDirectory" );
-        if ( !value.equals( project.getBuild().getDirectory() + "/foo" ) )
+        if ( !value.equals( project.getBuild().getDirectory() + FS + "foo" ) )
         {
             throw new MojoExecutionException( "Property value of 'myDirectory': " + value + " should equal project build directory: " + project.getBuild().getDirectory() + " + '/foo'" );
         }
