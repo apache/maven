@@ -32,7 +32,7 @@ public class PropertyInterpolationMojo
     extends AbstractMojo
 {
     
-    private static final String FS = File.separator;
+    private static final char FS = File.separatorChar;
     
     /** @parameter */
     private String myDirectory;
@@ -43,8 +43,12 @@ public class PropertyInterpolationMojo
     public void execute()
         throws MojoExecutionException
     {
-        String value = project.getProperties().getProperty( "myDirectory" );
-        if ( !value.equals( project.getBuild().getDirectory() + FS + "foo" ) )
+        String value = project.getProperties().getProperty( "myDirectory" ).replace( '/', FS ).replace( '\\', FS );
+        
+        String targetValue = project.getBuild().getDirectory() + FS + "foo";
+        targetValue = targetValue.replace( '/', FS).replace( '\\', FS );
+        
+        if ( !value.equals( targetValue ) )
         {
             throw new MojoExecutionException( "Property value of 'myDirectory': " + value + " should equal project build directory: " + project.getBuild().getDirectory() + " + '/foo'" );
         }
