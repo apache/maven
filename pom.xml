@@ -247,7 +247,6 @@
     <aspectjVersion>1.5.3</aspectjVersion>
     <classWorldsVersion>1.2-alpha-12</classWorldsVersion>
     <commonsCliVersion>1.0</commonsCliVersion>
-    <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
     <doxiaVersion>1.0-alpha-9</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.1</junitVersion>
@@ -393,12 +392,6 @@
         <groupId>easymock</groupId>
         <artifactId>easymock</artifactId>
         <version>${easyMockVersion}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>${commonsHttpClientVersion}</version>
         <scope>test</scope>
       </dependency>
       <dependency>

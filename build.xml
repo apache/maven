@@ -67,7 +67,7 @@ having a set of builds converge on the same repository for integration purposes.
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
     <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>                                                                                                     
-    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}">
+    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}" useScope="compile">
        <localRepository path="${maven.repo.local}"/>
        <pom refid="pom"/>                                                                                                                                       
     </artifact:dependencies>      
