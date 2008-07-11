@@ -59,7 +59,7 @@ public class MavenITmng3099SettingsProfilesWithNoPOM
          */
         List cliOptions = new ArrayList();
         cliOptions.add( "-s" );
-        cliOptions.add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        cliOptions.add( "\"" + new File( testDir, "settings.xml" ).getAbsolutePath() + "\"" );
 
         verifier.setCliOptions( cliOptions );
 

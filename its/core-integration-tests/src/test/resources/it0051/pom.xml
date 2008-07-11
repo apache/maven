@@ -15,4 +15,30 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <!-- NOTE: This build section has only a single function: 
+       to upgrade the version of plexus-utils, so this test 
+       can handle paths with spaces in them. 
+       
+       Once a new release of the javadoc plugin takes care of
+       http://jira.codehaus.org/browse/MJAVADOC-144
+       we should be able to remove this section of the POM.
+  -->
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.4</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.codehaus.plexus</groupId>
+              <artifactId>plexus-utils</artifactId>
+              <version>1.5.4</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

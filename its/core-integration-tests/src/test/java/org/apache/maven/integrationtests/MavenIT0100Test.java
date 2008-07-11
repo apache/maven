@@ -23,7 +23,7 @@ public class MavenIT0100Test
         Verifier verifier = new Verifier( child.getAbsolutePath() );
 
         List options = new ArrayList();
-        options.add( "-Doutput=" + new File( child, "target/effective-pom.txt" ).getAbsolutePath() );
+        options.add( "-Doutput=\"" + new File( child, "target/effective-pom.txt" ).getAbsolutePath() + "\"" );
 
         verifier.setCliOptions( options );
 

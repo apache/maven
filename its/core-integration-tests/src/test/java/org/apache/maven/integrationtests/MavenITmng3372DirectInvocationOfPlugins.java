@@ -47,7 +47,7 @@ public class MavenITmng3372DirectInvocationOfPlugins
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-s" );
-        cliOptions.add( settingsFile.getAbsolutePath() );
+        cliOptions.add( "\"" + settingsFile.getAbsolutePath() + "\"" );
 
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "mng3372:test" );

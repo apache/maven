@@ -82,8 +82,7 @@ public class MavenITmng3482DependencyPomInterpolationTest
         List cliOptions = new ArrayList();
 
         cliOptions.add( "-s" );
-        cliOptions.add( settings.getAbsolutePath() );
-        cliOptions.add( "-X" );
+        cliOptions.add( "\"" + settings.getAbsolutePath() + "\"" );
 
         verifier.setCliOptions( cliOptions );
 
@@ -128,9 +127,8 @@ public class MavenITmng3482DependencyPomInterpolationTest
                                                "@TESTDIR@",
                                                testDir.getAbsolutePath() );
 
-        File settingsOut = new File( testDir, "settings.xml" );
-
-        System.out.println( "Writing tets settings to: " + settingsOut );
+        File settingsOut = File.createTempFile( "settings.", ".xml" );
+        settingsOut.deleteOnExit();
 
         if ( settingsOut.exists() )
         {

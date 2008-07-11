@@ -24,7 +24,7 @@ public class MavenIT0095Test
         Verifier verifier = new Verifier( sub1.getAbsolutePath() );
 
         List options = new ArrayList();
-        options.add( "-Doutput=" + new File( sub1, "target/effective-pom.xml" ).getAbsolutePath() );
+        options.add( "-Doutput=\"" + new File( sub1, "target/effective-pom.xml" ).getAbsolutePath() + "\"" );
 
         verifier.setCliOptions( options );
 
