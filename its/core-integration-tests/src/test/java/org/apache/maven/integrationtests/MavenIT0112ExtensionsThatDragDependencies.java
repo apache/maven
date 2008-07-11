@@ -47,7 +47,7 @@ public class MavenIT0112ExtensionsThatDragDependencies
 
         // Run the whole test
         verifier = new Verifier( new File( testDir.getAbsolutePath(), "test-project" ).getAbsolutePath() );
-        verifier.executeGoal( "project-info-reports:scm" );
+        verifier.executeGoal( "org.apache.maven.plugins:maven-project-info-reports-plugin:2.0.1:scm" );
         // ommitted because we always get velocity errors that aren't covered by the verifier
 //        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
