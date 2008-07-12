@@ -7,6 +7,11 @@
   </parent>
   <artifactId>core-integration-tests</artifactId>
   <name>Maven Integration Tests</name>
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/core-integration-testing/trunk/core-integration-tests</url>
+  </scm>     
   <build>
     <plugins>
       <plugin>

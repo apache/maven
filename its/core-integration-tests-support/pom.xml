@@ -36,9 +36,9 @@
   <packaging>pom</packaging>
   <url>http://maven.apache.org</url>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/core-integration-testing/trunk</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests-support</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests-support</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/core-integration-testing/trunk/core-integration-tests-support</url>
   </scm>     
   <issueManagement>
     <system>jira</system>
