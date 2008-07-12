@@ -1,22 +1,18 @@
 package org.apache.maven.embedder.execution;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
@@ -34,19 +30,29 @@ public class EmbedderUsingScmPluginTest
     public void testRunningScmPlugin()
         throws Exception
     {
-        File svnDirectory = new File( getBasedir(), ".svn" );
-
-        if ( svnDirectory.exists() )
+        if ( hasExecutable( "svn" ) )
         {
-            Properties p = new Properties();
+            File svnDirectory = new File( getBasedir(), ".svn" );
 
-            File outputDirectory = new File( getBasedir(), "target/scm.diff" );
+            if ( svnDirectory.exists() )
+            {
+                Properties p = new Properties();
 
-            p.setProperty( "outputDirectory", outputDirectory.getCanonicalPath() );
+                File outputDirectory = new File( getBasedir(), "target/scm.diff" );
 
-            p.setProperty( "connectionUrl", "scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder" );
+                p.setProperty( "outputDirectory", outputDirectory.getCanonicalPath() );
 
-            File basedir = runWithProject( "org.apache.maven.plugins:maven-scm-plugin:1.0:diff", p );
+                p.setProperty( "connectionUrl", "scm:svn:http://svn.apache.org/repos/asf/maven/components/trunk/maven-embedder" );
+
+                runWithProject( "org.apache.maven.plugins:maven-scm-plugin:1.0:diff", p );
+                
+                System.out.println( "SVN is available on this system, so we're running this SVN-related test." );                
+            }
         }
+        else
+        {
+            System.out.println( "SVN is not available on this system, so we're not running this SVN-related test." );
+        }
+       
     }
 }
