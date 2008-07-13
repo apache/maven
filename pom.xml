@@ -245,7 +245,7 @@
   <properties>
     <artifactVersion>3.0-SNAPSHOT</artifactVersion>
     <aspectjVersion>1.5.3</aspectjVersion>
-    <classWorldsVersion>1.2-alpha-12</classWorldsVersion>
+    <classWorldsVersion>1.2-alpha-13</classWorldsVersion>
     <commonsCliVersion>1.0</commonsCliVersion>
     <doxiaVersion>1.0-alpha-9</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
