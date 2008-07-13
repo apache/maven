@@ -27,6 +27,10 @@ ant -Dmaven.repo.local=/my/integration/repository
 Those familiar with Maven will note this is the same way the local repository can be set from the command-line. This facilitates
 having a set of builds converge on the same repository for integration purposes.
 
+TODO:
+- Ant Tasks for Modello (generally useful and will greatly shorten the script)
+- Ant Tasks for Plexus Component Descriptors (generally useful and will allow us to eliminate the hand-coded descriptors)
+
 -->
 
 <project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
@@ -159,8 +163,7 @@ having a set of builds converge on the same repository for integration purposes.
     </java>
   </target>
 
-  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">  
-            
+  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">              
     <echo>
     The new Maven distribution was created as part of the MAVEN-COMPILE step, above. 
     This goal just validates the presence of that distribution.
