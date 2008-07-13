@@ -49,7 +49,12 @@ having a set of builds converge on the same repository for integration purposes.
     <xmlproperty prefix="pom" file="pom.xml"/>    
     <basename file="${maven.home}" property="maven.home.basename"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
+    <!-- Initialize properties -->
     <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
+    <property name="maven.assembly" location="maven-distribution/target/${maven.home.basename.expected}-bin.zip"/>
+    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
+    <property name="surefire.useFile" value="true"/>    
+    <echo>maven.home = ${maven.home}</echo>
   </target>
 
   <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
@@ -57,11 +62,7 @@ having a set of builds converge on the same repository for integration purposes.
   </target>
 
   <target name="pull" depends="init" unless="skip.pull">    
-    <property name="verbose" value="false"/>
-    
-    <!-- Initialize properties -->
-    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
-    <property name="surefire.useFile" value="true"/>
+    <property name="verbose" value="false"/>    
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
@@ -158,12 +159,12 @@ having a set of builds converge on the same repository for integration purposes.
     </java>
   </target>
 
-  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">          
+  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">  
+            
     <echo>
     The new Maven distribution was created as part of the MAVEN-COMPILE step, above. 
     This goal just validates the presence of that distribution.
     </echo>
-    <property name="maven.assembly" location="maven-distribution/target/${maven.home.basename.expected}-bin.zip"/>
     <condition property="build.failed">
       <not>
         <available file="${maven.assembly}"/>
@@ -175,17 +176,8 @@ having a set of builds converge on the same repository for integration purposes.
   <target name="extract-assembly" depends="init,maven-assembly" description="extracts the maven assembly into maven.home">
     <echo>Extracting assembly to ${maven.home.dirname} ...</echo>
     <!-- If we are starting from scratch make sure the directory is created -->
+    <delete dir="${maven.home}"/>
     <mkdir dir="${maven.home}"/>
-    <!-- Deleting the contents inside maven.home allow one to use symlinks for maven.home and still have this work. -->      
-    <delete>
-      <fileset dir="${maven.home}">
-        <include name="bin"/>
-        <include name="boot"/>
-        <include name="conf"/>
-        <include name="lib"/>
-        <include name="*.txt"/>
-      </fileset>
-    </delete>
     <unzip src="${maven.assembly}" dest="${maven.home.dirname}"/>
     <chmod perm="+x">
       <fileset dir="${maven.home}/bin">
