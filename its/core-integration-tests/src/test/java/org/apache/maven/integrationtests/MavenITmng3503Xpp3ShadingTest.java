@@ -37,21 +37,21 @@ import org.apache.maven.it.util.ResourceExtractor;
  * @author jdcasey
  * 
  */
-public class MavenITmng3502Xpp3ShadingTest
+public class MavenITmng3503Xpp3ShadingTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3502Xpp3ShadingTest()
+    public MavenITmng3503Xpp3ShadingTest()
         throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,)" ); // only test in 2.0.9+
     }
 
-    public void testitMNG3502a ()
+    public void testitMNG3503 ()
         throws Exception
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3502-xpp3Shading" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503-xpp3Shading" );
 
         Verifier verifier;
 
