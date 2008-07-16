@@ -16,13 +16,16 @@ package org.apache.maven.embedder;
  */
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 
@@ -31,9 +34,12 @@ public abstract class AbstractEmbedderTestCase
 {
     protected MavenEmbedder maven;
 
-    private String defaultPath;
-
     private List defaultPathList;
+
+    /**
+     * The file extensions used to resolve command names to executables. Each extension must have a leading period.
+     */
+    private List commandExtensions;
 
     protected void setUp()
         throws Exception
@@ -51,7 +57,9 @@ public abstract class AbstractEmbedderTestCase
         // but if they are not present on the machine we don't want tests to fail. Case in point would be using SVN via the SCM plugin. We'll
         // run it if we can, pass through gracefully otherwise.
 
-        defaultPath = CommandLineUtils.getSystemEnvVars().getProperty( "PATH" );
+        Properties env = CommandLineUtils.getSystemEnvVars( !Os.isFamily( Os.FAMILY_WINDOWS ) );
+
+        String defaultPath = env.getProperty( "PATH" );
 
         if ( defaultPath == null )
         {
@@ -59,9 +67,7 @@ public abstract class AbstractEmbedderTestCase
         }
         else
         {
-            String separator = System.getProperty( "path.separator" );
-
-            StringTokenizer tokenizer = new StringTokenizer( defaultPath, separator );
+            StringTokenizer tokenizer = new StringTokenizer( defaultPath, File.pathSeparator );
 
             defaultPathList = new LinkedList();
 
@@ -71,6 +77,17 @@ public abstract class AbstractEmbedderTestCase
 
                 defaultPathList.add( element );
             }
+        }        
+
+        String pathExt = env.getProperty( "PATHEXT" );
+
+        if ( pathExt == null )
+        {
+            commandExtensions = Collections.EMPTY_LIST;
+        }
+        else
+        {
+            commandExtensions = Arrays.asList( pathExt.split( "\\" + File.pathSeparatorChar + "+" ) );
         }        
     }
 
@@ -118,11 +135,21 @@ public abstract class AbstractEmbedderTestCase
             return null;
         }
 
-        // TODO: Need to resolve it with defaults extension of system
-        // ie. if executable is 'mvn', we must search 'mvn.bat'
         for ( Iterator it = path.iterator(); it.hasNext(); )
         {
             String s = (String) it.next();
+
+            for ( Iterator ite = commandExtensions.iterator(); ite.hasNext(); )
+            {
+                String ext = (String) ite.next();
+
+                f = new File( s, executable + ext );
+
+                if ( f.isFile() )
+                {
+                    return f;
+                }
+            }
 
             f = new File( s, executable );
 
