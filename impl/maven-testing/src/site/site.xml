@@ -19,8 +19,10 @@
   ~ under the License.
   -->
 
-<project name="Maven Plugin Testing Mechanism">
+<project name="Maven Plugin Testing Harness">
   <body>
+    <menu ref="parent" />
+
     <menu name="Overview">
       <item name="Introduction" href="index.html"/>
       <item name="Getting Started" href="/getting-started/index.html"/>
