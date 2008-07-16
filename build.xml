@@ -167,12 +167,12 @@ under the License.
     <echo>Extracting assembly to ${maven.home.dirname} ...</echo>
     <!-- Deleting the contents inside maven.home allow one to use symlinks for maven.home and still have this work. -->          
     <mkdir dir="${maven.home}"/>
-    <delete>
+    <delete includeemptydirs="true">
       <fileset dir="${maven.home}">
-        <include name="bin"/>
-        <include name="boot"/>
-        <include name="conf"/>
-        <include name="lib"/>
+        <include name="bin/**"/>
+        <include name="boot/**"/>
+        <include name="conf/**"/>
+        <include name="lib/**"/>
         <include name="*.txt"/>
       </fileset>
     </delete>
