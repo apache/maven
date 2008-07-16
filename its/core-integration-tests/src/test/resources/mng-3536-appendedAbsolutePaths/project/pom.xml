@@ -38,6 +38,9 @@ under the License.
                         <goals>
                             <goal>validate</goal>
                         </goals>
+                        <configuration>
+                          <foo>${project.build.outputDirectory}/foo.txt</foo>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
