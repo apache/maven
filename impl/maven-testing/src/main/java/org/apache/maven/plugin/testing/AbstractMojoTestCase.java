@@ -251,7 +251,8 @@ public abstract class AbstractMojoTestCase
 
                 if ( pluginConfigurationElement == null )
                 {
-                    throw new ConfigurationException( "Cannot find a configuration element for a plugin with an artifactId of " + artifactId + "." );
+                    throw new ConfigurationException( "Cannot find a configuration element for a plugin with an "
+                        + "artifactId of " + artifactId + "." );
                 }
             }
         }
