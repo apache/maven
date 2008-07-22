@@ -1,16 +1,13 @@
 package org.apache.maven.plugin.coreit;
 
+import java.util.Enumeration;
+import java.util.Properties;
+
+import org.apache.maven.model.Model;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.model.Model;
-
-import java.io.File;
-import java.util.Properties;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Enumeration;
 
 /**
  * @goal verify-property
@@ -22,11 +19,6 @@ public class PropertyInterpolationVerifierMojo extends AbstractMojo {
      * @parameter expression="${project}"
      */
     private MavenProject project;
-
-    /**
-     * @parameter expression="${buildSourceDirectory}"
-     */
-    private File buildSourceDirectory;
 
     /**
      * @parameter expression="${properties}"

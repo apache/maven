@@ -16,7 +16,8 @@ package org.apache.maven.plugin.coreit;
  * limitations under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
+import java.io.File;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -38,10 +39,17 @@ public class PluginParamInterpolationMojo
     public void execute()
         throws MojoExecutionException
     {
-	    
-        if ( !myDirectory.equals( project.getBuild().getDirectory() + "/foo" ) )
+        myDirectory = normalize( myDirectory );
+        String value = normalize( new File( project.getBuild().getDirectory(), "foo" ).getAbsolutePath() );
+        
+        if ( !myDirectory.equals( value ) )
         {
             throw new MojoExecutionException( "Directory supplied: " + myDirectory + " is not the same as the project build directory: " + project.getBuild().getDirectory() + " + '/foo'" );
         }
+    }
+
+    private String normalize( String src )
+    {
+        return src.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
     }
 }

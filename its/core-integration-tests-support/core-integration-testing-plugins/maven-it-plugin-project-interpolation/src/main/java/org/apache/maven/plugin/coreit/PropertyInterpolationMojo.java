@@ -18,7 +18,6 @@ package org.apache.maven.plugin.coreit;
 
 import java.io.File;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -32,25 +31,23 @@ public class PropertyInterpolationMojo
     extends AbstractMojo
 {
     
-    private static final char FS = File.separatorChar;
-    
-    /** @parameter */
-    private String myDirectory;
-
     /** @parameter expression="${project}" */
     private MavenProject project;
 
     public void execute()
         throws MojoExecutionException
     {
-        String value = project.getProperties().getProperty( "myDirectory" ).replace( '/', FS ).replace( '\\', FS );
-        
-        String targetValue = project.getBuild().getDirectory() + FS + "foo";
-        targetValue = targetValue.replace( '/', FS).replace( '\\', FS );
+        String value = normalize( project.getProperties().getProperty( "myDirectory" ) );
+        String targetValue = normalize( new File( project.getBuild().getDirectory(), "foo" ).getAbsolutePath() );
         
         if ( !value.equals( targetValue ) )
         {
             throw new MojoExecutionException( "Property value of 'myDirectory': " + value + " should equal the 'foo' subpath of the project build directory: " + targetValue );
         }
+    }
+    
+    private String normalize( String src )
+    {
+        return src.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
     }
 }
