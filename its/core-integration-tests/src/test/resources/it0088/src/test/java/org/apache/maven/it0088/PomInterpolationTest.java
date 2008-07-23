@@ -47,7 +47,7 @@ public class PomInterpolationTest
         File projectBuildDirectory = new File( basedir, "target" );
 
         assertEquals( normalize( projectBuildDirectory.getAbsolutePath() ), normalize( testProperties.getProperty( "project.build.directory" ) ) );
-        assertEquals( normalize( projectBuildDirectory.getAbsolutePath() ), normalized( testProperties.getProperty( "targetDirectoryFile" ) ) );
+        assertEquals( normalize( projectBuildDirectory.getAbsolutePath() ), normalize( testProperties.getProperty( "targetDirectoryFile" ) ) );
         assertEquals( "target", testProperties.getProperty( "targetDirectoryString" ) );
     }
 
