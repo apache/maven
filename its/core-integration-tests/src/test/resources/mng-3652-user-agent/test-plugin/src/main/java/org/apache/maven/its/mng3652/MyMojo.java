@@ -120,6 +120,10 @@ public class MyMojo
         {
             Properties properties = new Properties();
             resourceAsStream = getClass().getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven/maven-artifact/pom.properties" );
+            if ( resourceAsStream == null )
+            {
+                resourceAsStream = getClass().getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven.artifact/maven-artifact/pom.properties" );
+            }
             properties.load( resourceAsStream );
 
             artifactVersion = properties.getProperty( "version" );
