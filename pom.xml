@@ -203,6 +203,27 @@
           <version>1.0.0</version>
         </plugin>
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>clirr-maven-plugin</artifactId>
+          <version>2.2.1</version>
+          <configuration>
+            <!-- needed for release: default value "(,${project.version})" for 2.0.10 is 2.0.10-SNAPSHOT -->
+            <comparisonVersion>2.0.9</comparisonVersion>
+            <excludes>
+              <!-- TODO: These represent method ADDITIONS from 2.0.9, and should be removed after 
+                   2.0.10 is released. -->
+              <exclude>org/apache/maven/lifecycle/LifecycleExecutor*</exclude>
+              <exclude>org/apache/maven/artifact/metadata/ArtifactMetadataSource*</exclude>
+              <exclude>org/apache/maven/project/MavenProjectBuilder*</exclude>
+              <exclude>org/apache/maven/project/ProjectBuilderConfiguration*</exclude>
+              <exclude>org/apache/maven/project/interpolation/ModelInterpolator*</exclude>
+              <exclude>org/apache/maven/project/inheritance/ModelInheritanceAssembler*</exclude>
+              <exclude>org/apache/maven/execution/MavenExecutionRequest*</exclude>
+              <exclude>org/apache/maven/plugin/DefaultPluginManager*</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.3</version>
@@ -238,7 +259,7 @@
     <module>maven-toolchain</module>
   </modules>
   <properties>
-    <artifactVersion>3.0-SNAPSHOT</artifactVersion>
+    <artifactVersion>3.0-alpha-2-SNAPSHOT</artifactVersion>
     <aspectjVersion>1.5.3</aspectjVersion>
     <classWorldsVersion>1.2-alpha-13</classWorldsVersion>
     <commonsCliVersion>1.0</commonsCliVersion>
@@ -247,8 +268,8 @@
     <junitVersion>3.8.1</junitVersion>
     <plexusVersion>1.0-alpha-48</plexusVersion>
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
-    <plexusInterpolationVersion>1.0</plexusInterpolationVersion>
-    <plexusUtilsVersion>1.5.4</plexusUtilsVersion>
+    <plexusInterpolationVersion>1.1</plexusInterpolationVersion>
+    <plexusUtilsVersion>1.5.5</plexusUtilsVersion>
     <wagonVersion>1.0-beta-3</wagonVersion>
   </properties>
   

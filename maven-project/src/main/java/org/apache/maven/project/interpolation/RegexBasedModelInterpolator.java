@@ -88,6 +88,12 @@ public class RegexBasedModelInterpolator
         throws IOException
     {
     }
+    
+    // for testing.
+    protected RegexBasedModelInterpolator( PathTranslator pathTranslator )
+    {
+        this.pathTranslator = pathTranslator;
+    }
 
     public Model interpolate( Model model, Map<String, ?> context )
         throws ModelInterpolationException
@@ -199,15 +205,8 @@ public class RegexBasedModelInterpolator
             timestampFormat = modelProperties.getProperty( BUILD_TIMESTAMP_FORMAT_PROPERTY, timestampFormat );
         }
 
-        ValueSource baseModelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
-        ValueSource modelValueSource1 = new PathTranslatingValueSource( baseModelValueSource1,
-                                                                       TRANSLATED_PATH_EXPRESSIONS,
-                                                                       projectDir, pathTranslator );
-
-        ValueSource baseModelValueSource2 = new ObjectBasedValueSource( model );
-        ValueSource modelValueSource2 = new PathTranslatingValueSource( baseModelValueSource2,
-                                                                       TRANSLATED_PATH_EXPRESSIONS,
-                                                                       projectDir, pathTranslator );
+        ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
+        ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
 
         ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new ValueSource(){
             public Object getValue( String expression )
@@ -232,6 +231,11 @@ public class RegexBasedModelInterpolator
         interpolator.addValueSource( new PrefixedValueSourceWrapper( new MapBasedValueSource( modelProperties ), PROJECT_PREFIXES, true ) );
         interpolator.addValueSource( modelValueSource2 );
         interpolator.addValueSource( new MapBasedValueSource( config.getUserProperties() ) );
+        
+        PathTranslatingPostProcessor pathTranslatingPostProcessor =
+            new PathTranslatingPostProcessor( TRANSLATED_PATH_EXPRESSIONS, projectDir, pathTranslator );
+        
+        interpolator.addPostProcessor( pathTranslatingPostProcessor );
 
         RecursionInterceptor recursionInterceptor = new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
 
