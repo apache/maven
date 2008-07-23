@@ -30,7 +30,7 @@ public class PomInterpolationTest
 
         File projectBuildDirectory = new File( basedir, "target" );
 
-        assertEquals( projectBuildDirectory.getAbsolutePath(), testProperties.getProperty( "project.build.directory" ) );
+        assertEquals( normalize( projectBuildDirectory.getAbsolutePath() ), normalize( testProperties.getProperty( "project.build.directory" ) ) );
     }
 
     public void testProjectBuildDirectoryForMojoExecution()
@@ -46,8 +46,13 @@ public class PomInterpolationTest
 
         File projectBuildDirectory = new File( basedir, "target" );
 
-        assertEquals( projectBuildDirectory.getAbsolutePath(), testProperties.getProperty( "project.build.directory" ) );
-        assertEquals( projectBuildDirectory.getAbsolutePath(), testProperties.getProperty( "targetDirectoryFile" ) );
+        assertEquals( normalize( projectBuildDirectory.getAbsolutePath() ), normalize( testProperties.getProperty( "project.build.directory" ) ) );
+        assertEquals( normalize( projectBuildDirectory.getAbsolutePath() ), normalized( testProperties.getProperty( "targetDirectoryFile" ) ) );
         assertEquals( "target", testProperties.getProperty( "targetDirectoryString" ) );
+    }
+
+    private String normalize( String src )
+    {
+	    return src.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
     }
 }
