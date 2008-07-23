@@ -3,6 +3,8 @@ package org.apache.maven.its.mng3652;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -65,6 +67,12 @@ public class MyMojo
     private RuntimeInformation runtimeInformation;
     
     /**
+     * @parameter expression="${testProtocol}" default-value="http"
+     * @required
+     */
+    private String testProtocol;
+    
+    /**
      * @parameter expression="${testPort}"
      * @required
      */
@@ -74,7 +82,7 @@ public class MyMojo
         throws MojoExecutionException
     {
         ArtifactRepository remote =
-            repositoryFactory.createArtifactRepository( "test", "http://localhost:" + testPort, layout,
+            repositoryFactory.createArtifactRepository( "test", testProtocol + "://localhost:" + testPort, layout,
                                                         new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
         
         Artifact artifact = artifactFactory.createArtifact( "bad.group", "missing-artifact", "1", null, "jar" );
@@ -99,9 +107,34 @@ public class MyMojo
         }
         catch ( TransferFailedException e )
         {
+            // ignore on purpose - it doesn't actually send any content
         }
         catch ( ResourceDoesNotExistException e )
         {
+            throw new MojoExecutionException( e.getMessage(), e );
+        }
+
+        String artifactVersion;
+        InputStream resourceAsStream = null;
+        try
+        {
+            Properties properties = new Properties();
+            resourceAsStream = getClass().getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven/maven-artifact/pom.properties" );
+            properties.load( resourceAsStream );
+
+            artifactVersion = properties.getProperty( "version" );
+            if ( artifactVersion == null )
+            {
+                throw new MojoExecutionException( "Artifact version not found" );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Unable to read properties file from maven-core", e );
+        }
+        finally
+        {
+            IOUtil.close( resourceAsStream );
         }
         
         FileWriter w = null;
@@ -117,6 +150,8 @@ public class MyMojo
             w.write( System.getProperty( "os.name" ) );
             w.write( LS );
             w.write( System.getProperty( "os.version" ) );
+            w.write( LS );
+            w.write( artifactVersion );
         }
         catch ( IOException e )
         {

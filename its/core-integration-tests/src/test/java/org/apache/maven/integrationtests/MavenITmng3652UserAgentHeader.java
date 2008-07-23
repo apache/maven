@@ -49,8 +49,6 @@ public class MavenITmng3652UserAgentHeader
         t.setDaemon( true );
         t.start();
         
-        System.out.println( "\n\nHTTP Recording server started on port: " + port + "\n\n" );
-        
         verifier = new Verifier( projectDir.getAbsolutePath() );
         
         List cliOptions = new ArrayList();
@@ -58,10 +56,9 @@ public class MavenITmng3652UserAgentHeader
         verifier.setCliOptions( cliOptions );
         
         verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        t.interrupt();
-
         String userAgent = s.userAgent;
         assertNotNull( userAgent );
         
@@ -75,16 +72,59 @@ public class MavenITmng3652UserAgentHeader
         // the maven version into the check file.
         String mavenVersion = (String) lines.get( 0 );
         String javaVersion = (String) lines.get( 1 );
-        String os = (String) lines.get( 2 );
+        String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
+        String artifactVersion = (String) lines.get( 4 );
 
-        String minorVersion = mavenVersion.substring( 0, 3 );
+        assertEquals( "Apache-Maven/" + mavenVersion + " maven-artifact/" + artifactVersion + " (Java " + javaVersion + "; " + os + ")", userAgent );
+
+        // test webdav
+
+        cliOptions = new ArrayList();
+        cliOptions.add( "-DtestPort=" + port );
+        cliOptions.add( "-DtestProtocol=dav:http" );
+        verifier.setCliOptions( cliOptions );
         
-        System.out.println( "Found User-Agent of: \'" + userAgent + "\'" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
         
-        assertTrue( "User-Agent:\n\n\'" + userAgent + "\'\n\nshould have a main value of:\n\n\'ApacheMavenArtifact/" + minorVersion + "\'", userAgent.startsWith( "ApacheMavenArtifact/" + minorVersion ) );
-        assertTrue( "User-Agent:\n\n\'" + userAgent + "\'\n\nshould contain:\n\n\'Apache Maven " + mavenVersion + "\'", userAgent.indexOf( "Apache Maven " + mavenVersion ) > -1 );
-        assertTrue( "User-Agent:\n\n\'" + userAgent + "\'\n\nshould contain:\n\n\'JDK " + javaVersion + "\'", userAgent.indexOf( "JDK " + javaVersion ) > -1 );
-        assertTrue( "User-Agent:\n\n\'" + userAgent + "\'\n\nshould contain:\n\n\'" +os + "\'", userAgent.indexOf( os ) > -1 );
+        userAgent = s.userAgent;
+        assertNotNull( userAgent );
+        assertEquals( "Apache-Maven/" + mavenVersion + " maven-artifact/" + artifactVersion + " (Java " + javaVersion + "; " + os + ")", userAgent );
+
+        // test settings with no config
+
+        cliOptions = new ArrayList();
+        cliOptions.add( "-DtestPort=" + port );
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings-no-config.xml" );
+        verifier.setCliOptions( cliOptions );
+        
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+        
+        userAgent = s.userAgent;
+        assertNotNull( userAgent );
+        assertEquals( "Apache-Maven/" + mavenVersion + " maven-artifact/" + artifactVersion + " (Java " + javaVersion + "; " + os + ")", userAgent );
+
+        // test settings with config
+
+        cliOptions = new ArrayList();
+        cliOptions.add( "-DtestPort=" + port );
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings.xml" );
+        verifier.setCliOptions( cliOptions );
+        
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+        
+        userAgent = s.userAgent;
+        assertNotNull( userAgent );
+        assertEquals( "Maven Fu", userAgent );        
+
+        t.interrupt();
     }
 
     private static final class Server
@@ -137,7 +177,7 @@ public class MavenITmng3652UserAgentHeader
                         int count = 0;
                         while ( ( line = r.readLine() ) != null )
                         {
-                            System.out.println( line );
+                            Logger.getLogger( Server.class.getName() ).fine( line );
                             if ( line.startsWith( "User-Agent:" ) )
                             {
                                 userAgent = line.substring( "User-Agent: ".length() );
@@ -150,8 +190,6 @@ public class MavenITmng3652UserAgentHeader
                             }
                             count++;
                         }
-
-                        System.out.println( "Read in " + count + " passes." );
                     }
                     catch ( IOException e )
                     {

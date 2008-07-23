@@ -1,0 +1,16 @@
+<settings>
+  <servers>
+    <server>
+      <id>test</id>
+      <configuration>
+        <httpHeaders>
+          <property>
+            <name>User-Agent</name>
+            <value>Maven Fu</value>
+          </property>
+        </httpHeaders>
+      </configuration>
+    </server>
+  </servers>
+</settings>
+ 
