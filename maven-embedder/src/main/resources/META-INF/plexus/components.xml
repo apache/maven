@@ -54,7 +54,7 @@ under the License.
         <httpHeaders>
           <property>
             <name>User-Agent</name>
-            <value>Apache Maven/${project.version}</value>
+            <value>Apache-Maven/${project.version} maven-artifact/${artifactVersion}</value>
           </property>
         </httpHeaders>
       </configuration>
@@ -70,7 +70,7 @@ under the License.
         <httpHeaders>
           <property>
             <name>User-Agent</name>
-            <value>Apache Maven/${project.version}</value>
+            <value>Apache-Maven/${project.version} maven-artifact/${artifactVersion}</value>
           </property>
         </httpHeaders>
       </configuration>
