@@ -384,7 +384,7 @@ public class DefaultArtifactCollector
                             }
 
                             Artifact relocated = source.retrieveRelocatedArtifact( artifact, localRepository, childRemoteRepositories );
-                            if ( !artifact.equals( relocated ) )
+                            if ( relocated != null && !artifact.equals( relocated ) )
                             {
                                 artifact = relocated;
                                 child.setArtifact( artifact );

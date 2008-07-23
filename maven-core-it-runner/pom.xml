@@ -36,8 +36,12 @@ under the License.
       <repository>
         <id>test-plugins</id>
         <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-        <releases><enabled>false</enabled></releases>
-        <snapshots><enabled>true</enabled></snapshots>
+        <releases>
+          <enabled>false</enabled>
+        </releases>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
       </repository>
     </repositories>
 

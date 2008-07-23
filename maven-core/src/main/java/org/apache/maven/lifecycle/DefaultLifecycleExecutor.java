@@ -1694,4 +1694,9 @@ public class DefaultLifecycleExecutor
             return tasks;
         }
     }
+    
+    public List getLifecycles()
+    {
+        return lifecycles;
+    }
 }

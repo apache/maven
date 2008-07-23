@@ -30,6 +30,16 @@ under the License.
   <name>Maven Ant Mojo Support</name>
   <dependencies>
     <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.7.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant-launcher</artifactId>
+      <version>1.7.1</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
     </dependency>
@@ -37,6 +47,19 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-ant-factory</artifactId>
       <version>1.0-alpha-2</version>
+      <!-- We need to exclude this artifact's dependency on Ant, -->
+      <!-- because it has a different groupId that the version of Ant -->
+      <!-- we want to use now. -->
+      <exclusions>
+        <exclusion>
+          <groupId>ant</groupId>
+          <artifactId>ant</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>ant</groupId>
+          <artifactId>ant-launcher</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

@@ -92,7 +92,7 @@ public class MavenMetadataSource
         
         if ( rel == null )
         {
-            return null;
+            return artifact;
         }
         
         MavenProject project = rel.project;
@@ -101,14 +101,21 @@ public class MavenMetadataSource
             return artifact;
         }
 
+        
+        // NOTE: Using artifact information here, since some POMs are deployed 
+        // to central with one version in the filename, but another in the <version> string!
+        // Case in point: org.apache.ws.commons:XmlSchema:1.1:pom.
+        //
+        // Since relocation triggers a reconfiguration of the artifact's information
+        // in retrieveRelocatedProject(..), this is safe to do.
         Artifact result = null;
         if ( artifact.getClassifier() != null )
         {
-            result = artifactFactory.createArtifactWithClassifier( project.getGroupId(), project.getArtifactId(), project.getVersion(), artifact.getType(), artifact.getClassifier() );
+            result = artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier() );
         }
         else
         {
-            result = artifactFactory.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), artifact.getScope(), artifact.getType() );
+            result = artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope(), artifact.getType() );
         }
 
         result.setResolved( artifact.isResolved() );

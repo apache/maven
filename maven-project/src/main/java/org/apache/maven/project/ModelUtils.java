@@ -562,6 +562,8 @@ public final class ModelUtils
     public static Model cloneModel( Model model )
     {
         // TODO: would be nice for the modello:java code to generate this as a copy constructor
+        // FIXME: Fix deep cloning issues with existing plugin instances (setting 
+        //       a version when resolved will pollute the original model instance)
         Model newModel = new Model();
         ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
         newModel.setModelVersion( model.getModelVersion() );

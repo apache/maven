@@ -21,8 +21,10 @@ package org.apache.maven;
 
 
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.manager.DefaultWagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -602,6 +604,49 @@ public class DefaultMaven
     private void resolveParameters( Settings settings )
         throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
     {
+        // TODO: remove when components.xml can be used to configure this instead
+        try
+        {
+            DefaultWagonManager wagonManager = (DefaultWagonManager) container.lookup( WagonManager.ROLE );
+            
+            String oldUserAgent = wagonManager.getHttpUserAgent();
+            int firstSpace = oldUserAgent == null ? -1 : oldUserAgent.indexOf( " " );
+            
+            StringBuffer buffer = new StringBuffer();
+            
+            buffer.append( "Apache-Maven/" );
+            
+            ArtifactVersion version = runtimeInformation.getApplicationVersion();
+            if ( version != null )
+            {
+                buffer.append( version.getMajorVersion() );
+                buffer.append( '.' );
+                buffer.append( version.getMinorVersion() );
+            }
+            else
+            {
+                buffer.append( "unknown" );
+            }
+            
+            buffer.append( ' ' );
+            if ( firstSpace > -1 )
+            {
+                buffer.append( oldUserAgent.substring( firstSpace + 1 ) );
+                buffer.append( ' ' );
+                buffer.append( oldUserAgent.substring( 0, firstSpace ) );
+            }
+            else
+            {
+                buffer.append( oldUserAgent );
+            }
+            
+            wagonManager.setHttpUserAgent(  buffer.toString() );
+        }
+        catch ( ClassCastException e )
+        {
+            // ignore
+        }
+
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
         try

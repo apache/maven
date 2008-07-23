@@ -53,7 +53,7 @@ import org.easymock.MockControl;
 public class DefaultWagonManagerTest
     extends PlexusTestCase
 {
-    private DefaultWagonManager wagonManager;
+    private WagonManager wagonManager;
 
     private TransferListener transferListener = new Debug();
 
@@ -64,7 +64,7 @@ public class DefaultWagonManagerTest
     {
         super.setUp();
 
-        wagonManager = (DefaultWagonManager) lookup( WagonManager.ROLE );
+        wagonManager = (WagonManager) lookup( WagonManager.ROLE );
         
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
