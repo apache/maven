@@ -4,7 +4,24 @@
   <groupId>tests</groupId>
   <artifactId>interpolation-of-cliProps</artifactId>
   <version>1</version>
-
+  
+  <repositories>
+    <repository>
+      <id>test-plugins</id>
+      <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+      <releases><enabled>false</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>test-plugins</id>
+      <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+      <releases><enabled>false</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+  
   <build>
     <plugins>
       <plugin>
