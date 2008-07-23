@@ -72,12 +72,12 @@ public class MavenITmng3652UserAgentHeader
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
         // the maven version into the check file.
-        String mavenVersion = (String) lines.get( 0 );
+        String mavenVersion = ((String) lines.get( 0 )).substring( 0, 3 );
         String javaVersion = (String) lines.get( 1 );
         String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
         String artifactVersion = (String) lines.get( 4 );
 
-        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " maven-artifact/" + artifactVersion + " (Java " + javaVersion + "; " + os + ")", userAgent );
+        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java " + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
 
         // test webdav
         cliOptions = new ArrayList();
@@ -91,7 +91,7 @@ public class MavenITmng3652UserAgentHeader
         
         userAgent = s.userAgent;
         assertNotNull( userAgent );
-        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " maven-artifact/" + artifactVersion + " (Java " + javaVersion + "; " + os + ")", userAgent );
+        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java " + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
 
         // test settings with no config
 
@@ -107,7 +107,7 @@ public class MavenITmng3652UserAgentHeader
         
         userAgent = s.userAgent;
         assertNotNull( userAgent );
-        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " maven-artifact/" + artifactVersion + " (Java " + javaVersion + "; " + os + ")", userAgent );
+        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java " + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
 
         // test settings with config
 
@@ -181,11 +181,7 @@ public class MavenITmng3652UserAgentHeader
                             Logger.getLogger( Server.class.getName() ).fine( line );
                             if ( line.startsWith( "User-Agent:" ) )
                             {
-                                userAgent = line.substring( "User-Agent: ".length() );
-                                while( userAgent.startsWith( " " ) )
-                                {
-                                    userAgent = userAgent.substring( 1 );
-                                }
+                                userAgent = line.replaceAll( "User-Agent:\\s+", "" );
                                 
                                 break;
                             }
