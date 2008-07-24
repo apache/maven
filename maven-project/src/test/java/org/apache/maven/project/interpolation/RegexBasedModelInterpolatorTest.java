@@ -19,19 +19,25 @@ package org.apache.maven.project.interpolation;
  * under the License.
  */
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.path.DefaultPathTranslator;
+import org.apache.maven.project.path.PathTranslator;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -295,6 +301,85 @@ public class RegexBasedModelInterpolatorTest
         Model out = new RegexBasedModelInterpolator().interpolate( model, context );
         String result = ( (Dependency) out.getDependencies().get( 0 ) ).getVersion();
         assertEquals( "Expected '" + expectedVersion + "' for version expression '" + depVersionExpr + "', but was '" + result + "'", expectedVersion, result );
+    }
+
+    public void testShouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly()
+        throws Exception
+    {
+        Model model = new Model();
+
+        Build build = new Build();
+        build.setSourceDirectory( "correct" );
+
+        Resource res = new Resource();
+        res.setDirectory( "${project.build.sourceDirectory}" );
+
+        build.addResource( res );
+
+        Resource res2 = new Resource();
+        res2.setDirectory( "${pom.build.sourceDirectory}" );
+
+        build.addResource( res2 );
+
+        Resource res3 = new Resource();
+        res3.setDirectory( "${build.sourceDirectory}" );
+
+        build.addResource( res3 );
+
+        model.setBuild( build );
+
+        Model out = new RegexBasedModelInterpolator().interpolate( model, context );
+
+        List outResources = out.getBuild().getResources();
+        Iterator resIt = outResources.iterator();
+
+        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
+        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
+        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
+    }
+
+    public void testShouldInterpolateUnprefixedBasedirExpression()
+        throws ModelInterpolationException, IOException
+    {
+        File basedir = new File( "/test/path" );
+        Model model = new Model();
+        Dependency dep = new Dependency();
+        dep.setSystemPath( "${basedir}/artifact.jar" );
+
+        model.addDependency( dep );
+
+        Model result = new RegexBasedModelInterpolator().interpolate( model, basedir, new DefaultProjectBuilderConfiguration(), true );
+
+        List rDeps = result.getDependencies();
+        assertNotNull( rDeps );
+        assertEquals( 1, rDeps.size() );
+        assertEquals( new File( basedir, "artifact.jar" ).getAbsolutePath(), new File( ( (Dependency) rDeps.get( 0 ) )
+            .getSystemPath() ).getAbsolutePath() );
+    }
+    
+    public void testTwoLevelRecursiveBasedirAlignedExpression()
+        throws Exception
+    {
+        Model model = new Model();
+        Build build = new Build();
+        
+        model.setBuild( build );
+        
+        build.setDirectory( "${project.basedir}/target" );
+        build.setOutputDirectory( "${project.build.directory}/classes" );
+        
+        PathTranslator translator = new DefaultPathTranslator();
+        RegexBasedModelInterpolator interpolator = new RegexBasedModelInterpolator( translator );
+        
+        File basedir = new File( System.getProperty( "java.io.tmpdir" ), "base" );
+        
+        String value = interpolator.interpolate( "${project.build.outputDirectory}/foo", model, basedir, new DefaultProjectBuilderConfiguration(), true );
+        value = value.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
+        
+        String check = new File( basedir, "target/classes/foo" ).getAbsolutePath();
+        check = check.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
+        
+        assertEquals( check, value );
     }
 
 }
