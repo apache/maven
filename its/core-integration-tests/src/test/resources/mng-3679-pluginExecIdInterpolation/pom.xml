@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>test</groupId>
+  <artifactId>mng-3679-pluginExecIdInterpolation</artifactId>
+  <packaging>pom</packaging>
+  <name/>
+  <version>1</version>
+  <description/>
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-antrun-plugin</artifactId>
+  			<version>1.1</version>
+  			<executions>
+  				<execution>
+  					<id>${myExecId}</id>
+  					<phase>validate</phase>
+  					<goals>
+  						<goal>run</goal>
+  					</goals>
+  					<configuration>
+  					  <tasks>
+  					    <mkdir dir="${project.build.directory}" />
+  					    <echo file="${project.build.directory}/check.txt">${myExecId}</echo>
+  					  </tasks>
+  					</configuration>
+  				</execution>
+  			</executions>
+  		</plugin>
+  	</plugins>
+  </build>
+  <properties>
+    <myExecId>test-id</myExecId>
+  </properties>
+</project>

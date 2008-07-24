@@ -64,7 +64,10 @@ public class IntegrationTestSuite
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
          * a fail fast technique as well.
          */
-
+        
+        suite.addTestSuite( MavenITmng3679PluginExecIdInterpolationTest.class );
+        suite.addTestSuite( MavenITmng3671PluginLevelDepInterpolationTest.class );
+        suite.addTestSuite( MavenITmng3667ResolveDepsWithBadPomVersionTest.class );
         suite.addTestSuite( MavenITmng3652UserAgentHeader.class );
         suite.addTestSuite( MavenITmng3642DynamicResourcesTest.class );
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependency.class );
