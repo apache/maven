@@ -53,6 +53,6 @@ public abstract class AbstractProjectInheritanceTestCase
 
     protected File getLocalRepositoryPath()
     {
-        return getTestFile( "src/test/resources/inheritance-repo/" + getTestSeries() );
+        return getTestFile("src/test/resources/inheritance-repo/" + getTestSeries() );
     }
 }

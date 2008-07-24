@@ -74,10 +74,23 @@ under the License.
       </requirements>
     </component>
     <component>
+        <role>org.apache.maven.project.builder.ProjectBuilder</role>
+        <role-hint>default</role-hint>
+        <implementation>org.apache.maven.project.builder.impl.DefaultProjectBuilder</implementation>
+        <requirements>
+            <requirement>
+                <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+            </requirement>
+        </requirements>
+    </component>      
+    <component>
       <role>org.apache.maven.project.MavenProjectBuilder</role>
       <role-hint>test</role-hint>
       <implementation>org.apache.maven.project.TestProjectBuilder</implementation>
       <requirements>
+        <requirement>
+             <role>org.apache.maven.project.builder.ProjectBuilder</role>
+        </requirement>
         <requirement>
           <role>org.apache.maven.project.workspace.ProjectWorkspace</role>
         </requirement>

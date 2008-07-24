@@ -46,6 +46,7 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
@@ -69,6 +70,9 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.project.workspace.ProjectWorkspace;
+import org.apache.maven.project.builder.PomArtifactResolver;
+import org.apache.maven.project.builder.ProjectBuilder;
+import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -77,24 +81,9 @@ import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 /*:apt
 
@@ -137,7 +126,7 @@ public class DefaultMavenProjectBuilder
     implements MavenProjectBuilder,
     Initializable, LogEnabled
 {
-    protected MavenProfilesBuilder profilesBuilder;
+    protected MavenProfilesBuilder profilesBuilder;                        
 
     protected ArtifactResolver artifactResolver;
 
@@ -165,6 +154,8 @@ public class DefaultMavenProjectBuilder
     private MavenTools mavenTools;
 
     private ProjectWorkspace projectWorkspace;
+
+    private ProjectBuilder projectBuilder;
 
     //DO NOT USE, it is here only for backward compatibility reasons. The existing
     // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
@@ -500,11 +491,9 @@ public class DefaultMavenProjectBuilder
 
         if ( project == null )
         {
-//            getLogger().debug( "Allowing project-build to proceed for: " + projectDescriptor );
-
-            Model model = readModel( "unknown", projectDescriptor, STRICT_MODEL_PARSING );
-
-            project = buildInternal( model,
+            Model model = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver(config.getLocalRepository(),
+                    buildArtifactRepositories( getSuperModel() ), artifactResolver) );
+            project = buildInternal(model,
                 config,
                 buildArtifactRepositories( getSuperModel() ),
                 projectDescriptor,
@@ -512,11 +501,6 @@ public class DefaultMavenProjectBuilder
                 true,
                 true );
         }
-//        else
-//        {
-//            getLogger().debug( "Returning cached project: " + project );
-//        }
-
         return project;
     }
 
@@ -525,8 +509,8 @@ public class DefaultMavenProjectBuilder
                                            ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        String projectId = safeVersionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
 
+        String projectId = safeVersionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
         remoteArtifactRepositories = normalizeToArtifactRepositories( remoteArtifactRepositories, projectId );
 
         Artifact projectArtifact;
@@ -548,21 +532,20 @@ public class DefaultMavenProjectBuilder
                 artifact.getScope() );
         }
 
-        Model model;
-
+        Model legacy_model;
         try
         {
             artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
 
             File file = projectArtifact.getFile();
 
-            model = readModel( projectId, file, STRICT_MODEL_PARSING );
+            legacy_model = readModelLegacy( projectId, file, STRICT_MODEL_PARSING );
 
             String downloadUrl = null;
 
             ArtifactStatus status = ArtifactStatus.NONE;
 
-            DistributionManagement distributionManagement = model.getDistributionManagement();
+            DistributionManagement distributionManagement = legacy_model.getDistributionManagement();
 
             if ( distributionManagement != null )
             {
@@ -581,7 +564,7 @@ public class DefaultMavenProjectBuilder
             }
             else
             {
-                projectArtifact.setDownloadUrl( model.getUrl() );
+                projectArtifact.setDownloadUrl( legacy_model.getUrl() );
             }
         }
         catch ( ArtifactResolutionException e )
@@ -593,7 +576,7 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " + e.getMessage(), e );
         }
 
-        return model;
+        return legacy_model;
     }
 
     private List normalizeToArtifactRepositories( List remoteArtifactRepositories,
@@ -840,6 +823,7 @@ public class DefaultMavenProjectBuilder
         }
 
 //        getLogger().debug( "Caching project: " + project.getId() + " (also keyed by file: " + project.getFile() + ")" );
+
 
         projectWorkspace.storeProjectByCoordinate( project );
         projectWorkspace.storeProjectByFile( project );
@@ -1791,7 +1775,7 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private Model readModel( String projectId,
+    private Model readModelLegacy( String projectId,
                              File file,
                              boolean strict )
         throws ProjectBuildingException
@@ -2085,4 +2069,31 @@ public class DefaultMavenProjectBuilder
     {
         this.logger = logger;
     }
+
+    private Model readModelFromLocalPath( String projectId,
+                            File projectDescriptor,
+                            PomArtifactResolver resolver )
+       throws ProjectBuildingException
+   {
+       if(projectDescriptor == null) {
+           throw new IllegalArgumentException("projectDescriptor: null, Project Id =" + projectId);
+       }
+
+       if(projectBuilder == null) {
+           throw new IllegalArgumentException("projectBuilder: not initialized");
+       }
+
+       MavenProject mavenProject;
+       try {
+           mavenProject = projectBuilder.buildFromLocalPath(new FileInputStream(projectDescriptor),
+                   null, null, resolver,
+                   projectDescriptor.getParentFile());
+       } catch (IOException e) {
+           e.printStackTrace();
+           throw new ProjectBuildingException(projectId, "File = " + projectDescriptor.getAbsolutePath() , e);
+       }
+
+      return mavenProject.getModel();
+
+   }
 }
