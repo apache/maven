@@ -1,5 +1,3 @@
-package org.apache.maven.project.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,34 +17,33 @@ package org.apache.maven.project.interpolation;
  * under the License.
  */
 
+package org.apache.maven.project.interpolation;
+
 import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.interpolation.AbstractFunctionValueSourceWrapper;
-import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.ValueSource;
 
 import java.io.File;
 import java.util.List;
 
-/**
- * 
- * @version $Id: PathTranslatingPostProcessor.java 677447 2008-07-16 22:15:57Z jdcasey $
- */
-public class PathTranslatingPostProcessor
-    implements InterpolationPostProcessor
+public class PathTranslatingValueSource
+    extends AbstractFunctionValueSourceWrapper
 {
 
-    private final List unprefixedPathKeys;
+    private final List<String> unprefixedPathKeys;
     private final File projectDir;
     private final PathTranslator pathTranslator;
 
-    public PathTranslatingPostProcessor( List unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
+    protected PathTranslatingValueSource( ValueSource valueSource, List<String> unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
     {
+        super( valueSource );
         this.unprefixedPathKeys = unprefixedPathKeys;
         this.projectDir = projectDir;
         this.pathTranslator = pathTranslator;
     }
 
-    public Object execute( String expression,
+    @Override
+    protected Object executeFunction( String expression,
                                       Object value )
     {
         if ( projectDir != null && value != null && unprefixedPathKeys.contains( expression ) )

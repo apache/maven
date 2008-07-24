@@ -82,6 +82,4 @@ public interface LifecycleBindingManager
                                         final LifecycleBindings lifecycleBindings )
         throws LifecycleSpecificationException;
 
-    List<org.apache.maven.lifecycle.binding.Lifecycle> getLifecycles();
-
 }

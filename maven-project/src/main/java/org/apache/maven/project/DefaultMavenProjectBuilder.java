@@ -1087,8 +1087,6 @@ public class DefaultMavenProjectBuilder
                 dPlugin.setGroupId( iPlugin.getGroupId() );
                 dPlugin.setArtifactId( iPlugin.getArtifactId() );
                 dPlugin.setVersion( iPlugin.getVersion() );
-                
-                dPlugin.setDependencies( iPlugin.getDependencies() );
             }
         }
 
@@ -1110,8 +1108,6 @@ public class DefaultMavenProjectBuilder
                     dPlugin.setGroupId( iPlugin.getGroupId() );
                     dPlugin.setArtifactId( iPlugin.getArtifactId() );
                     dPlugin.setVersion( iPlugin.getVersion() );
-                    
-                    dPlugin.setDependencies( iPlugin.getDependencies() );
                 }
             }
         }

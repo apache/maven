@@ -426,9 +426,6 @@ under the License.
         <requirement>
           <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
-        </requirement>
       </requirements>
     </component>
 
@@ -818,15 +815,6 @@ under the License.
           -->
         </defaultReports>
         <!-- END SNIPPET: default-reports -->
-      </configuration>
-    </component>
-    
-    <component>
-      <role>org.apache.maven.artifact.manager.WagonManager</role>
-      <role-hint>default</role-hint>
-      <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
-      <configuration>
-        <httpUserAgent>Apache-Maven/2.1 (Java @java.version@; @os.name@ @os.version@) maven-artifact/${project.version}</httpUserAgent>
       </configuration>
     </component>
 

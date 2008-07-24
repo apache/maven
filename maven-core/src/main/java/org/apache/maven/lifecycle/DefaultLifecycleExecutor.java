@@ -28,7 +28,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.lifecycle.binding.LifecycleBindingManager;
 import org.apache.maven.lifecycle.binding.MojoBindingFactory;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.plan.BuildPlan;
@@ -92,8 +91,6 @@ public class DefaultLifecycleExecutor
     private BuildPlanner buildPlanner;
 
     private MojoBindingFactory mojoBindingFactory;
-    
-    private LifecycleBindingManager lifecycleBindingManager;
 
     // this is needed for setting the lookup realm before we start building a project.
     private PlexusContainer container;
@@ -961,10 +958,5 @@ public class DefaultLifecycleExecutor
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-    
-    public List getLifecycles()
-    {
-        return lifecycleBindingManager.getLifecycles();
     }
 }

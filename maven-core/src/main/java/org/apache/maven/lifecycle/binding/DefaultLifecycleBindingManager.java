@@ -64,18 +64,13 @@ public class DefaultLifecycleBindingManager
     private Logger logger;
 
     // configured. Moved out of DefaultLifecycleExecutor...
-    private List<org.apache.maven.lifecycle.binding.Lifecycle> lifecycles;
+    private List lifecycles;
 
     // configured. Moved out of DefaultLifecycleExecutor...
     private List defaultReports;
 
     // contextualized, used for setting lookup realm before retrieving lifecycle bindings for packaging.
     private PlexusContainer container;
-    
-    public List<org.apache.maven.lifecycle.binding.Lifecycle> getLifecycles()
-    {
-        return lifecycles;
-    }
 
     /**
      * {@inheritDoc}
