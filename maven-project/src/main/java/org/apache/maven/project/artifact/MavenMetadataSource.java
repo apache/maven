@@ -19,6 +19,16 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -49,14 +59,6 @@ import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -76,6 +78,8 @@ public class MavenMetadataSource
 
     // lazily instantiated and cached.
     private MavenProject superProject;
+    
+    private Set warnedPoms = new HashSet();
 
     /**
      * Resolve all relocations in the POM for this artifact, and return the new artifact coordinate.
@@ -162,23 +166,31 @@ public class MavenMetadataSource
                 }
                 catch ( InvalidProjectModelException e )
                 {
-                    getLogger().warn( "POM for \'" + pomArtifact +
-                        "\' is invalid. It will be ignored for artifact resolution. Reason: " + e.getMessage() );
-
-                    if ( getLogger().isDebugEnabled() )
+                    String id = pomArtifact.getId();
+                    
+                    if ( !warnedPoms.contains( id ) )
                     {
-                        getLogger().debug( "Reason: " + e.getMessage() );
+                        warnedPoms.add( pomArtifact.getId() );
 
-                        ModelValidationResult validationResult = e.getValidationResult();
+                        getLogger().warn( "POM for \'"
+                                              + pomArtifact
+                                              + "\' is invalid.\n\nIts dependencies (if any) will NOT be available to the current build." );
 
-                        if ( validationResult != null )
+                        if ( getLogger().isDebugEnabled() )
                         {
-                            getLogger().debug( "\nValidation Errors:" );
-                            for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
+                            getLogger().debug( "Reason: " + e.getMessage() );
+
+                            ModelValidationResult validationResult = e.getValidationResult();
+
+                            if ( validationResult != null )
                             {
-                                getLogger().debug( i.next().toString() );
+                                getLogger().debug( "\nValidation Errors:" );
+                                for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
+                                {
+                                    getLogger().debug( i.next().toString() );
+                                }
+                                getLogger().debug( "\n" );
                             }
-                            getLogger().debug( "\n" );
                         }
                     }
 
@@ -515,5 +527,5 @@ public class MavenMetadataSource
         private MavenProject project;
         private Artifact pomArtifact;
     }
-
+    
 }

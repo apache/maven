@@ -75,8 +75,7 @@ public abstract class AbstractConsoleDownloadMonitor
 
     public void transferError( TransferEvent transferEvent )
     {
-        // TODO: can't use getLogger() because this isn't currently instantiated as a component
-        transferEvent.getException().printStackTrace();
+        // these errors should already be handled elsewhere by Maven since they all result in an exception from Wagon
     }
 
     /**

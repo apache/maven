@@ -46,6 +46,7 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
@@ -1100,12 +1101,26 @@ public class DefaultMavenProjectBuilder
     private void mergeDeterministicBuildElements( Build interpolatedBuild,
                                                   Build dynamicBuild )
     {
-        List dPlugins = dynamicBuild.getPlugins();
+        mergeDeterministicPluginElements( interpolatedBuild.getPlugins(), dynamicBuild.getPlugins() );
 
+        PluginManagement dPluginMgmt = dynamicBuild.getPluginManagement();
+        PluginManagement iPluginMgmt = interpolatedBuild.getPluginManagement();
+
+        if ( dPluginMgmt != null )
+        {
+            mergeDeterministicPluginElements( iPluginMgmt.getPlugins(), dPluginMgmt.getPlugins() );
+        }
+
+        if ( dynamicBuild.getExtensions() != null )
+        {
+            dynamicBuild.setExtensions( interpolatedBuild.getExtensions() );
+        }
+    }
+
+    private void mergeDeterministicPluginElements( List iPlugins, List dPlugins )
+    {
         if ( dPlugins != null )
         {
-            List iPlugins = interpolatedBuild.getPlugins();
-
             for ( int i = 0; i < dPlugins.size(); i++ )
             {
                 Plugin dPlugin = (Plugin) dPlugins.get( i );
@@ -1116,36 +1131,21 @@ public class DefaultMavenProjectBuilder
                 dPlugin.setVersion( iPlugin.getVersion() );
                 
                 dPlugin.setDependencies( iPlugin.getDependencies() );
-            }
-        }
-
-        PluginManagement dPluginMgmt = dynamicBuild.getPluginManagement();
-
-        if ( dPluginMgmt != null )
-        {
-            PluginManagement iPluginMgmt = interpolatedBuild.getPluginManagement();
-            dPlugins = dPluginMgmt.getPlugins();
-            if ( dPlugins != null )
-            {
-                List iPlugins = iPluginMgmt.getPlugins();
-
-                for ( int i = 0; i < dPlugins.size(); i++ )
+                
+                List dExecutions = dPlugin.getExecutions();
+                if ( dExecutions != null )
                 {
-                    Plugin dPlugin = (Plugin) dPlugins.get( i );
-                    Plugin iPlugin = (Plugin) iPlugins.get( i );
-
-                    dPlugin.setGroupId( iPlugin.getGroupId() );
-                    dPlugin.setArtifactId( iPlugin.getArtifactId() );
-                    dPlugin.setVersion( iPlugin.getVersion() );
+                    List iExecutions = iPlugin.getExecutions();
                     
-                    dPlugin.setDependencies( iPlugin.getDependencies() );
+                    for ( int j = 0; j < dExecutions.size(); j++ )
+                    {
+                        PluginExecution dExec = (PluginExecution) dExecutions.get( j );
+                        PluginExecution iExec = (PluginExecution) iExecutions.get( j );
+                        
+                        dExec.setId( iExec.getId() );
+                    }
                 }
             }
-        }
-
-        if ( dynamicBuild.getExtensions() != null )
-        {
-            dynamicBuild.setExtensions( interpolatedBuild.getExtensions() );
         }
     }
 
