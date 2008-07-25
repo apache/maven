@@ -65,6 +65,7 @@ public class IntegrationTestSuite
          * a fail fast technique as well.
          */
         
+        suite.addTestSuite( MavenITmng3684BuildPluginParameterTest.class );
         suite.addTestSuite( MavenITmng3680InvalidDependencyPOMTest.class );
         suite.addTestSuite( MavenITmng3679PluginExecIdInterpolationTest.class );
         suite.addTestSuite( MavenITmng3671PluginLevelDepInterpolationTest.class );
