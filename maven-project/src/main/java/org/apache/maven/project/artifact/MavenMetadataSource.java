@@ -215,6 +215,8 @@ public class MavenMetadataSource
                 catch ( ProjectBuildingException e )
                 {
                     handleInvalidOrMissingMavenPOM( artifact, e );
+                    
+                    project = null;
                 }
 
                 if ( project != null )
