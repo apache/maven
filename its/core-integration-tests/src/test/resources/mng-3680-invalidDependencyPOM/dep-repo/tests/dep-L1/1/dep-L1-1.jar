@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>tests</groupId>
+  <artifactId>dep-L1</artifactId>
+  <packaging>jar</packaging>
+  <version>1</version>
+  
+  <dependencies>
+    <dependency>
+      <groupId>tests</groupId>
+      <artifactId>dep-L2</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+  
+  <!-- This is an invalid repositories section, which would trip up the model parser 
+       if it were used in strict mode, or if the handling of the strict-mode flag 
+       doesn't apply to association lists.
+       
+       Dependency POMs should always be parsed in non-strict mode, so this
+       shouldn't prevent the inclusion of the above dependency.
+  -->
+  <repositories>
+    <id>imaginary-repo</id>
+    <url>http://repository.imaginary/</url>
+  </repositories>
+</project>
