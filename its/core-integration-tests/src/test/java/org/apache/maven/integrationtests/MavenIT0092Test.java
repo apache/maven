@@ -11,11 +11,11 @@ import java.util.ArrayList;
 public class MavenIT0092Test
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0092Test()                                                                                                                                 
-        throws InvalidVersionSpecificationException                                                                                                          
-    {                                                                                                                                                        
-        super( "[,2.1-SNAPSHOT)" );                                                                                                                          
-    }    
+    public MavenIT0092Test()
+        throws InvalidVersionSpecificationException
+    {
+        super( "[,2.1-alpha-1-SNAPSHOT)" );
+    }
     
     /**
      * Test that legacy repositories with legacy snapshots download correctly.
@@ -30,7 +30,6 @@ public class MavenIT0092Test
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
 }
 

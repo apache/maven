@@ -14,7 +14,7 @@ public class MavenITmng3485OverrideWagonExtensionTest
     public MavenITmng3485OverrideWagonExtensionTest()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.8, 2.1-SNAPSHOT)" ); // only test in 2.0.9+
+        super( "(2.0.8,2.1-alpha-1-SNAPSHOT)" ); // only test in 2.0.9+
     }
 
     public void testitMNG3485 ()

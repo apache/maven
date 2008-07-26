@@ -26,7 +26,7 @@ public class MavenITmng3652UserAgentHeader
         // TODO: fix support for this in 2.1-SNAPSHOT
         // 2.0.10+
         //super( "(2.0.9,)" );
-        super( "(2.0.9,2.1-SNAPSHOT)" );
+        super( "(2.0.9,2.1-alpha-1-SNAPSHOT)" );
     }
 
     /**

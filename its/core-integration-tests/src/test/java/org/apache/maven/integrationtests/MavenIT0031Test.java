@@ -15,8 +15,6 @@ public class MavenIT0031Test
     public MavenIT0031Test()
         throws InvalidVersionSpecificationException
     {
-        // we still support pluginGroups in 2.1-SNAPSHOT
-        //super( "[,2.1-SNAPSHOT)" );
     }            
 
     /**
