@@ -65,6 +65,19 @@ public class IntegrationTestSuite
          * a fail fast technique as well.
          */
         
+/* Tests to be added
+MavenIT0109ReleaseUpdateTest
+MavenIT0125NewestConflictResolverTest
+MavenIT0127AntrunDependencies
+MavenIT0128DistMgmtSiteUrlParentCalculationTest
+MavenITmng2883LegacyRepoOfflineTest
+MavenITmng3259DepsDroppedInMultiModuleBuild
+MavenITmng3415JunkRepositoryMetadataTest
+MavenITmng3645POMSyntaxErrorTest
+*/
+
+        // Correct wagon issue in 2.0.10 first
+        //suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAV.class );
         suite.addTestSuite( MavenITmng3684BuildPluginParameterTest.class );
         suite.addTestSuite( MavenITmng3680InvalidDependencyPOMTest.class );
         suite.addTestSuite( MavenITmng3679PluginExecIdInterpolationTest.class );
@@ -259,7 +272,6 @@ public class IntegrationTestSuite
 
         // suite.addTestSuite( MavenIT0126TestJarDependency.class ); // MJAR-75 / MNG-3160
         // suite.addTestSuite(MavenIT0091Test.class); // MNG-3160
-        // suite.addTestSuite(MavenIT0106Test.class); // MNG-3160
 
         return suite;
     }
