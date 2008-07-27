@@ -94,7 +94,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
 
         // Doesn't work until 2.0.10+
         // TODO: reinstate for 2.1 when WebDAV works
-        if ( matchesVersionRange( "(2.0.9,2.1-ALPHA-1-SNAPSHOT)" ) )
+        if ( matchesVersionRange( "(2.0.9,2.0.99)" ) )
         {
             newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
             FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );

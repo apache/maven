@@ -14,7 +14,7 @@ public class MavenITmng3221InfiniteForking
     public MavenITmng3221InfiniteForking()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.8,2.1-ALPHA-1-SNAPSHOT)" ); // only test in 2.0.9+
+        super( "(2.0.8,2.0.99)" ); // only test in 2.0.9+, not 2.1+ (including snapshots)
     }
 
     public void testitMNG3221a()
