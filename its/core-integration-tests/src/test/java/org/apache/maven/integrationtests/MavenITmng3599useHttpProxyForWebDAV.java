@@ -73,7 +73,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599-useHttpProxyForWebDAV" );
         String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
-        settings = StringUtils.replace( settings, "@port@", Integer.valueOf( port ).toString() );
+        settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
         String newSettings = StringUtils.replace( settings, "@protocol@", "http" );
         FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
 
