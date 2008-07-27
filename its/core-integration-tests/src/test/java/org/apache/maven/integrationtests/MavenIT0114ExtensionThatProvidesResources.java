@@ -14,7 +14,7 @@ public class MavenIT0114ExtensionThatProvidesResources
     public MavenIT0114ExtensionThatProvidesResources()
         throws InvalidVersionSpecificationException
     {
-        super( "(,2.1-alpha-1-SNAPSHOT)" );
+        super( "(,2.1-ALPHA-1-SNAPSHOT)" );
     }
 
     public void testit0114()

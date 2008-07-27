@@ -13,7 +13,7 @@ public class MavenIT0026Test
     public MavenIT0026Test()
         throws InvalidVersionSpecificationException
     {
-        super( "[,2.1-alpha-1-SNAPSHOT)" );
+        super( "[,2.1-ALPHA-1-SNAPSHOT)" );
     }
 
     /**
