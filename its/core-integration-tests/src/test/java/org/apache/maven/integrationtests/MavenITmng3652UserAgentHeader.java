@@ -4,22 +4,32 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.Request;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.AbstractHandler;
 
 public class MavenITmng3652UserAgentHeader
     extends AbstractMavenIntegrationTestCase
 {
+    private Server server;
+
+    private int port;
+
+    private String userAgent;
+
     public MavenITmng3652UserAgentHeader()
         throws InvalidVersionSpecificationException
     {
@@ -27,6 +37,40 @@ public class MavenITmng3652UserAgentHeader
         // 2.0.10+
         //super( "(2.0.9,)" );
         super( "(2.0.9,2.1-ALPHA-1-SNAPSHOT)" );
+    }
+
+    public void setUp()
+        throws Exception
+    {
+        Handler handler = new AbstractHandler()
+        {   
+            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+                throws IOException, ServletException
+            {
+                userAgent = request.getHeader( "User-Agent" );
+
+                response.setContentType( "text/plain" );
+                response.setStatus( HttpServletResponse.SC_OK );
+                response.getWriter().println( "some content" );
+                response.getWriter().println();
+                
+                ( (Request) request ).setHandled( true );
+            }
+        };
+
+        server = new Server( 0 );
+        server.setHandler( handler );
+        server.start();
+
+        port = server.getConnectors()[0].getLocalPort();
+    }
+
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+
+        server.stop();
     }
 
     /**
@@ -44,13 +88,6 @@ public class MavenITmng3652UserAgentHeader
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        int port = ( Math.abs( new Random().nextInt() ) % 2048 ) + 1024;
-
-        Server s = new Server( port );
-        Thread t = new Thread( s );
-        t.setDaemon( true );
-        t.start();
-        
         verifier = new Verifier( projectDir.getAbsolutePath() );
         
         List cliOptions = new ArrayList();
@@ -61,7 +98,7 @@ public class MavenITmng3652UserAgentHeader
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        String userAgent = s.userAgent;
+        String userAgent = this.userAgent;
         assertNotNull( userAgent );
         
         File touchFile = new File( projectDir, "target/touch.txt" );
@@ -89,7 +126,7 @@ public class MavenITmng3652UserAgentHeader
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        userAgent = s.userAgent;
+        userAgent = this.userAgent;
         assertNotNull( userAgent );
         assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java " + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
 
@@ -105,7 +142,7 @@ public class MavenITmng3652UserAgentHeader
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        userAgent = s.userAgent;
+        userAgent = this.userAgent;
         assertNotNull( userAgent );
         assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java " + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
 
@@ -121,115 +158,8 @@ public class MavenITmng3652UserAgentHeader
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        userAgent = s.userAgent;
+        userAgent = this.userAgent;
         assertNotNull( userAgent );
         assertEquals( "Maven Fu", userAgent );        
-
-        t.interrupt();
-    }
-
-    private static final class Server
-        implements Runnable
-    {
-        
-        private final int port;
-        
-        private String userAgent;
-
-        private Server( int port )
-        {
-            this.port = port;
-        }
-
-        public void run()
-        {
-            ServerSocket ssock = null;
-            try
-            {
-                try
-                {
-                    ssock = new ServerSocket( port );
-                    ssock.setSoTimeout( 2000 );
-                }
-                catch ( IOException e )
-                {
-                    Logger.getLogger( Server.class.getName() ).log( Level.SEVERE, "", e );
-                    return;
-                }
-
-                while ( !Thread.currentThread().isInterrupted() )
-                {
-                    Socket sock = null;
-                    BufferedReader r = null;
-                    try
-                    {
-                        try
-                        {
-                            sock = ssock.accept();
-                        }
-                        catch ( SocketTimeoutException e )
-                        {
-                            continue;
-                        }
-
-                        r = new BufferedReader( new InputStreamReader( sock.getInputStream() ) );
-
-                        String line = null;
-                        int count = 0;
-                        while ( ( line = r.readLine() ) != null )
-                        {
-                            Logger.getLogger( Server.class.getName() ).fine( line );
-                            if ( line.startsWith( "User-Agent:" ) )
-                            {
-                                userAgent = line.replaceAll( "User-Agent:\\s+", "" );
-                                
-                                break;
-                            }
-                            count++;
-                        }
-                    }
-                    catch ( IOException e )
-                    {
-                        Logger.getLogger( Server.class.getName() ).log( Level.SEVERE, "", e );
-                    }
-                    finally
-                    {
-                        if ( r != null )
-                        {
-                            try
-                            {
-                                r.close();
-                            }
-                            catch ( IOException e )
-                            {
-                            }
-                        }
-                        if ( sock != null )
-                        {
-                            try
-                            {
-                                sock.close();
-                            }
-                            catch ( IOException e )
-                            {
-                            }
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                if ( ssock != null )
-                {
-                    try
-                    {
-                        ssock.close();
-                    }
-                    catch ( IOException e )
-                    {
-                    }
-                }
-            }
-        }
     }
 }

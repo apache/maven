@@ -95,5 +95,17 @@
       <scope>test</scope>
 -->
     </dependency>
+    <!--
+      Should be fine to introduce this here, even if we use the embedder as it should be using an isolated classloader 
+      Used to simplify tests that provide a test HTTP server.
+      -->
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty</artifactId>
+      <version>6.1.11</version>
+<!-- TODO: not transitive in tests artifact, so must be left in main scope
+      <scope>test</scope>
+-->
+    </dependency>
   </dependencies>
 </project>
