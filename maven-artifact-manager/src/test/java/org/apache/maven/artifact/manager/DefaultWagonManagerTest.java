@@ -95,6 +95,11 @@ public class DefaultWagonManagerTest
         return artifact;
     }
     
+    public void testAddMirrorWithNullRepositoryId()
+    {
+        wagonManager.addMirror( null, "test", "http://www.nowhere.com/" );
+    }
+    
     public void testGetArtifactSha1MissingMd5Present()
         throws IOException, UnsupportedProtocolException, TransferFailedException, ResourceDoesNotExistException
     {
