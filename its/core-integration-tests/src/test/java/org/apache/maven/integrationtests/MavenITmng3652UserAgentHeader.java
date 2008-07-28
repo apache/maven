@@ -36,7 +36,7 @@ public class MavenITmng3652UserAgentHeader
         // TODO: fix support for this in 2.1-SNAPSHOT
         // 2.0.10+
         //super( "(2.0.9,)" );
-        super( "(2.0.9,2.0.99)" );
+        super( "(2.0.10,2.0.99)" );
     }
 
     public void setUp()
