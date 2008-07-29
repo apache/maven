@@ -77,7 +77,7 @@ MavenITmng3645POMSyntaxErrorTest
 */
 
         // Correct wagon issue in 2.0.10 first
-        //suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAV.class );
+        suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAV.class );
         suite.addTestSuite( MavenITmng3684BuildPluginParameterTest.class );
         suite.addTestSuite( MavenITmng3680InvalidDependencyPOMTest.class );
         suite.addTestSuite( MavenITmng3679PluginExecIdInterpolationTest.class );

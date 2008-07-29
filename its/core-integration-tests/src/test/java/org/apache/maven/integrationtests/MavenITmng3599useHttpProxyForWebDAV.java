@@ -92,9 +92,9 @@ public class MavenITmng3599useHttpProxyForWebDAV
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar", "some content\n" );
 
-        // Doesn't work until 2.0.10+
+        // Doesn't work until 2.0.11+
         // TODO: reinstate for 2.1 when WebDAV works
-        if ( matchesVersionRange( "(2.0.9,2.0.99)" ) )
+        if ( matchesVersionRange( "(2.0.10,2.0.99)" ) )
         {
             newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
             FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );

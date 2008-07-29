@@ -34,7 +34,7 @@ public class MavenITmng3652UserAgentHeader
         throws InvalidVersionSpecificationException
     {
         // TODO: fix support for this in 2.1-SNAPSHOT
-        // 2.0.10+
+        // 2.0.11+
         //super( "(2.0.9,)" );
         super( "(2.0.10,2.0.99)" );
     }
