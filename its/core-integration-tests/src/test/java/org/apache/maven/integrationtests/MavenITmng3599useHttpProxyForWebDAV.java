@@ -68,19 +68,24 @@ public class MavenITmng3599useHttpProxyForWebDAV
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599-useHttpProxyForWebDAV" );
+
         String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
         String newSettings = StringUtils.replace( settings, "@protocol@", "http" );
+        
         FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
-
+        
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
+        
         verifier.setCliOptions( cliOptions );
 
         verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
+        
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -101,9 +106,12 @@ public class MavenITmng3599useHttpProxyForWebDAV
         if ( matchesVersionRange( "(2.0.10,2.0.99)" ) )
         {
             File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599-useHttpProxyForWebDAV" );
-            
+
             String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
             settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
+            String newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
+            
+            FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
 
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
@@ -113,10 +121,9 @@ public class MavenITmng3599useHttpProxyForWebDAV
             
             verifier.setCliOptions( cliOptions );
 
-            String newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
-            FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
-
             verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
+            verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
+            
             verifier.executeGoal( "compile" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
