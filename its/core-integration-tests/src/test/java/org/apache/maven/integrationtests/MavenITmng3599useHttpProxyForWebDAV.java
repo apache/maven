@@ -33,16 +33,24 @@ public class MavenITmng3599useHttpProxyForWebDAV
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
                 throws IOException, ServletException
             {
+                System.out.println( "Got request for URL: '" + request.getRequestURL() + "'" );
+                System.out.flush();
+                
                 response.setContentType( "text/plain" );
 
+                System.out.println( "Checking for 'Proxy-Connection' header..." );
                 if ( request.getHeader( "Proxy-Connection" ) != null )
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
                     response.getWriter().println( "some content" );
+                    
+                    System.out.println( "Proxy-Connection found." );
                 }
                 else
                 {
-                    response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+                    response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
+                    
+                    System.out.println( "Proxy-Connection not found." );
                 }
 
                 ( (Request) request ).setHandled( true );
@@ -80,6 +88,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
+        cliOptions.add( "-X" );
         
         verifier.setCliOptions( cliOptions );
 
@@ -89,6 +98,9 @@ public class MavenITmng3599useHttpProxyForWebDAV
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        File logFile = new File( testDir, "log.txt" );
+        logFile.renameTo( new File( testDir, "logHttp.txt" ) );
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
@@ -101,9 +113,9 @@ public class MavenITmng3599useHttpProxyForWebDAV
     public void testmng3599useHttpProxyForWebDAV()
         throws Exception
     {
-        // Doesn't work until 2.0.11+
+        // Doesn't work until 2.0.10+
         // TODO: reinstate for 2.1 when WebDAV works
-        if ( matchesVersionRange( "(2.0.10,2.0.99)" ) )
+        if ( matchesVersionRange( "(2.0.9,2.0.99)" ) )
         {
             File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599-useHttpProxyForWebDAV" );
 
@@ -118,6 +130,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
             List cliOptions = new ArrayList();
             cliOptions.add( "--settings" );
             cliOptions.add( "settings.xml" );
+            cliOptions.add( "-X" );
             
             verifier.setCliOptions( cliOptions );
 
@@ -127,6 +140,9 @@ public class MavenITmng3599useHttpProxyForWebDAV
             verifier.executeGoal( "compile" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
+
+            File logFile = new File( testDir, "log.txt" );
+            logFile.renameTo( new File( testDir, "logDAV.txt" ) );
 
             verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
             verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",

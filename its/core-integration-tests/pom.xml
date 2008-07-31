@@ -47,6 +47,12 @@
           </includes>
           <forkMode>never</forkMode>
           <skip>true</skip>
+          <systemProperties>
+            <property>
+              <name>maven.version</name>
+              <value>${maven.version}</value>
+            </property>
+          </systemProperties>
         </configuration>
       </plugin>
       <plugin>

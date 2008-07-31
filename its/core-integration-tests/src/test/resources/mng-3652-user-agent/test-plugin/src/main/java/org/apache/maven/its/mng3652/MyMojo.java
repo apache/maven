@@ -82,7 +82,7 @@ public class MyMojo
         throws MojoExecutionException
     {
         ArtifactRepository remote =
-            repositoryFactory.createArtifactRepository( "test", testProtocol + "://localhost:" + testPort, layout,
+            repositoryFactory.createArtifactRepository( "test", testProtocol + "://127.0.0.1:" + testPort, layout,
                                                         new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
         
         Artifact artifact = artifactFactory.createArtifact( "bad.group", "missing-artifact", "1", null, "jar" );
