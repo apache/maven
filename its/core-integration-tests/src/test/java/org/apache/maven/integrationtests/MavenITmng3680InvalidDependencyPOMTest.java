@@ -25,10 +25,23 @@ public class MavenITmng3680InvalidDependencyPOMTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3680-invalidDependencyPOM" );
+        File pluginDir = new File( testDir, "maven-mng3680-plugin" );
+        
+        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = new Verifier( testDir.getAbsolutePath() );
+        
+        verifier.deleteArtifact( "tests", "dep-L1", "1", "jar" );
+        verifier.deleteArtifact( "tests", "dep-L1", "1", "pom" );
+        
+        verifier.deleteArtifact( "tests", "dep-L1", "1", "jar" );
+        verifier.deleteArtifact( "tests", "dep-L2", "1", "pom" );
 
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

@@ -31,20 +31,16 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-2</version>
+        <groupId>org.apache.maven.its.mng3680</groupId>
+        <artifactId>maven-mng3680-plugin</artifactId>
+        <version>1</version>
         <executions>
           <execution>
-            <id>assembly</id>
-            <phase>package</phase>
+            <id>check-deps</id>
+            <phase>validate</phase>
             <goals>
-              <goal>single</goal>
+              <goal>check</goal>
             </goals>
-            <configuration>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-            </configuration>
           </execution>
         </executions>
       </plugin>
