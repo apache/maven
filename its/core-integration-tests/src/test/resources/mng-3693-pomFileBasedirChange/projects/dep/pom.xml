@@ -1,0 +1,31 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>parent</artifactId>
+    <groupId>org.apache.maven.its.mng3693</groupId>
+    <version>1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3693</groupId>
+  <artifactId>dep</artifactId>
+  <version>1</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng3693</groupId>
+        <artifactId>maven-mng3693-plugin</artifactId>
+        <version>1</version>
+        
+        <executions>
+          <execution>
+            <id>move-pom</id>
+            <phase>package</phase>
+            <goals>
+              <goal>move-pom</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
