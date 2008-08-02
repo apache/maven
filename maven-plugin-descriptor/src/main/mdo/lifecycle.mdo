@@ -30,7 +30,7 @@ under the License.
     </default>
   </defaults>
   <classes>
-    <class rootElement="true" xml.tagName="lifecycles">
+    <class rootElement="true" xml.tagName="lifecycles" xsd.compositor="sequence">
       <name>LifecycleConfiguration</name>
       <version>1.0.0</version>
       <description>Root element of the lifecycle.xml file.</description>
