@@ -154,7 +154,7 @@ public final class DefaultProjectBuilder
             Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
 
         PomClassicDomainModel transformedDomainModel =
-            ( (PomClassicDomainModel) ctx.transform( domainModels, transformer, transformer, properties ) );
+            ( (PomClassicDomainModel) ctx.transform( domainModels, transformer, transformer, null, properties ) );
         Model model = transformedDomainModel.getModel();
         return new MavenProject( model );
     }

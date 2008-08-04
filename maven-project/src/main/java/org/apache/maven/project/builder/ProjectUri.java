@@ -457,7 +457,7 @@ public class ProjectUri
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/inherited";
 
                     public static String configuration =
-                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/configuration#collection";
+                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/configuration#set";
                 }
             }
         }
@@ -569,7 +569,7 @@ public class ProjectUri
                     "http://apache.org/maven/project/build/plugins#collection/plugin/inherited";
 
                 public static String configuration =
-                    "http://apache.org/maven/project/build/plugins#collection/plugin/configuration#collection";
+                    "http://apache.org/maven/project/build/plugins#collection/plugin/configuration#set";
             }
         }
     }
