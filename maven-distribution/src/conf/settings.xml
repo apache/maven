@@ -86,7 +86,7 @@ under the License.
       <password>proxypass</password>
       <host>proxy.host.net</host>
       <port>80</port>
-      <nonProxyHosts>local.net,some.host.com</nonProxyHosts>
+      <nonProxyHosts>local.net|some.host.com</nonProxyHosts>
     </proxy>
     -->
   </proxies>
