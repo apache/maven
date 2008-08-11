@@ -23,7 +23,7 @@
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
   <artifactId>maven</artifactId>
-  <version>2.1-SNAPSHOT</version>
+  <version>3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Apache Maven</name>
   <description>Maven is a project development management and
@@ -289,6 +289,7 @@
     <!--end-->
     <dependencies>
       <!--  Maven Modules -->
+      <!--start-->
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-workspace</artifactId>
@@ -339,6 +340,7 @@
         <artifactId>maven-core</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <!--end-->
       <!--  Plexus -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
