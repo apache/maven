@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3703</groupId>
+  <artifactId>project</artifactId>
+  <name>project</name>
+  <version>1</version>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng3703</groupId>
+        <artifactId>maven-mng3703-plugin</artifactId>
+        <version>1</version>
+        <executions>
+          <execution>
+            <id>check</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>run</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
