@@ -76,6 +76,7 @@ MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
 */
 
+        suite.addTestSuite( MavenITmng3704LifecycleExecutorWrapperTest.class );
         suite.addTestSuite( MavenITmng3703ExecutionProjectWithRelativePathsTest.class );
         suite.addTestSuite( MavenITmng3694ReactorProjectsDynamismTest.class );
         suite.addTestSuite( MavenITmng3693PomFileBasedirChangeTest.class );
