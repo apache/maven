@@ -20,8 +20,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @goal check
- * @phase validate
- * @execute phase="validate"
+ * @execute phase="compile"
  */
 public class CheckMojo
     extends AbstractCheckMojo
@@ -34,6 +33,6 @@ public class CheckMojo
     
     protected String getTestProjectLabel()
     {
-        return "execution project";
+        return "forked project";
     }
 }

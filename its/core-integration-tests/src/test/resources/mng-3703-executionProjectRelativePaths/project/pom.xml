@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?><project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its.mng3703</groupId>
+  <groupId>org.apache.maven.its.mng3704</groupId>
   <artifactId>project</artifactId>
   <name>project</name>
   <version>1</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   
   <build>
     <plugins>
@@ -13,21 +22,31 @@
         <version>1</version>
         <executions>
           <execution>
-            <id>check</id>
-            <phase>validate</phase>
+            <id>test</id>
+            <phase>package</phase>
             <goals>
               <goal>check</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>run</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>run</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng3703</groupId>
+        <artifactId>maven-mng3703-plugin</artifactId>
+        <version>1</version>
+        <reportSets>
+          <reportSet>
+            <id>test-report</id>
+            <reports>
+              <report>check-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

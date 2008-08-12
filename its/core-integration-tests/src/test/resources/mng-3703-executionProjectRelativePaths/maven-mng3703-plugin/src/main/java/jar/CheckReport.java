@@ -18,27 +18,32 @@ package jar;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.doxia.siterenderer.DefaultSiteRenderer;
+import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.project.MavenProject;
 
 import com.sun.tools.jdi.LinkedHashMap;
+import org.apache.maven.reporting.AbstractMavenReport;
+import org.apache.maven.reporting.MavenReportException;
 
-public abstract class AbstractCheckMojo
-    extends AbstractMojo
+/**
+ * @goal check-report
+ * @execute phase="compile"
+ */
+public class CheckReport
+    extends AbstractMavenReport
 {
-    
-    protected static boolean forkHasRun = false;
-    
+
     /**
      * @parameter default-value="${project}"
      * @required
      * @readonly
      */
     private MavenProject project;
-    
+
     /**
      * @parameter default-value="${executedProject}"
      * @required
@@ -46,28 +51,34 @@ public abstract class AbstractCheckMojo
      */
     private MavenProject executionProject;
 
-    public void execute()
-        throws MojoExecutionException
+    /**
+     * @parameter default-value="${project.build.directory}/generated-site/mng3703"
+     * @readonly
+     */
+    private String outputDirectory;
+
+    protected void executeReport( Locale locale )
+        throws MavenReportException
     {
         if ( getMainProject().getBasedir() == null )
         {
-            throw new MojoExecutionException( "Basedir is null on the main project instance." );
+            throw new MavenReportException( "Basedir is null on the main project instance." );
         }
-        
-        if ( getTestProject().getBasedir() == null )
+
+        if ( executionProject.getBasedir() == null )
         {
-            throw new MojoExecutionException( "Basedir is null on the " + getTestProjectLabel() + " instance (during mojo execution)." );
+            throw new MavenReportException( "Basedir is null on the forked project instance (during report execution)." );
         }
-        
-        String executionBasedir = getTestProject().getBasedir().getAbsolutePath();
-        
+
+        String executionBasedir = executionProject.getBasedir().getAbsolutePath();
+
         Map failedPaths = new LinkedHashMap();
-        
-        checkListOfPaths( getTestProject().getCompileSourceRoots(), executionBasedir, "compileSourceRoots", failedPaths );
-        checkListOfPaths( getTestProject().getTestCompileSourceRoots(), executionBasedir, "testCompileSourceRoots", failedPaths );
-        checkListOfPaths( getTestProject().getScriptSourceRoots(), executionBasedir, "scriptSourceRoots", failedPaths );
-        
-        
+
+        checkListOfPaths( executionProject.getCompileSourceRoots(), executionBasedir, "compileSourceRoots", failedPaths );
+        checkListOfPaths( executionProject.getTestCompileSourceRoots(), executionBasedir, "testCompileSourceRoots",
+                          failedPaths );
+        checkListOfPaths( executionProject.getScriptSourceRoots(), executionBasedir, "scriptSourceRoots", failedPaths );
+
         if ( !failedPaths.isEmpty() )
         {
             StringBuffer buffer = new StringBuffer();
@@ -75,29 +86,24 @@ public abstract class AbstractCheckMojo
             for ( Iterator it = failedPaths.entrySet().iterator(); it.hasNext(); )
             {
                 Map.Entry entry = (Map.Entry) it.next();
-                
-                buffer.append( "\n-  " ).append( entry.getKey() ).append( ": '" ).append( entry.getValue() ).append( "'" );
+
+                buffer.append( "\n-  " ).append( entry.getKey() ).append( ": '" ).append( entry.getValue() ).append(
+                                                                                                                     "'" );
             }
-            
-            throw new MojoExecutionException( buffer.toString() );
+
+            throw new MavenReportException( buffer.toString() );
         }
-        
-        forkHasRun = true;
     }
-    
+
     protected MavenProject getMainProject()
     {
         return project;
     }
-    
+
     protected MavenProject getExecutionProject()
     {
         return executionProject;
     }
-    
-    protected abstract MavenProject getTestProject();
-    
-    protected abstract String getTestProjectLabel();
 
     private void checkListOfPaths( List paths, String base, String label, Map failedPaths )
     {
@@ -112,5 +118,35 @@ public abstract class AbstractCheckMojo
                 }
             }
         }
+    }
+
+    protected String getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    protected MavenProject getProject()
+    {
+        return project;
+    }
+
+    protected Renderer getSiteRenderer()
+    {
+        return new DefaultSiteRenderer();
+    }
+
+    public String getDescription( Locale locale )
+    {
+        return getOutputName();
+    }
+
+    public String getName( Locale locale )
+    {
+        return getOutputName();
+    }
+
+    public String getOutputName()
+    {
+        return "check-report";
     }
 }

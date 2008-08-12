@@ -20,22 +20,17 @@
 package org.apache.maven.integrationtests;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3703">MNG-3703</a>.
- *
- * @todo Fill in a better description of what this test verifies!
  * 
+ * @todo Fill in a better description of what this test verifies!
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
  */
 public class MavenITmng3703ExecutionProjectWithRelativePathsTest
     extends AbstractMavenIntegrationTestCase
@@ -46,7 +41,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         super( "(2.0.9,)" ); // only test in 2.0.9+
     }
 
-    public void testitMNG3703 ()
+    public void testForkFromMojo()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3703-executionProjectRelativePaths" );
@@ -61,12 +56,42 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = new Verifier( projectDir.getAbsolutePath() );
 
-        verifier.executeGoal( "validate" );
+        verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+        
+        File logFile = new File( projectDir, "log.txt" );
+        logFile.renameTo( new File( projectDir, "log-mojo.txt" ) );
+    }
+
+    public void testForkFromReport()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3703-executionProjectRelativePaths" );
+        File pluginDir = new File( testDir, "maven-mng3703-plugin" );
+        File projectDir = new File( testDir, "project" );
+
+        Verifier verifier;
+
+        verifier = new Verifier( pluginDir.getAbsolutePath() );
+
+        verifier.executeGoal( "install" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier = new Verifier( projectDir.getAbsolutePath() );
+
+        verifier.executeGoal( "site" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+        
+        File logFile = new File( projectDir, "log.txt" );
+        logFile.renameTo( new File( projectDir, "log-report.txt" ) );
     }
 }
