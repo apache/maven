@@ -17,14 +17,13 @@ package jar;
  */
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-
-import com.sun.tools.jdi.LinkedHashMap;
 
 public abstract class AbstractCheckMojo
     extends AbstractMojo
