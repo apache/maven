@@ -36,8 +36,7 @@ public final class ArtifactModelContainerFactory
 
     private static final Collection<String> uris = Collections.unmodifiableList( Arrays.asList(
 
-        ProjectUri.DependencyManagement.Dependencies.Dependency.xUri,
-        ProjectUri.Dependencies.Dependency.xUri,
+        ProjectUri.DependencyManagement.Dependencies.Dependency.xUri, ProjectUri.Dependencies.Dependency.xUri,
 
         ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri,
         ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.xUri,

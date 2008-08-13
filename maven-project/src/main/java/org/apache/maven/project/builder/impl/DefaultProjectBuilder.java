@@ -35,7 +35,6 @@ import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelTransformerContext;
-import org.apache.maven.shared.model.ImportModel;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -87,10 +86,9 @@ public final class DefaultProjectBuilder
     }
 
     /**
-     * @see ProjectBuilder#buildFromLocalPath(java.io.InputStream, java.util.List, java.util.Collection, java.util.Collection, org.apache.maven.project.builder.PomArtifactResolver, java.io.File)
+     * @see ProjectBuilder#buildFromLocalPath(java.io.InputStream, java.util.List, java.util.Collection, org.apache.maven.project.builder.PomArtifactResolver, java.io.File)
      */
     public MavenProject buildFromLocalPath( InputStream pom, List<Model> inheritedModels,
-                                            Collection<ImportModel> importModels,
                                             Collection<InterpolatorProperty> interpolatorProperties,
                                             PomArtifactResolver resolver, File projectDirectory )
         throws IOException
@@ -151,16 +149,14 @@ public final class DefaultProjectBuilder
             domainModels.add( new PomClassicDomainModel( model ) );
         }
 
-        PomClassicTransformer transformer = new PomClassicTransformer(null);
+        PomClassicTransformer transformer = new PomClassicTransformer();
         ModelTransformerContext ctx = new ModelTransformerContext(
             Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
 
         PomClassicDomainModel transformedDomainModel =
-            ( (PomClassicDomainModel) ctx.transform( domainModels, transformer, transformer, importModels, properties ) );
-
-
+            ( (PomClassicDomainModel) ctx.transform( domainModels, transformer, transformer, null, properties ) );
         Model model = transformedDomainModel.getModel();
-        return new MavenProject( model, artifactFactory );
+        return new MavenProject( model );
     }
 
     private boolean isParentLocal( Parent parent, File projectDirectory )

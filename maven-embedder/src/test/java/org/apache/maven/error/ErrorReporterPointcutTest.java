@@ -848,10 +848,6 @@ public class ErrorReporterPointcutTest
 
         reporterCtl.verify();
     }
-/*
-    TODO: Disabled these unit tests due to refactoring of maven-project. DefaultMavenProjectBuilder would throw an
-    exception which would be recorded here. Creation is now in MavenProject, which doesn't contain an exception
-     in method signature.
 
     public void testReportBadManagedDependencyVersion()
         throws IOException
@@ -888,7 +884,7 @@ public class ErrorReporterPointcutTest
 
         reporterCtl.verify();
     }
-*/
+
     public void testReportErrorCreatingArtifactRepository()
         throws IOException
     {
