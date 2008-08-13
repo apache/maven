@@ -21,6 +21,8 @@ import org.mortbay.jetty.handler.AbstractHandler;
 public class MavenITmng3599useHttpProxyForWebDAV
     extends AbstractMavenIntegrationTestCase
 {
+    private static final String LS = System.getProperty( "line.separator" );
+    
     private Server server;
 
     private int port;
@@ -104,7 +106,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                         "some content\n" );
+                                         "some content" + LS );
     }
 
     /**
@@ -146,7 +148,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
 
             verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
             verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                             "some content\n" );
+                                             "some content" + LS );
         }
         else
         {
