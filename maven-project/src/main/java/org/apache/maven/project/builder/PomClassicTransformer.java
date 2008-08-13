@@ -20,24 +20,13 @@ package org.apache.maven.project.builder;
  */
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.shared.model.DomainModel;
-import org.apache.maven.shared.model.ModelContainer;
-import org.apache.maven.shared.model.ModelDataSource;
-import org.apache.maven.shared.model.ModelMarshaller;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.ModelTransformer;
+import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
@@ -49,18 +38,7 @@ public final class PomClassicTransformer
     /**
      * The URIs this tranformer supports
      */
-    private final Set<String> uris;
-
-    private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
-
-    //private static List<DomainModel> cache = new ArrayList<DomainModel>();
-
-    /**
-     * Default constructor
-     */
-    public PomClassicTransformer()
-    {
-        this.uris = new HashSet<String>( Arrays.asList( ProjectUri.Build.Extensions.xUri,
+    private static Set<String> uris = new HashSet<String>( Arrays.asList( ProjectUri.Build.Extensions.xUri,
                                                         ProjectUri.Build.PluginManagement.Plugins.xUri,
                                                         ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                         ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
@@ -113,7 +91,21 @@ public final class PomClassicTransformer
                                                         "http://apache.org/maven/project/profiles/profile/build/plugins/plugin/dependencies/dependency/exclusions#collection",
                                                         "http://apache.org/maven/project/profiles/profile/dependencyManagement/dependencies/dependency/exclusions#collection",
                                                         "http://apache.org/maven/project/profiles/profile/reporting/plugins/plugin/reportSets#collection",
-                                                        "http://apache.org/maven/project/profiles/profile/build/plugins/plugin/executions#collection" ) );
+                                                        "http://apache.org/maven/project/profiles/profile/build/plugins/plugin/executions#collection" ));
+
+    private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
+
+    private Collection<Profile> profiles;
+
+
+    //private static List<DomainModel> cache = new ArrayList<DomainModel>();
+
+    /**
+     * Default constructor
+     */
+    public PomClassicTransformer(Collection<Profile> profiles)
+    {
+        this.profiles = profiles;
     }
 
     /**
@@ -140,6 +132,37 @@ public final class PomClassicTransformer
             }
         }
 
+        //dependency management
+        ModelDataSource source = new DefaultModelDataSource();
+        source.init( props, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+
+        for(ModelContainer dependencyContainer : source.queryFor( ProjectUri.Dependencies.Dependency.xUri)) {
+                for ( ModelContainer managementContainer : source.queryFor( ProjectUri.DependencyManagement.Dependencies.Dependency.xUri) )
+                {
+                    managementContainer = new ArtifactModelContainerFactory().create(transformDependencyManagement(managementContainer.getProperties()));
+                    ModelContainerAction action = dependencyContainer.containerAction(managementContainer);
+                    if(action.equals(ModelContainerAction.JOIN) || action.equals(ModelContainerAction.DELETE)) {
+                        source.join(dependencyContainer, managementContainer);
+                    }
+                }
+        }
+
+        for(ModelContainer dependencyContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri)) {
+                for ( ModelContainer managementContainer : source.queryFor( ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri) )
+                {
+                    managementContainer = new ArtifactModelContainerFactory().create(transformPluginManagement(managementContainer.getProperties()));
+                    ModelContainerAction action = dependencyContainer.containerAction(managementContainer);
+                    if(action.equals(ModelContainerAction.JOIN) || action.equals(ModelContainerAction.DELETE)) {
+                        source.join(dependencyContainer, managementContainer);
+                    }
+                }
+        }        
+
+        props = source.getModelProperties();
+      //   for(ModelProperty mp : props) {
+       //      System.out.println("-" + mp);
+      //   }
+
         String xml = null;
         try
         {
@@ -150,7 +173,7 @@ public final class PomClassicTransformer
         {
             throw new IOException( e + ":\r\n" + xml );
         }
-        }
+    }
 
     /**
      * @see ModelTransformer#transformToModelProperties(java.util.List)
@@ -185,6 +208,7 @@ public final class PomClassicTransformer
 
             List<ModelProperty> tmp = ModelMarshaller.marshallXmlToModelProperties(
                 ( (PomClassicDomainModel) domainModel ).getInputStream(), ProjectUri.baseUri, uris );
+
             List clearedProperties = new ArrayList<ModelProperty>();
 
             //Missing Version Rule
@@ -348,7 +372,7 @@ public final class PomClassicTransformer
             tmp.removeAll( clearedProperties );
             modelProperties.addAll( tmp );
 
-            if ( domainModels.indexOf( domainModel ) > 0 )
+            if ( domainModels.indexOf( domainModel ) == 0 )
             {
                 //cache.put( pomDomainModel.getId(), modelProperties );
             }
@@ -362,7 +386,12 @@ public final class PomClassicTransformer
             }
                        */
         }
-        return modelProperties;
+       return modelProperties;
+      //  return ModelTransformerContext.transformModelProperties(modelProperties, Arrays.asList(
+      //          new ProfileModelPropertyTransformer(),
+      //          new PluginManagementModelPropertyTransformer(),
+      //          new DependencyManagementModelPropertyTransformer()
+      //          ));
     }
 
     /**
@@ -414,5 +443,46 @@ public final class PomClassicTransformer
         }
         return null;
     }
+
+        private static List<ModelProperty> transformDependencyManagement(List<ModelProperty> modelProperties) {
+            List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
+            for(ModelProperty mp : modelProperties) {
+                if(mp.getUri().startsWith(ProjectUri.DependencyManagement.xUri))
+                {
+                    transformedProperties.add(new ModelProperty(
+                            mp.getUri().replace(ProjectUri.DependencyManagement.xUri, ProjectUri.xUri), mp.getValue()));
+                }
+            }
+            return transformedProperties;
+        }
+
+        public static List<ModelProperty> transformPluginManagement(List<ModelProperty> modelProperties) {
+            List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
+            for(ModelProperty mp : modelProperties) {
+                if(mp.getUri().startsWith(ProjectUri.Build.PluginManagement.xUri))
+                {
+                    transformedProperties.add(new ModelProperty(
+                            mp.getUri().replace(ProjectUri.Build.PluginManagement.xUri, ProjectUri.Build.xUri), mp.getValue()));
+                }
+            }
+            return transformedProperties;
+        }
+
+ /*
+    private static class ProfileModelPropertyTransformer implements ModelPropertyTransformer {
+        public List<ModelProperty> transform(List<ModelProperty> modelProperties) {
+            List<ModelProperty> properties = new ArrayList<ModelProperty>(modelProperties);
+            List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
+            for(ModelProperty mp : modelProperties) {
+                String uri = mp.getUri().replace("profiles#collection/profile", "");
+            }
+            return properties;
+        }
+
+        public String getBaseUri() {
+            return ProjectUri.baseUri;
+        }
+    }
+    */
 }
 

@@ -22,6 +22,7 @@ package org.apache.maven.project.builder;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.shared.model.ImportModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +50,7 @@ public interface ProjectBuilder
      * @throws IOException if there is a problem in the construction of the maven project
      */
     MavenProject buildFromLocalPath( InputStream pom, List<Model> inheritedModels,
+                                     Collection<ImportModel> importModels,
                                      Collection<InterpolatorProperty> interpolatorProperties,
                                      PomArtifactResolver resolver, File baseDirectory )
         throws IOException;
