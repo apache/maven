@@ -76,11 +76,11 @@ MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
 */
 
+        suite.addTestSuite( MavenITmng3710PollutedClonedPluginsTest.class );
         suite.addTestSuite( MavenITmng3704LifecycleExecutorWrapperTest.class );
         suite.addTestSuite( MavenITmng3703ExecutionProjectWithRelativePathsTest.class );
         suite.addTestSuite( MavenITmng3694ReactorProjectsDynamismTest.class );
         suite.addTestSuite( MavenITmng3693PomFileBasedirChangeTest.class );
-        suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAV.class );
         suite.addTestSuite( MavenITmng3684BuildPluginParameterTest.class );
         suite.addTestSuite( MavenITmng3680InvalidDependencyPOMTest.class );
         suite.addTestSuite( MavenITmng3679PluginExecIdInterpolationTest.class );
@@ -88,6 +88,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3667ResolveDepsWithBadPomVersionTest.class );
         suite.addTestSuite( MavenITmng3652UserAgentHeader.class );
         suite.addTestSuite( MavenITmng3642DynamicResourcesTest.class );
+        suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAV.class );
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependency.class );
         suite.addTestSuite( MavenITmng3545ProfileDeactivation.class );
         suite.addTestSuite( MavenITmng3536AppendedAbsolutePaths.class );
