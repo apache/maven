@@ -749,7 +749,7 @@ public class MavenCli
                 OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create(
                     ERRORS ) );
             options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
-                "Execute goals for project found in the reactor" ).create( REACTOR ) );
+                "Dynamically build reactor from subdirectories" ).create( REACTOR ) );
             options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(
                 "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
             options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription(
