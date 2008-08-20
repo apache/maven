@@ -34,6 +34,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MissingProjectException;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
@@ -201,7 +202,7 @@ public class PluginParameterExpressionEvaluatorTest
     }
 
     private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo )
-        throws CycleDetectedException, DuplicateProjectException
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
         return new MavenSession( container, new Settings(), repo, new DefaultEventDispatcher(),
                                  new ReactorManager( Collections.EMPTY_LIST ), Collections.EMPTY_LIST, ".",

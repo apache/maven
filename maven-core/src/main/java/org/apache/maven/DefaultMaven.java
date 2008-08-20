@@ -42,6 +42,7 @@ import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.MissingProjectException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.Mirror;
@@ -299,14 +300,16 @@ public class DefaultMaven
         ReactorManager rm;
         try
         {
-            rm = new ReactorManager( projects );
+            String resumeFrom = request.getResumeFrom();
+            
+            List projectList = request.getSelectedProjects();
+            
+            String makeBehavior = request.getMakeBehavior();
+            
+            rm = new ReactorManager( projects, projectList, resumeFrom, makeBehavior );
 
-            String requestFailureBehavior = request.getFailureBehavior();
-
-            if ( requestFailureBehavior != null )
-            {
-                rm.setFailureBehavior( requestFailureBehavior );
-            }
+            rm.setFailureBehavior( request.getFailureBehavior() );
+            
         }
         catch ( CycleDetectedException e )
         {
@@ -314,6 +317,10 @@ public class DefaultMaven
                 "The projects in the reactor contain a cyclic reference: " + e.getMessage(), e );
         }
         catch ( DuplicateProjectException e )
+        {
+            throw new BuildFailureException( e.getMessage(), e );
+        }
+        catch ( MissingProjectException e )
         {
             throw new BuildFailureException( e.getMessage(), e );
         }

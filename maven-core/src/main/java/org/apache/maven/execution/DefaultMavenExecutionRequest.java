@@ -70,6 +70,12 @@ public class DefaultMavenExecutionRequest
     private final Date startTime;
 
     private final boolean showErrors;
+    
+    private String makeBehavior;
+    
+    private String resumeFrom;
+    
+    private List selectedProjects;
 
     public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
                                          EventDispatcher eventDispatcher, List goals, String baseDirectory,
@@ -218,4 +224,35 @@ public class DefaultMavenExecutionRequest
 
         return config;
     }
+    
+    public String getMakeBehavior()
+    {
+        return makeBehavior;
+    }
+
+    public void setMakeBehavior( String makeBehavior )
+    {
+        this.makeBehavior = makeBehavior;
+    }
+
+    public String getResumeFrom()
+    {
+        return resumeFrom;
+    }
+
+    public void setResumeFrom( String resumeFrom )
+    {
+        this.resumeFrom = resumeFrom;
+    }
+
+    public List getSelectedProjects()
+    {
+        return selectedProjects;
+    }
+
+    public void setSelectedProjects( List selectedProjects )
+    {
+        this.selectedProjects = selectedProjects;
+    }
+
 }

@@ -24,6 +24,7 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MissingProjectException;
 import org.apache.maven.project.ProjectSorter;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
@@ -41,6 +42,13 @@ public class ReactorManager
 
     public static final String FAIL_NEVER = "fail-never";
 
+    public static final String MAKE_MODE = "make";
+
+    public static final String MAKE_DEPENDENTS_MODE = "make-dependents";
+
+    // make projects that depend on me, and projects that I depend on
+    public static final String MAKE_BOTH_MODE = "make-both";
+    
     private List blackList = new ArrayList();
 
     private Map buildFailuresByProject = new HashMap();
@@ -54,9 +62,41 @@ public class ReactorManager
     private Map buildSuccessesByProject = new HashMap();
 
     public ReactorManager( List projects )
-        throws CycleDetectedException, DuplicateProjectException
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
         this.sorter = new ProjectSorter( projects );
+    }
+    
+    public ReactorManager( List projects, List selectedProjects, String resumeFrom, String makeBehavior )
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        boolean make, makeDependents;
+        if ( makeBehavior == null )
+        {
+            make = false;
+            makeDependents = false;
+        }
+        else if ( MAKE_MODE.equals( makeBehavior ) )
+        {
+            make = true;
+            makeDependents = false;
+        }
+        else if ( MAKE_DEPENDENTS_MODE.equals( makeBehavior ) )
+        {
+            make = false;
+            makeDependents = true;
+        }
+        else if ( MAKE_BOTH_MODE.equals( makeBehavior ) )
+        {
+            make = true;
+            makeDependents = true;
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Invalid make behavior (must be one of: \'" + MAKE_MODE + "\', \'"
+                + MAKE_DEPENDENTS_MODE + "\', \'" + MAKE_BOTH_MODE + "\')." );
+        }
+        this.sorter = new ProjectSorter( projects, selectedProjects, resumeFrom, make, makeDependents );
     }
 
     public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
@@ -82,6 +122,11 @@ public class ReactorManager
 
     public void setFailureBehavior( String failureBehavior )
     {
+        if ( failureBehavior == null )
+        {
+            this.failureBehavior = FAIL_FAST; // default
+            return;
+        }
         if ( FAIL_FAST.equals( failureBehavior ) || FAIL_AT_END.equals( failureBehavior ) ||
             FAIL_NEVER.equals( failureBehavior ) )
         {

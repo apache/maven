@@ -55,6 +55,7 @@ import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.Os;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -62,6 +63,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -473,6 +475,32 @@ public class MavenCli
         {
             request.setPomFile( commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
         }
+        
+        if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
+        {
+            request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
+        }
+        
+        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
+        {
+            String projectList = commandLine.getOptionValue( CLIManager.PROJECT_LIST );
+            String[] projects = StringUtils.split( projectList, "," );
+            request.setSelectedProjects( Arrays.asList( projects ) );
+        }
+        
+        if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && !commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( ReactorManager.MAKE_MODE );
+        }
+        else if ( !commandLine.hasOption( CLIManager.ALSO_MAKE )
+            && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( ReactorManager.MAKE_DEPENDENTS_MODE );
+        }
+        if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( ReactorManager.MAKE_BOTH_MODE );
+        }
     }
 
     private static Maven createMavenInstance( boolean interactive )
@@ -721,6 +749,14 @@ public class MavenCli
         private static final String FAIL_AT_END = "fae";
 
         private static final String FAIL_NEVER = "fn";
+        
+        private static final String RESUME_FROM = "rf";
+        
+        private static final String PROJECT_LIST = "pl";
+        
+        private static final String ALSO_MAKE = "am";
+        
+        private static final String ALSO_MAKE_DEPENDENTS = "amd";
 
         public CLIManager()
         {
@@ -792,6 +828,14 @@ public class MavenCli
             options.addOption(
                               OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create(
                                   SHOW_VERSION ) );
+            options.addOption( OptionBuilder.withLongOpt( "resume-from" ).hasArg().withDescription( "Resume reactor from specified project" ).create(
+                                  RESUME_FROM ) );
+            options.addOption( OptionBuilder.withLongOpt( "projects" ).withDescription(
+                "Build specified reactor projects instead of all projects" ).hasArg().create( PROJECT_LIST ) );
+            options.addOption( OptionBuilder.withLongOpt( "also-make" ).withDescription(
+                "If project list is specified, also build projects required by the list" ).create( ALSO_MAKE ) );
+            options.addOption( OptionBuilder.withLongOpt( "also-make-dependents" ).withDescription(
+                "If project list is specified, also build projects that depend on projects on the list" ).create( ALSO_MAKE_DEPENDENTS ) );
         }
 
         public CommandLine parse( String[] args )

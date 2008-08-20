@@ -28,6 +28,7 @@ import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,9 +41,145 @@ import java.util.List;
 public class ProjectSorterTest
     extends TestCase
 {
+
+    public void testBasicSingleProject()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject project = createProject( "group", "artifactA", "1.0" );
+
+        List projects = new ProjectSorter( Collections.singletonList( project ) ).getSortedProjects();
+        
+        assertEquals( "Wrong number of projects: " + projects, 1, projects.size() );
+        assertEquals( "Didn't match project", project, projects.get( 0 ) );
+    }
+    
+    public void testBasicMultiProject()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject projectA = createProject( "group", "artifactA", "1.0" );
+        MavenProject projectB = createProject( "group", "artifactB", "1.0" );
+        MavenProject projectC = createProject( "group", "artifactC", "1.0" );
+        
+        projectA.getDependencies().add( createDependency( projectB ) );
+        projectB.getDependencies().add( createDependency( projectC ) );
+        
+        List projects = Arrays.asList( new Object[] { projectA, projectB, projectC} );
+
+        projects = new ProjectSorter( projects ).getSortedProjects();
+
+        assertEquals( "Wrong number of projects: " + projects, 3, projects.size() );
+        assertEquals( "Didn't match project", projectC, projects.get( 0 ) );
+        assertEquals( "Didn't match project", projectB, projects.get( 1 ) );
+        assertEquals( "Didn't match project", projectA, projects.get( 2 ) );
+    }
+
+    public void testResumeFrom()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject projectA = createProject( "group", "artifactA", "1.0" );
+        MavenProject projectB = createProject( "group", "artifactB", "1.0" );
+        MavenProject projectC = createProject( "group", "artifactC", "1.0" );
+
+        projectA.getDependencies().add( createDependency( projectB ) );
+        projectB.getDependencies().add( createDependency( projectC ) );
+
+        List projects = Arrays.asList( new Object[] { projectA, projectB, projectC } );
+
+        projects = new ProjectSorter( projects, null, "group:artifactB", false, false ).getSortedProjects();
+
+        assertEquals( "Wrong number of projects: " + projects, 2, projects.size() );
+        assertEquals( "Didn't match project", projectB, projects.get( 0 ) );
+        assertEquals( "Didn't match project", projectA, projects.get( 1 ) );
+    }
+
+    public void testSelectedProjects()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject projectA = createProject( "group", "artifactA", "1.0" );
+        MavenProject projectB = createProject( "group", "artifactB", "1.0" );
+        MavenProject projectC = createProject( "group", "artifactC", "1.0" );
+
+        projectA.getDependencies().add( createDependency( projectB ) );
+        projectB.getDependencies().add( createDependency( projectC ) );
+
+        List projects = Arrays.asList( new Object[] { projectA, projectB, projectC } );
+        List selectedProjects = Arrays.asList( new Object[] { "group:artifactB" } );
+
+        projects = new ProjectSorter( projects, selectedProjects, null, false, false ).getSortedProjects();
+
+        assertEquals( "Wrong number of projects: " + projects, 1, projects.size() );
+        assertEquals( "Didn't match project", projectB, projects.get( 0 ) );
+    }
+
+    public void testMake()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject projectA = createProject( "group", "artifactA", "1.0" );
+        MavenProject projectB = createProject( "group", "artifactB", "1.0" );
+        MavenProject projectC = createProject( "group", "artifactC", "1.0" );
+
+        projectA.getDependencies().add( createDependency( projectB ) );
+        projectB.getDependencies().add( createDependency( projectC ) );
+
+        List projects = Arrays.asList( new Object[] { projectA, projectB, projectC } );
+        List selectedProjects = Arrays.asList( new Object[] { "group:artifactB" } );
+
+        projects = new ProjectSorter( projects, selectedProjects, null, true/* make */, false ).getSortedProjects();
+
+        assertEquals( "Wrong number of projects: " + projects, 2, projects.size() );
+        assertEquals( "Didn't match project", projectC, projects.get( 0 ) );
+        assertEquals( "Didn't match project", projectB, projects.get( 1 ) );
+    }
+
+    public void testMakeDependents()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject projectA = createProject( "group", "artifactA", "1.0" );
+        MavenProject projectB = createProject( "group", "artifactB", "1.0" );
+        MavenProject projectC = createProject( "group", "artifactC", "1.0" );
+
+        projectA.getDependencies().add( createDependency( projectB ) );
+        projectB.getDependencies().add( createDependency( projectC ) );
+
+        List projects = Arrays.asList( new Object[] { projectA, projectB, projectC } );
+        List selectedProjects = Arrays.asList( new Object[] { "group:artifactB" } );
+
+        projects = new ProjectSorter( projects, selectedProjects, null, false/* make */, true/*makeDependents*/ ).getSortedProjects();
+
+        assertEquals( "Wrong number of projects: " + projects, 2, projects.size() );
+        assertEquals( "Didn't match project", projectB, projects.get( 0 ) );
+        assertEquals( "Didn't match project", projectA, projects.get( 1 ) );
+    }
+
+    public void testMakeBoth()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject projectA = createProject( "group", "artifactA", "1.0" );
+        MavenProject projectB = createProject( "group", "artifactB", "1.0" );
+        MavenProject projectC = createProject( "group", "artifactC", "1.0" );
+        MavenProject projectD = createProject( "group", "artifactD", "1.0" );
+        MavenProject projectE = createProject( "group", "artifactE", "1.0" );
+
+        projectA.getDependencies().add( createDependency( projectB ) );
+        projectB.getDependencies().add( createDependency( projectC ) );
+        projectD.getDependencies().add( createDependency( projectE ) );
+        projectE.getDependencies().add( createDependency( projectB ) );
+
+        List projects = Arrays.asList( new Object[] { projectA, projectB, projectC, projectD, projectE } );
+        List selectedProjects = Arrays.asList( new Object[] { "group:artifactE" } );
+
+        projects =
+            new ProjectSorter( projects, selectedProjects, null, true/* make */, true/* makeDependents */).getSortedProjects();
+
+        assertEquals( "Wrong number of projects: " + projects, 4, projects.size() );
+        assertEquals( "Didn't match project", projectC, projects.get( 0 ) );
+        assertEquals( "Didn't match project", projectB, projects.get( 1 ) );
+        assertEquals( "Didn't match project", projectE, projects.get( 2 ) );
+        assertEquals( "Didn't match project", projectD, projects.get( 3 ) );
+    }
     
     public void testShouldNotFailWhenProjectReferencesNonExistentProject()
-        throws CycleDetectedException, DuplicateProjectException
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
         MavenProject project = createProject( "group", "artifact", "1.0" );
         Model model = project.getModel();
@@ -67,7 +204,7 @@ public class ProjectSorterTest
     }
     
     public void testMatchingArtifactIdsDifferentGroupIds()
-        throws CycleDetectedException, DuplicateProjectException
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
         List projects = new ArrayList();
         MavenProject project1 = createProject( "groupId1", "artifactId", "1.0" );
@@ -83,7 +220,7 @@ public class ProjectSorterTest
     }
 
     public void testMatchingGroupIdsDifferentArtifactIds()
-        throws CycleDetectedException, DuplicateProjectException
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
         List projects = new ArrayList();
         MavenProject project1 = createProject( "groupId", "artifactId1", "1.0" );
@@ -99,7 +236,7 @@ public class ProjectSorterTest
     }
 
     public void testMatchingIdsAndVersions()
-        throws CycleDetectedException
+        throws CycleDetectedException, MissingProjectException
     {
         List projects = new ArrayList();
         MavenProject project1 = createProject( "groupId", "artifactId", "1.0" );
@@ -120,7 +257,7 @@ public class ProjectSorterTest
     }
 
     public void testMatchingIdsAndDifferentVersions()
-        throws CycleDetectedException
+        throws CycleDetectedException, MissingProjectException
     {
         List projects = new ArrayList();
         MavenProject project1 = createProject( "groupId", "artifactId", "1.0" );

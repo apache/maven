@@ -60,6 +60,18 @@ public interface MavenExecutionRequest
 
     boolean isReactorActive();
 
+    void setResumeFrom( String resumeFrom );
+
+    String getResumeFrom();
+    
+    void setSelectedProjects( List projects );
+    
+    List getSelectedProjects();
+    
+    void setMakeBehavior( String makeBehavior );
+    
+    String getMakeBehavior();
+    
     void setPomFile( String pomFile );
 
     String getPomFile();
