@@ -76,6 +76,7 @@ MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
 */
 
+        suite.addTestSuite( MavenITmng3723ConcreteParentProjectTest.class );
         suite.addTestSuite( MavenITmng3716AggregatorForkingTest.class );
         suite.addTestSuite( MavenITmng3710PollutedClonedPluginsTest.class );
         suite.addTestSuite( MavenITmng3704LifecycleExecutorWrapperTest.class );
