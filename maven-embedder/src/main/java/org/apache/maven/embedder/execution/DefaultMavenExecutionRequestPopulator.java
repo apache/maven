@@ -34,8 +34,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.monitor.event.MavenWorkspaceMonitor;
-import org.apache.maven.monitor.event.PerCallWorkspaceMonitor;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
@@ -96,8 +94,6 @@ public class DefaultMavenExecutionRequestPopulator
 
     private WagonManager wagonManager;
 
-    private MavenWorkspaceStore workspaceManager;
-
     private MavenSettingsBuilder settingsBuilder;
 
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request,
@@ -105,8 +101,6 @@ public class DefaultMavenExecutionRequestPopulator
         throws MavenEmbedderException
     {
         eventing( request, configuration );
-
-        workspaceMonitor( request, configuration );
 
         reporter( request, configuration );
 
@@ -134,44 +128,6 @@ public class DefaultMavenExecutionRequestPopulator
         processSettings( request, configuration );
 
         return request;
-    }
-
-    private void workspaceMonitor( MavenExecutionRequest request,
-                                   Configuration configuration )
-    {
-        MavenWorkspaceMonitor workspaceMonitor = request.getWorkspaceMonitor();
-
-        if ( workspaceMonitor == null )
-        {
-            workspaceMonitor = configuration.getWorkspaceMonitor();
-        }
-
-        List requestEventMonitors = request.getEventMonitors();
-        if ( ( requestEventMonitors != null ) && !requestEventMonitors.isEmpty() )
-        {
-            for ( Iterator it = requestEventMonitors.iterator(); it.hasNext(); )
-            {
-                Object monitor = it.next();
-                if ( monitor instanceof MavenWorkspaceMonitor )
-                {
-                    if ( workspaceMonitor == null )
-                    {
-                        workspaceMonitor = (MavenWorkspaceMonitor) monitor;
-                    }
-                    it.remove();
-                    break;
-                }
-            }
-        }
-
-        if ( workspaceMonitor == null )
-        {
-            workspaceMonitor = new PerCallWorkspaceMonitor();
-        }
-
-        workspaceMonitor.setWorkspaceStore( workspaceManager );
-
-        request.addEventMonitor( workspaceMonitor );
     }
 
     private void reporter( MavenExecutionRequest request,
