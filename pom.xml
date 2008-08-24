@@ -256,6 +256,7 @@
     <module>maven-project</module>
     <module>maven-reporting-api</module>
     <module>maven-embedder</module>
+    <module>maven-workspace</module>
     <module>maven-toolchain</module>
   </modules>
   <properties>
@@ -266,7 +267,7 @@
     <doxiaVersion>1.0-alpha-9</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.1</junitVersion>
-    <plexusVersion>1.0-alpha-50-SNAPSHOT</plexusVersion>
+    <plexusVersion>1.0-alpha-48</plexusVersion>
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.1</plexusInterpolationVersion>
     <plexusUtilsVersion>1.5.5</plexusUtilsVersion>

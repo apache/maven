@@ -167,6 +167,9 @@ public class MavenEmbedder
 
     private BuildPlanner buildPlanner;
 
+    // TODO: Remove this once we have better control over cache-cleaning.
+    private MavenWorkspaceStore workspaceStore;
+
     // ----------------------------------------------------------------------
     // Configuration
     // ----------------------------------------------------------------------
@@ -198,6 +201,11 @@ public class MavenEmbedder
     public MavenExecutionRequest getDefaultRequest()
     {
         return request;
+    }
+
+    protected MavenWorkspaceStore getWorkspaceStore()
+    {
+        return workspaceStore;
     }
 
     // ----------------------------------------------------------------------
@@ -701,6 +709,8 @@ public class MavenEmbedder
                 MavenExecutionRequestPopulator.ROLE );
 
             buildPlanner = (BuildPlanner) container.lookup( BuildPlanner.class );
+
+            workspaceStore = (MavenWorkspaceStore) container.lookup( MavenWorkspaceStore.class );
 
             artifactHandlerManager = (ArtifactHandlerManager) container.lookup( ArtifactHandlerManager.ROLE );
 
