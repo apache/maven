@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3724</groupId>
+  <artifactId>project</artifactId>
+  <version>1</version>
+  
+  <packaging>pom</packaging>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng3724</groupId>
+        <artifactId>maven-mng3724-plugin</artifactId>
+        <version>1</version>
+        <executions>
+          <execution>
+            <id>use-execution-project</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>phase1</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>add-compile-source-to-main-project</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>phase2</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>verify-compile-sources-in-execution-project</id>
+            <phase>package</phase>
+            <goals>
+              <goal>phase3</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
