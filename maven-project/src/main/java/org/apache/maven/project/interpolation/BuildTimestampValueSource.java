@@ -19,33 +19,41 @@ package org.apache.maven.project.interpolation;
  * under the License.
  */
 
-import org.codehaus.plexus.interpolation.ValueSource;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 /**
  *
  * @version $Id$
  */
 public class BuildTimestampValueSource
-    implements ValueSource
+    extends AbstractValueSource
 {
 
+    private final Date startTime;
+
+    private final String format;
+    
     private String formattedDate;
 
     public BuildTimestampValueSource( Date startTime, String format )
     {
-        if ( startTime != null )
-        {
-            formattedDate = new SimpleDateFormat( format ).format( startTime );
-        }
+        super( false );
+        this.startTime = startTime;
+        this.format = format;
     }
 
     public Object getValue( String expression )
     {
         if ( "build.timestamp".equals( expression ) || "maven.build.timestamp".equals( expression ) )
         {
+            if ( formattedDate == null && startTime != null )
+            {
+                formattedDate = new SimpleDateFormat( format ).format( startTime );
+            }
+            
             return formattedDate;
         }
 

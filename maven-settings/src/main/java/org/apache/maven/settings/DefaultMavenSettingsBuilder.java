@@ -192,6 +192,11 @@ public class DefaultMavenSettingsBuilder
         for ( Iterator profiles = settings.getProfiles().iterator(); profiles.hasNext(); )
         {
             Profile profile = (Profile) profiles.next();
+            if ( profile.getId() == null )
+            {
+                profile.setId( "default" );
+            }
+            
             if ( profile.getActivation() != null && profile.getActivation().isActiveByDefault()
                 && !activeProfiles.contains( profile.getId() ) )
             {

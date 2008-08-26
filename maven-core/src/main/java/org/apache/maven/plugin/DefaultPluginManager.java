@@ -1,4 +1,3 @@
-
 package org.apache.maven.plugin;
 
 /*
@@ -57,7 +56,6 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
@@ -82,8 +80,14 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.Xpp3DomWriter;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -127,7 +131,7 @@ public class DefaultPluginManager
     protected RuntimeInformation runtimeInformation;
 
     protected MavenProjectBuilder mavenProjectBuilder;
-
+    
     protected PluginMappingManager pluginMappingManager;
 
     // END component requirements
@@ -421,18 +425,6 @@ public class DefaultPluginManager
         String artifactId = pluginDescriptor.getArtifactId();
         String executionId = mojoExecution.getExecutionId();
 
-        if ( !project.isConcrete() )
-        {
-            try
-            {
-                mavenProjectBuilder.calculateConcreteState( project, session.getProjectBuilderConfiguration() );
-            }
-            catch ( ModelInterpolationException e )
-            {
-                throw new PluginManagerException( "Failed to calculate concrete state for project: " + project, e );
-            }
-        }
-
         Xpp3Dom dom = project.getGoalConfiguration( groupId, artifactId, executionId, goalId );
         Xpp3Dom reportDom = project.getReportConfiguration( groupId, artifactId, executionId );
         dom = Xpp3Dom.mergeXpp3Dom( dom, reportDom );
@@ -537,16 +529,8 @@ public class DefaultPluginManager
                 }
             }
         }
-
-        try
-        {
-            mavenProjectBuilder.restoreDynamicState( project, session.getProjectBuilderConfiguration() );
-        }
-        catch ( ModelInterpolationException e )
-        {
-            throw new PluginManagerException( "Failed to restore dynamic state for project: " + project, e );
-        }
     }
+
 
     public MavenReport getReport( MavenProject project,
                                   MojoExecution mojoExecution,
@@ -556,6 +540,7 @@ public class DefaultPluginManager
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         PluginDescriptor descriptor = mojoDescriptor.getPluginDescriptor();
+
         Xpp3Dom dom = project.getReportConfiguration( descriptor.getGroupId(), descriptor.getArtifactId(),
                                                       mojoExecution.getExecutionId() );
         if ( mojoExecution.getConfiguration() != null )
@@ -563,7 +548,9 @@ public class DefaultPluginManager
             dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
         }
 
-        return (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution );
+        MavenReport report = (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution );
+        
+        return report;
     }
 
     public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin,
@@ -673,7 +660,8 @@ public class DefaultPluginManager
         //                                                                          mojoDescriptor.getConfiguration() );
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution,
-                                                                                          pathTranslator, getLogger(),
+                                                                                          pathTranslator,
+                                                                                          getLogger(),
                                                                                           project,
                                                                                           session.getExecutionProperties() );
 

@@ -119,9 +119,55 @@ public interface MavenProjectBuilder
  // API BELOW IS USED TO PRESERVE DYNAMISM IN THE BUILD SECTION OF THE POM.
  // ----------------------------------------------------------------------------
 
+    /**
+     * Variant of {@link MavenProjectBuilder#calculateConcreteState(MavenProject, ProjectBuilderConfiguration, boolean)}
+     * which assumes that project references should be processed. This is provided for performance reasons, for cases
+     * where you know all projects in the reactor will be processed, making traversal of project references unnecessary.
+     */
     void calculateConcreteState( MavenProject project, ProjectBuilderConfiguration config )
         throws ModelInterpolationException;
 
-    void restoreDynamicState( MavenProject project, ProjectBuilderConfiguration config )
+    /**
+     * Up to this point, the build section of the POM remains uninterpolated except for the artifact coordinates
+     * it contains. This method will interpolate the build section and associated project-instance data
+     * structures. Along with the {@link MavenProjectBuilder#restoreDynamicState(MavenProject, ProjectBuilderConfiguration, boolean)}
+     * method, this method allows expressions in these areas of the POM and project instance to
+     * be reevaluated in the event that a mojo changes one the build-path values, or a project property.
+     * <br/><br/>
+     * This method will process the following:
+     * <ol>
+     *   <li>the specified project's parent project (if not null)</li>
+     *   <li>specified project</li>
+     *   <li>its execution project (if not null)</li>
+     *   <li>any project references (iff processReferences == true)</li>
+     * </ol>
+     */
+    void calculateConcreteState( MavenProject project, ProjectBuilderConfiguration config, boolean processReferences )
         throws ModelInterpolationException;
+
+//    /**
+//     * Variant of {@link MavenProjectBuilder#restoreDynamicState(MavenProject, ProjectBuilderConfiguration, boolean)}
+//     * which assumes that project references should be processed. This is provided for performance reasons, for cases
+//     * where you know all projects in the reactor will be processed, making traversal of project references unnecessary.
+//     */
+//    void restoreDynamicState( MavenProject project, ProjectBuilderConfiguration config )
+//        throws ModelInterpolationException;
+//    
+//    /**
+//     * In the event that a mojo execution has changed one or more build paths, or changed the project properties,
+//     * this method can restore the build section of the POM to its uninterpolated form, to allow reevaluation of
+//     * any expressions that may depend on this changed information. This method will short-circuit if the project
+//     * is not in a concrete state (see {@link MavenProjectBuilder#calculateConcreteState(MavenProject, ProjectBuilderConfiguration, boolean)}
+//     * or if the properties and build paths of the project remain unchanged.
+//     * <br/><br/>
+//     * This method will process the following:
+//     * <ol>
+//     *   <li>the specified project's parent project (if not null)</li>
+//     *   <li>specified project</li>
+//     *   <li>its execution project (if not null)</li>
+//     *   <li>any project references (iff processReferences == true)</li>
+//     * </ol>
+//     */
+//    void restoreDynamicState( MavenProject project, ProjectBuilderConfiguration config, boolean processReferences )
+//        throws ModelInterpolationException;
 }

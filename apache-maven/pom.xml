@@ -68,25 +68,28 @@
                   </exclude>
                   <exclude>classworlds:classworlds</exclude>
                   <exclude>xml-apis:xml-apis</exclude>
+                  <exclude>junit:junit</exclude>
+                  <exclude>jmock:jmock</exclude>
                 </excludes>
               </artifactSet>
               <relocations>
-                <!-- For slide webdav wagon -->
+                <!-- for jackrabbit webdav wagon -->
                 <relocation>
-                  <pattern>org.jdom</pattern>
+                  <pattern>org.apache.jackrabbit</pattern>
                 </relocation>
                 <relocation>
-                  <pattern>de.zeigermann.xml</pattern>
+                  <pattern>org.slf4j</pattern>
                 </relocation>
-                <relocation>
-                  <pattern>org.apache.webdav</pattern>
-                </relocation>
+                
                 <!-- For http/webdav wagons -->
                 <relocation>
                   <pattern>org.apache.commons.httpclient</pattern>
                 </relocation>
                 <relocation>
                   <pattern>org.apache.commons.logging</pattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.commons.codec</pattern>
                 </relocation>
 
                 <!-- For jsch wagon -->
@@ -117,16 +120,19 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.1</version>
-        <configuration>
-          <descriptor>src/assemble/bin.xml</descriptor>
-          <finalName>apache-maven-${project.version}</finalName>
-        </configuration>
+        <!--
+        <version>2.2-beta-2</version>
+        -->
         <executions>
           <execution>
+            <id>bin-assembly</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+            <configuration>
+              <descriptor>src/assemble/bin.xml</descriptor>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -183,6 +189,31 @@
                 <goals>
                   <goal>run</goal>
                 </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>make-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>src/assemble/src.xml</descriptor>
+                  </descriptors>
+                  <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
               </execution>
             </executions>
           </plugin>

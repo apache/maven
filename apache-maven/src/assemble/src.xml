@@ -26,14 +26,15 @@ under the License.
   </formats>
   <fileSets>
     <fileSet>
-      <directory>.</directory>
+      <directory>..</directory>
       <outputDirectory>/</outputDirectory>
       <excludes>
         <exclude>**/target/**</exclude>
+        <exclude>**/*.log</exclude>
       </excludes>
     </fileSet>
     <fileSet>
-      <directory>target/maven-shared-archive-resources/META-INF</directory>
+      <directory>../target/maven-shared-archive-resources/META-INF</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
   </fileSets>

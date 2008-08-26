@@ -184,7 +184,8 @@ public class ModelInterpolationEdgeCases
     private Model interpolate( Model model )
         throws Throwable
     {
-        ModelInterpolator interpolator = new RegexBasedModelInterpolator();
+        RegexBasedModelInterpolator interpolator = new RegexBasedModelInterpolator();
+        interpolator.initialize();
 
         return interpolator.interpolate( model, new HashMap(), true );
     }

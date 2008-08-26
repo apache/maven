@@ -19,43 +19,37 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.Iterator;
-import java.util.List;
-
 public class MavenProjectDynamismTest
     extends PlexusTestCase
 {
 
-    private MavenProjectBuilder projectBuilder;
+    private DefaultMavenProjectBuilder projectBuilder;
 
     public void setUp()
         throws Exception
     {
         super.setUp();
 
-        projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.class.getName() );
+        projectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class.getName() );
     }
 
     public void testBuildSectionGroupIdInterpolation()
@@ -96,6 +90,8 @@ public class MavenProjectDynamismTest
                 + " should have a an interpolated POM groupId as its value.", children[i].getValue(),
                           project.getGroupId() );
         }
+
+        project.getProperties().setProperty( "foo", "bar" );
 
         projectBuilder.restoreDynamicState( project, new DefaultProjectBuilderConfiguration() );
 
@@ -226,6 +222,9 @@ public class MavenProjectDynamismTest
         assertEquals( "Concrete build directory should be absolute.", new File( baseDir, "target" ).getAbsolutePath(),
                       new File( build.getDirectory() ).getAbsolutePath() );
 
+        // Next, we have to change something to ensure the project is restored to its dynamic state.
+        project.getProperties().setProperty( "restoreTrigger", "true" );
+
         // --------------------------------------------------------------------
         // NOW, RESTORE THE DYNAMIC STATE FOR THE BUILD SECTION AND
         // ASSOCIATED DIRECTORIES ATTACHED TO THE PROJECT INSTANCE.
@@ -326,6 +325,9 @@ public class MavenProjectDynamismTest
                                resources );
         assertResourcePresent( "concrete resources", "myDir", resources );
 
+        // Next, we have to change something to ensure the project is restored to its dynamic state.
+        project.getProperties().setProperty( "restoreTrigger", "true" );
+
         projectBuilder.restoreDynamicState( project, config );
 
         build = project.getBuild();
@@ -358,6 +360,9 @@ public class MavenProjectDynamismTest
                              filters );
 
         assertFilterPresent( "concrete filters", "myDir/filters.properties", filters );
+
+        // Next, we have to change something to ensure the project is restored to its dynamic state.
+        project.getProperties().setProperty( "restoreTrigger", "true" );
 
         projectBuilder.restoreDynamicState( project, config );
 
@@ -450,6 +455,9 @@ public class MavenProjectDynamismTest
 
         project.addCompileSourceRoot( newSourceRoot );
 
+        // Next, we have to change something to ensure the project is restored to its dynamic state.
+        project.getProperties().setProperty( "restoreTrigger", "true" );
+
         projectBuilder.restoreDynamicState( project, config );
 
         compileSourceRoots = project.getCompileSourceRoots();
@@ -471,31 +479,142 @@ public class MavenProjectDynamismTest
                       compileSourceRoots.get( 1 ) );
     }
 
+    public void testShouldMaintainAddedAndExistingPluginEntriesInRoundTrip()
+        throws IOException, XmlPullParserException, URISyntaxException, ProjectBuildingException,
+        ModelInterpolationException
+    {
+        MavenProject project = buildProject( "pom-plugins.xml" );
+
+        String firstPlugin = "one:first-maven-plugin";
+        String secondPlugin = "two:second-maven-plugin";
+        String thirdPlugin = "three:third-maven-plugin";
+
+        project.getBuild().flushPluginMap();
+        Map pluginMap = project.getBuild().getPluginsAsMap();
+
+        assertNotNull( "Before calculating concrete state, project should contain plugin: " + firstPlugin,
+                       pluginMap.get( firstPlugin ) );
+        assertNotNull( "Before calculating concrete state, project should contain plugin: " + secondPlugin,
+                       pluginMap.get( secondPlugin ) );
+        assertNull( "Before calculating concrete state, project should NOT contain plugin: " + thirdPlugin,
+                    pluginMap.get( thirdPlugin ) );
+
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+        projectBuilder.calculateConcreteState( project, config );
+
+        project.getBuild().flushPluginMap();
+        pluginMap = project.getBuild().getPluginsAsMap();
+
+        assertNotNull( "After calculating concrete state, project should contain plugin: " + firstPlugin,
+                       pluginMap.get( firstPlugin ) );
+        assertNotNull( "After calculating concrete state, project should contain plugin: " + secondPlugin,
+                       pluginMap.get( secondPlugin ) );
+        assertNull( "After calculating concrete state, project should NOT contain plugin: " + thirdPlugin,
+                    pluginMap.get( thirdPlugin ) );
+
+        Plugin third = new Plugin();
+        third.setGroupId( "three" );
+        third.setArtifactId( "third-maven-plugin" );
+        third.setVersion( "3" );
+
+        project.addPlugin( third );
+
+        project.getBuild().flushPluginMap();
+        pluginMap = project.getBuild().getPluginsAsMap();
+
+        assertNotNull( "After adding third plugin, project should contain plugin: " + firstPlugin,
+                       pluginMap.get( firstPlugin ) );
+        assertNotNull( "After adding third plugin, project should contain plugin: " + secondPlugin,
+                       pluginMap.get( secondPlugin ) );
+        assertNotNull( "After adding third plugin, project should contain plugin: " + thirdPlugin,
+                       pluginMap.get( thirdPlugin ) );
+
+        projectBuilder.restoreDynamicState( project, config );
+
+        project.getBuild().flushPluginMap();
+        pluginMap = project.getBuild().getPluginsAsMap();
+
+        assertNotNull( "After restoring project dynamism, project should contain plugin: " + firstPlugin,
+                       pluginMap.get( firstPlugin ) );
+        assertNotNull( "After restoring project dynamism, project should contain plugin: " + secondPlugin,
+                       pluginMap.get( secondPlugin ) );
+        assertNotNull( "After restoring project dynamism, project should contain plugin: " + thirdPlugin,
+                       pluginMap.get( thirdPlugin ) );
+    }
+
+    public void testShouldMaintainAddedAndExistingSourceRootsInRoundTrip()
+        throws IOException, XmlPullParserException, URISyntaxException, ProjectBuildingException,
+        ModelInterpolationException
+    {
+        MavenProject project = buildProject( "pom-source-roots.xml" );
+        
+        File basedir = project.getBasedir();
+
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+        projectBuilder.calculateConcreteState( project, config );
+
+        assertTrue( "Before adding source roots, project should be concrete", project.isConcrete() );
+        assertEquals( "Before adding source roots, project should contain one compile source root", 1, project.getCompileSourceRoots().size() );
+        assertEquals( "First compile source root should be absolute ref to src/main/java", new File( basedir, "src/main/java" ).getAbsolutePath(), project.getCompileSourceRoots().get( 0 ) );
+        
+        assertEquals( "Before adding source roots, project should contain one test source root", 1, project.getTestCompileSourceRoots().size() );
+        assertEquals( "First test source root should be absolute ref to src/test/java", new File( basedir, "src/test/java" ).getAbsolutePath(), project.getTestCompileSourceRoots().get( 0 ) );
+        
+        assertEquals( "Before adding source roots, project should contain one script source root", 1, project.getScriptSourceRoots().size() );
+        assertEquals( "First script source root should be absolute ref to src/main/scripts", new File( basedir, "src/main/scripts" ).getAbsolutePath(), project.getScriptSourceRoots().get( 0 ) );
+
+        project.addCompileSourceRoot( new File( basedir, "target/generated/src/main/java" ).getAbsolutePath() );
+        project.addTestCompileSourceRoot( new File( basedir, "target/generated/src/test/java" ).getAbsolutePath() );
+        project.addScriptSourceRoot( new File( basedir, "target/generated/src/main/scripts" ).getAbsolutePath() );
+        
+        project.getProperties().setProperty( "trigger-transition", "true" );
+        
+        projectBuilder.restoreDynamicState( project, config );
+        
+        projectBuilder.calculateConcreteState( project, config );
+        
+        assertTrue( "After adding source roots and transitioning, project should be concrete", project.isConcrete() );
+        assertEquals( "After adding source roots and transitioning, project should contain two compile source roots", 2, project.getCompileSourceRoots().size() );
+        assertEquals( "First compile source root should be absolute ref to src/main/java", new File( basedir, "src/main/java" ).getAbsolutePath(), project.getCompileSourceRoots().get( 0 ) );
+        assertEquals( "Second compile source root should be absolute ref to target/generated/src/main/java", new File( basedir, "target/generated/src/main/java" ).getAbsolutePath(), project.getCompileSourceRoots().get( 1 ) );
+        
+        assertEquals( "After adding source roots and transitioning, project should contain two test source roots", 2, project.getTestCompileSourceRoots().size() );
+        assertEquals( "First test source root should be absolute ref to src/test/java", new File( basedir, "src/test/java" ).getAbsolutePath(), project.getTestCompileSourceRoots().get( 0 ) );
+        assertEquals( "Second test source root should be absolute ref to target/generated/src/test/java", new File( basedir, "target/generated/src/test/java" ).getAbsolutePath(), project.getTestCompileSourceRoots().get( 1 ) );
+        
+        assertEquals( "After adding source roots and transitioning, project should contain two script source roots", 2, project.getScriptSourceRoots().size() );
+        assertEquals( "First script source root should be absolute ref to src/main/scripts", new File( basedir, "src/main/scripts" ).getAbsolutePath(), project.getScriptSourceRoots().get( 0 ) );
+        assertEquals( "Second script source root should be absolute ref to target/generated/src/main/scripts", new File( basedir, "target/generated/src/main/scripts" ).getAbsolutePath(), project.getScriptSourceRoots().get( 1 ) );
+    }
+
     public void testShouldInterpolatePluginLevelDependency()
         throws IOException, XmlPullParserException, URISyntaxException, ProjectBuildingException,
         ModelInterpolationException
     {
         MavenProject project = buildProject( "plugin-level-dep.pom.xml" );
 
-        Plugin plugin = (Plugin) project.getBuild().getPluginsAsMap().get( "org.apache.maven.plugins:maven-compiler-plugin" );
-        
+        Plugin plugin =
+            (Plugin) project.getBuild().getPluginsAsMap().get( "org.apache.maven.plugins:maven-compiler-plugin" );
+
         assertNotNull( "ERROR - compiler plugin config not found!", plugin );
-        assertTrue( "ERROR - compiler plugin custom dependencies not found!", ( plugin.getDependencies() != null && !plugin.getDependencies().isEmpty() ) );
-        
+        assertTrue( "ERROR - compiler plugin custom dependencies not found!",
+                    ( plugin.getDependencies() != null && !plugin.getDependencies().isEmpty() ) );
+
         Dependency dep = (Dependency) plugin.getDependencies().get( 0 );
-        
-        assertEquals( "custom dependency version should be an INTERPOLATED reference to this project's version.", project.getVersion(), dep.getVersion() );
+
+        assertEquals( "custom dependency version should be an INTERPOLATED reference to this project's version.",
+                      project.getVersion(), dep.getVersion() );
     }
 
     // Useful for diagnostics.
-//    private void displayPOM( Model model )
-//        throws IOException
-//    {
-//        StringWriter writer = new StringWriter();
-//        new MavenXpp3Writer().write( writer, model );
-//
-//        System.out.println( writer.toString() );
-//    }
+    // private void displayPOM( Model model )
+    // throws IOException
+    // {
+    // StringWriter writer = new StringWriter();
+    // new MavenXpp3Writer().write( writer, model );
+    //
+    // System.out.println( writer.toString() );
+    // }
 
     private void assertResourcePresent( String testLabel, String directory, List resources )
     {

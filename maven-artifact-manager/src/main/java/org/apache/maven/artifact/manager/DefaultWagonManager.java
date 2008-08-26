@@ -251,9 +251,12 @@ public class DefaultWagonManager
                 }
             }
 
-            wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider(){
-                public ProxyInfo getProxyInfo(String protocol) {
-                    return (ProxyInfo) proxies.get( protocol );
+//            wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
+            wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider()
+            {
+                public ProxyInfo getProxyInfo( String protocol )
+                {
+                    return getProxy( protocol );
                 }
             });
 
@@ -432,10 +435,14 @@ public class DefaultWagonManager
 
         try
         {
+            getLogger().debug( "Connecting to repository: \'" + repository.getId() + "\' with url: \'" + repository.getUrl() + "\'." );
+            
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
-                           getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider(){
-                public ProxyInfo getProxyInfo(String protocol) {
-                    return (ProxyInfo) proxies.get( protocol );
+                           getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider()
+            {
+                public ProxyInfo getProxyInfo( String protocol )
+                {
+                    return getProxy( protocol );
                 }
             });
 
@@ -633,6 +640,8 @@ public class DefaultWagonManager
                 // TODO: this should be illegal in settings.xml
                 id = repository.getId();
             }
+            
+            getLogger().debug( "Using mirror: " + mirror.getUrl() + " (id: " + id + ")" );
 
             repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
                                                                      repository.getLayout(), repository.getSnapshots(),
@@ -755,7 +764,14 @@ public class DefaultWagonManager
 
     public ProxyInfo getProxy( String protocol )
     {
-        return (ProxyInfo) proxies.get( protocol );
+        ProxyInfo info = (ProxyInfo) proxies.get( protocol );
+        
+        if ( info != null )
+        {
+            getLogger().debug( "Using Proxy: " + info.getHost() );
+        }
+        
+        return info;
     }
 
     public AuthenticationInfo getAuthenticationInfo( String id )
@@ -1081,6 +1097,8 @@ public class DefaultWagonManager
                 PlexusConfiguration headerConfig = config.getChild( "httpHeaders", true );
                 PlexusConfiguration[] children = headerConfig.getChildren( "property" );
                 boolean found = false;
+                
+                getLogger().debug( "Checking for pre-existing User-Agent configuration." );
                 for ( int i = 0; i < children.length; i++ )
                 {
                     PlexusConfiguration c = children[i].getChild( "name", false );
@@ -1090,8 +1108,10 @@ public class DefaultWagonManager
                         break;
                     }
                 }
+                
                 if ( !found )
                 {
+                    getLogger().debug( "Adding User-Agent configuration." );
                     XmlPlexusConfiguration propertyConfig = new XmlPlexusConfiguration( "property" );
                     headerConfig.addChild( propertyConfig );
                     
@@ -1103,13 +1123,19 @@ public class DefaultWagonManager
                     versionConfig.setValue( httpUserAgent );
                     propertyConfig.addChild( versionConfig );
                 }
+                else
+                {
+                    getLogger().debug( "User-Agent configuration found." );
+                }
             }
             catch ( SecurityException e )
             {
+                getLogger().debug( "setHttpHeaders method not accessible on wagon: " + wagon + "; skipping User-Agent configuration." );
                 // forget it. this method is public, if it exists.
             }
             catch ( NoSuchMethodException e )
             {
+                getLogger().debug( "setHttpHeaders method not found on wagon: " + wagon + "; skipping User-Agent configuration." );
                 // forget it.
             }
         }

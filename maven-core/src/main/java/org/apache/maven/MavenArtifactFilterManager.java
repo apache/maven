@@ -43,6 +43,7 @@ public class MavenArtifactFilterManager
         artifacts.add( "wagon-ssh-external" );
         artifacts.add( "wagon-ssh-common" );
         artifacts.add( "wagon-http-shared" );
+        artifacts.add( "wagon-webdav-jackrabbit" );
 
         return new ExclusionSetFilter( artifacts );
     }

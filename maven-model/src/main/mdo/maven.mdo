@@ -2660,12 +2660,18 @@
         return executionMap;
     }
 
+    private String key;
+    
     /**
      * @return the key of the plugin, ie <code>groupId:artifactId</code>
      */
     public String getKey()
     {
-        return constructKey( groupId, artifactId );
+        if ( key == null )
+        {
+            key = constructKey( groupId, artifactId ).intern();
+        }
+        return key;
     }
 
     /**
@@ -2683,6 +2689,11 @@
      */
     public boolean equals( Object other )
     {
+        if ( this == other )
+        {
+            return true;
+        }
+        
         if ( other instanceof Plugin )
         {
             Plugin otherPlugin = (Plugin) other;

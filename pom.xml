@@ -190,6 +190,7 @@ under the License.
           <configuration>
             <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
             <autoVersionSubmodules>true</autoVersionSubmodules>
+            <preparationGoals>install</preparationGoals>
           </configuration>
         </plugin>
         <plugin>
@@ -226,6 +227,7 @@ under the License.
               <!-- TODO: These represent method ADDITIONS from 2.0.9, and should be removed after 
                    2.0.10 is released. -->
               <exclude>org/apache/maven/lifecycle/LifecycleExecutor*</exclude>
+              <exclude>org/apache/maven/artifact/metadata/AbstractArtifactMetadata*</exclude>
               <exclude>org/apache/maven/artifact/metadata/ArtifactMetadataSource*</exclude>
               <exclude>org/apache/maven/project/MavenProjectBuilder*</exclude>
               <exclude>org/apache/maven/project/ProjectBuilderConfiguration*</exclude>
@@ -387,7 +389,7 @@ under the License.
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
-        <version>1.1</version>
+        <version>1.4</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -421,8 +423,8 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-webdav</artifactId>
-        <version>1.0-beta-2</version>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>${wagonVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
@@ -453,33 +455,6 @@ under the License.
   </distributionManagement>
 
   <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <inherited>false</inherited>
-            <configuration>
-              <descriptors>
-                <descriptor>src/main/assembly/src.xml</descriptor>
-              </descriptors>
-              <tarLongFileMode>gnu</tarLongFileMode>
-              <finalName>maven-${project.version}-src</finalName>
-            </configuration>
-            <executions>
-              <execution>
-                <id>make-assembly</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>run-its</id>
       <modules>

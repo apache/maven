@@ -678,6 +678,13 @@ public class DefaultMaven
                 wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
                                                     server.getPrivateKey(), server.getPassphrase() );
 
+                // Remove once Wagon is upgraded to 1.0-beta-5
+                if ( server.getPassword() != null )
+                {
+                    // setting this globally is not ideal, but not harmful
+                    com.jcraft.jsch.JSch.setConfig( "PreferredAuthentications", "gssapi-with-mic,publickey,password,keyboard-interactive" );
+                }
+
                 wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
                                                 server.getDirectoryPermissions() );
 
