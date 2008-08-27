@@ -3,7 +3,7 @@
  ------
  Vincent Siveton
  ------
- February 2008
+ 2008-08-27
  ------
 
 ~~ Licensed to the Apache Software Foundation (ASF) under one
@@ -67,7 +67,7 @@ maven-my-plugin
   ...
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven</groupId>
+      <groupId>org.apache.maven.plugin-testing</groupId>
       <artifactId>maven-plugin-testing-harness</artifactId>
       <scope>test</scope>
     </dependency>
