@@ -25,12 +25,9 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.WriterFactory;
 
 import java.io.File;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -105,14 +102,10 @@ public class DefaultMavenProjectBuilderTest
     public void testDuplicatePluginDefinitionsMerged()
         throws Exception
     {
-        File f1 = getTestFile( "maven-project/src/test/resources/projects/duplicate-plugins-merged-pom.xml" );
+        File f1 = getTestFile( "src/test/resources/projects/duplicate-plugins-merged-pom.xml" );
 
         MavenProject project = getProject( f1 );
 
-        Writer out = WriterFactory.newXmlWriter( System.out );
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        writer.write( out, project.getModel() );
-        out.close();
         assertEquals( 2, ( (Plugin) project.getBuildPlugins().get( 0 ) ).getDependencies().size() );
     }
 
@@ -154,26 +147,5 @@ public class DefaultMavenProjectBuilderTest
                                                               repoLayout );
 
         return r;
-    }
-
-    public void tetA() throws Exception {
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "default" );
-
-        ArtifactRepository r = new DefaultArtifactRepository( "local", "file://" + "C:\\Documents and Settings\\sisbell\\.m2\\repository\\",
-                                                              repoLayout );
-
-        try {
-            MavenProject mp = projectBuilder.build(new File("C:\\Documents and Settings\\sisbell\\.m2\\repository\\org\\apache\\maven\\maven-core\\2.0\\maven-core-2.0.pom"),
-                    new DefaultProjectBuilderConfiguration().setLocalRepository(r));
-
-        Writer out = WriterFactory.newXmlWriter( System.out );
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        writer.write( out, mp.getModel() );
-        out.close();
-           // System.out.println(mp.getModel())
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
