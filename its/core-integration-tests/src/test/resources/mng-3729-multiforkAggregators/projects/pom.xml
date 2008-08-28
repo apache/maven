@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3729</groupId>
+  <artifactId>projects</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>child1</module>
+  </modules>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng3729</groupId>
+        <artifactId>maven-mng3729-plugin</artifactId>
+        <version>1</version>
+        <executions>
+          <execution>
+            <inherited>false</inherited>
+            <id>fork1</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>fork1</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>fork2</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>fork2</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>plain-goal</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>plain1</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
