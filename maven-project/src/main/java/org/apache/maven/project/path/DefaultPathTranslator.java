@@ -60,7 +60,8 @@ public class DefaultPathTranslator
 
             build.setTestSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) );
 
-            build.setScriptSourceDirectory( alignToBaseDirectory( build.getScriptSourceDirectory(), basedir ) );
+            // TODO: MNG-3731
+//            build.setScriptSourceDirectory( alignToBaseDirectory( build.getScriptSourceDirectory(), basedir ) );
 
             for ( Iterator i = build.getResources().iterator(); i.hasNext(); )
             {

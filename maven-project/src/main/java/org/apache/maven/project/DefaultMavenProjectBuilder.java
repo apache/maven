@@ -1888,8 +1888,11 @@ public class DefaultMavenProjectBuilder
                                                                               getLogger().isDebugEnabled() );
 
             project.preserveScriptSourceRoots( originalInterpolatedScriptSourceRoots );
-            project.setScriptSourceRoots( originalInterpolatedScriptSourceRoots == null ? null
-                            : translateListOfPaths( originalInterpolatedScriptSourceRoots, basedir ) );
+            
+            // TODO: MNG-3731
+            project.setScriptSourceRoots( originalInterpolatedScriptSourceRoots );
+//            project.setScriptSourceRoots( originalInterpolatedScriptSourceRoots == null ? null
+//                            : translateListOfPaths( originalInterpolatedScriptSourceRoots, basedir ) );
 
             if ( basedir != null )
             {

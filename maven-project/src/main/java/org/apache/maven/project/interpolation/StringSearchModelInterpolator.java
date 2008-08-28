@@ -20,8 +20,6 @@ import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.logging.Logger;
 
-import sun.security.action.GetIntegerAction;
-
 public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
