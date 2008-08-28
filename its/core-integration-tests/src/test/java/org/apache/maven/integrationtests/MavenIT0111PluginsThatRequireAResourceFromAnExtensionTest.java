@@ -14,8 +14,7 @@ public class MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest
     public MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest()
         throws InvalidVersionSpecificationException
     {
-        // < 2.1 (including snapshots)
-        super( "(,2.0.99)" );
+        super();
     }
 
     public void testit0111()
