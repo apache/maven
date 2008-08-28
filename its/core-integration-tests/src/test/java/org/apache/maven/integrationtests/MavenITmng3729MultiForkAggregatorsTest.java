@@ -27,12 +27,26 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3729">MNG-3729</a>.
- *
- * @todo Fill in a better description of what this test verifies!
+ * <br/><br/>
+ * Complicated use case, but say
+ * you have an aggregator plugin that forks a lifecycle, and this aggregator is bound to the main lifecycle in a
+ * multimodule build. Further, say you call another plugin directly from the command line for this multimodule build,
+ * which forks a new lifecycle (like assembly:assembly).
+ * <br/><br/>
+ * When the directly invoked aggregator forks, it will force the
+ * forked lifecycle phase to be run for each project in the reactor, regardless of whether this causes the bound
+ * aggregator mojo to run multiple times. When the bound aggregator executes for the first project (this will be in an
+ * inner fork, two levels removed from the main lifecycle execution) it will set the executionProject to null for the
+ * current project (which is one of the reactorProjects member instances). On the second pass, as it tries to execute
+ * the inner aggregator's forked lifecycle for the second project in the reactor, one of the reactorProjects'
+ * project.getExecutionProject() results will be null. If any of the mojos in this inner lifecycle fork requires
+ * dependency resolution, it will cause a NullPointerException in the DefaultPluginManager when it tries to resolve the
+ * dependencies for the current project. This happened in 2.0.10-RC11 (which was the predecessor to 2.1.0-RC12, since
+ * the version was renamed while the release process was in mid-execution). It did not happen in 2.0.9, and was fixed in
+ * 2.1.0-RC12.
  * 
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
  */
 public class MavenITmng3729MultiForkAggregatorsTest
     extends AbstractMavenIntegrationTestCase
