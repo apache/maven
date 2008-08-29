@@ -1934,8 +1934,9 @@ public class DefaultLifecycleExecutor
 
     // -------------------------------------------------------------------------
     // TODO: The methods and fields below are only needed for products like Hudson,
-    //  that provide their own LifecycleExecutor and component configuration, 
-    //  which may not contain up-to-date component requirements.
+    // that provide their own LifecycleExecutor and component configuration that extend
+    // default implementation, and which may become out-of-date as component requirements
+    // are updated within Maven itself.
     public void initialize()
         throws InitializationException
     {
@@ -1973,6 +1974,10 @@ public class DefaultLifecycleExecutor
         buffer.append( "\n\nThis Maven runtime contains a LifecycleExecutor component with an incomplete configuration." );
         buffer.append( "\n\nLifecycleExecutor class: " ).append( getClass().getName() );
         buffer.append( "\nMissing component requirement: " ).append( role );
+        buffer.append( "\n" );
+        buffer.append( "\nNOTE: This seems to be a third-party Maven derivative you are using. If so, please" );
+        buffer.append( "\nnotify the developers for this derivative project of the problem. The Apache Maven team is not" );
+        buffer.append( "\nresponsible for maintaining the integrity of third-party component overrides." );
         buffer.append( "\n\n" );
         
         getLogger().warn( buffer.toString() );
