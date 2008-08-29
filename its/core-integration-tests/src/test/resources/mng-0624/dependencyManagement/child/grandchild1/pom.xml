@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>grandchild1</name>
+  <artifactId>grandchild1</artifactId>
+  <packaging>jar</packaging>
+  <parent>
+    <groupId>org.apache.maven.its.mng624.depmgmt</groupId>
+    <artifactId>child</artifactId>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng624.depmgmt</groupId>
+      <artifactId>grandchild2</artifactId>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,15 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>mng624 child2</name>
+  <groupId>org.apache.maven.its.mng624.opt</groupId>
+  <artifactId>child2</artifactId>
+  <packaging>pom</packaging>
+  <parent>
+    <groupId>org.apache.maven.its.mng624.opt</groupId>
+    <artifactId>parent</artifactId>
+  </parent>
+  <modules>
+    <module>grandchild</module>
+    <module>../grandchild2</module>
+  </modules>
+</project>

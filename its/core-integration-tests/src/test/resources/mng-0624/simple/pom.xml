@@ -1,0 +1,12 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>mng624 myproject</name>
+  <groupId>org.apache.maven.its.mng624.simple</groupId>
+  <artifactId>myproject</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>child</module>
+  </modules>
+</project>

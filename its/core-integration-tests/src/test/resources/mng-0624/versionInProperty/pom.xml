@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>mng624 parent</name>
+  <groupId>org.apache.maven.its.mng624</groupId>
+  <artifactId>parent</artifactId>
+  <version>${ver}</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>child1</module>
+    <module>child2</module>
+    <module>child3</module>
+  </modules>
+
+  <properties>
+    <ver>1</ver>
+  </properties>
+</project>

@@ -1,0 +1,13 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>mng624 child3child</name>
+  <groupId>org.apache.maven.its.mng624.opt</groupId>
+  <artifactId>child3child</artifactId>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng624.opt</groupId>
+    <artifactId>child3</artifactId>
+  </parent>
+
+</project>

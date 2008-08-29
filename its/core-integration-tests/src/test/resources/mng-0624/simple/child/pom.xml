@@ -1,0 +1,34 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>mng624 simple child</name>
+  <artifactId>child</artifactId>
+  <packaging>jar</packaging>
+  <parent>
+    <groupId>org.apache.maven.its.mng624.simple</groupId>
+    <artifactId>myproject</artifactId>
+  </parent>
+
+  <profiles>
+    <profile>
+      <id>test</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>install</phase>
+                <goals><goal>run</goal></goals>
+                <configuration>
+                  <tasks>
+                    <echo>hello world</echo>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
