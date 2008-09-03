@@ -1833,7 +1833,12 @@ public class DefaultMavenProjectBuilder
     private void calculateConcreteStateInternal( MavenProject project, ProjectBuilderConfiguration config, boolean processProjectReferences, Set processedProjects )
         throws ModelInterpolationException
     {
-        restoreDynamicState( project, config, false );
+        if ( processProjectReferences )
+        {
+            processedProjects.add( project.getId() );
+        }
+        
+        restoreDynamicStateInternal( project, config, processProjectReferences, processProjectReferences ? new HashSet( processedProjects ) : null );
         
         if ( !project.isConcrete() )
         {
@@ -1914,7 +1919,6 @@ public class DefaultMavenProjectBuilder
 
         if ( processProjectReferences )
         {
-            processedProjects.add( project.getId() );
             calculateConcreteProjectReferences( project, config, processedProjects );
         }
     }
@@ -2003,6 +2007,11 @@ public class DefaultMavenProjectBuilder
     private void restoreDynamicStateInternal( MavenProject project, ProjectBuilderConfiguration config, boolean processProjectReferences, Set processedProjects )
         throws ModelInterpolationException
     {
+        if ( processProjectReferences )
+        {
+            processedProjects.add( project.getId() );
+        }
+        
         if ( project.isConcrete() && projectWasChanged( project ) )
         {
             if ( project.getParent() != null )
@@ -2023,7 +2032,6 @@ public class DefaultMavenProjectBuilder
 
         if ( processProjectReferences )
         {
-            processedProjects.add( project.getId() );
             restoreDynamicProjectReferences( project, config, processedProjects );
         }
     }
