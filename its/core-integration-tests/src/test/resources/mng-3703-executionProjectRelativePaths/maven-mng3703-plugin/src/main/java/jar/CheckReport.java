@@ -77,7 +77,9 @@ public class CheckReport
         checkListOfPaths( executionProject.getCompileSourceRoots(), executionBasedir, "compileSourceRoots", failedPaths );
         checkListOfPaths( executionProject.getTestCompileSourceRoots(), executionBasedir, "testCompileSourceRoots",
                           failedPaths );
-        checkListOfPaths( executionProject.getScriptSourceRoots(), executionBasedir, "scriptSourceRoots", failedPaths );
+
+        // MNG-3741: Don't worry about relative paths in scriptSourceRoots.
+        // checkListOfPaths( executionProject.getScriptSourceRoots(), executionBasedir, "scriptSourceRoots", failedPaths );
 
         if ( !failedPaths.isEmpty() )
         {

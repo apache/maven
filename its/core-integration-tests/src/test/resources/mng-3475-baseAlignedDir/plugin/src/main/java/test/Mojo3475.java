@@ -34,7 +34,10 @@ public class Mojo3475
         testDirectoryAbsolutePath( build.getTestOutputDirectory(), failed );
         testDirectoryAbsolutePath( build.getSourceDirectory(), failed );
         testDirectoryAbsolutePath( build.getTestSourceDirectory(), failed );
-        testDirectoryAbsolutePath( build.getScriptSourceDirectory(), failed );
+
+        // MNG-3741: Don't worry about relative script source directory.
+        // testDirectoryAbsolutePath( build.getScriptSourceDirectory(), failed );
+
         testDirectoryAbsolutePath( project.getReporting().getOutputDirectory(), failed );
         
         if ( !failed.isEmpty() )

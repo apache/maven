@@ -64,7 +64,9 @@ public abstract class AbstractCheckMojo
         
         checkListOfPaths( getTestProject().getCompileSourceRoots(), executionBasedir, "compileSourceRoots", failedPaths );
         checkListOfPaths( getTestProject().getTestCompileSourceRoots(), executionBasedir, "testCompileSourceRoots", failedPaths );
-        checkListOfPaths( getTestProject().getScriptSourceRoots(), executionBasedir, "scriptSourceRoots", failedPaths );
+
+        // MNG-3741: Don't worry about relative paths in scriptSourceRoots.
+        // checkListOfPaths( getTestProject().getScriptSourceRoots(), executionBasedir, "scriptSourceRoots", failedPaths );
         
         
         if ( !failedPaths.isEmpty() )
