@@ -260,7 +260,7 @@
     <module>maven-toolchain</module>
   </modules>
   <properties>
-    <artifactVersion>3.0-alpha-1</artifactVersion>
+    <artifactVersion>3.0-alpha-2-SNAPSHOT</artifactVersion>
     <aspectjVersion>1.5.3</aspectjVersion>
     <classWorldsVersion>1.2-alpha-13</classWorldsVersion>
     <commonsCliVersion>1.0</commonsCliVersion>
@@ -271,7 +271,7 @@
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.1</plexusInterpolationVersion>
     <plexusUtilsVersion>1.5.5</plexusUtilsVersion>
-    <wagonVersion>1.0-beta-3</wagonVersion>
+    <wagonVersion>1.0-beta-4</wagonVersion>
     <mavenSharedModel>1.0-SNAPSHOT</mavenSharedModel>
     <woodstoxVersion>3.2.6</woodstoxVersion>
   </properties>
