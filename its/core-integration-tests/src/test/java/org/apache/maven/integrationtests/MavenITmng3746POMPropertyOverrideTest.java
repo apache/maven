@@ -20,6 +20,8 @@
 package org.apache.maven.integrationtests;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
@@ -27,12 +29,10 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3746">MNG-3746</a>.
- *
- * @todo Fill in a better description of what this test verifies!
  * 
+ * @todo Fill in a better description of what this test verifies!
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
  */
 public class MavenITmng3746POMPropertyOverrideTest
     extends AbstractMavenIntegrationTestCase
@@ -43,7 +43,7 @@ public class MavenITmng3746POMPropertyOverrideTest
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }
 
-    public void testitMNG3746 ()
+    public void testitMNG3746_UsingDefaultSystemProperty()
         throws Exception
     {
         // The testdir is computed from the location of this
@@ -58,8 +58,38 @@ public class MavenITmng3746POMPropertyOverrideTest
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    public void testitMNG3746_UsingCLIProperty()
+        throws Exception
+    {
+        // The testdir is computed from the location of this
+        // file.
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3746-pomPropertyOverride" );
+        File pluginDir = new File( testDir, "maven-mng3746-plugin" );
+        File projectDir = new File( testDir, "project" );
+
+        Verifier verifier;
+
+        verifier = new Verifier( pluginDir.getAbsolutePath() );
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier = new Verifier( projectDir.getAbsolutePath() );
+        
+        List cliOptions = new ArrayList();
+        cliOptions.add( "-Dtest.verification=cli" );
+        cliOptions.add( "-Dtest.usingCliValue=true" );
+        cliOptions.add( "-Djava.version=cli" );
+        
+        verifier.setCliOptions( cliOptions );
+        
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

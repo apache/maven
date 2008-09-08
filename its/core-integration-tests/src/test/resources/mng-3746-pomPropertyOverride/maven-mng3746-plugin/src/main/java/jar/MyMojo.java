@@ -34,11 +34,21 @@ public class MyMojo
     private String check;
     
     /**
+     * @parameter expression="${test.verification}"
+     */
+    private String verification;
+    
+    /**
+     * @parameter expression="${test.usingCliValue}" default-value="false"
+     */
+    private boolean usingCliValue;
+    
+    /**
      * @parameter default-value="${project.properties}"
      * @readonly
      */
     private Properties properties;
-
+    
     public void execute()
         throws MojoExecutionException
     {
@@ -47,15 +57,23 @@ public class MyMojo
         
         boolean fail = false;
         
-        if ( check.equals( sysProp ) )
+        if ( !usingCliValue )
         {
-            getLog().error( "Check value is the same as the system property; interpolation failed! (value: " + check + ")" );
-            fail = true;
+            if ( check.equals( sysProp ) )
+            {
+                getLog().error( "Check value is the same as the system property; interpolation failed! (value: " + check + ")" );
+                fail = true;
+            }
+            
+            if ( !check.equals( pomProp ) )
+            {
+                getLog().error( "Check value is NOT the same as the POM property; interpolation failed! (value: " + check + ")" );
+                fail = true;
+            }
         }
-        
-        if ( !check.equals( pomProp ) )
+        else if ( !check.equals( verification ) )
         {
-            getLog().error( "Check value is NOT the same as the POM property; interpolation failed! (value: " + check + ")" );
+            getLog().error( "Check value is NOT the same as the verification value; interpolation failed! (value: " + check + "; verification value: " + verification + ")" );
             fail = true;
         }
         
