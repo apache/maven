@@ -36,27 +36,25 @@ public final class RealmUtils
 
     public static String createExtensionRealmId( Artifact extensionArtifact )
     {
-        return "/extensions/" + extensionArtifact.getGroupId() + ":"
-               + extensionArtifact.getArtifactId() + ":" + extensionArtifact.getVersion() +
-               "/thread:" + Thread.currentThread().getName(); //add thread to the mix to prevent clashes in paralel execution
+        return "/extensions/" + extensionArtifact.getGroupId() + ":" + extensionArtifact.getArtifactId() + ":" +
+            extensionArtifact.getVersion() + "/thread:" +
+            Thread.currentThread().getName(); //add thread to the mix to prevent clashes in paralel execution
     }
 
-    public static String createProjectId( String projectGroupId,
-                                          String projectArtifactId,
-                                          String projectVersion )
+    public static String createProjectId( String projectGroupId, String projectArtifactId, String projectVersion )
     {
-        return "/projects/" + projectGroupId + ":" + projectArtifactId + ":" + projectVersion +
-               "/thread:" + Thread.currentThread().getName(); //add thread to the mix to prevent clashes in paralel execution
+        return "/projects/" + projectGroupId + ":" + projectArtifactId + ":" + projectVersion + "/thread:" +
+            Thread.currentThread().getName(); //add thread to the mix to prevent clashes in paralel execution
     }
 
     public static String createPluginRealmId( Plugin plugin )
     {
         StringBuffer id = new StringBuffer().append( "/plugins/" )
-                                            .append( plugin.getGroupId() )
-                                            .append( ':' )
-                                            .append( plugin.getArtifactId() )
-                                            .append( ':' )
-                                            .append( plugin.getVersion() );
+            .append( plugin.getGroupId() )
+            .append( ':' )
+            .append( plugin.getArtifactId() )
+            .append( ':' )
+            .append( plugin.getVersion() );
 
         StringBuffer depId = new StringBuffer();
 
@@ -70,10 +68,10 @@ public final class RealmUtils
                 Dependency dep = (Dependency) it.next();
 
                 depId.append( dep.getGroupId() )
-                     .append( ':' )
-                     .append( dep.getArtifactId() )
-                     .append( ';' )
-                     .append( dep.getVersion() );
+                    .append( ':' )
+                    .append( dep.getArtifactId() )
+                    .append( ';' )
+                    .append( dep.getVersion() );
 
                 if ( it.hasNext() )
                 {
@@ -87,7 +85,8 @@ public final class RealmUtils
         }
 
         id.append( '@' ).append( depId.toString().hashCode() )
-                .append( "/thread:" ).append( Thread.currentThread().getName() ); //add thread to the mix to prevent clashes in paralel execution
+            .append( "/thread:" ).append(
+            Thread.currentThread().getName() ); //add thread to the mix to prevent clashes in paralel execution
 
         return id.toString();
     }

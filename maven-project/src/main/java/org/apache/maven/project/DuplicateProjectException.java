@@ -43,7 +43,7 @@ public class DuplicateProjectException
     {
         this( null, null, null, message );
     }
-    
+
     /**
      * @deprecated use {@link #DuplicateProjectException(String, File, File, String)}
      */
@@ -55,9 +55,7 @@ public class DuplicateProjectException
         this.conflictingProjectFile = null;
     }
 
-    public DuplicateProjectException( String projectId,
-                                      File existingProjectFile,
-                                      File conflictingProjectFile,
+    public DuplicateProjectException( String projectId, File existingProjectFile, File conflictingProjectFile,
                                       String message )
     {
         super( message );

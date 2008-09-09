@@ -90,8 +90,9 @@ public class CustomActivator
         {
             if ( !context.isCustomActivatorFailureSuppressed() )
             {
-                throw new ProfileActivationException( "Cannot find custom ProfileActivator: " + type
-                    + ". \nPerhaps you're missing a build extension?", e );
+                throw new ProfileActivationException(
+                    "Cannot find custom ProfileActivator: " + type + ". \nPerhaps you're missing a build extension?",
+                    e );
             }
         }
 
@@ -107,8 +108,7 @@ public class CustomActivator
         {
             if ( !context.isCustomActivatorFailureSuppressed() )
             {
-                throw new ProfileActivationException( "Failed to configure custom ProfileActivator: " + type
-                    + ".", e );
+                throw new ProfileActivationException( "Failed to configure custom ProfileActivator: " + type + ".", e );
             }
         }
 

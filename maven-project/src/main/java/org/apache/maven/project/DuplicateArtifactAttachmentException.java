@@ -27,9 +27,8 @@ import org.apache.maven.artifact.Artifact;
  *
  * @author pgier
  * @author jdcasey
- *
  * @todo Make this a checked exception, and modify the API of MavenProjectHelper.
- *  Currently, this modification would create compatibility problems for existing plugins.
+ * Currently, this modification would create compatibility problems for existing plugins.
  */
 public class DuplicateArtifactAttachmentException
     extends RuntimeException
@@ -48,8 +47,7 @@ public class DuplicateArtifactAttachmentException
         this.artifact = artifact;
     }
 
-    private static String constructMessage( MavenProject project,
-                                            Artifact artifact )
+    private static String constructMessage( MavenProject project, Artifact artifact )
     {
         return DEFAULT_MESSAGE + " (project: " + project.getId() + "; illegal attachment: " + artifact.getId() + ")";
     }

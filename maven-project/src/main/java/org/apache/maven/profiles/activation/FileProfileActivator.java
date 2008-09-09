@@ -76,11 +76,13 @@ public class FileProfileActivator
                 {
                     if ( logger.isDebugEnabled() )
                     {
-                        logger.debug( "Failed to interpolate exists file location for profile activator: " + fileString, e );
+                        logger.debug( "Failed to interpolate exists file location for profile activator: " + fileString,
+                                      e );
                     }
                     else
                     {
-                        logger.warn( "Failed to interpolate exists file location for profile activator: " + fileString + ". Run in debug mode (-X) for more information." );
+                        logger.warn( "Failed to interpolate exists file location for profile activator: " + fileString +
+                            ". Run in debug mode (-X) for more information." );
                     }
                 }
 
@@ -88,7 +90,8 @@ public class FileProfileActivator
 
                 if ( logger != null )
                 {
-                    logger.debug( "FileProfileActivator: Checking file existence for: " + fileString + ". Result: " + result );
+                    logger.debug(
+                        "FileProfileActivator: Checking file existence for: " + fileString + ". Result: " + result );
                 }
 
                 return result;
@@ -107,11 +110,13 @@ public class FileProfileActivator
                 {
                     if ( logger.isDebugEnabled() )
                     {
-                        logger.debug( "Failed to interpolate missing file location for profile activator: " + fileString, e );
+                        logger.debug(
+                            "Failed to interpolate missing file location for profile activator: " + fileString, e );
                     }
                     else
                     {
-                        logger.warn( "Failed to interpolate missing file location for profile activator: " + fileString + ". Run in debug mode (-X) for more information." );
+                        logger.warn( "Failed to interpolate missing file location for profile activator: " +
+                            fileString + ". Run in debug mode (-X) for more information." );
                     }
                 }
 
@@ -119,7 +124,8 @@ public class FileProfileActivator
 
                 if ( logger != null )
                 {
-                    logger.debug( "FileProfileActivator: Checking file is missing for: " + fileString + ". Result: " + result );
+                    logger.debug(
+                        "FileProfileActivator: Checking file is missing for: " + fileString + ". Result: " + result );
                 }
 
                 return result;

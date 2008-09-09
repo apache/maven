@@ -61,7 +61,8 @@ public class RegexBasedModelInterpolator
     implements ModelInterpolator
 {
 
-    private static final List<String> PROJECT_PREFIXES = Arrays.asList( new String[]{ "pom.", "project." } );
+    private static final List<String> PROJECT_PREFIXES = Arrays.asList( new String[]{"pom.", "project."} );
+
     private static final List<String> TRANSLATED_PATH_EXPRESSIONS;
 
     static
@@ -88,7 +89,7 @@ public class RegexBasedModelInterpolator
         throws IOException
     {
     }
-    
+
     // for testing.
     protected RegexBasedModelInterpolator( PathTranslator pathTranslator )
     {
@@ -101,9 +102,7 @@ public class RegexBasedModelInterpolator
         Properties props = new Properties();
         props.putAll( context );
 
-        return interpolate( model,
-                            null,
-                            new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
+        return interpolate( model, null, new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
                             true );
     }
 
@@ -113,9 +112,7 @@ public class RegexBasedModelInterpolator
         Properties props = new Properties();
         props.putAll( context );
 
-        return interpolate( model,
-                            null,
-                            new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
+        return interpolate( model, null, new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
                             true );
     }
 
@@ -125,14 +122,14 @@ public class RegexBasedModelInterpolator
      * <br/>
      * <b>NOTE:</b> This will result in a different instance of Model being returned!!!
      *
-     * @param model   The inbound Model instance, to serialize and reference for expression resolution
-     * @param context The other context map to be used during resolution
+     * @param model           The inbound Model instance, to serialize and reference for expression resolution
+     * @param context         The other context map to be used during resolution
      * @param overrideContext The context map which should be used to OVERRIDE
      *                        values from everything else. This will come from the CLI
      *                        or userProperties in the execution request.
-     * @param projectDir The directory from which the current model's pom was read.
-     * @param strict  This parameter is ignored!
-     * @param debugMessages If true, print any feedback from the interpolator out to the DEBUG log-level.
+     * @param projectDir      The directory from which the current model's pom was read.
+     * @param strict          This parameter is ignored!
+     * @param debugMessages   If true, print any feedback from the interpolator out to the DEBUG log-level.
      * @return The resolved instance of the inbound Model. This is a different instance!
      */
     public Model interpolate( Model model, File projectDir, ProjectBuilderConfiguration config, boolean debugMessages )
@@ -176,23 +173,21 @@ public class RegexBasedModelInterpolator
 
     /**
      * Interpolates all expressions in the src parameter.
-     * <p>
+     * <p/>
      * The algorithm used for each expression is:
      * <ul>
-     *   <li>If it starts with either "pom." or "project.", the expression is evaluated against the model.</li>
-     *   <li>If the value is null, get the value from the context.</li>
-     *   <li>If the value is null, but the context contains the expression, don't replace the expression string
-     *       with the value, and continue to find other expressions.</li>
-     *   <li>If the value is null, get it from the model properties.</li>
-     *   <li>
+     * <li>If it starts with either "pom." or "project.", the expression is evaluated against the model.</li>
+     * <li>If the value is null, get the value from the context.</li>
+     * <li>If the value is null, but the context contains the expression, don't replace the expression string
+     * with the value, and continue to find other expressions.</li>
+     * <li>If the value is null, get it from the model properties.</li>
+     * <li>
+     *
      * @param overrideContext
      * @param debugMessages
      */
-    public String interpolate( String src,
-                                        Model model,
-                                        final File projectDir,
-                                        ProjectBuilderConfiguration config,
-                                        boolean debugMessages )
+    public String interpolate( String src, Model model, final File projectDir, ProjectBuilderConfiguration config,
+                               boolean debugMessages )
         throws ModelInterpolationException
     {
         Logger logger = getLogger();
@@ -208,7 +203,8 @@ public class RegexBasedModelInterpolator
         ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
         ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
 
-        ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new ValueSource(){
+        ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new ValueSource()
+        {
             public Object getValue( String expression )
             {
                 if ( projectDir != null && "basedir".equals( expression ) )
@@ -218,8 +214,7 @@ public class RegexBasedModelInterpolator
 
                 return null;
             }
-        },
-        PROJECT_PREFIXES, true );
+        }, PROJECT_PREFIXES, true );
 
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
@@ -228,13 +223,14 @@ public class RegexBasedModelInterpolator
         interpolator.addValueSource( new BuildTimestampValueSource( config.getBuildStartTime(), timestampFormat ) );
         interpolator.addValueSource( new MapBasedValueSource( config.getExecutionProperties() ) );
         interpolator.addValueSource( modelValueSource1 );
-        interpolator.addValueSource( new PrefixedValueSourceWrapper( new MapBasedValueSource( modelProperties ), PROJECT_PREFIXES, true ) );
+        interpolator.addValueSource(
+            new PrefixedValueSourceWrapper( new MapBasedValueSource( modelProperties ), PROJECT_PREFIXES, true ) );
         interpolator.addValueSource( modelValueSource2 );
         interpolator.addValueSource( new MapBasedValueSource( config.getUserProperties() ) );
-        
+
         PathTranslatingPostProcessor pathTranslatingPostProcessor =
             new PathTranslatingPostProcessor( TRANSLATED_PATH_EXPRESSIONS, projectDir, pathTranslator );
-        
+
         interpolator.addPostProcessor( pathTranslatingPostProcessor );
 
         RecursionInterceptor recursionInterceptor = new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
@@ -244,7 +240,7 @@ public class RegexBasedModelInterpolator
         {
             result = interpolator.interpolate( result, "", recursionInterceptor );
         }
-        catch( InterpolationException e )
+        catch ( InterpolationException e )
         {
             throw new ModelInterpolationException( e.getMessage(), e );
         }

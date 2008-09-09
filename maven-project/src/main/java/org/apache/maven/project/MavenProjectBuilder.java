@@ -43,21 +43,17 @@ public interface MavenProjectBuilder
      * @deprecated Use {@link MavenProjectBuilder#build(File, ProjectBuilderConfiguration)} instead.
      */
     @Deprecated
-    MavenProject build( File project,
-                        ArtifactRepository localRepository,
-                        ProfileManager globalProfileManager )
+    MavenProject build( File project, ArtifactRepository localRepository, ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
     MavenProject build( File project, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
-    MavenProject buildWithDependencies( File project,
-                                        ArtifactRepository localRepository,
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
-    MavenProjectBuildingResult buildProjectWithDependencies( File project,
-                                                             ProjectBuilderConfiguration config )
+    MavenProjectBuildingResult buildProjectWithDependencies( File project, ProjectBuilderConfiguration config )
         throws ProjectBuildingException;
 
 
@@ -65,23 +61,21 @@ public interface MavenProjectBuilder
      * @deprecated Use {@link MavenProjectBuilder#buildProjectWithDependencies(File, ProjectBuilderConfiguration)} instead.
      */
     @Deprecated
-    MavenProjectBuildingResult buildProjectWithDependencies( File project,
-                                                             ArtifactRepository localRepository,
+    MavenProjectBuildingResult buildProjectWithDependencies( File project, ArtifactRepository localRepository,
                                                              ProfileManager globalProfileManager )
         throws ProjectBuildingException;
 
 
-    MavenProject buildFromRepository( Artifact artifact,
-                                      List remoteArtifactRepositories,
+    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                       ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    /** @deprecated We do not want to allow projects to not have POMs. Maven 1.x repositories be damned. */
+    /**
+     * @deprecated We do not want to allow projects to not have POMs. Maven 1.x repositories be damned.
+     */
     @Deprecated
-    MavenProject buildFromRepository( Artifact artifact,
-                                      List remoteArtifactRepositories,
-                                      ArtifactRepository localRepository,
-                                      boolean allowStub )
+    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
+                                      ArtifactRepository localRepository, boolean allowStub )
         throws ProjectBuildingException;
 
     /**
@@ -105,11 +99,9 @@ public interface MavenProjectBuilder
     // API BELOW IS USED TO PRESERVE DYNAMISM IN THE BUILD SECTION OF THE POM.
     // ----------------------------------------------------------------------------
 
-    void calculateConcreteState( MavenProject project,
-                                 ProjectBuilderConfiguration config )
+    void calculateConcreteState( MavenProject project, ProjectBuilderConfiguration config )
         throws ModelInterpolationException;
 
-    void restoreDynamicState( MavenProject project,
-                              ProjectBuilderConfiguration config )
+    void restoreDynamicState( MavenProject project, ProjectBuilderConfiguration config )
         throws ModelInterpolationException;
 }

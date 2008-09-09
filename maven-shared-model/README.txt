@@ -1,0 +1,1 @@
+This module is not part of the shared build due to JDK 1.5 requirement.

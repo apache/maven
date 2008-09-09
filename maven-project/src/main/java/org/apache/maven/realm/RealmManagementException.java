@@ -13,8 +13,11 @@ public class RealmManagementException
 {
 
     private final String realmId;
+
     private String offendingGroupId;
+
     private String offendingArtifactId;
+
     private String offendingVersion;
 
     public RealmManagementException( String realmId, String message, DuplicateRealmException cause )
@@ -23,7 +26,8 @@ public class RealmManagementException
         this.realmId = realmId;
     }
 
-    public RealmManagementException( String realmId, Artifact offendingArtifact, String message, MalformedURLException cause )
+    public RealmManagementException( String realmId, Artifact offendingArtifact, String message,
+                                     MalformedURLException cause )
     {
         super( message, cause );
         this.realmId = realmId;
@@ -32,25 +36,19 @@ public class RealmManagementException
         offendingVersion = offendingArtifact.getVersion();
     }
 
-    public RealmManagementException( String realmId,
-                                     String message,
-                                     NoSuchRealmException cause )
+    public RealmManagementException( String realmId, String message, NoSuchRealmException cause )
     {
         super( message, cause );
         this.realmId = realmId;
     }
 
-    public RealmManagementException( String realmId,
-                                     String message,
-                                     ComponentRepositoryException cause )
+    public RealmManagementException( String realmId, String message, ComponentRepositoryException cause )
     {
         super( message, cause );
         this.realmId = realmId;
     }
 
-    public RealmManagementException( String realmId,
-                                     String message,
-                                     PlexusConfigurationException cause )
+    public RealmManagementException( String realmId, String message, PlexusConfigurationException cause )
     {
         super( message, cause );
         this.realmId = realmId;

@@ -302,11 +302,11 @@ public class DefaultPluginVersionManager
 
             version = artifactVersion;
         }
-
-        if ( version != null )
+        if( version == null )
         {
-            getLogger().info( "Using version: " + version + " of plugin: " + groupId + ":" + artifactId );
+            version = artifactVersion;
         }
+        getLogger().info( "Using version: " + version + " of plugin: " + groupId + ":" + artifactId );
 
         return version;
     }

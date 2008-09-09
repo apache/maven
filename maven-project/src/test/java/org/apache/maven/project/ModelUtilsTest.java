@@ -493,31 +493,6 @@ public class ModelUtilsTest
         assertEquals( expected, actual );
     }
 
-    public void testShouldMergeTwoPluginDependenciesOnMergeDupePluginDefs()
-    {
-        PluginContainer first = new PluginContainer();
-        Plugin fPlugin = createPlugin( "g", "a", "1", Collections.EMPTY_MAP );
-        Dependency fDep = new Dependency();
-        fDep.setGroupId( "group" );
-        fDep.setArtifactId( "artifact" );
-        fDep.setVersion( "1" );
-
-        first.addPlugin( fPlugin );
-        fPlugin.addDependency( fDep );
-
-        Plugin sPlugin = createPlugin( "g", "a", "1", Collections.EMPTY_MAP );
-        Dependency sDep = new Dependency();
-        sDep.setGroupId( "group" );
-        sDep.setArtifactId( "artifact2" );
-        sDep.setVersion( "1" );
-        first.addPlugin( sPlugin );
-        sPlugin.addDependency( sDep );
-
-        ModelUtils.mergeDuplicatePluginDefinitions( first );
-
-        assertEquals( 2, ((Plugin)first.getPlugins().get( 0 ) ).getDependencies().size() );
-    }
-
     public void testShouldNotMergePluginExecutionWhenExecInheritedIsFalseAndTreatAsInheritanceIsTrue()
     {
         String gid = "group";

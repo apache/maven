@@ -29,35 +29,25 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- *
  * @author jdcasey
- *
  */
 public interface ProfileAdvisor
 {
 
     String ROLE = ProfileAdvisor.class.getName();
 
-    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
-                                                             File pomFile,
-                                                             ProfileManager profileManager )
+    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File pomFile, ProfileManager profileManager )
         throws ProjectBuildingException;
 
-    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
-                                                             File pomFile,
-                                                             boolean useProfilesXml,
+    LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File pomFile, boolean useProfilesXml,
                                                              ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException;
 
-    List applyActivatedProfiles( Model model,
-                                 File pomFile,
-                                 boolean useProfilesXml,
+    List applyActivatedProfiles( Model model, File pomFile, boolean useProfilesXml,
                                  ProfileActivationContext activationContext )
         throws ProjectBuildingException;
 
-    List applyActivatedExternalProfiles( Model model,
-                                         File pomFile,
-                                         ProfileManager externalProfileManager )
+    List applyActivatedExternalProfiles( Model model, File pomFile, ProfileManager externalProfileManager )
         throws ProjectBuildingException;
 
 }

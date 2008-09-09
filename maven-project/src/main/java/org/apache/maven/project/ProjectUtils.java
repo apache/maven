@@ -97,7 +97,8 @@ public final class ProjectUtils
 
             if ( url == null || url.trim().length() < 1 )
             {
-                throw new MissingRepositoryElementException( "Repository URL must not be empty (ID is: " + id + ").", id );
+                throw new MissingRepositoryElementException( "Repository URL must not be empty (ID is: " + id + ").",
+                                                             id );
             }
 
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );

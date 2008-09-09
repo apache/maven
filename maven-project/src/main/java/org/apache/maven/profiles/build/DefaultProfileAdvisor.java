@@ -67,25 +67,18 @@ public class DefaultProfileAdvisor
 
     private Logger logger;
 
-    public List applyActivatedProfiles( Model model,
-                                        File pomFile,
-                                        boolean useProfilesXml,
+    public List applyActivatedProfiles( Model model, File pomFile, boolean useProfilesXml,
                                         ProfileActivationContext activationContext )
         throws ProjectBuildingException
     {
 //        logger.debug( "Building profile manager for model: " + model.getId() + " with pom file: "
 //                      + pomFile );
-        ProfileManager profileManager = buildProfileManager( model,
-                                                             pomFile,
-                                                             useProfilesXml,
-                                                             activationContext );
+        ProfileManager profileManager = buildProfileManager( model, pomFile, useProfilesXml, activationContext );
 
         return applyActivatedProfiles( model, pomFile, profileManager );
     }
 
-    public List applyActivatedExternalProfiles( Model model,
-                                                File projectDir,
-                                                ProfileManager externalProfileManager )
+    public List applyActivatedExternalProfiles( Model model, File projectDir, ProfileManager externalProfileManager )
         throws ProjectBuildingException
     {
         if ( externalProfileManager == null )
@@ -99,9 +92,7 @@ public class DefaultProfileAdvisor
         return applyActivatedProfiles( model, projectDir, externalProfileManager );
     }
 
-    private List applyActivatedProfiles( Model model,
-                                         File pomFile,
-                                         ProfileManager profileManager )
+    private List applyActivatedProfiles( Model model, File pomFile, ProfileManager profileManager )
         throws ProjectBuildingException
     {
         List activeProfiles;
@@ -146,9 +137,7 @@ public class DefaultProfileAdvisor
         return activeProfiles;
     }
 
-    private ProfileManager buildProfileManager( Model model,
-                                                File pomFile,
-                                                boolean useProfilesXml,
+    private ProfileManager buildProfileManager( Model model, File pomFile, boolean useProfilesXml,
                                                 ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException
     {
@@ -164,8 +153,7 @@ public class DefaultProfileAdvisor
         return profileManager;
     }
 
-    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
-                                                                    File pomFile,
+    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File pomFile,
                                                                     ProfileManager profileManager )
         throws ProjectBuildingException
     {
@@ -183,8 +171,7 @@ public class DefaultProfileAdvisor
             }
             catch ( ProfileActivationException e )
             {
-                throw new ProjectBuildingException(
-                                                    model.getId(),
+                throw new ProjectBuildingException( model.getId(),
                                                     "Failed to compute active profiles for repository aggregation.",
                                                     pomFile, e );
             }
@@ -196,7 +183,8 @@ public class DefaultProfileAdvisor
                 Profile externalProfile = (Profile) i.next();
                 if ( externalProfile.getRepositories() != null )
                 {
-                    for ( Iterator repoIterator = externalProfile.getRepositories().iterator(); repoIterator.hasNext(); )
+                    for ( Iterator repoIterator = externalProfile.getRepositories().iterator();
+                          repoIterator.hasNext(); )
                     {
                         Repository mavenRepo = (Repository) repoIterator.next();
 
@@ -219,23 +207,16 @@ public class DefaultProfileAdvisor
         }
     }
 
-    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model,
-                                                                    File pomFile,
-                                                                    boolean useProfilesXml,
+    public LinkedHashSet getArtifactRepositoriesFromActiveProfiles( Model model, File pomFile, boolean useProfilesXml,
                                                                     ProfileActivationContext activationContext )
         throws ProjectBuildingException
     {
-        ProfileManager profileManager = buildProfileManager( model,
-                                                             pomFile,
-                                                             useProfilesXml,
-                                                             activationContext );
+        ProfileManager profileManager = buildProfileManager( model, pomFile, useProfilesXml, activationContext );
 
         return getArtifactRepositoriesFromActiveProfiles( model, pomFile, profileManager );
     }
 
-    private void loadExternalProjectProfiles( ProfileManager profileManager,
-                                              Model model,
-                                              File pomFile )
+    private void loadExternalProjectProfiles( ProfileManager profileManager, Model model, File pomFile )
         throws ProjectBuildingException
     {
         if ( pomFile != null )
@@ -268,14 +249,14 @@ public class DefaultProfileAdvisor
             catch ( IOException e )
             {
                 throw new ProjectBuildingException( model.getId(),
-                                                    "Cannot read profiles.xml resource from directory: "
-                                                                    + projectDir, pomFile, e );
+                                                    "Cannot read profiles.xml resource from directory: " + projectDir,
+                                                    pomFile, e );
             }
             catch ( XmlPullParserException e )
             {
                 throw new ProjectBuildingException( model.getId(),
-                                                    "Cannot parse profiles.xml resource from directory: "
-                                                                    + projectDir, pomFile, e );
+                                                    "Cannot parse profiles.xml resource from directory: " + projectDir,
+                                                    pomFile, e );
             }
         }
     }

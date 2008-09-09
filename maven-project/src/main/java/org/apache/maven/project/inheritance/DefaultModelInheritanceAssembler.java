@@ -26,12 +26,15 @@ import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,19 +55,129 @@ import java.util.TreeMap;
 public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
 {
+
+    // TODO: Remove this!
+    @SuppressWarnings("unchecked")
+    public void assembleBuildInheritance( Build childBuild, Build parentBuild, boolean handleAsInheritance )
+    {
+        // The build has been set but we want to step in here and fill in
+        // values that have not been set by the child.
+
+        if ( childBuild.getSourceDirectory() == null )
+        {
+            childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
+        }
+
+        if ( childBuild.getScriptSourceDirectory() == null )
+        {
+            childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
+        }
+
+        if ( childBuild.getTestSourceDirectory() == null )
+        {
+            childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
+        }
+
+        if ( childBuild.getOutputDirectory() == null )
+        {
+            childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
+        }
+
+        if ( childBuild.getTestOutputDirectory() == null )
+        {
+            childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
+        }
+
+        // Extensions are accumlated
+        ModelUtils.mergeExtensionLists( childBuild, parentBuild );
+
+        if ( childBuild.getDirectory() == null )
+        {
+            childBuild.setDirectory( parentBuild.getDirectory() );
+        }
+
+        if ( childBuild.getDefaultGoal() == null )
+        {
+            childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
+        }
+
+        if ( childBuild.getFinalName() == null )
+        {
+            childBuild.setFinalName( parentBuild.getFinalName() );
+        }
+
+        ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
+
+        List<Resource> resources = childBuild.getResources();
+        if ( ( resources == null ) || resources.isEmpty() )
+        {
+            childBuild.setResources( parentBuild.getResources() );
+        }
+
+        resources = childBuild.getTestResources();
+        if ( ( resources == null ) || resources.isEmpty() )
+        {
+            childBuild.setTestResources( parentBuild.getTestResources() );
+        }
+
+        // Plugins are aggregated if Plugin.inherit != false
+        ModelUtils.mergePluginLists( childBuild, parentBuild, handleAsInheritance );
+
+        // Plugin management :: aggregate
+        PluginManagement dominantPM = childBuild.getPluginManagement();
+        PluginManagement recessivePM = parentBuild.getPluginManagement();
+
+        if ( ( dominantPM == null ) && ( recessivePM != null ) )
+        {
+            // FIXME: Filter out the inherited == false stuff!
+            childBuild.setPluginManagement( recessivePM );
+        }
+        else
+        {
+            ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(), false );
+        }
+    }
+
+    private void assembleScmInheritance( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
+    {
+        if ( parent.getScm() != null )
+        {
+            Scm parentScm = parent.getScm();
+
+            Scm childScm = child.getScm();
+
+            if ( childScm == null )
+            {
+                childScm = new Scm();
+
+                child.setScm( childScm );
+            }
+
+            if ( StringUtils.isEmpty( childScm.getConnection() ) && !StringUtils.isEmpty( parentScm.getConnection() ) )
+            {
+                childScm.setConnection(
+                    appendPath( parentScm.getConnection(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
+            }
+
+            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
+                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
+            {
+                childScm
+                    .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId(),
+                                                         childPathAdjustment, appendPaths ) );
+            }
+
+            if ( StringUtils.isEmpty( childScm.getUrl() ) && !StringUtils.isEmpty( parentScm.getUrl() ) )
+            {
+                childScm.setUrl(
+                    appendPath( parentScm.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
+            }
+        }
+    }
+
     public void copyModel( Model dest, Model source )
     {
         assembleModelInheritance( dest, source, null, false );
-    }
-
-    public void assembleModelInheritance( Model child, Model parent, String childPathAdjustment )
-    {
-        assembleModelInheritance( child, parent, childPathAdjustment, true );
-    }
-
-    public void assembleModelInheritance( Model child, Model parent )
-    {
-        assembleModelInheritance( child, parent, null, true );
     }
 
     private void assembleModelInheritance( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
@@ -243,8 +356,177 @@ public class DefaultModelInheritanceAssembler
                 childReporting.setOutputDirectory( parentReporting.getOutputDirectory() );
             }
 
-            ModelUtils.mergeReportPluginLists( childReporting, parentReporting, true );
+            mergeReportPluginLists( childReporting, parentReporting, true );
         }
+    }
+
+    private static void mergeReportPluginLists( Reporting child, Reporting parent, boolean handleAsInheritance )
+    {
+        if ( ( child == null ) || ( parent == null ) )
+        {
+            // nothing to do.
+            return;
+        }
+
+        List parentPlugins = parent.getPlugins();
+
+        if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
+        {
+            Map assembledPlugins = new TreeMap();
+
+            Map childPlugins = child.getReportPluginsAsMap();
+
+            for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+            {
+                ReportPlugin parentPlugin = (ReportPlugin) it.next();
+
+                String parentInherited = parentPlugin.getInherited();
+
+                if ( !handleAsInheritance || ( parentInherited == null ) ||
+                    Boolean.valueOf( parentInherited ).booleanValue() )
+                {
+
+                    ReportPlugin assembledPlugin = parentPlugin;
+
+                    ReportPlugin childPlugin = (ReportPlugin) childPlugins.get( parentPlugin.getKey() );
+
+                    if ( childPlugin != null )
+                    {
+                        assembledPlugin = childPlugin;
+
+                        mergeReportPluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
+                    }
+
+                    if ( handleAsInheritance && ( parentInherited == null ) )
+                    {
+                        assembledPlugin.unsetInheritanceApplied();
+                    }
+
+                    assembledPlugins.put( assembledPlugin.getKey(), assembledPlugin );
+                }
+            }
+
+            for ( Iterator it = childPlugins.values().iterator(); it.hasNext(); )
+            {
+                ReportPlugin childPlugin = (ReportPlugin) it.next();
+
+                if ( !assembledPlugins.containsKey( childPlugin.getKey() ) )
+                {
+                    assembledPlugins.put( childPlugin.getKey(), childPlugin );
+                }
+            }
+
+            child.setPlugins( new ArrayList( assembledPlugins.values() ) );
+
+            child.flushReportPluginMap();
+        }
+    }
+
+    private static void mergeReportSetDefinitions( ReportSet child, ReportSet parent )
+    {
+        List parentReports = parent.getReports();
+        List childReports = child.getReports();
+
+        List reports = new ArrayList();
+
+        if ( ( childReports != null ) && !childReports.isEmpty() )
+        {
+            reports.addAll( childReports );
+        }
+
+        if ( parentReports != null )
+        {
+            for ( Iterator i = parentReports.iterator(); i.hasNext(); )
+            {
+                String report = (String) i.next();
+
+                if ( !reports.contains( report ) )
+                {
+                    reports.add( report );
+                }
+            }
+        }
+
+        child.setReports( reports );
+
+        Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
+        Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
+
+        childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
+
+        child.setConfiguration( childConfiguration );
+    }
+
+
+    public static void mergeReportPluginDefinitions( ReportPlugin child, ReportPlugin parent,
+                                                     boolean handleAsInheritance )
+    {
+        if ( ( child == null ) || ( parent == null ) )
+        {
+            // nothing to do.
+            return;
+        }
+
+        if ( ( child.getVersion() == null ) && ( parent.getVersion() != null ) )
+        {
+            child.setVersion( parent.getVersion() );
+        }
+
+        // from here to the end of the method is dealing with merging of the <executions/> section.
+        String parentInherited = parent.getInherited();
+
+        boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
+
+        List parentReportSets = parent.getReportSets();
+
+        if ( ( parentReportSets != null ) && !parentReportSets.isEmpty() )
+        {
+            Map assembledReportSets = new TreeMap();
+
+            Map childReportSets = child.getReportSetsAsMap();
+
+            for ( Iterator it = parentReportSets.iterator(); it.hasNext(); )
+            {
+                ReportSet parentReportSet = (ReportSet) it.next();
+
+                if ( !handleAsInheritance || parentIsInherited )
+                {
+                    ReportSet assembledReportSet = parentReportSet;
+
+                    ReportSet childReportSet = (ReportSet) childReportSets.get( parentReportSet.getId() );
+
+                    if ( childReportSet != null )
+                    {
+                        mergeReportSetDefinitions( childReportSet, parentReportSet );
+
+                        assembledReportSet = childReportSet;
+                    }
+                    else if ( handleAsInheritance && ( parentInherited == null ) )
+                    {
+                        parentReportSet.unsetInheritanceApplied();
+                    }
+
+                    assembledReportSets.put( assembledReportSet.getId(), assembledReportSet );
+                }
+            }
+
+            for ( Iterator it = childReportSets.entrySet().iterator(); it.hasNext(); )
+            {
+                Map.Entry entry = (Map.Entry) it.next();
+
+                String id = (String) entry.getKey();
+
+                if ( !assembledReportSets.containsKey( id ) )
+                {
+                    assembledReportSets.put( id, entry.getValue() );
+                }
+            }
+
+            child.setReportSets( new ArrayList( assembledReportSets.values() ) );
+
+            child.flushReportSetMap();
+        }
+
     }
 
     // TODO: Remove this!
@@ -295,129 +577,8 @@ public class DefaultModelInheritanceAssembler
         }
     }
 
-    // TODO: Remove this!
-    @SuppressWarnings("unchecked")
-    public void assembleBuildInheritance( Build childBuild,
-                                           Build parentBuild,
-                                           boolean handleAsInheritance )
-    {
-        // The build has been set but we want to step in here and fill in
-        // values that have not been set by the child.
-
-        if ( childBuild.getSourceDirectory() == null )
-        {
-            childBuild.setSourceDirectory( parentBuild.getSourceDirectory() );
-        }
-
-        if ( childBuild.getScriptSourceDirectory() == null )
-        {
-            childBuild.setScriptSourceDirectory( parentBuild.getScriptSourceDirectory() );
-        }
-
-        if ( childBuild.getTestSourceDirectory() == null )
-        {
-            childBuild.setTestSourceDirectory( parentBuild.getTestSourceDirectory() );
-        }
-
-        if ( childBuild.getOutputDirectory() == null )
-        {
-            childBuild.setOutputDirectory( parentBuild.getOutputDirectory() );
-        }
-
-        if ( childBuild.getTestOutputDirectory() == null )
-        {
-            childBuild.setTestOutputDirectory( parentBuild.getTestOutputDirectory() );
-        }
-
-        // Extensions are accumlated
-        ModelUtils.mergeExtensionLists( childBuild, parentBuild );
-
-        if ( childBuild.getDirectory() == null )
-        {
-            childBuild.setDirectory( parentBuild.getDirectory() );
-        }
-
-        if ( childBuild.getDefaultGoal() == null )
-        {
-            childBuild.setDefaultGoal( parentBuild.getDefaultGoal() );
-        }
-
-        if ( childBuild.getFinalName() == null )
-        {
-            childBuild.setFinalName( parentBuild.getFinalName() );
-        }
-
-        ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
-
-        List<Resource> resources = childBuild.getResources();
-        if ( ( resources == null ) || resources.isEmpty() )
-        {
-            childBuild.setResources( parentBuild.getResources() );
-        }
-
-        resources = childBuild.getTestResources();
-        if ( ( resources == null ) || resources.isEmpty() )
-        {
-            childBuild.setTestResources( parentBuild.getTestResources() );
-        }
-
-        // Plugins are aggregated if Plugin.inherit != false
-        ModelUtils.mergePluginLists( childBuild, parentBuild, handleAsInheritance );
-
-        // Plugin management :: aggregate
-        PluginManagement dominantPM = childBuild.getPluginManagement();
-        PluginManagement recessivePM = parentBuild.getPluginManagement();
-
-        if ( ( dominantPM == null ) && ( recessivePM != null ) )
-        {
-            // FIXME: Filter out the inherited == false stuff!
-            childBuild.setPluginManagement( recessivePM );
-        }
-        else
-        {
-            ModelUtils.mergePluginLists( childBuild.getPluginManagement(), parentBuild.getPluginManagement(),
-                                         false );
-        }
-    }
-
-    private void assembleScmInheritance( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
-    {
-        if ( parent.getScm() != null )
-        {
-            Scm parentScm = parent.getScm();
-
-            Scm childScm = child.getScm();
-
-            if ( childScm == null )
-            {
-                childScm = new Scm();
-
-                child.setScm( childScm );
-            }
-
-            if ( StringUtils.isEmpty( childScm.getConnection() ) && !StringUtils.isEmpty( parentScm.getConnection() ) )
-            {
-                childScm.setConnection(
-                    appendPath( parentScm.getConnection(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
-            }
-
-            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
-                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
-            {
-                childScm
-                    .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId(),
-                                                         childPathAdjustment, appendPaths ) );
-            }
-
-            if ( StringUtils.isEmpty( childScm.getUrl() ) && !StringUtils.isEmpty( parentScm.getUrl() ) )
-            {
-                childScm.setUrl(
-                    appendPath( parentScm.getUrl(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
-            }
-        }
-    }
-
-    private void assembleDistributionInheritence( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
+    private void assembleDistributionInheritence( Model child, Model parent, String childPathAdjustment,
+                                                  boolean appendPaths )
     {
         if ( parent.getDistributionManagement() != null )
         {
@@ -569,7 +730,6 @@ public class DefaultModelInheritanceAssembler
                 pathElements.addLast( token );
             }
         }
-
 
         StringBuffer cleanedPath = new StringBuffer();
 

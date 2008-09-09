@@ -54,7 +54,6 @@ public class DefaultProfileManager
     /**
      * the properties passed to the profile manager are the props that
      * are passed to maven, possibly containing profile activator properties
-     *
      */
     public DefaultProfileManager( PlexusContainer container, ProfileActivationContext profileActivationContext )
     {
@@ -185,7 +184,7 @@ public class DefaultProfileManager
     public List getActiveProfiles()
         throws ProfileActivationException
     {
-         return getActiveProfiles( null );
+        return getActiveProfiles( null );
     }
 
     public List getActiveProfiles( Model model )
@@ -198,7 +197,8 @@ public class DefaultProfileManager
 
         if ( ( model != null ) && ( realmManager != null ) )
         {
-            projectRealm = realmManager.getProjectRealm( ModelUtils.getGroupId( model ), model.getArtifactId(), ModelUtils.getVersion( model ) );
+            projectRealm = realmManager.getProjectRealm( ModelUtils.getGroupId( model ), model.getArtifactId(),
+                                                         ModelUtils.getVersion( model ) );
             oldLookupRealm = container.setLookupRealm( projectRealm );
         }
 
@@ -241,18 +241,18 @@ public class DefaultProfileManager
             {
                 List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
 
-				List deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
-				
+                List deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
+
                 for ( Iterator it = defaultIds.iterator(); it.hasNext(); )
                 {
                     String profileId = (String) it.next();
-					
-					// If this profile was excluded, don't add it back in
-					// Fixes MNG-3545
-					if (deactivatedIds.contains(profileId)) 
-					{
-						continue;
-					}
+
+                    // If this profile was excluded, don't add it back in
+                    // Fixes MNG-3545
+                    if ( deactivatedIds.contains( profileId ) )
+                    {
+                        continue;
+                    }
                     Profile profile = (Profile) profilesById.get( profileId );
 
                     if ( profile != null )
@@ -295,7 +295,8 @@ public class DefaultProfileManager
                 {
                     if ( activator.isActive( profile, context ) )
                     {
-                        container.getLogger().debug( "Profile: " + profile.getId() + " is active. (source: " + profile.getSource() + ")" );
+                        container.getLogger().debug(
+                            "Profile: " + profile.getId() + " is active. (source: " + profile.getSource() + ")" );
                         return true;
                     }
                 }
@@ -309,7 +310,7 @@ public class DefaultProfileManager
         }
         finally
         {
-            container.getContext().put("SystemProperties", null);
+            container.getContext().put( "SystemProperties", null );
             if ( activators != null )
             {
                 try

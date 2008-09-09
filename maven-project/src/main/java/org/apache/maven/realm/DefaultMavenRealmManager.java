@@ -50,14 +50,16 @@ public class DefaultMavenRealmManager
 {
 
     private Map pluginArtifacts = new HashMap();
+
     private Set managedRealmIds = new HashSet();
 
     private final ClassWorld world;
+
     private final PlexusContainer container;
+
     private final Logger logger;
 
-    public DefaultMavenRealmManager( PlexusContainer container,
-                                     Logger logger )
+    public DefaultMavenRealmManager( PlexusContainer container, Logger logger )
     {
         world = container.getContainerRealm().getWorld();
         this.container = container;
@@ -114,8 +116,7 @@ public class DefaultMavenRealmManager
         }
     }
 
-    public ClassRealm createExtensionRealm( Artifact extensionArtifact,
-                                            List artifacts )
+    public ClassRealm createExtensionRealm( Artifact extensionArtifact, List artifacts )
         throws RealmManagementException
     {
         String id = RealmUtils.createExtensionRealmId( extensionArtifact );
@@ -127,8 +128,7 @@ public class DefaultMavenRealmManager
         }
         catch ( DuplicateRealmException e )
         {
-            throw new RealmManagementException( id, "Extension realm: " + id + " already exists.",
-                                                e );
+            throw new RealmManagementException( id, "Extension realm: " + id + " already exists.", e );
         }
 
         populateRealm( id, realm, extensionArtifact, artifacts, null );
@@ -136,24 +136,25 @@ public class DefaultMavenRealmManager
         return realm;
     }
 
-    public void importExtensionsIntoProjectRealm( String projectGroupId,
-                                                  String projectArtifactId,
-                                                  String projectVersion,
-                                                  Artifact extensionArtifact )
+    public void importExtensionsIntoProjectRealm( String projectGroupId, String projectArtifactId,
+                                                  String projectVersion, Artifact extensionArtifact )
         throws RealmManagementException
     {
         String extensionRealmId = RealmUtils.createExtensionRealmId( extensionArtifact );
 
         if ( extensionArtifact.getFile() == null )
         {
-            throw new RealmManagementException( extensionRealmId, "Cannot import project extensions; extension artifact has no associated file that can be scanned for extension components (extension: " + extensionArtifact.getId() + ")" );
+            throw new RealmManagementException( extensionRealmId,
+                                                "Cannot import project extensions; extension artifact has no associated file that can be scanned for extension components (extension: " +
+                                                    extensionArtifact.getId() + ")" );
         }
-
 
         ComponentDiscoverer discoverer = new DefaultComponentDiscoverer();
         discoverer.setManager( RealmScanningUtils.getDummyComponentDiscovererManager() );
 
-        List componentSetDescriptors = RealmScanningUtils.scanForComponentSetDescriptors( extensionArtifact, discoverer, container.getContext(), extensionRealmId );
+        List componentSetDescriptors = RealmScanningUtils.scanForComponentSetDescriptors( extensionArtifact, discoverer,
+                                                                                          container.getContext(),
+                                                                                          extensionRealmId );
 
         ClassRealm realm = getProjectRealm( projectGroupId, projectArtifactId, projectVersion, true );
 
@@ -168,7 +169,9 @@ public class DefaultMavenRealmManager
 
                 try
                 {
-                    logger.debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " + comp.getRoleHint() + "\nfrom extension realm: " + extensionRealmId + "\nto project realm: " + realm.getId() );
+                    logger.debug( "Importing: " + implementation + "\nwith role: " + comp.getRole() + "\nand hint: " +
+                        comp.getRoleHint() + "\nfrom extension realm: " + extensionRealmId + "\nto project realm: " +
+                        realm.getId() );
 
                     // Import the extension component's implementation class into the project-level
                     // realm.
@@ -187,12 +190,17 @@ public class DefaultMavenRealmManager
                 }
                 catch ( NoSuchRealmException e )
                 {
-                    throw new RealmManagementException( extensionRealmId, "Failed to create import for component: " + implementation + " from extension realm: " + extensionRealmId + " to project realm: " + realm.getId(), e );
+                    throw new RealmManagementException( extensionRealmId, "Failed to create import for component: " +
+                        implementation + " from extension realm: " + extensionRealmId + " to project realm: " +
+                        realm.getId(), e );
                 }
                 catch ( ComponentRepositoryException e )
                 {
                     String projectId = RealmUtils.createProjectId( projectGroupId, projectArtifactId, projectVersion );
-                    throw new RealmManagementException( extensionRealmId, "Unable to discover components from imports to project: " + projectId + " from extension artifact: " + extensionArtifact.getId(), e );
+                    throw new RealmManagementException( extensionRealmId,
+                                                        "Unable to discover components from imports to project: " +
+                                                            projectId + " from extension artifact: " +
+                                                            extensionArtifact.getId(), e );
                 }
             }
         }
@@ -203,7 +211,8 @@ public class DefaultMavenRealmManager
         return getProjectRealm( projectGroupId, projectArtifactId, projectVersion, false );
     }
 
-    private ClassRealm getProjectRealm( String projectGroupId, String projectArtifactId, String projectVersion, boolean create )
+    private ClassRealm getProjectRealm( String projectGroupId, String projectArtifactId, String projectVersion,
+                                        boolean create )
     {
         String id = RealmUtils.createProjectId( projectGroupId, projectArtifactId, projectVersion );
 
@@ -266,10 +275,8 @@ public class DefaultMavenRealmManager
         pluginArtifacts.remove( id );
     }
 
-    public ClassRealm createPluginRealm( Plugin plugin,
-                                          Artifact pluginArtifact,
-                                          List artifacts,
-                                          ArtifactFilter coreArtifactFilter )
+    public ClassRealm createPluginRealm( Plugin plugin, Artifact pluginArtifact, List artifacts,
+                                         ArtifactFilter coreArtifactFilter )
         throws RealmManagementException
     {
         String id = RealmUtils.createPluginRealmId( plugin );
@@ -284,8 +291,7 @@ public class DefaultMavenRealmManager
         }
         catch ( DuplicateRealmException e )
         {
-            throw new RealmManagementException( id, "Plugin realm: " + id + " already exists.",
-                                                e );
+            throw new RealmManagementException( id, "Plugin realm: " + id + " already exists.", e );
         }
 
         populateRealm( id, realm, pluginArtifact, artifacts, coreArtifactFilter );
@@ -296,10 +302,7 @@ public class DefaultMavenRealmManager
         return realm;
     }
 
-    private void populateRealm( String id,
-                                ClassRealm realm,
-                                Artifact mainArtifact,
-                                List artifacts,
+    private void populateRealm( String id, ClassRealm realm, Artifact mainArtifact, List artifacts,
                                 ArtifactFilter coreArtifactFilter )
         throws RealmManagementException
     {
@@ -311,10 +314,8 @@ public class DefaultMavenRealmManager
             }
             catch ( MalformedURLException e )
             {
-                throw new RealmManagementException( id, mainArtifact, "Invalid URL for artifact file: "
-                                                                  + mainArtifact.getFile()
-                                                                  + " to be used in realm: " + id
-                                                                  + ".", e );
+                throw new RealmManagementException( id, mainArtifact, "Invalid URL for artifact file: " +
+                    mainArtifact.getFile() + " to be used in realm: " + id + ".", e );
             }
         }
 
@@ -330,15 +331,14 @@ public class DefaultMavenRealmManager
                 }
                 catch ( MalformedURLException e )
                 {
-                    throw new RealmManagementException( id, artifact, "Invalid URL for artifact file: "
-                                                                      + artifact.getFile()
-                                                                      + " to be used in realm: " + id
-                                                                      + ".", e );
+                    throw new RealmManagementException( id, artifact, "Invalid URL for artifact file: " +
+                        artifact.getFile() + " to be used in realm: " + id + ".", e );
                 }
             }
             else
             {
-                logger.debug( "Excluding artifact: " + artifact.getArtifactId() + " from plugin realm; it's already included in Maven's core." );
+                logger.debug( "Excluding artifact: " + artifact.getArtifactId() +
+                    " from plugin realm; it's already included in Maven's core." );
             }
         }
     }
@@ -361,8 +361,7 @@ public class DefaultMavenRealmManager
         return null;
     }
 
-    public void setPluginArtifacts( Plugin plugin,
-                                    List artifacts )
+    public void setPluginArtifacts( Plugin plugin, List artifacts )
     {
         String id = RealmUtils.createPluginRealmId( plugin );
 

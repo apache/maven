@@ -49,10 +49,10 @@ public class ProjectBuildingException
     }
 
     /**
-     * @deprecated use {@link File} constructor for pomLocation
      * @param projectId
      * @param message
      * @param pomLocation absolute path of the pom file
+     * @deprecated use {@link File} constructor for pomLocation
      */
     protected ProjectBuildingException( String projectId, String message, String pomLocation )
     {
@@ -62,10 +62,9 @@ public class ProjectBuildingException
     }
 
     /**
-     *
      * @param projectId
      * @param message
-     * @param pomFile pom file location
+     * @param pomFile   pom file location
      */
     public ProjectBuildingException( String projectId, String message, File pomFile )
     {
@@ -77,7 +76,7 @@ public class ProjectBuildingException
     /**
      * @param projectId
      * @param message
-     * @param pomFile pom file location
+     * @param pomFile   pom file location
      * @param cause
      */
     protected ProjectBuildingException( String projectId, String message, File pomFile, Throwable cause )
@@ -98,8 +97,7 @@ public class ProjectBuildingException
         pomFile = new File( pomLocation );
     }
 
-    public ProjectBuildingException( String projectId, String message, File pomFile,
-                                     ProfileActivationException cause )
+    public ProjectBuildingException( String projectId, String message, File pomFile, ProfileActivationException cause )
     {
         super( message, cause );
         this.projectId = projectId;
@@ -133,7 +131,8 @@ public class ProjectBuildingException
     /**
      * @deprecated use {@link File} constructor for pomLocation
      */
-    public ProjectBuildingException( String projectId, String message, String pomLocation, XmlPullParserException cause )
+    public ProjectBuildingException( String projectId, String message, String pomLocation,
+                                     XmlPullParserException cause )
     {
         super( message, cause );
         this.projectId = projectId;
@@ -178,8 +177,7 @@ public class ProjectBuildingException
         this.projectId = projectId;
     }
 
-    public ProjectBuildingException( String projectId, String message, File pomFile,
-                                     ArtifactResolutionException cause )
+    public ProjectBuildingException( String projectId, String message, File pomFile, ArtifactResolutionException cause )
     {
         super( message, cause );
         this.projectId = projectId;
@@ -269,12 +267,10 @@ public class ProjectBuildingException
     {
         super( message, cause );
         this.projectId = projectId;
-        pomFile = new File ( pomLocation );
+        pomFile = new File( pomLocation );
     }
 
-    public ProjectBuildingException( String projectId,
-                                     String message,
-                                     ModelInterpolationException cause )
+    public ProjectBuildingException( String projectId, String message, ModelInterpolationException cause )
     {
         super( message, cause );
         this.projectId = projectId;
@@ -288,7 +284,7 @@ public class ProjectBuildingException
     /**
      * @deprecated use {@link #getPomFile()}
      */
-    public String getPomLocation ()
+    public String getPomLocation()
     {
         if ( getPomFile() != null )
         {
@@ -307,7 +303,7 @@ public class ProjectBuildingException
 
     public String getMessage()
     {
-        return super.getMessage() + " for project " + projectId
-            + ( ( getPomFile() == null ? "" : " at " + getPomFile().getAbsolutePath() ) );
+        return super.getMessage() + " for project " + projectId +
+            ( ( getPomFile() == null ? "" : " at " + getPomFile().getAbsolutePath() ) );
     }
 }

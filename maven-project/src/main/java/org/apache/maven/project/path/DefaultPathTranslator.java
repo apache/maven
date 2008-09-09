@@ -31,11 +31,7 @@ import java.util.List;
 public class DefaultPathTranslator
     implements PathTranslator
 {
-    private static final String[] BASEDIR_EXPRESSIONS = {
-        "${basedir}",
-        "${pom.basedir}",
-        "${project.basedir}"
-    };
+    private static final String[] BASEDIR_EXPRESSIONS = {"${basedir}", "${pom.basedir}", "${project.basedir}"};
 
     private String FILE_SEPARATOR = "/";
 

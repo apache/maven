@@ -14,32 +14,24 @@ public interface MavenRealmManager
 
     boolean hasExtensionRealm( Artifact extensionArtifact );
 
-    ClassRealm createExtensionRealm( Artifact extensionArtifact,
-                                     List artifacts )
+    ClassRealm createExtensionRealm( Artifact extensionArtifact, List artifacts )
         throws RealmManagementException;
 
-    void importExtensionsIntoProjectRealm( String projectGroupId,
-                                           String projectArtifactId,
-                                           String projectVersion,
+    void importExtensionsIntoProjectRealm( String projectGroupId, String projectArtifactId, String projectVersion,
                                            Artifact extensionArtifact )
         throws RealmManagementException;
 
-    ClassRealm getProjectRealm( String groupId,
-                                String artifactId,
-                                String version );
+    ClassRealm getProjectRealm( String groupId, String artifactId, String version );
 
     ClassRealm getPluginRealm( Plugin plugin );
 
     List getPluginArtifacts( Plugin plugin );
 
-    ClassRealm createPluginRealm( Plugin plugin,
-                                  Artifact pluginArtifact,
-                                  List artifacts,
+    ClassRealm createPluginRealm( Plugin plugin, Artifact pluginArtifact, List artifacts,
                                   ArtifactFilter coreArtifactFilter )
         throws RealmManagementException;
 
     void disposePluginRealm( Plugin plugin );
 
-    void setPluginArtifacts( Plugin plugin,
-                             List artifacts );
+    void setPluginArtifacts( Plugin plugin, List artifacts );
 }

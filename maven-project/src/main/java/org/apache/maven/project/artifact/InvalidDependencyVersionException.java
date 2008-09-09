@@ -37,7 +37,8 @@ public class InvalidDependencyVersionException
 {
     private Dependency dependency;
 
-    public InvalidDependencyVersionException( String projectId, Dependency dependency, File pomFile, InvalidVersionSpecificationException cause )
+    public InvalidDependencyVersionException( String projectId, Dependency dependency, File pomFile,
+                                              InvalidVersionSpecificationException cause )
     {
         super( projectId, formatLocationInPom( dependency ), dependency.getVersion(), pomFile, cause );
         this.dependency = dependency;

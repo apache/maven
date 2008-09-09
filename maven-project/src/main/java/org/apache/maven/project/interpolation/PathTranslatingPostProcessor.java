@@ -20,15 +20,12 @@ package org.apache.maven.project.interpolation;
  */
 
 import org.apache.maven.project.path.PathTranslator;
-import org.codehaus.plexus.interpolation.AbstractFunctionValueSourceWrapper;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
-import org.codehaus.plexus.interpolation.ValueSource;
 
 import java.io.File;
 import java.util.List;
 
 /**
- * 
  * @version $Id: PathTranslatingPostProcessor.java 677447 2008-07-16 22:15:57Z jdcasey $
  */
 public class PathTranslatingPostProcessor
@@ -36,7 +33,9 @@ public class PathTranslatingPostProcessor
 {
 
     private final List unprefixedPathKeys;
+
     private final File projectDir;
+
     private final PathTranslator pathTranslator;
 
     public PathTranslatingPostProcessor( List unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
@@ -46,8 +45,7 @@ public class PathTranslatingPostProcessor
         this.pathTranslator = pathTranslator;
     }
 
-    public Object execute( String expression,
-                                      Object value )
+    public Object execute( String expression, Object value )
     {
         if ( projectDir != null && value != null && unprefixedPathKeys.contains( expression ) )
         {

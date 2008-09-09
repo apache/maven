@@ -30,13 +30,7 @@ public interface ModelInheritanceAssembler
 {
     String ROLE = ModelInheritanceAssembler.class.getName();
 
-    void assembleModelInheritance( Model child, Model parent, String childPathAdjustment );
-
-    void assembleModelInheritance( Model child, Model parent );
-
-    void assembleBuildInheritance( Build childBuild,
-                                          Build parentBuild,
-                                          boolean handleAsInheriance );
+    void assembleBuildInheritance( Build childBuild, Build parentBuild, boolean handleAsInheriance );
 
     void copyModel( Model dest, Model source );
 }

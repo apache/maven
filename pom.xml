@@ -15,13 +15,14 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
     <version>9-SNAPSHOT</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
-  </parent>
+  </parent>    
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven</groupId>
   <artifactId>maven</artifactId>
   <version>3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -257,6 +258,7 @@
     <module>maven-reporting-api</module>
     <module>maven-embedder</module>
     <module>maven-workspace</module>
+    <module>maven-shared-model</module>
     <module>maven-toolchain</module>
   </modules>
   <properties>

@@ -29,7 +29,6 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.ArrayList;
@@ -155,7 +154,7 @@ public class MavenMetadataSourceTest
 
         MavenProject project = new MavenProject( model );
 
-        ModelDefaultsInjector injector = (ModelDefaultsInjector) lookup( ModelDefaultsInjector.ROLE );
+        TestModelDefaultsInjector injector = new TestModelDefaultsInjector();
 
         injector.injectDefaults( model );
 

@@ -31,6 +31,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -59,6 +61,10 @@ public final class PomClassicDomainModel
 
     private String id;
 
+    private File file;
+
+    private File parentFile;
+
     /**
      * Constructor
      *
@@ -73,10 +79,20 @@ public final class PomClassicDomainModel
             throw new IllegalArgumentException( "model: null" );
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer out = WriterFactory.newXmlWriter( baos );
+        Writer out = null;
         MavenXpp3Writer writer = new MavenXpp3Writer();
-        writer.write( out, model );
-        out.close();
+        try
+        {
+            out = WriterFactory.newXmlWriter( baos );
+            writer.write( out, model );
+        }
+        finally
+        {
+            if ( out != null )
+            {
+                out.close();
+            }
+        }
         inputBytes = baos.toByteArray();
     }
 
@@ -96,6 +112,22 @@ public final class PomClassicDomainModel
         this.inputBytes = IOUtil.toByteArray( inputStream );
     }
 
+    public PomClassicDomainModel( File file )
+        throws IOException
+    {
+        this( new FileInputStream( file ) );
+        this.file = file;
+    }
+
+    public File getParentFile()
+    {
+        return parentFile;
+    }
+
+    public void setParentFile( File parentFile )
+    {
+        this.parentFile = parentFile;
+    }
 
     /**
      * Returns true if groupId.equals(a.groupId) && artifactId.equals(a.artifactId) && version.equals(a.version),
@@ -140,10 +172,15 @@ public final class PomClassicDomainModel
                     return "";
                 }
             }
-            String groupId = ( model.getGroupId() == null ) ? model.getParent().getGroupId() : model.getGroupId();
-            String artifactId =
-                ( model.getArtifactId() == null ) ? model.getParent().getArtifactId() : model.getArtifactId();
-            String version = ( model.getVersion() == null ) ? model.getParent().getVersion() : model.getVersion();
+            String groupId = ( model.getGroupId() == null && model.getParent() != null )
+                ? model.getParent().getGroupId()
+                : model.getGroupId();
+            String artifactId = ( model.getArtifactId() == null && model.getParent() != null )
+                ? model.getParent().getArtifactId()
+                : model.getArtifactId();
+            String version = ( model.getVersion() == null && model.getParent() != null )
+                ? model.getParent().getVersion()
+                : model.getVersion();
 
             id = groupId + ":" + artifactId + ":" + version;
         }
@@ -209,6 +246,14 @@ public final class PomClassicDomainModel
         byte[] copy = new byte[inputBytes.length];
         System.arraycopy( inputBytes, 0, copy, 0, inputBytes.length );
         return new ByteArrayInputStream( copy );
+    }
+
+    /**
+     * @return file of pom. May be null.
+     */
+    public File getFile()
+    {
+        return file;
     }
 
     /**

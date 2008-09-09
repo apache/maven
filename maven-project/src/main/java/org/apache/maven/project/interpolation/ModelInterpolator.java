@@ -42,29 +42,20 @@ public interface ModelInterpolator
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
     @Deprecated
-    Model interpolate( Model project,
-                       Map<String, ?> context )
+    Model interpolate( Model project, Map<String, ?> context )
         throws ModelInterpolationException;
 
     /**
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
     @Deprecated
-    Model interpolate( Model model,
-                       Map<String, ?> context,
-                       boolean strict )
+    Model interpolate( Model model, Map<String, ?> context, boolean strict )
         throws ModelInterpolationException;
 
-    Model interpolate( Model model,
-                       File projectDir,
-                       ProjectBuilderConfiguration config,
-                       boolean debugEnabled )
+    Model interpolate( Model model, File projectDir, ProjectBuilderConfiguration config, boolean debugEnabled )
         throws ModelInterpolationException;
 
-    String interpolate( String src,
-                        Model model,
-                        File projectDir,
-                        ProjectBuilderConfiguration config,
+    String interpolate( String src, Model model, File projectDir, ProjectBuilderConfiguration config,
                         boolean debugEnabled )
         throws ModelInterpolationException;
 }

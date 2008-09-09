@@ -46,7 +46,7 @@ public class SystemPropertyProfileActivator
             String name = property.getName();
             boolean reverseName = false;
 
-            if ( name.startsWith("!") )
+            if ( name.startsWith( "!" ) )
             {
                 reverseName = true;
                 name = name.substring( 1 );

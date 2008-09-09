@@ -23,10 +23,8 @@ public class RealmScanningUtils
 
     private static final String DISCOVERY_REALM_ID = "discovery realm";
 
-    public static List scanForComponentSetDescriptors( Artifact artifact,
-                                        ComponentDiscoverer discoverer,
-                                        Context context,
-                                        String discoveryContextId )
+    public static List scanForComponentSetDescriptors( Artifact artifact, ComponentDiscoverer discoverer,
+                                                       Context context, String discoveryContextId )
         throws RealmManagementException
     {
         ClassWorld discoveryWorld = new ClassWorld();
@@ -44,7 +42,9 @@ public class RealmScanningUtils
             }
             catch ( DuplicateRealmException e )
             {
-                throw new RealmManagementException( discoveryContextId, "Unable to create temporary ClassRealm for local-component discovery.", e );
+                throw new RealmManagementException( discoveryContextId,
+                                                    "Unable to create temporary ClassRealm for local-component discovery.",
+                                                    e );
             }
 
             try
@@ -53,7 +53,9 @@ public class RealmScanningUtils
             }
             catch ( MalformedURLException e )
             {
-                throw new RealmManagementException( discoveryContextId, artifact, "Unable to generate URL from artifact file: " + artifact.getFile() + " for local-component discovery.", e );
+                throw new RealmManagementException( discoveryContextId, artifact,
+                                                    "Unable to generate URL from artifact file: " + artifact.getFile() +
+                                                        " for local-component discovery.", e );
             }
 
             try
@@ -65,7 +67,9 @@ public class RealmScanningUtils
             }
             catch ( PlexusConfigurationException e )
             {
-                throw new RealmManagementException( discoveryContextId, "Unable to discover components in artifact: " + artifact.getId(), e );
+                throw new RealmManagementException( discoveryContextId,
+                                                    "Unable to discover components in artifact: " + artifact.getId(),
+                                                    e );
             }
         }
         finally
@@ -92,7 +96,8 @@ public class RealmScanningUtils
         return new DummyDiscovererManager();
     }
 
-    private static final class DummyDiscovererManager implements ComponentDiscovererManager
+    private static final class DummyDiscovererManager
+        implements ComponentDiscovererManager
     {
 
         public void fireComponentDiscoveryEvent( ComponentDiscoveryEvent arg0 )

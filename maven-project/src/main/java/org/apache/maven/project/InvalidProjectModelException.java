@@ -37,11 +37,11 @@ public class InvalidProjectModelException
     }
 
     /**
-     * @deprecated use {@link File} constructor for pomLocation
      * @param projectId
-     * @param pomLocation absolute path of the pom file
+     * @param pomLocation      absolute path of the pom file
      * @param message
      * @param validationResult
+     * @deprecated use {@link File} constructor for pomLocation
      */
     public InvalidProjectModelException( String projectId, String pomLocation, String message,
                                          ModelValidationResult validationResult )
@@ -58,10 +58,10 @@ public class InvalidProjectModelException
     }
 
     /**
-     * @deprecated use {@link File} constructor for pomLocation
      * @param projectId
      * @param pomLocation absolute path of the pom file
      * @param message
+     * @deprecated use {@link File} constructor for pomLocation
      */
     public InvalidProjectModelException( String projectId, String pomLocation, String message )
     {

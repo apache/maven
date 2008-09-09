@@ -72,26 +72,40 @@ public final class ArtifactModelContainerFactory
 
         private List<ModelProperty> properties;
 
+        private static String findBaseUriFrom( List<ModelProperty> modelProperties )
+        {
+            String baseUri = null;
+            for ( ModelProperty mp : modelProperties )
+            {
+                if ( baseUri == null || mp.getUri().length() < baseUri.length() )
+                {
+                    baseUri = mp.getUri();
+                }
+            }
+            return baseUri;
+        }
+
         private ArtifactModelContainer( List<ModelProperty> properties )
         {
             this.properties = new ArrayList<ModelProperty>( properties );
             this.properties = Collections.unmodifiableList( this.properties );
+            String uri = findBaseUriFrom( this.properties );
 
-            for ( ModelProperty mp : properties )
+            for ( ModelProperty mp : this.properties )
             {
-                if ( mp.getUri().endsWith( "version" ) )
+                if ( version == null && mp.getUri().equals( uri + "/version" ) )
                 {
                     this.version = mp.getValue();
                 }
-                else if ( mp.getUri().endsWith( "artifactId" ) )
+                else if ( artifactId == null && mp.getUri().equals( uri + "/artifactId" ) )
                 {
                     this.artifactId = mp.getValue();
                 }
-                else if ( mp.getUri().endsWith( "groupId" ) )
+                else if ( groupId == null && mp.getUri().equals( uri + "/groupId" ) )
                 {
                     this.groupId = mp.getValue();
                 }
-                else if ( mp.getUri().equals( ProjectUri.Dependencies.Dependency.type ) )
+                else if ( mp.getUri().equals( ProjectUri.Dependencies.Dependency.type ) && type == null )
                 {
                     this.type = mp.getValue();
                 }
@@ -105,8 +119,13 @@ public final class ArtifactModelContainerFactory
 
             if ( artifactId == null )
             {
-                throw new IllegalArgumentException(
-                    "Properties does not contain artifact id. Group ID = " + groupId + ", Version = " + version );
+                StringBuffer sb = new StringBuffer();
+                for ( ModelProperty mp : properties )
+                {
+                    sb.append( mp ).append( "\r\n" );
+                }
+                throw new IllegalArgumentException( "Properties does not contain artifact id. Group ID = " + groupId +
+                    ", Version = " + version + ":" + sb );
             }
 
             if ( type == null )

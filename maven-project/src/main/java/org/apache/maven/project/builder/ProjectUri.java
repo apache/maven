@@ -372,27 +372,27 @@ public class ProjectUri
                     public static class Executions
                     {
                         public static String xUri =
-                            "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions";
+                            "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection";
 
                         public static class Execution
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions/execution";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution";
 
                             public static String id =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions/execution/id";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/id";
 
                             public static String phase =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions/execution/phase";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/phase";
 
                             public static String goals =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions/execution/goals";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals";
 
                             public static String inherited =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions/execution/inherited";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
 
                             public static String configuration =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions/execution/configuration";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/execution#collections/execution/configuration";
                         }
                     }
 
