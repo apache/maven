@@ -2,6 +2,7 @@ package org.apache.maven.integrationtests;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +11,11 @@ import java.util.List;
 public class MavenIT0095Test
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenIT0095Test()
+        throws InvalidVersionSpecificationException        
+    {
+        super( "[,2.1.99)" );
+    }
 
     /**
      * Test URL calculation when modules are in sibling dirs of parent. (MNG-2006)

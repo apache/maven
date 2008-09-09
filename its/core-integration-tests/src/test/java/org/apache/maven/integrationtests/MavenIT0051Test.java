@@ -14,7 +14,7 @@ public class MavenIT0051Test
     public MavenIT0051Test()                                                                                                                          
         throws InvalidVersionSpecificationException                                                                                                   
     {                                                                                                                                                 
-        super();
+        super( "[,2.1.99)" );
     }    
 
     /**
