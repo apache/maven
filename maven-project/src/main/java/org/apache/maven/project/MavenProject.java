@@ -1294,7 +1294,7 @@ public class MavenProject
         {
             return pluginArtifacts;
         }
-        Set pa = new HashSet();
+        pluginArtifacts = new HashSet();
         if ( artifactFactory != null )
         {
             List plugins = getBuildPlugins();
@@ -1320,16 +1320,15 @@ public class MavenProject
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    return pa;
+                    return pluginArtifacts;
                 }
 
                 if ( artifact != null )
                 {
-                    pa.add( artifact );
+                    pluginArtifacts.add( artifact );
                 }
             }
         }
-        pluginArtifacts = pa;
         pluginArtifactMap = null;
         return pluginArtifacts;
     }
