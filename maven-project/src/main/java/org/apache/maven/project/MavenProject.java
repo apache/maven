@@ -1349,7 +1349,7 @@ public class MavenProject
 
     public Set getReportArtifacts()
     {
-        Set pluginArtifacts = new HashSet();
+        Set reportArtifacts = new HashSet();
         List reports = getReportPlugins();
         if ( reports != null )
         {
@@ -1380,7 +1380,7 @@ public class MavenProject
 
                 if ( artifact != null )
                 {
-                    pluginArtifacts.add( artifact );
+                    reportArtifacts.add( artifact );
                 }
             }
         }
