@@ -30,8 +30,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
@@ -72,10 +70,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /*:apt
 
@@ -315,7 +311,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = interpolateModelAndInjectDefault( project.getModel(), null, null, config );
+            project = interpolateModel( project.getModel(), null, null, config );
             project.setActiveProfiles( activeProfiles );
             project.setRemoteArtifactRepositories(
                 mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
@@ -449,7 +445,7 @@ public class DefaultMavenProjectBuilder
         MavenProject project;
         try
         {
-            project = interpolateModelAndInjectDefault( model, projectDescriptor, parentDescriptor, config );
+            project = interpolateModel( model, projectDescriptor, parentDescriptor, config );
         }
         catch ( ModelInterpolationException e )
         {
@@ -473,7 +469,7 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private MavenProject interpolateModelAndInjectDefault( Model model, File pomFile, File parentFile,
+    private MavenProject interpolateModel( Model model, File pomFile, File parentFile,
                                                            ProjectBuilderConfiguration config )
         throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
     {
@@ -495,9 +491,6 @@ public class DefaultMavenProjectBuilder
             mergeDeterministicBuildElements( model.getBuild(), dynamicBuild );
             model.setBuild( dynamicBuild );
         }
-
-        // interpolation is before injection, because interpolation is off-limits in the injected variables
-        new DefaultModelDefaultsInjector().injectDefaults( model );
 
         // We will return a different project object using the new model (hence the need to return a project, not just modify the parameter)
         MavenProject project = new MavenProject( model, artifactFactory, mavenTools, repositoryHelper, this, config );
@@ -746,111 +739,6 @@ public class DefaultMavenProjectBuilder
         {
             parent.getModel().getBuild().setDirectory( parent.getFile().getAbsolutePath() );
             setBuildOutputDirectoryOnParent( parent );
-        }
-    }
-
-    private static class DefaultModelDefaultsInjector
-    {
-        public void injectDefaults( Model model )
-        {
-            injectDependencyDefaults( model.getDependencies(), model.getDependencyManagement() );
-            if ( model.getBuild() != null )
-            {
-                injectPluginDefaults( model.getBuild(), model.getBuild().getPluginManagement() );
-            }
-        }
-
-        private static void injectPluginDefaults( Build build, PluginManagement pluginManagement )
-        {
-            if ( pluginManagement == null )
-            {
-                // nothing to inject.
-                return;
-            }
-
-            List buildPlugins = build.getPlugins();
-
-            if ( buildPlugins != null && !buildPlugins.isEmpty() )
-            {
-                Map pmPlugins = pluginManagement.getPluginsAsMap();
-
-                if ( pmPlugins != null && !pmPlugins.isEmpty() )
-                {
-                    for ( Iterator it = buildPlugins.iterator(); it.hasNext(); )
-                    {
-                        Plugin buildPlugin = (Plugin) it.next();
-
-                        Plugin pmPlugin = (Plugin) pmPlugins.get( buildPlugin.getKey() );
-
-                        if ( pmPlugin != null )
-                        {
-                            ModelUtils.mergePluginDefinitions( buildPlugin, pmPlugin, false );
-                        }
-                    }
-                }
-            }
-
-        }
-
-        private static void injectDependencyDefaults( List dependencies, DependencyManagement dependencyManagement )
-        {
-            if ( dependencyManagement != null )
-            {
-                // a given project's dependencies should be smaller than the
-                // group-defined defaults set...
-                // in other words, the project's deps will probably be a subset of
-                // those specified in defaults.
-                Map depsMap = new TreeMap();
-                for ( Iterator it = dependencies.iterator(); it.hasNext(); )
-                {
-                    Dependency dep = (Dependency) it.next();
-                    depsMap.put( dep.getManagementKey(), dep );
-                }
-
-                List managedDependencies = dependencyManagement.getDependencies();
-
-                for ( Iterator it = managedDependencies.iterator(); it.hasNext(); )
-                {
-                    Dependency def = (Dependency) it.next();
-                    String key = def.getManagementKey();
-
-                    Dependency dep = (Dependency) depsMap.get( key );
-                    if ( dep != null )
-                    {
-                        mergeDependencyWithDefaults( dep, def );
-                    }
-                }
-            }
-        }
-
-        private static void mergeDependencyWithDefaults( Dependency dep, Dependency def )
-        {
-            if ( dep.getScope() == null && def.getScope() != null )
-            {
-                dep.setScope( def.getScope() );
-                dep.setSystemPath( def.getSystemPath() );
-            }
-
-            if ( dep.getVersion() == null && def.getVersion() != null )
-            {
-                dep.setVersion( def.getVersion() );
-            }
-
-            if ( dep.getClassifier() == null && def.getClassifier() != null )
-            {
-                dep.setClassifier( def.getClassifier() );
-            }
-
-            if ( dep.getType() == null && def.getType() != null )
-            {
-                dep.setType( def.getType() );
-            }
-
-            List exclusions = dep.getExclusions();
-            if ( exclusions == null || exclusions.isEmpty() )
-            {
-                dep.setExclusions( def.getExclusions() );
-            }
         }
     }
 }
