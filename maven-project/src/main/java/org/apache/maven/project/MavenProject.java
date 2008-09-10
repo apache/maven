@@ -282,11 +282,6 @@ public class MavenProject
             parentFile = new File( project.getParentFile().getAbsolutePath() );
         }
 
-        //    if ( project.getPluginArtifacts() != null )
-        //    {
-        // setPluginArtifacts( Collections.unmodifiableSet( project.getPluginArtifacts() ) );
-        //  }
-
         if ( project.getReportArtifacts() != null )
         {
             setReportArtifacts( Collections.unmodifiableSet( project.getReportArtifacts() ) );
@@ -1284,7 +1279,6 @@ public class MavenProject
         {
             artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
         }
-
         return artifactMap;
     }
 
@@ -1348,7 +1342,12 @@ public class MavenProject
 
     public Set getReportArtifacts()
     {
-        Set reportArtifacts = new HashSet();
+        if( reportArtifacts != null )
+        {
+            return reportArtifacts;
+        }
+
+        reportArtifacts = new HashSet();
         List reports = getReportPlugins();
         if ( reports != null )
         {
@@ -1406,7 +1405,11 @@ public class MavenProject
 
     public Set getExtensionArtifacts()
     {
-        Set extensionArtifacts = new HashSet();
+        if( extensionArtifacts != null )
+        {
+            return extensionArtifacts;
+        }
+        extensionArtifacts = new HashSet();
         List extensions = getBuildExtensions();
         if ( extensions != null )
         {
@@ -1484,7 +1487,7 @@ public class MavenProject
     {
         if ( getModel().getReporting() == null )
         {
-            return null;
+            return Collections.EMPTY_LIST;
         }
         return getModel().getReporting().getPlugins();
 
@@ -1494,7 +1497,7 @@ public class MavenProject
     {
         if ( getModel().getBuild() == null )
         {
-            return null;
+            return Collections.EMPTY_LIST;
         }
         return getModel().getBuild().getPlugins();
     }
