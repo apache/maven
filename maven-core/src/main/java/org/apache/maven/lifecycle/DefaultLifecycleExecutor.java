@@ -601,21 +601,20 @@ public class DefaultLifecycleExecutor
             
             if ( hasFork )
             {
+                // NOTE: This must always happen, regardless of treatment of reactorProjects below, because
+                // if we're in a forked execution right now, the current project will itself be an execution project of
+                // something in the reactorProjects list, and won't have a next-stage executionProject created
+                // for it otherwise, which leaves the project == null for the upcoming forked execution.
+                createExecutionProject( project, session, true );
+                
                 if ( usesReactorProjects )
                 {
                     List reactorProjects = session.getSortedProjects();
                     for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
                     {
                         MavenProject reactorProject = (MavenProject) it.next();
-                        if ( reactorProject.getExecutionProject() == null )
-                        {
-                            createExecutionProject( reactorProject, session, false );
-                        }
+                        createExecutionProject( reactorProject, session, false );
                     }
-                }
-                else
-                {
-                    createExecutionProject( project, session, true );
                 }
             }
 
@@ -652,6 +651,12 @@ public class DefaultLifecycleExecutor
             
             if ( hasFork )
             {
+                // NOTE: This must always happen, regardless of treatment of reactorProjects below, because
+                // if we're in a forked execution right now, the current project will itself be an execution project of
+                // something in the reactorProjects list, and may not have had its own executionProject instance reset to 
+                // a concrete state again after the previous forked executions.
+                calculateConcreteState( project.getExecutionProject(), session, true );
+                
                 // FIXME: Would be nice to find a way to cause the execution project to stay in a concrete state...
                 // TODO: Test this! It should be fixed, but I don't want to destabilize until I have the issue I'm working on fixed.
                 if ( usesReactorProjects )
@@ -663,10 +668,6 @@ public class DefaultLifecycleExecutor
                         MavenProject reactorProject = (MavenProject) it.next();
                         calculateConcreteState( reactorProject.getExecutionProject(), session, false );
                     }
-                }
-                else
-                {
-                    calculateConcreteState( project.getExecutionProject(), session, true );
                 }
             }
 
@@ -703,44 +704,17 @@ public class DefaultLifecycleExecutor
             {
                 throw new LifecycleExecutionException( e.getMessage(), e );
             }
-            
-            if ( hasFork )
-            {
-                project.setExecutionProject( null );
-                
-                if ( usesReactorProjects )
-                {
-                    List reactorProjects = session.getSortedProjects();
-                    for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
-                    {
-                        MavenProject reactorProject = (MavenProject) it.next();
-                        reactorProject.setExecutionProject( null );
-                    }
-                }
-            }
-            
-//            if ( usesReactorProjects )
-//            {
-//                restoreAllDynamicStates( session );
-//            }
-//            else
-//            {
-//                restoreDynamicState( project, session, true );
-//            }
         }
     }
     
     private void createExecutionProject( MavenProject project, MavenSession session, boolean processProjectReferences )
         throws LifecycleExecutionException
     {
-        if ( project.getExecutionProject() == null )
-        {
-            MavenProject executionProject = new MavenProject( project );
-            
-            calculateConcreteState( executionProject, session, processProjectReferences );
-            
-            project.setExecutionProject( executionProject );
-        }
+        MavenProject executionProject = new MavenProject( project );
+        
+        calculateConcreteState( executionProject, session, processProjectReferences );
+        
+        project.setExecutionProject( executionProject );
     }
 
     private boolean usesSessionOrReactorProjects( PlexusConfiguration configuration )
