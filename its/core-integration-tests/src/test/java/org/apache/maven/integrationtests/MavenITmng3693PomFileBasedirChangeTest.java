@@ -6,6 +6,7 @@ import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 /**
  * Test that changes to a project's POM file reference (MavenProject.setFile(..))
@@ -18,6 +19,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3693PomFileBasedirChangeTest
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenITmng3693PomFileBasedirChangeTest()
+        throws InvalidVersionSpecificationException
+    {
+        super( "[,2.1.99)" );
+    }
+
     public void testitMNG3693 ()
         throws Exception
     {
