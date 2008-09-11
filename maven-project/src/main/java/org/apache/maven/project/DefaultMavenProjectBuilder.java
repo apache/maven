@@ -184,6 +184,13 @@ public class DefaultMavenProjectBuilder
 
             project.setFile( projectDescriptor );
             project = buildInternal( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
+
+            Build build = project.getBuild();
+            // NOTE: setting this script-source root before path translation, because
+            // the plugin tools compose basedir and scriptSourceRoot into a single file.
+            project.addScriptSourceRoot( build.getScriptSourceDirectory() );
+            project.addCompileSourceRoot( build.getSourceDirectory() );
+            project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
             project.setFile( projectDescriptor );
 
             setBuildOutputDirectoryOnParent( project );
