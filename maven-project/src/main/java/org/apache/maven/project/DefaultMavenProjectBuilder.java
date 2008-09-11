@@ -184,13 +184,6 @@ public class DefaultMavenProjectBuilder
 
             project.setFile( projectDescriptor );
             project = buildInternal( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
-
-            Build build = project.getBuild();
-            // NOTE: setting this script-source root before path translation, because
-            // the plugin tools compose basedir and scriptSourceRoot into a single file.
-            project.addScriptSourceRoot( build.getScriptSourceDirectory() );
-            project.addCompileSourceRoot( build.getSourceDirectory() );
-            project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
             project.setFile( projectDescriptor );
 
             setBuildOutputDirectoryOnParent( project );
@@ -479,18 +472,7 @@ public class DefaultMavenProjectBuilder
             projectDir = pomFile.getAbsoluteFile().getParentFile();
         }
 
-        Build dynamicBuild = model.getBuild();
-        if ( dynamicBuild != null )
-        {
-            model.setBuild( ModelUtils.cloneBuild( dynamicBuild ) );
-        }
         model = modelInterpolator.interpolate( model, projectDir, config, getLogger().isDebugEnabled() );
-
-        if ( dynamicBuild != null && model.getBuild() != null )
-        {
-            mergeDeterministicBuildElements( model.getBuild(), dynamicBuild );
-            model.setBuild( dynamicBuild );
-        }
 
         // We will return a different project object using the new model (hence the need to return a project, not just modify the parameter)
         MavenProject project = new MavenProject( model, artifactFactory, mavenTools, repositoryHelper, this, config );
@@ -502,59 +484,6 @@ public class DefaultMavenProjectBuilder
 
         validateModel( model, pomFile );
         return project;
-    }
-
-    // TODO: Remove this!
-    @SuppressWarnings("unchecked")
-    private void mergeDeterministicBuildElements( Build interpolatedBuild, Build dynamicBuild )
-    {
-        List<Plugin> dPlugins = dynamicBuild.getPlugins();
-
-        if ( dPlugins != null )
-        {
-            List<Plugin> iPlugins = interpolatedBuild.getPlugins();
-
-            for ( int i = 0; i < dPlugins.size(); i++ )
-            {
-                Plugin dPlugin = dPlugins.get( i );
-                Plugin iPlugin = iPlugins.get( i );
-
-                dPlugin.setGroupId( iPlugin.getGroupId() );
-                dPlugin.setArtifactId( iPlugin.getArtifactId() );
-                dPlugin.setVersion( iPlugin.getVersion() );
-
-                dPlugin.setDependencies( iPlugin.getDependencies() );
-            }
-        }
-
-        PluginManagement dPluginMgmt = dynamicBuild.getPluginManagement();
-
-        if ( dPluginMgmt != null )
-        {
-            PluginManagement iPluginMgmt = interpolatedBuild.getPluginManagement();
-            dPlugins = dPluginMgmt.getPlugins();
-            if ( dPlugins != null )
-            {
-                List<Plugin> iPlugins = iPluginMgmt.getPlugins();
-
-                for ( int i = 0; i < dPlugins.size(); i++ )
-                {
-                    Plugin dPlugin = dPlugins.get( i );
-                    Plugin iPlugin = iPlugins.get( i );
-
-                    dPlugin.setGroupId( iPlugin.getGroupId() );
-                    dPlugin.setArtifactId( iPlugin.getArtifactId() );
-                    dPlugin.setVersion( iPlugin.getVersion() );
-
-                    dPlugin.setDependencies( iPlugin.getDependencies() );
-                }
-            }
-        }
-
-        if ( dynamicBuild.getExtensions() != null )
-        {
-            dynamicBuild.setExtensions( interpolatedBuild.getExtensions() );
-        }
     }
 
     private MavenProject getSuperProject( ProjectBuilderConfiguration config, File projectDescriptor,
