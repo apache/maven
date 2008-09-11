@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<plexus>                       svn ci-
+<plexus>
   <components><!--Eliminate this component after Mercury Integration-->
     <component>
       <role>org.apache.maven.project.RepositoryHelper</role>
