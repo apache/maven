@@ -144,7 +144,7 @@ public class PluginDescriptor
     {
         if ( lookupKey == null )
         {
-            lookupKey = groupId + ":" + artifactId.intern();
+            lookupKey = ( groupId + ":" + artifactId ).intern();
         }
         
         return lookupKey;

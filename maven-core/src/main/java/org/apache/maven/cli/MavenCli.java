@@ -353,7 +353,7 @@ public class MavenCli
         }
         catch ( XmlPullParserException e )
         {
-            throw new SettingsConfigurationException( e.getMessage(), e.getDetail(), e.getLineNumber(),
+            throw new SettingsConfigurationException( e.getMessage(), e, e.getLineNumber(),
                                                       e.getColumnNumber() );
         }
 

@@ -1433,6 +1433,37 @@ public class MavenProject
                 }
             }
         }
+        
+//        PluginManagement pluginManagement = getBuild().getPluginManagement();
+//        if ( pluginManagement != null && pluginManagement.getPlugins() != null )
+//        {
+//            for ( Iterator iterator = pluginManagement.getPlugins().iterator(); iterator.hasNext(); )
+//            {
+//                Plugin plugin = (Plugin) iterator.next();
+//
+//                if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
+//                {
+//                    Xpp3Dom managedDom = (Xpp3Dom) plugin.getConfiguration();
+//
+//                    if ( executionId != null )
+//                    {
+//                        PluginExecution execution = (PluginExecution) plugin.getExecutionsAsMap().get( executionId );
+//                        if ( execution != null )
+//                        {
+//                            Xpp3Dom executionConfiguration = (Xpp3Dom) execution.getConfiguration();
+//                            if ( executionConfiguration != null )
+//                            {
+//                                Xpp3Dom newDom = new Xpp3Dom( executionConfiguration );
+//                                managedDom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
+//                            }
+//                        }
+//                    }
+//                    
+//                    dom = Xpp3Dom.mergeXpp3Dom( dom, managedDom );
+//                    break;
+//                }
+//            }
+//        }
 
         if ( dom != null )
         {

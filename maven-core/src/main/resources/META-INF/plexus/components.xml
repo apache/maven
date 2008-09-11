@@ -209,6 +209,11 @@ under the License.
     <component>
       <role>org.apache.maven.ConfigurationInterpolator</role>
       <implementation>org.apache.maven.ReflectionConfigurationInterpolator</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.project.path.PathTranslator</role>
+        </requirement>
+      </requirements>
     </component>
     
     <!--

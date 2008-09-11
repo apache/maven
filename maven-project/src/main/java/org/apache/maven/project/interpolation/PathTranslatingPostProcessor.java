@@ -23,6 +23,7 @@ import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.interpolation.AbstractFunctionValueSourceWrapper;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.ValueSource;
+import org.codehaus.plexus.interpolation.util.ValueSourceUtils;
 
 import java.io.File;
 import java.util.List;
@@ -38,9 +39,11 @@ public class PathTranslatingPostProcessor
     private final List unprefixedPathKeys;
     private final File projectDir;
     private final PathTranslator pathTranslator;
+    private final List expressionPrefixes;
 
-    public PathTranslatingPostProcessor( List unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
+    public PathTranslatingPostProcessor( List expressionPrefixes, List unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
     {
+        this.expressionPrefixes = expressionPrefixes;
         this.unprefixedPathKeys = unprefixedPathKeys;
         this.projectDir = projectDir;
         this.pathTranslator = pathTranslator;
@@ -49,6 +52,8 @@ public class PathTranslatingPostProcessor
     public Object execute( String expression,
                                       Object value )
     {
+        expression = ValueSourceUtils.trimPrefix( expression, expressionPrefixes, true );
+        
         if ( projectDir != null && value != null && unprefixedPathKeys.contains( expression ) )
         {
             return pathTranslator.alignToBaseDirectory( String.valueOf( value ), projectDir );

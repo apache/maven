@@ -1025,6 +1025,8 @@ public class DefaultLifecycleExecutor
                                        MavenProject project )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
+        project = project.getExecutionProject();
+        
         forkEntryPoints.push( mojoDescriptor );
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
@@ -1174,15 +1176,13 @@ public class DefaultLifecycleExecutor
         {
             Lifecycle lifecycle = getLifecycleForPhase( targetPhase );
 
-            executeGoalWithLifecycle( targetPhase, forkEntryPoints, session, lifecycleMappings, project.getExecutionProject(),
-                                      lifecycle );
+            executeGoalWithLifecycle( targetPhase, forkEntryPoints, session, lifecycleMappings, project, lifecycle );
         }
         else
         {
             String goal = mojoDescriptor.getExecuteGoal();
             MojoDescriptor desc = getMojoDescriptor( pluginDescriptor, goal );
-            executeGoals( Collections.singletonList( new MojoExecution( desc ) ), forkEntryPoints, session,
-                          project.getExecutionProject() );
+            executeGoals( Collections.singletonList( new MojoExecution( desc ) ), forkEntryPoints, session, project );
         }
     }
 

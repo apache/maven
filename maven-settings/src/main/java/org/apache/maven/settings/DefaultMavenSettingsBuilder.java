@@ -119,7 +119,7 @@ public class DefaultMavenSettingsBuilder
 
                 SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
-                settings = modelReader.read( sReader );
+                settings = modelReader.read( sReader, true );
 
                 RuntimeInfo rtInfo = new RuntimeInfo( settings );
 
