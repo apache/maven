@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<plexus>
+<plexus>                       svn ci-
   <components><!--Eliminate this component after Mercury Integration-->
     <component>
       <role>org.apache.maven.project.RepositoryHelper</role>
@@ -135,9 +135,6 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.project.validation.ModelValidator</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>

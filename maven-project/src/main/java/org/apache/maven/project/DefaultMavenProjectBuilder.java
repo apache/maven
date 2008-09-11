@@ -31,8 +31,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -47,7 +45,6 @@ import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
-import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.project.workspace.ProjectWorkspace;
@@ -125,8 +122,6 @@ public class DefaultMavenProjectBuilder
 
     // TODO: make it a component
     private MavenXpp3Reader modelReader;
-
-    private PathTranslator pathTranslator;
 
     private ModelInterpolator modelInterpolator;
 
@@ -299,7 +294,7 @@ public class DefaultMavenProjectBuilder
         MavenProject project;
         try
         {
-            project = new MavenProject( superModel, artifactFactory, mavenTools, repositoryHelper, this, config );
+            project = new MavenProject( superModel, artifactFactory, mavenTools, this, config );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -391,20 +386,6 @@ public class DefaultMavenProjectBuilder
         return new MavenProjectBuildingResult( project, result );
     }
 
-    public void calculateConcreteState( MavenProject project, ProjectBuilderConfiguration config )
-        throws ModelInterpolationException
-    {
-        new MavenProjectRestorer( pathTranslator, modelInterpolator, getLogger() ).calculateConcreteState( project,
-                                                                                                           config );
-    }
-
-    public void restoreDynamicState( MavenProject project, ProjectBuilderConfiguration config )
-        throws ModelInterpolationException
-    {
-        new MavenProjectRestorer( pathTranslator, modelInterpolator, getLogger() ).restoreDynamicState( project,
-                                                                                                        config );
-    }
-
     public void enableLogging( Logger logger )
     {
         this.logger = logger;
@@ -482,7 +463,7 @@ public class DefaultMavenProjectBuilder
         model = modelInterpolator.interpolate( model, projectDir, config, getLogger().isDebugEnabled() );
 
         // We will return a different project object using the new model (hence the need to return a project, not just modify the parameter)
-        MavenProject project = new MavenProject( model, artifactFactory, mavenTools, repositoryHelper, this, config );
+        MavenProject project = new MavenProject( model, artifactFactory, mavenTools, this, config );
 
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
                                                                         project.getVersion(), project.getPackaging() );
@@ -502,7 +483,7 @@ public class DefaultMavenProjectBuilder
         Model model = getSuperModel();
         try
         {
-            superProject = new MavenProject( model, artifactFactory, mavenTools, repositoryHelper, this, config );
+            superProject = new MavenProject( model, artifactFactory, mavenTools, this, config );
         }
         catch ( InvalidRepositoryException e )
         {

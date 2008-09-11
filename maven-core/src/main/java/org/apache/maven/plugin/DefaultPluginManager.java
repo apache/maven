@@ -41,6 +41,7 @@ import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -56,6 +57,7 @@ import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ModelUtils;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -89,6 +91,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -516,14 +519,16 @@ public class DefaultPluginManager
 
         if ( !project.isConcrete() )
         {
-            try
-            {
-                mavenProjectBuilder.calculateConcreteState( project, session.getProjectBuilderConfiguration() );
-            }
-            catch ( ModelInterpolationException e )
-            {
-                throw new PluginManagerException( mojoDescriptor, project, "Failed to calculate concrete state for project.", e );
-            }
+            Model model = ModelUtils.cloneModel( project.getModel() );
+
+            File basedir = project.getBasedir();
+
+            Model model2 = ModelUtils.cloneModel( model );
+            pathTranslator.alignToBaseDirectory( model, basedir );
+            project.preserveBuild( model2.getBuild() );
+
+            project.setBuild( model.getBuild() );
+            project.setConcrete( true );
         }
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
@@ -734,14 +739,7 @@ public class DefaultPluginManager
             Thread.currentThread().setContextClassLoader( oldClassLoader );
         }
 
-        try
-        {
-            mavenProjectBuilder.restoreDynamicState( project, session.getProjectBuilderConfiguration() );
-        }
-        catch ( ModelInterpolationException e )
-        {
-            throw new PluginManagerException( mojoDescriptor, project, "Failed to restore dynamic state for project.", e );
-        }
+        project.setConcrete( false );
     }
 
     private Plugin createDummyPlugin( PluginDescriptor pluginDescriptor )

@@ -95,13 +95,4 @@ public interface MavenProjectBuilder
     MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException;
 
-    // ----------------------------------------------------------------------------
-    // API BELOW IS USED TO PRESERVE DYNAMISM IN THE BUILD SECTION OF THE POM.
-    // ----------------------------------------------------------------------------
-
-    void calculateConcreteState( MavenProject project, ProjectBuilderConfiguration config )
-        throws ModelInterpolationException;
-
-    void restoreDynamicState( MavenProject project, ProjectBuilderConfiguration config )
-        throws ModelInterpolationException;
 }

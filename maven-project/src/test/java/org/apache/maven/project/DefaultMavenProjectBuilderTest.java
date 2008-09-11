@@ -44,8 +44,6 @@ public class DefaultMavenProjectBuilderTest
 
     private File localRepoDir;
 
-    private DefaultMavenProjectBuilder projectBuilder;
-
     @Override
     public void setUp()
         throws Exception
@@ -116,32 +114,6 @@ public class DefaultMavenProjectBuilderTest
         assertEquals( 2, ( (Plugin) project.getBuildPlugins().get( 0 ) ).getDependencies().size() );
     }
 
-    public void testBuildDirectoryExpressionInterpolatedWithTranslatedValue()
-        throws Exception
-    {
-        File pom = getTestFile( "src/test/resources/projects/build-path-expression-pom.xml" );
-
-        MavenProject project = getProject( pom );
-
-        projectBuilder.calculateConcreteState( project, new DefaultProjectBuilderConfiguration() );
-
-        Build build = project.getBuild();
-        assertNotNull( "Project should have a build section containing the test resource.", build );
-
-        String sourceDirectory = build.getSourceDirectory();
-        assertNotNull( "Project build should contain a valid source directory.", sourceDirectory );
-
-        List resources = build.getResources();
-        assertNotNull( "Project should contain a build resource.", resources );
-        assertEquals( "Project should contain exactly one build resource.", 1, resources.size() );
-
-        Resource res = (Resource) resources.get( 0 );
-        assertEquals( "Project resource should be the same directory as the source directory.",
-                      sourceDirectory,
-                      res.getDirectory() );
-
-        System.out.println( "Interpolated, translated resource directory is: " + res.getDirectory() );
-    }
 
     @Override
     protected ArtifactRepository getLocalRepository()

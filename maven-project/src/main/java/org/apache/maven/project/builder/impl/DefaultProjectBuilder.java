@@ -186,7 +186,7 @@ public final class DefaultProjectBuilder
         try
         {
             MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), artifactFactory,
-                                                          mavenTools, repositoryHelper, null,
+                                                          mavenTools, null,
                                                           projectBuilderConfiguration );
             mavenProject.setParentFile( parentFile );
             return mavenProject;
