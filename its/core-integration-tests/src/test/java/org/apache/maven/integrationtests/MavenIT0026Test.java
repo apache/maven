@@ -13,7 +13,7 @@ public class MavenIT0026Test
     public MavenIT0026Test()
         throws InvalidVersionSpecificationException
     {
-        super( "[,2.1.99)" );
+        super( "[,2.99.99)" );
     }
 
     /**

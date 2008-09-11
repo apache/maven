@@ -29,7 +29,7 @@ public class MavenITmng3652UserAgentHeader
     public MavenITmng3652UserAgentHeader()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.9,2.1.99)" );
+        super( "(2.0.9,2.99.99)" );
     }
 
     public void setUp()

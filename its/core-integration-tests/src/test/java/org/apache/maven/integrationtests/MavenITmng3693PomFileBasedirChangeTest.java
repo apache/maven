@@ -22,7 +22,7 @@ public class MavenITmng3693PomFileBasedirChangeTest
     public MavenITmng3693PomFileBasedirChangeTest()
         throws InvalidVersionSpecificationException
     {
-        super( "[,2.1.99)" );
+        super( "[,2.99.99)" );
     }
 
     public void testitMNG3693 ()

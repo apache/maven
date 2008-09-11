@@ -15,7 +15,7 @@ public class MavenITmng3220ImportScopeTest
     public MavenITmng3220ImportScopeTest()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.8,2.1.99)" );
+        super( "(2.0.8,2.99.99)" );
     }
 
     public void testitMNG3220a()

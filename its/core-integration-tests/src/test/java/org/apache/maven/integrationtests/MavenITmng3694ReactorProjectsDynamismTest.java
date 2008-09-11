@@ -21,7 +21,7 @@ public class MavenITmng3694ReactorProjectsDynamismTest
     public MavenITmng3694ReactorProjectsDynamismTest()
         throws InvalidVersionSpecificationException
     {
-        super( "[,2.1.99)" );
+        super( "[,2.99.99)" );
     }
 
     public void testitMNG3694 ()
