@@ -9,12 +9,12 @@ import java.io.File;
 public class MavenITmng3475BaseAlignedDir
     extends AbstractMavenIntegrationTestCase
 {
-	
-	public MavenITmng3475BaseAlignedDir()
-		throws InvalidVersionSpecificationException
-	{
-		super( "(2.0.9,)");
-	}
+    
+    public MavenITmng3475BaseAlignedDir()
+        throws InvalidVersionSpecificationException
+    {
+        super( "(2.0.99,)"); // 2.1.0+ only
+    }
 
     public void testitMNG3475()
         throws Exception

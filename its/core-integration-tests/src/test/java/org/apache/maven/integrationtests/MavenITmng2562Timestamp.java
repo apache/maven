@@ -7,12 +7,12 @@ import org.apache.maven.it.Verifier;
 import java.io.File;
 
 public class MavenITmng2562Timestamp extends AbstractMavenIntegrationTestCase {
-	
-	public MavenITmng2562Timestamp()
-		throws InvalidVersionSpecificationException
-	{
-		super( "(2.0.9,)");
-	}
+    
+    public MavenITmng2562Timestamp()
+        throws InvalidVersionSpecificationException
+    {
+        super( "(2.0.99,)"); // 2.1.0+ only
+    }
 
     public void testitMNG2562() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(),

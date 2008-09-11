@@ -7,12 +7,12 @@ import org.apache.maven.it.Verifier;
 import java.io.File;
 
 public class MavenITmng3536AppendedAbsolutePaths extends AbstractMavenIntegrationTestCase {
-	
-	public MavenITmng3536AppendedAbsolutePaths()
-		throws InvalidVersionSpecificationException
-	{
-		super( "(2.0.9,)");
-	}
+    
+    public MavenITmng3536AppendedAbsolutePaths()
+        throws InvalidVersionSpecificationException
+    {
+        super( "(2.0.99,)"); // 2.1.0+ only
+    }
 
     public void testitMNG3536() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
