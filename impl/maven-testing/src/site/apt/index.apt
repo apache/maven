@@ -23,7 +23,7 @@
 ~~ specific language governing permissions and limitations
 ~~ under the License.
 
-Maven Plugin Testing Mechanism
+Maven Plugin Testing Harness
 
  The Maven Plugin Testing Harness provides mechanisms to manage tests on Mojos, i.e. by pre-constructing the
  {{{http://plexus.codehaus.org}Plexus}} components, providing stub objects for Maven functionality such as projects,
