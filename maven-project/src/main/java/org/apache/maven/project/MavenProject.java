@@ -54,6 +54,7 @@ import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
@@ -62,6 +63,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1842,6 +1844,14 @@ public class MavenProject
 
         return sb.toString();
     }
+
+    public void writeModel( Writer writer )
+           throws IOException
+    {
+        MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+        pomWriter.write( writer, getModel() );
+    }
+
 
     /**
      * @throws CloneNotSupportedException
