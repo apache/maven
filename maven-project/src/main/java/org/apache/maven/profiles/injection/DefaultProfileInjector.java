@@ -19,21 +19,7 @@ package org.apache.maven.profiles.injection;
  * under the License.
  */
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.ConfigurationContainer;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginContainer;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
-import org.apache.maven.model.Reporting;
+import org.apache.maven.model.*;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -120,8 +106,8 @@ public class DefaultProfileInjector
             }
 
             ModelUtils.mergeFilterLists( modelBuild.getFilters(), profileBuild.getFilters() );
-            ModelUtils.mergeResourceLists( modelBuild.getResources(), profileBuild.getResources() );
-            ModelUtils.mergeResourceLists( modelBuild.getTestResources(), profileBuild.getTestResources() );
+            mergeResourceLists( modelBuild.getResources(), profileBuild.getResources() );
+            mergeResourceLists( modelBuild.getTestResources(), profileBuild.getTestResources() );
 
             injectPlugins( profileBuild, modelBuild );
 
@@ -619,4 +605,15 @@ public class DefaultProfileInjector
         return new ArrayList( depsMap.values() );
     }
 
+    private static void mergeResourceLists( List childResources, List parentResources )
+    {
+        for ( Iterator i = parentResources.iterator(); i.hasNext(); )
+        {
+            Resource r = (Resource) i.next();
+            if ( !childResources.contains( r ) )
+            {
+                childResources.add( r );
+            }
+        }
+    }
 }

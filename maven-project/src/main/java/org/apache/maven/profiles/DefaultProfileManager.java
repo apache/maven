@@ -22,11 +22,11 @@ package org.apache.maven.profiles;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.Parent;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
-import org.apache.maven.project.ModelUtils;
 import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.apache.maven.realm.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
@@ -197,8 +197,8 @@ public class DefaultProfileManager
 
         if ( ( model != null ) && ( realmManager != null ) )
         {
-            projectRealm = realmManager.getProjectRealm( ModelUtils.getGroupId( model ), model.getArtifactId(),
-                                                         ModelUtils.getVersion( model ) );
+            projectRealm = realmManager.getProjectRealm( getGroupId( model ), model.getArtifactId(),
+                                                         getVersion( model ) );
             oldLookupRealm = container.setLookupRealm( projectRealm );
         }
 
@@ -361,5 +361,31 @@ public class DefaultProfileManager
     public List getIdsActivatedByDefault()
     {
         return profileActivationContext.getActiveByDefaultProfileIds();
+    }
+
+    private static String getVersion( Model model )
+    {
+        Parent parent = model.getParent();
+
+        String version = model.getVersion();
+        if ( ( parent != null ) && ( version == null ) )
+        {
+            version = parent.getVersion();
+        }
+
+        return version;
+    }
+
+    public static String getGroupId( Model model )
+    {
+        Parent parent = model.getParent();
+
+        String groupId = model.getGroupId();
+        if ( ( parent != null ) && ( groupId == null ) )
+        {
+            groupId = parent.getGroupId();
+        }
+
+        return groupId;
     }
 }

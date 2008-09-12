@@ -19,19 +19,7 @@ package org.apache.maven.project.inheritance;
  * under the License.
  */
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.DeploymentRepository;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
-import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Resource;
-import org.apache.maven.model.Scm;
-import org.apache.maven.model.Site;
+import org.apache.maven.model.*;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -89,7 +77,7 @@ public class DefaultModelInheritanceAssembler
         }
 
         // Extensions are accumlated
-        ModelUtils.mergeExtensionLists( childBuild, parentBuild );
+        mergeExtensionLists( childBuild, parentBuild );
 
         if ( childBuild.getDirectory() == null )
         {
@@ -745,4 +733,15 @@ public class DefaultModelInheritanceAssembler
         return cleanedPath.toString();
     }
 
+    private static void mergeExtensionLists( Build childBuild, Build parentBuild )
+    {
+        for ( Iterator i = parentBuild.getExtensions().iterator(); i.hasNext(); )
+        {
+            Extension e = (Extension) i.next();
+            if ( !childBuild.getExtensions().contains( e ) )
+            {
+                childBuild.addExtension( e );
+            }
+        }
+    }
 }

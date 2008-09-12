@@ -59,6 +59,8 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
+import org.apache.maven.project.inheritance.DefaultModelInheritanceAssembler;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -359,8 +361,8 @@ public class MavenProject
 
         if ( project.isConcrete() )
         {
-            setDynamicBuild( ModelUtils.cloneBuild( project.getDynamicBuild() ) );
-            setOriginalInterpolatedBuild( ModelUtils.cloneBuild( project.getOriginalInterpolatedBuild() ) );
+            setDynamicBuild( cloneBuild( project.getDynamicBuild() ) );
+            setOriginalInterpolatedBuild( cloneBuild( project.getOriginalInterpolatedBuild() ) );
 
             List dynamicRoots = project.getDynamicCompileSourceRoots();
             if ( dynamicRoots != null )
@@ -2318,4 +2320,14 @@ public class MavenProject
         this.originalInterpolatedScriptSourceRoots = originalInterpolatedScriptSourceRoots;
     }
 
+    private static Build cloneBuild( Build build )
+    {
+        ModelInheritanceAssembler assembler = new DefaultModelInheritanceAssembler();
+
+        Build clone = new Build();
+
+        assembler.assembleBuildInheritance( clone, build, false );
+
+        return clone;
+    }
 }
