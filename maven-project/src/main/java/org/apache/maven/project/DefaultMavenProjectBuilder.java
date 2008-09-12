@@ -70,39 +70,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/*:apt
-
- -----
- POM lifecycle
- -----
-
-POM Lifecycle
-
- Order of operations when building a POM
-
- * inheritance
- * path translation
- * interpolation
- * defaults injection
-
- Current processing is:
-
- * inheritance
- * interpolation
- * defaults injection
- * path translation
-
- I'm not sure how this is working at all ... i think i have a case where this is failing but i need to
- encapsulate as a test so i can fix it. Also need to think of the in working build directory versus looking
- things up from the repository i.e buildFromSource vs buildFromRepository.
-
-Notes
-
- * when the model is read it may not have a groupId, as it must be inherited
-
- * the inheritance assembler must use models that are unadulterated!
-
-*/
 
 /**
  * @version $Id$

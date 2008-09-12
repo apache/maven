@@ -517,19 +517,9 @@ public class DefaultPluginManager
             getLogger().warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
         }
 
-        if ( !project.isConcrete() )
-        {
-            Model model = ModelUtils.cloneModel( project.getModel() );
-
-            File basedir = project.getBasedir();
-
-            Model model2 = ModelUtils.cloneModel( model );
-            pathTranslator.alignToBaseDirectory( model, basedir );
-            project.preserveBuild( model2.getBuild() );
-
-            project.setBuild( model.getBuild() );
-            project.setConcrete( true );
-        }
+        Model model = ModelUtils.cloneModel( project.getModel() );
+        pathTranslator.alignToBaseDirectory( model, project.getBasedir() );
+        project.setBuild( model.getBuild() );
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
@@ -738,8 +728,6 @@ public class DefaultPluginManager
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
         }
-
-        project.setConcrete( false );
     }
 
     private Plugin createDummyPlugin( PluginDescriptor pluginDescriptor )
