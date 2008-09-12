@@ -13,6 +13,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.it.util.StringUtils;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
@@ -26,6 +27,15 @@ public class MavenITmng3599useHttpProxyForWebDAV
     private Server server;
 
     private int port;
+
+    private static final String content = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                            "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n" +
+                            "  <modelVersion>4.0.0</modelVersion>\n" +
+                            "  <groupId>org.apache.maven.plugin.site.test10</groupId>\n" +
+                            "  <artifactId>site-plugin-test10</artifactId>\n" +
+                            "  <version>1.0-SNAPSHOT</version>\n" +
+                            "  <name>Maven Site Plugin Test10</name>\n" +
+                            "</project>";
 
     public void setUp()
         throws Exception
@@ -44,7 +54,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
                 if ( request.getHeader( "Proxy-Connection" ) != null )
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
-                    response.getWriter().println( "some content" );
+                    response.getWriter().println( content );
                     
                     System.out.println( "Proxy-Connection found." );
                 }
@@ -106,7 +116,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                         "some content" + LS );
+                                         content + LS );
     }
 
     /**
@@ -147,7 +157,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
 
             verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
             verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                             "some content" + LS );
+                                             content + LS );
         }
         else
         {
