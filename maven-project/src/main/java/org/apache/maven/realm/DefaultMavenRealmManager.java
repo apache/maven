@@ -24,6 +24,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -246,14 +247,27 @@ public class DefaultMavenRealmManager
 
         logger.debug( "Retrieving realm for plugin with id: " + id );
 
+        ClassRealm pluginRealm = null;
+
         try
         {
-            return world.getRealm( id );
+            pluginRealm = world.getRealm( id );
+
+            //MNG-3012
+            String parentRealmId = container.getContainerRealm().getId();
+            pluginRealm.importFrom( parentRealmId, Xpp3Dom.class.getName() );
+            pluginRealm.importFrom( parentRealmId, "org.codehaus.plexus.util.xml.pull" );
+
         }
         catch ( NoSuchRealmException e )
         {
-            return null;
+
         }
+        finally
+        {
+            return pluginRealm;
+        }
+
     }
 
     public void disposePluginRealm( Plugin plugin )
