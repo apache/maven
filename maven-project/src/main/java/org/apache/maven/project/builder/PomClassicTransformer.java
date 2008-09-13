@@ -132,18 +132,7 @@ public final class PomClassicTransformer
             throw new IllegalArgumentException( "properties: null" );
         }
 
-        List<ModelProperty> props = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : properties )
-        { //TODO: Resolved values
-            if ( mp.getResolvedValue() != null && ( mp.getResolvedValue().contains( "=" ) || mp.getResolvedValue().contains( "<" ) ) )
-            {
-                props.add( new ModelProperty( mp.getUri(), "<![CDATA[" + mp.getResolvedValue() + "]]>" ) );
-            }
-            else
-            {
-                props.add( mp );
-            }
-        }
+        List<ModelProperty> props = new ArrayList<ModelProperty>( properties );
 
         //dependency management
         ModelDataSource source = new DefaultModelDataSource();
@@ -496,6 +485,7 @@ public final class PomClassicTransformer
         }
 
         interpolateModelProperties( modelProperties, interpolatorProperties, ((PomClassicDomainModel) domainModels.get(0)) );
+        
         return modelProperties;
     }
 

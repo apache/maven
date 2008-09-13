@@ -124,12 +124,17 @@ public final class ModelProperty
     }
 
     /**
-     * Value of this model property after interpolation.
+     * Value of this model property after interpolation. CDATA section will be added if needed.
      *
      * @return value of this model property after interpolation
      */
     public String getResolvedValue()
     {
+        if( resolvedValue != null && !resolvedValue.startsWith ("<![CDATA[")
+                && (resolvedValue.contains( "=" ) || resolvedValue.contains( "<" )))
+        {
+            resolvedValue =  "<![CDATA[" + resolvedValue + "]]>";
+        }
         return resolvedValue;
     }
 
