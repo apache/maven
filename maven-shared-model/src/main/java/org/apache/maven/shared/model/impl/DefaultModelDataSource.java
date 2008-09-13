@@ -347,7 +347,7 @@ public final class DefaultModelDataSource
         for ( ModelProperty mp : m )
         {
             String x = mp.getUri();
-            if ( x.endsWith( "#property/combine.children" ) && mp.getValue().equals( "append" ) )
+            if ( x.endsWith( "#property/combine.children" ) && mp.getResolvedValue().equals( "append" ) )
             {
                 combineChildrenUris.add( x.substring( 0, x.length() - 26 ) );
             }

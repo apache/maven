@@ -1,5 +1,7 @@
 package org.apache.maven.shared.model;
 
+import java.util.*;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -33,6 +35,7 @@ public final class InterpolatorProperty
      * The value of the property
      */
     private final String value;
+
 
     /**
      * Constructor
@@ -112,4 +115,24 @@ public final class InterpolatorProperty
         return key.hashCode();
     }
 
+    public String toString()
+    {
+        return "Key = " + key + ", Value = " + value +  ", Hash = " +
+            this.hashCode();
+    }
+
+    public static List<InterpolatorProperty> toInterpolatorProperties( Properties properties )
+    {
+        if( properties == null )
+        {
+            throw new IllegalArgumentException( "properties: null" );
+        }
+
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        for ( Map.Entry<Object, Object> e : properties.entrySet() )
+        {
+            interpolatorProperties.add( new InterpolatorProperty( (String) e.getKey(), (String) e.getValue()) );
+        }
+        return interpolatorProperties;
+    }
 }

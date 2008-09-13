@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.ArtifactFilterManager;
+import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -58,10 +59,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ModelUtils;
+import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
-import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
@@ -142,8 +142,6 @@ public class DefaultPluginManager
     protected RuntimeInformation runtimeInformation;
 
     protected MavenProjectBuilder mavenProjectBuilder;
-
-    protected ModelInterpolator modelInterpolator;
 
     protected PluginMappingManager pluginMappingManager;
 
@@ -560,22 +558,12 @@ public class DefaultPluginManager
         {
             try
             {
-                String interpolatedDom = modelInterpolator.interpolate( String.valueOf( dom ),
-                                                                        project.getModel(),
-                                                                        project.getBasedir(),
-                                                                        session.getProjectBuilderConfiguration(),
-                                                                        getLogger().isDebugEnabled() );
-
+                List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getExecutionProperties()));
+                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties()));
+                String interpolatedDom  =
+                        PomClassicTransformer.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
                 dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
-            }
-            catch ( ModelInterpolationException e )
-            {
-                throw new PluginManagerException(
-                                                  mojoDescriptor,
-                                                  project,
-                                                  "Failed to calculate concrete state for configuration of: "
-                                                                  + mojoDescriptor.getHumanReadableKey(),
-                                                  e );
             }
             catch ( XmlPullParserException e )
             {

@@ -20,7 +20,6 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -68,20 +67,6 @@ public class InvalidProjectModelException
         this( projectId, message, new File( pomLocation ) );
     }
 
-    /**
-     * @deprecated use {@link File} constructor for pomLocation
-     */
-    public InvalidProjectModelException( String projectId, String pomLocation, String message,
-                                         ModelInterpolationException cause )
-    {
-        this( projectId, message, new File( pomLocation ), cause );
-    }
-
-    public InvalidProjectModelException( String projectId, String message, File pomLocation,
-                                         ModelInterpolationException cause )
-    {
-        super( projectId, message, pomLocation, cause );
-    }
 
     /**
      * @deprecated use {@link File} constructor for pomLocation

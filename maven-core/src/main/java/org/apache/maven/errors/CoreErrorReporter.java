@@ -14,6 +14,7 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.extension.ExtensionManagerException;
+import org.apache.maven.extension.ModelInterpolationException;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
@@ -37,7 +38,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.errors.ProjectErrorReporter;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.reactor.MissingModuleException;

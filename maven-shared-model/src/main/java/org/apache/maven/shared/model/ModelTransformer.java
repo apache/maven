@@ -49,7 +49,8 @@ public interface ModelTransformer
      * @param domainModels list of domain models to transform to a list of model properties. List may not be null.
      * @return list of model properties
      */
-    List<ModelProperty> transformToModelProperties( List<DomainModel> domainModels )
+    List<ModelProperty> transformToModelProperties( List<DomainModel> domainModels,
+                                                    List<InterpolatorProperty> interpolatorProperties)
         throws IOException;
 
 }

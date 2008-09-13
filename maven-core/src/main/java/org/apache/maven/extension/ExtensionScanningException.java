@@ -4,7 +4,7 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.apache.maven.extension.ModelInterpolationException;
 
 import java.io.File;
 import java.io.IOException;

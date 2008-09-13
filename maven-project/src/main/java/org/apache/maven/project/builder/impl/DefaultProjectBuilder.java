@@ -139,6 +139,8 @@ public final class DefaultProjectBuilder
         }
 
         PomClassicDomainModel domainModel = new PomClassicDomainModel( pom );
+        domainModel.setProjectDirectory( projectDirectory );
+
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
         domainModels.add( domainModel );
 
@@ -160,9 +162,6 @@ public final class DefaultProjectBuilder
                 PomClassicDomainModel dm = (PomClassicDomainModel) mavenParents.get( 0 );
                 parentFile = dm.getFile();
                 domainModel.setParentFile( parentFile );
-                // mavenParent = buildFromLocalPath( dm.getInputStream(), inheritedModels,
-                //        importModels, interpolatorProperties, resolver, projectDirectory);
-                // mavenParent.setFile(dm.getFile());
             }
 
             domainModels.addAll( mavenParents );
@@ -182,7 +181,6 @@ public final class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 importModels,
                                                                                                 properties ) );
-        // System.out.println(transformedDomainModel.asString());
         try
         {
             MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), artifactFactory,
@@ -305,6 +303,8 @@ public final class DefaultProjectBuilder
         }
 
         PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( parentFile );
+        parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
+
         if ( !parentDomainModel.matchesParent( domainModel.getModel().getParent() ) )
         {
             logger.warn( "Parent pom ids do not match: Parent File = " + parentFile.getAbsolutePath() +

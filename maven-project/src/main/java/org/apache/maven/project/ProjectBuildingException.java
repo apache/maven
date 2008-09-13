@@ -6,7 +6,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -251,30 +250,6 @@ public class ProjectBuildingException
         pomFile = new File( pomLocation );
     }
 
-    protected ProjectBuildingException( String projectId, String message, File pomFile,
-                                        ModelInterpolationException cause )
-    {
-        super( message, cause );
-        this.projectId = projectId;
-        this.pomFile = pomFile;
-    }
-
-    /**
-     * @deprecated use {@link File} constructor for pomLocation
-     */
-    protected ProjectBuildingException( String projectId, String message, String pomLocation,
-                                        ModelInterpolationException cause )
-    {
-        super( message, cause );
-        this.projectId = projectId;
-        pomFile = new File( pomLocation );
-    }
-
-    public ProjectBuildingException( String projectId, String message, ModelInterpolationException cause )
-    {
-        super( message, cause );
-        this.projectId = projectId;
-    }
 
     public File getPomFile()
     {

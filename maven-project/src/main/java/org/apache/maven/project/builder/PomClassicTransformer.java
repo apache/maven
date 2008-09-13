@@ -20,18 +20,15 @@ package org.apache.maven.project.builder;
  */
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.shared.model.DomainModel;
-import org.apache.maven.shared.model.ModelContainer;
-import org.apache.maven.shared.model.ModelContainerAction;
-import org.apache.maven.shared.model.ModelDataSource;
-import org.apache.maven.shared.model.ModelMarshaller;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.ModelTransformer;
+import org.apache.maven.model.Model;
+import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -138,9 +135,9 @@ public final class PomClassicTransformer
         List<ModelProperty> props = new ArrayList<ModelProperty>();
         for ( ModelProperty mp : properties )
         { //TODO: Resolved values
-            if ( mp.getValue() != null && ( mp.getValue().contains( "=" ) || mp.getValue().contains( "<" ) ) )
+            if ( mp.getResolvedValue() != null && ( mp.getResolvedValue().contains( "=" ) || mp.getResolvedValue().contains( "<" ) ) )
             {
-                props.add( new ModelProperty( mp.getUri(), "<![CDATA[" + mp.getValue() + "]]>" ) );
+                props.add( new ModelProperty( mp.getUri(), "<![CDATA[" + mp.getResolvedValue() + "]]>" ) );
             }
             else
             {
@@ -257,9 +254,10 @@ public final class PomClassicTransformer
     }
 
     /**
-     * @see ModelTransformer#transformToModelProperties(java.util.List)
+     * @see ModelTransformer#transformToModelProperties(java.util.List, java.util.List)
      */
-    public List<ModelProperty> transformToModelProperties( List<DomainModel> domainModels )
+    public List<ModelProperty> transformToModelProperties( List<DomainModel> domainModels, 
+                                                           List<InterpolatorProperty> interpolatorProperties)
         throws IOException
     {
         if ( domainModels == null || domainModels.isEmpty() )
@@ -303,7 +301,7 @@ public final class PomClassicTransformer
                 ModelProperty parentVersion = getPropertyFor( ProjectUri.Parent.version, tmp );
                 if ( parentVersion != null )
                 {
-                    tmp.add( new ModelProperty( ProjectUri.version, parentVersion.getValue() ) );
+                    tmp.add( new ModelProperty( ProjectUri.version, parentVersion.getResolvedValue() ) );
                 }
             }
 
@@ -324,7 +322,7 @@ public final class PomClassicTransformer
                 ModelProperty parentGroupId = getPropertyFor( ProjectUri.Parent.groupId, tmp );
                 if ( parentGroupId != null )
                 {
-                    tmp.add( new ModelProperty( ProjectUri.groupId, parentGroupId.getValue() ) );
+                    tmp.add( new ModelProperty( ProjectUri.groupId, parentGroupId.getResolvedValue() ) );
                 }
 
             }
@@ -342,7 +340,7 @@ public final class PomClassicTransformer
                     for ( ModelProperty mp : container.getProperties() )
                     {
                         if ( mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.Executions.Execution.inherited ) &&
-                            mp.getValue() != null && mp.getValue().equals( "false" ) )
+                            mp.getResolvedValue() != null && mp.getResolvedValue().equals( "false" ) )
                         {
                             removeProperties.addAll( container.getProperties() );
                             for ( int j = tmp.indexOf( mp ); j >= 0; j-- )
@@ -370,8 +368,8 @@ public final class PomClassicTransformer
                 {
                     for ( ModelProperty mp : container.getProperties() )
                     {
-                        if ( mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.inherited ) && mp.getValue() != null &&
-                            mp.getValue().equals( "false" ) )
+                        if ( mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.inherited ) && mp.getResolvedValue() != null &&
+                            mp.getResolvedValue().equals( "false" ) )
                         {
                             removeProperties.addAll( container.getProperties() );
                             for ( int j = tmp.indexOf( mp ); j >= 0; j-- )
@@ -393,7 +391,7 @@ public final class PomClassicTransformer
             ModelProperty scmUrlProperty = getPropertyFor( ProjectUri.Scm.url, tmp );
             if ( scmUrl.length() == 0 && scmUrlProperty != null )
             {
-                scmUrl.append( scmUrlProperty.getValue() );
+                scmUrl.append( scmUrlProperty.getResolvedValue() );
                 for ( String projectName : projectNames )
                 {
                     scmUrl.append( "/" ).append( projectName );
@@ -407,7 +405,7 @@ public final class PomClassicTransformer
             scmUrlProperty = getPropertyFor( ProjectUri.Scm.connection, tmp );
             if ( scmConnectionUrl.length() == 0 && scmUrlProperty != null )
             {
-                scmConnectionUrl.append( scmUrlProperty.getValue() );
+                scmConnectionUrl.append( scmUrlProperty.getResolvedValue() );
                 for ( String projectName : projectNames )
                 {
                     scmConnectionUrl.append( "/" ).append( projectName );
@@ -420,7 +418,7 @@ public final class PomClassicTransformer
             scmUrlProperty = getPropertyFor( ProjectUri.Scm.developerConnection, tmp );
             if ( scmDeveloperUrl.length() == 0 && scmUrlProperty != null )
             {
-                scmDeveloperUrl.append( scmUrlProperty.getValue() );
+                scmDeveloperUrl.append( scmUrlProperty.getResolvedValue() );
                 for ( String projectName : projectNames )
                 {
                     scmDeveloperUrl.append( "/" ).append( projectName );
@@ -489,29 +487,95 @@ public final class PomClassicTransformer
             ModelProperty artifactId = getPropertyFor( ProjectUri.artifactId, tmp );
             if ( artifactId != null )
             {
-                projectNames.add( 0, artifactId.getValue() );
+                projectNames.add( 0, artifactId.getResolvedValue() );
             }
 
             tmp.removeAll( clearedProperties );
             modelProperties.addAll( tmp );
             modelProperties.removeAll( clearedProperties );
-
-            if ( domainModels.indexOf( domainModel ) == 0 )
-            {
-                //cache.put( pomDomainModel.getId(), modelProperties );
-            }
-
-            //Remove Parent Info
-            /*
-            for (ModelProperty mp : tmp) {
-                if (mp.getUri().startsWith(ProjectUri.Parent.xUri)) {
-                    modelProperties.remove(mp);
-                }
-            }
-                       */
         }
 
+        interpolateModelProperties( modelProperties, interpolatorProperties, ((PomClassicDomainModel) domainModels.get(0)) );
         return modelProperties;
+    }
+
+    public static String interpolateXmlString( String xml, List<InterpolatorProperty> interpolatorProperties )
+            throws IOException
+    {
+        List<ModelProperty> modelProperties =
+            ModelMarshaller.marshallXmlToModelProperties( new ByteArrayInputStream(xml.getBytes()), ProjectUri.baseUri, uris );
+
+        Map<String, String> aliases = new HashMap<String, String>();
+        aliases.put( "project.", "pom.");
+
+        List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>(interpolatorProperties);
+        ips.addAll(ModelTransformerContext.createInterpolatorProperties(modelProperties, ProjectUri.baseUri, aliases,
+                        false, false));
+
+        for(ModelProperty mp : modelProperties)
+        {
+            if(mp.getUri().startsWith(ProjectUri.properties) && mp.getValue() != null )
+            {
+                String uri = mp.getUri();
+                ips.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1,
+                        uri.length() ) + "}", mp.getValue() ) );
+            }
+        }
+
+        ModelTransformerContext.interpolateModelProperties( modelProperties, ips );
+        return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
+    }
+
+    public static String interpolateModelAsString(Model model, List<InterpolatorProperty> interpolatorProperties, File projectDirectory)
+            throws IOException
+    {
+        PomClassicDomainModel domainModel = new PomClassicDomainModel( model );
+        domainModel.setProjectDirectory( projectDirectory );
+        List<ModelProperty> modelProperties =
+                ModelMarshaller.marshallXmlToModelProperties( domainModel.getInputStream(), ProjectUri.baseUri, uris );
+        interpolateModelProperties( modelProperties, interpolatorProperties, domainModel);
+
+        return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
+    }
+
+    public static Model interpolateModel(Model model, List<InterpolatorProperty> interpolatorProperties, File projectDirectory)
+        throws IOException
+    {
+        String pomXml = interpolateModelAsString( model, interpolatorProperties, projectDirectory );
+        PomClassicDomainModel domainModel = new PomClassicDomainModel( new ByteArrayInputStream( pomXml.getBytes() ));
+        return domainModel.getModel();
+    }
+
+    private static void interpolateModelProperties(List<ModelProperty> modelProperties,
+                                                   List<InterpolatorProperty> interpolatorProperties,
+                                                   PomClassicDomainModel domainModel)
+    {
+        Map<String, String> aliases = new HashMap<String, String>();
+        aliases.put( "project.", "pom.");
+
+        List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>(interpolatorProperties);
+        ips.addAll(ModelTransformerContext.createInterpolatorProperties(modelProperties, ProjectUri.baseUri, aliases,
+                        false, false));
+
+        if(domainModel.isPomInBuild())
+        {
+            ips.add(new InterpolatorProperty("${project.basedir}", domainModel.getProjectDirectory().getAbsolutePath()));
+            ips.add(new InterpolatorProperty("${basedir}", domainModel.getProjectDirectory().getAbsolutePath()));
+            ips.add(new InterpolatorProperty("${pom.basedir}", domainModel.getProjectDirectory().getAbsolutePath()));
+
+        }
+
+        for(ModelProperty mp : modelProperties)
+        {
+            if(mp.getUri().startsWith(ProjectUri.properties) && mp.getValue() != null )
+            {
+                String uri = mp.getUri();
+                ips.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1,
+                        uri.length() ) + "}", mp.getValue() ) );
+            }
+        }
+
+        ModelTransformerContext.interpolateModelProperties( modelProperties, ips );
     }
 
     private static boolean hasExecutionId( ModelContainer executionContainer )
@@ -596,7 +660,7 @@ public final class PomClassicTransformer
             if ( mp.getUri().startsWith( ProjectUri.DependencyManagement.xUri ) )
             {
                 transformedProperties.add( new ModelProperty(
-                    mp.getUri().replace( ProjectUri.DependencyManagement.xUri, ProjectUri.xUri ), mp.getValue() ) );
+                    mp.getUri().replace( ProjectUri.DependencyManagement.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
             }
         }
         return transformedProperties;
@@ -611,7 +675,7 @@ public final class PomClassicTransformer
             {
                 transformedProperties.add( new ModelProperty(
                     mp.getUri().replace( ProjectUri.Build.PluginManagement.xUri, ProjectUri.Build.xUri ),
-                    mp.getValue() ) );
+                    mp.getResolvedValue() ) );
             }
         }
         return transformedProperties;

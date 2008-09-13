@@ -28,9 +28,6 @@ under the License.
           <role>org.apache.maven.extension.ExtensionManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.extension.lineage.ModelLineageBuilder</role>
           <role-hint>default</role-hint>
         </requirement>

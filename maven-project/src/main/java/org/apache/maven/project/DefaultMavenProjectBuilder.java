@@ -20,6 +20,7 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.MavenTools;
+import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -43,8 +44,6 @@ import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.ProjectBuilder;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
-import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.project.workspace.ProjectWorkspace;
@@ -89,8 +88,6 @@ public class DefaultMavenProjectBuilder
 
     // TODO: make it a component
     private MavenXpp3Reader modelReader;
-
-    private ModelInterpolator modelInterpolator;
 
     private ProfileAdvisor profileAdvisor;
 
@@ -273,7 +270,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project = interpolateModel( project.getModel(), null, null, config );
+            project = constructMavenProjectFromModel( project.getModel(), null, null, config );
             project.setActiveProfiles( activeProfiles );
             project.setRemoteArtifactRepositories(
                 mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
@@ -284,11 +281,6 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID,
                                                 "Maven super-POM contains an invalid repository!", e );
-        }
-        catch ( ModelInterpolationException e )
-        {
-            throw new ProjectBuildingException( STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID,
-                                                "Maven super-POM contains an invalid expressions!", e );
         }
 
         project.setExecutionRoot( true );
@@ -393,11 +385,7 @@ public class DefaultMavenProjectBuilder
         MavenProject project;
         try
         {
-            project = interpolateModel( model, projectDescriptor, parentDescriptor, config );
-        }
-        catch ( ModelInterpolationException e )
-        {
-            throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
+            project = constructMavenProjectFromModel( model, projectDescriptor, parentDescriptor, config );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -417,19 +405,11 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private MavenProject interpolateModel( Model model, File pomFile, File parentFile,
+    private MavenProject constructMavenProjectFromModel( Model model, File pomFile, File parentFile,
                                                            ProjectBuilderConfiguration config )
-        throws ProjectBuildingException, ModelInterpolationException, InvalidRepositoryException
+            throws ProjectBuildingException, InvalidRepositoryException
     {
-        File projectDir = null;
-        if ( pomFile != null )
-        {
-            projectDir = pomFile.getAbsoluteFile().getParentFile();
-        }
 
-        model = modelInterpolator.interpolate( model, projectDir, config, getLogger().isDebugEnabled() );
-
-        // We will return a different project object using the new model (hence the need to return a project, not just modify the parameter)
         MavenProject project = new MavenProject( model, artifactFactory, mavenTools, this, config );
 
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
@@ -551,11 +531,15 @@ public class DefaultMavenProjectBuilder
             throw new IllegalArgumentException( "projectBuilder: not initialized" );
         }
 
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties()));
+        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties()));
+
         MavenProject mavenProject;
         try
         {
             mavenProject = projectBuilder.buildFromLocalPath( new FileInputStream( projectDescriptor ), Arrays.asList(
-                getSuperProject( config, projectDescriptor, true ).getModel() ), null, null, resolver,
+                getSuperProject( config, projectDescriptor, true ).getModel() ), null, interpolatorProperties, resolver,
                                                                                  projectDescriptor.getParentFile(),
                                                                                  config );
         }

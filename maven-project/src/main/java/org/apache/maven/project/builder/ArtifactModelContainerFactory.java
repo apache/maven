@@ -95,19 +95,19 @@ public final class ArtifactModelContainerFactory
             {
                 if ( version == null && mp.getUri().equals( uri + "/version" ) )
                 {
-                    this.version = mp.getValue();
+                    this.version = mp.getResolvedValue();
                 }
                 else if ( artifactId == null && mp.getUri().equals( uri + "/artifactId" ) )
                 {
-                    this.artifactId = mp.getValue();
+                    this.artifactId = mp.getResolvedValue();
                 }
                 else if ( groupId == null && mp.getUri().equals( uri + "/groupId" ) )
                 {
-                    this.groupId = mp.getValue();
+                    this.groupId = mp.getResolvedValue();
                 }
                 else if ( mp.getUri().equals( ProjectUri.Dependencies.Dependency.type ) && type == null )
                 {
-                    this.type = mp.getValue();
+                    this.type = mp.getResolvedValue();
                 }
             }
             if ( groupId == null )

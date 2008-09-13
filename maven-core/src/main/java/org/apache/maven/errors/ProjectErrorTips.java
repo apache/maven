@@ -11,7 +11,7 @@ import org.apache.maven.profiles.activation.ProfileActivator;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.apache.maven.extension.ModelInterpolationException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;

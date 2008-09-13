@@ -24,9 +24,6 @@ under the License.
       <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.project.validation.ModelValidator</role>
         </requirement>
         <requirement>

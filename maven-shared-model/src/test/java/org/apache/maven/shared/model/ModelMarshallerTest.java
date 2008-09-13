@@ -95,7 +95,7 @@ public class ModelMarshallerTest
         assertEquals( 2, modelProperties.size() );
         assertEquals( "http://apache.org/maven/project", modelProperties.get( 0 ).getUri() );
         assertEquals( "http://apache.org/maven/project/version", modelProperties.get( 1 ).getUri() );
-        assertEquals( "1.1", modelProperties.get( 1 ).getValue() );
+        assertEquals( "1.1", modelProperties.get( 1 ).getResolvedValue() );
     }
 
     /*

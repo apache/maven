@@ -1,4 +1,4 @@
-package org.apache.maven.project.interpolation;
+package org.apache.maven.extension;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

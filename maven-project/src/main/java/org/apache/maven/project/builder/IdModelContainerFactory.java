@@ -70,7 +70,7 @@ public class IdModelContainerFactory
             {
                 if ( mp.getUri().endsWith( "/id" ) )
                 {
-                    this.id = mp.getValue();
+                    this.id = mp.getResolvedValue();
                 }
             }
         }

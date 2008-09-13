@@ -41,6 +41,9 @@ public final class ModelTransformerContext
     private final static List<InterpolatorProperty> systemInterpolatorProperties =
         new ArrayList<InterpolatorProperty>();
 
+    private final static List<InterpolatorProperty> environmentInterpolatorProperties =
+        new ArrayList<InterpolatorProperty>();
+
     static
     {
         for ( Map.Entry<Object, Object> e : System.getProperties().entrySet() )
@@ -51,7 +54,7 @@ public final class ModelTransformerContext
 
         for ( Map.Entry<String, String> e : System.getenv().entrySet() )
         {
-            systemInterpolatorProperties.add( new InterpolatorProperty( "${env." + e.getKey() + "}", e.getValue() ) );
+            environmentInterpolatorProperties.add( new InterpolatorProperty( "${env." + e.getKey() + "}", e.getValue() ) );
         }
     }
 
@@ -71,6 +74,84 @@ public final class ModelTransformerContext
             this.factories = factories;
         }
     }
+
+    public static List<InterpolatorProperty> createInterpolatorProperties(List<ModelProperty> modelProperties,
+                                                                      String baseUriForModel,
+                                                                      Map<String, String> aliases,
+                                                                      boolean includeSystemProperties,
+                                                                      boolean includeEnvironmentProperties)
+    {
+        if(modelProperties == null)
+        {
+            throw new IllegalArgumentException("modelProperties: null");
+        }
+
+        if(baseUriForModel == null)
+        {
+            throw new IllegalArgumentException( "baseUriForModel: null");
+        }
+
+        List<InterpolatorProperty> interpolatorProperties
+                = new ArrayList<InterpolatorProperty>( );
+
+        if( includeSystemProperties )
+        {
+            interpolatorProperties.addAll( systemInterpolatorProperties );
+        }
+
+        if( includeEnvironmentProperties )
+        {
+            interpolatorProperties.addAll( environmentInterpolatorProperties );
+        }
+
+        for ( ModelProperty mp : modelProperties )
+        {
+            InterpolatorProperty ip = mp.asInterpolatorProperty( baseUriForModel );
+            if ( ip != null )
+            {
+                interpolatorProperties.add( ip );
+                for ( Map.Entry<String, String> a : aliases.entrySet() )
+                {
+                    interpolatorProperties.add( new InterpolatorProperty(
+                            ip.getKey().replaceAll( a.getKey(), a.getValue()),
+                            ip.getValue().replaceAll( a.getKey(), a.getValue()) ) );
+                }
+            }
+        }
+        return interpolatorProperties;
+    }
+
+    public static void interpolateModelProperties(List<ModelProperty> modelProperties, 
+                                                  List<InterpolatorProperty> interpolatorProperties )
+    {
+
+        List<ModelProperty> unresolvedProperties = new ArrayList<ModelProperty>();
+        for ( ModelProperty mp : modelProperties )
+        {
+            if ( !mp.isResolved() )
+            {
+                unresolvedProperties.add( mp );
+            }
+        }
+
+        for ( InterpolatorProperty ip : interpolatorProperties )
+        {
+            for ( ModelProperty mp : unresolvedProperties )
+            {
+                  mp.resolveWith(ip);
+            }
+        }
+
+
+        for ( InterpolatorProperty ip : interpolatorProperties )
+        {
+            for ( ModelProperty mp : unresolvedProperties )
+            {
+                  mp.resolveWith(ip);
+            }
+        }
+    }
+
 
     /**
      * Transforms the specified model properties using the specified transformers.
@@ -115,13 +196,12 @@ public final class ModelTransformerContext
      */
     public DomainModel transform(List<DomainModel> domainModels, ModelTransformer fromModelTransformer,
                                  ModelTransformer toModelTransformer,
-                                 Collection<ImportModel> importModels, Collection<InterpolatorProperty> interpolatorProperties)
+                                 Collection<ImportModel> importModels, List<InterpolatorProperty> interpolatorProperties)
         throws IOException
     {
-        List<InterpolatorProperty> properties = new ArrayList<InterpolatorProperty>( interpolatorProperties );
 
         List<ModelProperty> transformedProperties =
-                importModelProperties(importModels, fromModelTransformer.transformToModelProperties( domainModels ));
+                importModelProperties(importModels, fromModelTransformer.transformToModelProperties( domainModels, interpolatorProperties ));
 
         String baseUriForModel = fromModelTransformer.getBaseUri();
         List<ModelProperty> modelProperties =
@@ -183,38 +263,9 @@ public final class ModelTransformerContext
             }
         }
 
-        //interpolator
+
         List<ModelProperty> mps = modelDataSource.getModelProperties();
-
-        for ( ModelProperty mp : mps )
-        {
-            InterpolatorProperty ip = mp.asInterpolatorProperty( baseUriForModel );
-            if ( ip != null )
-            {
-                properties.add( ip );
-            }
-        }
-
-        List<ModelProperty> unresolvedProperties = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : mps )
-        {
-            if ( !mp.isResolved() )
-            {
-                unresolvedProperties.add( mp );
-            }
-        }
-
-        /*
-        for ( InterpolatorProperty ip : properties )
-        {
-            for ( ModelProperty mp : unresolvedProperties )
-            {
-                  mp.resolveWith(ip);
-                  System.out.println(mp);
-                 System.out.println("-------------------");
-            }
-        }
-        */
+        //interpolateModelProperties( mps, baseUriForModel );
         mps = sort( mps, baseUriForModel );
 
         try
@@ -254,7 +305,7 @@ public final class ModelTransformerContext
         for(ModelProperty mp: modelProperties) {
             if(mp.getUri().endsWith("importModel")) {
                 for(ImportModel im : importModels) {
-                    if(im.getId().equals(mp.getValue())) {
+                    if(im.getId().equals(mp.getResolvedValue())) {
                         properties.addAll(im.getModelProperties());
                     }
                 }
@@ -322,7 +373,7 @@ public final class ModelTransformerContext
         List<ModelProperty> mps = new ArrayList<ModelProperty>();
         for(ModelProperty mp : modelProperties)
         {
-            if(mp.getValue() != null && mp.getValue().trim().equals("") && isLeafNode( mp, modelProperties) )
+            if(mp.getResolvedValue() != null && mp.getResolvedValue().trim().equals("") && isLeafNode( mp, modelProperties) )
             {
                 mps.add( new ModelProperty(mp.getUri(), null) );
             }

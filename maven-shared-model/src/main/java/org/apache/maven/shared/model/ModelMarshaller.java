@@ -239,7 +239,7 @@ public final class ModelMarshaller
                 continue;
             }
 
-            //String val = (mp.getValue() != null) ? "\"" + mp.getValue() + "\"" : null;
+            //String val = (mp.getResolvedValue() != null) ? "\"" + mp.getResolvedValue() + "\"" : null;
             //   System.out.println("new ModelProperty(\"" + mp.getUri() +"\" , " + val +"),");
             if ( !uri.startsWith( baseUri ) )
             {
@@ -346,7 +346,7 @@ public final class ModelMarshaller
             {
                 sb.append( " " ).append(
                     attribute.getUri().substring( attribute.getUri().indexOf( "#property/" ) + 10 ) ).append( "=\"" )
-                    .append( attribute.getValue() ).append( "\" " );
+                    .append( attribute.getResolvedValue() ).append( "\" " );
             }
         }
         sb.append( ">" );

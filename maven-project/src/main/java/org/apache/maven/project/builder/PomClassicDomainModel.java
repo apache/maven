@@ -65,6 +65,8 @@ public final class PomClassicDomainModel
 
     private File parentFile;
 
+    private File projectDirectory;
+
     /**
      * Constructor
      *
@@ -127,6 +129,21 @@ public final class PomClassicDomainModel
     public void setParentFile( File parentFile )
     {
         this.parentFile = parentFile;
+    }
+    
+    public void setProjectDirectory(File projectDirectory)
+    {
+        this.projectDirectory = projectDirectory;
+    }
+
+    public File getProjectDirectory()
+    {
+        return projectDirectory;
+    }
+
+    public boolean isPomInBuild()
+    {
+        return projectDirectory != null;
     }
 
     /**

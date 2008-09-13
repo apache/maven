@@ -44,7 +44,7 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.errors.DefaultProjectErrorReporter;
 import org.apache.maven.errors.ProjectErrorReporter;
 import org.apache.maven.errors.ProjectReporterManager;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.apache.maven.extension.ModelInterpolationException;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.reactor.MissingModuleException;

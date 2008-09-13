@@ -92,9 +92,6 @@ under the License.
           <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>
         </requirement>
         <requirement>

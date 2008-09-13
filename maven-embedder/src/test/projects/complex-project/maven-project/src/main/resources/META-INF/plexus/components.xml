@@ -135,15 +135,6 @@ under the License.
         </requirement>
       </requirements>
     </component>
-<!--
-     |
-     |
-     |
-     -->
-    <component>
-      <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
-      <implementation>org.apache.maven.project.interpolation.RegexBasedModelInterpolator</implementation>
-    </component>
 
 <!--
      |
@@ -169,9 +160,6 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.profiles.MavenProfilesBuilder</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.validation.ModelValidator</role>

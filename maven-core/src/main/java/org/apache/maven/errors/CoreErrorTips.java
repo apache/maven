@@ -1,6 +1,7 @@
 package org.apache.maven.errors;
 
 import org.apache.maven.ProjectCycleException;
+import org.apache.maven.extension.ModelInterpolationException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
@@ -23,7 +24,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
