@@ -539,7 +539,22 @@ public final class PomClassicTransformer
     private static void interpolateModelProperties(List<ModelProperty> modelProperties,
                                                    List<InterpolatorProperty> interpolatorProperties,
                                                    PomClassicDomainModel domainModel)
+           throws IOException
     {
+        //RULE: No Self-Referential Properties
+        /*
+        for(ModelProperty mp : modelProperties)
+        {
+            if(mp.getUri().startsWith( ProjectUri.properties ) && mp.getValue() != null)
+            {
+                String name = mp.getUri().substring( mp.getUri().lastIndexOf( "/" ) + 1, mp.getUri().length() );
+                if( mp.getValue().equals( "${" + name + "}") )
+                {
+                    throw new IOException( "Self-Referential reference in pom: Name = " + name );
+                }
+            }
+        }
+        */
         Map<String, String> aliases = new HashMap<String, String>();
         aliases.put( "project.", "pom.");
 

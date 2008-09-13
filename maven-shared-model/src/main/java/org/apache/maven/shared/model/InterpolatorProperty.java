@@ -131,7 +131,7 @@ public final class InterpolatorProperty
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         for ( Map.Entry<Object, Object> e : properties.entrySet() )
         {
-            interpolatorProperties.add( new InterpolatorProperty( (String) e.getKey(), (String) e.getValue()) );
+            interpolatorProperties.add( new InterpolatorProperty( "${" + e.getKey() +"}", (String) e.getValue()) );
         }
         return interpolatorProperties;
     }

@@ -167,13 +167,6 @@ public class DefaultBuildExtensionScanner
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties()));
                 model = PomClassicTransformer.interpolateModel( model, interpolatorProperties, modelPom.getParentFile());
 
-                /*
-                try {
-                    model = modelInterpolator.interpolate( model, modelPom.getParentFile(), config, getLogger().isDebugEnabled() );
-                } catch (ModelInterpolationException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-                */
                 grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );
 
                 Properties modelProps = model.getProperties();
