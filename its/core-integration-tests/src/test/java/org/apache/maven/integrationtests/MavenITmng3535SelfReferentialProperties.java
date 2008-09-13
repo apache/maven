@@ -15,7 +15,7 @@ public class MavenITmng3535SelfReferentialProperties
     public MavenITmng3535SelfReferentialProperties()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.99,)" ); // 2.1.0+ only
+        super( "(2.0.99,2.99.99)" );
     }
 
     public void testitMNG3535_ShouldSucceed()
