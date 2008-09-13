@@ -38,7 +38,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.errors.ProjectErrorReporter;
-import org.apache.maven.project.path.PathTranslator;
+import org.apache.maven.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.realm.RealmManagementException;

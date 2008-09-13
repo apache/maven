@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.ArtifactFilterManager;
+import org.apache.maven.path.PathTranslator;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -62,7 +63,6 @@ import org.apache.maven.project.ModelUtils;
 import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
-import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.reporting.MavenReport;
@@ -91,7 +91,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

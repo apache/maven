@@ -165,7 +165,7 @@ under the License.
           <role>org.apache.maven.project.validation.ModelValidator</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.path.PathTranslator</role>
+          <role>org.apache.maven.path.PathTranslator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
@@ -288,8 +288,8 @@ under the License.
 | I realize this is duplicated but allows the project builder to work by itself
 -->
     <component>
-      <role>org.apache.maven.project.path.PathTranslator</role>
-      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
+      <role>org.apache.maven.path.PathTranslator</role>
+      <implementation>org.apache.maven.path.DefaultPathTranslator</implementation>
     </component>
     
     <component>

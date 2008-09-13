@@ -223,11 +223,7 @@ under the License.
 <!-- ********************* FIXME *******************************************
 | I realize this is duplicated but allows the project builder to work by itself
 -->
-    <component>
-      <role>org.apache.maven.project.path.PathTranslator</role>
-      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
-    </component>
-    
+
     <component>
       <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
       <role-hint>maven</role-hint>

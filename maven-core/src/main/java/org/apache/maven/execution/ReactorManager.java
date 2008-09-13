@@ -22,7 +22,7 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.DuplicateProjectException;
+import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;

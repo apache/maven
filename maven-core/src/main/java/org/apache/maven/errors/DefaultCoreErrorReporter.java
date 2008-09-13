@@ -2,6 +2,7 @@ package org.apache.maven.errors;
 
 import org.apache.maven.NoGoalsSpecifiedException;
 import org.apache.maven.ProjectCycleException;
+import org.apache.maven.path.PathTranslator;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -45,7 +46,6 @@ import org.apache.maven.errors.DefaultProjectErrorReporter;
 import org.apache.maven.errors.ProjectErrorReporter;
 import org.apache.maven.errors.ProjectReporterManager;
 import org.apache.maven.extension.ModelInterpolationException;
-import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.realm.RealmManagementException;

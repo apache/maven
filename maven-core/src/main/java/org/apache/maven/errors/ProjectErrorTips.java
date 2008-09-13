@@ -8,7 +8,7 @@ import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
-import org.apache.maven.project.DuplicateProjectException;
+import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.extension.ModelInterpolationException;
