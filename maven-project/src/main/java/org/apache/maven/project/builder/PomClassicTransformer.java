@@ -243,10 +243,10 @@ public final class PomClassicTransformer
     }
 
     /**
-     * @see ModelTransformer#transformToModelProperties(java.util.List, java.util.List)
+     * @see ModelTransformer#transformToModelProperties(java.util.List
      */
-    public List<ModelProperty> transformToModelProperties( List<DomainModel> domainModels, 
-                                                           List<InterpolatorProperty> interpolatorProperties)
+    public List<ModelProperty> transformToModelProperties(List<DomainModel> domainModels
+    )
         throws IOException
     {
         if ( domainModels == null || domainModels.isEmpty() )
@@ -484,9 +484,15 @@ public final class PomClassicTransformer
             modelProperties.removeAll( clearedProperties );
         }
 
-        interpolateModelProperties( modelProperties, interpolatorProperties, ((PomClassicDomainModel) domainModels.get(0)) );
-        
         return modelProperties;
+    }
+
+    public void interpolateModelProperties(List<ModelProperty> modelProperties,
+                                           List<InterpolatorProperty> interpolatorProperties,
+                                           DomainModel domainModel)
+            throws IOException
+    {
+        interpolateModelProperties( modelProperties, interpolatorProperties, (PomClassicDomainModel) domainModel);
     }
 
     public static String interpolateXmlString( String xml, List<InterpolatorProperty> interpolatorProperties )
@@ -541,32 +547,36 @@ public final class PomClassicTransformer
                                                    PomClassicDomainModel domainModel)
            throws IOException
     {
-        //RULE: No Self-Referential Properties
-        /*
-        for(ModelProperty mp : modelProperties)
-        {
-            if(mp.getUri().startsWith( ProjectUri.properties ) && mp.getValue() != null)
-            {
-                String name = mp.getUri().substring( mp.getUri().lastIndexOf( "/" ) + 1, mp.getUri().length() );
-                if( mp.getValue().equals( "${" + name + "}") )
-                {
-                    throw new IOException( "Self-Referential reference in pom: Name = " + name );
-                }
-            }
-        }
-        */
+
         Map<String, String> aliases = new HashMap<String, String>();
         aliases.put( "project.", "pom.");
 
-        List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>(interpolatorProperties);
-        ips.addAll(ModelTransformerContext.createInterpolatorProperties(modelProperties, ProjectUri.baseUri, aliases,
-                        false, false));
+        List<ModelProperty> firstPassModelProperties = new ArrayList<ModelProperty>();
+        List<ModelProperty> secondPassModelProperties = new ArrayList<ModelProperty>();
 
+        ModelProperty buildProperty = new ModelProperty(ProjectUri.Build.xUri, null);
+        for(ModelProperty mp : modelProperties)
+        {
+            if( mp.getValue() != null && !mp.getUri().contains( "#property" ) && !mp.getUri().contains( "#collection" ))
+            {
+                if( !buildProperty.isParentOf( mp ) || mp.getUri().equals(ProjectUri.Build.finalName ) )
+                {
+                    firstPassModelProperties.add(mp);
+                }
+                else
+                {
+                    secondPassModelProperties.add(mp);
+                }
+            }
+        }
+
+        String basedir = domainModel.getProjectDirectory().getAbsolutePath();
+        List<InterpolatorProperty> standardInterpolatorProperties = new ArrayList<InterpolatorProperty>();
         if(domainModel.isPomInBuild())
         {
-            ips.add(new InterpolatorProperty("${project.basedir}", domainModel.getProjectDirectory().getAbsolutePath()));
-            ips.add(new InterpolatorProperty("${basedir}", domainModel.getProjectDirectory().getAbsolutePath()));
-            ips.add(new InterpolatorProperty("${pom.basedir}", domainModel.getProjectDirectory().getAbsolutePath()));
+            standardInterpolatorProperties.add(new InterpolatorProperty("${project.basedir}", basedir ));
+            standardInterpolatorProperties.add(new InterpolatorProperty("${basedir}", basedir ));
+            standardInterpolatorProperties.add(new InterpolatorProperty("${pom.basedir}", basedir ));
 
         }
 
@@ -575,12 +585,49 @@ public final class PomClassicTransformer
             if(mp.getUri().startsWith(ProjectUri.properties) && mp.getValue() != null )
             {
                 String uri = mp.getUri();
-                ips.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1,
+                standardInterpolatorProperties.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1,
                         uri.length() ) + "}", mp.getValue() ) );
             }
         }
 
-        ModelTransformerContext.interpolateModelProperties( modelProperties, ips );
+        //FIRST PASS - Withhold using build directories as interpolator properties
+        List<InterpolatorProperty> ips1 = new ArrayList<InterpolatorProperty>(interpolatorProperties);
+        ips1.addAll(ModelTransformerContext.createInterpolatorProperties(firstPassModelProperties, ProjectUri.baseUri, aliases,
+                        false, false));
+        ips1.addAll(standardInterpolatorProperties);
+
+        ModelTransformerContext.interpolateModelProperties( modelProperties, ips1 );
+
+        //SECOND PASS - Set absolute paths on build directories
+        if( domainModel.isPomInBuild() )
+        {
+            Map<ModelProperty, ModelProperty> buildDirectories = new HashMap<ModelProperty, ModelProperty>();
+            for(ModelProperty mp : secondPassModelProperties)
+            {
+                if(mp.getUri().equals( ProjectUri.Build.directory ))
+                {
+                    File file = new File(mp.getResolvedValue());
+                    if( !file.isAbsolute() )
+                    {
+                        buildDirectories.put(mp, new ModelProperty(mp.getUri(), new File(basedir, file.getPath()).getAbsolutePath()));
+                    }
+                }
+            }
+
+            for ( Map.Entry<ModelProperty, ModelProperty> e : buildDirectories.entrySet() )
+            {
+                secondPassModelProperties.remove( e.getKey() );
+                secondPassModelProperties.add(e.getValue() );
+            }
+        }
+
+        //THIRD PASS - Use build directories as interpolator properties
+        List<InterpolatorProperty> ips2 = new ArrayList<InterpolatorProperty>(interpolatorProperties);
+        ips2.addAll(ModelTransformerContext.createInterpolatorProperties(secondPassModelProperties, ProjectUri.baseUri, aliases,
+                        false, false));
+        ips2.addAll(standardInterpolatorProperties);
+
+        ModelTransformerContext.interpolateModelProperties( modelProperties, ips2 );
     }
 
     private static boolean hasExecutionId( ModelContainer executionContainer )

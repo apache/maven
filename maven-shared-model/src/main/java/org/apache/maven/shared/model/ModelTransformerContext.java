@@ -201,7 +201,7 @@ public final class ModelTransformerContext
     {
 
         List<ModelProperty> transformedProperties =
-                importModelProperties(importModels, fromModelTransformer.transformToModelProperties( domainModels, interpolatorProperties ));
+                importModelProperties(importModels, fromModelTransformer.transformToModelProperties( domainModels));
 
         String baseUriForModel = fromModelTransformer.getBaseUri();
         List<ModelProperty> modelProperties =
@@ -265,8 +265,9 @@ public final class ModelTransformerContext
 
 
         List<ModelProperty> mps = modelDataSource.getModelProperties();
-        //interpolateModelProperties( mps, baseUriForModel );
         mps = sort( mps, baseUriForModel );
+
+        fromModelTransformer.interpolateModelProperties( mps, interpolatorProperties, domainModels.get(0));
 
         try
         {
