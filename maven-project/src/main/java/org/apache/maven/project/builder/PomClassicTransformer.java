@@ -542,6 +542,20 @@ public final class PomClassicTransformer
         return domainModel.getModel();
     }
 
+    private static boolean containsProjectVersion( List<InterpolatorProperty> interpolatorProperties )
+    {
+        InterpolatorProperty versionInterpolatorProperty =
+                new ModelProperty( ProjectUri.version, "").asInterpolatorProperty( ProjectUri.baseUri);
+        for( InterpolatorProperty ip : interpolatorProperties)
+        {
+            if ( ip.equals( versionInterpolatorProperty ) )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void interpolateModelProperties(List<ModelProperty> modelProperties,
                                                    List<InterpolatorProperty> interpolatorProperties,
                                                    PomClassicDomainModel domainModel)
@@ -550,6 +564,11 @@ public final class PomClassicTransformer
 
         Map<String, String> aliases = new HashMap<String, String>();
         aliases.put( "project.", "pom.");
+
+        if(!containsProjectVersion(interpolatorProperties))
+        {
+            aliases.put("\\$\\{project.version\\}", "\\$\\{version\\}");
+        }
 
         List<ModelProperty> firstPassModelProperties = new ArrayList<ModelProperty>();
         List<ModelProperty> secondPassModelProperties = new ArrayList<ModelProperty>();
