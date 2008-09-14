@@ -64,11 +64,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.text.SimpleDateFormat;
 
 
 /**
@@ -537,6 +534,13 @@ public class DefaultMavenProjectBuilder
                 PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
                 PomInterpolatorTag.USER_PROPERTIES.name()));
+
+        if(config.getBuildStartTime() != null)
+        {
+            interpolatorProperties.add(new InterpolatorProperty("${build.timestamp}",
+                new SimpleDateFormat("yyyyMMdd-hhmm").format( config.getBuildStartTime() ),
+                PomInterpolatorTag.PROJECT_PROPERTIES.name()));
+        }
 
         MavenProject mavenProject;
         try

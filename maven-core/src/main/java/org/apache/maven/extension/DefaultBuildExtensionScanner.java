@@ -49,14 +49,8 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class DefaultBuildExtensionScanner
     implements BuildExtensionScanner, LogEnabled
@@ -163,11 +157,20 @@ public class DefaultBuildExtensionScanner
 
                 config.setExecutionProperties( execProps );
 
+                //INTERPOLATION
                 List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
                     interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), 
                 PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
                     interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
                 PomInterpolatorTag.USER_PROPERTIES.name()));
+                if(config.getBuildStartTime() != null)
+                {
+                    interpolatorProperties.add(new InterpolatorProperty("${build.timestamp}",
+                        new SimpleDateFormat("yyyyMMdd-hhmm").format( config.getBuildStartTime() ),
+                        PomInterpolatorTag.PROJECT_PROPERTIES.name()));
+                }
+
+
                 model = PomClassicTransformer.interpolateModel( model, interpolatorProperties, modelPom.getParentFile());
 
                 grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );
