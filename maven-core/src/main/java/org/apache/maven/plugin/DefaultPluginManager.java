@@ -61,6 +61,7 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ModelUtils;
 import org.apache.maven.project.builder.PomClassicTransformer;
+import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.realm.MavenRealmManager;
@@ -556,10 +557,12 @@ public class DefaultPluginManager
         if ( dom != null )
         {
             try
-            {
+            {  
                 List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getExecutionProperties()));
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties()));
+                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getExecutionProperties(),
+                        PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(),
+                        PomInterpolatorTag.USER_PROPERTIES.name()));
                 String interpolatedDom  =
                         PomClassicTransformer.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
                 dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );

@@ -44,6 +44,7 @@ import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.ProjectBuilder;
+import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.project.workspace.ProjectWorkspace;
@@ -532,8 +533,10 @@ public class DefaultMavenProjectBuilder
         }
 
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties()));
-        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties()));
+        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), 
+                PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
+                PomInterpolatorTag.USER_PROPERTIES.name()));
 
         MavenProject mavenProject;
         try

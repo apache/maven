@@ -36,6 +36,11 @@ public final class InterpolatorProperty
      */
     private final String value;
 
+    /**
+     * Metadata tag (general use)
+     */
+    private String tag;
+
 
     /**
      * Constructor
@@ -44,6 +49,11 @@ public final class InterpolatorProperty
      * @param value the value of the property. May not be null.
      */
     public InterpolatorProperty( String key, String value )
+    {
+        this(key, value, null);
+    }
+
+    public InterpolatorProperty( String key, String value, String tag )
     {
         if ( key == null )
         {
@@ -56,6 +66,8 @@ public final class InterpolatorProperty
         }
         this.key = key;
         this.value = value;
+        this.tag = tag;
+
     }
 
     /**
@@ -76,6 +88,16 @@ public final class InterpolatorProperty
     public String getValue()
     {
         return value;
+    }
+
+    public String getTag()
+    {
+        return tag;
+    }
+
+    public void setTag(String tag)
+    {
+        this.tag = tag;
     }
 
     /**
@@ -121,7 +143,7 @@ public final class InterpolatorProperty
             this.hashCode();
     }
 
-    public static List<InterpolatorProperty> toInterpolatorProperties( Properties properties )
+    public static List<InterpolatorProperty> toInterpolatorProperties( Properties properties, String tag )
     {
         if( properties == null )
         {
@@ -131,7 +153,7 @@ public final class InterpolatorProperty
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         for ( Map.Entry<Object, Object> e : properties.entrySet() )
         {
-            interpolatorProperties.add( new InterpolatorProperty( "${" + e.getKey() +"}", (String) e.getValue()) );
+            interpolatorProperties.add( new InterpolatorProperty( "${" + e.getKey() +"}", (String) e.getValue(), tag) );
         }
         return interpolatorProperties;
     }

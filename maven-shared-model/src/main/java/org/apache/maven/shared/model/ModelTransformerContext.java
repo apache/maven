@@ -78,6 +78,7 @@ public final class ModelTransformerContext
     public static List<InterpolatorProperty> createInterpolatorProperties(List<ModelProperty> modelProperties,
                                                                       String baseUriForModel,
                                                                       Map<String, String> aliases,
+                                                                      String interpolatorTag,
                                                                       boolean includeSystemProperties,
                                                                       boolean includeEnvironmentProperties)
     {
@@ -108,13 +109,14 @@ public final class ModelTransformerContext
         {
             InterpolatorProperty ip = mp.asInterpolatorProperty( baseUriForModel );
             if ( ip != null )
-            {
+            {   ip.setTag( interpolatorTag );
                 interpolatorProperties.add( ip );
                 for ( Map.Entry<String, String> a : aliases.entrySet() )
                 {
                     interpolatorProperties.add( new InterpolatorProperty(
                             ip.getKey().replaceAll( a.getKey(), a.getValue()),
-                            ip.getValue().replaceAll( a.getKey(), a.getValue()) ) );
+                            ip.getValue().replaceAll( a.getKey(), a.getValue()),
+                            interpolatorTag) );
                 }
             }
         }
@@ -124,6 +126,15 @@ public final class ModelTransformerContext
     public static void interpolateModelProperties(List<ModelProperty> modelProperties, 
                                                   List<InterpolatorProperty> interpolatorProperties )
     {
+        if( modelProperties == null )
+        {
+            throw new IllegalArgumentException("modelProperties: null");
+        }
+
+        if( interpolatorProperties == null )
+        {
+            throw new IllegalArgumentException("interpolatorProperties: null");
+        }
 
         List<ModelProperty> unresolvedProperties = new ArrayList<ModelProperty>();
         for ( ModelProperty mp : modelProperties )
@@ -134,7 +145,10 @@ public final class ModelTransformerContext
             }
         }
 
-        for ( InterpolatorProperty ip : interpolatorProperties )
+        LinkedHashSet<InterpolatorProperty> ips = new LinkedHashSet<InterpolatorProperty>();
+        ips.addAll(interpolatorProperties);
+
+        for ( InterpolatorProperty ip : ips)
         {
             for ( ModelProperty mp : unresolvedProperties )
             {
@@ -142,8 +156,7 @@ public final class ModelTransformerContext
             }
         }
 
-
-        for ( InterpolatorProperty ip : interpolatorProperties )
+        for ( InterpolatorProperty ip : ips )
         {
             for ( ModelProperty mp : unresolvedProperties )
             {
@@ -151,7 +164,6 @@ public final class ModelTransformerContext
             }
         }
     }
-
 
     /**
      * Transforms the specified model properties using the specified transformers.

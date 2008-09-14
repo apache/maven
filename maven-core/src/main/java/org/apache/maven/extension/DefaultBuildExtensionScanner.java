@@ -36,6 +36,7 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.builder.PomClassicTransformer;
+import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.extension.lineage.ModelLineage;
 import org.apache.maven.extension.lineage.ModelLineageBuilder;
 import org.apache.maven.extension.lineage.ModelLineageIterator;
@@ -163,8 +164,10 @@ public class DefaultBuildExtensionScanner
                 config.setExecutionProperties( execProps );
 
                 List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties()));
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties()));
+                    interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), 
+                PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+                    interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
+                PomInterpolatorTag.USER_PROPERTIES.name()));
                 model = PomClassicTransformer.interpolateModel( model, interpolatorProperties, modelPom.getParentFile());
 
                 grabManagedPluginsWithExtensionsFlagTurnedOn( model, managedPluginsWithExtensionsFlag );

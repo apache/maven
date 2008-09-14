@@ -29,14 +29,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.File;
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
@@ -506,7 +499,7 @@ public final class PomClassicTransformer
 
         List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>(interpolatorProperties);
         ips.addAll(ModelTransformerContext.createInterpolatorProperties(modelProperties, ProjectUri.baseUri, aliases,
-                        false, false));
+                        PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false));
 
         for(ModelProperty mp : modelProperties)
         {
@@ -593,9 +586,12 @@ public final class PomClassicTransformer
         List<InterpolatorProperty> standardInterpolatorProperties = new ArrayList<InterpolatorProperty>();
         if(domainModel.isPomInBuild())
         {
-            standardInterpolatorProperties.add(new InterpolatorProperty("${project.basedir}", basedir ));
-            standardInterpolatorProperties.add(new InterpolatorProperty("${basedir}", basedir ));
-            standardInterpolatorProperties.add(new InterpolatorProperty("${pom.basedir}", basedir ));
+            standardInterpolatorProperties.add(new InterpolatorProperty("${project.basedir}", basedir,
+                    PomInterpolatorTag.PROJECT_PROPERTIES.name() ));
+            standardInterpolatorProperties.add(new InterpolatorProperty("${basedir}", basedir,
+                    PomInterpolatorTag.PROJECT_PROPERTIES.name() ));
+            standardInterpolatorProperties.add(new InterpolatorProperty("${pom.basedir}", basedir,
+                    PomInterpolatorTag.PROJECT_PROPERTIES.name() ));
 
         }
 
@@ -605,15 +601,21 @@ public final class PomClassicTransformer
             {
                 String uri = mp.getUri();
                 standardInterpolatorProperties.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1,
-                        uri.length() ) + "}", mp.getValue() ) );
+                        uri.length() ) + "}", mp.getValue(), PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
             }
         }
 
         //FIRST PASS - Withhold using build directories as interpolator properties
         List<InterpolatorProperty> ips1 = new ArrayList<InterpolatorProperty>(interpolatorProperties);
-        ips1.addAll(ModelTransformerContext.createInterpolatorProperties(firstPassModelProperties, ProjectUri.baseUri, aliases,
-                        false, false));
         ips1.addAll(standardInterpolatorProperties);
+        ips1.addAll(ModelTransformerContext.createInterpolatorProperties(firstPassModelProperties, ProjectUri.baseUri, aliases,
+                        PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false));
+        Collections.sort(ips1, new Comparator<InterpolatorProperty>()
+        {
+            public int compare(InterpolatorProperty o, InterpolatorProperty o1) {
+                return PomInterpolatorTag.valueOf(o.getTag()).compareTo(PomInterpolatorTag.valueOf(o1.getTag()));
+            }
+        });
 
         ModelTransformerContext.interpolateModelProperties( modelProperties, ips1 );
 
@@ -642,9 +644,16 @@ public final class PomClassicTransformer
 
         //THIRD PASS - Use build directories as interpolator properties
         List<InterpolatorProperty> ips2 = new ArrayList<InterpolatorProperty>(interpolatorProperties);
+        ips2.addAll(standardInterpolatorProperties);        
         ips2.addAll(ModelTransformerContext.createInterpolatorProperties(secondPassModelProperties, ProjectUri.baseUri, aliases,
-                        false, false));
-        ips2.addAll(standardInterpolatorProperties);
+                        PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false));
+        ips2.addAll(interpolatorProperties);
+        Collections.sort(ips2, new Comparator<InterpolatorProperty>()
+        {
+            public int compare(InterpolatorProperty o, InterpolatorProperty o1) {
+                return PomInterpolatorTag.valueOf(o.getTag()).compareTo(PomInterpolatorTag.valueOf(o1.getTag()));
+            }
+        });
 
         ModelTransformerContext.interpolateModelProperties( modelProperties, ips2 );
     }
