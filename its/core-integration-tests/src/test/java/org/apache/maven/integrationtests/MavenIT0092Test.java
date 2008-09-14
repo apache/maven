@@ -11,11 +11,6 @@ import java.util.ArrayList;
 public class MavenIT0092Test
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0092Test()
-        throws InvalidVersionSpecificationException
-    {
-        super( "[,2.99.99)" );
-    }
     
     /**
      * Test that legacy repositories with legacy snapshots download correctly.

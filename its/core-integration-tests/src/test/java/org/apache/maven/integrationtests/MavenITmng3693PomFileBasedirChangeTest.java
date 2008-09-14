@@ -19,11 +19,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 public class MavenITmng3693PomFileBasedirChangeTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3693PomFileBasedirChangeTest()
-        throws InvalidVersionSpecificationException
-    {
-        super( "[,2.99.99)" );
-    }
 
     public void testitMNG3693 ()
         throws Exception

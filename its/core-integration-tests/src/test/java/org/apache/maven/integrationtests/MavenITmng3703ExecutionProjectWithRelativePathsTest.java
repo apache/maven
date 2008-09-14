@@ -38,7 +38,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
     public MavenITmng3703ExecutionProjectWithRelativePathsTest()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.99,2.99.99)" ); // only test in 2.0.9+
+        super( "(2.0.99,)" ); // only test in 2.0.9+
     }
 
     public void testForkFromMojo()

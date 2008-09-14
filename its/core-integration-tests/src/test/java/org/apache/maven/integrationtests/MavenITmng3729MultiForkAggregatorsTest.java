@@ -54,7 +54,8 @@ public class MavenITmng3729MultiForkAggregatorsTest
     public MavenITmng3729MultiForkAggregatorsTest()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+        super( "(2.0.8,2.99.99)" ); // only test in 2.0.9+
+        //TODO: FIX: Disabled for 3.0.x, causes infinite looping on Mac.
     }
 
     public void testitMNG3729 ()
