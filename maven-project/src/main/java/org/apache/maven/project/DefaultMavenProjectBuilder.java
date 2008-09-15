@@ -45,6 +45,7 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.project.workspace.ProjectWorkspace;
@@ -251,6 +252,48 @@ public class DefaultMavenProjectBuilder
             {
                 activeProfiles.addAll( activated );
             }
+        }
+
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(),
+                PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
+                PomInterpolatorTag.USER_PROPERTIES.name()));
+
+        if(config.getBuildStartTime() != null)
+        {
+            interpolatorProperties.add(new InterpolatorProperty("${build.timestamp}",
+                new SimpleDateFormat("yyyyMMdd-hhmm").format( config.getBuildStartTime() ),
+                PomInterpolatorTag.PROJECT_PROPERTIES.name()));
+        }
+
+        File basedir = null;
+        for(InterpolatorProperty ip : interpolatorProperties )
+        {
+            if(ip.getKey().equals("${basedir}"))
+            {
+                basedir = new File(ip.getValue());
+                break;
+            }
+        }
+
+        if(basedir == null)
+        {
+            String bd = System.getProperty("basedir");
+            if( bd != null )
+            {
+                basedir = new File(bd);
+            }
+        }
+
+        try
+        {
+            superModel = PomClassicTransformer.interpolateModel(superModel, interpolatorProperties, basedir);
+        }
+        catch (IOException e)
+        {
+            throw new ProjectBuildingException(STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID,
+                                                "Interpolation failure:", e);
         }
 
         MavenProject project;

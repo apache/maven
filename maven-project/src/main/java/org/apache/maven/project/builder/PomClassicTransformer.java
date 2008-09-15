@@ -582,10 +582,11 @@ public final class PomClassicTransformer
             }
         }
 
-        String basedir = domainModel.getProjectDirectory().getAbsolutePath();
+
         List<InterpolatorProperty> standardInterpolatorProperties = new ArrayList<InterpolatorProperty>();
         if(domainModel.isPomInBuild())
         {
+            String basedir = domainModel.getProjectDirectory().getAbsolutePath();
             standardInterpolatorProperties.add(new InterpolatorProperty("${project.basedir}", basedir,
                     PomInterpolatorTag.PROJECT_PROPERTIES.name() ));
             standardInterpolatorProperties.add(new InterpolatorProperty("${basedir}", basedir,
@@ -621,7 +622,7 @@ public final class PomClassicTransformer
 
         //SECOND PASS - Set absolute paths on build directories
         if( domainModel.isPomInBuild() )
-        {
+        {   String basedir = domainModel.getProjectDirectory().getAbsolutePath();
             Map<ModelProperty, ModelProperty> buildDirectories = new HashMap<ModelProperty, ModelProperty>();
             for(ModelProperty mp : secondPassModelProperties)
             {
