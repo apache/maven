@@ -742,8 +742,8 @@ public class DefaultMavenExecutionRequestPopulator
         ProfileActivationContext activationContext = request.getProfileActivationContext();
         if ( activationContext == null )
         {
-            activationContext = new DefaultProfileActivationContext( request.getRealmManager(),
-                                                                     request.getProperties(), false );
+            activationContext = new DefaultProfileActivationContext(
+                    request.getProperties(), false );
         }
 
         activationContext.setExplicitlyActiveProfileIds( request.getActiveProfiles() );

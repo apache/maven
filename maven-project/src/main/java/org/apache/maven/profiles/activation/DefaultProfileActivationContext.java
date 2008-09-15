@@ -19,7 +19,6 @@ package org.apache.maven.profiles.activation;
  * under the License.
  */
 
-import org.apache.maven.realm.MavenRealmManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,21 +37,10 @@ public class DefaultProfileActivationContext
 
     List explicitlyInactive;
 
-    private final MavenRealmManager realmManager;
-
     private List activeByDefault;
-
-    public DefaultProfileActivationContext( MavenRealmManager realmManager, Properties executionProperties,
-                                            boolean isCustomActivatorFailureSuppressed )
-    {
-        this.realmManager = realmManager;
-        this.executionProperties = executionProperties;
-        this.isCustomActivatorFailureSuppressed = isCustomActivatorFailureSuppressed;
-    }
 
     public DefaultProfileActivationContext( Properties executionProperties, boolean isCustomActivatorFailureSuppressed )
     {
-        realmManager = null;
         this.executionProperties = executionProperties;
         this.isCustomActivatorFailureSuppressed = isCustomActivatorFailureSuppressed;
     }
@@ -100,11 +88,6 @@ public class DefaultProfileActivationContext
     public void setExplicitlyInactiveProfileIds( List inactive )
     {
         explicitlyInactive = inactive;
-    }
-
-    public MavenRealmManager getRealmManager()
-    {
-        return realmManager;
     }
 
     public void setActive( String profileId )

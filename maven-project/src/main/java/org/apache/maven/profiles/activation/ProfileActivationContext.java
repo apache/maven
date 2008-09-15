@@ -19,7 +19,6 @@ package org.apache.maven.profiles.activation;
  * under the License.
  */
 
-import org.apache.maven.realm.MavenRealmManager;
 
 import java.util.List;
 import java.util.Properties;
@@ -30,8 +29,6 @@ public interface ProfileActivationContext
     List getExplicitlyActiveProfileIds();
 
     List getExplicitlyInactiveProfileIds();
-
-    MavenRealmManager getRealmManager();
 
     Properties getExecutionProperties();
 

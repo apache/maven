@@ -27,13 +27,9 @@ import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
-import org.apache.maven.realm.DefaultMavenRealmManager;
-import org.apache.maven.realm.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,11 +77,8 @@ public class DefaultProfileManager
 
     private ProfileActivationContext createDefaultActivationContext()
     {
-        // create the necessary bits to get a skeletal profile manager running.
-        Logger logger = container.getLoggerManager().getLoggerForComponent( DefaultProfileManager.class.getName() );
-        MavenRealmManager manager = new DefaultMavenRealmManager( container, logger );
 
-        return new DefaultProfileActivationContext( manager, System.getProperties(), false );
+        return new DefaultProfileActivationContext(System.getProperties(), false );
     }
 
     public ProfileActivationContext getProfileActivationContext()
@@ -190,17 +183,6 @@ public class DefaultProfileManager
     public List getActiveProfiles( Model model )
         throws ProfileActivationException
     {
-        MavenRealmManager realmManager = profileActivationContext.getRealmManager();
-
-        ClassRealm projectRealm = null;
-        ClassRealm oldLookupRealm = null;
-
-        if ( ( model != null ) && ( realmManager != null ) )
-        {
-            projectRealm = realmManager.getProjectRealm( getGroupId( model ), model.getArtifactId(),
-                                                         getVersion( model ) );
-            oldLookupRealm = container.setLookupRealm( projectRealm );
-        }
 
         try
         {
@@ -271,10 +253,6 @@ public class DefaultProfileManager
         }
         finally
         {
-            if ( projectRealm != null )
-            {
-                container.setLookupRealm( oldLookupRealm );
-            }
         }
     }
 
