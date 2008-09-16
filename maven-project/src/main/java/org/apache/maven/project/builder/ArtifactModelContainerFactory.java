@@ -105,7 +105,10 @@ public final class ArtifactModelContainerFactory
                 {
                     this.groupId = mp.getResolvedValue();
                 }
-                else if ( mp.getUri().equals( ProjectUri.Dependencies.Dependency.type ) && type == null )
+                else if ( type == null && mp.getUri().equals( ProjectUri.Dependencies.Dependency.type )
+                        || mp.getUri().equals(ProjectUri.DependencyManagement.Dependencies.Dependency.type)
+                        || mp.getUri().equals(ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.type)
+                        || mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.type))
                 {
                     this.type = mp.getResolvedValue();
                 }
