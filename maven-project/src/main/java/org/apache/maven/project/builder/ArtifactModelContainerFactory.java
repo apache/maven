@@ -153,7 +153,14 @@ public final class ArtifactModelContainerFactory
                 {
                     if ( version == null )
                     {
-                        return ModelContainerAction.JOIN;
+                        if ( c.type.equals( type ) )
+                        {
+                            return ModelContainerAction.JOIN;
+                        }
+                        else
+                        {
+                            return ModelContainerAction.NOP;
+                        }
                     }
                     return ModelContainerAction.DELETE;//TODO Verify - PluginManagement Section may make versions equal
                 }
