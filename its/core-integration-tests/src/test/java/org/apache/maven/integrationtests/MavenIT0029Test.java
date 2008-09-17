@@ -16,14 +16,14 @@ public class MavenIT0029Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0029" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0029", "1.0-SNAPSHOT", "jar" );
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0029-child", "1.0-SNAPSHOT", "jar" );
         verifier.executeGoal( "install" );
-        verifier.assertFilePresent( "child-project/target/classes/org/apache/maven/it0029/Person.class" );
+        verifier.assertFilePresent( "plugin-management-configuration.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
