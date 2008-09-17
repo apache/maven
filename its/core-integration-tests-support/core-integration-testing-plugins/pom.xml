@@ -37,6 +37,7 @@ under the License.
   <modules>
     <module>maven-it-plugin-configuration</module>
     <module>maven-it-plugin-context-passing</module>
+    <module>maven-it-plugin-file</module>
     <module>maven-it-plugin-fork</module>
     <module>maven-it-plugin-generate-envar-properties</module>
     <module>maven-it-plugin-generate-properties</module>
