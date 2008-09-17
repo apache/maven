@@ -70,7 +70,8 @@ public class DefaultProfileInjector
         injectBuild( profile, model );
 
         Properties props = new Properties();
-
+        props.putAll( model.getProperties() );
+        props.putAll( profile.getProperties() );
 
         model.setProperties( props );
     }

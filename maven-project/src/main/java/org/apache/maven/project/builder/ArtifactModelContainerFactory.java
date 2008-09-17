@@ -165,18 +165,7 @@ public final class ArtifactModelContainerFactory
                             return ModelContainerAction.NOP;
                         }
                     }
-                    else
-                    {
-                        if ( c.type.equals( type ) )
-                        {
-                            return ModelContainerAction.DELETE;
-                        }
-                        else
-                        {
-                            return ModelContainerAction.NOP;
-                        }
-                    }
-                    //TODO Verify - PluginManagement Section may make versions equal
+                    return ModelContainerAction.DELETE;//TODO Verify - PluginManagement Section may make versions equal
                 }
 
                 if ( c.version.equals( version ) )
@@ -192,14 +181,7 @@ public final class ArtifactModelContainerFactory
                 }
                 else
                 {
-                    if ( c.type.equals( type ) )
-                    {
-                        return ModelContainerAction.DELETE;
-                    }
-                    else
-                    {
-                        return ModelContainerAction.NOP;
-                    }
+                    return ModelContainerAction.DELETE;
                 }
             }
             else

@@ -20,7 +20,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.ArtifactFilterManager;
-import org.apache.maven.profiles.Profile;
 import org.apache.maven.path.PathTranslator;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.artifact.Artifact;
@@ -558,15 +557,8 @@ public class DefaultPluginManager
         if ( dom != null )
         {
             try
-            {
+            {  
                 List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-                /*
-                for(Profile profile : (List<Profile>) project.getActiveProfiles())
-                {
-                    interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( profile.getProperties(),
-                        PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
-                }
-                */
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getExecutionProperties(),
                         PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(),
