@@ -11,18 +11,18 @@ public class MavenIT0024Test
 
     /**
      * Test usage of &lt;executions/&gt; inside a plugin rather than &lt;goals/&gt;
-     * that are directly inside th plugin.
+     * that are directly inside the plugin.
      */
     public void testit0024()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0024" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "generate-sources" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0024/Person.class" );
+        verifier.executeGoal( "initialize" );
+        verifier.assertFilePresent( "plugin-exec-configuration.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
