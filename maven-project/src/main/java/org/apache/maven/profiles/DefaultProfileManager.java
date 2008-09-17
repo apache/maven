@@ -341,19 +341,6 @@ public class DefaultProfileManager
         return profileActivationContext.getActiveByDefaultProfileIds();
     }
 
-    private static String getVersion( Model model )
-    {
-        Parent parent = model.getParent();
-
-        String version = model.getVersion();
-        if ( ( parent != null ) && ( version == null ) )
-        {
-            version = parent.getVersion();
-        }
-
-        return version;
-    }
-
     public static String getGroupId( Model model )
     {
         Parent parent = model.getParent();

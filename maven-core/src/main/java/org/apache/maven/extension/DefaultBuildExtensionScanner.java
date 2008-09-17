@@ -29,6 +29,7 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.Profile;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.project.MavenProject;
@@ -146,23 +147,24 @@ public class DefaultBuildExtensionScanner
                     execProps.putAll( config.getExecutionProperties() );
                 }
 
-                if ( inheritedInterpolationValues != null )
-                {
-                    execProps.putAll( inheritedInterpolationValues );
-                }
-                else
-                {
-                    inheritedInterpolationValues = new HashMap();
-                }
+                execProps.putAll( inheritedInterpolationValues );
 
                 config.setExecutionProperties( execProps );
 
-                //INTERPOLATION
+                //INTERPOLATION                
                 List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-                    interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), 
-                PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
-                    interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
-                PomInterpolatorTag.USER_PROPERTIES.name()));
+                /*
+                for(Profile profile : (List<Profile>) request.getActiveProfiles())
+                {
+                    interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( profile.getProperties(),
+                        PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+                }
+                */
+                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(),
+                    PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+
+                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
+                    PomInterpolatorTag.USER_PROPERTIES.name()));
                 if(config.getBuildStartTime() != null)
                 {
                     interpolatorProperties.add(new InterpolatorProperty("${build.timestamp}",
