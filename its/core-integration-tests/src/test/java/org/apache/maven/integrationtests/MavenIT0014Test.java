@@ -17,12 +17,12 @@ public class MavenIT0014Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0014" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "test" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0014/Person.class" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file::file" );
+        verifier.assertFilePresent( "plugin-configuration.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
