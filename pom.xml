@@ -18,7 +18,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>    
   <modelVersion>4.0.0</modelVersion>
