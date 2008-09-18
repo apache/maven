@@ -307,8 +307,8 @@ public final class DefaultProjectBuilder
 
         if ( !parentDomainModel.matchesParent( domainModel.getModel().getParent() ) )
         {
-            logger.warn( "Parent pom ids do not match: Parent File = " + parentFile.getAbsolutePath() +
-                ": Child ID = " + domainModel.getModel().getId() );
+            logger.warn( "Parent pom ids do not match: Parent File = " + parentFile.getAbsolutePath() + ", Parent ID = "
+                    + parentDomainModel.getId() + ": Child ID = " + domainModel.getId() );
         }
 
         domainModels.add( parentDomainModel );
