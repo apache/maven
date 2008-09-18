@@ -30,25 +30,7 @@ import java.util.List;
 
 public class ModelMarshallerTest
 {
-    /*
-     @Test
-     public void aaa() throws IOException {
-         List<ModelProperty> properties =
-                 ModelMarshaller.marshallXmlToModelProperties(
-                         new FileInputStream("/home/shane/checkout/SI_MAVEN_2_1_A/maven-core-it-runner/target/it-working-folder/it0060/subproject/pom.xml"),
-                         "http://apache.org/maven",  null);
-         for(ModelProperty mp : properties) {
-         //    System.out.println(mp);
-         }
-         ModelTransformerContext ctx = new ModelTransformerContext(new ArrayList());
 
-
-                         for(ModelProperty mp : properties) {
-            System.out.println(mp);
-         }
-         System.out.println(ModelMarshaller.unmarshalModelPropertiesToXml(properties, "http://apache.org/maven"));
-     }
-    */
     @Test
     public void unmarshalWithEmptyCollectionTags()
         throws IOException
@@ -57,7 +39,7 @@ public class ModelMarshallerTest
             new ModelProperty( "http://apache.org/maven/project", null ),
             new ModelProperty( "http://apache.org/maven/project/dependencies#collection", null ) );
         String xml = ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, "http://apache.org/maven" );
-        System.out.println( "COMPLETE:" + xml ); //TODO: Verify proper xml
+       // System.out.println( "COMPLETE:" + xml ); //TODO: Verify proper xml
     }
 
     @Test
@@ -68,7 +50,7 @@ public class ModelMarshallerTest
             new ModelProperty( "http://apache.org/maven/project", null ),
             new ModelProperty( "http://apache.org/maven/project/modelVersion", "4.0.0" ) );
         String xml = ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, "http://apache.org/maven" );
-        System.out.println( "COMPLETE:" + xml ); //TODO: Verify proper xml
+       // System.out.println( "COMPLETE:" + xml ); //TODO: Verify proper xml
     }
 
     @Test
@@ -81,7 +63,7 @@ public class ModelMarshallerTest
                                                                                             null );
 
         String xml = ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, "http://apache.org/maven" );
-        System.out.println( "COMPLETE:" + xml ); //TODO: Verify proper xml
+       // System.out.println( "COMPLETE:" + xml ); //TODO: Verify proper xml
     }
 
     @Test

@@ -107,10 +107,6 @@ public class DefaultMavenProjectBuilderTest
         File f1 = getTestFile( "src/test/resources/projects/duplicate-plugins-merged-pom.xml" );
 
         MavenProject project = getProject( f1 );
-        Writer out = WriterFactory.newXmlWriter( System.out );
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        writer.write( out, project.getModel() );
-        out.close();
         assertEquals( 2, ( (Plugin) project.getBuildPlugins().get( 0 ) ).getDependencies().size() );
     }
 

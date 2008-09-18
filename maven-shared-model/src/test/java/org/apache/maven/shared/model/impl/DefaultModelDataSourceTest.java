@@ -81,9 +81,9 @@ public class DefaultModelDataSourceTest
         List<ModelProperty> mps = datasource.mergeModelContainers(
             factory.create( new ArrayList<ModelProperty>( modelProperties.subList( 3, 9 ) ) ),
             factory.create( new ArrayList<ModelProperty>( modelProperties.subList( 9, 14 ) ) ) );
-        for(ModelProperty mp : mps) {
-            System.out.println(mp);
-        }
+      //  for(ModelProperty mp : mps) {
+      //      System.out.println(mp);
+      //  }
         assertTrue(mps.contains(dup6a));
         assertTrue(mps.contains(dup11a));
     }
@@ -125,9 +125,6 @@ public class DefaultModelDataSourceTest
         List<ModelProperty> mps = datasource.mergeModelContainers(
             factory.create( new ArrayList<ModelProperty>( modelProperties.subList( 4, 8 ) ) ),
             factory.create( new ArrayList<ModelProperty>( modelProperties.subList( 8, 11 ) ) ) );
-                for(ModelProperty mp : mps) {
-            System.out.println(mp);
-        }
         assertFalse(mps.contains(dup10));
     }
 
@@ -263,21 +260,10 @@ public class DefaultModelDataSourceTest
             factory.create( new ArrayList<ModelProperty>( modelProperties.subList( 4, 8 ) ) ),
             factory.create( new ArrayList<ModelProperty>( modelProperties.subList( 8, 12 ) ) ) );
 
-        for ( ModelProperty mp : joinedModelContainer.getProperties() )
-        {
-            System.out.println( "-" + mp );
-        }
-
         if ( !datasource.getModelProperties().containsAll( joinedModelContainer.getProperties() ) )
         {
             throw new IOException();
         }
-
-        for ( ModelProperty mp : datasource.getModelProperties() )
-        {
-            System.out.println( "+" + mp );
-        }
-
     }
 
 
