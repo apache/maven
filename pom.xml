@@ -518,7 +518,6 @@
     <profile>
       <id>run-its</id>
       <modules>
-        <module>maven-embedder-integration-tests</module>
         <module>maven-core-it-runner</module>
       </modules>
     </profile>
