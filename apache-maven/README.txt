@@ -42,18 +42,18 @@
   1) Unpack the archive where you would like to store the binaries, eg:
 
     Unix-based Operating Systems (Linux, Solaris and Mac OS X)
-      tar zxvf apache-maven-2.0.x.tar.gz
+      tar zxvf apache-maven-2.1.x.tar.gz
     Windows 2000/XP
-      unzip apache-maven-2.0.x.zip
+      unzip apache-maven-2.1.x.zip
 
-  2) A directory called "apache-maven-2.0.x" will be created.
+  2) A directory called "apache-maven-2.1.x" will be created.
 
   3) Add the bin directory to your PATH, eg:
 
     Unix-based Operating Systems (Linux, Solaris and Mac OS X)
-      export PATH=/usr/local/apache-maven-2.0.x/bin:$PATH
+      export PATH=/usr/local/apache-maven-2.1.x/bin:$PATH
     Windows 2000/XP
-      set PATH="c:\program files\apache-maven-2.0.x\bin";%PATH%
+      set PATH="c:\program files\apache-maven-2.1.x\bin";%PATH%
 
   4) Make sure JAVA_HOME is set to the location of your JDK
 
