@@ -1,6 +1,7 @@
 package org.apache.maven.integrationtests;
 
 import org.apache.maven.it.Verifier;
+import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -19,10 +20,28 @@ public class MavenIT0103Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0103" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
+        
+        if ( matchesVersionRange( "(2.0.9, 2.99.99)" ) )
+        {
+            verifier.executeGoal( "package" );
+            verifier.verifyErrorFreeLog();
+            verifier.resetStreams();
+        }
+        else
+        {
+            try
+            {
+                verifier.executeGoal( "package" );
+            }
+            catch ( VerificationException e )
+            {
+                verifier.verifyTextInLog( "java.io.IOException" );
+                verifier.resetStreams();
+                return;
+            }
+            throw new VerificationException( "Build should have failed with java.io.IOException" );           
+        }
     }
 }
 
