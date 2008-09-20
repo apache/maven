@@ -140,6 +140,15 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng1493NonStandardModulePomNames.class );
         suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
         suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
+        suite.addTestSuite( MavenIT0138PluginLifecycleTest.class );
+        suite.addTestSuite( MavenIT0137EarLifecycleTest.class );
+        suite.addTestSuite( MavenIT0136RarLifecycleTest.class );
+        suite.addTestSuite( MavenIT0135EjbLifecycleTest.class );
+        suite.addTestSuite( MavenIT0134WarLifecycleTest.class );
+        suite.addTestSuite( MavenIT0133JarLifecycleTest.class );
+        suite.addTestSuite( MavenIT0132PomLifecycleTest.class );
+        suite.addTestSuite( MavenIT0131SiteLifecycleTest.class );
+        suite.addTestSuite( MavenIT0130CleanLifecycleTest.class );
         suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependency.class );
         suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
