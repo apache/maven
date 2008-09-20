@@ -108,6 +108,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3482DependencyPomInterpolationTest.class );
         suite.addTestSuite( MavenITmng3475BaseAlignedDir.class );
         suite.addTestSuite( MavenITmng3473PluginReportCrash.class );
+        suite.addTestSuite( MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
         suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRanges.class );
@@ -115,7 +116,6 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3380ManagedRelocatedTransdepsTest.class );
         suite.addTestSuite( MavenITmng3372DirectInvocationOfPlugins.class );
         suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
-        suite.addTestSuite( MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
         suite.addTestSuite( MavenITmng3314OfflineSnapshotsTest.class );
         suite.addTestSuite( MavenITmng3221InfiniteForking.class );

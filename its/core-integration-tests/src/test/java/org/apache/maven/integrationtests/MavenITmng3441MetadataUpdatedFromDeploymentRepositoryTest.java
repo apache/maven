@@ -14,20 +14,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest
+public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest()
+    public MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest()
         throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" );
     }
 
-    public void testitMNG3341()
+    public void testitMNG3441()
         throws Exception
     {
         File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3341-metadataUpdatedFromDeploymentRepository" );
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3441-metadataUpdatedFromDeploymentRepository" );
 
         File targetRepository = new File( testDir, "target-repository" );
         FileUtils.deleteDirectory( targetRepository );
@@ -46,10 +46,10 @@ public class MavenITmng3341MetadataUpdatedFromDeploymentRepositoryTest
         verifier.verifyErrorFreeLog();
 
         Xpp3Dom dom = readDom( new File( targetRepository,
-                                         "org/apache/maven/its/mng3341/test-artifact/1.0-SNAPSHOT/maven-metadata.xml" ) );
+                                         "org/apache/maven/its/mng3441/test-artifact/1.0-SNAPSHOT/maven-metadata.xml" ) );
         assertEquals( "2", dom.getChild( "versioning" ).getChild( "snapshot" ).getChild( "buildNumber" ).getValue() );
 
-        dom = readDom( new File( targetRepository, "org/apache/maven/its/mng3341/maven-metadata.xml" ) );
+        dom = readDom( new File( targetRepository, "org/apache/maven/its/mng3441/maven-metadata.xml" ) );
         Xpp3Dom[] plugins = dom.getChild( "plugins" ).getChildren();
         assertEquals( "other-plugin", plugins[0].getChild( "prefix" ).getValue() );
         assertEquals( "test-artifact", plugins[1].getChild( "prefix" ).getValue() );
