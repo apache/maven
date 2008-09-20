@@ -25,7 +25,7 @@ public class MavenITmng3473PluginReportCrash
     public void testitMNG3473 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3473PluginReportCrash" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3473-PluginReportCrash" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

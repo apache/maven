@@ -28,7 +28,7 @@ public class MavenITmng2972OverridePluginDependency
 
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng2972-overridingPluginDependency" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2972-overridingPluginDependency" );
 
         Verifier verifier;
 

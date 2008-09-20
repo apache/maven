@@ -28,7 +28,7 @@ public class MavenITmng3284UsingCachedPluginsTest
 
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng3284-usingCachedPlugins" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3284-usingCachedPlugins" );
 
         Verifier verifier;
 

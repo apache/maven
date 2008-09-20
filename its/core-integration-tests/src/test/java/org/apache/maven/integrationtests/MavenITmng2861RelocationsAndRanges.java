@@ -23,7 +23,7 @@ public class MavenITmng2861RelocationsAndRanges
 
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2861relocationsAndRanges" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2861-relocationsAndRanges" );
 
         Verifier verifier;
 

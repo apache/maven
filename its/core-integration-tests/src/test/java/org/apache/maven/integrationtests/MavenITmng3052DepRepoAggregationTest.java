@@ -60,7 +60,7 @@ public class MavenITmng3052DepRepoAggregationTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3052depRepoAggregation" )
+                                                                 "/mng-3052-depRepoAggregation" )
                                         .getCanonicalFile();
 
         File foo = new File( testDir, "foo" );

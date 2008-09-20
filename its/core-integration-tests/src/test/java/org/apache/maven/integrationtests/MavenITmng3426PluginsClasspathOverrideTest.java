@@ -49,7 +49,7 @@ public class MavenITmng3426PluginsClasspathOverrideTest
 
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng3426-overridingPluginDependency" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3426-overridingPluginDependency" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         List cliOptions = new ArrayList();
