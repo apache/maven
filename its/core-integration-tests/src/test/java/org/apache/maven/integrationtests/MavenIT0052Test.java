@@ -25,7 +25,8 @@ public class MavenIT0052Test
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "package" );
         verifier.assertFilePresent( "target/maven-it-it0052-1.0.jar" );
-        verifier.assertFileNotPresent( "target/maven-it-it0052-1.0-sources.jar" );
+        verifier.assertFileNotPresent( "target/source-jar.txt" );
+        verifier.assertFileNotPresent( "target/javadoc-jar.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
