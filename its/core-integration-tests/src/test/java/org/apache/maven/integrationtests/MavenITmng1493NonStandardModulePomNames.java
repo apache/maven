@@ -15,7 +15,7 @@ public class MavenITmng1493NonStandardModulePomNames
     public MavenITmng1493NonStandardModulePomNames()
         throws InvalidVersionSpecificationException
     {
-        super( "[2.0.99,)" ); // 2.1+ (including snapshots)
+        super( "(2.0.8,)" ); // 2.0.9+ (including snapshots)
     }
 
     public void testitMNG1493 ()
