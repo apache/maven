@@ -30,7 +30,6 @@ public class MavenITmng2339BadProjectInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng2339BadProjectInterpolationTest()
-        throws org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // 2.0.9+
     }

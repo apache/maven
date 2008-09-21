@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.IOUtil;
@@ -34,7 +33,6 @@ public class MavenITmng2883LegacyRepoOfflineTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng2883LegacyRepoOfflineTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.4,)" );
     }

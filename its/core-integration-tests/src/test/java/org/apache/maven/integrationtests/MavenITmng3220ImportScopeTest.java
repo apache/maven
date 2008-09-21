@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -13,7 +12,6 @@ public class MavenITmng3220ImportScopeTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3220ImportScopeTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,2.99.99)" );
     }

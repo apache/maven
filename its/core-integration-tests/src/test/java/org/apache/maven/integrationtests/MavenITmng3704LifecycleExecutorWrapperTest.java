@@ -21,7 +21,6 @@ package org.apache.maven.integrationtests;
 
 import java.io.File;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -38,7 +37,6 @@ public class MavenITmng3704LifecycleExecutorWrapperTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3704LifecycleExecutorWrapperTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,2.99.99)" ); // only test in 2.0.9+
     }

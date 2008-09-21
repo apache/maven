@@ -4,10 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 /**
  * Verify that any plugin injecting reactorProjects gets project instances that
@@ -19,7 +17,6 @@ public class MavenITmng3694ReactorProjectsDynamismTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3694ReactorProjectsDynamismTest()
-        throws InvalidVersionSpecificationException
     {
         super( "[,2.99.99)" );
     }

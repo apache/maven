@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -18,7 +17,6 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" );
     }

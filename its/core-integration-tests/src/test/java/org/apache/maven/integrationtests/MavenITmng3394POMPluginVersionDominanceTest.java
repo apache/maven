@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -20,10 +19,9 @@ public class MavenITmng3394POMPluginVersionDominanceTest
     extends AbstractMavenIntegrationTestCase
 {
 
-	private static final String BASEDIR_PREFIX = "/mng-3394-pomPluginVersionDominance/";
+    private static final String BASEDIR_PREFIX = "/mng-3394-pomPluginVersionDominance/";
 
     public MavenITmng3394POMPluginVersionDominanceTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }

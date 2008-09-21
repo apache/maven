@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -10,7 +9,6 @@ public class MavenITmng3581PluginUsesWagonDependency
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3581PluginUsesWagonDependency()
-        throws InvalidVersionSpecificationException
     {
         // Not 2.0.9
         super( "(,2.0.9),(2.0.9,)" );

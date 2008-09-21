@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
@@ -37,7 +36,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     private static final String RESOURCE_BASE = "/mng-3415-junk-repository-metadata";
 
     public MavenITmng3415JunkRepositoryMetadataTest()
-        throws InvalidVersionSpecificationException
     {
         // we're going to control the test execution according to the maven version present within each test method.
         // all methods should execute as long as we're using maven 2.0.9+, but the specific tests may vary a little
@@ -267,7 +265,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      * otherwise, use the new resolver-status.properties file (new artifact code).
      */
     private File getUpdateCheckFile( File localRepo )
-        throws InvalidVersionSpecificationException
     {
         File dir = new File( localRepo, "tests/missing/1.0-SNAPSHOT" );
 

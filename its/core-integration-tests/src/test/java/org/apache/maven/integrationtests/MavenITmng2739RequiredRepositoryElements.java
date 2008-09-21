@@ -19,7 +19,6 @@
 
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -41,7 +40,6 @@ public class MavenITmng2739RequiredRepositoryElements
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng2739RequiredRepositoryElements()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,)" ); // only test in 2.0.9+
     }

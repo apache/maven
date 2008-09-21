@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -17,7 +15,6 @@ public class MavenITmng2277AggregatorAndResolutionPluginsTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng2277AggregatorAndResolutionPluginsTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.7,)" ); // 2.0.8+
     }

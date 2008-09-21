@@ -2,7 +2,6 @@ package org.apache.maven.integrationtests;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ public class MavenIT0095Test
     extends AbstractMavenIntegrationTestCase
 {
     public MavenIT0095Test()
-        throws InvalidVersionSpecificationException        
     {
         super( "[,2.99.99)" );
     }

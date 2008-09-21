@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -18,10 +17,10 @@ public class MavenITmng3473PluginReportCrash
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3473PluginReportCrash()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // >2.0.8
     }
+
     public void testitMNG3473 ()
         throws Exception
     {

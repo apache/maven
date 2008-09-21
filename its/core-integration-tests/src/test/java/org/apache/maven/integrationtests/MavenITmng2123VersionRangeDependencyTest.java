@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -15,7 +13,6 @@ public class MavenITmng2123VersionRangeDependencyTest
 {
     
     public MavenITmng2123VersionRangeDependencyTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" );
     }

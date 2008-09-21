@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -11,7 +10,6 @@ public class MavenITmng3475BaseAlignedDir
 {
     
     public MavenITmng3475BaseAlignedDir()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.99,)"); // 2.1.0+ only
     }

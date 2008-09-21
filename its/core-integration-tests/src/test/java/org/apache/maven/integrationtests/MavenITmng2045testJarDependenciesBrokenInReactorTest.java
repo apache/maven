@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -17,10 +15,11 @@ import org.apache.maven.it.util.ResourceExtractor;
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author mikko.koponen@ri.fi
  */
-public class MavenITmng2045testJarDependenciesBrokenInReactorTest extends AbstractMavenIntegrationTestCase {
+public class MavenITmng2045testJarDependenciesBrokenInReactorTest
+    extends AbstractMavenIntegrationTestCase 
+{
 
     public MavenITmng2045testJarDependenciesBrokenInReactorTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.7,)" ); // 2.0.8+
     }

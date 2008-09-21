@@ -30,7 +30,6 @@ public class MavenITmng3355TranslatedPathInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3355TranslatedPathInterpolationTest()
-        throws org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // 2.0.9+
     }

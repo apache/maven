@@ -19,7 +19,6 @@
 
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -40,7 +39,6 @@ public class MavenITmng3530DynamicPOMInterpolationTest
     private static final String BASEDIR = "/mng-3530-dynamicPOMInterpolation/";
 
     public MavenITmng3530DynamicPOMInterpolationTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,)" ); // only test in 2.0.9+
     }

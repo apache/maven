@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -12,7 +11,6 @@ public class MavenIT0114ExtensionThatProvidesResources
     extends AbstractMavenIntegrationTestCase
 {
     public MavenIT0114ExtensionThatProvidesResources()
-        throws InvalidVersionSpecificationException
     {
         super( "[,2.99.99)" );
     }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -17,7 +16,6 @@ public class MavenITmng3106ProfileMultipleActivators
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3106ProfileMultipleActivators()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,)" );
     }

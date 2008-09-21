@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -19,13 +18,17 @@ import java.io.File;
  *
  */
 public class MavenITmng3380ManagedRelocatedTransdepsTest
-        extends AbstractMavenIntegrationTestCase {
+    extends AbstractMavenIntegrationTestCase
+{
+
     public MavenITmng3380ManagedRelocatedTransdepsTest()
-            throws InvalidVersionSpecificationException {
+    {
         super("(2.0.9,)");
     }
 
-    public void testitMNG3380() throws Exception {
+    public void testitMNG3380()
+        throws Exception 
+    {
 
         // compute test directory
         File testDir = ResourceExtractor.simpleExtractResources(getClass(),
@@ -35,7 +38,7 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
 
         deleteArtifacts( verifier );
 
-		installDependencies( testDir );
+        installDependencies( testDir );
 
         String path = testDir.getAbsolutePath() //
                 + "/consumer";

@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -13,7 +11,6 @@ public class MavenITmng1493NonStandardModulePomNames
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng1493NonStandardModulePomNames()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // 2.0.9+ (including snapshots)
     }

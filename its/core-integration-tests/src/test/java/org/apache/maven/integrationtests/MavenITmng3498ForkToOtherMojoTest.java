@@ -37,7 +37,6 @@ public class MavenITmng3498ForkToOtherMojoTest
     extends AbstractMavenIntegrationTestCase
 {
 //    public MavenITmng3498ForkToOtherMojoTest()
-//        throws InvalidVersionSpecificationException
 //    {
 //        super( "(2.0.8,)" ); // only test in 2.0.9+
 //    }

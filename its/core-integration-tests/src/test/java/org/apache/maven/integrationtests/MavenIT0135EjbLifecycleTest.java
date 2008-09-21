@@ -21,7 +21,6 @@ package org.apache.maven.integrationtests;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 import java.io.File;
 
@@ -35,7 +34,6 @@ public class MavenIT0135EjbLifecycleTest
 {
 
     public MavenIT0135EjbLifecycleTest()
-        throws InvalidVersionSpecificationException
     {
         super( "[2.0.0,)" );
     }

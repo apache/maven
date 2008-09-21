@@ -6,7 +6,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -17,7 +16,6 @@ public class MavenITmng3284UsingCachedPluginsTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3284UsingCachedPluginsTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); 
     }

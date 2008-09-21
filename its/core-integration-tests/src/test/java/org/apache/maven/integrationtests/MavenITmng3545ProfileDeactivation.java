@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -17,7 +16,6 @@ public class MavenITmng3545ProfileDeactivation
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3545ProfileDeactivation()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,)" );
     }

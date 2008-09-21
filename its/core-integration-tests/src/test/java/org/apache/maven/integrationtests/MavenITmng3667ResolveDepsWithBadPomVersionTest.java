@@ -23,8 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -42,7 +40,6 @@ public class MavenITmng3667ResolveDepsWithBadPomVersionTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3667ResolveDepsWithBadPomVersionTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,)" ); // only test in 2.0.9+
     }

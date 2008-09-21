@@ -9,7 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.mortbay.jetty.Handler;
@@ -27,7 +26,6 @@ public class MavenITmng3652UserAgentHeader
     private String userAgent;
 
     public MavenITmng3652UserAgentHeader()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,2.99.99)" );
     }

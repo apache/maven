@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -11,7 +10,6 @@ public class MavenITmng2861RelocationsAndRanges
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng2861RelocationsAndRanges()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" );
     }

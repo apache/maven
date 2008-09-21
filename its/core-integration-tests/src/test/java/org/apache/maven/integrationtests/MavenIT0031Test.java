@@ -1,6 +1,5 @@
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -13,7 +12,6 @@ public class MavenIT0031Test
     extends AbstractMavenIntegrationTestCase
 {
     public MavenIT0031Test()
-        throws InvalidVersionSpecificationException
     {
     }            
 

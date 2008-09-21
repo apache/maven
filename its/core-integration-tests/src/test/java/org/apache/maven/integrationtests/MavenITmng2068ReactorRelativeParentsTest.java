@@ -23,8 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -42,7 +40,6 @@ public class MavenITmng2068ReactorRelativeParentsTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng2068ReactorRelativeParentsTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.6,)" ); // only test in 2.0.7+
     }

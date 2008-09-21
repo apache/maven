@@ -19,7 +19,6 @@
 
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -39,7 +38,6 @@ public class MavenITmng3645POMSyntaxErrorTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3645POMSyntaxErrorTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.10,)" ); // only test in 2.0.10+
     }

@@ -19,7 +19,6 @@
 
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
@@ -42,7 +41,6 @@ public class MavenITmng3314OfflineSnapshotsTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3314OfflineSnapshotsTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }

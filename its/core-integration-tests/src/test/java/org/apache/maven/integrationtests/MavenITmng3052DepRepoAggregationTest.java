@@ -19,7 +19,6 @@
 
 package org.apache.maven.integrationtests;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.IOUtil;
@@ -51,7 +50,6 @@ public class MavenITmng3052DepRepoAggregationTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3052DepRepoAggregationTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.9,)" ); // only test in 2.0.10+
     }

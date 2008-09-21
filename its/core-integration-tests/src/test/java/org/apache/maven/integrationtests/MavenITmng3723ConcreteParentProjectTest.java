@@ -21,7 +21,6 @@ package org.apache.maven.integrationtests;
 
 import java.io.File;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -41,7 +40,6 @@ public class MavenITmng3723ConcreteParentProjectTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3723ConcreteParentProjectTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }

@@ -2,11 +2,9 @@ package org.apache.maven.integrationtests;
 
 import java.io.File;
 
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 /**
  * Test that changes to a project's POM file reference (MavenProject.setFile(..))

@@ -7,8 +7,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -17,7 +15,6 @@ public class MavenITmng2972OverridePluginDependency
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng2972OverridePluginDependency()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" );
     }
