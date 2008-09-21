@@ -53,9 +53,15 @@ public abstract class AbstractMavenIntegrationTestCase
     }
 
     protected AbstractMavenIntegrationTestCase( String versionRangeStr )
-        throws InvalidVersionSpecificationException
     {
-        versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
+        try
+        {
+            versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
+        }
+        catch ( InvalidVersionSpecificationException e)
+        {
+            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr ).initCause( e );
+        }
 
         String v = System.getProperty( "maven.version" );
         if ( v != null )
@@ -79,9 +85,15 @@ public abstract class AbstractMavenIntegrationTestCase
      * executing altogether if the wrong version is present.
      */
     protected boolean matchesVersionRange( String versionRangeStr )
-        throws InvalidVersionSpecificationException
     {
-        versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
+        try
+        {
+            versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
+        }
+        catch ( InvalidVersionSpecificationException e)
+        {
+            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr ).initCause( e );
+        }
 
         String v = System.getProperty( "maven.version" );
         if ( v != null )
