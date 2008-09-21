@@ -20,7 +20,7 @@ public class MavenIT0024Test
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "initialize" );
-        verifier.assertFilePresent( "plugin-exec-configuration.txt" );
+        verifier.assertFilePresent( "target/plugin-exec-configuration.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

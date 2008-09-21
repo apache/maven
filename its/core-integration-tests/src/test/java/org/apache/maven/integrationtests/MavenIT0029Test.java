@@ -21,7 +21,7 @@ public class MavenIT0029Test
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0029", "1.0-SNAPSHOT", "jar" );
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0029-child", "1.0-SNAPSHOT", "jar" );
         verifier.executeGoal( "install" );
-        verifier.assertFilePresent( "plugin-management-configuration.txt" );
+        verifier.assertFilePresent( "target/plugin-management-configuration.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

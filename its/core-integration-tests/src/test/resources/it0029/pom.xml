@@ -41,7 +41,7 @@ under the License.
           <groupId>org.apache.maven.its.plugins</groupId>
           <artifactId>maven-it-plugin-file</artifactId>
           <configuration>
-            <pathname>plugin-management-configuration.txt</pathname>
+            <pathname>target/plugin-management-configuration.txt</pathname>
           </configuration>
         </plugin>
       </plugins>

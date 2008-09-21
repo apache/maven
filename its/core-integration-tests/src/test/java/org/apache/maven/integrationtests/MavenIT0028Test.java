@@ -20,7 +20,7 @@ public class MavenIT0028Test
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file::file" );
-        verifier.assertFilePresent( "file.txt" );
+        verifier.assertFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

@@ -43,7 +43,7 @@ under the License.
             <id>test</id>
             <phase>initialize</phase>
             <configuration>
-              <pathname>plugin-exec-configuration.txt</pathname>
+              <pathname>target/plugin-exec-configuration.txt</pathname>
             </configuration>
             <goals>
               <goal>file</goal>
