@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -44,7 +43,6 @@ public class MavenITmngXXXXDescriptionOfProblemTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmngXXXXDescriptionOfProblemTest()
-        throws InvalidVersionSpecificationException
     {
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }
