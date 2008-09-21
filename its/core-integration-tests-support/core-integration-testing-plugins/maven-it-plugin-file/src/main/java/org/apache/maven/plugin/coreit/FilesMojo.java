@@ -77,7 +77,8 @@ public class FilesMojo
 
             try
             {
-                 outputFile.createNewFile();
+                outputFile.getParentFile().mkdirs();
+                outputFile.createNewFile();
             }
             catch ( IOException e )
             {

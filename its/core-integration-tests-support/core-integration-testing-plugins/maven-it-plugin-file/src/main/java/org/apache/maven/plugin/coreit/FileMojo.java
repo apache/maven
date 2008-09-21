@@ -41,7 +41,7 @@ public class FileMojo
     /**
      * The path to the output file, relative to the current working directory.
      * 
-     * @parameter expression="${maven.pathname}" default-value="file.txt" alias="outputFile"
+     * @parameter expression="${maven.pathname}" default-value="target/file.txt" alias="outputFile"
      */
     private String pathname;
 
@@ -67,7 +67,8 @@ public class FileMojo
 
         try
         {
-             outputFile.createNewFile();
+            outputFile.getParentFile().mkdirs();
+            outputFile.createNewFile();
         }
         catch ( IOException e )
         {
