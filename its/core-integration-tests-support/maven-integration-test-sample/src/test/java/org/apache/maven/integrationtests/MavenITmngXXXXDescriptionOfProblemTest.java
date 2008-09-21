@@ -1,4 +1,4 @@
-package org.apache.maven.itSample;
+package org.apache.maven.integrationtests;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
