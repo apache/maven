@@ -165,9 +165,23 @@ public final class ArtifactModelContainerFactory
                             return ModelContainerAction.NOP;
                         }
                     }
-                    return ModelContainerAction.DELETE;//TODO Verify - PluginManagement Section may make versions equal
+                    return ModelContainerAction.JOIN;
                 }
-
+                if ( version == null )
+                {
+                    if ( c.version == null )
+                    {
+                        if ( c.type.equals( type ) )
+                        {
+                            return ModelContainerAction.JOIN;
+                        }
+                        else
+                        {
+                            return ModelContainerAction.NOP;
+                        }
+                    }
+                    return ModelContainerAction.JOIN;
+                }
                 if ( c.version.equals( version ) )
                 {
                     if ( c.type.equals( type ) )
