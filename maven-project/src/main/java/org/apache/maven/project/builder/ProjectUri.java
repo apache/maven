@@ -392,7 +392,7 @@ public class ProjectUri
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
 
                             public static String configuration =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/execution#collections/execution/configuration";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/execution#collection/execution/configuration";
                         }
                     }
 
