@@ -45,9 +45,9 @@ under the License.
   </modules>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests-support</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests-support</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-integration-tests-support</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support</developerConnection>
+    <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-it-support</url>
   </scm>
   <issueManagement>
     <system>jira</system>

@@ -36,6 +36,6 @@ under the License.
 
   <modules>
     <module>core-it-suite</module>
-    <module>core-integration-tests-support</module>
+    <module>core-it-support</module>
   </modules>
 </project>
