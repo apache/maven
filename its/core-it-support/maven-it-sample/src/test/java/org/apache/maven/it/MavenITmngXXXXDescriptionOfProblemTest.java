@@ -1,4 +1,4 @@
-package org.apache.maven.integrationtests;
+package org.apache.maven.it;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

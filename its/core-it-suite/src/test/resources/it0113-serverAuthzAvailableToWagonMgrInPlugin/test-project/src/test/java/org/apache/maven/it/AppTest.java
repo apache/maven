@@ -1,4 +1,4 @@
-package org.apache.maven.integrationtests;
+package org.apache.maven.it;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
