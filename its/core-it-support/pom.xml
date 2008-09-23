@@ -39,7 +39,7 @@ under the License.
 
   <modules>
     <module>core-it-plugins</module>
-    <module>core-integration-testing-wagon</module>
+    <module>core-it-wagon</module>
     <module>core-integration-testing-support</module>
     <module>maven-it-helper</module>
   </modules>

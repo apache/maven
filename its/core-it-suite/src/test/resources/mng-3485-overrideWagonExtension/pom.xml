@@ -16,7 +16,7 @@
     <extensions>
       <extension>
         <groupId>org.apache.maven.its</groupId>
-        <artifactId>core-integration-testing-wagon</artifactId>
+        <artifactId>core-it-wagon</artifactId>
         <version>2.1-SNAPSHOT</version>
       </extension>
     </extensions>
