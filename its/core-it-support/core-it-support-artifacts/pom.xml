@@ -28,11 +28,11 @@ under the License.
     <version>2.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>integration-test-support-artifacts</artifactId>
+  <artifactId>core-it-support-artifacts</artifactId>
   <version>2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Integration Test Support Artifacts</name>
+  <name>Maven Integration Test Support Artifacts</name>
 
   <build>
     <plugins>
