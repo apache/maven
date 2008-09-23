@@ -160,7 +160,6 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
         suite.addTestSuite( MavenIT0107Test.class );
         suite.addTestSuite( MavenIT0106Test.class );
-        suite.addTestSuite( MavenIT0105Test.class );
         suite.addTestSuite( MavenIT0104Test.class );
         suite.addTestSuite( MavenIT0103Test.class );
         suite.addTestSuite( MavenIT0102Test.class );
