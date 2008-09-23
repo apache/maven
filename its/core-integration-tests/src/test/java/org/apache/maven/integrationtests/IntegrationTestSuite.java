@@ -229,7 +229,6 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenIT0036Test.class );
         suite.addTestSuite( MavenIT0035Test.class );
         suite.addTestSuite( MavenIT0034Test.class );
-        suite.addTestSuite( MavenIT0033Test.class );
         suite.addTestSuite( MavenIT0032Test.class );
         suite.addTestSuite( MavenIT0031Test.class );
         suite.addTestSuite( MavenIT0030Test.class );
