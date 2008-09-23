@@ -29,7 +29,7 @@ under the License.
   </parent>
 
   <groupId>org.apache.maven.its</groupId>
-  <artifactId>maven-integration-test-sample-archetype</artifactId>
+  <artifactId>maven-it-archetype</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
 
