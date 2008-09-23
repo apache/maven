@@ -29,19 +29,19 @@ public class MavenIT0048Test
 {
 
     /**
-     * Verify that default values for mojo parameters are working (indirectly,
-     * by verifying that the Surefire mojo is functioning correctly).
+     * Verify that default values for mojo parameters are working (indirectly, 
+     * by verifying that the IT mojo is functioning correctly).
      */
     public void testit0048()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0048" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "test" );
-        verifier.assertFilePresent( "target/testFileOutput.txt" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file::file" );
+        verifier.assertFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
