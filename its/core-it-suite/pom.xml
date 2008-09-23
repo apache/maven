@@ -29,15 +29,15 @@ under the License.
     <relativePath>../core-integration-tests-support/pom.xml</relativePath>
   </parent>
 
-  <artifactId>core-integration-tests</artifactId>
+  <artifactId>core-it-suite</artifactId>
 
   <name>Maven Integration Tests</name>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-integration-tests</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-integration-tests</url>
-  </scm>     
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-suite</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-suite</developerConnection>
+    <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-it-suite</url>
+  </scm>
 
   <dependencies>
     <dependency>
@@ -126,8 +126,8 @@ under the License.
             <configuration>
               <skip>false</skip>
             </configuration>
-          </plugin>  
-        </plugins>  
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>

@@ -35,7 +35,7 @@ under the License.
   <packaging>pom</packaging>
 
   <modules>
-    <module>core-integration-tests</module>
+    <module>core-it-suite</module>
     <module>core-integration-tests-support</module>
   </modules>
 </project>
