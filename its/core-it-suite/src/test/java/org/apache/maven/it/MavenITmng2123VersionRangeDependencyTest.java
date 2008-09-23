@@ -1,4 +1,4 @@
-package ${package};
+package org.apache.maven.it;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package ${package};
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -23,37 +23,27 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.it.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-/**
- * This is a sample integration test. The IT tests typically
- * operate by having a sample project in the
- * /src/test/resources folder along with a junit test like
- * this one. The junit test uses the verifier (which uses
- * the invoker) to invoke a new instance of Maven on the
- * project in the resources folder. It then checks the
- * results. This is a non-trivial example that shows two
- * phases. See more information inline in the code.
- * 
- * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * 
- */
-public class MavenITmngXXXXDescriptionOfProblemTest
+
+public class MavenITmng2123VersionRangeDependencyTest
     extends AbstractMavenIntegrationTestCase
 {
-    public void testitMNGxxxx ()
+    
+    public MavenITmng2123VersionRangeDependencyTest()
+    {
+        super( "(2.0.8,)" );
+    }
+    
+    public void testitMNG2123 ()
         throws Exception
     {
-        // TODO: RENAME THIS TEST TO SUIT YOUR SCENARIO.
-        // Usign the Jira issue id this reproduces is a good
-        // start, along with a description:
-        // ie MNG-13x-HoustonWeHaveAProblemTest  (must end in test)
+       
 
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-xxxx-descriptionOfProblem" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2123-npe-with-conflicting-ranges" );
 
         Verifier verifier;
 
@@ -65,9 +55,10 @@ public class MavenITmngXXXXDescriptionOfProblemTest
          * makes it easy to do this.
          */
         verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.itsample", "parent", "1.0", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.itsample", "checkstyle-test", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.itsample", "checkstyle-assembly", "1.0", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2123", "parent", "1.0", "pom" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2123", "artifact-combined", "1.0", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2123", "artifact-fix", "1.0", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2123", "artifact-range", "1.0", "jar" );
 
         /*
          * The Command Line Options (CLI) are passed to the
@@ -99,35 +90,31 @@ public class MavenITmngXXXXDescriptionOfProblemTest
         verifier.resetStreams();
 
         /*
-         * This particular test requires an extension
-         * containing resources to be installed that is then
-         * used by the actual IT test. Here we invoker Maven
-         * again to install it. Again, this is just
-         * preparation for the test.
+         * Build the artifact with a fix version of commons-collections
          */
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "checkstyle-assembly" ).getAbsolutePath() );
+        verifier = new Verifier( new File( testDir.getAbsolutePath(), "artifact-fix" ).getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         /*
-         * Now we are running the actual test. This
-         * particular test will attempt to load the
-         * resources from the extension jar previously
-         * installed. If Maven doesn't pass this to the
-         * classpath correctly, the build will fail. This
-         * particular test will fail in Maven <2.0.6.
+         * Build the artifact with a version range of commons-collections
          */
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "checkstyle-test" ).getAbsolutePath() );
+        verifier = new Verifier( new File( testDir.getAbsolutePath(), "artifact-range" ).getAbsolutePath() );
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+        
+        /*
+         * Now we are running the actual test. 
+         * This particular test will attempt to build the
+         * artifact that uses the artifacts above.
+         * On any version >= 2.0.9 it should work
+         */
+        verifier = new Verifier( new File( testDir.getAbsolutePath(), "artifact-combined" ).getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        /*
-         * The verifier also supports beanshell scripts for
-         * verification of more complex scenarios. There are
-         * plenty of examples in the core-it tests here:
-         * http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk
-         */
     }
 }
