@@ -29,7 +29,7 @@ under the License.
   </parent>
 
   <groupId>org.apache.maven.its</groupId>
-  <artifactId>maven-integration-test-helper</artifactId>
+  <artifactId>maven-it-helper</artifactId>
 
   <name>Maven Integration Test Helper Library</name>
 

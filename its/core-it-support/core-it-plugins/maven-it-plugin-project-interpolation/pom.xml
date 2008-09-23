@@ -48,7 +48,7 @@ under the License.
     <!-- Test the resolution of the version -->
     <dependency>
       <groupId>org.apache.maven.its</groupId>
-      <artifactId>maven-integration-test-helper</artifactId>
+      <artifactId>maven-it-helper</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
