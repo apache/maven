@@ -38,10 +38,10 @@ public class MavenIT0076Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0076" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "initialize" );
+        verifier.assertFileNotPresent( "target/unexpected.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
