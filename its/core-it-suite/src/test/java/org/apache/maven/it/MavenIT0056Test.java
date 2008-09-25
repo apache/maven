@@ -29,24 +29,19 @@ public class MavenIT0056Test
 {
 
     /**
-     * Test that multiple executions of the compile goal with different
-     * includes/excludes will succeed.
+     * Test that multiple executions of a goal with different
+     * parameter values will succeed.
      */
     public void testit0056()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0056" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "test-compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0056/Person.class" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0056/PersonTwo.class" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0056/PersonThree.class" );
-        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0056/PersonTest.class" );
-        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0056/PersonTwoTest.class" );
-        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0056/PersonThreeTest.class" );
+        verifier.executeGoal( "initialize" );
+        verifier.assertFilePresent( "target/first-exec.txt" );
+        verifier.assertFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
