@@ -29,7 +29,7 @@ public class MavenIT0078Test
 {
 
     /**
-     * Test that configuration for maven-compiler-plugin is injected from
+     * Test that configuration for a lifecycle-bound plugin is injected from
      * PluginManagement section even when it's not explicitly defined in the
      * plugins section.
      */
@@ -38,11 +38,11 @@ public class MavenIT0078Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0078" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "compile" );
-        verifier.assertFileNotPresent( "target/classes/Test.class" );
+        verifier.executeGoal( "process-resources" );
+        verifier.assertFilePresent( "target/plugin-management.txt" );
+        verifier.assertFileNotPresent( "target/resources-resources.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
