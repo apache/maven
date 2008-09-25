@@ -37,11 +37,11 @@ public class MavenIT0074Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0074" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "eclipse:eclipse" );
-        verifier.assertFilePresent( ".classpath" );
+        verifier.executeGoal( "process-resources" );
+        verifier.assertFilePresent( "target/exec-level.txt" );
+        verifier.assertFilePresent( "target/resources-resources.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
