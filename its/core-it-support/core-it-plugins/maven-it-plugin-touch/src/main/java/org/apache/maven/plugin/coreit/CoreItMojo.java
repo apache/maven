@@ -94,7 +94,7 @@ public class CoreItMojo
         // This parameter should be aligned to the basedir as the parameter type is specified
         // as java.io.File
 
-        if ( basedirAlignmentDirectory.getPath().equals( "target/test-basedir-alignment" ) )
+        if ( !basedirAlignmentDirectory.isAbsolute() )
         {
             throw new MojoExecutionException( "basedirAlignmentDirectory not aligned" );
         }
