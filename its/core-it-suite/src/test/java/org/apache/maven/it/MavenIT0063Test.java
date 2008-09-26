@@ -23,27 +23,30 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
 
 public class MavenIT0063Test
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test the use of a system scoped dependency to tools.jar.
+     * Test the use of a system scoped dependency to a (fake) tools.jar.
      */
     public void testit0063()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0063" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0063/Person.class" );
-        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0063/PersonTest.class" );
-        verifier.assertFilePresent( "target/maven-it-it0063-1.0.jar" );
-        verifier.assertFilePresent( "target/maven-it-it0063-1.0.jar!/it0063.properties" );
+        verifier.getSystemProperties().setProperty( "jre.home", new File( testDir, "jdk/jre" ).getPath() );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        List lines = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        assertEquals( 2, lines.size() );
+        assertEquals( new File( testDir, "jdk/lib/tools.jar").getCanonicalFile(), 
+                      new File( (String) lines.get(1) ).getCanonicalFile() );
     }
-}
 
+}
