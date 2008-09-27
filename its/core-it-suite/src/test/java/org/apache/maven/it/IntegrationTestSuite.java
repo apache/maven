@@ -238,6 +238,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenIT0022Test.class );
         suite.addTestSuite( MavenIT0021Test.class );
         suite.addTestSuite( MavenIT0019Test.class );
+        suite.addTestSuite( MavenIT0018Test.class );
         suite.addTestSuite( MavenIT0014Test.class );
         suite.addTestSuite( MavenIT0012Test.class );
         suite.addTestSuite( MavenIT0011Test.class );
@@ -264,11 +265,6 @@ MavenITmng3645POMSyntaxErrorTest
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
         // suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
         // suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
-
-        // Test 18 always fails because it is trying to delete a
-        // commonly used artifact (commons-logging-1.0.3) that is in use
-        // in the repo. It should be redone using fake artifacts.
-        // suite.addTestSuite( MavenIT0018Test.class );
 
         // this test is flakey on windows and isn't a test of the core.
         // suite.addTestSuite( MavenIT0020Test.class );

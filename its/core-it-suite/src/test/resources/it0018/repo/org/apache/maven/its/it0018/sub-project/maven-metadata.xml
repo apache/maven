@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <groupId>org.apache.maven.its.it0018</groupId>
+  <artifactId>sub-project</artifactId>
+  <version>1</version>
+  <versioning>
+    <versions>
+      <version>1</version>
+    </versions>
+    <lastUpdated>20080927182601</lastUpdated>
+  </versioning>
+</metadata>
