@@ -253,7 +253,6 @@
     <module>maven-lifecycle</module>
     <module>maven-model</module>
     <module>maven-plugin-api</module>
-    <module>maven-profile</module>
     <module>maven-project</module>
     <module>maven-reporting-api</module>
     <module>maven-embedder</module>
