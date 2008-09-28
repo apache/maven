@@ -58,7 +58,9 @@ public class SuperPomProjectBuilderTest
         pm.addProfile( profile );
         pm.explicitlyActivate( profile.getId() );
 
-        MavenProject project = projectBuilder.buildStandaloneSuperProject( pm );
+        ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
+        pbc.setGlobalProfileManager( pm );
+        MavenProject project = projectBuilder.buildStandaloneSuperProject( pbc );
 
         assertRepository( repo.getId(), project.getRepositories() );
         assertRepository( repo.getId(), project.getPluginRepositories() );
@@ -69,7 +71,7 @@ public class SuperPomProjectBuilderTest
     public void testStandaloneSuperPomContainsCentralRepo()
         throws ProjectBuildingException
     {
-        MavenProject project = projectBuilder.buildStandaloneSuperProject();
+        MavenProject project = projectBuilder.buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
 
         assertRepository( "central", project.getRepositories() );
         assertRepository( "central", project.getPluginRepositories() );

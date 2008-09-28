@@ -115,17 +115,16 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public MavenProject build( File projectDescriptor, ArtifactRepository localRepository,
-                               ProfileManager profileManager )
+    // This is used by the SITE plugin.
+    public MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        ProjectBuilderConfiguration config =
-            new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository )
-                .setGlobalProfileManager( profileManager );
-
-        return build( projectDescriptor, config );
-    }
-
+        ProjectBuilderConfiguration cbf = new DefaultProjectBuilderConfiguration();
+        cbf.setLocalRepository( localRepository );
+        cbf.setGlobalProfileManager( profileManager );
+        return build( project, cbf );
+    }    
+    
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
@@ -148,21 +147,14 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
-                                             ArtifactRepository localRepository, boolean allowStub )
+    // This is used by the RR plugin
+    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository, boolean allowStubs )
         throws ProjectBuildingException
-
     {
         return buildFromRepository( artifact, remoteArtifactRepositories, localRepository );
     }
 
-    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
-                                             ArtifactRepository localRepository )
+    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         File f = artifact.getFile();
@@ -184,22 +176,6 @@ public class DefaultMavenProjectBuilder
         project.setVersion( artifact.getVersion() );
 
         return project;
-    }
-
-    // what is using this externally? jvz.
-    public MavenProject buildStandaloneSuperProject()
-        throws ProjectBuildingException
-    {
-        //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
-        return buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
-    }
-
-    public MavenProject buildStandaloneSuperProject( ProfileManager profileManager )
-        throws ProjectBuildingException
-    {
-        //TODO mkleint - use the (Container, Properties) constructor to make system properties embeddable
-        return buildStandaloneSuperProject(
-            new DefaultProjectBuilderConfiguration().setGlobalProfileManager( profileManager ) );
     }
 
     public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
@@ -307,31 +283,6 @@ public class DefaultMavenProjectBuilder
         project.setExecutionRoot( true );
 
         return project;
-    }
-
-    /**
-     * @since 2.0.x
-     */
-    public MavenProject buildWithDependencies( File projectDescriptor, ArtifactRepository localRepository,
-                                               ProfileManager profileManager )
-        throws ProjectBuildingException
-    {
-        return buildProjectWithDependencies( projectDescriptor, localRepository, profileManager ).getProject();
-    }
-
-    /**
-     * @since 2.1
-     */
-    public MavenProjectBuildingResult buildProjectWithDependencies( File projectDescriptor,
-                                                                    ArtifactRepository localRepository,
-                                                                    ProfileManager profileManager )
-        throws ProjectBuildingException
-    {
-        ProjectBuilderConfiguration config =
-            new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository )
-                .setGlobalProfileManager( profileManager );
-
-        return buildProjectWithDependencies( projectDescriptor, config );
     }
 
     public MavenProjectBuildingResult buildProjectWithDependencies( File projectDescriptor,

@@ -41,6 +41,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -74,6 +75,8 @@ public class MavenMetadataSource
     private ArtifactFactory artifactFactory;
 
     private RepositoryMetadataManager repositoryMetadataManager;
+
+    public HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();
 
     // lazily instantiated and cached.
     private MavenProject superProject;
@@ -143,8 +146,6 @@ public class MavenMetadataSource
     {
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
-
-    private HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();
     
     private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository,
                                                         List<ArtifactRepository> remoteRepositories )
@@ -407,7 +408,7 @@ public class MavenMetadataSource
         {
             try
             {
-                superProject = mavenProjectBuilder.buildStandaloneSuperProject();
+                superProject = mavenProjectBuilder.buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
             }
             catch ( ProjectBuildingException e )
             {
