@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Maven 2.x Embedder Plug-in
-Bundle-Vendor: maven.org
-Bundle-SymbolicName: org.maven.ide.embedder
-Bundle-Version: ${bundleVersion}
-Bundle-ClassPath: .

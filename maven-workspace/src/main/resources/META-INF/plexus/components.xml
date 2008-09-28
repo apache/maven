@@ -1,9 +1,0 @@
-<component-set>
-  <components>
-    <component>
-      <role>org.apache.maven.workspace.MavenWorkspaceStore</role>
-      <role-hint>default</role-hint>
-      <implementation>org.apache.maven.workspace.DefaultMavenWorkspaceStore</implementation>
-    </component>
-  </components>
-</component-set>

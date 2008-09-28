@@ -207,9 +207,6 @@ under the License.
       <implementation>org.apache.maven.extension.lineage.DefaultModelLineageBuilder</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.project.workspace.ProjectWorkspace</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.profiles.build.ProfileAdvisor</role>
           <role-hint>default</role-hint>
         </requirement>

@@ -155,6 +155,7 @@ TODO:
   <target name="maven-compile" depends="compile-boot" description="compiles Maven using the bootstrap Maven, skipping automated tests">
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <classpath refid="maven.classpath"/>
+      <arg value="-e"/>      
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>

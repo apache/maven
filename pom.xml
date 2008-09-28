@@ -256,9 +256,9 @@
     <module>maven-project</module>
     <module>maven-reporting-api</module>
     <module>maven-embedder</module>
-    <module>maven-workspace</module>
     <module>maven-shared-model</module>
     <module>maven-toolchain</module>
+    <module>maven-compat</module>
   </modules>
   <properties>
     <artifactVersion>3.0-alpha-2-SNAPSHOT</artifactVersion>
@@ -291,11 +291,6 @@
     <dependencies>
       <!--  Maven Modules -->
       <!--start-->
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-workspace</artifactId>
-        <version>${project.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-lifecycle</artifactId>

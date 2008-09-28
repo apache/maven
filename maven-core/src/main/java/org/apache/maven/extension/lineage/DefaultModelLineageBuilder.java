@@ -35,7 +35,6 @@ import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ModelAndFile;
-import org.apache.maven.project.workspace.ProjectWorkspace;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -69,8 +68,6 @@ public class DefaultModelLineageBuilder
 
     private ProfileAdvisor profileAdvisor;
 
-    private ProjectWorkspace projectWorkspace;
-
     private Logger logger;
 
     public DefaultModelLineageBuilder()
@@ -99,12 +96,7 @@ public class DefaultModelLineageBuilder
         List currentRemoteRepositories = remoteRepositories == null ? new ArrayList()
                         : new ArrayList( remoteRepositories );
 
-        ModelAndFile current = projectWorkspace.getModelAndFile( pom );
-        if ( current == null )
-        {
-            current = new ModelAndFile( readModel( pom ), pom, isReactorProject );
-            projectWorkspace.storeModelAndFile( current );
-        }
+        ModelAndFile current = current = new ModelAndFile( readModel( pom ), pom, isReactorProject );
 
         do
         {
@@ -311,31 +303,7 @@ public class DefaultModelLineageBuilder
                 {
                     parentPomFile = new File( parentPomFile, "pom.xml" );
                 }
-
-//                getLogger().debug( "Checking cache for parent model-and-file instance: " + key + " using file: " + parentPomFile );
-
-                result = projectWorkspace.getModelAndFile( parentPomFile );
-                if ( result != null && !parentModelMatches( modelParent, result.getModel() ) )
-                {
-                    parentPomFile = null;
-                    result = null;
-                }
             }
-
-            if ( result == null )
-            {
-//                getLogger().debug( "Checking cache for parent model-and-file instance: " + key + " using project groupId:artifactId:version." );
-
-                result = projectWorkspace.getModelAndFile( modelParent.getGroupId(), modelParent.getArtifactId(), modelParent.getVersion() );
-            }
-
-            if ( result != null )
-            {
-//                getLogger().debug( "Returning cached instance." );
-                return result;
-            }
-
-//            getLogger().debug( "Allowing parent-model resolution to proceed for: " + key + " (child is: " + model.getId() + ")" );
 
             if ( parentPomFile != null )
             {
@@ -419,12 +387,6 @@ public class DefaultModelLineageBuilder
                 Model parent = readModel( parentPomFile );
                 result = new ModelAndFile( parent, parentPomFile, !isResolved );
             }
-        }
-
-        if ( result != null )
-        {
-//            getLogger().debug( "Caching parent model-and-file: " + result );
-            projectWorkspace.storeModelAndFile( result );
         }
 
         return result;

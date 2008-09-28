@@ -70,6 +70,7 @@
           <lifecycle>
             <id>default</id>
             <!-- START SNIPPET: pom-lifecycle -->
+            
             <phases>
               <package>org.apache.maven.plugins:maven-site-plugin:attach-descriptor</package>
               <install>org.apache.maven.plugins:maven-install-plugin:install</install>

@@ -24,9 +24,6 @@ under the License.
       <implementation>org.apache.maven.embedder.execution.DefaultMavenExecutionRequestPopulator</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.workspace.MavenWorkspaceStore</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.artifact.manager.WagonManager</role>
           <role-hint>default</role-hint>
         </requirement>
@@ -75,6 +72,5 @@ under the License.
         </httpHeaders>
       </configuration>
     </component>
-
   </components>
 </component-set>

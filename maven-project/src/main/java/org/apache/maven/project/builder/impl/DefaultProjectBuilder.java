@@ -27,7 +27,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.project.RepositoryHelper;
 import org.apache.maven.project.builder.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.IdModelContainerFactory;
 import org.apache.maven.project.builder.PomArtifactResolver;
@@ -69,8 +68,6 @@ public final class DefaultProjectBuilder
     private ModelValidator validator;
 
     private MavenTools mavenTools;
-
-    private RepositoryHelper repositoryHelper;
 
     /**
      * Default constructor

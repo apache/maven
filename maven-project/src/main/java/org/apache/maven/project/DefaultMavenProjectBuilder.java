@@ -48,7 +48,6 @@ import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.apache.maven.project.workspace.ProjectWorkspace;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -91,8 +90,6 @@ public class DefaultMavenProjectBuilder
     private ProfileAdvisor profileAdvisor;
 
     private MavenTools mavenTools;
-
-    private ProjectWorkspace projectWorkspace;
 
     private ProjectBuilder projectBuilder;
 

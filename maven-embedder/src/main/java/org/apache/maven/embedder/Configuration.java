@@ -20,7 +20,6 @@ package org.apache.maven.embedder;
 
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.monitor.event.MavenWorkspaceMonitor;
 import org.apache.maven.realm.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -152,8 +151,4 @@ public interface Configuration
     Configuration setEventMonitors( List eventMonitors );
 
     List getEventMonitors();
-
-    Configuration setWorkspaceMonitor( MavenWorkspaceMonitor workspaceMonitor );
-
-    MavenWorkspaceMonitor getWorkspaceMonitor();
 }
