@@ -132,11 +132,7 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        MavenProject project = projectWorkspace.getProject( projectDescriptor );
-
-        if ( project == null )
-        {
-            project = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver(
+            MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver(
                 config.getLocalRepository(), repositoryHelper.buildArtifactRepositories(
                 getSuperProject( config, projectDescriptor, true ).getModel() ), artifactResolver ), config );
 
@@ -152,8 +148,6 @@ public class DefaultMavenProjectBuilder
             project.setFile( projectDescriptor );
 
             setBuildOutputDirectoryOnParent( project );
-
-        }
         return project;
     }
 
@@ -170,21 +164,11 @@ public class DefaultMavenProjectBuilder
         return buildFromRepository( artifact, remoteArtifactRepositories, localRepository );
     }
 
-
     public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        MavenProject project = null;
-        if ( !Artifact.LATEST_VERSION.equals( artifact.getVersion() ) &&
-            !Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
-        {
-            project =
-                projectWorkspace.getProject( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-        }
         File f = artifact.getFile();
-        if ( project == null )
-        {
             repositoryHelper.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
             ProjectBuilderConfiguration config =
@@ -195,10 +179,9 @@ public class DefaultMavenProjectBuilder
             artifactRepositories.addAll( repositoryHelper.buildArtifactRepositories(
                 getSuperProject( config, artifact.getFile(), false ).getModel() ) );
 
-            project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver(
+            MavenProject project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver(
                 config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
             project = buildInternal( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
-        }
 
         artifact.setFile( f );
         project.setVersion( artifact.getVersion() );
@@ -439,9 +422,6 @@ public class DefaultMavenProjectBuilder
         projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( project.getModel(), project.getFile(),
                                                                                externalProfileManager ) );
         project.setActiveProfiles( projectProfiles );
-
-        projectWorkspace.storeProjectByCoordinate( project );
-        projectWorkspace.storeProjectByFile( project );
 
         return project;
     }

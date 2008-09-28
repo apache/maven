@@ -56,12 +56,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Jason van Zyl
@@ -149,6 +144,8 @@ public class MavenMetadataSource
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
 
+    private HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();
+    
     private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository,
                                                         List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
@@ -184,44 +181,55 @@ public class MavenMetadataSource
             }
             else
             {
-                try
-                {
-                    project =
-                        mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
-                }
-                catch ( InvalidProjectModelException e )
-                {
-                    handleInvalidOrMissingMavenPOM( artifact, e );
 
-                    if ( getLogger().isDebugEnabled() )
+                if(hm.containsKey(pomArtifact.getId()))
+                {
+                    project = hm.get(pomArtifact.getId());
+                }
+                else
+                {
+                    try
                     {
-                        getLogger().debug( "Reason: " + e.getMessage() );
+                        project =
+                            mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+                        hm.put(pomArtifact.getId(), project);
 
-                        ModelValidationResult validationResult = e.getValidationResult();
-
-                        if ( validationResult != null )
-                        {
-                            getLogger().debug( "\nValidation Errors:" );
-                            for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
-                            {
-                                getLogger().debug( i.next().toString() );
-                            }
-                            getLogger().debug( "\n" );
-                        }
-                        else
-                        {
-                            getLogger().debug( "", e );
-                        }
                     }
+                    catch ( InvalidProjectModelException e )
+                    {
+                        handleInvalidOrMissingMavenPOM( artifact, e );
 
-                    project = null;
-                }
-                catch ( ProjectBuildingException e )
-                {
-                    handleInvalidOrMissingMavenPOM( artifact, e );
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug( "Reason: " + e.getMessage() );
 
-                    project = null;
+                            ModelValidationResult validationResult = e.getValidationResult();
+
+                            if ( validationResult != null )
+                            {
+                                getLogger().debug( "\nValidation Errors:" );
+                                for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
+                                {
+                                    getLogger().debug( i.next().toString() );
+                                }
+                                getLogger().debug( "\n" );
+                            }
+                            else
+                            {
+                                getLogger().debug( "", e );
+                            }
+                        }
+
+                        project = null;
+                    }
+                    catch ( ProjectBuildingException e )
+                    {
+                        handleInvalidOrMissingMavenPOM( artifact, e );
+
+                        project = null;
+                    }
                 }
+
 
                 if ( project != null )
                 {
