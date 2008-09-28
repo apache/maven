@@ -50,12 +50,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This is a temporary class. These methods are originally from the DefaultMavenProjectHelper. This class will be
@@ -78,6 +73,8 @@ public class DefaultRepositoryHelper
     private ProfileAdvisor profileAdvisor;
 
     private MavenXpp3Reader modelReader;
+
+    private static HashMap<String, Model> cache = new HashMap<String, Model>();
 
     private Logger getLogger()
     {
@@ -116,7 +113,15 @@ public class DefaultRepositoryHelper
 
             File file = projectArtifact.getFile();
             artifact.setFile( file );
-            legacy_model = readModelLegacy( projectId, file, false );
+            if(cache.containsKey(projectId))
+            {
+                legacy_model = cache.get(projectId);
+            }
+            else
+            {
+                legacy_model = readModelLegacy( projectId, file, false );
+                cache.put(projectId, legacy_model);
+            }
 
             String downloadUrl = null;
 
