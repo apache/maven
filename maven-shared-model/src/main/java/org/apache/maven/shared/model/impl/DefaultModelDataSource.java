@@ -136,7 +136,7 @@ public final class DefaultModelDataSource
         joinedProperties = sort(joinedProperties, findBaseUriFrom(joinedProperties));
 
         modelProperties.addAll( startIndex, joinedProperties );
-
+        /*
         List<ModelProperty> deletedProperties = new ArrayList<ModelProperty>();
         deletedProperties.addAll( a.getProperties() );
         deletedProperties.addAll( b.getProperties() );
@@ -145,7 +145,7 @@ public final class DefaultModelDataSource
         {
             dataEvents.add( new DataEvent( a, b, deletedProperties, "join" ) );
         }
-
+        */
         return a.createNewInstance( joinedProperties );
     }
 
@@ -163,7 +163,7 @@ public final class DefaultModelDataSource
             throw new IllegalArgumentException( "modelContainer.properties: null" );
         }
         modelProperties.removeAll( modelContainer.getProperties() );
-        dataEvents.add( new DataEvent( modelContainer, null, modelContainer.getProperties(), "delete" ) );
+        //dataEvents.add( new DataEvent( modelContainer, null, modelContainer.getProperties(), "delete" ) );
     }
 
     /**
@@ -311,6 +311,7 @@ public final class DefaultModelDataSource
     public String getEventHistory()
     {
         StringBuffer sb = new StringBuffer();
+        /*
         sb.append( "Original Model Properties\r\n" );
         for ( ModelProperty mp : originalModelProperties )
         {
@@ -327,6 +328,7 @@ public final class DefaultModelDataSource
         {
             sb.append( mp ).append( "\r\n" );
         }
+        */
         return sb.toString();
     }
 
