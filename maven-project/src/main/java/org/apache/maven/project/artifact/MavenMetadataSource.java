@@ -75,9 +75,7 @@ public class MavenMetadataSource
     private ArtifactFactory artifactFactory;
 
     private RepositoryMetadataManager repositoryMetadataManager;
-
-    public HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();
-
+    
     // lazily instantiated and cached.
     private MavenProject superProject;
 
@@ -182,53 +180,42 @@ public class MavenMetadataSource
             }
             else
             {
-
-                if(hm.containsKey(pomArtifact.getId()))
+                try
                 {
-                    project = hm.get(pomArtifact.getId());
+                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
                 }
-                else
+                catch ( InvalidProjectModelException e )
                 {
-                    try
-                    {
-                        project =
-                            mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
-                        hm.put(pomArtifact.getId(), project);
+                    handleInvalidOrMissingMavenPOM( artifact, e );
 
-                    }
-                    catch ( InvalidProjectModelException e )
+                    if ( getLogger().isDebugEnabled() )
                     {
-                        handleInvalidOrMissingMavenPOM( artifact, e );
+                        getLogger().debug( "Reason: " + e.getMessage() );
 
-                        if ( getLogger().isDebugEnabled() )
+                        ModelValidationResult validationResult = e.getValidationResult();
+
+                        if ( validationResult != null )
                         {
-                            getLogger().debug( "Reason: " + e.getMessage() );
-
-                            ModelValidationResult validationResult = e.getValidationResult();
-
-                            if ( validationResult != null )
+                            getLogger().debug( "\nValidation Errors:" );
+                            for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
                             {
-                                getLogger().debug( "\nValidation Errors:" );
-                                for ( Iterator i = validationResult.getMessages().iterator(); i.hasNext(); )
-                                {
-                                    getLogger().debug( i.next().toString() );
-                                }
-                                getLogger().debug( "\n" );
+                                getLogger().debug( i.next().toString() );
                             }
-                            else
-                            {
-                                getLogger().debug( "", e );
-                            }
+                            getLogger().debug( "\n" );
                         }
-
-                        project = null;
+                        else
+                        {
+                            getLogger().debug( "", e );
+                        }
                     }
-                    catch ( ProjectBuildingException e )
-                    {
-                        handleInvalidOrMissingMavenPOM( artifact, e );
 
-                        project = null;
-                    }
+                    project = null;
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    handleInvalidOrMissingMavenPOM( artifact, e );
+
+                    project = null;
                 }
 
 

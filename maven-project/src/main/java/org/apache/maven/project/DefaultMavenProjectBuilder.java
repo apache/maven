@@ -106,6 +106,8 @@ public class DefaultMavenProjectBuilder
 
     private static final String MAVEN_MODEL_VERSION = "4.0.0";
 
+    private HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();    
+    
     public void initialize()
     {
         modelReader = new MavenXpp3Reader();
@@ -157,24 +159,29 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+        MavenProject project = hm.get( artifact.getId() );
+        
+        if ( project != null )
+        {            
+            return project;
+        }        
+        
         File f = artifact.getFile();
-            repositoryHelper.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
+        repositoryHelper.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
-            ProjectBuilderConfiguration config =
-                new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 
-            List<ArtifactRepository> artifactRepositories =
-                new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
-            artifactRepositories.addAll( repositoryHelper.buildArtifactRepositories(
-                getSuperProject( config, artifact.getFile(), false ).getModel() ) );
+        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
+        artifactRepositories.addAll( repositoryHelper.buildArtifactRepositories( getSuperProject( config, artifact.getFile(), false ).getModel() ) );
 
-            MavenProject project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver(
-                config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
-            project = buildInternal( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
+        project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
+        project = buildInternal( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
 
         artifact.setFile( f );
         project.setVersion( artifact.getVersion() );
 
+        hm.put( artifact.getId(), project );
+        
         return project;
     }
 
