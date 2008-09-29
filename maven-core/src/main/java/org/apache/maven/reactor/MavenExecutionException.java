@@ -19,7 +19,6 @@ package org.apache.maven.reactor;
  * under the License.
  */
 
-import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.project.ProjectBuildingException;
 
 import java.io.File;
@@ -47,11 +46,6 @@ public class MavenExecutionException
     }
 
     public MavenExecutionException( String message, IOException cause )
-    {
-        super( message, cause );
-    }
-
-    public MavenExecutionException( String message, ExtensionScanningException cause )
     {
         super( message, cause );
     }

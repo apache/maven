@@ -1,7 +1,6 @@
 package org.apache.maven.errors;
 
 import org.apache.maven.ProjectCycleException;
-import org.apache.maven.extension.ModelInterpolationException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
@@ -181,13 +180,6 @@ public final class CoreErrorTips
         return null;
     }
 
-    public static List getTipsForModelInterpolationError( Model model,
-                                                          File pomFile,
-                                                          ModelInterpolationException cause )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     public static List getIncompatibleProjectMavenVersionPrereqTips( MavenProject project,
                                                                      ArtifactVersion mavenVersion )

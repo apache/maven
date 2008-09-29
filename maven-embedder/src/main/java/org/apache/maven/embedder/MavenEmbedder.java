@@ -34,8 +34,6 @@ import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.errors.CoreReporterManager;
 import org.apache.maven.execution.*;
-import org.apache.maven.extension.BuildExtensionScanner;
-import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.lifecycle.plan.BuildPlan;
@@ -134,8 +132,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private MavenProjectBuilder mavenProjectBuilder;
-
-    private BuildExtensionScanner extensionScanner;
 
     private MavenXpp3Reader modelReader;
 
@@ -345,7 +341,7 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     public MavenProject readProject( File mavenProject )
-    throws ProjectBuildingException, ExtensionScanningException, MavenExecutionException
+    throws ProjectBuildingException, MavenExecutionException
     {
         CoreErrorReporter errorReporter = request.getErrorReporter();
         errorReporter.clearErrors();
@@ -356,12 +352,8 @@ public class MavenEmbedder
     }
 
     private MavenProject readProject( File mavenProject, MavenExecutionRequest request )
-        throws ProjectBuildingException, ExtensionScanningException, MissingModuleException
+        throws ProjectBuildingException, MissingModuleException
     {
-        getLogger().debug( "Scanning for extensions: " + mavenProject );
-
-        extensionScanner.scanForBuildExtensions( mavenProject, request, true );
-
         getLogger().debug( "Building MavenProject instance: " + mavenProject );
 
         return mavenProjectBuilder.build( mavenProject, request.getProjectBuildingConfiguration() );
@@ -413,10 +405,6 @@ public class MavenEmbedder
             return result.addException( e );
         }
         catch ( ProjectBuildingException e )
-        {
-            return result.addException( e );
-        }
-        catch ( ExtensionScanningException e )
         {
             return result.addException( e );
         }
@@ -675,8 +663,6 @@ public class MavenEmbedder
             pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
             mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
-
-            extensionScanner = (BuildExtensionScanner) container.lookup( BuildExtensionScanner.ROLE );
 
             // ----------------------------------------------------------------------
             // Artifact related components

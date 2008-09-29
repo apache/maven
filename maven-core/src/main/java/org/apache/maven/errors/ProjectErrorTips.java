@@ -11,7 +11,6 @@ import org.apache.maven.profiles.activation.ProfileActivator;
 import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.extension.ModelInterpolationException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -121,14 +120,6 @@ public final class ProjectErrorTips
     public static List getTipsForBadNonDependencyArtifactSpec( MavenProject project,
                                                                        File pomFile,
                                                                        InvalidProjectVersionException cause )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public static List getTipsForProjectInterpolationError( MavenProject project,
-                                                                    File pomFile,
-                                                                    ModelInterpolationException cause )
     {
         // TODO Auto-generated method stub
         return null;

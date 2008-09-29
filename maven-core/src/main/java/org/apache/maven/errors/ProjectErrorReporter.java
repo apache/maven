@@ -18,7 +18,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.ModelAndFile;
-import org.apache.maven.extension.ModelInterpolationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -179,25 +178,6 @@ public interface ProjectErrorReporter
                                                 File pomFile,
                                                 Repository repo,
                                                 InvalidRepositoryException cause );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * ...
-     * --&gt; DefaultMavenProjectBuilder.buildFromRepository(..)
-     *  DefaultMavenProjectBuilder.build(..)
-     * --&gt; DefaultMavenProjectBuilder.buildFromSourceFileInternal(..) (private)
-     *     --&gt; DefaultMavenProjectBuilder.buildInternal(..) (private)
-     *         --&gt; DefaultMavenProjectBuilder.processProjectLogic(..) (private)
-     *             --&gt; ModelInterpolator.interpolate(..)
-     *             &lt;-- ModelInterpolationException
-     * &lt;---------- ProjectBuildingException
-     * </pre>
-     */
-    void reportErrorInterpolatingModel( MavenProject project,
-                                        File pomFile,
-                                        ModelInterpolationException cause );
 
     /**
      * <b>Call Stack:</b>

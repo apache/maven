@@ -21,7 +21,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.ModelAndFile;
-import org.apache.maven.extension.ModelInterpolationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -416,23 +415,6 @@ public class DefaultProjectErrorReporter
         registerBuildError( cause, writer.toString() );
     }
 
-    public void reportErrorInterpolatingModel( MavenProject project,
-                                               File pomFile,
-                                               ModelInterpolationException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "You have an invalid expression in your POM (interpolation failed):" );
-        writer.write( NEWLINE );
-        writer.write( cause.getMessage() );
-
-        addStandardInfo( project.getId(), pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForProjectInterpolationError( project, pomFile, cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString() );
-    }
 
     public void reportProjectValidationFailure( MavenProject project,
                                                 File pomFile,

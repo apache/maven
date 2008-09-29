@@ -22,8 +22,6 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.*;
-import org.apache.maven.extension.BuildExtensionScanner;
-import org.apache.maven.extension.ExtensionScanningException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.TaskValidationResult;
@@ -76,8 +74,6 @@ public class DefaultMaven
     protected PlexusContainer container;
 
     protected RuntimeInformation runtimeInformation;
-
-    private BuildExtensionScanner buildExtensionScanner;
 
     private Logger logger;
 
@@ -261,17 +257,6 @@ public class DefaultMaven
             throw new MavenExecutionException(
                 "Error selecting project files for the reactor: " + e.getMessage(),
                 e );
-        }
-
-        // TODO: We should probably do this discovery just-in-time, if we can move to building project
-        // instances just-in-time.
-        try
-        {
-            buildExtensionScanner.scanForBuildExtensions( files, request, false );
-        }
-        catch ( ExtensionScanningException e )
-        {
-            throw new MavenExecutionException( "Error scanning for extensions: " + e.getMessage(), e );
         }
 
         projects = collectProjects( files, request, !request.useReactor() );
