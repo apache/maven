@@ -76,6 +76,12 @@ public class MavenITmng3599useHttpProxyForWebDAV
                     
                     System.out.println( "Proxy-Connection found." );
                 }
+                /*
+                 * 2008-09-29 Oleg: "Proxy-Connection" is not part of http spec, but an extended header, and 
+                 * as such cannot be expected from all the clients.
+                 * Changing the code to test for more generalized case: local proxy receives a request with
+                 * correct server url and resource uri
+                 */
                 else if( 
                     request.getRequestURI().startsWith( "/org/apache/maven/its/mng3599/test-dependency" )
                     && request.getRequestURL().toString().startsWith( "http://www.example.com" )
