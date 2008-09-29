@@ -76,6 +76,16 @@ public class MavenITmng3599useHttpProxyForWebDAV
                     
                     System.out.println( "Proxy-Connection found." );
                 }
+                else if( 
+                    request.getRequestURI().startsWith( "/org/apache/maven/its/mng3599/test-dependency" )
+                    && request.getRequestURL().toString().startsWith( "http://www.example.com" )
+                )
+                {
+                    response.setStatus( HttpServletResponse.SC_OK );
+                    response.getWriter().println( content );
+                    
+                    System.out.println( "Correct proxied request 'http://www.example.com' for resource '/org/apache/maven/its/mng3599/test-dependency' found." );
+                }
                 else
                 {
                     response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
