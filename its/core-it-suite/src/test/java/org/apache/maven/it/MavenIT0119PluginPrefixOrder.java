@@ -34,6 +34,8 @@ public class MavenIT0119PluginPrefixOrder
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0119-pluginprefixorder" );
 
         Verifier verifier;
+        //use my custom settings upon invocation.
+        ArrayList cli = new ArrayList();
 
         // Install the parent POM, extension and the plugin
         verifier = new Verifier( testDir.getAbsolutePath() );
@@ -42,20 +44,22 @@ public class MavenIT0119PluginPrefixOrder
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-
+        // 2008-09-29 Oleg: fixed the test. If current settings.xml contains codehause group, 
+        // default order will be changed. Artificially make currently set groups disappear
+        
         // now run the test. Since we have apache and codehaus, i should get the apache one first
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0119-pluginprefixorder/test-project" );
+        cli.add("-s '" +testDir.getAbsolutePath()+"/settings-apache.xml'");
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setCliOptions( cli );
         verifier.executeGoal( "it0119:apache" );
         verifier.verifyErrorFreeLog();
 
-        
+        cli.clear();
 //      now run the test. Since we have apache and codehaus and a prefix in my settings, i should get the custom one first
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0119-pluginprefixorder/test-project" );
         verifier = new Verifier( testDir.getAbsolutePath() );
         
-        //use my custom settings upon invocation.
-        ArrayList cli = new ArrayList();
         cli.add("-s '" +testDir.getAbsolutePath()+"/settings.xml'");
         verifier.setCliOptions( cli );
         verifier.executeGoal( "it0119:custom" );
