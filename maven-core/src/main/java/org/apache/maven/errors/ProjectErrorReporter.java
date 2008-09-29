@@ -1,11 +1,8 @@
 package org.apache.maven.errors;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -15,9 +12,7 @@ import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.ModelAndFile;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -275,21 +270,6 @@ public interface ProjectErrorReporter
      * <br/>
      * <pre>
      * ...
-     * --&gt; DefaultModelLineageBuilder.buildModelLineage(..)
-     *     --&gt; DefaultModelLineageBuilder.readModel(..) (private)
-     *         --&gt; thrown XmlPullParserException
-     * &lt;------ ProjectBuildingException
-     * </pre>
-     */
-    void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
-                                               File parentPomFile,
-                                               XmlPullParserException cause );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * ...
      * --&gt; DefaultMavenProjectBuilder.buildFromRepository(..)
      *     --&gt; DefaultMavenProjectBuilder.findModelFromRepository(..) (private)
      * DefaultMavenProjectBuilder.build(..)
@@ -302,59 +282,6 @@ public interface ProjectErrorReporter
     void reportErrorParsingProjectModel( String projectId,
                                          File pomFile,
                                          IOException cause );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * ...
-     * --&gt; DefaultModelLineageBuilder.buildModelLineage(..)
-     *     --&gt; DefaultModelLineageBuilder.readModel(..) (private)
-     *         --&gt; thrown IOException
-     * &lt;------ ProjectBuildingException
-     * </pre>
-     */
-    void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
-                                               File parentPomFile,
-                                               IOException cause );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * ...
-     * --&gt; DefaultModelLineageBuilder.buildModelLineage(..)
-     *     --&gt; DefaultModelLineageBuilder.resolveParentPom(..) (private)
-     *         --&gt; DefaultModelLineageBuilder.resolveParentFromRepository(..) (private)
-     *             --&gt; thrown ArtifactNotFoundException
-     * &lt;---------- ProjectBuildingException
-     * </pre>
-     */
-    void reportParentPomArtifactNotFound( Parent parentRef,
-                                          ProjectBuilderConfiguration config,
-                                          List remoteRepos,
-                                          String childId,
-                                          File childPomFile,
-                                          ArtifactNotFoundException cause );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * ...
-     * --&gt; DefaultModelLineageBuilder.buildModelLineage(..)
-     *     --&gt; DefaultModelLineageBuilder.resolveParentPom(..) (private)
-     *         --&gt; DefaultModelLineageBuilder.resolveParentFromRepository(..) (private)
-     *             --&gt; thrown ArtifactResolutionException
-     * &lt;---------- ProjectBuildingException
-     * </pre>
-     */
-    void reportParentPomArtifactUnresolvable( Parent parentRef,
-                                              ProjectBuilderConfiguration config,
-                                              List remoteRepos,
-                                              String childId,
-                                              File childPomFile,
-                                              ArtifactResolutionException cause );
 
     /**
      * <b>Call Stack:</b>

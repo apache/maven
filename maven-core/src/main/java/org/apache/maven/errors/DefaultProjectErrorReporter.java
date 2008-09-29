@@ -20,7 +20,6 @@ import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.ModelAndFile;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -551,50 +550,6 @@ public class DefaultProjectErrorReporter
         registerBuildError( cause, writer.toString() );
     }
 
-    public void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
-                                                      File parentPomFile,
-                                                      XmlPullParserException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        if ( parentPomFile == null )
-        {
-            writer.write( "Error parsing built-in super POM!" );
-        }
-        else
-        {
-            writer.write( "Error parsing parent-POM." );
-        }
-
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( cause.getMessage() );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Line: " );
-        writer.write( "" + cause.getLineNumber() );
-        writer.write( NEWLINE );
-        writer.write( "Column: " );
-        writer.write( "" + cause.getColumnNumber() );
-        writer.write( NEWLINE );
-
-        String projectId = childInfo.getModel().getParent().getId();
-        String childId = childInfo.getModel().getId();
-
-        addStandardInfo( projectId, parentPomFile, writer );
-
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Child-Project Id: " );
-        writer.write( childId );
-
-        addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, parentPomFile, cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString() );
-    }
-
     public void reportErrorParsingProjectModel( String projectId,
                                                 File pomFile,
                                                 IOException cause )
@@ -618,43 +573,6 @@ public class DefaultProjectErrorReporter
 
         addStandardInfo( projectId, pomFile, writer );
         addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, pomFile, cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString() );
-    }
-
-    public void reportErrorParsingParentProjectModel( ModelAndFile childInfo,
-                                                      File parentPomFile,
-                                                      IOException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        if ( parentPomFile == null )
-        {
-            writer.write( "Error reading built-in super POM!" );
-        }
-        else
-        {
-            writer.write( "Error reading parent-POM." );
-        }
-
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( cause.getMessage() );
-        writer.write( NEWLINE );
-
-        String projectId = childInfo.getModel().getParent().getId();
-        String childId = childInfo.getModel().getId();
-
-        addStandardInfo( projectId, parentPomFile, writer );
-
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Child-Project Id: " );
-        writer.write( childId );
-
-        addTips( ProjectErrorTips.getTipsForPomParsingError( projectId, parentPomFile, cause ),
                  writer );
 
         registerBuildError( cause, writer.toString() );
