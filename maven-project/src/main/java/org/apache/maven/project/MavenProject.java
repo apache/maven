@@ -203,7 +203,7 @@ public class MavenProject
         this.artifactFactory = artifactFactory;
         this.mavenProjectBuilder = mavenProjectBuilder;
         this.projectBuilderConfiguration = projectBuilderConfiguration;
-        originalModel = ModelUtils.cloneModel( model );
+        originalModel = model;
         DistributionManagement dm = model.getDistributionManagement();
 
         if ( dm != null )
@@ -1980,11 +1980,11 @@ public class MavenProject
             setScriptSourceRoots( ( new ArrayList( project.getScriptSourceRoots() ) ) );
         }
 
-        setModel( ( ModelUtils.cloneModel( project.getModel() ) ) );
+        setModel(  project.getModel() );
 
         if ( project.getOriginalModel() != null )
         {
-            setOriginalModel( ( ModelUtils.cloneModel( project.getOriginalModel() ) ) );
+            setOriginalModel( project.getOriginalModel() );
         }
 
         setExecutionRoot( project.isExecutionRoot() );

@@ -196,7 +196,7 @@ public class DefaultMavenProjectBuilder
 
         superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
 
-        superModel = ModelUtils.cloneModel( superModel );
+        superModel = superModel;
 
         ProfileManager profileManager = config.getGlobalProfileManager();
 

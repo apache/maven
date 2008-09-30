@@ -20,10 +20,8 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.model.*;
-import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.io.IOException;
 import java.util.*;
 
 public final class ModelUtils
@@ -310,16 +308,6 @@ public final class ModelUtils
         childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
 
         child.setConfiguration( childConfiguration );
-    }
-
-    public static Model cloneModel( Model model )
-    {
-        try {
-            return new PomClassicDomainModel(model).getModel();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return model;
-        }
     }
 
     public static List mergeRepositoryLists( List dominant, List recessive )

@@ -515,7 +515,7 @@ public class DefaultPluginManager
             getLogger().warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
         }
 
-        Model model = ModelUtils.cloneModel( project.getModel() );
+        Model model = project.getModel();
         pathTranslator.alignToBaseDirectory( model, project.getBasedir() );
         project.setBuild( model.getBuild() );
 
