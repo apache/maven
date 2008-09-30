@@ -88,10 +88,7 @@ under the License.
       <role>org.apache.maven.project.MavenProjectBuilder</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.project.DefaultMavenProjectBuilder</implementation>
-      <requirements>
-        <requirement>
-             <role>org.apache.maven.project.RepositoryHelper</role>
-        </requirement>             
+      <requirements>             
         <requirement>
              <role>org.apache.maven.project.builder.ProjectBuilder</role>
         </requirement>
@@ -106,27 +103,6 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.project.validation.ModelValidator</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.MavenTools</role>
-        </requirement>
-      </requirements>
-    </component>
-
-<!--Eliminate this component after Mercury Integration-->      
-    <component>
-      <role>org.apache.maven.project.RepositoryHelper</role>
-      <implementation>org.apache.maven.project.DefaultRepositoryHelper</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.profiles.build.ProfileAdvisor</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>

@@ -93,8 +93,6 @@ public class DefaultMavenProjectBuilder
 
     private ProjectBuilder projectBuilder;
 
-    private RepositoryHelper repositoryHelper;
-
     private Logger logger;
 
     //DO NOT USE, it is here only for backward compatibility reasons. The existing
@@ -131,7 +129,7 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
             MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver(
-                config.getLocalRepository(), repositoryHelper.buildArtifactRepositories(
+                config.getLocalRepository(), buildArtifactRepositories(
                 getSuperProject( config, projectDescriptor, true ).getModel() ), artifactResolver ), config );
 
             project.setFile( projectDescriptor );
@@ -164,21 +162,29 @@ public class DefaultMavenProjectBuilder
         if ( project != null )
         {            
             return project;
-        }        
-        
-        File f = (artifact.getFile() != null) ? artifact.getFile() :
-                new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );;
-        repositoryHelper.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
+        }
+        File originalArtifactFile = artifact.getFile();
+        File f;
+        if ( !"pom".equals( artifact.getType() ) )
+        {
+            Artifact a = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                     artifact.getVersion(), artifact.getScope() );
+            f = new File( localRepository.getBasedir(), localRepository.pathOf( a ) );
+        } else
+        {
+            f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+        }
 
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
-        artifactRepositories.addAll( repositoryHelper.buildArtifactRepositories( getSuperProject( config, artifact.getFile(), false ).getModel() ) );
+        artifactRepositories.addAll( buildArtifactRepositories( getSuperProject( config, f, false ).getModel() ) );
 
-        project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
-        project = buildInternal( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
+        project = readModelFromLocalPath( "unknown", f, new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
+        project = buildInternal( project.getModel(), config, f, project.getParentFile(), false );
 
-        artifact.setFile( f );
+        artifact.setFile( originalArtifactFile );
+
         project.setVersion( artifact.getVersion() );
 
         hm.put( artifact.getId(), project );
@@ -595,4 +601,20 @@ public class DefaultMavenProjectBuilder
             setBuildOutputDirectoryOnParent( parent );
         }
     }
+
+    public List buildArtifactRepositories( Model model )
+        throws ProjectBuildingException
+    {
+        try
+        {
+            return mavenTools.buildArtifactRepositories( model.getRepositories() );
+        }
+        catch ( InvalidRepositoryException e )
+        {
+            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+
+            throw new ProjectBuildingException( projectId, e.getMessage(), e );
+        }
+    }
+
 }
