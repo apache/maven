@@ -104,7 +104,7 @@ public class DefaultMavenProjectBuilder
 
     private static final String MAVEN_MODEL_VERSION = "4.0.0";
 
-    private HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();    
+    private static HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();    
     
     public void initialize()
     {
