@@ -46,7 +46,7 @@ public class MavenITmng3652UserAgentHeader
 
     public MavenITmng3652UserAgentHeader()
     {
-        super( "(2.0.9,2.99.99)" );
+        super( "[2.1.0-M1,2.99.99)" );
     }
 
     public void setUp()
