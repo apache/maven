@@ -37,15 +37,50 @@ public class MavenIT0069Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0069" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-o" );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0069/ClassworldBasedThing.class" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
+        {
+            // phase 1: run build in online mode to fill local repo
+            Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+            verifier.assertFilePresent( "target/compile.txt" );
+            verifier.verifyErrorFreeLog();
+            verifier.resetStreams();
+            new File( testDir, "log.txt").renameTo( new File( testDir, "log1.txt" ) );
+        }
+
+        {
+            // phase 2: run build in offline mode to check it still passes (after deleting test repo, to be sure)
+            Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier.deleteDirectory( "repo" );
+            List cliOptions = new ArrayList();
+            cliOptions.add( "-o" );
+            verifier.setCliOptions( cliOptions );
+            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+            verifier.assertFilePresent( "target/compile.txt" );
+            verifier.verifyErrorFreeLog();
+            verifier.resetStreams();
+            new File( testDir, "log.txt").renameTo( new File( testDir, "log2.txt" ) );
+        }
+
+        {
+            // phase 3: delete test artifact and run build in offline mode to check it fails now
+            Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier.deleteArtifact( "org.apache.maven.its.it0069", "it", "1.0.3", "jar" );
+            List cliOptions = new ArrayList();
+            cliOptions.add( "-o" );
+            verifier.setCliOptions( cliOptions );
+            try
+            {
+                verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+                fail( "Build did not fail!" );
+            }
+            catch( VerificationException e )
+            {
+                // expected, should fail
+            }
+            verifier.resetStreams();
+            new File( testDir, "log.txt").renameTo( new File( testDir, "log3.txt" ) );
+        }
     }
-}
 
+}
