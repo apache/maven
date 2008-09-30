@@ -32,7 +32,7 @@ public class MavenIT0031Test
 {
     public MavenIT0031Test()
     {
-    }            
+    }
 
     /**
      * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from it's prefix using the
@@ -42,21 +42,18 @@ public class MavenIT0031Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0031" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings settings.xml" );
         verifier.setCliOptions( cliOptions );
         Properties systemProperties = new Properties();
-        systemProperties.put( "model", "src/main/mdo/test.mdo" );
-        systemProperties.put( "version", "1.0.0" );
+        systemProperties.put( "maven.pathname", "target/file.txt" );
         verifier.setSystemProperties( systemProperties );
-        Properties verifierProperties = new Properties();
-        verifierProperties.put( "failOnErrorOutput", "false" );
-        verifier.setVerifierProperties( verifierProperties );
-        verifier.executeGoal( "modello:java" );
-        verifier.assertFilePresent( "target/generated-sources/modello/org/apache/maven/it/it0031/Root.java" );
-        // don't verify error free log
+        verifier.executeGoal( "itfile:file" );
+        verifier.assertFilePresent( "target/file.txt" );
+        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
+
 }

@@ -1,35 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0031</name> 
+
   <groupId>org.apache.maven.its.it0031</groupId>
   <artifactId>maven-it-it0031</artifactId>
-  <description>Test usage of plugins.xml mapping file on the repository to resolve
-        plugin artifactId from it's prefix using the pluginGroups in
-        the provided settings.xml.</description>
   <version>1.0-SNAPSHOT</version>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-touch</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <configuration>
-          <pluginItem>${test}</pluginItem>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-    <!--remove when the IT plugins are actually release-->
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache.snapshots</id>
-            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
+
+  <name>Maven Integration Test :: it0031</name> 
+  <description>
+    Test usage of plugins.xml mapping file on the repository to resolve
+    plugin artifactId from it's prefix using the pluginGroups in
+    the provided settings.xml.
+  </description>
+
+  <!--remove when the IT plugins are actually release-->
+  <pluginRepositories>
+      <pluginRepository>
+          <id>apache.snapshots</id>
+          <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+          <snapshots>
+              <enabled>true</enabled>
+          </snapshots>
+          <releases>
+              <enabled>false</enabled>
+          </releases>
+      </pluginRepository>
+  </pluginRepositories>
 </project>

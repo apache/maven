@@ -1,5 +1,5 @@
 <settings>
   <pluginGroups>
-    <pluginGroup>org.codehaus.modello</pluginGroup>
+    <pluginGroup>org.apache.maven.its.plugins</pluginGroup>
   </pluginGroups>
 </settings>
