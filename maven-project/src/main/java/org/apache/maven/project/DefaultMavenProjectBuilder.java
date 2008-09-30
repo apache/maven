@@ -166,7 +166,8 @@ public class DefaultMavenProjectBuilder
             return project;
         }        
         
-        File f = artifact.getFile();
+        File f = (artifact.getFile() != null) ? artifact.getFile() :
+                new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );;
         repositoryHelper.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );

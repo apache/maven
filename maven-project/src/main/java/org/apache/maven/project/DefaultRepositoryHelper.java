@@ -74,17 +74,22 @@ public class DefaultRepositoryHelper
 
     private MavenXpp3Reader modelReader;
 
-    private static HashMap<String, Model> cache = new HashMap<String, Model>();
+    private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();
 
     private Logger getLogger()
     {
         return logger;
     }
 
-    public Model findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
+    public void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                           ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+
+        if(cache.containsKey(artifact.getId()))
+        {
+            artifact.setFile(cache.get(artifact.getId()).getFile());
+        }
 
         String projectId = safeVersionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
         remoteArtifactRepositories = normalizeToArtifactRepositories( remoteArtifactRepositories, projectId );
@@ -106,48 +111,13 @@ public class DefaultRepositoryHelper
                                                                      artifact.getVersion(), artifact.getScope() );
         }
 
-        Model legacy_model;
         try
         {
             artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
 
             File file = projectArtifact.getFile();
             artifact.setFile( file );
-            if(cache.containsKey(projectId))
-            {
-                legacy_model = cache.get(projectId);
-            }
-            else
-            {
-                legacy_model = readModelLegacy( projectId, file, false );
-                cache.put(projectId, legacy_model);
-            }
-
-            String downloadUrl = null;
-
-            ArtifactStatus status = ArtifactStatus.NONE;
-
-            DistributionManagement distributionManagement = legacy_model.getDistributionManagement();
-
-            if ( distributionManagement != null )
-            {
-                downloadUrl = distributionManagement.getDownloadUrl();
-
-                status = ArtifactStatus.valueOf( distributionManagement.getStatus() );
-            }
-
-            checkStatusAndUpdate( projectArtifact, status, file, remoteArtifactRepositories, localRepository );
-
-            // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
-            // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
-            if ( downloadUrl != null )
-            {
-                projectArtifact.setDownloadUrl( downloadUrl );
-            }
-            else
-            {
-                projectArtifact.setDownloadUrl( legacy_model.getUrl() );
-            }
+            cache.put(artifact.getId(), artifact);
         }
         catch ( ArtifactResolutionException e )
         {
@@ -160,8 +130,6 @@ public class DefaultRepositoryHelper
                                                 "POM '" + projectId + "' not found in repository: " + e.getMessage(),
                                                 e );
         }
-
-        return legacy_model;
     }
 
     public List buildArtifactRepositories( Model model )
@@ -277,56 +245,6 @@ public class DefaultRepositoryHelper
         return ArtifactUtils.versionlessKey( gid, aid );
     }
 
-    private void checkModelVersion( String modelSource, String projectId, File file )
-        throws InvalidProjectModelException
-    {
-        if ( modelSource.indexOf( "<modelVersion>4.0.0" ) < 0 )
-        {
-            throw new InvalidProjectModelException( projectId, "Not a v" + MAVEN_MODEL_VERSION + " POM.", file );
-        }
-    }
-
-    private Model readModelLegacy( String projectId, File file, boolean strict )
-        throws ProjectBuildingException
-    {
-        Reader reader = null;
-        try
-        {
-            reader = ReaderFactory.newXmlReader( file );
-
-            String modelSource = IOUtil.toString( reader );
-
-            checkModelVersion( modelSource, projectId, file );
-
-            StringReader sReader = new StringReader( modelSource );
-
-            try
-            {
-                return new MavenXpp3Reader().read( sReader, strict );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new InvalidProjectModelException( projectId, "Parse error reading POM. Reason: " + e.getMessage(),
-                                                        file, e );
-            }
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new ProjectBuildingException( projectId,
-                                                "Could not find the model file '" + file.getAbsolutePath() + "'.", file,
-                                                e );
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( projectId, "Failed to build model from file '" +
-                file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", file, e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-    }
-
     private void collectInitialRepositoriesFromModel( LinkedHashSet collected, Model model, File pomFile,
                                                       boolean validProfilesXmlLocation,
                                                       ProfileActivationContext profileActivationContext )
@@ -355,43 +273,6 @@ public class DefaultRepositoryHelper
                 throw new ProjectBuildingException( safeVersionlessKey( model.getGroupId(), model.getArtifactId() ),
                                                     "Failed to construct ArtifactRepository instances for repositories declared in: " +
                                                         model.getId(), e );
-            }
-        }
-    }
-
-    private void checkStatusAndUpdate( Artifact projectArtifact, ArtifactStatus status, File file,
-                                       List remoteArtifactRepositories, ArtifactRepository localRepository )
-        throws ArtifactNotFoundException
-    {
-        // TODO: configurable actions dependant on status
-        if ( !projectArtifact.isSnapshot() && ( status.compareTo( ArtifactStatus.DEPLOYED ) < 0 ) )
-        {
-            // use default policy (enabled, daily update, warn on bad checksum)
-            ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
-            // TODO: re-enable [MNG-798/865]
-            policy.setUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
-
-            if ( policy.checkOutOfDate( new Date( file.lastModified() ) ) )
-            {
-                getLogger().info(
-                    projectArtifact.getArtifactId() + ": updating metadata due to status of '" + status + "'" );
-                try
-                {
-                    projectArtifact.setResolved( false );
-                    artifactResolver.resolveAlways( projectArtifact, remoteArtifactRepositories, localRepository );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    getLogger().warn( "Error updating POM - using existing version" );
-                    getLogger().debug( "Cause", e );
-                }
-                catch ( ArtifactNotFoundException e )
-                {
-                    getLogger().warn( "Error updating POM - not found. Removing local copy." );
-                    getLogger().debug( "Cause", e );
-                    file.delete();
-                    throw e;
-                }
             }
         }
     }
