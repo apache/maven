@@ -82,7 +82,14 @@ TODO:
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
        <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-20"/>
+    </artifact:dependencies>
+    
+    <!-- Pull the dependencies for the MetadataGenerator CLI -->
+    <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
+       <localRepository path="${maven.repo.local}"/>
+       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="1.0-beta-1"/>
     </artifact:dependencies>          
+    
   </target>
 
   <target name="generate-sources" depends="pull" description="generates Java sources from Modello mdo model files">
