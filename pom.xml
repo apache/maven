@@ -149,6 +149,18 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>1.0-beta-1</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>      
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>2.1</version>
@@ -268,7 +280,7 @@
     <doxiaVersion>1.0-alpha-9</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.1</junitVersion>
-    <plexusVersion>1.0-alpha-48</plexusVersion>
+    <plexusVersion>1.0-beta-1</plexusVersion>
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.1</plexusInterpolationVersion>
     <plexusUtilsVersion>1.5.5</plexusUtilsVersion>
@@ -353,6 +365,11 @@
         <artifactId>plexus-container-default</artifactId>
         <version>${plexusVersion}</version>
       </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>${plexusVersion}</version>
+      </dependency>          
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
