@@ -406,13 +406,13 @@ public class DefaultMavenProjectBuilder
     {
 
         MavenProject project = new MavenProject( model, artifactFactory, mavenTools, this, config );
+        validateModel( model, pomFile );
 
         Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
                                                                         project.getVersion(), project.getPackaging() );
         project.setArtifact( projectArtifact );
         project.setParentFile( parentFile );
 
-        validateModel( model, pomFile );
         return project;
     }
 
