@@ -21,6 +21,7 @@ package org.apache.maven.project.inheritance;
 
 import org.apache.maven.model.*;
 import org.apache.maven.project.ModelUtils;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -34,16 +35,10 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
-/**
- * @author Jason van Zyl
- * @version $Id: DefaultModelInheritanceAssembler.java,v 1.4 2004/08/23 20:24:54
- *          jdcasey Exp $
- * @todo generate this with modello to keep it in sync with changes in the model.
- */
+@Component(role = ModelInheritanceAssembler.class)
 public class DefaultModelInheritanceAssembler
     implements ModelInheritanceAssembler
 {
-
     // TODO: Remove this!
     @SuppressWarnings("unchecked")
     public void assembleBuildInheritance( Build childBuild, Build parentBuild, boolean handleAsInheritance )
