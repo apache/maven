@@ -34,7 +34,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
@@ -569,17 +568,6 @@ public class DefaultMavenProjectBuilder
             for ( String s : (List<String>) validationResult.getMessages() )
             {
                 System.out.println( s );
-            }
-            try
-            {
-                Writer out = WriterFactory.newXmlWriter( System.out );
-                MavenXpp3Writer writer = new MavenXpp3Writer();
-                writer.write( out, model );
-                out.close();
-            }
-            catch ( IOException e )
-            {
-
             }
             throw new InvalidProjectModelException( projectId, "Failed to validate POM", pomFile, validationResult );
         }
