@@ -147,6 +147,24 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
+    // I want to build this out as a component with history and statistics to help me track down the realm problems. jvz.
+    class ProjectCache
+    {
+        private Map<String, MavenProject> projects = new HashMap<String, MavenProject>();
+        
+        public MavenProject get( String key )
+        {
+            MavenProject p = projects.get( key ); 
+                        
+            return p;            
+        }
+        
+        public MavenProject put( String key, MavenProject project )
+        {
+            return projects.put( key, project );
+        }
+    }
+    
     // This is used by the RR plugin
     public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository, boolean allowStubs )
         throws ProjectBuildingException
