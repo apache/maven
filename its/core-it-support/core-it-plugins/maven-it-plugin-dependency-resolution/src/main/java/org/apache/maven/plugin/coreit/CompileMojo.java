@@ -41,7 +41,7 @@ public class CompileMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
      * 
-     * @parameter
+     * @parameter expression="${depres.compileArtifacts}"
      */
     private String compileArtifacts;
 
@@ -50,7 +50,7 @@ public class CompileMojo
      * this UTF-8 encoded file specifies the absolute path to a class path element. If not specified, the class path
      * will not be written to disk.
      * 
-     * @parameter
+     * @parameter expression="${depres.compileClassPath}"
      */
     private String compileClassPath;
 
