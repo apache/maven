@@ -21,8 +21,11 @@ package org.apache.maven.it;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.it.util.StringUtils;
 
 import java.io.File;
+import java.util.List;
+import java.util.Properties;
 
 public class MavenIT0047Test
     extends AbstractMavenIntegrationTestCase
@@ -37,11 +40,18 @@ public class MavenIT0047Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0047" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0047/Person.class" );
+        Properties systemProperties = new Properties();
+        systemProperties.put( "depres.compileClassPath", new File( testDir, "target/compile.txt" ).getAbsolutePath() );
+        verifier.setSystemProperties( systemProperties );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+        verifier.assertFilePresent( "target/compile.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        List lines = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        String paths = StringUtils.join( lines.iterator(), "\t" ).replace( '\\', '/' );
+        assertTrue( paths.indexOf( "org/apache/maven/its/it0047/direct-dep/1.0/direct-dep-1.0.jar" ) >= 0 );
+        assertTrue( paths.indexOf( "org/apache/maven/its/it0047/transitive-dep/1.1/transitive-dep-1.1.jar" ) >= 0 );
     }
-}
 
+}
