@@ -240,16 +240,12 @@ public final class DefaultProjectBuilder
         artifactResolver.resolve( artifactParent );
 
         PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( artifactParent.getFile() );
+
         if ( !parentDomainModel.matchesParent( domainModel.getModel().getParent() ) )
         {
-            logger.warn( "Parent pom ids do not match: Parent File = " + artifactParent.getFile().getAbsolutePath() +
+            logger.debug( "Parent pom ids do not match: Parent File = " + artifactParent.getFile().getAbsolutePath() +
                 ": Child ID = " + domainModel.getModel().getId() );
             return domainModels;
-        }
-        else
-        {
-            //  logger.info("Adding pom to hierarchy: Group Id = " + parent.getGroupId() + ", Artifact Id ="
-            //      + parent.getArtifactId()  + ", Version = " + parent.getVersion() + ", File" + artifactParent.getFile());
         }
 
         domainModels.add( parentDomainModel );
