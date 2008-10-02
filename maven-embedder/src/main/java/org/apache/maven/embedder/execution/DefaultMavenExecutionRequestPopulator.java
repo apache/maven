@@ -113,9 +113,6 @@ public class DefaultMavenExecutionRequestPopulator
 
         snapshotPolicy( request, configuration );
 
-        // TODO: Can we remove this second call?
-//        localRepository( request, configuration );
-
         checksumPolicy( request, configuration );
 
         artifactTransferMechanism( request, configuration );
@@ -334,12 +331,13 @@ public class DefaultMavenExecutionRequestPopulator
 
             try
             {
-                request.setSettings(
-                    settingsBuilder.buildSettings( request ) );
+                Settings settings = settingsBuilder.buildSettings( request );
+                
+                request.setSettings( new SettingsAdapter( request, settings ) );
             }
             catch ( Exception e )
             {
-                request.setSettings( new Settings() );
+                request.setSettings( new SettingsAdapter( request, new Settings() ) );
             }
         }
     }

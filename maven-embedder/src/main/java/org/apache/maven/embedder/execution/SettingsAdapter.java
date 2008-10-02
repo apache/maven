@@ -1,4 +1,4 @@
-package org.apache.maven.embedder.user;
+package org.apache.maven.embedder.execution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -26,6 +26,9 @@ import java.util.List;
 
 /**
  * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core.
+ * We want to make sure that what is ask for in the execution request overrides what is in the settings.
+ * The CLI feeds into an execution request so if a particular value is present in the execution request
+ * then we will take that over the value coming from the user settings.
  *
  * @author Jason van Zyl
  */
@@ -33,20 +36,27 @@ public class SettingsAdapter
     extends Settings
 {
     private MavenExecutionRequest request;
+    private Settings settings;
 
-    public SettingsAdapter( MavenExecutionRequest request )
+    public SettingsAdapter( MavenExecutionRequest request, Settings settings )
     {
         this.request = request;
+        this.settings = settings;
     }
 
     public String getLocalRepository()
     {
-        return request.getLocalRepositoryPath().getAbsolutePath();
+        if ( request.getLocalRepositoryPath() != null )
+        {
+            return request.getLocalRepositoryPath().getAbsolutePath();
+        }
+        
+        return settings.getLocalRepository();
     }
 
     public boolean isInteractiveMode()
-    {
-        return request.isInteractiveMode();
+    {                    
+        return request.isInteractiveMode();            
     }
 
     public boolean isOffline()
@@ -54,33 +64,35 @@ public class SettingsAdapter
         return request.isOffline();
     }
 
+    // These we are not setting in the execution request currently
+    
     public List getProxies()
     {
-        return request.getProxies();
+        return settings.getProxies();
     }
 
     public List getServers()
     {
-        return request.getServers();
+        return settings.getServers();
     }
 
     public List getMirrors()
     {
-        return request.getMirrors();
+        return settings.getMirrors();
     }
 
     public List getProfiles()
     {
-        return request.getProfiles();
+        return settings.getProfiles();
     }
 
     public List getActiveProfiles()
     {
-        return request.getActiveProfiles();
+        return settings.getActiveProfiles();
     }
 
     public List getPluginGroups()
     {
-        return request.getPluginGroups();
+        return settings.getPluginGroups();
     }
 }

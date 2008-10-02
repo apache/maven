@@ -1,22 +1,18 @@
 package org.apache.maven.cli;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import org.apache.commons.cli.CommandLine;
@@ -90,83 +86,36 @@ public class CLIManager
 
     private Options options;
 
+    @SuppressWarnings("static-access")
     public CLIManager()
     {
         options = new Options();
-
-        options.addOption( OptionBuilder.withLongOpt( "file" ).hasArg().withDescription(
-            "Force the use of an alternate POM file." ).create( ALTERNATE_POM_FILE ) );
-
-        options.addOption(
-            OptionBuilder.withLongOpt( "define" ).hasArg().withDescription( "Define a system property" ).create(
-                SET_SYSTEM_PROPERTY ) );
-        options.addOption(
-            OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create( OFFLINE ) );
-        options.addOption(
-            OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create( HELP ) );
-        options.addOption(
-            OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create(
-                VERSION ) );
-        options.addOption(
-            OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show errors" ).create(
-                QUIET ) );
-        options.addOption(
-            OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create(
-                DEBUG ) );
-        options.addOption(
-            OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create(
-                ERRORS ) );
-        options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription(
-            "Execute goals for project found in the reactor" ).create( REACTOR ) );
-        options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription(
-            "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
-        options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription(
-            "Forces a check for updated releases and snapshots on remote repositories" ).create( UPDATE_SNAPSHOTS ) );
-        options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription(
-            "Comma-delimited list of profiles to activate" ).hasArg().create( ACTIVATE_PROFILES ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription(
-            "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "check-plugin-updates" ).withDescription(
-            "Force upToDate check for any relevant registered plugins" ).create( FORCE_PLUGIN_UPDATES ) );
-        options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription(
-            "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
-        options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription(
-            "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
-
-        options.addOption(OptionBuilder.withLongOpt("no-snapshot-updates")
-                .withDescription("Supress SNAPSHOT updates")
-                .create(SUPRESS_SNAPSHOT_UPDATES));
-
-        options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription(
-            "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( SUPPRESS_PLUGIN_REGISTRY ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription(
-            "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
-        options.addOption(
-            OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create(
-                CHECKSUM_WARNING_POLICY ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "settings" )
-            .withDescription( "Alternate path for the user settings file" ).hasArg()
-            .create( ALTERNATE_USER_SETTINGS ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "fail-fast" ).withDescription(
-            "Stop at first failure in reactorized builds" ).create( FAIL_FAST ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription(
-            "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription(
-            "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription(
-            "Log file to where all build output will go." ).create( LOG_FILE ) );
-
-        options.addOption(
-                          OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create(
-                              SHOW_VERSION ) );
+        options.addOption( OptionBuilder.withLongOpt( "file" ).hasArg().withDescription( "Force the use of an alternate POM file." ).create( ALTERNATE_POM_FILE ) );
+        options.addOption( OptionBuilder.withLongOpt( "define" ).hasArg().withDescription( "Define a system property" ).create( SET_SYSTEM_PROPERTY ) );
+        options.addOption( OptionBuilder.withLongOpt( "offline" ).withDescription( "Work offline" ).create( OFFLINE ) );
+        options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Display help information" ).create( HELP ) );
+        options.addOption( OptionBuilder.withLongOpt( "version" ).withDescription( "Display version information" ).create( VERSION ) );
+        options.addOption( OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show errors" ).create( QUIET ) );
+        options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create( DEBUG ) );
+        options.addOption( OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create( ERRORS ) );
+        options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription( "Execute goals for project found in the reactor" ).create( REACTOR ) );
+        options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription( "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
+        options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription( "Forces a check for updated releases and snapshots on remote repositories" ).create( UPDATE_SNAPSHOTS ) );
+        options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription( "Comma-delimited list of profiles to activate" ).hasArg().create( ACTIVATE_PROFILES ) );
+        options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription( "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
+        options.addOption( OptionBuilder.withLongOpt( "check-plugin-updates" ).withDescription( "Force upToDate check for any relevant registered plugins" ).create( FORCE_PLUGIN_UPDATES ) );
+        options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
+        options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription( "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
+        options.addOption( OptionBuilder.withLongOpt( "no-snapshot-updates" ).withDescription( "Supress SNAPSHOT updates" ).create( SUPRESS_SNAPSHOT_UPDATES ) );
+        options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( SUPPRESS_PLUGIN_REGISTRY ) );
+        options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription( "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
+        options.addOption( OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create( CHECKSUM_WARNING_POLICY ) );
+        options.addOption( OptionBuilder.withLongOpt( "settings" ).withDescription( "Alternate path for the user settings file" ).hasArg().create( ALTERNATE_USER_SETTINGS ) );
+        options.addOption( OptionBuilder.withLongOpt( "fail-fast" ).withDescription( "Stop at first failure in reactorized builds" ).create( FAIL_FAST ) );
+        options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription( "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );
+        options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription( "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
+        options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file to where all build output will go." ).create( LOG_FILE ) );
+        options.addOption( OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create( SHOW_VERSION ) );
     }
 
     public CommandLine parse( String[] args )
@@ -275,7 +224,6 @@ public class CLIManager
 
         return cleanArgs;
     }
-
 
     public void displayHelp()
     {

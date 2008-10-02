@@ -19,6 +19,16 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -33,7 +43,13 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.errors.CoreReporterManager;
-import org.apache.maven.execution.*;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.DuplicateProjectException;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.lifecycle.plan.BuildPlan;
@@ -50,10 +66,8 @@ import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
@@ -87,16 +101,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Class intended to be used by clients who wish to embed Maven into their applications
@@ -137,17 +141,9 @@ public class MavenEmbedder
 
     private MavenXpp3Writer modelWriter;
 
-    private SettingsXpp3Writer settingsWriter;
-
-    private PluginDescriptorBuilder pluginDescriptorBuilder;
-
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
-
     private ArtifactFactory artifactFactory;
 
     private ArtifactResolver artifactResolver;
-
-    private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
     private ArtifactHandlerManager artifactHandlerManager;
 
@@ -392,6 +388,7 @@ public class MavenEmbedder
             // registered as an artifact and is not added to the classpath elements.
 
             readProject( request.getPom(), request );
+
         }
         catch ( MavenEmbedderException e )
         {
@@ -649,11 +646,7 @@ public class MavenEmbedder
 
             modelWriter = new MavenXpp3Writer();
 
-            settingsWriter = new SettingsXpp3Writer();
-
             maven = (Maven) container.lookup( Maven.ROLE );
-
-            pluginDescriptorBuilder = new PluginDescriptorBuilder();
 
             mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
 
@@ -661,17 +654,11 @@ public class MavenEmbedder
             // Artifact related components
             // ----------------------------------------------------------------------
 
-            artifactRepositoryFactory = (ArtifactRepositoryFactory) container.lookup( ArtifactRepositoryFactory.ROLE );
-
             artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
 
             artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE, "default" );
 
-            defaultArtifactRepositoryLayout =
-                (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, "default" );
-
-            populator = (MavenExecutionRequestPopulator) container.lookup(
-                MavenExecutionRequestPopulator.ROLE );
+            populator = (MavenExecutionRequestPopulator) container.lookup( MavenExecutionRequestPopulator.ROLE );
 
             buildPlanner = (BuildPlanner) container.lookup( BuildPlanner.class );
 

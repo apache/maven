@@ -232,7 +232,7 @@ public final class CLIRequestUtils
             .setRecursive( recursive ) // default: true
             .setUseReactor( useReactor ) // default: false
             .setShowErrors( showErrors ) // default: false
-            .setInteractiveMode( interactive ) // default: false
+            .setInteractiveMode( interactive ) // default: true
             .setOffline( offline ) // default: false
             .setUsePluginUpdateOverride( pluginUpdateOverride )
             .addActiveProfiles( activeProfiles ) // optional
