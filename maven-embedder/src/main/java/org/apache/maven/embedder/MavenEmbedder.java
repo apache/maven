@@ -392,13 +392,6 @@ public class MavenEmbedder
             // registered as an artifact and is not added to the classpath elements.
 
             readProject( request.getPom(), request );
-
-//            Map handlers = findArtifactTypeHandlers( project );
-
-            //TODO: ok this is crappy, now there are active collections so when new artifact handlers
-            // enter the system they should be available.
-
-//            artifactHandlerManager.addHandlers( handlers );
         }
         catch ( MavenEmbedderException e )
         {
