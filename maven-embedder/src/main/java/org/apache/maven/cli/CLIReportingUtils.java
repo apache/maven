@@ -122,7 +122,7 @@ public final class CLIReportingUtils
                 line( logger );
             }
 
-            if ( ( reactorManager != null ) && !ReactorManager.FAIL_NEVER.equals( reactorManager.getFailureBehavior() ) )
+            if ( !ReactorManager.FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )
             {
                 logger.info( "BUILD FAILED" );
 
@@ -131,6 +131,7 @@ public final class CLIReportingUtils
                 stats( request.getStartTime(), logger );
 
                 line( logger );
+                
                 printSuccess = false;
             }
             else

@@ -85,8 +85,7 @@ public class DefaultMaven
     // artifact resolution
     // lifecycle execution
 
-    public ReactorManager createReactorManager( MavenExecutionRequest request,
-                                                MavenExecutionResult result )
+    public ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result )
     {
         List projects;
         try
@@ -115,16 +114,13 @@ public class DefaultMaven
 
         try
         {
-            reactorManager = new ReactorManager(
-                projects,
-                request.getReactorFailureBehavior() );
+            reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
 
             result.setReactorManager( reactorManager );
         }
         catch ( CycleDetectedException e )
         {
-            String message = "The projects in the reactor contain a cyclic reference: "
-                             + e.getMessage();
+            String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
 
             ProjectCycleException error = new ProjectCycleException( projects, message, e );
 
@@ -148,9 +144,7 @@ public class DefaultMaven
 
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-        ReactorManager reactorManager = createReactorManager(
-            request,
-            result );
+        ReactorManager reactorManager = createReactorManager( request, result );
 
         if ( result.hasExceptions() )
         {
