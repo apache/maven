@@ -256,7 +256,7 @@ public class DefaultPluginVersionManager
                                                                         e.getMessage() );
                     }
 
-                    if ( ( mavenRange != null ) && !mavenRange.containsVersion( runtimeInformation.getApplicationVersion() ) )
+                    if ( ( mavenRange != null ) && !mavenRange.containsVersion( runtimeInformation.getApplicationInformation().getVersion() ) )
                     {
                         getLogger().info( "Ignoring available plugin version: " + artifactVersion +
                             " for: " + groupId + ":" + artifactId + " as it requires Maven version matching: " + mavenVersion );

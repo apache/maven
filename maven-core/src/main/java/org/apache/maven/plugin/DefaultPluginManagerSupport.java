@@ -154,7 +154,7 @@ public class DefaultPluginManagerSupport
                                                                                  pluginProject.getPrerequisites()
                                                                                               .getMaven() );
 
-            if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
+            if ( runtimeInformation.getApplicationInformation().getVersion().compareTo( requiredVersion ) < 0 )
             {
                 throw new PluginVersionResolutionException( plugin.getGroupId(),
                                                             plugin.getArtifactId(),

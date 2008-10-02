@@ -19,8 +19,6 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-
 /**
  * Describes runtime information about the application.
  *
@@ -29,5 +27,5 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  */
 public interface RuntimeInformation
 {
-    ArtifactVersion getApplicationVersion();
+    ApplicationInformation getApplicationInformation();
 }

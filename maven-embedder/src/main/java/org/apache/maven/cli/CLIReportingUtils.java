@@ -4,6 +4,8 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.errors.DefaultCoreErrorReporter;
+import org.apache.maven.execution.ApplicationInformation;
+import org.apache.maven.execution.DefaultRuntimeInformation;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
@@ -27,9 +29,9 @@ import java.util.TimeZone;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
- *
+ * 
  * @author jdcasey
- *
+ * 
  */
 public final class CLIReportingUtils
 {
@@ -48,58 +50,22 @@ public final class CLIReportingUtils
 
     static void showVersion()
     {
-        InputStream resourceAsStream;
-        try
-        {
-            Properties properties = new Properties();
-            resourceAsStream = MavenCli.class.getClassLoader()
-                                             .getResourceAsStream( "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+        ApplicationInformation ai = DefaultRuntimeInformation.getVersion( MavenCli.class.getClassLoader(), "org.apache.maven", "maven-core" );
 
-            if ( resourceAsStream != null )
-            {
-                properties.load( resourceAsStream );
-
-                if ( properties.getProperty( "builtOn" ) != null )
-                {
-                    System.out.println( "Maven version: "
-                                        + properties.getProperty( "version", "unknown" ) + " built on "
-                                        + properties.getProperty( "builtOn" ) );
-                }
-                else
-                {
-                    System.out.println( "Maven version: "
-                                        + properties.getProperty( "version", "unknown" ) );
-                }
-            }
-            else
-            {
-                System.out.println( "Maven version: unknown" );
-            }
-
-            System.out.println( "Java version: "
-                                + System.getProperty( "java.version", "<unknown java version>" ) );
-
-            System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
-                                + System.getProperty( "file.encoding", "<unknown encoding>" ) );
-
-            System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION +
-                                "\" arch: \"" + Os.OS_ARCH + "\" family: \"" + Os.OS_FAMILY + "\"" );
-        }
-        catch ( IOException e )
-        {
-            System.err.println( "Unable determine version from JAR file: " + e.getMessage() );
-        }
+        System.out.println( "Maven version: " + ai.getVersion() + " built on " + ai.getBuiltOn() );
+        System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
+        System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: " + System.getProperty( "file.encoding", "<unknown encoding>" ) );
+        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION + "\" arch: \"" + Os.OS_ARCH + "\" family: \"" + Os.OS_FAMILY + "\"" );
     }
 
     /**
      * Logs result of the executed build.
+     * 
      * @param request - build parameters
      * @param result - result of build
      * @param logger - the logger to use
      */
-    public static void logResult( MavenExecutionRequest request,
-                           MavenExecutionResult result,
-                           MavenEmbedderLogger logger )
+    public static void logResult( MavenExecutionRequest request, MavenExecutionResult result, MavenEmbedderLogger logger )
     {
         ReactorManager reactorManager = result.getReactorManager();
 
@@ -131,7 +97,7 @@ public final class CLIReportingUtils
                 stats( request.getStartTime(), logger );
 
                 line( logger );
-                
+
                 printSuccess = false;
             }
             else
@@ -156,9 +122,7 @@ public final class CLIReportingUtils
         logger.close();
     }
 
-    static void showError( String message,
-                           Exception e,
-                           boolean showErrors )
+    static void showError( String message, Exception e, boolean showErrors )
     {
         MavenEmbedderLogger logger = new MavenEmbedderConsoleLogger();
 
@@ -170,27 +134,21 @@ public final class CLIReportingUtils
         }
     }
 
-    private static void showError( Exception e,
-                           boolean show,
-                           CoreErrorReporter reporter,
-                           MavenEmbedderLogger logger )
+    private static void showError( Exception e, boolean show, CoreErrorReporter reporter, MavenEmbedderLogger logger )
     {
         showError( null, e, show, reporter, logger );
     }
 
     /**
      * Format the exception and output it through the logger.
+     * 
      * @param message - error message
      * @param e - exception that was thrown
      * @param showStackTraces
      * @param logger
      */
     //mkleint: public because used in netbeans integration
-    public static void showError( String message,
-                           Exception e,
-                           boolean showStackTraces,
-                           CoreErrorReporter reporter,
-                           MavenEmbedderLogger logger )
+    public static void showError( String message, Exception e, boolean showStackTraces, CoreErrorReporter reporter, MavenEmbedderLogger logger )
     {
         StringWriter writer = new StringWriter();
 
@@ -217,10 +175,7 @@ public final class CLIReportingUtils
         logger.error( writer.toString() );
     }
 
-    public static void buildErrorMessage( Exception e,
-                                           boolean showStackTraces,
-                                           CoreErrorReporter reporter,
-                                           StringWriter writer )
+    public static void buildErrorMessage( Exception e, boolean showStackTraces, CoreErrorReporter reporter, StringWriter writer )
     {
         if ( reporter != null )
         {
@@ -252,21 +207,15 @@ public final class CLIReportingUtils
 
         if ( e instanceof ProjectBuildingException )
         {
-            handled = handleProjectBuildingException( (ProjectBuildingException) e,
-                                                      showStackTraces,
-                                                      writer );
+            handled = handleProjectBuildingException( (ProjectBuildingException) e, showStackTraces, writer );
         }
         else if ( e instanceof LifecycleExecutionException )
         {
-            handled = handleLifecycleExecutionException( (LifecycleExecutionException) e,
-                                                         showStackTraces,
-                                                         writer );
+            handled = handleLifecycleExecutionException( (LifecycleExecutionException) e, showStackTraces, writer );
         }
         else if ( e instanceof MavenExecutionException )
         {
-            handled = handleMavenExecutionException( (MavenExecutionException) e,
-                                                     showStackTraces,
-                                                     writer );
+            handled = handleMavenExecutionException( (MavenExecutionException) e, showStackTraces, writer );
         }
 
         if ( !handled )
@@ -275,9 +224,7 @@ public final class CLIReportingUtils
         }
     }
 
-    private static boolean handleMavenExecutionException( MavenExecutionException e,
-                                                          boolean showStackTraces,
-                                                          StringWriter writer )
+    private static boolean handleMavenExecutionException( MavenExecutionException e, boolean showStackTraces, StringWriter writer )
     {
         handleGenericException( e, showStackTraces, writer );
 
@@ -294,17 +241,13 @@ public final class CLIReportingUtils
         return true;
     }
 
-    private static void handleGenericException( Throwable exception,
-                                                boolean showStackTraces,
-                                                StringWriter writer )
+    private static void handleGenericException( Throwable exception, boolean showStackTraces, StringWriter writer )
     {
         writer.write( exception.getMessage() );
         writer.write( NEWLINE );
     }
 
-    private static boolean handleLifecycleExecutionException( LifecycleExecutionException e,
-                                                              boolean showStackTraces,
-                                                              StringWriter writer )
+    private static boolean handleLifecycleExecutionException( LifecycleExecutionException e, boolean showStackTraces, StringWriter writer )
     {
         handleGenericException( e, showStackTraces, writer );
 
@@ -324,9 +267,7 @@ public final class CLIReportingUtils
         return true;
     }
 
-    private static boolean handleProjectBuildingException( ProjectBuildingException e,
-                                                           boolean showStackTraces,
-                                                           StringWriter writer )
+    private static boolean handleProjectBuildingException( ProjectBuildingException e, boolean showStackTraces, StringWriter writer )
     {
         handleGenericException( e, showStackTraces, writer );
 
@@ -348,8 +289,7 @@ public final class CLIReportingUtils
         return true;
     }
 
-    private static void logReactorSummary( ReactorManager rm,
-                                           MavenEmbedderLogger logger )
+    private static void logReactorSummary( ReactorManager rm, MavenEmbedderLogger logger )
     {
         if ( ( rm != null ) && rm.hasMultipleProjects() && rm.executedMultipleProjects() )
         {
@@ -373,23 +313,15 @@ public final class CLIReportingUtils
 
                 if ( rm.hasBuildFailure( project ) )
                 {
-                    logReactorSummaryLine( project.getName(),
-                                           "FAILED",
-                                           rm.getBuildFailure( project ).getTime(),
-                                           logger );
+                    logReactorSummaryLine( project.getName(), "FAILED", rm.getBuildFailure( project ).getTime(), logger );
                 }
                 else if ( rm.isBlackListed( project ) )
                 {
-                    logReactorSummaryLine( project.getName(),
-                                           "SKIPPED (dependency build failed or was skipped)",
-                                           logger );
+                    logReactorSummaryLine( project.getName(), "SKIPPED (dependency build failed or was skipped)", logger );
                 }
                 else if ( rm.hasBuildSuccess( project ) )
                 {
-                    logReactorSummaryLine( project.getName(),
-                                           "SUCCESS",
-                                           rm.getBuildSuccess( project ).getTime(),
-                                           logger );
+                    logReactorSummaryLine( project.getName(), "SUCCESS", rm.getBuildSuccess( project ).getTime(), logger );
                 }
                 else
                 {
@@ -400,8 +332,7 @@ public final class CLIReportingUtils
         }
     }
 
-    private static void stats( Date start,
-                               MavenEmbedderLogger logger )
+    private static void stats( Date start, MavenEmbedderLogger logger )
     {
         Date finish = new Date();
 
@@ -416,8 +347,7 @@ public final class CLIReportingUtils
 
         Runtime r = Runtime.getRuntime();
 
-        logger.info( "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / MB + "M/"
-                     + r.totalMemory() / MB + "M" );
+        logger.info( "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / MB + "M/" + r.totalMemory() / MB + "M" );
     }
 
     private static void line( MavenEmbedderLogger logger )
@@ -459,17 +389,12 @@ public final class CLIReportingUtils
         return msg;
     }
 
-    private static void logReactorSummaryLine( String name,
-                                               String status,
-                                               MavenEmbedderLogger logger )
+    private static void logReactorSummaryLine( String name, String status, MavenEmbedderLogger logger )
     {
         logReactorSummaryLine( name, status, -1, logger );
     }
 
-    private static void logReactorSummaryLine( String name,
-                                               String status,
-                                               long time,
-                                               MavenEmbedderLogger logger )
+    private static void logReactorSummaryLine( String name, String status, long time, MavenEmbedderLogger logger )
     {
         StringBuffer messageBuffer = new StringBuffer();
 

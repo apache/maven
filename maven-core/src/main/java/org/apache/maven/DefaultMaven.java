@@ -299,7 +299,7 @@ public class DefaultMaven
                 {
                     DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
 
-                    if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
+                    if ( runtimeInformation.getApplicationInformation().getVersion().compareTo( version ) < 0 )
                     {
                         throw new MavenExecutionException(
                             "Unable to build project '" + file +
