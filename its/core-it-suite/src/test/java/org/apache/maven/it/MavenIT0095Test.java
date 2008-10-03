@@ -23,8 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Properties;
 
 public class MavenIT0095Test
     extends AbstractMavenIntegrationTestCase
@@ -40,25 +39,25 @@ public class MavenIT0095Test
     public void testit0095()
         throws Exception
     {
-        // TODO: This is WRONG! Need to run only sub1 to effective-pom, then run all to verify.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0095" );
         File sub1 = new File( testDir, "sub1" );
 
         Verifier verifier = new Verifier( sub1.getAbsolutePath() );
-
-        List options = new ArrayList();
-        options.add( "-Doutput=\"" + new File( sub1, "target/effective-pom.xml" ).getAbsolutePath() + "\"" );
-
-        verifier.setCliOptions( options );
-
-        List goals = new ArrayList();
-        goals.add( "org.apache.maven.plugins:maven-help-plugin:2.0.2:effective-pom" );
-        goals.add( "verify" );
-
-        verifier.executeGoals( goals );
+        Properties systemProperties = new Properties();
+        systemProperties.put( "expression.expressions", "project/scm" );
+        verifier.setSystemProperties( systemProperties );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression::eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/expression.properties" );
+        Properties props = verifier.loadProperties( "target/expression.properties" );
+        assertEquals( "scm:svn:http://svn.apache.org/repos/asf/maven/it0095/sub1", 
+                      props.getProperty( "project.scm.connection" ) );
+        assertEquals( "scm:svn:https://svn.apache.org/repos/asf/maven/it0095/sub1", 
+                      props.getProperty( "project.scm.developerConnection" ) );
+        assertEquals( "http://svn.apache.org/repos/asf/maven/it0095/sub1", 
+                      props.getProperty( "project.scm.url" ) );
     }
-}
 
+}
