@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 public class MavenIT0043Test
     extends AbstractMavenIntegrationTestCase
@@ -36,22 +37,50 @@ public class MavenIT0043Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0043" );
 
-        File child1 = new File( testDir, "child1" );
+        // Phase 1: Ensure the test plugin is downloaded before the test cuts off access to central
+        File child1 = new File( testDir, "setup" );
         Verifier verifier = new Verifier( child1.getAbsolutePath() );
 
-        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-help-plugin", "2.0.2", "jar" );
-
-        verifier.executeGoal( "org.apache.maven.plugins:maven-help-plugin:2.0.2:effective-pom" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression::eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        File child2 = new File( testDir, "child2" );
+        // Phase 2: Now run the test
+        File child2 = new File( testDir, "test" );
         verifier = new Verifier( child2.getAbsolutePath() );
 
-        verifier.executeGoal( "org.apache.maven.plugins:maven-help-plugin:2.0.2:effective-pom" );
+        Properties systemProperties = new Properties();
+        systemProperties.put( "expression.expressions", "project/repositories,project/pluginRepositories" );
+        verifier.setSystemProperties( systemProperties );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression::eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-    }
-}
+        verifier.assertFilePresent( "target/expression.properties" );
+        Properties props = verifier.loadProperties( "target/expression.properties" );
 
+        int count = Integer.parseInt( props.getProperty( "project.repositories", "0" ) );
+        assertTrue( count > 0 );
+        for ( int i = 0; i < count; i++ )
+        {
+            String key = "project.repositories." + i;
+            if ( "central".equals( props.getProperty( key + ".id" ) ) )
+            {
+                assertEquals( "it0043", props.getProperty( key + ".name" ) );
+                assertTrue( props.getProperty( key + ".url" ).endsWith( "/tmp/maven-core-it0043-repo" ) );
+            }
+        }
+
+        count = Integer.parseInt( props.getProperty( "project.pluginRepositories", "0" ) );
+        for ( int i = 0; i < count; i++ )
+        {
+            String key = "project.pluginRepositories." + i;
+            if ( "central".equals( props.getProperty( key + ".id" ) ) )
+            {
+                assertEquals( "it0043", props.getProperty( key + ".name" ) );
+                assertTrue( props.getProperty( key + ".url" ).endsWith( "/tmp/maven-core-it0043-repo" ) );
+            }
+        }
+    }
+
+}
