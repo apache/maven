@@ -195,7 +195,7 @@ public class MavenITmng3599useHttpProxyForWebDAV
         }
         else
         {
-            System.out.print( " [skipping DAV test for Maven versions < 2.0.10 / 2.1 alpha]" );
+            System.out.print( " [skipping DAV test for Maven versions < 2.0.10]" );
         }
     }
 }
