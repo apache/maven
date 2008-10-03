@@ -2,7 +2,7 @@ package org.apache.maven.its;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
-import org.apache.maven.integrationtests.IntegrationTestSuite;
+import org.apache.maven.it.IntegrationTestSuite;
 import org.apache.maven.it.VerificationException;
 
 public class Suite
