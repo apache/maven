@@ -94,9 +94,23 @@ public class DefaultPluginManagerSupport
 
         remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
 
-        MavenProject pluginProject = buildPluginProject( plugin,
-                                                         localRepository,
-                                                         remoteRepositories );
+        MavenProject pluginProject = null;
+        for(MavenProject mp : (List<MavenProject>) session.getSortedProjects())
+        {
+            if(mp.getId().equals(project.getId()))
+            {
+                pluginProject = mp;
+                break;
+            }
+        }
+
+        if(pluginProject == null)
+        {
+            pluginProject = buildPluginProject( plugin,
+                                                localRepository,
+                                                remoteRepositories );
+        }
+
 
         checkRequiredMavenVersion( plugin, pluginProject, localRepository, remoteRepositories );
 
@@ -121,7 +135,6 @@ public class DefaultPluginManagerSupport
         Artifact artifact = artifactFactory.createProjectArtifact( plugin.getGroupId(),
                                                                    plugin.getArtifactId(),
                                                                    plugin.getVersion() );
-
         try
         {
             return mavenProjectBuilder.buildFromRepository( artifact,
