@@ -23,8 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Properties;
 
 public class MavenIT0102Test
     extends AbstractMavenIntegrationTestCase
@@ -41,18 +40,18 @@ public class MavenIT0102Test
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
-        List options = new ArrayList();
-        options.add( "-Doutput=" + new File( testDir, "target/effective-pom.txt" ).getAbsolutePath() );
-
-        verifier.setCliOptions( options );
-
-        List goals = new ArrayList();
-        goals.add( "org.apache.maven.plugins:maven-help-plugin:2.0.2:effective-pom" );
-        goals.add( "verify" );
-
+        Properties systemProperties = new Properties();
+        systemProperties.put( "expression.expressions", "project/properties" );
+        verifier.setSystemProperties( systemProperties );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression::eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/expression.properties" );
+        Properties props = verifier.loadProperties( "target/expression.properties" );
+        assertNull( props.getProperty( "project.properties.it0102.testOutput" ) );
+        assertEquals( "Success", props.getProperty( "project.properties.testOutput" ) );
+        assertEquals( "Present", props.getProperty( "project.properties.profilesXmlValue" ) );
     }
-}
 
+}
