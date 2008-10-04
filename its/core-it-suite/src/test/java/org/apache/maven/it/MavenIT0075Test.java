@@ -23,9 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Properties;
 
 public class MavenIT0075Test
     extends AbstractMavenIntegrationTestCase
@@ -39,17 +37,16 @@ public class MavenIT0075Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0075" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dactivate=anything" );
-        verifier.setCliOptions( cliOptions );
-        List goals = Arrays.asList( new String[]{"help:active-profiles", "package", "eclipse:eclipse", "clean:clean"} );
-        verifier.executeGoals( goals );
-        verifier.assertFileNotPresent( "sub1/target/maven-it-it0075-sub1-1.0.jar" );
-        verifier.assertFileNotPresent( "sub2/target/maven-it-it0075-sub2-1.0.jar" );
+        Properties systemProperties = new Properties();
+        systemProperties.put( "activate", "anything" );
+        verifier.setSystemProperties( systemProperties );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression::eval" );
+        verifier.assertFilePresent( "sub1/target/expression.properties" );
+        verifier.assertFilePresent( "sub2/target/expression.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
