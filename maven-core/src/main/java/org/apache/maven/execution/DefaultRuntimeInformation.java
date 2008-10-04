@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -45,6 +46,12 @@ public class DefaultRuntimeInformation
         return applicationInformation;
     }
 
+    /** @deprecated Use getApplicationInformation() */
+    public ArtifactVersion getApplicationVersion()
+    {
+        return applicationInformation.getVersion();
+    }    
+    
     public void initialize()
         throws InitializationException
     {
