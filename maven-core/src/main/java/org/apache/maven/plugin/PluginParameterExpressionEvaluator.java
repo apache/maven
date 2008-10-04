@@ -86,7 +86,7 @@ public class PluginParameterExpressionEvaluator
         this.logger = logger;
         this.properties = properties;
         project = context.getCurrentProject();
-
+        
         String basedir = null;
 
         if ( project != null )
@@ -223,6 +223,21 @@ public class PluginParameterExpressionEvaluator
                 "\' instead." );
         }
 
+        // We will attempt to get nab a system property as a way to specify a
+        // parameter to a plugins. My particular case here is allowing the surefire
+        // plugin to run a single test so I want to specify that class on the cli
+        // as a parameter.
+
+        if ( properties != null )
+        {
+            value = properties.getProperty( expression );
+            
+            if ( value != null )
+            {
+                return value;
+            }
+        }        
+        
         if ( "localRepository".equals( expression ) )
         {
             value = context.getLocalRepository();
@@ -381,23 +396,10 @@ public class PluginParameterExpressionEvaluator
 
         if ( value == null )
         {
-            // The CLI should win for defining properties
-
-            if ( ( value == null ) && ( properties != null ) )
-            {
-                // We will attempt to get nab a system property as a way to specify a
-                // parameter to a plugins. My particular case here is allowing the surefire
-                // plugin to run a single test so I want to specify that class on the cli
-                // as a parameter.
-
-                value = properties.getProperty( expression );
-            }
-
-            if ( ( value == null ) && ( ( project != null ) && ( project.getProperties() != null ) ) )
+            if ( project != null && project.getProperties() != null )
             {
                 value = project.getProperties().getProperty( expression );
             }
-
         }
 
         if ( value instanceof String )
