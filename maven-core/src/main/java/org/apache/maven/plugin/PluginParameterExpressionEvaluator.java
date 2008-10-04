@@ -222,21 +222,6 @@ public class PluginParameterExpressionEvaluator
                 mojoDescriptor.getGoal() + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression ) +
                 "\' instead." );
         }
-
-        // We will attempt to get nab a system property as a way to specify a
-        // parameter to a plugins. My particular case here is allowing the surefire
-        // plugin to run a single test so I want to specify that class on the cli
-        // as a parameter.
-
-        if ( properties != null )
-        {
-            value = properties.getProperty( expression );
-            
-            if ( value != null )
-            {
-                return value;
-            }
-        }        
         
         if ( "localRepository".equals( expression ) )
         {
@@ -336,6 +321,7 @@ public class PluginParameterExpressionEvaluator
                     value = ReflectionValueExtractor.evaluate( pathExpression, pluginDescriptor );
                     value = value + expression.substring( pathSeparator );
                 }
+                
                 else
                 {
                     value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), pluginDescriptor );
@@ -396,6 +382,16 @@ public class PluginParameterExpressionEvaluator
 
         if ( value == null )
         {
+            // We will attempt to get nab a system property as a way to specify a
+            // parameter to a plugins. My particular case here is allowing the surefire
+            // plugin to run a single test so I want to specify that class on the cli
+            // as a parameter.
+
+            if ( properties != null )
+            {
+                value = properties.getProperty( expression );                
+            }                    
+            
             if ( project != null && project.getProperties() != null )
             {
                 value = project.getProperties().getProperty( expression );
