@@ -67,7 +67,7 @@ public class MavenIT0043Test
             if ( "central".equals( props.getProperty( key + ".id" ) ) )
             {
                 assertEquals( "it0043", props.getProperty( key + ".name" ) );
-                assertTrue( props.getProperty( key + ".url" ).endsWith( "/tmp/maven-core-it0043-repo" ) );
+                assertTrue( props.getProperty( key + ".url" ).endsWith( "/target/maven-core-it0043-repo" ) );
             }
         }
 
@@ -78,7 +78,7 @@ public class MavenIT0043Test
             if ( "central".equals( props.getProperty( key + ".id" ) ) )
             {
                 assertEquals( "it0043", props.getProperty( key + ".name" ) );
-                assertTrue( props.getProperty( key + ".url" ).endsWith( "/tmp/maven-core-it0043-repo" ) );
+                assertTrue( props.getProperty( key + ".url" ).endsWith( "/target/maven-core-it0043-repo" ) );
             }
         }
     }

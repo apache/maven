@@ -33,7 +33,7 @@ under the License.
     <repository>
       <id>central</id>
       <name>it0043</name>
-      <url>file:/tmp/maven-core-it0043-repo</url>
+      <url>file:///${basedir}/target/maven-core-it0043-repo</url>
     </repository>
   </repositories>
 
@@ -41,7 +41,7 @@ under the License.
     <pluginRepository>
       <id>central</id>
       <name>it0043</name>
-      <url>file:/tmp/maven-core-it0043-repo</url>
+      <url>file:///${basedir}/target/maven-core-it0043-repo</url>
     </pluginRepository>
   </pluginRepositories>
 </project>
