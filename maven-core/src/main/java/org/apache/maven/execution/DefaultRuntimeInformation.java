@@ -66,7 +66,7 @@ public class DefaultRuntimeInformation
             
             if ( resourceAsStream == null )
             {
-                return new ApplicationInformation( new DefaultArtifactVersion( version ), builtOn );
+                return new ApplicationInformation( new DefaultArtifactVersion( "3.0" ), builtOn );
             }
             
             properties.load( resourceAsStream );
