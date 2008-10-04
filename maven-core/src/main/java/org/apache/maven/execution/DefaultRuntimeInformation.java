@@ -66,7 +66,7 @@ public class DefaultRuntimeInformation
             
             if ( resourceAsStream == null )
             {
-                throw new IllegalStateException( "Unable to find Maven properties in classpath: " + MAVEN_PROPERTIES );
+                return new ApplicationInformation( new DefaultArtifactVersion( version ), builtOn );
             }
             
             properties.load( resourceAsStream );
