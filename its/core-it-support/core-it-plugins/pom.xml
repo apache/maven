@@ -35,6 +35,7 @@ under the License.
   <name>Maven Integration Tests :: Plugins</name>
 
   <modules>
+    <module>maven-it-plugin-artifact</module>
     <module>maven-it-plugin-configuration</module>
     <module>maven-it-plugin-context-passing</module>
     <module>maven-it-plugin-core-stubs</module>
