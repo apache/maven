@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.bootstrap</groupId>
+  <artifactId>maven-it-boostrap</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: Boostrap</name> 
+  <description>
+    This project pulls down all the snapshot plugins required for the IT suite. Due to MNG-2974, snapshot versions of
+    plugins cannot be downloaded by Maven from non-default repositories configured in the POM if the plugin is invoked
+    directly from the command line. Also, having this in a central place spares us from copying the snapshot repo
+    config all around in the IT POMs.
+  </description>
+
+  <!-- TODO: Remove once IT support plugins/artifacts have been released -->
+  <repositories>
+    <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <properties>
+    <itPluginVersion>2.1-SNAPSHOT</itPluginVersion>
+    <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
+  </properties>
+
+  <dependencies>
+    <!-- IT plugins in alphabetical order -->
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-artifact</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-configuration</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-context-passing</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-expression</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-file</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-fork</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-generate-envar-properties</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-generate-properties</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-loadable</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-no-project</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-packaging</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-parameter-implementation</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-project-interpolation</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-setter</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-touch</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-uses-properties</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-uses-wagon</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- stub plugins in alphabetical order -->
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-clean-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-deploy-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-ear-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-ejb-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-install-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-javadoc-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-plugin-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-rar-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-resources-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-site-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-source-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-war-plugin</artifactId>
+      <version>${stubPluginVersion}</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>

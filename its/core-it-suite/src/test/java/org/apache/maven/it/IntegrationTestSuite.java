@@ -59,6 +59,11 @@ public class IntegrationTestSuite
         TestSuite suite = new TestSuite();
 
         /*
+         * This must be the first one to ensure the local repository is properly setup.
+         */
+        suite.addTestSuite( MavenITBootstrapTest.class );
+
+        /*
          * Add tests in reverse alpha order by number below. This makes testing new
          * ITs quicker and since it counts down to zero, it's easier to judge how close
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
