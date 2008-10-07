@@ -30,8 +30,8 @@ public class MavenIT0018Test
 
     /**
      * Ensure that managed dependencies for dependency POMs are calculated
-     * correctly when resolved. Removes commons-logging-1.0.3 and checks it is
-     * redownloaded.
+     * correctly when resolved. Removes managed-dep-1.0.3 and checks it is
+     * redownloaded upon resolution of direct-dep.
      */
     public void testit0018()
         throws Exception
@@ -39,7 +39,7 @@ public class MavenIT0018Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0018" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.assertArtifactPresent( "org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

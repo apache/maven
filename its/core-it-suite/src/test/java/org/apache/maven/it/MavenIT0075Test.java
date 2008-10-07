@@ -42,7 +42,7 @@ public class MavenIT0075Test
         Properties systemProperties = new Properties();
         systemProperties.put( "activate", "anything" );
         verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression::eval" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.assertFilePresent( "sub1/target/expression.properties" );
         verifier.assertFilePresent( "sub2/target/expression.properties" );
         verifier.verifyErrorFreeLog();

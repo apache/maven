@@ -41,7 +41,7 @@ public class MavenIT0069Test
         {
             // phase 1: run build in online mode to fill local repo
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
@@ -55,7 +55,7 @@ public class MavenIT0069Test
             List cliOptions = new ArrayList();
             cliOptions.add( "-o" );
             verifier.setCliOptions( cliOptions );
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
@@ -71,7 +71,7 @@ public class MavenIT0069Test
             verifier.setCliOptions( cliOptions );
             try
             {
-                verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+                verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
                 fail( "Build did not fail!" );
             }
             catch( VerificationException e )

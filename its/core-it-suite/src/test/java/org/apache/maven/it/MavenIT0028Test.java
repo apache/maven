@@ -38,7 +38,7 @@ public class MavenIT0028Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0028" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file::file" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
         verifier.assertFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

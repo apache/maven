@@ -43,7 +43,7 @@ public class MavenIT0047Test
         Properties systemProperties = new Properties();
         systemProperties.put( "depres.compileClassPath", new File( testDir, "target/compile.txt" ).getAbsolutePath() );
         verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.assertFilePresent( "target/compile.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

@@ -46,7 +46,7 @@ public class MavenIT0095Test
         Properties systemProperties = new Properties();
         systemProperties.put( "expression.expressions", "project/scm" );
         verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression::eval" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

@@ -50,7 +50,7 @@ public class MavenITmng0469Test
         Verifier verifier = new Verifier( new File( testDir, "test0" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file::file" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
         verifier.assertFilePresent( "target/reporting.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -58,7 +58,7 @@ public class MavenITmng0469Test
         verifier = new Verifier( new File( testDir, "test1" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file::file" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
         verifier.assertFilePresent( "target/build.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
