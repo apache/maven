@@ -267,9 +267,6 @@ MavenITmng3645POMSyntaxErrorTest
         // suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
         // suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
 
-        // this test is flakey on windows and isn't a test of the core.
-        // suite.addTestSuite( MavenIT0020Test.class );
-
         // -- not passing for 2.0.7 either, looks to be 2.1+ ?
         // suite.addTestSuite( MavenIT0120EjbClientDependency.class );
 
