@@ -1,8 +1,0 @@
-<verifications>
-  <files>
-    <file>
-      <location>target/effective-pom.txt</location>
-      <contains>Parent: parent, project: child</contains>
-    </file>
-  </files>
-</verifications>
