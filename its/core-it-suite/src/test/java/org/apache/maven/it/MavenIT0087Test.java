@@ -23,13 +23,14 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 public class MavenIT0087Test
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that a project-level plugin dependency class can be loaded from both the plugin classloader
+     * Verify that a project-level plugin dependency class/resource can be loaded from both the plugin classloader
      * and the context classloader available to the plugin.
      */
     public void testit0087()
@@ -37,11 +38,21 @@ public class MavenIT0087Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0087" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-it-it-plugin", "1.0", "maven-plugin" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-    }
-}
+        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.its.it0087.IT0087" ) );
+        assertNotNull( pclProps.getProperty( "src/main/java/org/apache/maven/its/it0087/IT0087.java" ) );
+        assertEquals( "1", pclProps.getProperty( "src/main/java/org/apache/maven/its/it0087/IT0087.java.count" ) );
 
+        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
+        assertEquals( pclProps, tcclProps );
+    }
+
+}
