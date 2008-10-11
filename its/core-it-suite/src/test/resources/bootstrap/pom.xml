@@ -74,109 +74,115 @@ under the License.
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-artifact</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-class-loader</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-configuration</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-context-passing</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-dependency-resolution</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-expression</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-file</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-fork</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-generate-envar-properties</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-generate-properties</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-loadable</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-no-project</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-packaging</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-parameter-implementation</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-project-interpolation</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-setter</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-touch</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-uses-properties</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-uses-wagon</artifactId>
       <version>${itPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- stub plugins in alphabetical order -->
@@ -184,91 +190,91 @@ under the License.
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-clean-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-compiler-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-deploy-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-ear-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-ejb-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-install-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-jar-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-javadoc-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-plugin-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-rar-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-resources-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-site-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-source-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-surefire-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-war-plugin</artifactId>
       <version>${stubPluginVersion}</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

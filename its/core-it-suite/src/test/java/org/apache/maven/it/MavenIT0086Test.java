@@ -23,13 +23,14 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 public class MavenIT0086Test
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that a plugin dependency class can be loaded from both the plugin classloader and the
+     * Verify that a plugin dependency class/resource can be loaded from both the plugin classloader and the
      * context classloader available to the plugin.
      */
     public void testit0086()
@@ -37,11 +38,26 @@ public class MavenIT0086Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0086" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-it-it-plugin", "1.0", "maven-plugin" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-    }
-}
+        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.SomeClass" ) );
+        assertEquals( "methodB", pclProps.getProperty( "org.apache.maven.plugin.coreit.SomeClass.methods" ) );
+        assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties" ) );
+        assertEquals( "1", pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties.count" ) );
+        assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/b.properties" ) );
+        assertEquals( "1", pclProps.getProperty( "org/apache/maven/plugin/coreit/b.properties.count" ) );
+        assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/it.properties" ) );
+        assertEquals( "2", pclProps.getProperty( "org/apache/maven/plugin/coreit/it.properties.count" ) );
 
+        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
+        assertEquals( pclProps, tcclProps );
+    }
+
+}
