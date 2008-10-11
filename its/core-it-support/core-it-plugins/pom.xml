@@ -36,6 +36,7 @@ under the License.
 
   <modules>
     <module>maven-it-plugin-artifact</module>
+    <module>maven-it-plugin-class-loader</module>
     <module>maven-it-plugin-configuration</module>
     <module>maven-it-plugin-context-passing</module>
     <module>maven-it-plugin-core-stubs</module>
@@ -62,7 +63,7 @@ under the License.
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support/core-it-plugins</developerConnection>
     <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-it-support/core-it-plugins</url>
   </scm>
-  
+
   <build>
     <pluginManagement>
       <plugins>
