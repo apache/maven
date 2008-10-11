@@ -19,6 +19,7 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -44,7 +45,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
     private boolean skip;
 
-    private DefaultArtifactVersion version;
+    private ArtifactVersion mavenVersion;
 
     private VersionRange versionRange;
 
@@ -63,20 +64,35 @@ public abstract class AbstractMavenIntegrationTestCase
             throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr ).initCause( e );
         }
 
-        String v = System.getProperty( "maven.version" );
-        if ( v != null )
+        ArtifactVersion version = getMavenVersion();
+        if ( version != null )
         {
-            version = new DefaultArtifactVersion( v );
-            if ( !versionRange.containsVersion( version ) )
-            {
-                skip = true;
-            }
+            skip = !versionRange.containsVersion( version );
         }
         else
         {
             out.println( "WARNING: " + getITName() + ": version range '" + versionRange
-                + "' supplied but no maven version - not skipping test." );
+                + "' supplied but no Maven version - not skipping test." );
         }
+    }
+
+    /**
+     * Gets the Maven version used to run this test.
+     * 
+     * @return The Maven version or <code>null</code> if unknown.
+     */
+    private ArtifactVersion getMavenVersion()
+    {
+        if ( mavenVersion == null )
+        {
+            String v = System.getProperty( "maven.version" );
+            // NOTE: If the version looks like "${...}" it has been configured from an undefined expression
+            if ( v != null && v.length() > 0 && !v.startsWith( "${" ) )
+            {
+                mavenVersion = new DefaultArtifactVersion( v );
+            }
+        }
+        return mavenVersion;
     }
 
     /**
@@ -86,6 +102,7 @@ public abstract class AbstractMavenIntegrationTestCase
      */
     protected boolean matchesVersionRange( String versionRangeStr )
     {
+        VersionRange versionRange;
         try
         {
             versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
@@ -95,16 +112,15 @@ public abstract class AbstractMavenIntegrationTestCase
             throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr ).initCause( e );
         }
 
-        String v = System.getProperty( "maven.version" );
-        if ( v != null )
+        ArtifactVersion version = getMavenVersion();
+        if ( version != null )
         {
-            version = new DefaultArtifactVersion( v );
             return versionRange.containsVersion( version );
         }
         else
         {
             out.println( "WARNING: " + getITName() + ": version range '" + versionRange
-                + "' supplied but no maven version found - returning true for match check." );
+                + "' supplied but no Maven version found - returning true for match check." );
 
             return true;
         }
@@ -117,7 +133,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
         if ( skip )
         {
-            out.println( " Skipping (version " + version + " not in range " + versionRange + ")" );
+            out.println( " Skipping - version " + getMavenVersion() + " not in range " + versionRange );
             return;
         }
 
