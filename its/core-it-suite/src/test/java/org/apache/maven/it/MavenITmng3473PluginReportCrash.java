@@ -57,7 +57,6 @@ public class MavenITmng3473PluginReportCrash
 
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         logFile.renameTo( new File( testDir, "log-2.4.1-preinstall.txt" ) );
 
@@ -66,7 +65,6 @@ public class MavenITmng3473PluginReportCrash
 
         // NOTE: Velocity prints an [ERROR] line pertaining to an incorrect macro usage when run in 2.1, so this doesn't work.
 //        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         logFile.renameTo( new File( testDir, "log-2.4.1.txt" ) );
 
