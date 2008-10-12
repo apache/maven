@@ -133,6 +133,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
         suite.addTestSuite( MavenITmng2892Test.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
+        suite.addTestSuite( MavenITmng2749Test.class );
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         suite.addTestSuite( MavenITmng2739RequiredRepositoryElements.class );
         suite.addTestSuite( MavenITmng2695OfflinePluginSnapshotsTest.class );
@@ -163,7 +164,6 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
-        suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin.class );
         suite.addTestSuite( MavenIT0112ExtensionsThatDragDependencies.class );
         suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
