@@ -143,6 +143,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
         suite.addTestSuite( MavenITmng2068ReactorRelativeParentsTest.class );
         suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
+        suite.addTestSuite( MavenITmng1999Test.class );
         suite.addTestSuite( MavenITmng1703Test.class );
         suite.addTestSuite( MavenITmng1493NonStandardModulePomNames.class );
         suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
