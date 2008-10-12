@@ -28,6 +28,9 @@ import org.apache.maven.it.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import junit.framework.TestCase;
 
@@ -43,6 +46,17 @@ public abstract class AbstractMavenIntegrationTestCase
      */
     private static PrintStream out = System.out;
 
+    /**
+     * The format for elapsed time.
+     */
+    private static final DecimalFormat SECS_FORMAT =
+        new DecimalFormat( "(0.0 s)", new DecimalFormatSymbols( Locale.ENGLISH ) );
+
+    /**
+     * The zero-based column index where to print the test result.
+     */
+    private static final int RESULT_COLUMN = 60;
+    
     private boolean skip;
 
     private ArtifactVersion mavenVersion;
@@ -129,11 +143,13 @@ public abstract class AbstractMavenIntegrationTestCase
     protected void runTest()
         throws Throwable
     {
-        out.print( getITName() + "(" + getName() + ").." );
+        String line = getTestName() + "..";
+        out.print( line );
 
         if ( skip )
         {
-            out.println( " Skipping - version " + getMavenVersion() + " not in range " + versionRange );
+            out.println( pad( RESULT_COLUMN - line.length() ) + "SKIPPED - version " + getMavenVersion()
+                + " not in range " + versionRange );
             return;
         }
 
@@ -142,14 +158,19 @@ public abstract class AbstractMavenIntegrationTestCase
             setupLocalRepo();
         }
 
+        long milliseconds = System.currentTimeMillis();
         try
         {
             super.runTest();
-            out.println( " Ok" );
+            milliseconds = System.currentTimeMillis() - milliseconds;
+            String result = "OK " + formatTime( milliseconds );
+            out.println( pad( RESULT_COLUMN - line.length() ) + result );
         }
         catch ( Throwable t )
         {
-            out.println( " Failure" );
+            milliseconds = System.currentTimeMillis() - milliseconds;
+            String result = "FAILURE " + formatTime( milliseconds );
+            out.println( pad( RESULT_COLUMN - line.length() ) + result );
             throw t;
         }
     }
@@ -162,6 +183,32 @@ public abstract class AbstractMavenIntegrationTestCase
         simpleName = simpleName.startsWith( "MavenIT" ) ? simpleName.substring( "MavenIT".length() ) : simpleName;
         simpleName = simpleName.endsWith( "Test" ) ? simpleName.substring( 0, simpleName.length() - 4 ) : simpleName;
         return simpleName;
+    }
+
+    private String getTestName()
+    {
+        String className = getITName();
+        String methodName = getName();
+        if ( methodName.startsWith( "test" ) )
+        {
+            methodName = methodName.substring( 4 );
+        }
+        return className + '(' + methodName + ')';
+    }
+
+    private String pad( int chars )
+    {
+        StringBuffer buffer = new StringBuffer( 128 );
+        for ( int i = 0; i < chars; i++ )
+        {
+            buffer.append( '.' );
+        }
+        return buffer.toString();
+    }
+
+    private String formatTime( long milliseconds )
+    {
+        return SECS_FORMAT.format( milliseconds / 1000.0 );
     }
 
     protected File setupLocalRepo()
