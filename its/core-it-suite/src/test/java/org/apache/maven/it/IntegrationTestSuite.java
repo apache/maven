@@ -123,6 +123,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
         suite.addTestSuite( MavenITmng3314OfflineSnapshotsTest.class );
+        suite.addTestSuite( MavenITmng3271Test.class );
         suite.addTestSuite( MavenITmng3221InfiniteForking.class );
         suite.addTestSuite( MavenITmng3268MultipleDashPCommandLine.class );
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
