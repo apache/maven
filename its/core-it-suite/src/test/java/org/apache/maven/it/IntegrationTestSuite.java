@@ -166,7 +166,6 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenIT0114ExtensionThatProvidesResources.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPlugin.class );
         suite.addTestSuite( MavenIT0112ExtensionsThatDragDependencies.class );
-        suite.addTestSuite( MavenIT0111PluginsThatRequireAResourceFromAnExtensionTest.class );
         suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
         suite.addTestSuite( MavenIT0107Test.class );
         suite.addTestSuite( MavenIT0106Test.class );
