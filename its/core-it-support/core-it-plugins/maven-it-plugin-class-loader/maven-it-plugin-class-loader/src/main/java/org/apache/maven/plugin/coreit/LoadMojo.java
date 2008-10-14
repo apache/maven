@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -116,6 +117,18 @@ public class LoadMojo
     {
         getLog().info( "[MAVEN-CORE-IT-LOG] Using class loader " + classLoader );
 
+        /*
+         * NOTE: This one is a little subtle. For all properly implemented class loaders, loading a class/resource from
+         * a child class loader (with the usual parent-first delegation and no additional search path) will deliver the
+         * same result as loading directly from the parent class loader. However, Maven or better Plexus Classworlds
+         * employs custom class loaders which - as history has shown (MNG-1898) - might not always be cleanly
+         * implemented. To catch potential class loader defects, we check both the results from the original class
+         * loader and a delegating child class loader for consistency. The key point is that querying the child class
+         * loader will use a slightly different code path in the original class loader during parent delegation, thereby
+         * increasing test coverage for its implementation.
+         */
+        ClassLoader childClassLoader = new URLClassLoader( new URL[0], classLoader );
+
         Properties loaderProperties = new Properties();
 
         if ( classNames != null && classNames.length() > 0 )
@@ -126,10 +139,19 @@ public class LoadMojo
                 String name = names[i];
                 getLog().info( "[MAVEN-CORE-IT-LOG] Loading class " + name );
 
-                // test ClassLoader.loadClass()
+                // test ClassLoader.loadClass(String) and (indirectly) ClassLoader.loadClass(String, boolean)
                 try
                 {
                     Class type = classLoader.loadClass( name );
+                    try
+                    {
+                        type = childClassLoader.loadClass( name );
+                    }
+                    catch ( ClassNotFoundException cnfe )
+                    {
+                        getLog().error( "[MAVEN-CORE-IT-LOG] Detected class loader defect while loading " + name );
+                        throw cnfe;
+                    }
                     loaderProperties.setProperty( name, "" + type.hashCode() );
 
                     Method[] methods = type.getDeclaredMethods();
@@ -171,6 +193,11 @@ public class LoadMojo
 
                 // test ClassLoader.getResource()
                 URL url = classLoader.getResource( path );
+                if ( url != null && !url.equals( childClassLoader.getResource( path ) ) )
+                {
+                    getLog().error( "[MAVEN-CORE-IT-LOG] Detected class loader defect while getting " + path );
+                    url = null;
+                }
                 if ( url != null )
                 {
                     loaderProperties.setProperty( path, url.toString() );
@@ -180,6 +207,11 @@ public class LoadMojo
                 try
                 {
                     List urls = Collections.list( classLoader.getResources( path ) );
+                    if ( !urls.equals( Collections.list( childClassLoader.getResources( path ) ) ) )
+                    {
+                        getLog().error( "[MAVEN-CORE-IT-LOG] Detected class loader defect while getting " + path );
+                        urls = Collections.EMPTY_LIST;
+                    }
                     loaderProperties.setProperty( path + ".count", "" + urls.size() );
                     for ( int j = 0; j < urls.size(); j++ )
                     {
