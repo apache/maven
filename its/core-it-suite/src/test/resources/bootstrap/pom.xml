@@ -66,6 +66,7 @@ under the License.
   <properties>
     <itPluginVersion>2.1-SNAPSHOT</itPluginVersion>
     <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
+    <maven.test.skip>true</maven.test.skip>
   </properties>
 
   <dependencies>

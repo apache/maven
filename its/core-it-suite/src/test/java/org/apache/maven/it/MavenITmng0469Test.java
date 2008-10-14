@@ -42,7 +42,7 @@ public class MavenITmng0469Test
     /**
      * Test that <reporting> configuration also affects build plugins unless <build> configuration is also given.
      */
-    public void testMNG0469()
+    public void testitMNG0469()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469" );

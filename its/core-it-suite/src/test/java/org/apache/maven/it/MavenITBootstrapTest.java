@@ -43,7 +43,7 @@ public class MavenITBootstrapTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "test-compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
