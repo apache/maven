@@ -151,6 +151,9 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollision.class );
         suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
         suite.addTestSuite( MavenITmng0469Test.class );
+        suite.addTestSuite( MavenIT0141Test.class );
+        suite.addTestSuite( MavenIT0140Test.class );
+        suite.addTestSuite( MavenIT0139Test.class );
         suite.addTestSuite( MavenIT0138PluginLifecycleTest.class );
         suite.addTestSuite( MavenIT0137EarLifecycleTest.class );
         suite.addTestSuite( MavenIT0136RarLifecycleTest.class );
