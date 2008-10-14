@@ -558,6 +558,7 @@ public final class PomClassicTransformer
         Map<String, String> aliases = new HashMap<String, String>();
         aliases.put( "project.", "pom.");
         aliases.put( "\\$\\{project.build.", "\\$\\{build.");
+        aliases.put( "\\$\\{project.parent.", "\\$\\{parent.");
 
         if(!containsProjectVersion(interpolatorProperties))
         {
