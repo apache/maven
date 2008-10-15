@@ -86,7 +86,7 @@ public class PluginParameterExpressionEvaluator
         this.logger = logger;
         this.properties = properties;
         project = context.getCurrentProject();
-        
+
         String basedir = null;
 
         if ( project != null )
@@ -222,7 +222,7 @@ public class PluginParameterExpressionEvaluator
                 mojoDescriptor.getGoal() + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression ) +
                 "\' instead." );
         }
-        
+
         if ( "localRepository".equals( expression ) )
         {
             value = context.getLocalRepository();
@@ -321,7 +321,6 @@ public class PluginParameterExpressionEvaluator
                     value = ReflectionValueExtractor.evaluate( pathExpression, pluginDescriptor );
                     value = value + expression.substring( pathSeparator );
                 }
-                
                 else
                 {
                     value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), pluginDescriptor );
@@ -382,20 +381,23 @@ public class PluginParameterExpressionEvaluator
 
         if ( value == null )
         {
-            // We will attempt to get nab a system property as a way to specify a
-            // parameter to a plugins. My particular case here is allowing the surefire
-            // plugin to run a single test so I want to specify that class on the cli
-            // as a parameter.
+            // The CLI should win for defining properties
 
-            if ( properties != null )
+            if ( ( value == null ) && ( properties != null ) )
             {
-                value = properties.getProperty( expression );                
-            }                    
-            
-            if ( project != null && project.getProperties() != null )
+                // We will attempt to get nab a system property as a way to specify a
+                // parameter to a plugins. My particular case here is allowing the surefire
+                // plugin to run a single test so I want to specify that class on the cli
+                // as a parameter.
+
+                value = properties.getProperty( expression );
+            }
+
+            if ( ( value == null ) && ( ( project != null ) && ( project.getProperties() != null ) ) )
             {
                 value = project.getProperties().getProperty( expression );
             }
+
         }
 
         if ( value instanceof String )
