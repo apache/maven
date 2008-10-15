@@ -29,6 +29,11 @@ import java.util.List;
 public class MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest
     extends AbstractMavenIntegrationTestCase
 {
+
+    public MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest() {
+        super( "[,2.99.99)" );//extension support removed from 3.0
+    }
+
     public void testit0115()
         throws Exception
     {
