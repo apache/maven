@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Properties;
 
 public class MavenIT0043Test
@@ -52,6 +53,7 @@ public class MavenIT0043Test
         Properties systemProperties = new Properties();
         systemProperties.put( "expression.expressions", "project/repositories,project/pluginRepositories" );
         verifier.setSystemProperties( systemProperties );
+        verifier.setCliOptions( Collections.singletonList( "-s settings.xml" ) );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
