@@ -50,6 +50,8 @@ public final class PomClassicTransformer
 
                                                                           ProjectUri.Build.Plugins.xUri,
                                                                           ProjectUri.Build.Plugins.Plugin.configuration,
+                                                                          ProjectUri.Reporting.Plugins.xUri,
+                                                                          ProjectUri.Reporting.Plugins.Plugin.configuration,
                                                                           ProjectUri.Build.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Build.Plugins.Plugin.Executions.xUri,
                                                                           ProjectUri.Build.Resources.xUri,
@@ -223,6 +225,7 @@ public final class PomClassicTransformer
             }
         }
         props.removeAll( removeProperties );
+
         String xml = null;
         try
         {
@@ -477,6 +480,27 @@ public final class PomClassicTransformer
             modelProperties.removeAll( clearedProperties );
         }
 
+        //Rule: Build plugin config overrides reporting plugin config
+        ModelDataSource source = new DefaultModelDataSource();
+        source.init( modelProperties, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+
+        List<ModelContainer> reportContainers = source.queryFor( ProjectUri.Reporting.Plugins.Plugin.xUri );
+        for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
+        {
+            ModelContainer transformedReportContainer = new ArtifactModelContainerFactory().create(
+                    transformPlugin( pluginContainer.getProperties() ) );
+
+            for(ModelContainer reportContainer : reportContainers) {
+                ModelContainerAction action = transformedReportContainer.containerAction( reportContainer );
+                if ( action.equals( ModelContainerAction.JOIN ) )
+                {
+                    source.join( transformedReportContainer, reportContainer );
+                    break;
+                }
+            }
+        }
+
+        modelProperties = source.getModelProperties();
         return modelProperties;
     }
 
@@ -749,7 +773,7 @@ public final class PomClassicTransformer
         return transformedProperties;
     }
 
-    public static List<ModelProperty> transformPluginManagement( List<ModelProperty> modelProperties )
+    private static List<ModelProperty> transformPluginManagement( List<ModelProperty> modelProperties )
     {
         List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
         for ( ModelProperty mp : modelProperties )
@@ -759,6 +783,28 @@ public final class PomClassicTransformer
                 transformedProperties.add( new ModelProperty(
                     mp.getUri().replace( ProjectUri.Build.PluginManagement.xUri, ProjectUri.Build.xUri ),
                     mp.getResolvedValue() ) );
+            }
+        }
+        return transformedProperties;
+    }
+
+    private static List<ModelProperty> transformPlugin( List<ModelProperty> modelProperties )
+    {
+        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
+        for ( ModelProperty mp : modelProperties )
+        {
+            if ( mp.getUri().startsWith( ProjectUri.Build.Plugins.xUri ) )
+            {   if(mp.getUri().startsWith(ProjectUri.Build.Plugins.Plugin.configuration)
+                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.groupId)
+                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.artifactId)
+                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.version)
+                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.xUri ) )
+                {
+                transformedProperties.add( new ModelProperty(
+                    mp.getUri().replace( ProjectUri.Build.Plugins.xUri, ProjectUri.Reporting.Plugins.xUri ),
+                    mp.getResolvedValue() ) );
+                }
+
             }
         }
         return transformedProperties;

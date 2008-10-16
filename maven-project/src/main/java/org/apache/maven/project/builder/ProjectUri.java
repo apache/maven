@@ -1506,7 +1506,7 @@ public class ProjectUri
                     "http://apache.org/maven/project/reporting/plugins#collection/plugin/inherited";
 
                 public static String configuration =
-                    "http://apache.org/maven/project/reporting/plugins#collection/plugin/configuration";
+                    "http://apache.org/maven/project/reporting/plugins#collection/plugin/configuration#set";
 
                 public static class ReportSets
                 {

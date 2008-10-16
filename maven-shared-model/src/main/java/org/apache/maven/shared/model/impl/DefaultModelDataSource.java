@@ -124,6 +124,9 @@ public final class DefaultModelDataSource
         if(startIndex == -1)
         {
             startIndex = modelProperties.indexOf( a.getProperties().get( 0 ) );
+            if(startIndex == -1) {
+                return null;
+            }
         }
         delete( a );
         delete( b );
