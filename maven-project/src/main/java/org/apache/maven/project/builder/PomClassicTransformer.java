@@ -573,17 +573,33 @@ public final class PomClassicTransformer
         return false;
     }
 
+    private static void putProjectAliasIn(Map<String, String> map, String s)
+    {
+        map.put( "\\$\\{project." + s + "\\}", "\\$\\{" + s + "\\}");
+    }
+
+    private static Map<String, String> aliases = new HashMap<String, String>();
+
+    static
+    {
+        aliases.put( "project.", "pom.");
+        aliases.put( "\\$\\{project.build.", "\\$\\{build.");
+
+        List<String> aliasList = Arrays.asList("artifactId", "groupId", "version", "packaging", "name", "description",
+            "url", "inceptionYear", "scm.url", "ciManagement.url", "distributionManagement.repository.name",
+            "reporting.outputDirectory", "parent.groupId", "parent.artifactId",
+            "parent.version", "prerequisites.maven", "issueManagement.url", "organization.name");
+        for(String alias : aliasList) {
+            putProjectAliasIn(aliases, alias);
+        }
+
+    }
+
     private static void interpolateModelProperties(List<ModelProperty> modelProperties,
                                                    List<InterpolatorProperty> interpolatorProperties,
                                                    PomClassicDomainModel domainModel)
            throws IOException
     {
-
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.put( "project.", "pom.");
-        aliases.put( "\\$\\{project.build.", "\\$\\{build.");
-        aliases.put( "\\$\\{project.parent.", "\\$\\{parent.");
-
         if(!containsProjectVersion(interpolatorProperties))
         {
             aliases.put("\\$\\{project.version\\}", "\\$\\{version\\}");
