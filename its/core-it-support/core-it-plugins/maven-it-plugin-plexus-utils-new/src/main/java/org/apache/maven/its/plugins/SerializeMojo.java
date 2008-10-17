@@ -1,5 +1,6 @@
 package org.apache.maven.its.plugins;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -24,7 +25,7 @@ public class SerializeMojo
     /**
      * @parameter default-value="${project.build.directory}/serialized.xml"
      */
-    private String filename;
+    private File file;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -33,7 +34,8 @@ public class SerializeMojo
         XmlSerializer s = new MXSerializer();
         try
         {
-            writer = new OutputStreamWriter( new FileOutputStream( filename ), "UTF-8" );
+            file.getParentFile().mkdirs();
+            writer = new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" );
             s.setOutput( writer );
 
             Xpp3Dom dom = new Xpp3Dom( "root" );
