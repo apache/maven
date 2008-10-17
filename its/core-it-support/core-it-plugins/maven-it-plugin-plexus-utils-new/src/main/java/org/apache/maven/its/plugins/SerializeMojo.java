@@ -1,7 +1,9 @@
 package org.apache.maven.its.plugins;
 
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -27,11 +29,11 @@ public class SerializeMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        FileWriter writer = null;
+        Writer writer = null;
         XmlSerializer s = new MXSerializer();
         try
         {
-            writer = new FileWriter( filename );
+            writer = new OutputStreamWriter( new FileOutputStream( filename ), "UTF-8" );
             s.setOutput( writer );
 
             Xpp3Dom dom = new Xpp3Dom( "root" );
