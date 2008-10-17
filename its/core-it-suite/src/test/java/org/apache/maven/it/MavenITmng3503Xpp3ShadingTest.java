@@ -25,29 +25,26 @@ import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3503">MNG-3503</a>.
- * 
- * The first test verifies that a plugin using plexus-utils-1.1 does not cause linkage errors.
- * The second test verifies that a plugin with a different implementation of the shaded classes is used instead.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3503">MNG-3503</a>. The first test verifies that
+ * a plugin using plexus-utils-1.1 does not cause linkage errors. The second test verifies that a plugin with a
+ * different implementation of the shaded classes is used instead.
  */
 public class MavenITmng3503Xpp3ShadingTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3503Xpp3ShadingTest()
     {
-        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // only test in 2.0.9+, and not in 2.1.0-M1
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // only test in 2.0.10+, and not in 2.1.0-M1
     }
 
-    public void testitMNG3503()
+    public void testitMNG3503NoLinkageErrors()
         throws Exception
     {
-        // The testdir is computed from the location of this
-        // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503-xpp3Shading" );
+        File dir =
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503-xpp3Shading/mng-3503-xpp3Shading-pu11" );
 
         Verifier verifier;
 
-        File dir = new File( testDir, "mng-3503-xpp3Shading-pu11" );
         verifier = new Verifier( dir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );
@@ -57,9 +54,14 @@ public class MavenITmng3503Xpp3ShadingTest
         verifier.resetStreams();
 
         assertEquals( "<root />", FileUtils.fileRead( new File( dir, "target/serialized.xml" ), "UTF-8" ) );
+    }
 
-        dir = new File( testDir, "mng-3503-xpp3Shading-pu-new" );
-        verifier = new Verifier( dir.getAbsolutePath() );
+    public void testitMNG3503Xpp3Shading()
+        throws Exception
+    {
+        File dir =
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503-xpp3Shading/mng-3503-xpp3Shading-pu-new" );
+        Verifier verifier = new Verifier( dir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );
 
