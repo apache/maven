@@ -36,7 +36,7 @@ public class MavenITmng1999Test
 
     public MavenITmng1999Test()
     {
-        super( "(2.9999,)" );
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // 2.0.10+, excluding 2.1.0-M1
     }
 
     /**
