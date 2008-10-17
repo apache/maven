@@ -131,6 +131,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3106ProfileMultipleActivators.class );
         suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPOM.class );
         suite.addTestSuite( MavenITmng3052DepRepoAggregationTest.class );
+        suite.addTestSuite( MavenITmng3012Test.class );
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
         suite.addTestSuite( MavenITmng2892Test.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
