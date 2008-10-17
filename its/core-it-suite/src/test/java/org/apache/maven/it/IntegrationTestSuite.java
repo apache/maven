@@ -81,6 +81,7 @@ MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
 */
 
+        suite.addTestSuite( MavenITmng3796Test.class );
         suite.addTestSuite( MavenITmng3748BadSettingsXmlTest.class );
         suite.addTestSuite( MavenITmng3747PrefixedPathExpressionTest.class );
         suite.addTestSuite( MavenITmng3746POMPropertyOverrideTest.class );
