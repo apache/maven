@@ -28,7 +28,7 @@ under the License.
     <version>1.0</version>
   </parent>
 
-  <artifactId>child</artifactId>
+  <artifactId>child1</artifactId>
 
   <name>Maven Integration Test :: MNG-1999</name> 
   <description>

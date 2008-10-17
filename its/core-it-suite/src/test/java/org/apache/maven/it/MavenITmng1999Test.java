@@ -42,12 +42,12 @@ public class MavenITmng1999Test
     /**
      * Test that default reports can be suppressed via inheritance from the parent.
      */
-    public void testitMNG1999()
+    public void testitInheritSuppression()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1999" );
 
-        Verifier verifier = new Verifier( new File( testDir, "child" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( new File( testDir, "child1" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
@@ -57,6 +57,26 @@ public class MavenITmng1999Test
         Properties props = verifier.loadProperties( "target/reports.properties" );
         assertEquals( "0", props.getProperty( "reports" ) );
         assertNull( props.getProperty( "reports.0" ) );
+    }
+
+    /**
+     * Verify that children can re-enable default reports if suppressed via inheritance from the parent.
+     */
+    public void testitOverrideSuppression()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1999" );
+
+        Verifier verifier = new Verifier( new File( testDir, "child2" ).getAbsolutePath() );
+        verifier.deleteDirectory( "target" );
+        verifier.setAutoclean( false );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/reports.properties" );
+        props = verifier.loadProperties( "target/reports.properties" );
+        assertNotNull( props.getProperty( "reports.0" ) );
     }
 
 }
