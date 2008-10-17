@@ -20,30 +20,25 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.maven.it.Verifier;
+import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3503">MNG-3503</a>.
- *
- * @todo Fill in a better description of what this test verifies!
  * 
- * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * @author jdcasey
- * 
+ * The first test verifies that a plugin using plexus-utils-1.1 does not cause linkage errors.
+ * The second test verifies that a plugin with a different implementation of the shaded classes is used instead.
  */
 public class MavenITmng3503Xpp3ShadingTest
     extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng3503Xpp3ShadingTest()
     {
-        super( "(2.0.9,)" ); // only test in 2.0.9+
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // only test in 2.0.9+, and not in 2.1.0-M1
     }
 
-    public void testitMNG3503 ()
+    public void testitMNG3503()
         throws Exception
     {
         // The testdir is computed from the location of this
@@ -52,32 +47,26 @@ public class MavenITmng3503Xpp3ShadingTest
 
         Verifier verifier;
 
-        /*
-         * We must first make sure that any artifact created
-         * by this test has been removed from the local
-         * repository. Failing to do this could cause
-         * unstable test results. Fortunately, the verifier
-         * makes it easy to do this.
-         */
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        File dir = new File( testDir, "mng-3503-xpp3Shading-pu11" );
+        verifier = new Verifier( dir.getAbsolutePath() );
 
         verifier.executeGoal( "install" );
 
-        /*
-         * This is the simplest way to check a build
-         * succeeded. It is also the simplest way to create
-         * an IT test: make the build pass when the test
-         * should pass, and make the build fail when the
-         * test should fail. There are other methods
-         * supported by the verifier. They can be seen here:
-         * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
-         */
         verifier.verifyErrorFreeLog();
 
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
         verifier.resetStreams();
+
+        assertEquals( "<root />", FileUtils.fileRead( new File( dir, "target/serialized.xml" ) ) );
+
+        dir = new File( testDir, "mng-3503-xpp3Shading-pu-new" );
+        verifier = new Verifier( dir.getAbsolutePath() );
+
+        verifier.executeGoal( "install" );
+
+        verifier.verifyErrorFreeLog();
+
+        verifier.resetStreams();
+
+        assertEquals( "root", FileUtils.fileRead( new File( dir, "target/serialized.xml" ) ) );
     }
 }

@@ -57,6 +57,8 @@ under the License.
     <module>maven-it-plugin-uses-properties</module>
     <module>maven-it-plugin-uses-wagon</module>
     <module>maven-it-plugin-all</module>
+    <module>maven-it-plugin-plexus-utils-11</module>
+    <module>maven-it-plugin-plexus-utils-new</module>
   </modules>
 
   <scm>
