@@ -56,7 +56,7 @@ public class MavenITmng3503Xpp3ShadingTest
 
         verifier.resetStreams();
 
-        assertEquals( "<root />", FileUtils.fileRead( new File( dir, "target/serialized.xml" ) ) );
+        assertEquals( "<root />", FileUtils.fileRead( new File( dir, "target/serialized.xml" ), "UTF-8" ) );
 
         dir = new File( testDir, "mng-3503-xpp3Shading-pu-new" );
         verifier = new Verifier( dir.getAbsolutePath() );
@@ -67,6 +67,6 @@ public class MavenITmng3503Xpp3ShadingTest
 
         verifier.resetStreams();
 
-        assertEquals( "root", FileUtils.fileRead( new File( dir, "target/serialized.xml" ) ) );
+        assertEquals( "root", FileUtils.fileRead( new File( dir, "target/serialized.xml" ), "UTF-8" ) );
     }
 }
