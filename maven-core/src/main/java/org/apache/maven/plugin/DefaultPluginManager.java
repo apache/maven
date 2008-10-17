@@ -305,7 +305,9 @@ public class DefaultPluginManager
             try
             {
                 child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.Xpp3Dom" );
-                child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.pull" );
+                child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.pull.XmlPullParser" );
+                child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.pull.XmlPullParserException" );
+                child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.pull.XmlSerializer" );
 
                 // MNG-2878
                 child.getContainerRealm().importFrom( "plexus.core", "/default-report.xml" );
