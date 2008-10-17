@@ -15,7 +15,7 @@ import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 /**
  * @goal serialize
- * @phase package
+ * @phase validate
  */
 public class SerializeMojo
     extends AbstractMojo

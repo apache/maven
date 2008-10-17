@@ -50,7 +50,7 @@ public class MavenITmng3503Xpp3ShadingTest
         File dir = new File( testDir, "mng-3503-xpp3Shading-pu11" );
         verifier = new Verifier( dir.getAbsolutePath() );
 
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
 
@@ -61,7 +61,7 @@ public class MavenITmng3503Xpp3ShadingTest
         dir = new File( testDir, "mng-3503-xpp3Shading-pu-new" );
         verifier = new Verifier( dir.getAbsolutePath() );
 
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
 
