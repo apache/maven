@@ -233,9 +233,9 @@ public class DefaultModelInheritanceAssembler
                 child.setReporting( childReporting );
             }
 
-            if ( parentReporting.isExcludeDefaults() )
+            if ( childReporting.isExcludeDefaultsValue() == null )
             {
-                childReporting.setExcludeDefaults( true );
+                childReporting.setExcludeDefaultsValue( parentReporting.isExcludeDefaultsValue() );
             }
 
             if ( StringUtils.isEmpty( childReporting.getOutputDirectory() ) )

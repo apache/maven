@@ -655,46 +655,148 @@ public class DefaultModelInheritanceAssemblerTest
 
     public void testReportingExcludeDefaultsInheritance()
     {
+        // parent and child have no reporting section
         Model parent = makeBaseModel( "parent" );
-
         Model child = makeBaseModel( "child" );
 
-        Reporting parentBuild = new Reporting();
-        parentBuild.setExcludeDefaults( false );
-        parent.setReporting( parentBuild );
-
         assembler.assembleModelInheritance( child, parent );
+        assertNull( child.getReporting() );
 
-        assertFalse( "Check excludeDefaults is inherited", child.getReporting().isExcludeDefaults() );
-
+        // parent is default, and child has no reporting section
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( new Reporting() );
         child = makeBaseModel( "child" );
 
-        parentBuild.setExcludeDefaults( true );
+        assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
+
+        // parent is false, and child has no reporting section
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( createReportingWithExcludeDefaults( false ) );
+        child = makeBaseModel( "child" );
 
         assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
 
-        assertTrue( "Check excludeDefaults is inherited", child.getReporting().isExcludeDefaults() );
+        // parent is true, and child has no reporting section
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( createReportingWithExcludeDefaults( true ) );
+        child = makeBaseModel( "child" );
 
+        assembler.assembleModelInheritance( child, parent );
+        assertTrue( child.getReporting().isExcludeDefaults() );
+
+        // parent has no reporting section, child is false
+        parent = makeBaseModel( "parent" );
+        child = makeBaseModel( "child" );
+        child.setReporting( createReportingWithExcludeDefaults( false ) );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
+
+        // parent is default, and child is false
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( new Reporting() );
+        child = makeBaseModel( "child" );
+        child.setReporting( createReportingWithExcludeDefaults( false ) );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
+
+        // parent is false, and child is false
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( createReportingWithExcludeDefaults( false ) );
+        child = makeBaseModel( "child" );
+        child.setReporting( createReportingWithExcludeDefaults( false ) );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
+
+        // parent is true, and child is false
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( createReportingWithExcludeDefaults( true ) );
+        child = makeBaseModel( "child" );
+        child.setReporting( createReportingWithExcludeDefaults( false ) );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
+
+        // parent has no reporting section, child is true
+        parent = makeBaseModel( "parent" );
+        child = makeBaseModel( "child" );
+        child.setReporting( createReportingWithExcludeDefaults( true ) );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertTrue( child.getReporting().isExcludeDefaults() );
+
+        // parent is default, and child is true
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( new Reporting() );
+        child = makeBaseModel( "child" );
+        child.setReporting( createReportingWithExcludeDefaults( true ) );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertTrue( child.getReporting().isExcludeDefaults() );
+
+        // parent is false, and child is true
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( createReportingWithExcludeDefaults( false ) );
+        child = makeBaseModel( "child" );
+        child.setReporting( createReportingWithExcludeDefaults( true ) );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertTrue( child.getReporting().isExcludeDefaults() );
+
+        // parent is true, and child is true
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( createReportingWithExcludeDefaults( true ) );
+        child = makeBaseModel( "child" );
+        child.setReporting( createReportingWithExcludeDefaults( true ) );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertTrue( child.getReporting().isExcludeDefaults() );
+
+        // parent has no reporting section, child is default
+        parent = makeBaseModel( "parent" );
         child = makeBaseModel( "child" );
         child.setReporting( new Reporting() );
 
-        parentBuild.setExcludeDefaults( true );
-
         assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
 
-        assertTrue( "Check excludeDefaults is inherited when reporting is set but excludeDefaults is not",
-                    child.getReporting().isExcludeDefaults() );
-
-        child = makeBaseModel( "child" );
-        Reporting childReporting = new Reporting();
-        child.setReporting( childReporting );
-
+        // parent is default, and child is default
+        parent = makeBaseModel( "parent" );
         parent.setReporting( new Reporting() );
-        childReporting.setExcludeDefaults( true );
+        child = makeBaseModel( "child" );
+        child.setReporting( new Reporting() );
 
         assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
 
-        assertTrue( "Check excludeDefaults is inherited properly", child.getReporting().isExcludeDefaults() );
+        // parent is false, and child is default
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( createReportingWithExcludeDefaults( false ) );
+        child = makeBaseModel( "child" );
+        child.setReporting( new Reporting() );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertFalse( child.getReporting().isExcludeDefaults() );
+
+        // parent is true, and child is default
+        parent = makeBaseModel( "parent" );
+        parent.setReporting( createReportingWithExcludeDefaults( true ) );
+        child = makeBaseModel( "child" );
+        child.setReporting( new Reporting() );
+
+        assembler.assembleModelInheritance( child, parent );
+        assertTrue( child.getReporting().isExcludeDefaults() );
+    }
+
+    private Reporting createReportingWithExcludeDefaults( boolean excludeDefaults )
+    {
+        Reporting reporting = new Reporting();
+        reporting.setExcludeDefaults( excludeDefaults );
+        return reporting;
     }
 
     public void testReportInheritanceWhereParentReportWithoutInheritFlagAndChildHasNoReports()

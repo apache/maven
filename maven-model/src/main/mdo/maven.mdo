@@ -2803,13 +2803,12 @@
       <version>4.0.0</version>
       <description>Section for management of reports and their configuration.</description>
       <fields>
-        <field>
-          <name>excludeDefaults</name>
+        <field xml.tagName="excludeDefaults">
+          <name>excludeDefaultsValue</name>
           <version>4.0.0</version>
-          <type>boolean</type>
+          <type>Boolean</type>
           <description>If true, then the default reports are not included in the site generation.
             This includes the reports in the "Project Info" menu.</description>
-          <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>outputDirectory</name>
@@ -2869,6 +2868,21 @@
         }
 
         return reportPluginMap;
+    }
+
+    public boolean isExcludeDefaults()
+    {
+        return excludeDefaultsValue != null ? excludeDefaultsValue.booleanValue() : false;
+    }
+
+    public void setExcludeDefaults( boolean excludeDefaults )
+    {
+        excludeDefaultsValue = excludeDefaults ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    public void setExcludeDefaultsValue( String excludeDefaults )
+    {
+        excludeDefaultsValue = excludeDefaults != null ? Boolean.valueOf( excludeDefaults ) : null;
     }
             ]]>
           </code>
