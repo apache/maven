@@ -674,6 +674,27 @@ public class DefaultModelInheritanceAssemblerTest
         assembler.assembleModelInheritance( child, parent );
 
         assertTrue( "Check excludeDefaults is inherited", child.getReporting().isExcludeDefaults() );
+
+        child = makeBaseModel( "child" );
+        child.setReporting( new Reporting() );
+
+        parentBuild.setExcludeDefaults( true );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertTrue( "Check excludeDefaults is inherited when reporting is set but excludeDefaults is not",
+                    child.getReporting().isExcludeDefaults() );
+
+        child = makeBaseModel( "child" );
+        Reporting childReporting = new Reporting();
+        child.setReporting( childReporting );
+
+        parent.setReporting( new Reporting() );
+        childReporting.setExcludeDefaults( true );
+
+        assembler.assembleModelInheritance( child, parent );
+
+        assertTrue( "Check excludeDefaults is inherited properly", child.getReporting().isExcludeDefaults() );
     }
 
     public void testReportInheritanceWhereParentReportWithoutInheritFlagAndChildHasNoReports()
