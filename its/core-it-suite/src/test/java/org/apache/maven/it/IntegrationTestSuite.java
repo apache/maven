@@ -116,7 +116,6 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3473PluginReportCrash.class );
         suite.addTestSuite( MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
-        suite.addTestSuite( MavenITmng3426PluginsClasspathOverrideTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRanges.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
         suite.addTestSuite( MavenITmng3380ManagedRelocatedTransdepsTest.class );
