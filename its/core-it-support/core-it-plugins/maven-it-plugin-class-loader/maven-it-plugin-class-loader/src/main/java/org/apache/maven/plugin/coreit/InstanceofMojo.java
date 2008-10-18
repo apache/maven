@@ -28,6 +28,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -69,6 +71,13 @@ public class InstanceofMojo
     private String[] objectExpressions;
 
     /**
+     * A list of injected component instances that should be type-checked.
+     * 
+     * @component role="org.apache.maven.plugin.coreit.Component"
+     */
+    private List components;
+
+    /**
      * The current Maven project against which expressions are evaluated.
      * 
      * @parameter default-value="${project}"
@@ -98,22 +107,39 @@ public class InstanceofMojo
 
         Properties instanceofProperties = new Properties();
 
-        Map contexts = new HashMap();
-        contexts.put( "project", project );
-        contexts.put( "pom", project );
-
-        for ( int i = 0; i < objectExpressions.length; i++ )
+        if ( objectExpressions != null && objectExpressions.length > 0 )
         {
-            String expression = objectExpressions[i];
-            getLog().info( "[MAVEN-CORE-IT-LOG] Evaluating expression " + expression );
-            Object object = ExpressionUtil.evaluate( expression, contexts );
-            getLog().info( "[MAVEN-CORE-IT-LOG] Checking object " + object );
-            if ( object != null )
+            Map contexts = new HashMap();
+            contexts.put( "project", project );
+            contexts.put( "pom", project );
+
+            for ( int i = 0; i < objectExpressions.length; i++ )
             {
-                getLog().info( "[MAVEN-CORE-IT-LOG] Loaded object from " + object.getClass().getClassLoader() );
+                String expression = objectExpressions[i];
+                getLog().info( "[MAVEN-CORE-IT-LOG] Evaluating expression " + expression );
+                Object object = ExpressionUtil.evaluate( expression, contexts );
+                getLog().info( "[MAVEN-CORE-IT-LOG] Checking object " + object );
+                if ( object != null )
+                {
+                    getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded class " + object.getClass().getName() );
+                    getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded class from " + object.getClass().getClassLoader() );
+                }
+                instanceofProperties.setProperty( expression.replace( '/', '.' ),
+                                                  Boolean.toString( type.isInstance( object ) ) );
             }
-            instanceofProperties.setProperty( expression.replace( '/', '.' ),
-                                              Boolean.toString( type.isInstance( object ) ) );
+        }
+
+        if ( components != null && !components.isEmpty() )
+        {
+            for ( Iterator it = components.iterator(); it.hasNext(); )
+            {
+                Object object = it.next();
+                getLog().info( "[MAVEN-CORE-IT-LOG] Checking component " + object );
+                getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded class " + object.getClass().getName() );
+                getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded class from " + object.getClass().getClassLoader() );
+                instanceofProperties.setProperty( object.getClass().getName(),
+                                                  Boolean.toString( type.isInstance( object ) ) );
+            }
         }
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file " + instanceofPropertiesFile );
