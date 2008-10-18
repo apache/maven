@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <groupId>org.apache.maven.its.plugins.class-loader</groupId>
+  <artifactId>dep-b</artifactId>
+  <version>0.2-mng-2972</version>
+  <versioning>
+    <versions>
+      <version>0.2-mng-2972</version>
+    </versions>
+    <lastUpdated>20081018154402</lastUpdated>
+  </versioning>
+</metadata>
