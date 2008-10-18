@@ -23,7 +23,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng2972</groupId>
-  <artifactId>test</artifactId>
+  <artifactId>test2</artifactId>
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-2972</name> 
@@ -75,12 +75,13 @@ under the License.
           <dependency>
             <groupId>org.apache.maven.its.plugins.class-loader</groupId>
             <artifactId>dep-b</artifactId>
-            <version>0.2-mng-2972</version>
+            <version>9.9-MNG-2972</version>
           </dependency>
         </dependencies>
         <configuration>
           <classNames>org.apache.maven.its.mng2972.MNG2972,org.apache.maven.plugin.coreit.ClassA,org.apache.maven.plugin.coreit.ClassB</classNames>
           <resourcePaths>org/apache/maven/its/mng2972/mng-2972.properties,org/apache/maven/plugin/coreit/a.properties,org/apache/maven/plugin/coreit/b.properties</resourcePaths>
+          <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
         </configuration>
         <executions>
           <execution>

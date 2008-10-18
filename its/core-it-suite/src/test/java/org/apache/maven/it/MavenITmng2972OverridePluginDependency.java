@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -47,37 +46,48 @@ public class MavenITmng2972OverridePluginDependency
     public void testitLifecycleInvocation()
         throws Exception
     {
-        run( false );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2972/test1" );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "0.2-mng-2972", "jar" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
+        verify( pclProps );
     }
 
     /**
      * Verify that a project-level plugin dependency replaces the original dependency from the plugin POM.
+     * Apart from testing direct CLI invocation this time, this test also employs a slightly different version for the
+     * overriding dependency. The original bug is caused by usage of a HashSet but whenever the random order of its
+     * elements happens to match the correct ordering, the test cannot detect the bad implementation. The obvious way
+     * to increase the test coverage is re-running the test with different dependency versions, each time producing
+     * another hash code for the dependency artifact and thereby changing its position in the HashSet's element order.
+     * The two versions 0.2-mng-2972 and 9.9-MNG-2972 we use here have at least once proven (on Sun JDK 1.6.0_07) to
+     * successfully break the correctness of the random ordering.
      */
     public void testitCommandLineInvocation()
         throws Exception
     {
-        run( true );
-    }
-
-    private void run( boolean cli )
-        throws Exception
-    {
-        String propFile = cli ? "target/cli.properties" : "target/lifecycle.properties";
-
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2972" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2972/test2" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "0.2-mng-2972", "jar" );
-        new File( testDir, propFile ).delete();
-        Properties sysProps = new Properties();
-        sysProps.setProperty( "clsldr.pluginClassLoaderOutput", propFile );
-        verifier.setSystemProperties( sysProps );
-        verifier.executeGoal( cli ? "org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load" : "validate" );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "9.9-MNG-2972", "jar" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        FileUtils.rename( new File( testDir, "log.txt"), new File( testDir, cli ? "log2.txt" : "log1.txt" ) );
 
-        Properties pclProps = verifier.loadProperties( propFile );
+        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
+        verify( pclProps );
+    }
+
+    private void verify( Properties pclProps )
+        throws Exception
+    {
         assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng2972.MNG2972" ) );
         assertNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
         assertNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
