@@ -29,7 +29,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
 /**
  * Gather all resources in a XAR file (which is actually a ZIP file)
  *
- * @version $Id: $
+ * @version $Id$
  * @goal xar
  * @phase package
  */
