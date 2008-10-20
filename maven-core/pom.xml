@@ -33,10 +33,6 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project-builder</artifactId>
-    </dependency>      
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-lifecycle</artifactId>
     </dependency>
     <dependency>
