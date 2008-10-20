@@ -69,7 +69,7 @@
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
     </dependency>
-    <!--Wagon-->  
+    <!--Wagon-->
     <dependency>
       <groupId>easymock</groupId>
       <artifactId>easymock</artifactId>
@@ -206,7 +206,9 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <descriptor>src/main/assembly/bin.xml</descriptor>
+                  <descriptors>
+                    <descriptor>src/main/assembly/bin.xml</descriptor>
+                  </descriptors>
                   <finalName>apache-maven-${pom.version}</finalName>
                 </configuration>
               </execution>
