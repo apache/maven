@@ -37,12 +37,13 @@ public final class ArtifactModelContainerFactory
     private static final Collection<String> uris = Collections.unmodifiableList( Arrays.asList(
 
         ProjectUri.DependencyManagement.Dependencies.Dependency.xUri, ProjectUri.Dependencies.Dependency.xUri,
-
+        ProjectUri.Reporting.Plugins.Plugin.xUri,
         ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri,
         ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.xUri,
 
         ProjectUri.Build.Plugins.Plugin.xUri, ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.xUri,
-        ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.Exclusions.Exclusion.xUri ) );
+        ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.Exclusions.Exclusion.xUri
+         ) );
 
     public Collection<String> getUris()
     {
@@ -128,7 +129,7 @@ public final class ArtifactModelContainerFactory
                     sb.append( mp ).append( "\r\n" );
                 }
                 throw new IllegalArgumentException( "Properties does not contain artifact id. Group ID = " + groupId +
-                    ", Version = " + version + ":" + sb );
+                    ", Version = " + version + ", Base = " + uri + ":\r\n" + sb );
             }
 
             if ( type == null )
