@@ -133,6 +133,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3012Test.class );
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
         suite.addTestSuite( MavenITmng2892Test.class );
+        suite.addTestSuite( MavenITmng2878Test.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
         suite.addTestSuite( MavenITmng2749Test.class );
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
