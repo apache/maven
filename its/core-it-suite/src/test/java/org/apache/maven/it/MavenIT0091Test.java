@@ -23,29 +23,39 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
- * # it0091 currrently fails. Not sure if there is an associated JIRA.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1995">MNG-1995</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
  */
 public class MavenIT0091Test
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenIT0091Test()
+    {
+        super( "(2.999.0,)" );
+    }
+
     /**
-     * Test that currently demonstrates that properties are not correctly
-     * interpolated into other areas in the POM. This may strictly be a boolean
-     * problem: I captured the problem as it was reported.
+     * Verify that POM fields that are of type boolean can be interpolated with expressions.
      */
-    public void testit0091()
+    public void testitMNG1995()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0091" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "test" );
-        verifier.assertFilePresent( "target/classes/test.properties" );
+
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties props = verifier.loadProperties( "target/expression.properties" );
+        assertEquals( "true", props.getProperty( "project.build.resources.0.filtering" ) );
     }
-}
 
+}

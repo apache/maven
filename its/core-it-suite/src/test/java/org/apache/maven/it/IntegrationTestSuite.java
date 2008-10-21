@@ -184,6 +184,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenIT0096Test.class );
         suite.addTestSuite( MavenIT0095Test.class );
         suite.addTestSuite( MavenIT0092Test.class );
+        suite.addTestSuite( MavenIT0091Test.class );
         suite.addTestSuite( MavenIT0090Test.class );
         suite.addTestSuite( MavenIT0088Test.class );
         suite.addTestSuite( MavenIT0087Test.class );
@@ -287,7 +288,6 @@ MavenITmng3645POMSyntaxErrorTest
         // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
 
         // suite.addTestSuite( MavenIT0126TestJarDependency.class ); // MJAR-75 / MNG-3160
-        // suite.addTestSuite(MavenIT0091Test.class); // MNG-3160
 
         return suite;
     }
