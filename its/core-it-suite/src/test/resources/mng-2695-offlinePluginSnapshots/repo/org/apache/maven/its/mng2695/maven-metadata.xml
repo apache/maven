@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <plugins>
+    <plugin>
+      <name>Unnamed - org.apache.maven.its.mng2695:plugin-a:maven-plugin:0.1-SNAPSHOT</name>
+      <prefix>a</prefix>
+      <artifactId>plugin-a</artifactId>
+    </plugin>
+    <plugin>
+      <name>Unnamed - org.apache.maven.its.mng2695:plugin-b:maven-plugin:0.1-SNAPSHOT</name>
+      <prefix>b</prefix>
+      <artifactId>plugin-b</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

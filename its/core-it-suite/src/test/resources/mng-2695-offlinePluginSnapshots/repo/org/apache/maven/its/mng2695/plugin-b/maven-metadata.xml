@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <groupId>org.apache.maven.its.mng2695</groupId>
+  <artifactId>plugin-b</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <versioning>
+    <latest>0.1-SNAPSHOT</latest>
+    <versions>
+      <version>0.1-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20081021184238</lastUpdated>
+  </versioning>
+</metadata>
