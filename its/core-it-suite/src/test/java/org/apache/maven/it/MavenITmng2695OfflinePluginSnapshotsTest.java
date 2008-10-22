@@ -40,7 +40,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
 
     public MavenITmng2695OfflinePluginSnapshotsTest()
     {
-        super( "(2.0.8,)" ); // only test in 2.0.9+
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // only test in 2.0.10+, and not in 2.1.0-M1
     }
 
     /**
