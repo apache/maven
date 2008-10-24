@@ -20,31 +20,59 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
+import java.util.Properties;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1323">MNG-1323</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
+ */
 public class MavenIT0127AntrunDependencies
     extends AbstractMavenIntegrationTestCase
 {
-  
+
     /**
-    * MNG-1323
-    */
-    public void testit0127()
+     * Verify that project-level plugin dependencies actually apply to the current project only and not the entire
+     * reactor.
+     */
+    public void testitMNG1323()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0127-antrunDependencies" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0127", "parent", "1.0-SNAPSHOT", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0127", "a", "1.0-SNAPSHOT", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0127", "b",  "1.0-SNAPSHOT", "jar" );
-        verifier.executeGoal( "compile" ); 
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "a/target" );
+        verifier.deleteDirectory( "b/target" );
+        verifier.deleteDirectory( "c/target" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng1323", "dep-a", "0.1", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng1323", "dep-b", "0.1", "jar" );
+        verifier.executeGoal( "validate" ); 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        Properties pclProps;
+
+        pclProps = verifier.loadProperties( "target/pcl.properties" );
+        assertNull( pclProps.getProperty( "org.apache.maven.its.mng1323.ClassA" ) );
+        assertNull( pclProps.getProperty( "org.apache.maven.its.mng1323.ClassB" ) );
+
+        pclProps = verifier.loadProperties( "a/target/pcl.properties" );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng1323.ClassA" ) );
+        assertNull( pclProps.getProperty( "org.apache.maven.its.mng1323.ClassB" ) );
+
+        pclProps = verifier.loadProperties( "b/target/pcl.properties" );
+        assertNull( pclProps.getProperty( "org.apache.maven.its.mng1323.ClassA" ) );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng1323.ClassB" ) );
+
+        pclProps = verifier.loadProperties( "c/target/pcl.properties" );
+        assertNull( pclProps.getProperty( "org.apache.maven.its.mng1323.ClassA" ) );
+        assertNull( pclProps.getProperty( "org.apache.maven.its.mng1323.ClassB" ) );
     }
-    
-    
 
 }

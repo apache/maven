@@ -28,14 +28,14 @@ under the License.
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>b</artifactId>
+  <artifactId>c</artifactId>
 
-  <name>Maven Integration Test :: MNG-1323 :: Module B</name> 
+  <name>Maven Integration Test :: MNG-1323 :: Module C</name> 
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng1323</groupId>
-      <artifactId>a</artifactId>
+      <artifactId>b</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
@@ -58,13 +58,6 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-class-loader</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.its.mng1323</groupId>
-            <artifactId>dep-b</artifactId>
-            <version>0.1</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>

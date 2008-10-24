@@ -9,7 +9,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -19,20 +19,45 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its.it0127</groupId>
+
+  <groupId>org.apache.maven.its.mng1323</groupId>
   <artifactId>parent</artifactId>
-  <name>Parent</name>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-1323 :: Parent</name> 
+  <description>
+    Verify that project-level plugin dependencies actually apply to the current project only and not the entire reactor.
+  </description>
+
   <modules>
     <module>a</module>
     <module>b</module>
+    <module>c</module>
   </modules>
-  <properties>
-    <issue>MNG-1323</issue>
-  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-class-loader</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>load</id>
+            <phase>validate</phase>
+            <configuration>
+              <classNames>org.apache.maven.its.mng1323.ClassA,org.apache.maven.its.mng1323.ClassB</classNames>
+              <pluginClassLoaderOutput>${basedir}/target/pcl.properties</pluginClassLoaderOutput>
+            </configuration>
+            <goals>
+              <goal>load</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
