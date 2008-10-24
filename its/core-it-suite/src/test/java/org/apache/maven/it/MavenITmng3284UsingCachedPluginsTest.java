@@ -20,10 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-
-import junit.framework.Assert;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -34,61 +30,50 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3284UsingCachedPluginsTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3284UsingCachedPluginsTest()
     {
         super( "(2.0.8,)" ); 
     }
-    
+
+    /**
+     * Verify that the effective plugin versions used for a project are not influenced by other instances of this
+     * plugin in the reactor, i.e. each module gets exactly the plugin version it declares.
+     */
     public void testitMNG3284()
         throws Exception
     {
-
-        // The testdir is computed from the location of this
-        // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3284-usingCachedPlugins" );
 
-        Verifier verifier;
-
         /*
-         * Build Mojo v1
+         * Phase 1: Ensure both plugin versions are already in the local repo. This is a crucial prerequisite for the
+         * test because downloading the plugins just-in-time during the test build would trigger a timestamp-based
+         * reloading of the plugin container by the DefaultPluginManager in Maven 2.x, thereby hiding the bug we want
+         * to expose here.
          */
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "mojo" ).getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifact( "org.apache.maven.its.mng3284", "maven-it-plugin-version", "0.1", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng3284", "maven-it-plugin-version", "0.2", "jar" );
+        verifier.executeGoal( "validate" ); 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         /*
-         * Build Mojo v2
-         */
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "mojo2" ).getAbsolutePath() );
-        verifier.executeGoal( "install" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        /*
-         * Run the simple build
+         * Phase 2: Now that the plugin versions have been downloaded to the local repo, run the actual test.
          */
         verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "mod-a/target" );
+        verifier.deleteDirectory( "mod-b/target" );
+        verifier.executeGoal( "validate" ); 
         verifier.verifyErrorFreeLog();
-
-        List lines = verifier.loadFile( testDir.getAbsolutePath(), "log.txt", false );
-        int foundVersionOne = 0;
-        int foundVersionTwo = 0;
-        for ( Iterator i = lines.iterator(); i.hasNext(); )
-        {
-
-            String line = (String) i.next();
-            if ( line.indexOf( "USING VERSION 1" ) != -1 )
-                foundVersionOne++;
-            if ( line.indexOf( "USING VERSION 2" ) != -1 )
-                foundVersionTwo++;
-        }
-
         verifier.resetStreams();
 
-        Assert.assertEquals( "Should be using plugin version 1 only once.", 1,foundVersionOne );
-        Assert.assertEquals( "Should be using plugin version 2 only once.", 1,foundVersionTwo );
-
+        verifier.assertFilePresent( "mod-a/target/version-0.1.txt" );
+        verifier.assertFileNotPresent( "mod-a/target/version-0.2.txt" );
+        verifier.assertFilePresent( "mod-b/target/version-0.2.txt" );
+        verifier.assertFileNotPresent( "mod-b/target/version-0.1.txt" );
     }
+
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <plugins>
+    <plugin>
+      <name>Maven Integration Test Plugin :: Version</name>
+      <prefix>itversion</prefix>
+      <artifactId>maven-it-plugin-version</artifactId>
+    </plugin>
+  </plugins>
+</metadata>
