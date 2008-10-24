@@ -23,7 +23,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng2892</groupId>
-  <artifactId>maven-it-mng2892</artifactId>
+  <artifactId>test</artifactId>
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-2892</name> 
@@ -54,7 +54,7 @@ under the License.
           <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>0.1-stub</version>
+            <version>0.1-mng2892</version>
           </dependency>
         </dependencies>
         <executions>

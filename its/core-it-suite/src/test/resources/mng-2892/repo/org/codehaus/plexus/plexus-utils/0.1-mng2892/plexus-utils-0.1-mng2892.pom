@@ -24,7 +24,7 @@ under the License.
 
   <groupId>org.codehaus.plexus</groupId>
   <artifactId>plexus-utils</artifactId>
-  <version>0.1-stub</version>
+  <version>0.1-mng2892</version>
   <packaging>jar</packaging>
 
   <distributionManagement>
@@ -41,8 +41,14 @@ under the License.
   <build>
     <resources>
       <resource>
-        <directory>src</directory>
-        <targetPath>src</targetPath>
+        <directory>.</directory>
+        <includes>
+          <include>pom.xml</include>
+          <include>src/**</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
       </resource>
     </resources>
   </build>
