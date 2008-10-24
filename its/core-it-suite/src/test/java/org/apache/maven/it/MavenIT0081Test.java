@@ -23,25 +23,28 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 public class MavenIT0081Test
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test per-plugin dependencies.
+     * Test component injection from project-level plugin dependencies.
      */
     public void testit0081()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0081" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0081", "test-plugin", "0.1", "maven-plugin" );
-        verifier.executeGoal( "install" );
-        verifier.assertFilePresent( "test-component-c/target/org.apache.maven.wagon.providers.ftp.FtpWagon" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties apiProps = verifier.loadProperties( "target/component.properties" );
+        assertEquals( "true", apiProps.getProperty( "org.apache.maven.its.it0081.DefaultComponent" ) );
     }
-}
 
+}
