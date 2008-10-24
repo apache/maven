@@ -143,6 +143,7 @@ public class LoadMojo
                 try
                 {
                     Class type = classLoader.loadClass( name );
+                    getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded class from " + type.getClassLoader() );
                     try
                     {
                         type = childClassLoader.loadClass( name );
@@ -179,6 +180,7 @@ public class LoadMojo
                 catch ( ClassNotFoundException e )
                 {
                     // ignore, will be reported by means of missing keys in the properties file
+                    getLog().info( "[MAVEN-CORE-IT-LOG]   Class not available" );
                 }
             }
         }
@@ -193,6 +195,7 @@ public class LoadMojo
 
                 // test ClassLoader.getResource()
                 URL url = classLoader.getResource( path );
+                getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded resource from " + url );
                 if ( url != null && !url.equals( childClassLoader.getResource( path ) ) )
                 {
                     getLog().error( "[MAVEN-CORE-IT-LOG] Detected class loader defect while getting " + path );
