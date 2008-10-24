@@ -73,7 +73,6 @@ public class IntegrationTestSuite
 /* Tests to be added
 MavenIT0109ReleaseUpdateTest
 MavenIT0125NewestConflictResolverTest
-MavenIT0127AntrunDependencies
 MavenIT0128DistMgmtSiteUrlParentCalculationTest
 MavenITmng2883LegacyRepoOfflineTest
 MavenITmng3259DepsDroppedInMultiModuleBuild
@@ -166,6 +165,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenIT0131SiteLifecycleTest.class );
         suite.addTestSuite( MavenIT0130CleanLifecycleTest.class );
         suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependency.class );
+        suite.addTestSuite( MavenIT0127AntrunDependencies.class );
         suite.addTestSuite( MavenIT0119PluginPrefixOrder.class );
         suite.addTestSuite( MavenIT0118AttachedArtifactsInReactor.class );
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );

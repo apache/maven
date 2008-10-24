@@ -35,6 +35,11 @@ public class MavenIT0127AntrunDependencies
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenIT0127AntrunDependencies()
+    {
+        super( "(2.999,)" );
+    }
+
     /**
      * Verify that project-level plugin dependencies actually apply to the current project only and not the entire
      * reactor.
