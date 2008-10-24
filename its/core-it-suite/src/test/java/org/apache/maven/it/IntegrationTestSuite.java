@@ -121,6 +121,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3331ModulePathNormalization.class );
         suite.addTestSuite( MavenITmng3314OfflineSnapshotsTest.class );
+        suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
         suite.addTestSuite( MavenITmng3271Test.class );
         suite.addTestSuite( MavenITmng3221InfiniteForking.class );
         suite.addTestSuite( MavenITmng3268MultipleDashPCommandLine.class );
@@ -275,7 +276,6 @@ MavenITmng3645POMSyntaxErrorTest
 
         // Pending resolution in code
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
-        // suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
         // suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
 
         // -- not passing for 2.0.7 either, looks to be 2.1+ ?

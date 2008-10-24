@@ -33,7 +33,7 @@ public class MavenITmng3284UsingCachedPluginsTest
 
     public MavenITmng3284UsingCachedPluginsTest()
     {
-        super( "(2.0.8,)" ); 
+        super( "(2.999,)" ); 
     }
 
     /**
