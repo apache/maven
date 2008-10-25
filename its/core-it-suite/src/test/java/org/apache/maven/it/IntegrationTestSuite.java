@@ -287,8 +287,6 @@ MavenITmng3645POMSyntaxErrorTest
         // suite.addTestSuite( MavenIT0123SnapshotRangeRepositoryTest.class ); -- MNG-2994
         // suite.addTestSuite( MavenIT0124PomExtensionComponentOverrideTest.class ); -- MNG-2771
 
-        // suite.addTestSuite( MavenIT0126TestJarDependency.class ); // MJAR-75 / MNG-3160
-
         return suite;
     }
 }
