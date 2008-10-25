@@ -131,8 +131,10 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3052DepRepoAggregationTest.class );
         suite.addTestSuite( MavenITmng3012Test.class );
         suite.addTestSuite( MavenITmng2972OverridePluginDependency.class );
+        suite.addTestSuite( MavenITmng2921Test.class );
         suite.addTestSuite( MavenITmng2892Test.class );
         suite.addTestSuite( MavenITmng2878Test.class );
+        suite.addTestSuite( MavenITmng2871Test.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
         suite.addTestSuite( MavenITmng2790Test.class );
         suite.addTestSuite( MavenITmng2749Test.class );
@@ -278,9 +280,6 @@ MavenITmng3645POMSyntaxErrorTest
         // Pending resolution in code
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
         // suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
-
-        // -- not passing for 2.0.7 either, looks to be 2.1+ ?
-        // suite.addTestSuite( MavenIT0120EjbClientDependency.class );
 
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
         // suite.addTestSuite( MavenIT0121TransitiveDepManVersion.class ); -- MNG-3038
