@@ -134,6 +134,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng2892Test.class );
         suite.addTestSuite( MavenITmng2878Test.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRanges.class );
+        suite.addTestSuite( MavenITmng2790Test.class );
         suite.addTestSuite( MavenITmng2749Test.class );
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         suite.addTestSuite( MavenITmng2739RequiredRepositoryElements.class );

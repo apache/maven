@@ -201,54 +201,9 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.resetStreams();
     }
 
-    public void testSnapshotLocalMetadataUpdatedOnInstall()
-        throws Exception
-    {
-        File localMetadata =
-            getMetadataFile( "org/apache/maven/its/snapshotUpdate", "maven-it-snapshot-update", "1.0-SNAPSHOT" );
-
-        localMetadata.delete();
-        assertFalse( localMetadata.exists() );
-
-        verifier.executeGoal( "install" );
-
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        assertLocalMetadataIsToday( localMetadata );
-
-        Calendar cal = Calendar.getInstance();
-        cal.add( Calendar.YEAR, -1 );
-        FileUtils.fileWrite( localMetadata.getAbsolutePath(), constructLocalMetadata(
-            "org.apache.maven.its.snapshotUpdate", "maven-it-snapshot-update", cal.getTimeInMillis(), true ) );
-
-        verifier.executeGoal( "install" );
-
-        assertLocalMetadataIsToday( localMetadata );
-
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-    }
-
     private File getMetadataFile( String groupId, String artifactId, String version )
     {
         return new File( verifier.localRepo, groupId + "/" + artifactId + "/" + version + "/maven-metadata-local.xml" );
-    }
-
-    private void assertLocalMetadataIsToday( File localMetadata )
-        throws IOException
-    {
-        String actual = stripTime( FileUtils.fileRead( localMetadata ) );
-        String expected = stripTime( constructLocalMetadata( "org.apache.maven.its.snapshotUpdate",
-                                                             "maven-it-snapshot-update", System.currentTimeMillis(),
-                                                             true ) );
-
-        assertEquals( expected, actual );
-    }
-
-    private static String stripTime( String s )
-    {
-        return s.replaceAll( "(.*)[0-9]{6}(</lastUpdated>.*)", "$1$2" );
     }
 
     private void assertArtifactContents( String s )
