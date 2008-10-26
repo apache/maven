@@ -30,7 +30,7 @@ public class MavenITmng3475BaseAlignedDir
     
     public MavenITmng3475BaseAlignedDir()
     {
-        super( "(2.0.99,)"); // 2.1.0+ only
+        super( "[2.1.0-M1,)"); // 2.1.0+ only
     }
 
     public void testitMNG3475()

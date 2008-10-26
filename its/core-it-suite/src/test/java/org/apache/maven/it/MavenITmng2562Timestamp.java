@@ -28,7 +28,7 @@ public class MavenITmng2562Timestamp extends AbstractMavenIntegrationTestCase {
     
     public MavenITmng2562Timestamp()
     {
-        super( "(2.0.99,)"); // 2.1.0+ only
+        super( "[2.1.0-M1,)"); // 2.1.0+ only
     }
 
     public void testitMNG2562() throws Exception {

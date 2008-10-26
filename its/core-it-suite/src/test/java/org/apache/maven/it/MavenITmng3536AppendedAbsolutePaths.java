@@ -28,7 +28,7 @@ public class MavenITmng3536AppendedAbsolutePaths extends AbstractMavenIntegratio
     
     public MavenITmng3536AppendedAbsolutePaths()
     {
-        super( "(2.0.99,)"); // 2.1.0+ only
+        super( "[2.1.0-M1,)"); // 2.1.0+ only
     }
 
     public void testitMNG3536() throws Exception {

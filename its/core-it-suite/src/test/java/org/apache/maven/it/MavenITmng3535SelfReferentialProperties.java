@@ -32,7 +32,7 @@ public class MavenITmng3535SelfReferentialProperties
 
     public MavenITmng3535SelfReferentialProperties()
     {
-        super( "(2.0.99,2.99.99)" );
+        super( "[2.1.0-M1,2.99.99)" );
     }
 
     public void testitMNG3535_ShouldSucceed()

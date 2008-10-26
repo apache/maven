@@ -36,7 +36,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
 {
     public MavenITmng3703ExecutionProjectWithRelativePathsTest()
     {
-        super( "(2.0.99,)" ); // only test in 2.0.9+
+        super( "[2.1.0-M1,)" ); // only test in 2.1.0+
     }
 
     public void testForkFromMojo()

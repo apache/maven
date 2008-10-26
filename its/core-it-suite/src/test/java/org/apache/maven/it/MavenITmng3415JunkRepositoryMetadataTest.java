@@ -280,7 +280,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     }
 
     /**
-     * If the current maven version is < 2.1, we'll use the metadata file itself (old maven-artifact code)...
+     * If the current maven version is < 3.0, we'll use the metadata file itself (old maven-artifact code)...
      * otherwise, use the new resolver-status.properties file (new artifact code).
      */
     private File getUpdateCheckFile( File localRepo )
@@ -289,8 +289,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         dir.mkdirs();
 
-        // < 2.1 (including snapshots)
-        if ( matchesVersionRange( "(2.0.8,2.0.99)" ) )
+        // < 3.0 (including snapshots)
+        if ( matchesVersionRange( "(2.0.8,2.999)" ) )
         {
             return new File( dir, "maven-metadata-testing-repo.xml" );
         }
