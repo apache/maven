@@ -59,6 +59,8 @@ under the License.
             <configuration>
               <mainFile>jars/main.jar</mainFile>
               <attachedFile>jars/attached.jar</attachedFile>
+              <artifactType>jar</artifactType>
+              <artifactClassifier>it</artifactClassifier>
             </configuration>
           </execution>
         </executions>
