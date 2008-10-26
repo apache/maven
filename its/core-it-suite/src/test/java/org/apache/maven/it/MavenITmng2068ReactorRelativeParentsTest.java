@@ -49,7 +49,7 @@ public class MavenITmng2068ReactorRelativeParentsTest
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068-reactorRelativeParents" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068" );
         File projectDir = new File( testDir, "frameworks" );
 
         Verifier verifier;

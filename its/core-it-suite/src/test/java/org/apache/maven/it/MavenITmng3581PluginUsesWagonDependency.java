@@ -39,7 +39,7 @@ public class MavenITmng3581PluginUsesWagonDependency
     public void testmng3581()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3581-useWagonDependency" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3581" );
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "project" );
 

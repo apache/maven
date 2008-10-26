@@ -45,7 +45,7 @@ public class MavenITmng2254PomEncodingTest
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2254-PomEncoding" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2254" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

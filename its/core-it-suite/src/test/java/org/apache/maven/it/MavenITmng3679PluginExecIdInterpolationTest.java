@@ -36,7 +36,7 @@ public class MavenITmng3679PluginExecIdInterpolationTest
     public void testitMNG3679 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3679-pluginExecIdInterpolation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3679" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

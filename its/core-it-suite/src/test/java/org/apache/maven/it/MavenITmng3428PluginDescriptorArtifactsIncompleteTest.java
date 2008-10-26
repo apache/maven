@@ -39,7 +39,7 @@ public class MavenITmng3428PluginDescriptorArtifactsIncompleteTest
     public void testitMNG3428 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3428-pluginDescriptorArtifactsIncomplete" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3428" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

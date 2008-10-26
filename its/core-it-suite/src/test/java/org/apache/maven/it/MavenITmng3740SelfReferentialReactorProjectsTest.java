@@ -46,7 +46,7 @@ public class MavenITmng3740SelfReferentialReactorProjectsTest
     public void testitMNG3740 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3740-selfReferentialReactorProjects" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3740" );
         File v1 = new File( testDir, "projects.v1" );
         File v2 = new File( testDir, "projects.v2" );
 

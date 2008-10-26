@@ -44,7 +44,7 @@ public class MavenITmng3747PrefixedPathExpressionTest
     public void testitMNG3747 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3747-prefixedPathExpression" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3747" );
         File pluginDir = new File( testDir, "maven-mng3747-plugin" );
         File projectDir = new File( testDir, "project" );
 

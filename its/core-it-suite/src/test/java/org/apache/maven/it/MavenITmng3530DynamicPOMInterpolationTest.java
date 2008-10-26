@@ -36,7 +36,7 @@ import java.io.File;
 public class MavenITmng3530DynamicPOMInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
-    private static final String BASEDIR = "/mng-3530-dynamicPOMInterpolation/";
+    private static final String BASEDIR = "/mng-3530/";
 
     public MavenITmng3530DynamicPOMInterpolationTest()
     {

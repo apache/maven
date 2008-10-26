@@ -37,7 +37,7 @@ public class MavenITmng3475BaseAlignedDir
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3475-baseAlignedDir" );
+                                                                 "/mng-3475" );
 
         File pluginDir = new File( testDir, "plugin" );
         Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );

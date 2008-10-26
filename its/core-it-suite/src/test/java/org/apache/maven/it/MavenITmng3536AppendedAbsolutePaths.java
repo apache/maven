@@ -33,7 +33,7 @@ public class MavenITmng3536AppendedAbsolutePaths extends AbstractMavenIntegratio
 
     public void testitMNG3536() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3536-appendedAbsolutePaths" );
+                                                                 "/mng-3536" );
         File pluginDir = new File( testDir, "plugin" );
         Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
 

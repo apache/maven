@@ -37,7 +37,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRanges
     public void testitMNG3396()
         throws Exception
     {
-        String baseDir = "/mng-3396-dependencyManagementForOverConstrainedRanges";
+        String baseDir = "/mng-3396";
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), baseDir + "/dependencies" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );

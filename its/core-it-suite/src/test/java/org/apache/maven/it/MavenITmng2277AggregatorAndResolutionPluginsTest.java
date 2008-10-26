@@ -44,7 +44,7 @@ public class MavenITmng2277AggregatorAndResolutionPluginsTest
    
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2277-aggregatorPlugins" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2277" );
 
         Verifier verifier;
 

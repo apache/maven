@@ -47,7 +47,7 @@ public class MavenITmng3645POMSyntaxErrorTest
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3645-pomSyntaxError" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3645" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

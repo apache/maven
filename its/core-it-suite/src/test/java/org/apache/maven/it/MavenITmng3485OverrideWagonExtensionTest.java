@@ -37,7 +37,7 @@ public class MavenITmng3485OverrideWagonExtensionTest
     public void testitMNG3485 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3485-overrideWagonExtension" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3485" );
 
         Verifier verifier;
 

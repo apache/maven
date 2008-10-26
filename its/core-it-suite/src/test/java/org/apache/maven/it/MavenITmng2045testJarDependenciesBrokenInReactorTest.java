@@ -46,7 +46,7 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest
     public void testitMNG2045()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2045-testJarDependenciesBrokenInReactor" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2045" );
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );

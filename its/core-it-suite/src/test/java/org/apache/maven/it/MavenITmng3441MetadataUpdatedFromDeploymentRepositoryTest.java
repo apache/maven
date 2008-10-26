@@ -44,7 +44,7 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
         throws Exception
     {
         File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3441-metadataUpdatedFromDeploymentRepository" );
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3441" );
 
         File targetRepository = new File( testDir, "target-repository" );
         FileUtils.deleteDirectory( targetRepository );

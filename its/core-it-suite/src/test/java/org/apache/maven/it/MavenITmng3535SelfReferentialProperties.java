@@ -39,7 +39,7 @@ public class MavenITmng3535SelfReferentialProperties
         throws Exception
     {
         File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3535-selfReferentialProperties/success" );
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3535/success" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
@@ -58,7 +58,7 @@ public class MavenITmng3535SelfReferentialProperties
         throws Exception
     {
         File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3535-selfReferentialProperties/failure" );
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3535/failure" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

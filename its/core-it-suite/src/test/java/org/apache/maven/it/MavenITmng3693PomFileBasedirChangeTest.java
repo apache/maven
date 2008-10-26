@@ -40,7 +40,7 @@ public class MavenITmng3693PomFileBasedirChangeTest
     public void testitMNG3693 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3693-pomFileBasedirChange" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3693" );
         
         File pluginDir = new File( testDir, "maven-mng3693-plugin" );
         File projectsDir = new File( testDir, "projects" );

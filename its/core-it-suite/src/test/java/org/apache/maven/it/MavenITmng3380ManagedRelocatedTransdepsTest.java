@@ -51,7 +51,7 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
 
         // compute test directory
         File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-                "/mng-3380-managedRelocatedTransdeps");
+                "/mng-3380");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
 

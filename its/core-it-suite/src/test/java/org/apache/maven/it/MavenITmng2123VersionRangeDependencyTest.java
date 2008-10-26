@@ -43,7 +43,7 @@ public class MavenITmng2123VersionRangeDependencyTest
 
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2123-npe-with-conflicting-ranges" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2123" );
 
         Verifier verifier;
 

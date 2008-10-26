@@ -44,7 +44,7 @@ public class MavenITmng1412DependenciesOrderTest
         throws Exception
     {
         // The testdir is computed from the location of this file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1412-DependenciesOrder" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1412" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

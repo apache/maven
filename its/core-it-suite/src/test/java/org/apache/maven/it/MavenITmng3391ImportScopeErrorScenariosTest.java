@@ -36,7 +36,7 @@ public class MavenITmng3391ImportScopeErrorScenariosTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3391-importScopeErrorScenarios/depMgmt-importPom-noParentCycle" );
+                                                                 "/mng-3391/depMgmt-importPom-noParentCycle" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
@@ -53,7 +53,7 @@ public class MavenITmng3391ImportScopeErrorScenariosTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3391-importScopeErrorScenarios/depMgmt-importPom-noParentCycle" );
+                                                                 "/mng-3391/depMgmt-importPom-noParentCycle" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
@@ -73,7 +73,7 @@ public class MavenITmng3391ImportScopeErrorScenariosTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3391-importScopeErrorScenarios/depMgmt-importPom-parentCycle" );
+                                                                 "/mng-3391/depMgmt-importPom-parentCycle" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
@@ -90,7 +90,7 @@ public class MavenITmng3391ImportScopeErrorScenariosTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3391-importScopeErrorScenarios/depMgmt-importPom-parentCycle" );
+                                                                 "/mng-3391/depMgmt-importPom-parentCycle" );
 
         Verifier verifier = new Verifier( new File( testDir, "dm-pom" ).getAbsolutePath() );
         verifier.executeGoal( "install" );

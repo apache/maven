@@ -37,7 +37,7 @@ public class MavenITmng1493NonStandardModulePomNames
     public void testitMNG1493 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1493-nonstandardModulePomNames" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1493" );
 
         Verifier verifier;
 

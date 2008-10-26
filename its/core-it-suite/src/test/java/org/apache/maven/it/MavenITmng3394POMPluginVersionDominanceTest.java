@@ -38,7 +38,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    private static final String BASEDIR_PREFIX = "/mng-3394-pomPluginVersionDominance/";
+    private static final String BASEDIR_PREFIX = "/mng-3394/";
 
     public MavenITmng3394POMPluginVersionDominanceTest()
     {

@@ -48,7 +48,7 @@ public class MavenITmng3642DynamicResourcesTest
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3642-dynamicResources" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3642" );
 
         Verifier verifier;
 

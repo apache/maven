@@ -46,7 +46,7 @@ public class MavenITmng3331ModulePathNormalization
         throws Exception
     {
         //testMNG3331ModuleWithSpaces
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331-modulePathNormalization/with-spaces" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331/with-spaces" );
 
         Verifier verifier;
 
@@ -76,7 +76,7 @@ public class MavenITmng3331ModulePathNormalization
         throws Exception
     {
         //testMNG3331ModuleWithRelativeParentDirRef
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331-modulePathNormalization/with-relative-parentDir-ref" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3331/with-relative-parentDir-ref" );
 
         Verifier verifier;
 

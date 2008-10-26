@@ -44,7 +44,7 @@ public class MavenITmng3743ForkWithPluginManagementTest
     public void testitMNG3743 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3743-forkWithPluginManagement" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3743" );
         File pluginsDir = new File( testDir, "plugins" );
         File projectDir = new File( testDir, "project" );
 

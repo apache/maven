@@ -39,7 +39,7 @@ public class MavenITmng3220ImportScopeTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3220-importedDepMgmt/imported-pom-depMgmt" );
+                                                                 "/mng-3220/imported-pom-depMgmt" );
 
         File dmDir = new File( testDir, "dm-pom" );
         Verifier verifier = new Verifier( dmDir.getAbsolutePath() );
@@ -61,7 +61,7 @@ public class MavenITmng3220ImportScopeTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3220-importedDepMgmt/depMgmt-pom-module-notImported" );
+                                                                 "/mng-3220/depMgmt-pom-module-notImported" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

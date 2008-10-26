@@ -49,7 +49,7 @@ public class MavenITmng3667ResolveDepsWithBadPomVersionTest
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3667-resolveDepsWithBadPomVersion" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3667" );
         File repoDir = new File( testDir, "repo" );
         File projectDir = new File( testDir, "project" );
 

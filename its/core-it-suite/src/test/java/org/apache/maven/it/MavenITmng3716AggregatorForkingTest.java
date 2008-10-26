@@ -44,7 +44,7 @@ public class MavenITmng3716AggregatorForkingTest
     public void testitMNG3716 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3716-aggregatorForking" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3716" );
         File pluginDir = new File( testDir, "maven-mng3716-plugin" );
         File projectsDir = new File( testDir, "projects" );
 

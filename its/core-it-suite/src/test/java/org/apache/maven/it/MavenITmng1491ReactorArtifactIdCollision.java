@@ -31,7 +31,7 @@ public class MavenITmng1491ReactorArtifactIdCollision
     public void testitMNG1491 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1491-reactorArtifactIdCollision" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1491" );
 
         Verifier verifier;
 

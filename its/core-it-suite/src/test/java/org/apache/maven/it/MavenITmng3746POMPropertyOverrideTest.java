@@ -46,7 +46,7 @@ public class MavenITmng3746POMPropertyOverrideTest
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3746-pomPropertyOverride" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3746" );
         File pluginDir = new File( testDir, "maven-mng3746-plugin" );
         File projectDir = new File( testDir, "project" );
 
@@ -68,7 +68,7 @@ public class MavenITmng3746POMPropertyOverrideTest
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3746-pomPropertyOverride" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3746" );
         File pluginDir = new File( testDir, "maven-mng3746-plugin" );
         File projectDir = new File( testDir, "project" );
 

@@ -47,7 +47,7 @@ public class MavenITmng3748BadSettingsXmlTest
     public void testitMNG3748 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3748-badSettingsXml" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3748" );
 
         Verifier verifier;
 

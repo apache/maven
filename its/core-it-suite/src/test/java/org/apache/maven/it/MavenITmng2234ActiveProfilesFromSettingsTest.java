@@ -37,7 +37,7 @@ public class MavenITmng2234ActiveProfilesFromSettingsTest
     public void testitMNG2234 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2234-activeProfilesFromSettings" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2234" );
 
         Verifier verifier;
 

@@ -33,7 +33,7 @@ public class MavenITmng2562Timestamp extends AbstractMavenIntegrationTestCase {
 
     public void testitMNG2562() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-                "/mng-2562-timestamp");
+                "/mng-2562");
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
         verifier.executeGoal("verify");
 

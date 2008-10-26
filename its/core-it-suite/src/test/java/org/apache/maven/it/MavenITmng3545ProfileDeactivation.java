@@ -46,7 +46,7 @@ public class MavenITmng3545ProfileDeactivation
     public void testBasicBuildWithDefaultProfiles()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
         Verifier verifier;
 
@@ -75,7 +75,7 @@ public class MavenITmng3545ProfileDeactivation
     public void testDeactivateDefaultProfilesDash()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
         Verifier verifier;
 
@@ -100,7 +100,7 @@ public class MavenITmng3545ProfileDeactivation
     public void testDeactivateDefaultProfilesExclamation()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
     
         Verifier verifier;
     
@@ -131,7 +131,7 @@ public class MavenITmng3545ProfileDeactivation
         throws Exception
     {
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
         Verifier verifier;
 
@@ -164,7 +164,7 @@ public class MavenITmng3545ProfileDeactivation
         throws Exception
     {
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
         Verifier verifier;
 
@@ -197,7 +197,7 @@ public class MavenITmng3545ProfileDeactivation
         throws Exception
     {
 
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
         Verifier verifier;
 
@@ -226,7 +226,7 @@ public class MavenITmng3545ProfileDeactivation
     public void tearDown()
         throws IOException
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545-ProfileDeactivation" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
         File targetDir = new File( testDir, "target" );
         if ( targetDir.exists() )

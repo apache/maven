@@ -61,7 +61,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
     {
         String testName = "parent";
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2883-legacy-repo-offline/"
+                                                                 "/mng-2883/"
                                                                                  + testName );
 
         Verifier verifier;
@@ -152,7 +152,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
     {
         String testName = "dependency";
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2883-legacy-repo-offline/"
+                                                                 "/mng-2883/"
                                                                                  + testName );
 
         Verifier verifier;
@@ -246,7 +246,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
     {
         String testName = "plugin";
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2883-legacy-repo-offline/"
+                                                                 "/mng-2883/"
                                                                                  + testName );
 
         Verifier verifier;

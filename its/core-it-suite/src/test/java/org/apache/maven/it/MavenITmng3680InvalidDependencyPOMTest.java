@@ -41,7 +41,7 @@ public class MavenITmng3680InvalidDependencyPOMTest
     public void testitMNG3680 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3680-invalidDependencyPOM" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3680" );
         File pluginDir = new File( testDir, "maven-mng3680-plugin" );
         
         Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );

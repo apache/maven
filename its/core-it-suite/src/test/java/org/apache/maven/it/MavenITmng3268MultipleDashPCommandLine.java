@@ -37,7 +37,7 @@ public class MavenITmng3268MultipleDashPCommandLine
     public void testMultipleProfileParams ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3268-MultipleDashPCommandLine" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3268" );
 
         Verifier verifier;
 

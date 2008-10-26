@@ -38,7 +38,7 @@ public class MavenITmng2339BadProjectInterpolationTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2339-badProjectInterpolation/a" );
+                                                                 "/mng-2339/a" );
 
         Verifier verifier;
 
@@ -58,7 +58,7 @@ public class MavenITmng2339BadProjectInterpolationTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2339-badProjectInterpolation/b" );
+                                                                 "/mng-2339/b" );
 
         Verifier verifier;
 

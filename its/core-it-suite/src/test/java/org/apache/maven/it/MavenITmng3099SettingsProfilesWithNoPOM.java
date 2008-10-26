@@ -53,7 +53,7 @@ public class MavenITmng3099SettingsProfilesWithNoPOM
     {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3099-settingsProfilesWithNoPOM" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3099" );
 
         File plugin = new File( testDir, "plugin" );
 

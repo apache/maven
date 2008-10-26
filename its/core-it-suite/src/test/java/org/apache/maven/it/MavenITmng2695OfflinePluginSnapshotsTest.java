@@ -49,7 +49,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
     public void testitMNG2695()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2695-offlinePluginSnapshots" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2695" );
 
         {
             // phase 1: run build in online mode to fill local repo

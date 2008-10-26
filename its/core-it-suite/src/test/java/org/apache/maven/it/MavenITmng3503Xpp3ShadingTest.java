@@ -41,7 +41,7 @@ public class MavenITmng3503Xpp3ShadingTest
         throws Exception
     {
         File dir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503-xpp3Shading/mng-3503-xpp3Shading-pu11" );
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503/mng-3503-xpp3Shading-pu11" );
 
         Verifier verifier;
 
@@ -60,7 +60,7 @@ public class MavenITmng3503Xpp3ShadingTest
         throws Exception
     {
         File dir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503-xpp3Shading/mng-3503-xpp3Shading-pu-new" );
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503/mng-3503-xpp3Shading-pu-new" );
         Verifier verifier = new Verifier( dir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );

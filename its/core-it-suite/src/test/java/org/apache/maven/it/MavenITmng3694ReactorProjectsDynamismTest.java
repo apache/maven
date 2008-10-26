@@ -43,7 +43,7 @@ public class MavenITmng3694ReactorProjectsDynamismTest
     public void testitMNG3694 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3694-reactorProjectsDynamism" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3694" );
 
         File pluginDir = new File( testDir, "maven-mng3694-plugin" );
         File projectDir = new File( testDir, "projects" );

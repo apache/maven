@@ -42,7 +42,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
     public void testForkFromMojo()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3703-executionProjectRelativePaths" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3703" );
         File pluginDir = new File( testDir, "maven-mng3703-plugin" );
         File projectDir = new File( testDir, "project" );
 
@@ -69,7 +69,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
     public void testForkFromReport()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3703-executionProjectRelativePaths" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3703" );
         File pluginDir = new File( testDir, "maven-mng3703-plugin" );
         File projectDir = new File( testDir, "project" );
 

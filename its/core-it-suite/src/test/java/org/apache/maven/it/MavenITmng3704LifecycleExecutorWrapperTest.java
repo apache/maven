@@ -44,7 +44,7 @@ public class MavenITmng3704LifecycleExecutorWrapperTest
     public void testitMNG3704 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3704-lifecycleExecutorWrapper" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3704" );
         File pluginDir = new File( testDir, "maven-mng3704-plugin" );
         File projectDir = new File( testDir, "project" );
 

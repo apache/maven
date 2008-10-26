@@ -51,7 +51,7 @@ public class MavenITmng3372DirectInvocationOfPlugins
     {
         // The testdir is computed from the location of this
         // file.
-        File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372-directInvocationOfPlugins/direct-using-prefix" );
+        File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372/direct-using-prefix" );
         File plugin = new File( testBaseDir, "plugin" );
         File project = new File( testBaseDir, "project" );
         File settingsFile = new File( testBaseDir, "settings.xml" );
@@ -81,7 +81,7 @@ public class MavenITmng3372DirectInvocationOfPlugins
     {
         // The testdir is computed from the location of this
         // file.
-        File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372-directInvocationOfPlugins/dependency-tree" );
+        File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372/dependency-tree" );
 
         Verifier verifier = new Verifier( testBaseDir.getAbsolutePath() );
 

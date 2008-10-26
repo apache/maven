@@ -52,7 +52,7 @@ import java.util.List;
 public class MavenITmng3415JunkRepositoryMetadataTest
     extends AbstractMavenIntegrationTestCase
 {
-    private static final String RESOURCE_BASE = "/mng-3415-junk-repository-metadata";
+    private static final String RESOURCE_BASE = "/mng-3415";
 
     public MavenITmng3415JunkRepositoryMetadataTest()
     {

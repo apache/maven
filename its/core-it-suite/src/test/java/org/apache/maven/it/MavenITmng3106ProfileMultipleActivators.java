@@ -48,7 +48,7 @@ public class MavenITmng3106ProfileMultipleActivators
     public void testProfilesWithMultipleActivators()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3106-ProfileMultipleActivators" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3106" );
 
         Verifier verifier;
 

@@ -44,7 +44,7 @@ public class MavenITmng3724ExecutionProjectSyncTest
     public void testitMNG3724 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3724-executionProjectSync" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3724" );
         File pluginDir = new File( testDir, "maven-mng3724-plugin" );
         File projectDir = new File( testDir, "project" );
 

@@ -32,7 +32,7 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuild
     public void testitMNG3259 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3259-depsDroppedInMultiModuleBuild" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3259" );
 
         Verifier verifier;
 
