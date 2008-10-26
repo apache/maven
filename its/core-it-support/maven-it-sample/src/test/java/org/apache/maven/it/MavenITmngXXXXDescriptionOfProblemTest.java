@@ -9,7 +9,7 @@ package org.apache.maven.it;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -37,11 +37,16 @@ import org.apache.maven.it.util.ResourceExtractor;
  * phases. See more information inline in the code.
  * 
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * 
+ * @version $Id$
  */
 public class MavenITmngXXXXDescriptionOfProblemTest
     extends AbstractMavenIntegrationTestCase
 {
+
+    // TODO: RENAME THIS TEST TO SUIT YOUR SCENARIO.
+    // Usign the Jira issue id this reproduces is a good
+    // start, along with a description:
+    // ie MavenITmngXXXXHoustonWeHaveAProblemTest  (must end in test)
     public MavenITmngXXXXDescriptionOfProblemTest()
     {
         super( "(2.0.8,)" ); // only test in 2.0.9+
@@ -50,14 +55,11 @@ public class MavenITmngXXXXDescriptionOfProblemTest
     public void testitMNGxxxx ()
         throws Exception
     {
-        // TODO: RENAME THIS TEST TO SUIT YOUR SCENARIO.
-        // Usign the Jira issue id this reproduces is a good
-        // start, along with a description:
-        // ie MNG-13x-HoustonWeHaveAProblemTest  (must end in test)
 
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-xxxx-descriptionOfProblem" );
+        // TODO: RENAME THIS PATH TO MATCH YOUR ISSUE ID.
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-xxxx" );
 
         Verifier verifier;
 
