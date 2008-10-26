@@ -23,43 +23,45 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2749">MNG-2749</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-469">MNG-469</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng2749Test
+public class MavenITmng0469ReportConfigTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng2749Test()
+    public MavenITmng0469ReportConfigTest()
     {
-        super( "[,2.99.99)" );
+        super( "[2.0.0,)" );
     }
 
     /**
-     * Verify that plugins can load classes/resources from a build extension.
+     * Test that <reporting> configuration also affects build plugins unless <build> configuration is also given.
      */
-    public void testitMNG2749()
+    public void testitMNG0469()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2749" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469" );
+
+        Verifier verifier = new Verifier( new File( testDir, "test0" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.setAutoclean( false );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
+        verifier.assertFilePresent( "target/reporting.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng2749.ExtensionClass" ) );
-        assertNotNull( pclProps.getProperty( "org/apache/maven/its/mng2749/extension.properties" ) );
-
-        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
-        assertEquals( pclProps, tcclProps );
+        verifier = new Verifier( new File( testDir, "test1" ).getAbsolutePath() );
+        verifier.deleteDirectory( "target" );
+        verifier.setAutoclean( false );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
+        verifier.assertFilePresent( "target/build.txt" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
     }
 
 }

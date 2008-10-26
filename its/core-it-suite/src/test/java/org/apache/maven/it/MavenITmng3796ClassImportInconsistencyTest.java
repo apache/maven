@@ -26,22 +26,22 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2878">MNG-2878</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3796">MNG-3796</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng2878Test
+public class MavenITmng3796ClassImportInconsistencyTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that a plugin can load default-report.xml from the core.
+     * Verify that classes shared with the Maven core realm are properly imported into the plugin realm.
      */
-    public void testitMNG2878()
+    public void testitMNG3796()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2878" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3796" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
@@ -50,7 +50,7 @@ public class MavenITmng2878Test
         verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertNotNull( pclProps.getProperty( "default-report.xml" ) );
+        assertNotNull( pclProps.getProperty( "org.codehaus.plexus.util.xml.Xpp3Dom" ) );
 
         Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
         assertEquals( pclProps, tcclProps );

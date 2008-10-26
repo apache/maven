@@ -31,11 +31,11 @@ import java.util.Collection;
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng2921Test
+public class MavenITmng2921ActiveAttachedArtifactsTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng2921Test()
+    public MavenITmng2921ActiveAttachedArtifactsTest()
     {
         super( "(2.0.6,)" );
     }

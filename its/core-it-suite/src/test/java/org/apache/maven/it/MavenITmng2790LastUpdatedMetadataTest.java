@@ -35,11 +35,11 @@ import java.text.SimpleDateFormat;
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng2790Test
+public class MavenITmng2790LastUpdatedMetadataTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng2790Test()
+    public MavenITmng2790LastUpdatedMetadataTest()
     {
         super( "(2.0.4,)" );
     }

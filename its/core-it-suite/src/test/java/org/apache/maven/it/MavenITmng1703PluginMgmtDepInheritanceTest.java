@@ -26,32 +26,39 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2228">MNG-2228</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1703">MNG-1703</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng2228Test
+public class MavenITmng1703PluginMgmtDepInheritanceTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that components injected into plugins are actually assignment-compatible with the corresponding mojo
-     * fields in case the field type is both provided by a plugin dependency and by a build extension.
+     * Verify that a project-level plugin dependency class/resource inherited from the parent can be loaded from both the plugin classloader
+     * and the context classloader available to the plugin.
      */
-    public void testitMNG2228()
+    public void testitMNG1703()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2228" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1703" );
+        Verifier verifier = new Verifier( new File( testDir, "child" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Properties apiProps = verifier.loadProperties( "target/api.properties" );
-        assertEquals( "true", apiProps.getProperty( "org.apache.maven.its.mng2228.DefaultComponent" ) );
+        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng1703.MNG1703" ) );
+        assertNotNull( pclProps.getProperty( "src/main/java/org/apache/maven/its/mng1703/MNG1703.java" ) );
+        assertEquals( "1", pclProps.getProperty( "src/main/java/org/apache/maven/its/mng1703/MNG1703.java.count" ) );
+
+        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
+        assertEquals( pclProps, tcclProps );
     }
 
 }

@@ -23,42 +23,43 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.List;
+import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2871">MNG-2871</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2749">MNG-2749</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng2871Test
+public class MavenITmng2749ExtensionAvailableToPluginTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng2871Test()
+    public MavenITmng2749ExtensionAvailableToPluginTest()
     {
-        super( "(2.999,)" );
+        super( "[,2.99.99)" );
     }
 
     /**
-     * Verify that dependencies on not-yet-packaged sub artifacts in build phases prior to package can be satisfied
-     * from a module's output directory, i.e. with the loose class files.
+     * Verify that plugins can load classes/resources from a build extension.
      */
-    public void testitMNG2871()
+    public void testitMNG2749()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2871" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2749" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "consumer/target" );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compileClassPath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
-        assertEquals( 2, compileClassPath.size() );
-        assertEquals( new File( testDir, "ejbs/target/classes" ).getCanonicalFile(), 
-            new File( compileClassPath.get( 1 ).toString() ).getCanonicalFile() );
+        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
+        assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng2749.ExtensionClass" ) );
+        assertNotNull( pclProps.getProperty( "org/apache/maven/its/mng2749/extension.properties" ) );
+
+        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
+        assertEquals( pclProps, tcclProps );
     }
 
 }

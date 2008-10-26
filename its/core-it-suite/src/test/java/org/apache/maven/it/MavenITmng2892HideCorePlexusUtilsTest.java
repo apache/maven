@@ -26,23 +26,23 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3012">MNG-3012</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2892">MNG-2892</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng3012Test
+public class MavenITmng2892HideCorePlexusUtilsTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that classes shared with the Maven core realm are imported into the plugin realm such that instances of
-     * these classes created by the core can be cast to classes loaded by the plugin.
+     * Verify that plugins can use their own version of plexus-utils and are not bound to the version bundled in the
+     * core.
      */
-    public void testitMNG3012()
+    public void testitMNG2892()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3012" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2892" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
@@ -50,8 +50,11 @@ public class MavenITmng3012Test
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Properties xpp3domProps = verifier.loadProperties( "target/xpp3dom.properties" );
-        assertEquals( "true", xpp3domProps.getProperty( "project.reporting.plugins.0.configuration" ) );
+        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
+        assertEquals( "methodStub", pclProps.getProperty( "org.codehaus.plexus.util.StringUtils.methods" ) );
+
+        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
+        assertEquals( pclProps, tcclProps );
     }
 
 }

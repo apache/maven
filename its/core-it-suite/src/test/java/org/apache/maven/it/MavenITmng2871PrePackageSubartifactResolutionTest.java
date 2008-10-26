@@ -23,32 +23,42 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.List;
 
-public class MavenITmng2892Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2871">MNG-2871</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
+ */
+public class MavenITmng2871PrePackageSubartifactResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng2871PrePackageSubartifactResolutionTest()
+    {
+        super( "(2.999,)" );
+    }
+
     /**
-     * Verify that plugins can use their own version of plexus-utils and are not bound to the version bundled in the
-     * core.
+     * Verify that dependencies on not-yet-packaged sub artifacts in build phases prior to package can be satisfied
+     * from a module's output directory, i.e. with the loose class files.
      */
-    public void testitMNG2892()
+    public void testitMNG2871()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2892" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2871" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "consumer/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertEquals( "methodStub", pclProps.getProperty( "org.codehaus.plexus.util.StringUtils.methods" ) );
-
-        Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
-        assertEquals( pclProps, tcclProps );
+        List compileClassPath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        assertEquals( 2, compileClassPath.size() );
+        assertEquals( new File( testDir, "ejbs/target/classes" ).getCanonicalFile(), 
+            new File( compileClassPath.get( 1 ).toString() ).getCanonicalFile() );
     }
 
 }

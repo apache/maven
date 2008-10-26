@@ -26,15 +26,16 @@ import java.io.File;
 import java.util.Properties;
 
 /**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3271">MNG-3271</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng3271Test
+public class MavenITmng3271DefaultReportsSuppressionTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng3271Test()
+    public MavenITmng3271DefaultReportsSuppressionTest()
     {
         super( "(2.9999,)" );
     }

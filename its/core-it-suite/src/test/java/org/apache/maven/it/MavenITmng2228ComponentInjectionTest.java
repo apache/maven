@@ -23,45 +23,35 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-469">MNG-469</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2228">MNG-2228</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng0469Test
+public class MavenITmng2228ComponentInjectionTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng0469Test()
-    {
-        super( "[2.0.0,)" );
-    }
-
     /**
-     * Test that <reporting> configuration also affects build plugins unless <build> configuration is also given.
+     * Verify that components injected into plugins are actually assignment-compatible with the corresponding mojo
+     * fields in case the field type is both provided by a plugin dependency and by a build extension.
      */
-    public void testitMNG0469()
+    public void testitMNG2228()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469" );
-
-        Verifier verifier = new Verifier( new File( testDir, "test0" ).getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2228" );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
-        verifier.assertFilePresent( "target/reporting.txt" );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( new File( testDir, "test1" ).getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
-        verifier.assertFilePresent( "target/build.txt" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
+        Properties apiProps = verifier.loadProperties( "target/api.properties" );
+        assertEquals( "true", apiProps.getProperty( "org.apache.maven.its.mng2228.DefaultComponent" ) );
     }
 
 }

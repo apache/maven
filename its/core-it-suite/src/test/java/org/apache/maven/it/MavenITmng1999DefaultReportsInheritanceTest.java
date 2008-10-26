@@ -26,15 +26,16 @@ import java.io.File;
 import java.util.Properties;
 
 /**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1999">MNG-1999</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng1999Test
+public class MavenITmng1999DefaultReportsInheritanceTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng1999Test()
+    public MavenITmng1999DefaultReportsInheritanceTest()
     {
         super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // 2.0.10+, excluding 2.1.0-M1
     }

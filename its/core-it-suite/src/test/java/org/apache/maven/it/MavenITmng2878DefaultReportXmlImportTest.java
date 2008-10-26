@@ -25,19 +25,24 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
-public class MavenITmng1703Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2878">MNG-2878</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
+ */
+public class MavenITmng2878DefaultReportXmlImportTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that a project-level plugin dependency class/resource inherited from the parent can be loaded from both the plugin classloader
-     * and the context classloader available to the plugin.
+     * Verify that a plugin can load default-report.xml from the core.
      */
-    public void testitMNG1703()
+    public void testitMNG2878()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1703" );
-        Verifier verifier = new Verifier( new File( testDir, "child" ).getAbsolutePath() );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2878" );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
@@ -45,11 +50,7 @@ public class MavenITmng1703Test
         verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
-        assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng1703.MNG1703" ) );
-        assertNotNull( pclProps.getProperty( "src/main/java/org/apache/maven/its/mng1703/MNG1703.java" ) );
-        assertEquals( "1", pclProps.getProperty( "src/main/java/org/apache/maven/its/mng1703/MNG1703.java.count" ) );
+        assertNotNull( pclProps.getProperty( "default-report.xml" ) );
 
         Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
         assertEquals( pclProps, tcclProps );
