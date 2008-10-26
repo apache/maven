@@ -24,12 +24,12 @@ import java.io.File;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-public class MavenITmng3396DependencyManagementForOverConstrainedRanges
+public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest
     extends AbstractMavenIntegrationTestCase
 {
     private static final String GROUP_ID = "org.apache.maven.its.mng3396";
 
-    public MavenITmng3396DependencyManagementForOverConstrainedRanges()
+    public MavenITmng3396DependencyManagementForOverConstrainedRangesTest()
     {
         super( "(2.0.8,)" ); // 2.0.9+
     }

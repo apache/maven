@@ -39,7 +39,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * 
  */
-public class MavenITmng3331ModulePathNormalization
+public class MavenITmng3331ModulePathNormalizationTest
     extends AbstractMavenIntegrationTestCase
 {
     public void testitMNG3331a ()

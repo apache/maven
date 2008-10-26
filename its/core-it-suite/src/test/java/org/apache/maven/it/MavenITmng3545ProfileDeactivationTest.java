@@ -31,10 +31,10 @@ import org.apache.maven.it.util.ResourceExtractor;
  * Test activation and deactivation of profiles.
  * 
  */
-public class MavenITmng3545ProfileDeactivation
+public class MavenITmng3545ProfileDeactivationTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3545ProfileDeactivation()
+    public MavenITmng3545ProfileDeactivationTest()
     {
         super( "(2.0.9,)" );
     }

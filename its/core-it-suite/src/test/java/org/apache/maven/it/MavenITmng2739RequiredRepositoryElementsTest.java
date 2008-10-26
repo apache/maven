@@ -36,10 +36,10 @@ import java.util.List;
  * @author jdcasey
  *
  */
-public class MavenITmng2739RequiredRepositoryElements
+public class MavenITmng2739RequiredRepositoryElementsTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng2739RequiredRepositoryElements()
+    public MavenITmng2739RequiredRepositoryElementsTest()
     {
         super( "(2.0.9,)" ); // only test in 2.0.9+
     }

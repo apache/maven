@@ -26,11 +26,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MavenITmng3535SelfReferentialProperties
+public class MavenITmng3535SelfReferentialPropertiesTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng3535SelfReferentialProperties()
+    public MavenITmng3535SelfReferentialPropertiesTest()
     {
         super( "[2.1.0-M1,2.99.99)" );
     }

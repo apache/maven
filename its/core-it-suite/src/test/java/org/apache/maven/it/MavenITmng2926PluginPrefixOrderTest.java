@@ -31,7 +31,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * @author Brian Fox
  * @version $Id$
  */
-public class MavenITmng2926PluginPrefixOrder
+public class MavenITmng2926PluginPrefixOrderTest
     extends AbstractMavenIntegrationTestCase
 {
     public void testitMNG2926()

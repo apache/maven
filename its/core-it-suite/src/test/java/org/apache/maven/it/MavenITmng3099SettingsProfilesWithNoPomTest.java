@@ -40,10 +40,10 @@ import java.util.List;
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  *
  */
-public class MavenITmng3099SettingsProfilesWithNoPOM
+public class MavenITmng3099SettingsProfilesWithNoPomTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3099SettingsProfilesWithNoPOM()
+    public MavenITmng3099SettingsProfilesWithNoPomTest()
     {
         super( "(2.0.8,)" ); // 2.0.9+
     }

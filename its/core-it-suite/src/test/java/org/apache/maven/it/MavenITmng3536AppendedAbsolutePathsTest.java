@@ -24,14 +24,18 @@ import org.apache.maven.it.Verifier;
 
 import java.io.File;
 
-public class MavenITmng3536AppendedAbsolutePaths extends AbstractMavenIntegrationTestCase {
+public class MavenITmng3536AppendedAbsolutePathsTest
+    extends AbstractMavenIntegrationTestCase
+{
     
-    public MavenITmng3536AppendedAbsolutePaths()
+    public MavenITmng3536AppendedAbsolutePathsTest()
     {
         super( "[2.1.0-M1,)"); // 2.1.0+ only
     }
 
-    public void testitMNG3536() throws Exception {
+    public void testitMNG3536()
+        throws Exception
+    {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
                                                                  "/mng-3536" );
         File pluginDir = new File( testDir, "plugin" );

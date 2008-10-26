@@ -31,11 +31,11 @@ import org.apache.maven.it.util.ResourceExtractor;
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng1323AntrunDependencies
+public class MavenITmng1323AntrunDependenciesTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng1323AntrunDependencies()
+    public MavenITmng1323AntrunDependenciesTest()
     {
         super( "(2.999,)" );
     }

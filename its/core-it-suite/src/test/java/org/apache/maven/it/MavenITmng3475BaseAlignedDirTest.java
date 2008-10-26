@@ -23,38 +23,36 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-public class MavenITmng3268MultipleDashPCommandLine
+public class MavenITmng3475BaseAlignedDirTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3268MultipleDashPCommandLine()
+    
+    public MavenITmng3475BaseAlignedDirTest()
     {
-        super( "(2.0.9,)" );
+        super( "[2.1.0-M1,)"); // 2.1.0+ only
     }
 
-    public void testMultipleProfileParams ()
+    public void testitMNG3475()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3268" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
+                                                                 "/mng-3475" );
 
-        Verifier verifier;
+        File pluginDir = new File( testDir, "plugin" );
+        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
-
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Pprofile1,profile2" );
-        cliOptions.add( "-Pprofile3" );
-        cliOptions.add( "-P profile4" );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "package" );
+        verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "target/profile1/touch.txt" );
-        verifier.assertFilePresent( "target/profile2/touch.txt" );
-        verifier.assertFilePresent( "target/profile3/touch.txt" );
-        verifier.assertFilePresent( "target/profile4/touch.txt" );
+        verifier.resetStreams();
+
+        File projectDir = new File( testDir, "project" );
+        verifier = new Verifier( projectDir.getAbsolutePath() );
+
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
+
 }

@@ -24,9 +24,11 @@ import org.apache.maven.it.Verifier;
 
 import java.io.File;
 
-public class MavenITmng2562Timestamp extends AbstractMavenIntegrationTestCase {
+public class MavenITmng2562TimestampTest
+    extends AbstractMavenIntegrationTestCase
+{
     
-    public MavenITmng2562Timestamp()
+    public MavenITmng2562TimestampTest()
     {
         super( "[2.1.0-M1,)"); // 2.1.0+ only
     }

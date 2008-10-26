@@ -32,7 +32,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * @author Joakim Erdfelt
  * @version $Id$
  */
-public class MavenITmng3038TransitiveDepManVersion
+public class MavenITmng3038TransitiveDepManVersionTest
     extends AbstractMavenIntegrationTestCase
 {
     public void testitMNG3038()

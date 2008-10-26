@@ -26,36 +26,25 @@ import java.util.ArrayList;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-public class MavenIT0129ResourceProvidedToAPluginAsAPluginDependency
+public class MavenIT0118AttachedArtifactsInReactorTest
     extends AbstractMavenIntegrationTestCase
 {
-    public void testit0129()
+    public void testit0118()
         throws Exception
     {
         File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/it0129-resourcesForAPluginProvidedAsAPluginDependency" );
+            ResourceExtractor.simpleExtractResources( getClass(), "/it0118-attachedartifactinreactor" );
 
         Verifier verifier;
 
-        // Install the parent POM, extension and the plugin
+        // Install the parent POM
         verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0129", "it0129-plugin-runner", "1.0", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0129", "it0129-extension", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0129", "it0129-plugin", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0129", "it0129-parent", "1.0", "pom" );
-
+        verifier.deleteArtifact( "org.apache.maven.its.it0118", "parent", "1.0", "pom" );                
+        verifier.deleteArtifact( "org.apache.maven.its.it0118", "one", "1.0", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.it0118", "two", "1.0", "pom" );
         List cliOptions = new ArrayList();
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
-        //now run the test
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0129-resourcesForAPluginProvidedAsAPluginDependency/test-project" );
-        verifier = new Verifier( testDir.getAbsolutePath() );
-        cliOptions = new ArrayList();
-        verifier.executeGoal( "verify" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
     }
 }

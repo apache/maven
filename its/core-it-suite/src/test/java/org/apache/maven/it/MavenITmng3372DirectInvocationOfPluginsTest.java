@@ -42,7 +42,7 @@ import junit.framework.TestCase;
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  *
  */
-public class MavenITmng3372DirectInvocationOfPlugins
+public class MavenITmng3372DirectInvocationOfPluginsTest
     extends TestCase
 {
 

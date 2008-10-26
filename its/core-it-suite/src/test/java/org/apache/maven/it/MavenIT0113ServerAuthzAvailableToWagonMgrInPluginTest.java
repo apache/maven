@@ -19,31 +19,41 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
-
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-public class MavenIT0118AttachedArtifactsInReactor
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
     extends AbstractMavenIntegrationTestCase
 {
-    public void testit0118()
+    public void testit0113()
         throws Exception
     {
-        File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/it0118-attachedartifactinreactor" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0113-serverAuthzAvailableToWagonMgrInPlugin" );
 
         Verifier verifier;
 
         // Install the parent POM
         verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0118", "parent", "1.0", "pom" );                
-        verifier.deleteArtifact( "org.apache.maven.its.it0118", "one", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0118", "two", "1.0", "pom" );
+        verifier.deleteArtifact( "org.apache.maven.its.it0113", "maven-it0113-plugin", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.it0113", "test-project", "1.0-SNAPSHOT", "jar" );
+
+        // Install the plugin to test for Authz info in the WagonManager
+        verifier = new Verifier( new File( testDir.getAbsolutePath(), "maven-it0113-plugin" ).getAbsolutePath() );
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        // Build the test project that uses the plugin.
+        verifier = new Verifier( new File( testDir.getAbsolutePath(), "test-project" ).getAbsolutePath() );
         List cliOptions = new ArrayList();
-        verifier.executeGoal( "package" );
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings.xml" );
+        verifier.setCliOptions( cliOptions );
+        verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

@@ -26,10 +26,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MavenITmng3221InfiniteForking
+public class MavenITmng3221InfiniteForkingTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3221InfiniteForking()
+    public MavenITmng3221InfiniteForkingTest()
     {
         super( "(2.0.8,2.99.99)" );
     }

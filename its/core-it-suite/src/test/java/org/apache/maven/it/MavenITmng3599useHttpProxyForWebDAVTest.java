@@ -37,7 +37,7 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
-public class MavenITmng3599useHttpProxyForWebDAV
+public class MavenITmng3599useHttpProxyForWebDAVTest
     extends AbstractMavenIntegrationTestCase
 {
     private static final String LS = System.getProperty( "line.separator" );

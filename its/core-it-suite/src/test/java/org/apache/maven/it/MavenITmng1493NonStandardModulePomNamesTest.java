@@ -26,10 +26,10 @@ import java.util.List;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-public class MavenITmng1493NonStandardModulePomNames
+public class MavenITmng1493NonStandardModulePomNamesTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng1493NonStandardModulePomNames()
+    public MavenITmng1493NonStandardModulePomNamesTest()
     {
         super( "(2.0.8,)" ); // 2.0.9+ (including snapshots)
     }

@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenITmng1491ReactorArtifactIdCollision
+public class MavenITmng1491ReactorArtifactIdCollisionTest
     extends AbstractMavenIntegrationTestCase
 {
     public void testitMNG1491 ()

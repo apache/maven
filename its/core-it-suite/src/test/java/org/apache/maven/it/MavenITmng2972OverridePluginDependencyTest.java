@@ -31,11 +31,11 @@ import java.util.Properties;
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng2972OverridePluginDependency
+public class MavenITmng2972OverridePluginDependencyTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng2972OverridePluginDependency()
+    public MavenITmng2972OverridePluginDependencyTest()
     {
         super( "(2.0.8,)" );
     }

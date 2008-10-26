@@ -23,36 +23,36 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MavenITmng3475BaseAlignedDir
+public class MavenITmng3259DepsDroppedInMultiModuleBuildTest
     extends AbstractMavenIntegrationTestCase
 {
-    
-    public MavenITmng3475BaseAlignedDir()
-    {
-        super( "[2.1.0-M1,)"); // 2.1.0+ only
-    }
-
-    public void testitMNG3475()
+    public void testitMNG3259 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3475" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3259" );
 
-        File pluginDir = new File( testDir, "plugin" );
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        Verifier verifier;
+
+        verifier = new Verifier( new File( testDir, "parent" ).getAbsolutePath() );
+
+        List cliOptions = new ArrayList();
+
+        verifier.setCliOptions( cliOptions );
+
+        verifier.executeGoal( "install" );
+
+        verifier.verifyErrorFreeLog();
+
+        verifier.resetStreams();
+
+        verifier = new Verifier( testDir.getAbsolutePath() );
 
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
-        File projectDir = new File( testDir, "project" );
-        verifier = new Verifier( projectDir.getAbsolutePath() );
-
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
-
 }

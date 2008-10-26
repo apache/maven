@@ -35,7 +35,7 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
-public class MavenITmng3652UserAgentHeader
+public class MavenITmng3652UserAgentHeaderTest
     extends AbstractMavenIntegrationTestCase
 {
     private Server server;
@@ -44,7 +44,7 @@ public class MavenITmng3652UserAgentHeader
 
     private String userAgent;
 
-    public MavenITmng3652UserAgentHeader()
+    public MavenITmng3652UserAgentHeaderTest()
     {
         super( "[2.1.0-M1,2.99.99)" );
     }

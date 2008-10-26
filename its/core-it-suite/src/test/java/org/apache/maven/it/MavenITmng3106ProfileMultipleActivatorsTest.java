@@ -31,10 +31,10 @@ import org.apache.maven.it.util.ResourceExtractor;
  * when any of the activators are on.
  * 
  */
-public class MavenITmng3106ProfileMultipleActivators
+public class MavenITmng3106ProfileMultipleActivatorsTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3106ProfileMultipleActivators()
+    public MavenITmng3106ProfileMultipleActivatorsTest()
     {
         super( "(2.0.9,)" );
     }
