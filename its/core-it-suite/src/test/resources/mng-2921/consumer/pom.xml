@@ -35,7 +35,7 @@ under the License.
 
   <dependencies>
     <!--
-    NOTE: Is is an essential part of the test design to check dependencies with different scopes since active project
+    NOTE: It is an essential part of the test design to check dependencies with different scopes since active project
     artifacts must be resolved with the same scope as the requested dependency.
     -->
     <dependency>
