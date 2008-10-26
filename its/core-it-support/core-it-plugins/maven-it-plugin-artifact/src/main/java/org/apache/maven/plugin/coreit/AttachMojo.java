@@ -65,14 +65,19 @@ public class AttachMojo
     private String attachedFile;
 
     /**
-     * @parameter expression="${artifact.artifactType}" default-value="jar"
+     * The type of the artifact to attach.
+     * 
+     * @parameter expression="${artifact.artifactType}"
      */
-    private String artifactType = "jar";
+    private String artifactType;
 
     /**
-     * @parameter expression="${artifact.artifactClassifier}" default-value="it"
+     * The classifier for the attached artifact. If unspecified, the default classifier for the specified artifact type
+     * is used.
+     * 
+     * @parameter expression="${artifact.artifactClassifier}"
      */
-    private String artifactClassifier = "it";
+    private String artifactClassifier;
 
     /**
      * Runs this mojo.
