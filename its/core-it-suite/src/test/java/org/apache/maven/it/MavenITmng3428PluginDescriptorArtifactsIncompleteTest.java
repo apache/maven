@@ -66,7 +66,7 @@ public class MavenITmng3428PluginDescriptorArtifactsIncompleteTest
         // This should only succeed if commons-cli is part of ${plugin.artifacts}. The
         // commons-cli library is part of Maven's core classpath, so if this mojo succeeds
         // it means the PluginDescriptor.getArtifacts() call returns an unfiltered collection.
-        verifier.executeGoal( "tests:test-cli-maven-plugin:1:test" );
+        verifier.executeGoal( "org.apache.maven.its.mng3428:test-cli-maven-plugin:1:test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

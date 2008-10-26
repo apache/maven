@@ -20,7 +20,7 @@ under the License.
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>test</groupId>
+    <groupId>org.apache.maven.its.mng3536</groupId>
     <artifactId>mng3536-AppendedAbsolutePaths</artifactId>
     <packaging>pom</packaging>
     <version>1.0</version>
@@ -29,7 +29,7 @@ under the License.
         <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
         <plugins>
             <plugin>
-                <groupId>plugin</groupId>
+                <groupId>org.apache.maven.its.mng3536</groupId>
                 <artifactId>mng3536-AppendedAbsolutePaths-plugin</artifactId>
                 <version>1.0</version>
                 <executions>

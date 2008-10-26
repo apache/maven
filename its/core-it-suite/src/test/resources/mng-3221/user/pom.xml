@@ -20,7 +20,7 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>tests</groupId>
+  <groupId>org.apache.maven.its.mng3221</groupId>
   <artifactId>mng-3221-with-forking-report</artifactId>
   <packaging>jar</packaging>
   <version>1</version>
@@ -46,7 +46,7 @@ under the License.
             <version>2.0.1</version>
           </plugin>
           <plugin>
-            <groupId>tests</groupId>
+            <groupId>org.apache.maven.its.mng3221</groupId>
             <artifactId>maven-forking-report-plugin</artifactId>
             <version>1</version>
           </plugin>
@@ -60,7 +60,7 @@ under the License.
       <build>
         <plugins>
           <plugin>
-            <groupId>tests</groupId>
+            <groupId>org.apache.maven.its.mng3221</groupId>
             <artifactId>maven-forking-test-plugin</artifactId>
             <version>1</version>
             <executions>

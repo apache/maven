@@ -49,7 +49,7 @@ public class MavenITmng3221InfiniteForkingTest
         {
             verifier = new Verifier( reportDir.getAbsolutePath() );
 
-            verifier.deleteArtifact( "tests", "maven-forking-report-plugin", "1", "jar" );
+            verifier.deleteArtifact( "org.apache.maven.its.mng3221", "maven-forking-report-plugin", "1", "jar" );
 
             verifier.executeGoal( "install" );
             verifier.verifyErrorFreeLog();
@@ -93,7 +93,7 @@ public class MavenITmng3221InfiniteForkingTest
         {
             verifier = new Verifier( pluginDir.getAbsolutePath() );
 
-            verifier.deleteArtifact( "tests", "maven-forking-test-plugin", "1", "jar" );
+            verifier.deleteArtifact( "org.apache.maven.its.mng3221", "maven-forking-test-plugin", "1", "jar" );
 
             verifier.executeGoal( "install" );
             verifier.verifyErrorFreeLog();

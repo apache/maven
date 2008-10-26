@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>tests</groupId>
+  <groupId>org.apache.maven.its.mng3428</groupId>
   <artifactId>test-cli-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>test-cli-maven-plugin Maven Mojo</name>

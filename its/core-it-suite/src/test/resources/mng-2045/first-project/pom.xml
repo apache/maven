@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project>
   <parent>
-    <groupId>testing</groupId>
+    <groupId>org.apache.maven.its.mng2045</groupId>
     <artifactId>mng-2045-test</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>

@@ -20,7 +20,7 @@ under the License.
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>test</groupId>
+    <groupId>org.apache.maven.its.mng2562</groupId>
     <artifactId>mng-2562-timestamp</artifactId>
     <packaging>pom</packaging>
     <version>1.0</version>

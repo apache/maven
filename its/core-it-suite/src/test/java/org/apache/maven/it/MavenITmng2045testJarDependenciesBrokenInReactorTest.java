@@ -50,9 +50,9 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "testing", "mng-2045-test", "1.0-SNAPSHOT", "pom" );
-        verifier.deleteArtifact( "testing", "first-project", "1.0-SNAPSHOT", "jar" );
-        verifier.deleteArtifact( "testing", "second-project", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2045", "mng-2045-test", "1.0-SNAPSHOT", "pom" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2045", "first-project", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng2045", "second-project", "1.0-SNAPSHOT", "jar" );
 
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();

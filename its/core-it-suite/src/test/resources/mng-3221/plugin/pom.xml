@@ -21,7 +21,7 @@ under the License.
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
   xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>tests</groupId>
+  <groupId>org.apache.maven.its.mng3221</groupId>
   <artifactId>maven-forking-test-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <version>1</version>

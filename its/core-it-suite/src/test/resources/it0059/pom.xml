@@ -11,12 +11,18 @@
     <repository>
       <id>test</id>
       <url>file:test-repo</url>
+      <releases>
+        <checksumPolicy>ignore</checksumPolicy>
+      </releases>
+      <snapshots>
+        <checksumPolicy>ignore</checksumPolicy>
+      </snapshots>
     </repository>
   </repositories>
 
   <dependencies>
     <dependency>
-      <groupId>test</groupId>
+      <groupId>org.apache.maven.its.it0059</groupId>
       <artifactId>test</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>

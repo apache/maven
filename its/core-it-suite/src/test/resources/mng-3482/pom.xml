@@ -7,7 +7,7 @@
   
   <name>Integration Test Project for MNG-3482</name>
   <description>
-    This project verifies that MNG-3482 is fixed. It is controlled by a JUnit test called org.apache.maven.integrationtests.MNG3482Test
+    This project verifies that MNG-3482 is fixed. It is controlled by a JUnit test called org.apache.maven.it.MNG3482Test
   </description>
   
   <url>http://jira.codehaus.org/browse/MNG-3482</url>
