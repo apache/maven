@@ -26,13 +26,19 @@ import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-public class MavenIT0121TransitiveDepManVersion
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3038">MNG-3038</a>
+ * 
+ * @author Joakim Erdfelt
+ * @version $Id$
+ */
+public class MavenITmng3038TransitiveDepManVersion
     extends AbstractMavenIntegrationTestCase
 {
-    public void testit0121()
+    public void testitMNG3038()
         throws Exception
     {
-        File testDirBase = ResourceExtractor.simpleExtractResources( getClass(), "/it0121-transitiveDepManVersion" );
+        File testDirBase = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3038" );
 
         compileDDep( testDirBase, "D1", "1.0" );
         compileDDep( testDirBase, "D2", "2.0" );

@@ -24,32 +24,30 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0125NewestConflictResolverTest
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3023">MNG-3023</a>
+ * 
+ * @author Mark Hobson
+ * @version $Id$
+ */
+public class MavenITmng3023ReactorDependencyResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
     /**
-     * Test that ensures the newest-wins conflict resolver is used.
-     * 
-     * @throws Exception
-     * @see <a href="http://jira.codehaus.org/browse/MNG-612">MNG-612</a>
+     * Test that reactor projects are included in dependency resolution.
      */
-    public void testit0125() throws Exception
+    public void testitMNG3023()
+        throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0125-newestConflictResolver/dependency" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023/plugin" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0125-newestConflictResolver/plugin" );
+        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023/project" );
         verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0125-newestConflictResolver/project" );
-        verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "verify" );
+        verifier.executeGoal( "org.apache.maven.its.it0122:maven-it-it0122-plugin:1.0:test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

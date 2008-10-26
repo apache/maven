@@ -31,11 +31,11 @@ import org.apache.maven.it.util.ResourceExtractor;
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenIT0127AntrunDependencies
+public class MavenITmng1323AntrunDependencies
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenIT0127AntrunDependencies()
+    public MavenITmng1323AntrunDependencies()
     {
         super( "(2.999,)" );
     }
@@ -47,7 +47,7 @@ public class MavenIT0127AntrunDependencies
     public void testitMNG1323()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0127-antrunDependencies" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1323" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );

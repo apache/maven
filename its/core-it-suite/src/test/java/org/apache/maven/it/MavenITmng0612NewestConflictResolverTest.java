@@ -24,30 +24,34 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0124PomExtensionComponentOverrideTest
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-612">MNG-612</a>.
+ * 
+ * @author Mark Hobson
+ * @version $Id$
+ */
+public class MavenITmng0612NewestConflictResolverTest
     extends AbstractMavenIntegrationTestCase
 {
     /**
-     * Test that ensures the POM extensions can override default component implementations.
-     * 
-     * @throws Exception
-     * @see <a href="http://jira.codehaus.org/browse/MNG-2771">MNG-2771</a>
+     * Test that ensures the newest-wins conflict resolver is used.
      */
-    public void testit0124() throws Exception
+    public void testitMNG612()
+        throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0124-pomExtensionComponentOverride/extension" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0612/dependency" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0124-pomExtensionComponentOverride/plugin" );
+        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0612/plugin" );
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0124-pomExtensionComponentOverride/project" );
+        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0612/project" );
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();

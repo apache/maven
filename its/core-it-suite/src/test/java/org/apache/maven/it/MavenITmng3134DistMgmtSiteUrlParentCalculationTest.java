@@ -24,26 +24,28 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0122ReactorDependencyResolutionTest
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3134">MNG-3134</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng3134DistMgmtSiteUrlParentCalculationTest
     extends AbstractMavenIntegrationTestCase
 {
+
     /**
-     * Test that reactor projects are included in dependency resolution.
-     * 
-     * @throws Exception
+     * Test DistributionManagement Site-URL calculation when modules are in sibling dirs of parent.
      */
-    public void testit0122() throws Exception
+    public void testitMNG3134()
+        throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0122-reactorDependencyResolution/plugin" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3134" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "integration-test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0122-reactorDependencyResolution/project" );
-        verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "org.apache.maven.its.it0122:maven-it-it0122-plugin:1.0:test" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }
+

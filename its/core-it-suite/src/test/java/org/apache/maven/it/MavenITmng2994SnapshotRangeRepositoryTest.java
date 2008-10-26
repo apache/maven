@@ -24,22 +24,25 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0128DistMgmtSiteUrlParentCalculationTest
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2994">MNG-2994</a>
+ * 
+ * @author Mark Hobson
+ * @version $Id$
+ */
+public class MavenITmng2994SnapshotRangeRepositoryTest
     extends AbstractMavenIntegrationTestCase
 {
-
     /**
-     * Test DistributionManagement Site-URL calculation when modules are in sibling dirs of parent. (MNG-3134)
+     * Test that snapshot repositories are checked for ranges with snapshot boundaries.
      */
-    public void testit0128()
+    public void testitMNG2994()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0128-distMgmtSiteUrlParentCalc" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2994" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "integration-test" );
+        verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
 }
-

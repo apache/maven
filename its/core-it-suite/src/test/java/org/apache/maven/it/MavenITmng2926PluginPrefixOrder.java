@@ -25,13 +25,19 @@ import java.util.ArrayList;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-public class MavenIT0119PluginPrefixOrder
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2926">MNG-2926</a>
+ * 
+ * @author Brian Fox
+ * @version $Id$
+ */
+public class MavenITmng2926PluginPrefixOrder
     extends AbstractMavenIntegrationTestCase
 {
-    public void testit0119()
+    public void testitMNG2926()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0119-pluginprefixorder" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2926" );
 
         Verifier verifier;
         //use my custom settings upon invocation.
@@ -48,7 +54,7 @@ public class MavenIT0119PluginPrefixOrder
         // default order will be changed. Artificially make currently set groups disappear
         
         // now run the test. Since we have apache and codehaus, i should get the apache one first
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0119-pluginprefixorder/test-project" );
+        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2926/test-project" );
         cli.add("-s '" +testDir.getAbsolutePath()+"/settings-apache.xml'");
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setCliOptions( cli );
@@ -57,7 +63,7 @@ public class MavenIT0119PluginPrefixOrder
 
         cli.clear();
 //      now run the test. Since we have apache and codehaus and a prefix in my settings, i should get the custom one first
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0119-pluginprefixorder/test-project" );
+        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2926/test-project" );
         verifier = new Verifier( testDir.getAbsolutePath() );
         
         cli.add("-s '" +testDir.getAbsolutePath()+"/settings.xml'");

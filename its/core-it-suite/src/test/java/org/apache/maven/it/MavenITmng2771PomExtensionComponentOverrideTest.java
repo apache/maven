@@ -24,20 +24,36 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0123SnapshotRangeRepositoryTest
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2771">MNG-2771</a>
+ * 
+ * @author Mark Hobson
+ * @version $Id$
+ */
+public class MavenITmng2771PomExtensionComponentOverrideTest
     extends AbstractMavenIntegrationTestCase
 {
     /**
-     * Test that snapshot repositories are checked for ranges with snapshot boundaries.
-     * 
-     * @throws Exception
-     * @see <a href="http://jira.codehaus.org/browse/MNG-2994">MNG-2994</a>
+     * Test that ensures the POM extensions can override default component implementations.
      */
-    public void testit0123() throws Exception
+    public void testitMNG2771()
+        throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0123-snapshotRangeRepository" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2771/extension" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2771/plugin" );
+        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2771/project" );
+        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
