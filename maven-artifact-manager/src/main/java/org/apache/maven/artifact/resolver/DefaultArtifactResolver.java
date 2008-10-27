@@ -157,7 +157,7 @@ public class DefaultArtifactResolver
 
             // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
             if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
-                destination.exists() && !localCopy )
+                destination.exists() && !localCopy && wagonManager.isOnline() )
             {
                 Date comparisonDate = new Date( destination.lastModified() );
 
