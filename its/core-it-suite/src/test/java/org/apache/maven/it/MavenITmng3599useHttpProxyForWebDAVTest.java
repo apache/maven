@@ -37,6 +37,7 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
+
 public class MavenITmng3599useHttpProxyForWebDAVTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -54,6 +55,11 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
                             "  <version>1.0-SNAPSHOT</version>\n" +
                             "  <name>Maven Site Plugin Test10</name>\n" +
                             "</project>";
+
+    public MavenITmng3599useHttpProxyForWebDAVTest()
+    {
+        super( "(2.1.0-M1,)" );
+    }
 
     public void setUp()
         throws Exception
