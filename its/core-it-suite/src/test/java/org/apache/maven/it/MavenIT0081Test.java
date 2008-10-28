@@ -39,6 +39,7 @@ public class MavenIT0081Test
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0081" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

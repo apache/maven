@@ -46,6 +46,8 @@ public class MavenITmng2892HideCorePlexusUtilsTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
+        verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar" );
+        verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "pom" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

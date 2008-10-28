@@ -46,6 +46,7 @@ public class MavenITmng2228ComponentInjectionTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2228" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

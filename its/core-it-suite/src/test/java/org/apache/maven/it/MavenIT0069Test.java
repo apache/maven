@@ -41,6 +41,7 @@ public class MavenIT0069Test
         {
             // phase 1: run build in online mode to fill local repo
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier.deleteArtifacts( "org.apache.maven.its.it0069" );
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
@@ -65,7 +66,7 @@ public class MavenIT0069Test
         {
             // phase 3: delete test artifact and run build in offline mode to check it fails now
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-            verifier.deleteArtifact( "org.apache.maven.its.it0069", "it", "1.0.3", "jar" );
+            verifier.deleteArtifacts( "org.apache.maven.its.it0069" );
             List cliOptions = new ArrayList();
             cliOptions.add( "-o" );
             verifier.setCliOptions( cliOptions );

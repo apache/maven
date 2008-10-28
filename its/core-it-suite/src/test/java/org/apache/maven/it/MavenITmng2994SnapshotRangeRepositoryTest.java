@@ -41,6 +41,7 @@ public class MavenITmng2994SnapshotRangeRepositoryTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2994" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0123" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

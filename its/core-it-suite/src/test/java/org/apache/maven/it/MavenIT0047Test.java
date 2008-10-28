@@ -40,6 +40,7 @@ public class MavenIT0047Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0047" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0047" );
         Properties systemProperties = new Properties();
         systemProperties.put( "depres.compileClassPath", new File( testDir, "target/compile.txt" ).getAbsolutePath() );
         verifier.setSystemProperties( systemProperties );

@@ -46,6 +46,8 @@ public class MavenITmng3012CoreClassImportTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
+        verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "jar" );
+        verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "pom" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

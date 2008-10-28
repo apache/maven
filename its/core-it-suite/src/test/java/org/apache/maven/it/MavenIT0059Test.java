@@ -40,6 +40,7 @@ public class MavenIT0059Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0059" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0059" );
         Properties verifierProperties = new Properties();
         verifierProperties.put( "failOnErrorOutput", "false" );
         verifier.setVerifierProperties( verifierProperties );
