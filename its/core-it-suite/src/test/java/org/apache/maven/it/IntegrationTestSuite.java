@@ -278,6 +278,7 @@ MavenITmng3645POMSyntaxErrorTest
         // ----------------------------------------------------------------------------------------------------
 
         // Pending resolution in code
+        // suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
         // suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
 
