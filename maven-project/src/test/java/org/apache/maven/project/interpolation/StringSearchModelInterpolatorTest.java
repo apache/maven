@@ -34,7 +34,7 @@ import org.apache.maven.project.path.PathTranslator;
 
 /**
  * @author jdcasey
- * @version $Id: RegexBasedModelInterpolatorTest.java 686268 2008-08-15 16:01:30Z jdcasey $
+ * @version $Id$
  */
 public class StringSearchModelInterpolatorTest
     extends AbstractModelInterpolatorTest

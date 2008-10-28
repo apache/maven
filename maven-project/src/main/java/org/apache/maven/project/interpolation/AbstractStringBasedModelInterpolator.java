@@ -58,7 +58,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * Use a regular expression search to find and resolve expressions within the POM.
  *
  * @author jdcasey Created on Feb 3, 2005
- * @version $Id: RegexBasedModelInterpolator.java 683740 2008-08-07 22:33:15Z jdcasey $
+ * @version $Id$
  * @todo Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 public abstract class AbstractStringBasedModelInterpolator

@@ -24,7 +24,7 @@ package org.apache.maven.project;
  * Exception that occurs when the user has identifed a project to make, but that project doesn't exist.
  * 
  * @author <a href="mailto:dfabulich@apache.org">Dan Fabulich</a>
- * @version $Id: DuplicateProjectException.java 640549 2008-03-24 20:05:11Z bentmann $
+ * @version $Id$
  */
 public class MissingProjectException
     extends Exception

@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * 
- * @version $Id: PathTranslatingPostProcessor.java 677447 2008-07-16 22:15:57Z jdcasey $
+ * @version $Id$
  */
 public class PathTranslatingPostProcessor
     implements InterpolationPostProcessor
