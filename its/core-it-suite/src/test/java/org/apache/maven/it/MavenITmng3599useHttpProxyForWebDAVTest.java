@@ -58,7 +58,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
 
     public MavenITmng3599useHttpProxyForWebDAVTest()
     {
-        super( "(2.1.0-M1,)" );
+        super( "(2.0.9,)" );
     }
 
     public void setUp()

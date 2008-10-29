@@ -80,6 +80,7 @@ MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
 */
 
+        suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3796ClassImportInconsistencyTest.class );
         suite.addTestSuite( MavenITmng3748BadSettingsXmlTest.class );
         suite.addTestSuite( MavenITmng3747PrefixedPathExpressionTest.class );
@@ -278,7 +279,6 @@ MavenITmng3645POMSyntaxErrorTest
         // ----------------------------------------------------------------------------------------------------
 
         // Pending resolution in code
-        // suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
         // suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
 
