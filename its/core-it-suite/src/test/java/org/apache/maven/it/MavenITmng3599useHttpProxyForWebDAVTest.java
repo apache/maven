@@ -37,7 +37,13 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
-
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3599">MNG-3599</a>.
+ * 
+ * @author Brett Porter
+ * @author John Casey
+ * @version $Id$
+ */
 public class MavenITmng3599useHttpProxyForWebDAVTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -50,10 +56,10 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
     private static final String content = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                             "  xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n" +
                             "  <modelVersion>4.0.0</modelVersion>\n" +
-                            "  <groupId>org.apache.maven.plugin.site.test10</groupId>\n" +
-                            "  <artifactId>site-plugin-test10</artifactId>\n" +
+                            "  <groupId>org.apache.maven.its.mng3599</groupId>\n" +
+                            "  <artifactId>test</artifactId>\n" +
                             "  <version>1.0-SNAPSHOT</version>\n" +
-                            "  <name>Maven Site Plugin Test10</name>\n" +
+                            "  <name>MNG-3599</name>\n" +
                             "</project>";
 
     public MavenITmng3599useHttpProxyForWebDAVTest()
@@ -121,7 +127,10 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
     {
         super.tearDown();
 
-        server.stop();
+        if ( server != null )
+        {
+            server.stop();
+        }
     }
 
     public void testmng3599useHttpProxyForHttp()
@@ -129,13 +138,23 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
 
+        /*
+         * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
+         * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
+         * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
+         */
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
         String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
         String newSettings = StringUtils.replace( settings, "@protocol@", "http" );
         
         FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
         
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = new Verifier( testDir.getAbsolutePath() );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
@@ -170,13 +189,23 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         {
             File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
 
+            /*
+             * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
+             * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
+             * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
+             */
+            Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
+            verifier.resetStreams();
+
             String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
             settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
             String newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
             
             FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
 
-            Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier = new Verifier( testDir.getAbsolutePath() );
 
             List cliOptions = new ArrayList();
             cliOptions.add( "--settings" );
