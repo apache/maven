@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><archetype-descriptor id="maven-integration-test-sample-archetype">
+<?xml version="1.0" encoding="UTF-8"?><archetype-descriptor name="maven-it-sample">
   <fileSets>
     <fileSet filtered="true" packaged="true" encoding="UTF-8">
       <directory>src/test/java</directory>
@@ -12,14 +12,6 @@
         <include>**/*.txt</include>
         <include>**/*.java</include>
         <include>**/*.xml</include>
-      </includes>
-    </fileSet>
-    <fileSet filtered="true" encoding="UTF-8">
-      <directory></directory>
-      <includes>
-        <include>.classpath</include>
-        <include>.project</include>
-        <include>out.txt</include>
       </includes>
     </fileSet>
   </fileSets>

@@ -1,3 +1,6 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
 <?xml version="1.0"?>
 <!DOCTYPE module PUBLIC
     "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
@@ -78,8 +81,8 @@
 
 
     <module name="GenericIllegalRegexp"> 
-      <!-- \s matches whitespace character, $ matches end of line. --> 
-      <property name="format" value="(?:\x66\x75\x63\x6B)|(?:\x73\x68\x69\x74)|(?:\x63\x75\x6E\x74)"/>
+      <!-- ${symbol_escape}s matches whitespace character, ${symbol_dollar} matches end of line. --> 
+      <property name="format" value="(?:${symbol_escape}x66${symbol_escape}x75${symbol_escape}x63${symbol_escape}x6B)|(?:${symbol_escape}x73${symbol_escape}x68${symbol_escape}x69${symbol_escape}x74)|(?:${symbol_escape}x63${symbol_escape}x75${symbol_escape}x6E${symbol_escape}x74)"/>
       <property name="ignoreCase" value="true" />
       <property name="message" value="Code contains inappropriate language"/>
 
@@ -99,7 +102,7 @@
     </module> -->
 
 
-    <!-- http://checkstyle.sourceforge.net/config_coding.html#IllegalCatch-->
+    <!-- http://checkstyle.sourceforge.net/config_coding.html${symbol_pound}IllegalCatch-->
    <!-- <module name="IllegalCatch">
       <property name="severity" value="warning"/>
     </module>   

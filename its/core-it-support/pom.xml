@@ -42,6 +42,8 @@ under the License.
     <module>core-it-wagon</module>
     <module>core-it-support-artifacts</module>
     <module>maven-it-helper</module>
+    <module>maven-it-archetype</module>
+    <module>maven-it-sample</module>
   </modules>
 
   <scm>

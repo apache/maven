@@ -1,3 +1,6 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
@@ -23,7 +26,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven.its.itsample</groupId>
+    <groupId>${package}s.itsample</groupId>
     <artifactId>parent</artifactId>
     <version>1</version>
   </parent>
@@ -37,7 +40,7 @@ under the License.
     <!--This extension is installed by the IT prior to invoking this build. See ../checkstyle-assembly-->
     <extensions>
       <extension>
-        <groupId>org.apache.maven.its.itsample</groupId>
+        <groupId>${package}s.itsample</groupId>
         <artifactId>checkstyle-assembly</artifactId>
         <version>1.0</version>
       </extension>
@@ -64,7 +67,7 @@ under the License.
             <configuration>
               <configLocation>stc_checks.xml</configLocation>
               <failsOnError>true</failsOnError>
-              <cacheFile>${project.build.directory}/checkstyle-cachefile</cacheFile>
+              <cacheFile>${symbol_dollar}{project.build.directory}/checkstyle-cachefile</cacheFile>
               <consoleOutput>true</consoleOutput>
             </configuration>
           </execution>

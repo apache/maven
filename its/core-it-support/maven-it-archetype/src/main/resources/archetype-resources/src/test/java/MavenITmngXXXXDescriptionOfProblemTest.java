@@ -1,3 +1,6 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
 package ${package};
 
 /*
@@ -23,9 +26,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.it.AbstractMavenIntegrationTestCase;
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.ResourceExtractor;
+import ${package}.Verifier;
+import ${package}.util.ResourceExtractor;
 
 /**
  * This is a sample integration test. The IT tests typically
@@ -38,7 +40,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * phases. See more information inline in the code.
  * 
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- * @version $Id$
+ * @version ${symbol_dollar}Id: MavenITmngXXXXDescriptionOfProblemTest.java 707999 2008-10-26 14:42:38Z bentmann ${symbol_dollar}
  */
 public class MavenITmngXXXXDescriptionOfProblemTest
     extends AbstractMavenIntegrationTestCase
@@ -72,9 +74,9 @@ public class MavenITmngXXXXDescriptionOfProblemTest
          * makes it easy to do this.
          */
         verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.itsample", "parent", "1.0", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.itsample", "checkstyle-test", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.itsample", "checkstyle-assembly", "1.0", "jar" );
+        verifier.deleteArtifact( "${package}s.itsample", "parent", "1.0", "pom" );
+        verifier.deleteArtifact( "${package}s.itsample", "checkstyle-test", "1.0", "jar" );
+        verifier.deleteArtifact( "${package}s.itsample", "checkstyle-assembly", "1.0", "jar" );
 
         /*
          * The Command Line Options (CLI) are passed to the
