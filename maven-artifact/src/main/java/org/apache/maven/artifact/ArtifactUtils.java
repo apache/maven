@@ -24,8 +24,8 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +75,7 @@ public final class ArtifactUtils
 
     public static Map artifactMapByVersionlessId( Collection artifacts )
     {
-        Map artifactMap = new HashMap();
+        Map artifactMap = new LinkedHashMap();
 
         if ( artifacts != null )
         {
@@ -92,7 +92,7 @@ public final class ArtifactUtils
 
     public static Map artifactMapByArtifactId( Collection artifacts )
     {
-        Map artifactMap = new HashMap();
+        Map artifactMap = new LinkedHashMap();
 
         if ( artifacts != null )
         {

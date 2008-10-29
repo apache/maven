@@ -58,6 +58,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
@@ -121,12 +122,14 @@ public class DefaultExtensionManager
             Set rgArtifacts = resolutionGroup.getArtifacts();
             rgArtifacts = DefaultPluginManager.checkPlexusUtils( rgArtifacts, artifactFactory );
 
-            rgArtifacts.add( artifact );
+            Set dependencies = new LinkedHashSet();
+            dependencies.add( artifact );
+            dependencies.addAll( rgArtifacts );
 
             // Make sure that we do not influence the dependenecy resolution of extensions with the project's
             // dependencyManagement
 
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively( rgArtifacts, project.getArtifact(),
+            ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, project.getArtifact(),
                                                                                     Collections.EMPTY_MAP,
                                                                                     //project.getManagedVersionMap(),
                                                                                     localRepository,
