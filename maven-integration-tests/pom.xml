@@ -71,23 +71,6 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>echo</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <tasks>
-                <available property="exists" file="tests/pom.xml"/>
-                <echo>Checking for POM in test workdir: tests/pom.xml. Exists? ${exists}</echo></tasks>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-scm-plugin</artifactId>
         <version>1.1</version>
         <configuration>
