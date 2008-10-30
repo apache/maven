@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>maven</artifactId>
+    <groupId>org.apache.maven</groupId>
+    <version>3.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>maven-integration-tests</artifactId>
+  <name>Maven Integration-Test Importer</name>
+  
+  <properties>
+    <integrationTestSVNDir>trunk</integrationTestSVNDir>
+    <itDir>${pom.basedir}/tests</itDir>
+  </properties>
+  
+  <profiles>
+    <profile>
+      <id>update</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <file>
+          <!-- NOT INTERPOLATED. These values must be explicit. -->
+          <exists>/tmp/maven-integration-tests-3.0.x/pom.xml</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-scm-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>scm</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>update</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>checkout</id>
+      <activation>
+        <file>
+          <!-- NOT INTERPOLATED. These values must be explicit. -->
+          <missing>/tmp/maven-integration-tests-3.0.x/pom.xml</missing>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-scm-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>scm</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>checkout</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-scm-plugin</artifactId>
+        <version>1.1</version>
+        <configuration>
+          <connectionUrl>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/${integrationTestSVNDir}</connectionUrl>
+          <!-- Hard-coding to /tmp/ to avoid long path names that will make windows scream. -->
+          <!-- NOT INTERPOLATED DURING PROFILE ACTIVATION, so making these values explicit throughout to avoid confusion. -->
+          <checkoutDirectory>/tmp/maven-integration-tests-3.0.x</checkoutDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
