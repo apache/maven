@@ -80,6 +80,7 @@ MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
 */
 
+        suite.addTestSuite( MavenITmng3813PluginClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3796ClassImportInconsistencyTest.class );
         suite.addTestSuite( MavenITmng3748BadSettingsXmlTest.class );
