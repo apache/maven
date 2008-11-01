@@ -46,7 +46,6 @@ under the License.
     <module>maven-it-plugin-fork</module>
     <module>maven-it-plugin-generate-envar-properties</module>
     <module>maven-it-plugin-generate-properties</module>
-    <module>maven-it-plugin-loadable</module>
     <module>maven-it-plugin-no-project</module>
     <module>maven-it-plugin-packaging</module>
     <module>maven-it-plugin-parameter-implementation</module>
