@@ -21,13 +21,13 @@ package org.apache.maven.usability.plugin;
 
 import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -116,7 +116,7 @@ public class ExpressionDocumenter
     private static Map parseExpressionDocumentation( InputStream docStream )
         throws IOException, XmlPullParserException
     {
-        Reader reader = new BufferedReader( new InputStreamReader( docStream ) );
+        Reader reader = new BufferedReader( ReaderFactory.newXmlReader( docStream ) );
         
         ParamdocXpp3Reader paramdocReader = new ParamdocXpp3Reader();
         
