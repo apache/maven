@@ -48,7 +48,6 @@ public class MavenIT0086Test
         assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );
         assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassB" ) );
         assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.SomeClass" ) );
-        assertEquals( "methodB", pclProps.getProperty( "org.apache.maven.plugin.coreit.SomeClass.methods" ) );
         assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties" ) );
         assertEquals( "1", pclProps.getProperty( "org/apache/maven/plugin/coreit/a.properties.count" ) );
         assertNotNull( pclProps.getProperty( "org/apache/maven/plugin/coreit/b.properties" ) );
