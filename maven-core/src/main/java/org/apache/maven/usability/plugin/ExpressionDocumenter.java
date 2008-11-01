@@ -52,7 +52,7 @@ public class ExpressionDocumenter
         if ( expressionDocumentation == null )
         {
             expressionDocumentation = new HashMap();
-            
+
             ClassLoader docLoader = initializeDocLoader();
 
             for ( int i = 0; i < EXPRESSION_ROOTS.length; i++ )
@@ -84,7 +84,7 @@ public class ExpressionDocumenter
                 }
             }
         }
-        
+
         return expressionDocumentation;
     }
 
@@ -117,25 +117,25 @@ public class ExpressionDocumenter
         throws IOException, XmlPullParserException
     {
         Reader reader = new BufferedReader( ReaderFactory.newXmlReader( docStream ) );
-        
+
         ParamdocXpp3Reader paramdocReader = new ParamdocXpp3Reader();
-        
+
         ExpressionDocumentation documentation = paramdocReader.read( reader, true );
-        
+
         List expressions = documentation.getExpressions();
-        
+
         Map bySyntax = new HashMap();
-        
+
         if ( expressions != null && !expressions.isEmpty() )
         {
             for ( Iterator it = expressions.iterator(); it.hasNext(); )
             {
                 Expression expr = (Expression) it.next();
-                
+
                 bySyntax.put( expr.getSyntax(), expr );
             }
         }
-        
+
         return bySyntax;
     }
 
@@ -143,13 +143,13 @@ public class ExpressionDocumenter
         throws ExpressionDocumentationException
     {
         String myResourcePath = ExpressionDocumenter.class.getName().replace( '.', '/' ) + ".class";
-        
+
         URL myResource = ExpressionDocumenter.class.getClassLoader().getResource( myResourcePath );
 
         String myClasspathEntry = myResource.getPath();
-        
+
         myClasspathEntry = myClasspathEntry.substring( 0, myClasspathEntry.length() - ( myResourcePath.length() + 2 ) );
-        
+
         if ( myClasspathEntry.startsWith( "file:" ) )
         {
             myClasspathEntry = myClasspathEntry.substring( "file:".length() );

@@ -47,9 +47,9 @@ public class ArtifactResolverDiagnoser
         message.append( "Failed to resolve artifact." );
         message.append( "\n\n" );
         message.append( exception.getMessage() );
-        
+
         IOException ioe = (IOException) DiagnosisUtils.getFromCausality( exception, IOException.class );
-        
+
         if ( ioe != null && exception.getMessage().indexOf( ioe.getMessage() ) < 0 )
         {
             message.append( "\n\nCaused by I/O exception: " ).append( ioe.getMessage() );
