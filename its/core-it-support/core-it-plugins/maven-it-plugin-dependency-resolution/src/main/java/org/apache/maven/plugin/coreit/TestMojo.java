@@ -37,6 +37,16 @@ public class TestMojo
 {
 
     /**
+     * The path to the output file for the project artifacts, relative to the project base directory. Each line of this
+     * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
+     * disk. Unlike the test artifacts, the collection of project artifacts additionally contains those artifacts that
+     * do not contribute to the class path.
+     * 
+     * @parameter expression="${depres.projectArtifacts}"
+     */
+    private String projectArtifacts;
+
+    /**
      * The path to the output file for the test artifacts, relative to the project base directory. Each line of this
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
@@ -64,6 +74,7 @@ public class TestMojo
     {
         try
         {
+            writeArtifacts( projectArtifacts, project.getArtifacts() );
             writeArtifacts( testArtifacts, project.getTestArtifacts() );
             writeClassPath( testClassPath, project.getTestClasspathElements() );
         }
