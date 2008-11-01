@@ -26,7 +26,9 @@ import java.io.File;
 import java.util.Collection;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2921">MNG-2921</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2921">MNG-2921</a>. It naturally includes the
+ * test for the related issue <a href="http://jira.codehaus.org/browse/MNG-2877">MNG-2877</a> whose original test was
+ * too weak to prevent this issue.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
@@ -45,7 +47,8 @@ public class MavenITmng2921ActiveAttachedArtifactsTest
      * consumption on other module's class paths. Note the subtle difference of this test compared to the closely
      * related issue MNG-2871: This test is about *attached* artifacts, i.e. dependencies that have already been
      * packaged. MNG-2871 on the other hand is about dependencies that haven't been packaged yet but merely exist
-     * as loose class files in a module's output directory.
+     * as loose class files in a module's output directory. In other words, this test is concerned with the situation
+     * during the lifecycle phase "package" while MNG-2871 is concerned with earlier phases like "test".
      */
     public void testitMNG2921()
         throws Exception
