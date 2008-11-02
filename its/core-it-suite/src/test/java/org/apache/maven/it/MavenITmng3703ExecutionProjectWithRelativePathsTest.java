@@ -56,14 +56,12 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         verifier.resetStreams();
 
         verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.setLogFileName( "log-mojo.txt" );
 
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
-        File logFile = new File( projectDir, "log.txt" );
-        logFile.renameTo( new File( projectDir, "log-mojo.txt" ) );
     }
 
     public void testForkFromReport()
@@ -83,13 +81,11 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         verifier.resetStreams();
 
         verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.setLogFileName( "log-report.txt" );
 
         verifier.executeGoal( "site" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
-        File logFile = new File( projectDir, "log.txt" );
-        logFile.renameTo( new File( projectDir, "log-report.txt" ) );
     }
 }

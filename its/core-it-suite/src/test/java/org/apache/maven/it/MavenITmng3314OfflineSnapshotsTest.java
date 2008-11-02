@@ -56,22 +56,22 @@ public class MavenITmng3314OfflineSnapshotsTest
             // phase 1: run build in online mode to fill local repo
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
             verifier.deleteArtifacts( "org.apache.maven.its.mng3314" );
+            verifier.setLogFileName( "log1.txt" );
             verifier.executeGoal( "validate" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
-            new File( testDir, "log.txt").renameTo( new File( testDir, "log1.txt" ) );
         }
 
         {
             // phase 2: run build in offline mode to check it still passes
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
             verifier.setCliOptions( Collections.singletonList( "-o" ) );
+            verifier.setLogFileName( "log2.txt" );
             verifier.executeGoal( "validate" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
-            new File( testDir, "log.txt").renameTo( new File( testDir, "log2.txt" ) );
         }
     }
 

@@ -52,20 +52,16 @@ public class MavenITmng3684BuildPluginParameterTest
         verifier.resetStreams();
         
         verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.setLogFileName( "log-validate.txt" );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        File logFile = new File( projectDir, "log.txt" );
-        logFile.renameTo( new File( projectDir, "log-validate.txt" ) );
-        
+        verifier.setLogFileName( "log-site.txt" );
         verifier.executeGoal( "site" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
-        logFile.renameTo( new File( projectDir, "log-site.txt" ) );
-        
     }
 }

@@ -109,12 +109,10 @@ public class MavenITmng3652UserAgentHeaderTest
         cliOptions.add( "-X" );
         verifier.setCliOptions( cliOptions );
 
+        verifier.setLogFileName( "log-unConfiguredHttp.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
-        File logFile = new File( projectDir, "log.txt" );
-        logFile.renameTo( new File( projectDir, "log-unConfiguredHttp.txt" ) );
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
@@ -159,6 +157,7 @@ public class MavenITmng3652UserAgentHeaderTest
         cliOptions.add( "-X" );
         verifier.setCliOptions( cliOptions );
 
+        verifier.setLogFileName( "log-unConfiguredDAV.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -175,9 +174,6 @@ public class MavenITmng3652UserAgentHeaderTest
         String javaVersion = (String) lines.get( 1 );
         String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
         String artifactVersion = (String) lines.get( 4 );
-
-        File logFile = new File( projectDir, "log.txt" );
-        logFile.renameTo( new File( projectDir, "log-unConfiguredDAV.txt" ) );
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
@@ -211,6 +207,7 @@ public class MavenITmng3652UserAgentHeaderTest
         cliOptions.add( "-X" );
         verifier.setCliOptions( cliOptions );
 
+        verifier.setLogFileName( "log-configWithoutUserAgent.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -227,9 +224,6 @@ public class MavenITmng3652UserAgentHeaderTest
         String javaVersion = (String) lines.get( 1 );
         String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
         String artifactVersion = (String) lines.get( 4 );
-
-        File logFile = new File( projectDir, "log.txt" );
-        logFile.renameTo( new File( projectDir, "log-configWithoutUserAgent.txt" ) );
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
@@ -263,12 +257,10 @@ public class MavenITmng3652UserAgentHeaderTest
         cliOptions.add( "-X" );
         verifier.setCliOptions( cliOptions );
 
+        verifier.setLogFileName( "log-configWithUserAgent.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
-        File logFile = new File( projectDir, "log.txt" );
-        logFile.renameTo( new File( projectDir, "log-configWithUserAgent.txt" ) );
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );

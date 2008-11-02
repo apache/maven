@@ -42,11 +42,11 @@ public class MavenIT0069Test
             // phase 1: run build in online mode to fill local repo
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
             verifier.deleteArtifacts( "org.apache.maven.its.it0069" );
+            verifier.setLogFileName( "log1.txt" );
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
-            new File( testDir, "log.txt").renameTo( new File( testDir, "log1.txt" ) );
         }
 
         {
@@ -56,11 +56,11 @@ public class MavenIT0069Test
             List cliOptions = new ArrayList();
             cliOptions.add( "-o" );
             verifier.setCliOptions( cliOptions );
+            verifier.setLogFileName( "log2.txt" );
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
-            new File( testDir, "log.txt").renameTo( new File( testDir, "log2.txt" ) );
         }
 
         {
@@ -70,6 +70,7 @@ public class MavenIT0069Test
             List cliOptions = new ArrayList();
             cliOptions.add( "-o" );
             verifier.setCliOptions( cliOptions );
+            verifier.setLogFileName( "log3.txt" );
             try
             {
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
@@ -80,7 +81,6 @@ public class MavenIT0069Test
                 // expected, should fail
             }
             verifier.resetStreams();
-            new File( testDir, "log.txt").renameTo( new File( testDir, "log3.txt" ) );
         }
     }
 

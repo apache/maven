@@ -166,12 +166,10 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
         
+        verifier.setLogFileName( "logHttp.txt" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
-        File logFile = new File( testDir, "log.txt" );
-        logFile.renameTo( new File( testDir, "logHttp.txt" ) );
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
@@ -217,12 +215,10 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
             verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
             verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
             
+            verifier.setLogFileName( "logDAV.txt" );
             verifier.executeGoal( "compile" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
-
-            File logFile = new File( testDir, "log.txt" );
-            logFile.renameTo( new File( testDir, "logDAV.txt" ) );
 
             verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
             verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",

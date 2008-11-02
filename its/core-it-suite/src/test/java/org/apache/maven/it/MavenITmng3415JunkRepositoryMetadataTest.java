@@ -112,25 +112,21 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         cliOptions.add( settings.getPath() );
 
         verifier.setCliOptions( cliOptions );
+        verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
-        File firstLogFile = new File( testDir, "log-" + methodName + "-firstBuild.txt" );
-        logFile.renameTo( firstLogFile );
 
         assertMetadataMissing( localRepo );
 
         setupDummyDependency( testDir, localRepo, true );
 
+        verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
-        File secondLogFile = new File( testDir, "log-" + methodName + "-secondBuild.txt" );
-        logFile.renameTo( secondLogFile );
 
         assertMetadataMissing( localRepo );
     }
@@ -193,13 +189,13 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         verifier.setCliOptions( cliOptions );
 
+        verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        File firstLogFile = new File( testDir, "log-" + methodName + "-firstBuild.txt" );
-        logFile.renameTo( firstLogFile );
+        File firstLogFile = new File( testDir, verifier.getLogFileName() );
 
         // FIXME: There really should be a better way than this!
         assertOutputLinePresent( verifier, firstLogFile, "snapshot tests:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
@@ -209,13 +205,13 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         setupDummyDependency( testDir, localRepo, false );
 
+        verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        File secondLogFile = new File( testDir, "log-" + methodName + "-secondBuild.txt" );
-        logFile.renameTo( secondLogFile );
+        File secondLogFile = new File( testDir, verifier.getLogFileName() );
 
         // FIXME: There really should be a better way than this!
         assertOutputLineMissing( verifier, secondLogFile, "snapshot tests:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );

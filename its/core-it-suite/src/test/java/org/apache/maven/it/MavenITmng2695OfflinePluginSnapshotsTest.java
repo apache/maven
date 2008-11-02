@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -57,12 +56,12 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng2695" );
             verifier.setAutoclean( false );
+            verifier.setLogFileName( "log1.txt" );
             verifier.executeGoal( "validate" );
             verifier.assertFilePresent( "target/a.txt" );
             verifier.assertFilePresent( "target/b.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
-            new File( testDir, "log.txt").renameTo( new File( testDir, "log1.txt" ) );
         }
 
         {
@@ -71,12 +70,12 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.deleteDirectory( "target" );
             verifier.setAutoclean( false );
             verifier.setCliOptions( Collections.singletonList( "-o" ) );
+            verifier.setLogFileName( "log2.txt" );
             verifier.executeGoal( "validate" );
             verifier.assertFilePresent( "target/a.txt" );
             verifier.assertFilePresent( "target/b.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
-            new File( testDir, "log.txt").renameTo( new File( testDir, "log2.txt" ) );
         }
     }
 

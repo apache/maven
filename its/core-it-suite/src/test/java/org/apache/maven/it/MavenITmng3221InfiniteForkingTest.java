@@ -51,6 +51,7 @@ public class MavenITmng3221InfiniteForkingTest
 
             verifier.deleteArtifact( "org.apache.maven.its.mng3221", "maven-forking-report-plugin", "1", "jar" );
 
+            verifier.setLogFileName( "mng-3221-a-log.txt" );
             verifier.executeGoal( "install" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
@@ -61,6 +62,7 @@ public class MavenITmng3221InfiniteForkingTest
             cliOptions.add( "-Psite" );
             verifier.setCliOptions( cliOptions );
 
+            verifier.setLogFileName( "mng-3221-a-log.txt" );
             verifier.executeGoal( "site" );
             verifier.verifyErrorFreeLog();
         }
@@ -70,11 +72,6 @@ public class MavenITmng3221InfiniteForkingTest
             {
                 verifier.resetStreams();
             }
-
-            File logFile = new File( projectDir, "log.txt" );
-            File logFileBackup = new File( logBackupDir, "mng-3221-a-log.txt" );
-
-            logFile.renameTo( logFileBackup );
         }
    }
 
@@ -95,6 +92,7 @@ public class MavenITmng3221InfiniteForkingTest
 
             verifier.deleteArtifact( "org.apache.maven.its.mng3221", "maven-forking-test-plugin", "1", "jar" );
 
+            verifier.setLogFileName( "mng-3221-b-log.txt" );
             verifier.executeGoal( "install" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
@@ -105,6 +103,7 @@ public class MavenITmng3221InfiniteForkingTest
             cliOptions.add( "-Pplugin" );
             verifier.setCliOptions( cliOptions );
 
+            verifier.setLogFileName( "mng-3221-b-log.txt" );
             verifier.executeGoal( "package" );
             verifier.verifyErrorFreeLog();
         }
@@ -114,11 +113,6 @@ public class MavenITmng3221InfiniteForkingTest
             {
                 verifier.resetStreams();
             }
-
-            File logFile = new File( projectDir, "log.txt" );
-            File logFileBackup = new File( logBackupDir, "mng-3221-b-log.txt" );
-
-            logFile.renameTo( logFileBackup );
         }
     }
 }
