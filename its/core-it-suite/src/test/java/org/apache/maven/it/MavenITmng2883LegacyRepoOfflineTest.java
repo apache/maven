@@ -21,16 +21,9 @@ package org.apache.maven.it;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.it.util.StringUtils;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -69,7 +62,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        File settings = writeSettings( testDir );
+        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
+                                             verifier.newDefaultFilterProperties() );
         List cliOptions = new ArrayList();
 
         // used to inject the remote repository
@@ -167,7 +161,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         List cliOptions = new ArrayList();
 
-        File settings = writeSettings( testDir );
+        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
+                                             verifier.newDefaultFilterProperties() );
 
         // used to inject the remote repository
         cliOptions.add( "-s" );
@@ -267,7 +262,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         List cliOptions = new ArrayList();
 
-        File settings = writeSettings( testDir );
+        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
+                                             verifier.newDefaultFilterProperties() );
 
         // used to inject the remote repository
         cliOptions.add( "-s" );
@@ -340,50 +336,6 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
             fail( buffer.toString() );
         }
-    }
-
-    private File writeSettings( File testDir )
-        throws IOException
-    {
-        File settingsIn = new File( testDir.getParentFile(), "settings-template.xml" );
-
-        String settingsContent = null;
-        Reader reader = null;
-        try
-        {
-            reader = new FileReader( settingsIn );
-            settingsContent = IOUtil.toString( reader );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        settingsContent = StringUtils.replace( settingsContent,
-                                               "@TESTDIR@",
-                                               testDir.getAbsolutePath() );
-
-        File settingsOut = new File( testDir, "settings.xml" );
-
-        System.out.println( "Writing tets settings to: " + settingsOut );
-
-        if ( settingsOut.exists() )
-        {
-            settingsOut.delete();
-        }
-
-        Writer writer = null;
-        try
-        {
-            writer = new FileWriter( settingsOut );
-            IOUtil.copy( settingsContent, writer );
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
-
-        return settingsOut;
     }
 
 }

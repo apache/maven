@@ -20,16 +20,9 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.it.util.StringUtils;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +45,6 @@ public class MavenITmng3482DependencyPomInterpolationTest
         // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3482" );
 
-        File settings = writeSettings( testDir );
-
         Verifier verifier;
 
         /*
@@ -64,6 +55,9 @@ public class MavenITmng3482DependencyPomInterpolationTest
          * makes it easy to do this.
          */
         verifier = new Verifier( testDir.getAbsolutePath() );
+
+        File settings = verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
+                                             verifier.newDefaultFilterProperties() );
 
         verifier.deleteArtifact( "org.apache.maven.its.mng3482", "mng-3482", "1", "pom" );
         verifier.deleteArtifact( "org.apache.maven.its.mng3482", "mng-3482", "1", "jar" );
@@ -106,46 +100,4 @@ public class MavenITmng3482DependencyPomInterpolationTest
         verifier.resetStreams();
     }
 
-    private File writeSettings( File testDir )
-        throws IOException
-    {
-        File settingsIn = new File( testDir, "settings-template.xml" );
-
-        String settingsContent = null;
-        Reader reader = null;
-        try
-        {
-            reader = new FileReader( settingsIn );
-            settingsContent = IOUtil.toString( reader );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        settingsContent = StringUtils.replace( settingsContent,
-                                               "@TESTDIR@",
-                                               testDir.getAbsolutePath() );
-
-        File settingsOut = File.createTempFile( "settings.", ".xml" );
-        settingsOut.deleteOnExit();
-
-        if ( settingsOut.exists() )
-        {
-            settingsOut.delete();
-        }
-
-        Writer writer = null;
-        try
-        {
-            writer = new FileWriter( settingsOut );
-            IOUtil.copy( settingsContent, writer );
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
-
-        return settingsOut;
-    }
 }
