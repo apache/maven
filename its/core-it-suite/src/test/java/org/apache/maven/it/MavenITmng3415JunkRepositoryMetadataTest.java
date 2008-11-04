@@ -22,19 +22,14 @@ package org.apache.maven.it;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
-import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.it.util.StringUtils;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * This is a sample integration test. The IT tests typically
@@ -95,9 +90,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         File logFile = new File( projectDir, "log.txt" );
 
-        String proto = "invalid";
-
-        File settings = writeSettings( proto, testDir );
         File localRepo = findLocalRepoDirectory();
 
         setupDummyDependency( testDir, localRepo, true );
@@ -105,6 +97,10 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         Verifier verifier;
 
         verifier = new Verifier( projectDir.getAbsolutePath() );
+
+        Properties filterProps = verifier.newDefaultFilterProperties();
+        filterProps.put( "@baseurl@", "invalid" + filterProps.getProperty( "@baseurl@" ).substring( "file".length() ) );
+        File settings = verifier.filterFile( "../settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-X" );
@@ -173,7 +169,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         File logFile = new File( projectDir, "log.txt" );
 
-        File settings = writeSettings( "file", testDir );
         File localRepo = findLocalRepoDirectory();
 
         setupDummyDependency( testDir, localRepo, true );
@@ -181,6 +176,9 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         Verifier verifier;
 
         verifier = new Verifier( projectDir.getAbsolutePath() );
+
+        Properties filterProps = verifier.newDefaultFilterProperties();
+        File settings = verifier.filterFile( "../settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-X" );
@@ -325,52 +323,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         System.out.println( "Using local repository at: " + localRepo );
 
         return localRepo;
-    }
-
-    private File writeSettings( String repositoryProtocol,
-                                File testDir )
-        throws IOException
-    {
-        File settingsIn = new File( testDir, "settings-template.xml" );
-
-        String settingsContent = null;
-        Reader reader = null;
-        try
-        {
-            reader = new FileReader( settingsIn );
-            settingsContent = IOUtil.toString( reader );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        settingsContent = StringUtils.replace( settingsContent, "@PROTO@", repositoryProtocol );
-        settingsContent = StringUtils.replace( settingsContent,
-                                               "@TESTDIR@",
-                                               testDir.getAbsolutePath() );
-
-        File settingsOut = new File( testDir, "settings.xml" );
-
-        System.out.println( "Writing tets settings to: " + settingsOut );
-
-        if ( settingsOut.exists() )
-        {
-            settingsOut.delete();
-        }
-
-        Writer writer = null;
-        try
-        {
-            writer = new FileWriter( settingsOut );
-            IOUtil.copy( settingsContent, writer );
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
-
-        return settingsOut;
     }
 
     private void assertOutputLinePresent( Verifier verifier,
