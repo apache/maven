@@ -167,8 +167,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_BASE );
         File projectDir = new File( testDir, "project" );
 
-        File logFile = new File( projectDir, "log.txt" );
-
         File localRepo = findLocalRepoDirectory();
 
         setupDummyDependency( testDir, localRepo, true );
@@ -193,7 +191,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        File firstLogFile = new File( testDir, verifier.getLogFileName() );
+        File firstLogFile = new File( projectDir, verifier.getLogFileName() );
 
         // FIXME: There really should be a better way than this!
         assertOutputLinePresent( verifier, firstLogFile, "snapshot tests:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
@@ -209,7 +207,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        File secondLogFile = new File( testDir, verifier.getLogFileName() );
+        File secondLogFile = new File( projectDir, verifier.getLogFileName() );
 
         // FIXME: There really should be a better way than this!
         assertOutputLineMissing( verifier, secondLogFile, "snapshot tests:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
