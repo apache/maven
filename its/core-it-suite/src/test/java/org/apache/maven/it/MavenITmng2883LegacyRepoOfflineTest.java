@@ -80,6 +80,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         // execute once just to make sure this test works at all!
         try
         {
+            verifier.setLogFileName( "log-parent-a.txt" );
             // this will ensure that all relevant plugins are present.
             verifier.executeGoal( "initialize" );
         }
@@ -99,6 +100,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         try
         {
+            verifier.setLogFileName( "log-parent-b.txt" );
             verifier.executeGoal( "initialize" );
 
             fail( "Build should fail with unresolvable parent POM." );
@@ -111,7 +113,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         missingMessages.add( "System is offline." );
         missingMessages.add( "org.apache.maven.its.mng2883:parent:pom:1.0-SNAPSHOT" );
 
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 
         for ( Iterator it = lines.iterator(); it.hasNext(); )
         {
@@ -172,6 +174,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         // execute once just to make sure this test works at all!
         try
         {
+            verifier.setLogFileName( "log-dep-a.txt" );
             // this will ensure that all relevant plugins are present.
             verifier.executeGoal( "compile" );
         }
@@ -191,6 +194,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         try
         {
+            verifier.setLogFileName( "log-dep-b.txt" );
             verifier.executeGoal( "compile" );
 
             fail( "Build should fail with unresolvable dependency artifact." );
@@ -205,7 +209,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         missingMessages.add( "offline mode." );
         missingMessages.add( "org.apache.maven.its.mng2883:dep:jar:1.0-SNAPSHOT" );
 
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 
         for ( Iterator it = lines.iterator(); it.hasNext(); )
         {
@@ -272,6 +276,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         try
         {
+            verifier.setLogFileName( "log-plugin-a.txt" );
             verifier.executeGoal( "org.apache.maven.its.mng2883:plugin:1.0-SNAPSHOT:run" );
 
             fail( "Build should fail with unresolvable plugin artifact." );
@@ -284,7 +289,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         missingMessages.add( "System is offline." );
         missingMessages.add( "org.apache.maven.its.mng2883:plugin:pom:1.0-SNAPSHOT" );
 
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 
         for ( Iterator it = lines.iterator(); it.hasNext(); )
         {
