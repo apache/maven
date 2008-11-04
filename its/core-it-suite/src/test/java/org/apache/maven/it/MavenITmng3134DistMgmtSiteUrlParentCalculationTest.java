@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3134">MNG-3134</a>.
@@ -47,10 +48,14 @@ public class MavenITmng3134DistMgmtSiteUrlParentCalculationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3134" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "integration-test" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "sub1/target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties props = verifier.loadProperties( "sub1/target/site.properties" );
+        assertEquals( "scp://host/path/sub1", props.getProperty( "project.distributionManagement.site.url" ) );
     }
-}
 
+}
