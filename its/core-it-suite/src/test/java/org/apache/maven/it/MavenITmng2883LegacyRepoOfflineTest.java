@@ -51,22 +51,23 @@ import java.util.List;
 public class MavenITmng2883LegacyRepoOfflineTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng2883LegacyRepoOfflineTest()
     {
-        super( "(2.0.4,)" );
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" );
     }
 
     public void testParentUnresolvable()
         throws Exception
     {
         String testName = "parent";
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2883/"
-                                                                                 + testName );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883/" + testName );
 
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         File settings = writeSettings( testDir );
         List cliOptions = new ArrayList();
@@ -93,14 +94,17 @@ public class MavenITmng2883LegacyRepoOfflineTest
         cliOptions.add( "-o" );
 
         verifier.setCliOptions( cliOptions );
-        verifier.setAutoclean( false );
+
+        // re-run in offline mode, should still succeed by using local repo
+        verifier.setLogFileName( "log-parent-b.txt" );
+        verifier.executeGoal( "initialize" );
 
         // clear out the parent POM if it's in the local repository.
         verifier.deleteArtifact( "org.apache.maven.its.mng2883", "parent", "1.0-SNAPSHOT", "pom" );
 
         try
         {
-            verifier.setLogFileName( "log-parent-b.txt" );
+            verifier.setLogFileName( "log-parent-c.txt" );
             verifier.executeGoal( "initialize" );
 
             fail( "Build should fail with unresolvable parent POM." );
@@ -153,13 +157,13 @@ public class MavenITmng2883LegacyRepoOfflineTest
         throws Exception
     {
         String testName = "dependency";
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2883/"
-                                                                                 + testName );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883/" + testName );
 
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
 
@@ -188,13 +192,17 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         verifier.setCliOptions( cliOptions );
 
+        // re-run in offline mode, should still succeed by using local repo
+        verifier.setLogFileName( "log-dep-b.txt" );
+        verifier.executeGoal( "compile" );
+
         // clear out the dependency if it's in the local repository.
         verifier.deleteArtifact( "org.apache.maven.its.mng2883", "dep", "1.0-SNAPSHOT", "pom" );
         verifier.deleteArtifact( "org.apache.maven.its.mng2883", "dep", "1.0-SNAPSHOT", "jar" );
 
         try
         {
-            verifier.setLogFileName( "log-dep-b.txt" );
+            verifier.setLogFileName( "log-dep-c.txt" );
             verifier.executeGoal( "compile" );
 
             fail( "Build should fail with unresolvable dependency artifact." );
@@ -249,18 +257,15 @@ public class MavenITmng2883LegacyRepoOfflineTest
         throws Exception
     {
         String testName = "plugin";
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2883/"
-                                                                                 + testName );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883/" + testName );
 
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
-
-        // the centerpiece of these tests!
-        cliOptions.add( "-o" );
 
         File settings = writeSettings( testDir );
 
@@ -269,6 +274,18 @@ public class MavenITmng2883LegacyRepoOfflineTest
         cliOptions.add( settings.getAbsolutePath() );
 
         verifier.setCliOptions( cliOptions );
+
+        verifier.setLogFileName( "log-plugin-a.txt" );
+        verifier.executeGoal( "org.apache.maven.its.mng2883:plugin:1.0-SNAPSHOT:run" );
+
+        // the centerpiece of these tests!
+        cliOptions.add( "-o" );
+
+        verifier.setCliOptions( cliOptions );
+
+        // re-run in offline mode, should still succeed by using local repo
+        verifier.setLogFileName( "log-plugin-b.txt" );
+        verifier.executeGoal( "org.apache.maven.its.mng2883:plugin:1.0-SNAPSHOT:run" );
 
         // clear out the dependency if it's in the local repository.
         verifier.deleteArtifact( "org.apache.maven.its.mng2883", "plugin", "1.0-SNAPSHOT", "pom" );
