@@ -34,6 +34,11 @@ public class MavenITmng3134DistMgmtSiteUrlParentCalculationTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng3134DistMgmtSiteUrlParentCalculationTest()
+    {
+        super( "(2.0.7,)" );
+    }
+
     /**
      * Test DistributionManagement Site-URL calculation when modules are in sibling dirs of parent.
      */
