@@ -194,7 +194,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         File firstLogFile = new File( projectDir, verifier.getLogFileName() );
 
         // FIXME: There really should be a better way than this!
-        assertOutputLinePresent( verifier, firstLogFile, "snapshot tests:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
+        assertOutputLinePresent( verifier, firstLogFile, "snapshot org.apache.maven.its.mng3415:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
 
         File updateCheckFile = getUpdateCheckFile( localRepo );
         long firstLastMod = updateCheckFile.lastModified();
@@ -210,7 +210,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         File secondLogFile = new File( projectDir, verifier.getLogFileName() );
 
         // FIXME: There really should be a better way than this!
-        assertOutputLineMissing( verifier, secondLogFile, "snapshot tests:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
+        assertOutputLineMissing( verifier, secondLogFile, "snapshot org.apache.maven.its.mng3415:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
 
         assertEquals( "Last-modified time should be unchanged from first build through second build for the file we use for updateInterval checks.", firstLastMod, updateCheckFile.lastModified() );
     }
@@ -264,7 +264,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
     private File getMetadataFile( File localRepo )
     {
-        File dir = new File( localRepo, "tests/missing/1.0-SNAPSHOT" );
+        File dir = new File( localRepo, "org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT" );
 
         dir.mkdirs();
 
@@ -277,7 +277,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      */
     private File getUpdateCheckFile( File localRepo )
     {
-        File dir = new File( localRepo, "tests/missing/1.0-SNAPSHOT" );
+        File dir = new File( localRepo, "org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT" );
 
         dir.mkdirs();
 
@@ -301,14 +301,14 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
-        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-find-local-repo-plugin", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-find-local-repo-plugin", "1.0-SNAPSHOT", "jar" );
 
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.executeGoal( "find-local-repo:find" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-find-local-repo-plugin:1.0-SNAPSHOT:find" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
