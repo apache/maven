@@ -17,14 +17,14 @@
     <repository>
       <id>example-repo</id>
       <name>Example Repo</name>
-      <url>file://@testDir@/target/repo</url>
+      <url>@baseurl@/target/repo</url>
     </repository>
   </repositories>
   <distributionManagement>
     <repository>
       <id>example2-repo</id>
       <name>Example Repo</name>
-      <url>file://@testDir@/target/repo2</url>
+      <url>@baseurl@/target/repo2</url>
     </repository>
   </distributionManagement>
 </project>

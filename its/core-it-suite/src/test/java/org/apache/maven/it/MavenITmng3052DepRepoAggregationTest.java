@@ -21,16 +21,12 @@ package org.apache.maven.it;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;
-import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.it.util.StringUtils;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3052">MNG-3052</a>.
@@ -57,9 +53,7 @@ public class MavenITmng3052DepRepoAggregationTest
     public void testitMNG3052 ()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3052" )
-                                        .getCanonicalFile();
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3052" ).getCanonicalFile();
 
         File foo = new File( testDir, "foo" );
         File bar = new File( testDir, "bar" );
@@ -74,14 +68,15 @@ public class MavenITmng3052DepRepoAggregationTest
         // commands below substitute the current testDir location into the
         // repository declarations, to make them absolute file references on the
         // local filesystem.
-        rewritePom( new File( foo, "pom.xml" ), testDir );
-        rewritePom( new File( bar, "pom.xml" ), testDir );
-        rewritePom( new File( wombat, "pom.xml" ), testDir );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Properties filterProps = verifier.newDefaultFilterProperties();
+        verifier.filterFile( "foo/pom.xml", "foo/pom.xml", "UTF-8", filterProps );
+        verifier.filterFile( "bar/pom.xml", "bar/pom.xml", "UTF-8", filterProps );
+        verifier.filterFile( "wombat/pom.xml", "wombat/pom.xml", "UTF-8", filterProps );
+        verifier.resetStreams();
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-X" );
-
-        Verifier verifier;
 
         // First, build the two levels of dependencies that will be resolved.
 
@@ -120,33 +115,4 @@ public class MavenITmng3052DepRepoAggregationTest
         verifier.resetStreams();
     }
 
-    private void rewritePom( File pomFile,
-                             File testDir )
-        throws IOException
-    {
-        FileReader reader = null;
-        String pomContent = null;
-        try
-        {
-            reader = new FileReader( pomFile );
-            pomContent = IOUtil.toString( reader );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        pomContent = StringUtils.replace( pomContent, "@testDir@", testDir.getAbsolutePath() );
-
-        FileWriter writer = null;
-        try
-        {
-            writer = new FileWriter( pomFile );
-            writer.write( pomContent );
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
-    }
 }
