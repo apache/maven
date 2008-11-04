@@ -59,11 +59,7 @@ public class MavenITmng3482DependencyPomInterpolationTest
         File settings = verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
                                              verifier.newDefaultFilterProperties() );
 
-        verifier.deleteArtifact( "org.apache.maven.its.mng3482", "mng-3482", "1", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3482", "mng-3482", "1", "jar" );
-        verifier.deleteArtifact( "test", "dep", "1", "pom" );
-        verifier.deleteArtifact( "test", "dep2", "1", "pom" );
-        verifier.deleteArtifact( "test", "dep2", "1", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3482" );
 
         /*
          * The Command Line Options (CLI) are passed to the

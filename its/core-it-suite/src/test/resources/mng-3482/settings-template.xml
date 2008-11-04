@@ -27,12 +27,18 @@ under the License.
         <repository>
           <id>testing-repo</id>
           <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
         </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
           <id>testing-repo</id>
           <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
         </pluginRepository>
       </pluginRepositories>
     </profile>
