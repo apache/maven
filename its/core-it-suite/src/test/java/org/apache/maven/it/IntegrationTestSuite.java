@@ -73,7 +73,6 @@ public class IntegrationTestSuite
 /* Tests to be added
 MavenIT0109ReleaseUpdateTest
 MavenITmng0612NewestConflictResolverTest
-MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
 */
 
@@ -114,6 +113,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3475BaseAlignedDirTest.class );
         suite.addTestSuite( MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
+        suite.addTestSuite( MavenITmng3415JunkRepositoryMetadataTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRangesTest.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
         suite.addTestSuite( MavenITmng3380ManagedRelocatedTransdepsTest.class );
