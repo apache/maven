@@ -39,6 +39,7 @@ public class MavenITmng3391ImportScopeErrorScenariosTest
                                                                  "/mng-3391/depMgmt-importPom-noParentCycle" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setLogFileName( "log-a.txt" );
 
         verifier.deleteArtifact( "org.apache.maven.its.mng3391.2", "dm-pom", "1", "pom" );
 
