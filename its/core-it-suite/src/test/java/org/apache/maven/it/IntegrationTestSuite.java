@@ -73,7 +73,6 @@ public class IntegrationTestSuite
 /* Tests to be added
 MavenIT0109ReleaseUpdateTest
 MavenITmng0612NewestConflictResolverTest
-MavenITmng2883LegacyRepoOfflineTest
 MavenITmng3259DepsDroppedInMultiModuleBuildTest
 MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
@@ -137,6 +136,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng2926PluginPrefixOrderTest.class );
         suite.addTestSuite( MavenITmng2921ActiveAttachedArtifactsTest.class );
         suite.addTestSuite( MavenITmng2892HideCorePlexusUtilsTest.class );
+        suite.addTestSuite( MavenITmng2883LegacyRepoOfflineTest.class );
         suite.addTestSuite( MavenITmng2878DefaultReportXmlImportTest.class );
         suite.addTestSuite( MavenITmng2871PrePackageSubartifactResolutionTest.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRangesTest.class );
