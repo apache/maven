@@ -69,12 +69,24 @@ public class IntegrationTestSuite
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
          * a fail fast technique as well.
          */
-        
-/* Tests to be added
-MavenIT0109ReleaseUpdateTest
-MavenITmng0612NewestConflictResolverTest
-MavenITmng3645POMSyntaxErrorTest
-*/
+
+        // -------------------------------------------------------------------------------------------------------------
+        // Tests that currently don't pass for any Maven version, i.e. the corresponding issue hasn't been resolved yet
+        // -------------------------------------------------------------------------------------------------------------
+        // suite.addTestSuite( MavenITmng3814BogusProjectCycleTest.class );
+        // suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
+        // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
+        // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
+        // suite.addTestSuite( MavenITmng3023ReactorDependencyResolutionTest.class );
+        // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
+        // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
+        // suite.addTestSuite( MavenITmng0612NewestConflictResolverTest.class );
+
+        // -------------------------------------------------------------------------------------------------------------
+        // Tests that don't run stable and need to be fixed
+        // -------------------------------------------------------------------------------------------------------------
+        // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
+        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
         suite.addTestSuite( MavenITmng3813PluginClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
@@ -274,20 +286,6 @@ MavenITmng3645POMSyntaxErrorTest
         /*
          * Add tests in reverse alpha order above.
          */
-
-        // ----------------------------------------------------------------------------------------------------
-        // Tests that need to be fixed.
-        // ----------------------------------------------------------------------------------------------------
-
-        // Pending resolution in code
-        // suite.addTestSuite( MavenITmng3814BogusProjectCycleTest.class );
-        // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
-
-        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
-        // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class ); -- MNG-3038
-        // suite.addTestSuite( MavenITmng3023ReactorDependencyResolutionTest.class ); -- MNG-3023
-        // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class ); -- MNG-2994
-        // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class ); -- MNG-2771
 
         return suite;
     }
