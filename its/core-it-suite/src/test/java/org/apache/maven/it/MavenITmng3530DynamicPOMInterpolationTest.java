@@ -40,7 +40,7 @@ public class MavenITmng3530DynamicPOMInterpolationTest
 
     public MavenITmng3530DynamicPOMInterpolationTest()
     {
-        super( "(2.0.9,)" ); // only test in 2.0.9+
+        super( "[2.1.0-M1,)" );
     }
 
     public void testitMNG3530_BuildPath()

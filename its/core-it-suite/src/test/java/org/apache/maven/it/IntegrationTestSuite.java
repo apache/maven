@@ -109,6 +109,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3545ProfileDeactivationTest.class );
         suite.addTestSuite( MavenITmng3536AppendedAbsolutePathsTest.class );
         suite.addTestSuite( MavenITmng3535SelfReferentialPropertiesTest.class );
+        suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
         suite.addTestSuite( MavenITmng3503Xpp3ShadingTest.class );
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
@@ -281,7 +282,6 @@ MavenITmng3645POMSyntaxErrorTest
         // Pending resolution in code
         // suite.addTestSuite( MavenITmng3814BogusProjectCycleTest.class );
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
-        // suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
 
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
         // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class ); -- MNG-3038
