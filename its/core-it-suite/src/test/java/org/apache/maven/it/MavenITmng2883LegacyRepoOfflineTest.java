@@ -328,7 +328,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
     private File writeSettings( File testDir )
         throws IOException
     {
-        File settingsIn = new File( testDir.getParentFile(), "settings.xml.in" );
+        File settingsIn = new File( testDir.getParentFile(), "settings-template.xml" );
 
         String settingsContent = null;
         Reader reader = null;

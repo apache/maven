@@ -331,7 +331,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
                                 File testDir )
         throws IOException
     {
-        File settingsIn = new File( testDir, "settings.xml.in" );
+        File settingsIn = new File( testDir, "settings-template.xml" );
 
         String settingsContent = null;
         Reader reader = null;
