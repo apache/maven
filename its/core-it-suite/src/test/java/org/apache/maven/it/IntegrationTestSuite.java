@@ -73,7 +73,6 @@ public class IntegrationTestSuite
 /* Tests to be added
 MavenIT0109ReleaseUpdateTest
 MavenITmng0612NewestConflictResolverTest
-MavenITmng3259DepsDroppedInMultiModuleBuildTest
 MavenITmng3415JunkRepositoryMetadataTest
 MavenITmng3645POMSyntaxErrorTest
 */
@@ -126,6 +125,7 @@ MavenITmng3645POMSyntaxErrorTest
         suite.addTestSuite( MavenITmng3271DefaultReportsSuppressionTest.class );
         suite.addTestSuite( MavenITmng3221InfiniteForkingTest.class );
         suite.addTestSuite( MavenITmng3268MultipleDashPCommandLineTest.class );
+        suite.addTestSuite( MavenITmng3259DepsDroppedInMultiModuleBuildTest.class );
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
         suite.addTestSuite( MavenITmng3134DistMgmtSiteUrlParentCalculationTest.class );
         suite.addTestSuite( MavenITmng3106ProfileMultipleActivatorsTest.class );
