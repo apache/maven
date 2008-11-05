@@ -252,6 +252,7 @@ public final class PomClassicTransformer
 
         List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
         List<String> projectNames = new ArrayList<String>();
+        StringBuffer siteUrl = new StringBuffer();
         StringBuffer scmUrl = new StringBuffer();
         StringBuffer scmConnectionUrl = new StringBuffer();
         StringBuffer scmDeveloperUrl = new StringBuffer();
@@ -371,6 +372,20 @@ public final class PomClassicTransformer
                 }
                 tmp.removeAll( removeProperties );
             }
+
+            //Site Rule
+            ModelProperty siteUrlProperty = getPropertyFor( ProjectUri.DistributionManagement.Site.url, tmp );
+            if ( siteUrl.length() == 0 && siteUrlProperty != null )
+            {
+                siteUrl.append( siteUrlProperty.getResolvedValue().substring(0, siteUrlProperty.getResolvedValue().lastIndexOf("/")) );
+                for ( String projectName : projectNames )
+                {
+                    siteUrl.append( "/" ).append( projectName );
+                }
+                int index = tmp.indexOf( siteUrlProperty );
+                tmp.remove( index );
+                tmp.add( index, new ModelProperty( ProjectUri.DistributionManagement.Site.url, siteUrl.toString() ) );
+            }            
 
             //SCM Rule
             ModelProperty scmUrlProperty = getPropertyFor( ProjectUri.Scm.url, tmp );
