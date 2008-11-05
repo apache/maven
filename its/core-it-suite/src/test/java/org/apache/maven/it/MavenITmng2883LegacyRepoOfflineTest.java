@@ -289,7 +289,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         try
         {
-            verifier.setLogFileName( "log-plugin-a.txt" );
+            verifier.setLogFileName( "log-plugin-c.txt" );
             verifier.executeGoal( "org.apache.maven.its.mng2883:plugin:1.0-SNAPSHOT:run" );
 
             fail( "Build should fail with unresolvable plugin artifact." );
@@ -300,7 +300,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         List missingMessages = new ArrayList();
         missingMessages.add( "System is offline." );
-        missingMessages.add( "org.apache.maven.its.mng2883:plugin:pom:1.0-SNAPSHOT" );
+        missingMessages.add( "org.apache.maven.its.mng2883:plugin" );
 
         List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 
