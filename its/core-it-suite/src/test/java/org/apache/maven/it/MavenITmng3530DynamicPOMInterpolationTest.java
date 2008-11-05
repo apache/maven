@@ -39,8 +39,8 @@ public class MavenITmng3530DynamicPOMInterpolationTest
     private static final String BASEDIR = "/mng-3530/";
 
     public MavenITmng3530DynamicPOMInterpolationTest()
-    {
-        super( "[2.1.0-M1,)" );
+    {   //Dynamic properties for forked lifecycles not supported in 3.0
+        super( "[2.1.0-M1,2.999)" );
     }
 
     public void testitMNG3530_BuildPath()
