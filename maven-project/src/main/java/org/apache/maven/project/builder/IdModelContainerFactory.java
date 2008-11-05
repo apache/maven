@@ -36,8 +36,7 @@ public class IdModelContainerFactory
 
     private static final Collection<String> uris = Collections.unmodifiableList( Arrays.asList(
         ProjectUri.PluginRepositories.PluginRepository.xUri, ProjectUri.Repositories.Repository.xUri,
-        ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri, ProjectUri.Profiles.Profile.xUri,
-        ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri ) );
+        ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri, ProjectUri.Profiles.Profile.xUri) );
 
     public Collection<String> getUris()
     {

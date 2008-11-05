@@ -46,14 +46,12 @@ public final class PomClassicTransformer
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.configuration,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
-                                                                          ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
 
                                                                           ProjectUri.Build.Plugins.xUri,
                                                                           ProjectUri.Build.Plugins.Plugin.configuration,
                                                                           ProjectUri.Reporting.Plugins.xUri,
                                                                           ProjectUri.Reporting.Plugins.Plugin.configuration,
                                                                           ProjectUri.Build.Plugins.Plugin.Dependencies.xUri,
-                                                                          ProjectUri.Build.Plugins.Plugin.Executions.xUri,
                                                                           ProjectUri.Build.Resources.xUri,
                                                                           ProjectUri.Build.Resources.Resource.includes,
                                                                           ProjectUri.Build.Resources.Resource.excludes,
@@ -202,7 +200,7 @@ public final class PomClassicTransformer
         {
             ModelDataSource executionSource = new DefaultModelDataSource();
             executionSource.init( pluginContainer.getProperties(),
-                                  Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+                                  Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
             List<ModelContainer> executionContainers =
                 executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
             if ( executionContainers.size() < 2 )
@@ -318,7 +316,7 @@ public final class PomClassicTransformer
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
                 ModelDataSource source = new DefaultModelDataSource();
-                source.init( tmp, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+                source.init( tmp, Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
                 List<ModelContainer> containers =
                     source.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
                 for ( ModelContainer container : containers )
