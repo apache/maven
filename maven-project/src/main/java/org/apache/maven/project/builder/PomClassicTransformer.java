@@ -372,19 +372,22 @@ public final class PomClassicTransformer
             }
 
             //Site Rule
+
             ModelProperty siteUrlProperty = getPropertyFor( ProjectUri.DistributionManagement.Site.url, tmp );
             if ( siteUrl.length() == 0 && siteUrlProperty != null )
             {
-                siteUrl.append( siteUrlProperty.getResolvedValue().substring(0, siteUrlProperty.getResolvedValue().lastIndexOf("/")) );
-                for ( String projectName : projectNames )
-                {
-                    siteUrl.append( "/" ).append( projectName );
+                if(!siteUrlProperty.getResolvedValue().endsWith("}")) {
+                    siteUrl.append( siteUrlProperty.getResolvedValue().substring(0, siteUrlProperty.getResolvedValue().lastIndexOf("/")) );
                 }
-                int index = tmp.indexOf( siteUrlProperty );
-                tmp.remove( index );
-                tmp.add( index, new ModelProperty( ProjectUri.DistributionManagement.Site.url, siteUrl.toString() ) );
+                    for ( String projectName : projectNames )
+                    {
+                        siteUrl.append( "/" ).append( projectName );
+                    }
+                    int index = tmp.indexOf( siteUrlProperty );
+                    tmp.remove( index );
+                    tmp.add( index, new ModelProperty( ProjectUri.DistributionManagement.Site.url, siteUrl.toString() ) );
             }            
-
+  //If DistributionManagement site URL is property,
             //SCM Rule
             ModelProperty scmUrlProperty = getPropertyFor( ProjectUri.Scm.url, tmp );
             if ( scmUrl.length() == 0 && scmUrlProperty != null )
