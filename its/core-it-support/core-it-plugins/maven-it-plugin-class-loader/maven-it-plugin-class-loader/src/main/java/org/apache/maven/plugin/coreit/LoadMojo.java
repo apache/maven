@@ -146,7 +146,10 @@ public class LoadMojo
                     getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded class from " + type.getClassLoader() );
                     try
                     {
-                        type = childClassLoader.loadClass( name );
+                        if ( !type.equals( childClassLoader.loadClass( name ) ) )
+                        {
+                            throw new ClassNotFoundException( name );
+                        }
                     }
                     catch ( ClassNotFoundException cnfe )
                     {
