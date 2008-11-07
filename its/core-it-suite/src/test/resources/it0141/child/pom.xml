@@ -60,6 +60,11 @@ under the License.
       <name>child-dist-repo</name>
       <url>http://dist.org/</url>
     </repository>
+    <site>
+      <id>maven-core-it</id>
+      <name>child-site</name>
+      <url>http://site.org/</url>
+    </site>
   </distributionManagement>
 
   <properties>
@@ -79,6 +84,7 @@ under the License.
     <projectIssueUrl>${issueManagement.url}</projectIssueUrl>
     <projectCiUrl>${ciManagement.url}</projectCiUrl>
     <projectDistRepoName>${distributionManagement.repository.name}</projectDistRepoName>
+    <projectDistSiteUrl>${distributionManagement.site.url}</projectDistSiteUrl>
     <projectBuildOut>${build.outputDirectory}</projectBuildOut>
     <projectSiteOut>${reporting.outputDirectory}</projectSiteOut>
     <parentGroupId>${parent.groupId}</parentGroupId>
