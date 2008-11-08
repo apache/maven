@@ -42,24 +42,50 @@ public class MavenITmng0469ReportConfigTest
     /**
      * Test that <reporting> configuration also affects build plugins unless <build> configuration is also given.
      */
-    public void testitMNG0469()
+    public void testitReportConfigOverridesBuildDefaults()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469/test0" );
 
-        Verifier verifier = new Verifier( new File( testDir, "test0" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
         verifier.assertFilePresent( "target/reporting.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+    }
 
-        verifier = new Verifier( new File( testDir, "test1" ).getAbsolutePath() );
+    /**
+     * Test that <build> configuration dominates <reporting> configuration for build goals.
+     */
+    public void testitBuildConfigDominantDuringBuild()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469/test1" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
         verifier.assertFilePresent( "target/build.txt" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    /**
+     * Test that <build> configuration does not affect report goals.
+     */
+    public void testitBuildConfigIrrelevantForReports()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469/test2" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteDirectory( "target" );
+        verifier.setAutoclean( false );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-site:2.1-SNAPSHOT:generate" );
+        verifier.assertFilePresent( "target/site/info.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
