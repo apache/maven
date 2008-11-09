@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 public class MavenIT0104Test
     extends AbstractMavenIntegrationTestCase
@@ -36,10 +37,22 @@ public class MavenIT0104Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0104" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "test" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        assertEquals( new File( testDir, "target" ), new File( props.getProperty( "stringParam" ) ) );
+        assertEquals( "4.0.0", props.getProperty( "domParam.children.modelVersion.0.value" ) );
+        assertEquals( "org.apache.maven.its.it0104", props.getProperty( "domParam.children.groupId.0.value" ) );
+        assertEquals( "1.0-SNAPSHOT", props.getProperty( "domParam.children.version.0.value" ) );
+        assertEquals( "jar", props.getProperty( "domParam.children.packaging.0.value" ) );
+        assertEquals( "http://maven.apache.org", props.getProperty( "domParam.children.url.0.value" ) );
+        assertEquals( "Apache", props.getProperty( "domParam.children.organization.0.children.name.0.value" ) );
+        assertEquals( new File( testDir, "target" ), new File( props.getProperty( "domParam.children.build.0.children.directory.0.value" ) ) );
+        assertEquals( new File( testDir, "target/classes" ), new File( props.getProperty( "domParam.children.build.0.children.outputDirectory.0.value" ) ) );
     }
-}
 
+}
