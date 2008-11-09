@@ -30,17 +30,17 @@ import java.util.Properties;
  * 
  * @version $Id$
  */
-public class MavenIT0104Test
+public class MavenITmng2201PluginConfigInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
      * Verify that plugin configurations are correctly interpolated
      */
-    public void testit0104()
+    public void testitMNG2201()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0104" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2201" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );

@@ -23,30 +23,27 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * #it0107 requires a snapshot version of maven-plugin-plugin, which indicates it doesn't belong here
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2318">MNG-2318</a>.
+ * 
+ * @version $Id$
  */
-public class MavenIT0107Test
+public class MavenITmng2318LocalParentResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
+
     /**
-     * Verify that default implementation of an implementation for a complex object works as
-     * expected [MNG-2293]
+     * When a project has modules and its parent is not preinstalled [MNG-2318]
      */
-    public void testit0107()
+    public void testitMNG2318()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0107" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2318" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "validate" );
+        verifier.executeGoal( "clean" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
