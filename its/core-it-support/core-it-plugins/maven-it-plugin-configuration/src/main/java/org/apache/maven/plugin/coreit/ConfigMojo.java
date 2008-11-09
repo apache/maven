@@ -351,7 +351,7 @@ public class ConfigMojo
             PlexusConfiguration children[] = config.getChildren();
             props.setProperty( key + ".children", Integer.toString( children.length ) );
             Map indices = new HashMap();
-            for ( int i = children.length - 1; i >= 0; i-- )
+            for ( int i = 0; i < children.length; i++ )
             {
                 PlexusConfiguration child = children[i];
                 String name = child.getName();
