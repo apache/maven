@@ -25,12 +25,17 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2201">MNG-2201</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenIT0104Test
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that plugin configurations are resolved correctly.
+     * Verify that plugin configurations are correctly interpolated
      */
     public void testit0104()
         throws Exception
@@ -45,6 +50,8 @@ public class MavenIT0104Test
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( new File( testDir, "target" ), new File( props.getProperty( "stringParam" ) ) );
+        assertEquals( new File( testDir, "target" ), new File( props.getProperty( "propertiesParam.buildDir" ) ) );
+        assertEquals( new File( testDir, "target" ), new File( props.getProperty( "mapParam.buildDir" ) ) );
         assertEquals( "4.0.0", props.getProperty( "domParam.children.modelVersion.0.value" ) );
         assertEquals( "org.apache.maven.its.it0104", props.getProperty( "domParam.children.groupId.0.value" ) );
         assertEquals( "1.0-SNAPSHOT", props.getProperty( "domParam.children.version.0.value" ) );

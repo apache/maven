@@ -47,6 +47,15 @@ under the License.
           <configuration>
             <propertiesFile>${project.build.directory}/config.properties</propertiesFile>
             <stringParam>${project.build.directory}</stringParam>
+            <mapParam>
+              <buildDir>${project.build.directory}</buildDir>
+            </mapParam>
+            <propertiesParam>
+              <property>
+                <name>buildDir</name>
+                <value>${project.build.directory}</value>
+              </property>
+            </propertiesParam>
             <domParam>
               <basedir>${basedir}</basedir>
               <modelVersion>${project.modelVersion}</modelVersion>
