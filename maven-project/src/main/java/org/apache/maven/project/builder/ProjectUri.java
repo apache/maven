@@ -1144,18 +1144,18 @@ public class ProjectUri
                         public static class ReportSets
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets";
+                                "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection";
 
                             public static class ReportSet
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets/reportSet";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet";
 
                                 public static String id =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets/reportSet/id";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/id";
 
                                 public static String configuration =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets/reportSet/configuration";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/configuration";
 
                                 public static String inherited =
                                     "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets/reportSet/inherited";
@@ -1511,24 +1511,24 @@ public class ProjectUri
                 public static class ReportSets
                 {
                     public static String xUri =
-                        "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets";
+                        "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection";
 
                     public static class ReportSet
                     {
                         public static String xUri =
-                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets/reportSet";
+                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet";
 
                         public static String id =
-                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets/reportSet/id";
+                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/id";
 
                         public static String configuration =
-                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets/reportSet/configuration";
+                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/configuration";
 
                         public static String inherited =
-                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets/reportSet/inherited";
+                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/inherited";
 
                         public static String reports =
-                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets/reportSet/reports";
+                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/reports";
                     }
                 }
             }
