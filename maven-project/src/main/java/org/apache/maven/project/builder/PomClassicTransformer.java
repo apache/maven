@@ -376,16 +376,17 @@ public final class PomClassicTransformer
             ModelProperty siteUrlProperty = getPropertyFor( ProjectUri.DistributionManagement.Site.url, tmp );
             if ( siteUrl.length() == 0 && siteUrlProperty != null )
             {
-                if(!siteUrlProperty.getResolvedValue().endsWith("}")) {
-                    siteUrl.append( siteUrlProperty.getResolvedValue().substring(0, siteUrlProperty.getResolvedValue().lastIndexOf("/")) );
-                }
-                    for ( String projectName : projectNames )
-                    {
-                        siteUrl.append( "/" ).append( projectName );
+                siteUrl.append( siteUrlProperty.getResolvedValue());//.substring(0, siteUrlProperty.getResolvedValue().lastIndexOf("/")) );
+                for ( String projectName : projectNames )
+                {
+                    if(!siteUrl.toString().endsWith( "/")) {
+                        siteUrl.append( "/" );
                     }
-                    int index = tmp.indexOf( siteUrlProperty );
-                    tmp.remove( index );
-                    tmp.add( index, new ModelProperty( ProjectUri.DistributionManagement.Site.url, siteUrl.toString() ) );
+                    siteUrl.append( projectName );
+                }
+                int index = tmp.indexOf( siteUrlProperty );
+                tmp.remove( index );
+                tmp.add( index, new ModelProperty( ProjectUri.DistributionManagement.Site.url, siteUrl.toString() ) );
             }            
   //If DistributionManagement site URL is property,
             //SCM Rule
@@ -602,7 +603,9 @@ public final class PomClassicTransformer
         aliases.put( "\\$\\{project.build.", "\\$\\{build.");
 
         List<String> aliasList = Arrays.asList("artifactId", "groupId", "version", "packaging", "name", "description",
-            "url", "inceptionYear", "scm.url", "ciManagement.url", "distributionManagement.repository.name",
+            "url", "inceptionYear", "scm.url", "ciManagement.url",
+            "distributionManagement.repository.name",
+            "distributionManagement.site.url",
             "reporting.outputDirectory", "parent.groupId", "parent.artifactId",
             "parent.version", "prerequisites.maven", "issueManagement.url", "organization.name");
         for(String alias : aliasList) {
