@@ -26,21 +26,22 @@ import java.io.File;
 import java.util.Properties;
 
 /**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3831">MNG-3831</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenIT0141Test
+public class MavenITmng3831PomInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
      * Test that expressions of the form ${*} resolve correctly to POM values (ugly but real).
      */
-    public void testit0141()
+    public void testitMNG3831()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0141" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3831" );
         File child = new File( testDir, "child" );
 
         Verifier verifier = new Verifier( child.getAbsolutePath() );
@@ -53,7 +54,7 @@ public class MavenIT0141Test
 
         assertEquals( child.getCanonicalFile(), new File( props.getProperty( prefix + "projectDir" ) ).getCanonicalFile() );
 
-        assertEquals( "org.apache.maven.its.it0141.child", props.getProperty( prefix + "projectGroupId" ) );
+        assertEquals( "org.apache.maven.its.mng3831.child", props.getProperty( prefix + "projectGroupId" ) );
         assertEquals( "child", props.getProperty( prefix + "projectArtifactId" ) );
         assertEquals( "2.0-alpha-1", props.getProperty( prefix + "projectVersion" ) );
         assertEquals( "jar", props.getProperty( prefix + "projectPackaging" ) );
@@ -72,7 +73,7 @@ public class MavenIT0141Test
         assertEquals( "http://dist.org/", props.getProperty( prefix + "projectDistRepoUrl" ) );
         assertEquals( "http://site.org/", props.getProperty( prefix + "projectDistSiteUrl" ) );
 
-        assertEquals( "org.apache.maven.its.it0141", props.getProperty( prefix + "parentGroupId" ) );
+        assertEquals( "org.apache.maven.its.mng3831", props.getProperty( prefix + "parentGroupId" ) );
         assertEquals( "parent", props.getProperty( prefix + "parentArtifactId" ) );
         assertEquals( "1.0", props.getProperty( prefix + "parentVersion" ) );
 

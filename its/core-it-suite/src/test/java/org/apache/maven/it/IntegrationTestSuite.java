@@ -88,6 +88,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng3831PomInterpolationTest.class );
         suite.addTestSuite( MavenITmng3827PluginConfigTest.class );
         suite.addTestSuite( MavenITmng3822BasedirAlignedInterpolationTest.class );
         suite.addTestSuite( MavenITmng3821EqualPluginExecIdsTest.class );
@@ -180,7 +181,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
         suite.addTestSuite( MavenITmng1323AntrunDependenciesTest.class );
         suite.addTestSuite( MavenITmng0469ReportConfigTest.class );
-        suite.addTestSuite( MavenIT0141Test.class );
         suite.addTestSuite( MavenIT0140Test.class );
         suite.addTestSuite( MavenIT0139Test.class );
         suite.addTestSuite( MavenIT0138PluginLifecycleTest.class );
