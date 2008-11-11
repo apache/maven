@@ -93,7 +93,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3827PluginConfigTest.class );
         suite.addTestSuite( MavenITmng3822BasedirAlignedInterpolationTest.class );
         suite.addTestSuite( MavenITmng3821EqualPluginExecIdsTest.class );
-        suite.addTestSuite( MavenITmng3818PluginDepPlexusUtilsTest.class );
+        suite.addTestSuite( MavenITmng3819PluginDepPlexusUtilsTest.class );
         suite.addTestSuite( MavenITmng3813PluginClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3796ClassImportInconsistencyTest.class );

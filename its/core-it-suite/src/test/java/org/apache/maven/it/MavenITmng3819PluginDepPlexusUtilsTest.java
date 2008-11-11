@@ -26,12 +26,12 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3818">MNG-3818</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3819">MNG-3819</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng3818PluginDepPlexusUtilsTest
+public class MavenITmng3819PluginDepPlexusUtilsTest
     extends AbstractMavenIntegrationTestCase
 {
 
@@ -43,7 +43,7 @@ public class MavenITmng3818PluginDepPlexusUtilsTest
     public void testitMNG3818()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3818" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3819" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
