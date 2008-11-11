@@ -69,6 +69,7 @@ public class MavenIT0141Test
         assertEquals( "http://issue.org/", props.getProperty( prefix + "projectIssueUrl" ) );
         assertEquals( "http://ci.org/", props.getProperty( prefix + "projectCiUrl" ) );
         assertEquals( "child-dist-repo", props.getProperty( prefix + "projectDistRepoName" ) );
+        assertEquals( "http://dist.org/", props.getProperty( prefix + "projectDistRepoUrl" ) );
         assertEquals( "http://site.org/", props.getProperty( prefix + "projectDistSiteUrl" ) );
 
         assertEquals( "org.apache.maven.its.it0141", props.getProperty( prefix + "parentGroupId" ) );

@@ -84,6 +84,7 @@ under the License.
     <projectIssueUrl>${issueManagement.url}</projectIssueUrl>
     <projectCiUrl>${ciManagement.url}</projectCiUrl>
     <projectDistRepoName>${distributionManagement.repository.name}</projectDistRepoName>
+    <projectDistRepoUrl>${distributionManagement.repository.url}</projectDistRepoUrl>
     <projectDistSiteUrl>${distributionManagement.site.url}</projectDistSiteUrl>
     <projectBuildOut>${build.outputDirectory}</projectBuildOut>
     <projectSiteOut>${reporting.outputDirectory}</projectSiteOut>
