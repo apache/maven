@@ -590,28 +590,35 @@ public final class PomClassicTransformer
         return false;
     }
 
-    private static void putProjectAliasIn(Map<String, String> map, String s)
-    {
-        map.put( "\\$\\{project." + s + "\\}", "\\$\\{" + s + "\\}");
-    }
+    private static final Map<String, String> aliases = new HashMap<String, String>();
 
-    private static Map<String, String> aliases = new HashMap<String, String>();
+    private static void addProjectAlias( String element, boolean leaf )
+    {
+        String suffix = leaf ? "\\}" : "\\.";
+        aliases.put( "\\$\\{project\\." + element + suffix, "\\$\\{" + element + suffix );
+    }
 
     static
     {
-        aliases.put( "project.", "pom.");
-        aliases.put( "\\$\\{project.build.", "\\$\\{build.");
-
-        List<String> aliasList = Arrays.asList("artifactId", "groupId", "version", "packaging", "name", "description",
-            "url", "inceptionYear", "scm.url", "ciManagement.url",
-            "distributionManagement.repository.name",
-            "distributionManagement.site.url",
-            "reporting.outputDirectory", "parent.groupId", "parent.artifactId",
-            "parent.version", "prerequisites.maven", "issueManagement.url", "organization.name");
-        for(String alias : aliasList) {
-            putProjectAliasIn(aliases, alias);
-        }
-
+        aliases.put( "\\$\\{project\\.", "\\$\\{pom\\.");
+        addProjectAlias( "modelVersion", true );
+        addProjectAlias( "groupId", true );
+        addProjectAlias( "artifactId", true );
+        addProjectAlias( "version", true );
+        addProjectAlias( "packaging", true );
+        addProjectAlias( "name", true );
+        addProjectAlias( "description", true );
+        addProjectAlias( "inceptionYear", true );
+        addProjectAlias( "url", true );
+        addProjectAlias( "parent", false );
+        addProjectAlias( "prerequisites", false );
+        addProjectAlias( "organization", false );
+        addProjectAlias( "build", false );
+        addProjectAlias( "reporting", false );
+        addProjectAlias( "scm", false );
+        addProjectAlias( "distributionManagement", false );
+        addProjectAlias( "issueManagement", false );
+        addProjectAlias( "ciManagement", false );
     }
 
     private static void interpolateModelProperties(List<ModelProperty> modelProperties,
