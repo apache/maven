@@ -36,7 +36,7 @@ import java.util.List;
  * Test sorting projects by dependencies.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: ProjectSorterTest.java 513038 2007-02-28 22:54:19Z jvanzyl $
+ * @version $Id$
  */
 public class ProjectSorterTest
     extends TestCase
