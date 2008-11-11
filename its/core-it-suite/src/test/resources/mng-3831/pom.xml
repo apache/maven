@@ -22,12 +22,12 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.it0141</groupId>
+  <groupId>org.apache.maven.its.mng3831</groupId>
   <artifactId>parent</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: it0141</name> 
+  <name>Maven Integration Test :: MNG-3831</name> 
   <description>Test POM interpolation with expressions of the form $ { * } (ugly but real)</description>
 
   <modules>
