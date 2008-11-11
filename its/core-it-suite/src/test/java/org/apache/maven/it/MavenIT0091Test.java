@@ -56,6 +56,16 @@ public class MavenIT0091Test
 
         Properties props = verifier.loadProperties( "target/expression.properties" );
         assertEquals( "true", props.getProperty( "project.build.resources.0.filtering" ) );
+        boolean foundTestRepo = false;
+        for ( int i = Integer.parseInt( props.getProperty( "project.repositories" ) ) - 1; i >= 0; i-- )
+        {
+            if ( "maven-core-it".equals( props.getProperty( "project.repositories." + i + ".id" ) ) )
+            {
+                assertEquals( "true", props.getProperty( "project.repositories." + i + ".releases.enabled" ) );
+                foundTestRepo = true;
+            }
+        }
+        assertTrue( foundTestRepo );
     }
 
 }

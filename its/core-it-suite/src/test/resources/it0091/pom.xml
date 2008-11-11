@@ -33,7 +33,19 @@ under the License.
 
   <properties>
     <filter.resources>true</filter.resources>
+    <releasesEnabled>true</releasesEnabled>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>maven-core-it</id>
+      <url>file:///${basedir}/repo</url>
+      <releases>
+        <!-- That's the boolean POM field we would like to interpolate -->
+        <enabled>${releasesEnabled}</enabled>
+      </releases>
+    </repository>
+  </repositories>
 
   <build>
     <resources>
@@ -52,6 +64,7 @@ under the License.
           <outputFile>target/expression.properties</outputFile>
           <expressions>
             <expression>project/build/resources/0/filtering</expression>
+            <expression>project/repositories</expression>
           </expressions>
         </configuration>
         <executions>
