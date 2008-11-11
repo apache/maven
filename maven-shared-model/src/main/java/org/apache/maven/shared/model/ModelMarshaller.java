@@ -77,8 +77,8 @@ public final class ModelMarshaller
 
         List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, "false");
-        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, "false");
+        xmlInputFactory.setProperty( XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE );
+        xmlInputFactory.setProperty( XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE );
 
         Uri uri = new Uri( baseUri );
         String tagName = baseUri;
