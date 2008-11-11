@@ -25,6 +25,9 @@ import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -256,8 +259,9 @@ public class DefaultMavenRealmManager
             //MNG-3012
             String parentRealmId = container.getContainerRealm().getId();
             pluginRealm.importFrom( parentRealmId, Xpp3Dom.class.getName() );
-            pluginRealm.importFrom( parentRealmId, "org.codehaus.plexus.util.xml.pull" );
-
+            pluginRealm.importFrom( parentRealmId, XmlPullParser.class.getName() );
+            pluginRealm.importFrom( parentRealmId, XmlPullParserException.class.getName() );
+            pluginRealm.importFrom( parentRealmId, XmlSerializer.class.getName() );
         }
         catch ( NoSuchRealmException e )
         {
