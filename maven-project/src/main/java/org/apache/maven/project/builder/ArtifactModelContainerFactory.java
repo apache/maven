@@ -71,6 +71,8 @@ public final class ArtifactModelContainerFactory
 
         private String type;
 
+        private String scope;
+
         private List<ModelProperty> properties;
 
         private static String findBaseUriFrom( List<ModelProperty> modelProperties )
@@ -106,6 +108,10 @@ public final class ArtifactModelContainerFactory
                 {
                     this.groupId = mp.getResolvedValue();
                 }
+                else if ( scope == null && mp.getUri().equals( uri + "/scope" ) )
+                {
+                    this.scope = mp.getResolvedValue();
+                }
                 else if ( type == null && mp.getUri().equals( ProjectUri.Dependencies.Dependency.type )
                         || mp.getUri().equals(ProjectUri.DependencyManagement.Dependencies.Dependency.type)
                         || mp.getUri().equals(ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.type)
@@ -132,9 +138,19 @@ public final class ArtifactModelContainerFactory
                     ", Version = " + version + ", Base = " + uri + ":\r\n" + sb );
             }
 
+            if ( version == null )
+            {
+                version = "";
+            }
+
             if ( type == null )
             {
                 type = "";
+            }
+
+            if ( scope == null )
+            {
+                scope = "";
             }
         }
 
@@ -153,39 +169,9 @@ public final class ArtifactModelContainerFactory
             ArtifactModelContainer c = (ArtifactModelContainer) modelContainer;
             if ( c.groupId.equals( groupId ) && c.artifactId.equals( artifactId ) )
             {
-                if ( c.version == null )
-                {
-                    if ( version == null )
-                    {
-                        if ( c.type.equals( type ) )
-                        {
-                            return ModelContainerAction.JOIN;
-                        }
-                        else
-                        {
-                            return ModelContainerAction.NOP;
-                        }
-                    }
-                    return ModelContainerAction.JOIN;
-                }
-                if ( version == null )
-                {
-                    if ( c.version == null )
-                    {
-                        if ( c.type.equals( type ) )
-                        {
-                            return ModelContainerAction.JOIN;
-                        }
-                        else
-                        {
-                            return ModelContainerAction.NOP;
-                        }
-                    }
-                    return ModelContainerAction.JOIN;
-                }
                 if ( c.version.equals( version ) )
                 {
-                    if ( c.type.equals( type ) )
+                    if ( c.type.equals( type )  )
                     {
                         return ModelContainerAction.JOIN;
                     }
@@ -196,7 +182,14 @@ public final class ArtifactModelContainerFactory
                 }
                 else
                 {
-                    return ModelContainerAction.DELETE;
+                    if ( c.type.equals( type ) )
+                    {
+                        return ModelContainerAction.DELETE;
+                    }
+                    else
+                    {
+                        return ModelContainerAction.NOP;
+                    }
                 }
             }
             else
