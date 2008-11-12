@@ -40,7 +40,7 @@ public class MavenITmng3819PluginDepPlexusUtilsTest
      * plugin POM for backward-compat with Maven 2.0.5- (due to MNG-2892, plexus-utils is no longer part of the core
      * class realm in Maven 2.0.6+).
      */
-    public void testitMNG3818()
+    public void testitMNG3819()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3819" );
