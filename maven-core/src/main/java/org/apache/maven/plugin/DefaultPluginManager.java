@@ -436,7 +436,7 @@ public class DefaultPluginManager
         // followed by the plugin's default artifact set
         dependencies.addAll( resolutionGroup.getArtifacts() );
 
-        LinkedHashSet repositories = new LinkedHashSet();
+        Set repositories = new LinkedHashSet();
 
         repositories.addAll( resolutionGroup.getResolutionRepositories() );
 
@@ -456,7 +456,7 @@ public class DefaultPluginManager
                                                                                 artifactMetadataSource,
                                                                                 filter );
 
-        Set<Artifact> resolved = new HashSet<Artifact>();
+        Set<Artifact> resolved = new LinkedHashSet<Artifact>();
 
         for ( Iterator<Artifact> it = result.getArtifacts().iterator(); it.hasNext(); )
         {
@@ -1516,7 +1516,7 @@ public class DefaultPluginManager
                  && checkMissingArtifactsInReactor( context.getSortedProjects(),
                                                     e.getMissingArtifacts() ) )
             {
-                resolvedArtifacts = new HashSet( e.getResolvedArtifacts() );
+                resolvedArtifacts = new LinkedHashSet( e.getResolvedArtifacts() );
             }
             else
             {
