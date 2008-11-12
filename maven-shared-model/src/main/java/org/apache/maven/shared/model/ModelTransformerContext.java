@@ -120,7 +120,14 @@ public final class ModelTransformerContext
                 }
             }
         }
-        return interpolatorProperties;
+        
+        List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>();
+        for(InterpolatorProperty ip : interpolatorProperties) {
+            if(!ips.contains(ip)) {
+                ips.add(ip);
+            }
+        }
+        return ips;
     }
 
     public static void interpolateModelProperties(List<ModelProperty> modelProperties, 
