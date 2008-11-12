@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 public class MavenIT0060Test
     extends AbstractMavenIntegrationTestCase
@@ -37,12 +38,33 @@ public class MavenIT0060Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0060" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "initialize" );
-        verifier.assertFilePresent( "parent.txt" );
-        verifier.assertFilePresent( "child.txt" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "subproject/target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-    }
-}
+        Properties props = verifier.loadProperties( "subproject/target/config.properties" );
 
+        assertEquals( "8", props.getProperty( "stringParams" ) );
+        assertEquals( "PARENT-1", props.getProperty( "stringParams.0" ) );
+        assertEquals( "PARENT-3", props.getProperty( "stringParams.1" ) );
+        assertEquals( "PARENT-2", props.getProperty( "stringParams.2" ) );
+        assertEquals( "PARENT-4", props.getProperty( "stringParams.3" ) );
+        assertEquals( "CHILD-1", props.getProperty( "stringParams.4" ) );
+        assertEquals( "CHILD-3", props.getProperty( "stringParams.5" ) );
+        assertEquals( "CHILD-2", props.getProperty( "stringParams.6" ) );
+        assertEquals( "CHILD-4", props.getProperty( "stringParams.7" ) );
+
+        assertEquals( "8", props.getProperty( "listParam" ) );
+        assertEquals( "PARENT-1", props.getProperty( "listParam.0" ) );
+        assertEquals( "PARENT-3", props.getProperty( "listParam.1" ) );
+        assertEquals( "PARENT-2", props.getProperty( "listParam.2" ) );
+        assertEquals( "PARENT-4", props.getProperty( "listParam.3" ) );
+        assertEquals( "CHILD-1", props.getProperty( "listParam.4" ) );
+        assertEquals( "CHILD-3", props.getProperty( "listParam.5" ) );
+        assertEquals( "CHILD-2", props.getProperty( "listParam.6" ) );
+        assertEquals( "CHILD-4", props.getProperty( "listParam.7" ) );
+    }
+
+}

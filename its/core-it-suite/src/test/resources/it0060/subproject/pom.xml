@@ -24,7 +24,7 @@ under the License.
 
   <parent>
     <groupId>org.apache.maven.its.it0060</groupId>
-    <artifactId>maven-it-it0060</artifactId>
+    <artifactId>parent</artifactId>
     <version>1.0</version>
   </parent>
 
@@ -36,20 +36,31 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-file</artifactId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
         <version>2.1-SNAPSHOT</version>
-        <inherited>true</inherited>
         <configuration>
-          <pathnames combine.children="append">
-            <pathname>child.txt</pathname>
-          </pathnames>
+          <propertiesFile>target/config.properties</propertiesFile>
+          <stringParams combine.children="append">
+            <!-- NOTE: These values are deliberately not in alpha order! -->
+            <stringParam>CHILD-1</stringParam>
+            <stringParam>CHILD-3</stringParam>
+            <stringParam>CHILD-2</stringParam>
+            <stringParam>CHILD-4</stringParam>
+          </stringParams>
+          <listParam combine.children="append">
+            <!-- NOTE: These values are deliberately not in alpha order! -->
+            <listParam>CHILD-1</listParam>
+            <listParam>CHILD-3</listParam>
+            <listParam>CHILD-2</listParam>
+            <listParam>CHILD-4</listParam>
+          </listParam>
         </configuration>
         <executions>
           <execution>
             <id>test</id>
-            <phase>initialize</phase>
+            <phase>validate</phase>
             <goals>
-              <goal>files</goal>
+              <goal>config</goal>
             </goals>
           </execution>
         </executions>

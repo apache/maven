@@ -23,13 +23,13 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.it0060</groupId>
-  <artifactId>maven-it-it0060</artifactId>
+  <artifactId>parent</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: it0060</name> 
   <description>
-    Test aggregation of list configuration items when using
+    Test aggregation of list configuration items for build plugins when using
     'combine.children=append' attribute.
   </description>
 
@@ -38,16 +38,41 @@ under the License.
   </modules>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!-- inherit via <pluginManagement> -->
+          <groupId>org.apache.maven.its.plugins</groupId>
+          <artifactId>maven-it-plugin-configuration</artifactId>
+          <version>2.1-SNAPSHOT</version>
+          <inherited>true</inherited>
+          <configuration>
+            <listParam>
+              <!-- NOTE: These values are deliberately not in alpha order! -->
+              <listParam>PARENT-1</listParam>
+              <listParam>PARENT-3</listParam>
+              <listParam>PARENT-2</listParam>
+              <listParam>PARENT-4</listParam>
+            </listParam>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
+        <!-- inherit not via <pluginManagement> -->
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-file</artifactId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
         <version>2.1-SNAPSHOT</version>
         <inherited>true</inherited>
         <configuration>
-          <pathnames>
-            <pathname>parent.txt</pathname>
-          </pathnames>
+          <stringParams>
+            <!-- NOTE: These values are deliberately not in alpha order! -->
+            <stringParam>PARENT-1</stringParam>
+            <stringParam>PARENT-3</stringParam>
+            <stringParam>PARENT-2</stringParam>
+            <stringParam>PARENT-4</stringParam>
+          </stringParams>
         </configuration>
       </plugin>
     </plugins>
