@@ -25,18 +25,24 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
-public class MavenIT0060Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2591">MNG-2591</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
+ */
+public class MavenITmng2591MergeInheritedPluginConfigTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test aggregation of list configuration items when using
+     * Test aggregation of list configuration items for build plugins when using
      * 'combine.children=append' attribute.
      */
-    public void testit0060()
+    public void testitMNG2591()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0060" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2591" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "subproject/target" );

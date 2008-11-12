@@ -164,6 +164,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         suite.addTestSuite( MavenITmng2739RequiredRepositoryElementsTest.class );
         suite.addTestSuite( MavenITmng2695OfflinePluginSnapshotsTest.class );
+        suite.addTestSuite( MavenITmng2591MergeInheritedPluginConfigTest.class );
         suite.addTestSuite( MavenITmng2562TimestampTest.class );
         suite.addTestSuite( MavenITmng2339BadProjectInterpolationTest.class );
         suite.addTestSuite( MavenITmng2318LocalParentResolutionTest.class );
@@ -237,7 +238,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0063Test.class );
         suite.addTestSuite( MavenIT0062Test.class );
         suite.addTestSuite( MavenIT0061Test.class );
-        suite.addTestSuite( MavenIT0060Test.class );
         suite.addTestSuite( MavenIT0059Test.class );
         suite.addTestSuite( MavenIT0058Test.class );
         suite.addTestSuite( MavenIT0057Test.class );
