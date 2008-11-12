@@ -210,7 +210,7 @@ public final class ModelProperty
      *
      * @param property the interpolator property used to resolve
      */
-    public void resolveWith( InterpolatorProperty property )
+    public boolean resolveWith( InterpolatorProperty property )
     {
         if ( property == null )
         {
@@ -218,12 +218,14 @@ public final class ModelProperty
         }
         if ( isResolved() )
         {
-            return;
+            return false;
         }
+        boolean resolved = false;
         for ( String expression : unresolvedExpressions )
         {
             if ( property.getKey().equals( expression ) )
             {
+                resolved = true;
                 resolvedValue = resolvedValue.replace( property.getKey(), property.getValue() );
                 unresolvedExpressions.clear();
                 Matcher matcher = EXPRESSION_PATTERN.matcher( resolvedValue );
@@ -234,6 +236,7 @@ public final class ModelProperty
                 break;
             }
         }
+        return resolved;
     }
 
     public String toString()
