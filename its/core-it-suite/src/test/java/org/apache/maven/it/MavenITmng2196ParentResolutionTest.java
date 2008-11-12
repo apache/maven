@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0103Test
+public class MavenITmng2196ParentResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
 
@@ -34,10 +34,10 @@ public class MavenIT0103Test
      * a parent can build, even if that parent is not correctly referenced by
      * &lt;relativePath/&gt; and is not in the local repository. [MNG-2196]
      */
-    public void testit0103()
+    public void testitMNG2196()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0103" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2196" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
         

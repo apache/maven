@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
-public class MavenIT0102Test
+public class MavenITmng2136ActiveByDefaultProfileTest
     extends AbstractMavenIntegrationTestCase
 {
 
@@ -33,10 +33,10 @@ public class MavenIT0102Test
      * Test that &lt;activeByDefault/&gt; calculations for profile activation only
      * use profiles defined in the POM. [MNG-2136]
      */
-    public void testit0102()
+    public void testitMNG2136()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0102" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2136" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 

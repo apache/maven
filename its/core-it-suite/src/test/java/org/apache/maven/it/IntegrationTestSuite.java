@@ -174,8 +174,11 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
         suite.addTestSuite( MavenITmng2228ComponentInjectionTest.class );
         suite.addTestSuite( MavenITmng2201PluginConfigInterpolationTest.class );
+        suite.addTestSuite( MavenITmng2196ParentResolutionTest.class );
+        suite.addTestSuite( MavenITmng2136ActiveByDefaultProfileTest.class );
         suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
         suite.addTestSuite( MavenITmng2068ReactorRelativeParentsTest.class );
+        suite.addTestSuite( MavenITmng2052InterpolateWithSettingsProfilePropertiesTest.class );
         suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
         suite.addTestSuite( MavenITmng1999DefaultReportsInheritanceTest.class );
         suite.addTestSuite( MavenITmng1703PluginMgmtDepInheritanceTest.class );
@@ -199,9 +202,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest.class );
         suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
-        suite.addTestSuite( MavenIT0103Test.class );
-        suite.addTestSuite( MavenIT0102Test.class );
-        suite.addTestSuite( MavenIT0101Test.class );
         suite.addTestSuite( MavenIT0100Test.class );
         suite.addTestSuite( MavenIT0099Test.class );
         suite.addTestSuite( MavenIT0098Test.class );
