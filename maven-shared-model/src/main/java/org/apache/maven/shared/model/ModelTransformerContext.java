@@ -340,7 +340,7 @@ public final class ModelTransformerContext
      * @param baseUri    the base URI of every model property
      * @return sorted list of model properties
      */
-    protected static List<ModelProperty> sort( List<ModelProperty> properties, String baseUri )
+    public static List<ModelProperty> sort( List<ModelProperty> properties, String baseUri )
     {
         if ( properties == null )
         {

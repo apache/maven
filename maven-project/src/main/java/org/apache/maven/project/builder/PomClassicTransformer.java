@@ -184,7 +184,9 @@ public final class PomClassicTransformer
                 ModelContainerAction action = dependencyContainer.containerAction( managementContainer );
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
                 {
-                    source.join( dependencyContainer, managementContainer );
+                    ModelContainer reverseSortedContainer = new ArtifactModelContainerFactory().create(
+                        ModelTransformerContext.sort(dependencyContainer.getProperties(), ProjectUri.Build.Plugins.Plugin.xUri) );
+                    source.join( reverseSortedContainer, managementContainer );
                 }
             }
         }
