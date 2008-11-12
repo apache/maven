@@ -22,12 +22,12 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.it0060</groupId>
+  <groupId>org.apache.maven.its.mng2591</groupId>
   <artifactId>parent</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: it0060</name> 
+  <name>Maven Integration Test :: MNG-2591</name> 
   <description>
     Test aggregation of list configuration items for build plugins when using
     'combine.children=append' attribute.

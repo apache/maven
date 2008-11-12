@@ -23,7 +23,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven.its.it0060</groupId>
+    <groupId>org.apache.maven.its.mng2591</groupId>
     <artifactId>parent</artifactId>
     <version>1.0</version>
   </parent>
