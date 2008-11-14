@@ -23,25 +23,28 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
-public class MavenIT0099Test
+public class MavenITmng2124PomInterpolationWithParentValuesTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test that parent-POMs cached during a build are available as parents
-     * to other POMs in the multimodule build. [MNG-2130]
+     * Test that ${parent.artifactId} resolves correctly. [MNG-2124]
      */
-    public void testit0099()
+    public void testitMNG2124()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0099" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.it0099", "maven-it-it0099-parent", "1", "pom" );
-        verifier.executeGoal( "package" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2124" );
+        File child = new File( testDir, "parent/child" );
+
+        Verifier verifier = new Verifier( child.getAbsolutePath() );
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
+        
+        Properties props = verifier.loadProperties( "target/parent.properties" );
+        assertEquals( "parent, child, parent, child", props.getProperty( "project.description" ) );
     }
-}
 
+}

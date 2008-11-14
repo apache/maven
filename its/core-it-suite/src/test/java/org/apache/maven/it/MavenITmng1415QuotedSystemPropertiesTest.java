@@ -27,19 +27,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * # it0098 - something started failing here, not yet identified. MNG-2322
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1415">MNG-1415</a>.
+ * 
+ * @version $Id$
  */
-public class MavenIT0098Test
+public class MavenITmng1415QuotedSystemPropertiesTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
      * Test that quoted system properties are processed correctly. [MNG-1415]
      */
-    public void testit0098()
+    public void testitMNG1415()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0098" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1415" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dtest.property=\"Test Property\"" );
