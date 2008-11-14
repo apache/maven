@@ -93,6 +93,16 @@ public class PropertyUtilTest
         assertEquals( 2, props.size() );
     }
 
+    public void testStoreCycle()
+    {
+        Object[] arr = { null };
+        arr[0] = Collections.singleton( Collections.singletonMap( "key", arr ) );
+
+        Properties props = new Properties();
+        PropertyUtil.store( props, "cycle", arr );
+        assertTrue( "Should not die because of stack overflow", true );
+    }
+
     public void testGetPropertyName()
     {
         assertEquals( "name", PropertyUtil.getPropertyName( "getName" ) );

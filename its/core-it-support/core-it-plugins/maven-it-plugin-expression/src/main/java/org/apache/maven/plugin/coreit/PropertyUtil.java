@@ -68,8 +68,9 @@ class PropertyUtil
      */
     private static void store( Properties props, String key, Object obj, Collection visited )
     {
-        if ( obj != null )
+        if ( obj != null && !visited.contains( obj ) )
         {
+            visited.add( obj );
             if ( ( obj instanceof String ) || ( obj instanceof Number ) || ( obj instanceof Boolean )
                 || ( obj instanceof File ) )
             {
@@ -83,7 +84,7 @@ class PropertyUtil
                 for ( Iterator it = coll.iterator(); it.hasNext(); index++ )
                 {
                     Object elem = it.next();
-                    store( props, key + "." + index, elem );
+                    store( props, key + "." + index, elem, visited );
                 }
             }
             else if ( obj instanceof Map )
@@ -94,7 +95,7 @@ class PropertyUtil
                 for ( Iterator it = map.entrySet().iterator(); it.hasNext(); index++ )
                 {
                     Map.Entry entry = (Map.Entry) it.next();
-                    store( props, key + "." + entry.getKey(), entry.getValue() );
+                    store( props, key + "." + entry.getKey(), entry.getValue(), visited );
                 }
             }
             else if ( obj.getClass().isArray() )
@@ -104,12 +105,11 @@ class PropertyUtil
                 for ( int index = 0; index < length; index++ )
                 {
                     Object elem = Array.get( obj, index );
-                    store( props, key + "." + index, elem );
+                    store( props, key + "." + index, elem, visited );
                 }
             }
-            else if ( obj != null && !visited.contains( obj ) )
+            else if ( obj != null )
             {
-                visited.add( obj );
                 Class type = obj.getClass();
                 Method[] methods = type.getMethods();
                 for ( int i = 0; i < methods.length; i++ )
@@ -133,8 +133,8 @@ class PropertyUtil
                         // just ignore
                     }
                 }
-                visited.remove( obj );
             }
+            visited.remove( obj );
         }
     }
 
