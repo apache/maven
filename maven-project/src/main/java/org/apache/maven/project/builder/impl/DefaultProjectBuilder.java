@@ -33,12 +33,10 @@ import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.builder.ProjectBuilder;
+import org.apache.maven.project.builder.listeners.PluginExtensionListener;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.apache.maven.shared.model.DomainModel;
-import org.apache.maven.shared.model.ImportModel;
-import org.apache.maven.shared.model.InterpolatorProperty;
-import org.apache.maven.shared.model.ModelTransformerContext;
+import org.apache.maven.shared.model.*;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -178,7 +176,7 @@ public final class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 importModels,
                                                                                                 properties,
-                                                                                                null) );
+                                                                                                Arrays.asList((ModelEventListener) new PluginExtensionListener())) );
         try
         {
             MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), artifactFactory,
