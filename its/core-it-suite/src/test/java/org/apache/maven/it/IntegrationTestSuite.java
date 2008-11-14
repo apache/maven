@@ -88,6 +88,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng3843PomInheritanceTest.class );
         suite.addTestSuite( MavenITmng3839PomParsingCoalesceTextTest.class );
         suite.addTestSuite( MavenITmng3838EqualPluginDepsTest.class );
         suite.addTestSuite( MavenITmng3836PluginConfigInheritanceTest.class );
