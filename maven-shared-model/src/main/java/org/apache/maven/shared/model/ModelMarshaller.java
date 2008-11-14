@@ -82,9 +82,10 @@ public final class ModelMarshaller
 
         Uri uri = new Uri( baseUri );
         String tagName = baseUri;
-        String tagValue = null;
+        StringBuilder tagValue = new StringBuilder( 256 );
 
         int depth = 0;
+        int depthOfTagValue = depth;
         XMLStreamReader xmlStreamReader = null;
         try
         {
@@ -97,22 +98,27 @@ public final class ModelMarshaller
                 switch ( type )
                 {
 
+                    case XMLStreamConstants.CDATA:
                     case XMLStreamConstants.CHARACTERS:
                     {
-                        String tmp = xmlStreamReader.getText();
-                        if ( tmp != null && tmp.trim().length() != 0 )
+                        if ( depth == depthOfTagValue )
                         {
-                            tagValue = tmp;
+                            tagValue.append( xmlStreamReader.getTextCharacters(), xmlStreamReader.getTextStart(),
+                                             xmlStreamReader.getTextLength() );
                         }
                         break;
                     }
 
                     case XMLStreamConstants.START_ELEMENT:
                     {
-                        depth++;
                         if ( !tagName.equals( baseUri ) )
                         {
-                            modelProperties.add( new ModelProperty( tagName, tagValue ) );
+                            String value = null;
+                            if ( depth < depthOfTagValue )
+                            {
+                                value = tagValue.toString();
+                            }
+                            modelProperties.add( new ModelProperty( tagName, value ) );
                             if ( !attributes.isEmpty() )
                             {
                                 for ( Map.Entry<String, String> e : attributes.entrySet() )
@@ -123,6 +129,7 @@ public final class ModelMarshaller
                             }
                         }
 
+                        depth++;
                         tagName = uri.getUriFor( xmlStreamReader.getName().getLocalPart(), depth );
                         if ( collections.contains( tagName + "#collection" ) )
                         {
@@ -138,8 +145,8 @@ public final class ModelMarshaller
                         {
                             uri.addTag( xmlStreamReader.getName().getLocalPart() );
                         }
-                        tagValue = null;
-
+                        tagValue.setLength( 0 );
+                        depthOfTagValue = depth;
                     }
                     case XMLStreamConstants.ATTRIBUTE:
                     {
@@ -155,15 +162,11 @@ public final class ModelMarshaller
                     case XMLStreamConstants.END_ELEMENT:
                     {
                         depth--;
-                        if ( tagValue == null )
-                        {
-                            tagValue = "";
-                        }
                         break;
                     }
                     case XMLStreamConstants.END_DOCUMENT:
                     {
-                        modelProperties.add( new ModelProperty( tagName, tagValue ) );
+                        modelProperties.add( new ModelProperty( tagName, tagValue.toString() ) );
                         if ( !attributes.isEmpty() )
                         {
                             for ( Map.Entry<String, String> e : attributes.entrySet() )

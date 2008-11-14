@@ -28,7 +28,7 @@ under the License.
   </parent>
   <artifactId>maven-shared-model</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>maven-shared-model</name>
+  <name>Maven Shared Model</name>
   <dependencies>
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
