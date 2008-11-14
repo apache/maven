@@ -115,14 +115,23 @@ public final class PomClassicTransformer
     }
 
     /**
-     * @see ModelTransformer#transformToDomainModel(java.util.List)
+     * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
      */
-    public DomainModel transformToDomainModel( List<ModelProperty> properties )
+    public DomainModel transformToDomainModel( List<ModelProperty> properties, List<ModelEventListener> eventListeners)
         throws IOException
     {
         if ( properties == null )
         {
             throw new IllegalArgumentException( "properties: null" );
+        }
+
+        if( eventListeners == null )
+        {
+            eventListeners = new ArrayList<ModelEventListener>();
+        }
+        else
+        {
+            eventListeners = new ArrayList<ModelEventListener>(eventListeners);
         }
 
         List<ModelProperty> props = new ArrayList<ModelProperty>( properties );
@@ -225,6 +234,16 @@ public final class PomClassicTransformer
             }
         }
         props.removeAll( removeProperties );
+
+        for(ModelEventListener listener : eventListeners)
+        {
+            ModelDataSource ds = new DefaultModelDataSource();
+            ds.init( props, listener.getModelContainerFactories() );
+            for(String uri : listener.getUris() )
+            {
+                listener.fire(ds.queryFor(uri));
+            }
+        }
 
         String xml = null;
         try

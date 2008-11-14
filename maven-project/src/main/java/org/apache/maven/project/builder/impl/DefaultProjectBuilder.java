@@ -177,7 +177,8 @@ public final class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 transformer,
                                                                                                 importModels,
-                                                                                                properties ) );
+                                                                                                properties,
+                                                                                                null) );
         try
         {
             MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), artifactFactory,

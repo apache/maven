@@ -213,11 +213,23 @@ public final class ModelTransformerContext
      * @param interpolatorProperties properties to use during interpolation. @return processed domain model
      * @throws IOException if there was a problem with the transform
      */
-    public DomainModel transform(List<DomainModel> domainModels, ModelTransformer fromModelTransformer,
+    public DomainModel transform(List<DomainModel> domainModels,
+                                 ModelTransformer fromModelTransformer,
                                  ModelTransformer toModelTransformer,
-                                 Collection<ImportModel> importModels, List<InterpolatorProperty> interpolatorProperties)
+                                 Collection<ImportModel> importModels,
+                                 List<InterpolatorProperty> interpolatorProperties,
+                                 List<ModelEventListener> eventListeners)
         throws IOException
     {
+
+        if( eventListeners == null )
+        {
+            eventListeners = new ArrayList<ModelEventListener>();
+        }
+        else
+        {
+            eventListeners = new ArrayList<ModelEventListener>(eventListeners);
+        }
 
         List<ModelProperty> transformedProperties =
                 importModelProperties(importModels, fromModelTransformer.transformToModelProperties( domainModels));
@@ -290,7 +302,7 @@ public final class ModelTransformerContext
 
         try
         {
-            DomainModel domainModel = toModelTransformer.transformToDomainModel( mps );
+            DomainModel domainModel = toModelTransformer.transformToDomainModel( mps, eventListeners );
             domainModel.setEventHistory(modelDataSource.getEventHistory());
             return domainModel;
         }
@@ -316,7 +328,7 @@ public final class ModelTransformerContext
                                   ModelTransformer toModelTransformer )
         throws IOException
     {
-        return this.transform( domainModels, fromModelTransformer, toModelTransformer, null, systemInterpolatorProperties );
+        return this.transform( domainModels, fromModelTransformer, toModelTransformer, null, systemInterpolatorProperties, null );
     }
 
     private static List<ModelProperty> importModelProperties(Collection<ImportModel> importModels,

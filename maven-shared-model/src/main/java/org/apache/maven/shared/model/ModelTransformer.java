@@ -39,7 +39,7 @@ public interface ModelTransformer
      * @param properties list of model properties to transform into domain model. List may not be null.
      * @return domain model
      */
-    DomainModel transformToDomainModel( List<ModelProperty> properties )
+    DomainModel transformToDomainModel( List<ModelProperty> properties, List<ModelEventListener> eventListeners)
         throws IOException;
 
     /**
