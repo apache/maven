@@ -39,9 +39,10 @@ under the License.
     <prop0>A <![CDATA[ Test ]]> Project<![CDATA[ ]]>Property</prop0>
 
     <!--
-    This checks the coalescing of CHARACTERS events that are interleaved with comments.
+    This checks the coalescing of CHARACTERS events that are interleaved with comments. Note that inner whitespace
+    formed by whitespace-only events must be retained.
     -->
-    <prop1><!-- X -->That's <!-- X -->a<!-- X --> test!<!-- X --></prop1>
+    <prop1><!-- X -->That's<!-- X --> <!-- X -->a<!-- X --> <!-- X -->test!<!-- X --></prop1>
 
     <!--
     This checks the coalescing of CHARACTERS events which would otherwise be reported in chunks of the internal parser

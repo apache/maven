@@ -42,7 +42,7 @@ public class MavenITmng3839PomParsingCoalesceTextTest
     /**
      * Test that POM parsing properly coalesces text data.
      */
-    public void testitMNG3833()
+    public void testitMNG3839()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3839" );
