@@ -258,7 +258,7 @@ public final class PomClassicTransformer
     }
 
     /**
-     * @see ModelTransformer#transformToModelProperties(java.util.List
+     * @see ModelTransformer#transformToModelProperties(java.util.List)
      */
     public List<ModelProperty> transformToModelProperties(List<DomainModel> domainModels
     )
@@ -271,10 +271,11 @@ public final class PomClassicTransformer
 
         List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
         List<String> projectNames = new ArrayList<String>();
-        StringBuffer siteUrl = new StringBuffer();
-        StringBuffer scmUrl = new StringBuffer();
-        StringBuffer scmConnectionUrl = new StringBuffer();
-        StringBuffer scmDeveloperUrl = new StringBuffer();
+        StringBuilder projectUrl = new StringBuilder( 128 );
+        StringBuilder siteUrl = new StringBuilder( 128 );
+        StringBuilder scmUrl = new StringBuilder( 128 );
+        StringBuilder scmConnectionUrl = new StringBuilder( 128 );
+        StringBuilder scmDeveloperUrl = new StringBuilder( 128 );
 
         boolean containsBuildResources = false;
         boolean containsTestResources = false;
@@ -392,64 +393,16 @@ public final class PomClassicTransformer
                 tmp.removeAll( removeProperties );
             }
 
-            //Site Rule
-
-            ModelProperty siteUrlProperty = getPropertyFor( ProjectUri.DistributionManagement.Site.url, tmp );
-            if ( siteUrl.length() == 0 && siteUrlProperty != null )
-            {
-                siteUrl.append( siteUrlProperty.getResolvedValue());//.substring(0, siteUrlProperty.getResolvedValue().lastIndexOf("/")) );
-                for ( String projectName : projectNames )
-                {
-                    if(!siteUrl.toString().endsWith( "/")) {
-                        siteUrl.append( "/" );
-                    }
-                    siteUrl.append( projectName );
-                }
-                int index = tmp.indexOf( siteUrlProperty );
-                tmp.remove( index );
-                tmp.add( index, new ModelProperty( ProjectUri.DistributionManagement.Site.url, siteUrl.toString() ) );
-            }            
-  //If DistributionManagement site URL is property,
-            //SCM Rule
-            ModelProperty scmUrlProperty = getPropertyFor( ProjectUri.Scm.url, tmp );
-            if ( scmUrl.length() == 0 && scmUrlProperty != null )
-            {
-                scmUrl.append( scmUrlProperty.getResolvedValue() );
-                for ( String projectName : projectNames )
-                {
-                    scmUrl.append( "/" ).append( projectName );
-                }
-                int index = tmp.indexOf( scmUrlProperty );
-                tmp.remove( index );
-                tmp.add( index, new ModelProperty( ProjectUri.Scm.url, scmUrl.toString() ) );
-            }
-
-            //SCM Connection Rule
-            scmUrlProperty = getPropertyFor( ProjectUri.Scm.connection, tmp );
-            if ( scmConnectionUrl.length() == 0 && scmUrlProperty != null )
-            {
-                scmConnectionUrl.append( scmUrlProperty.getResolvedValue() );
-                for ( String projectName : projectNames )
-                {
-                    scmConnectionUrl.append( "/" ).append( projectName );
-                }
-                int index = tmp.indexOf( scmUrlProperty );
-                tmp.remove( index );
-                tmp.add( index, new ModelProperty( ProjectUri.Scm.connection, scmConnectionUrl.toString() ) );
-            }
-            //SCM Developer Rule
-            scmUrlProperty = getPropertyFor( ProjectUri.Scm.developerConnection, tmp );
-            if ( scmDeveloperUrl.length() == 0 && scmUrlProperty != null )
-            {
-                scmDeveloperUrl.append( scmUrlProperty.getResolvedValue() );
-                for ( String projectName : projectNames )
-                {
-                    scmDeveloperUrl.append( "/" ).append( projectName );
-                }
-                int index = tmp.indexOf( scmUrlProperty );
-                tmp.remove( index );
-                tmp.add( index, new ModelProperty( ProjectUri.Scm.developerConnection, scmDeveloperUrl.toString() ) );
-            }
+            // Project URL Rule
+            adjustUrl( projectUrl, tmp, ProjectUri.url, projectNames );
+            // Site Rule
+            adjustUrl( siteUrl, tmp, ProjectUri.DistributionManagement.Site.url, projectNames );
+            // SCM Rule
+            adjustUrl( scmUrl, tmp, ProjectUri.Scm.url, projectNames );
+            // SCM Connection Rule
+            adjustUrl( scmConnectionUrl, tmp, ProjectUri.Scm.connection, projectNames );
+            // SCM Developer Rule
+            adjustUrl( scmDeveloperUrl, tmp, ProjectUri.Scm.developerConnection, projectNames );
 
             //Project Name Inheritance Rule
             //Packaging Inheritance Rule
@@ -540,6 +493,37 @@ public final class PomClassicTransformer
 
         modelProperties = source.getModelProperties();
         return modelProperties;
+    }
+
+    /**
+     * Adjusts an inherited URL to compensate for a child's relation/distance to the parent that defines the URL.
+     * 
+     * @param url The buffer for the adjusted URL, must not be {@code null}.
+     * @param properties The model properties to update, must not be {@code null}.
+     * @param uri The URI of the model property defining the URL to adjust, must not be {@code null}.
+     * @param ids The artifact identifiers of the parent projects, starting with the least significant parent, must not
+     *            be {@code null}.
+     */
+    private void adjustUrl( StringBuilder url, List<ModelProperty> properties, String uri, List<String> ids )
+    {
+        if ( url.length() == 0 )
+        {
+            ModelProperty property = getPropertyFor( uri, properties );
+            if ( property != null )
+            {
+                url.append( property.getResolvedValue() );
+                for ( String id : ids )
+                {
+                    if ( url.length() > 0 && url.charAt( url.length() - 1 ) != '/' )
+                    {
+                        url.append( '/' );
+                    }
+                    url.append( id );
+                }
+                int index = properties.indexOf( property );
+                properties.set( index, new ModelProperty( uri, url.toString() ) );
+            }
+        }
     }
 
     public void interpolateModelProperties(List<ModelProperty> modelProperties,
