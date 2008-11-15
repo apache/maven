@@ -96,6 +96,10 @@ under the License.
       <url>http://parent.url/site</url>
       <id>parent.site</id>
     </site>
+    <downloadUrl>http://parent.url/download</downloadUrl>
+    <relocation>
+      <message>parent-reloc-msg</message>
+    </relocation>
   </distributionManagement>
 
   <properties>

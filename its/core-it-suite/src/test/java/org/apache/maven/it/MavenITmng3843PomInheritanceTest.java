@@ -136,6 +136,8 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "http://parent.url/dist", props.getProperty( "project.distributionManagement.repository.url" ) );
         assertEquals( "http://parent.url/snaps", props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
         assertUrlCommon( "http://parent.url/site", props.getProperty( "project.distributionManagement.site.url" ) );
+        assertUrlCommon( "http://parent.url/download", props.getProperty( "project.distributionManagement.downloadUrl" ) );
+        assertMissing( props, "project.distributionManagement.relocation." );
         assertMissing( props, "project.profiles." );
         assertEquals( "child-1-0.1", props.getProperty( "project.build.finalName" ) );
         assertPathEquals( basedir, "src/main", props.getProperty( "project.build.sourceDirectory" ) );
