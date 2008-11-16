@@ -44,8 +44,8 @@ public class DefaultBuildPlannerTest
         throws Exception
     {
         super.setUp();
-        buildPlanner = (DefaultBuildPlanner) lookup( BuildPlanner.class.getName(), "default" );
-        pluginLoader = (TestPluginLoader) lookup( PluginLoader.class.getName(), "default" );
+        buildPlanner = (DefaultBuildPlanner) lookup( BuildPlanner.class );
+        pluginLoader = (TestPluginLoader) lookup( PluginLoader.class );
     }
 
     public void test_constructBuildPlan_ForkedPhaseFromMojoBoundInThatPhase()

@@ -21,7 +21,7 @@ public class DefaultMavenRealmManagerTest
     {
         super.setUp();
 
-        factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        factory = lookup( ArtifactFactory.class );
     }
 
     public void test_ReuseSingleExtensionRealmFromMultipleProjectRealms_UsingTwoManagerInstances()
@@ -57,9 +57,7 @@ public class DefaultMavenRealmManagerTest
 
         mgr1.importExtensionsIntoProjectRealm( "org.group", pAid1, "2", ext1 );
 
-        String targetClass = ArtifactFactory.ROLE;
-
-        Object result1 = getContainer().lookup( targetClass, "test", mgr1.getProjectRealm( "org.group", pAid1, "2" ) );
+        ArtifactFactory result1 = getContainer().lookup( ArtifactFactory.class, "test" );
 
         assertNotNull( result1 );
 
@@ -72,7 +70,7 @@ public class DefaultMavenRealmManagerTest
         // ext2 doesn't have a file associated with it, but it SHOULD succeed anyway.
         mgr2.importExtensionsIntoProjectRealm( "org.group", pAid2, "2", ext2 );
 
-        Object result2 = getContainer().lookup( targetClass, "test", mgr2.getProjectRealm( "org.group", pAid2, "2" ) );
+        ArtifactFactory result2 = getContainer().lookup( ArtifactFactory.class, "test" );
 
         assertNotNull( result2 );
 

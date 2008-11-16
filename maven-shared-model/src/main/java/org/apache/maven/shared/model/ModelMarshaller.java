@@ -38,6 +38,7 @@ import java.util.Set;
  * Provides methods for marshalling and unmarshalling XML that does not contain attributes.
  */
 public final class ModelMarshaller
+    implements ModelPropertiesGenerator
 {
 
     /**
@@ -47,6 +48,16 @@ public final class ModelMarshaller
     {
     }
 
+    public List<ModelProperty> generateModelProperties( InputStream inputStream, String baseUri, Set<String> collections ) 
+        throws IOException
+    {
+        return marshallXmlToModelProperties( inputStream, baseUri, collections );
+    }
+
+    public void registerModelPropertyListener( String uri )
+    {
+    }
+    
     /**
      * Returns list of model properties transformed from the specified input stream.
      *

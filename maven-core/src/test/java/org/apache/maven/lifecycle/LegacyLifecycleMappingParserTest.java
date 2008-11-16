@@ -27,11 +27,11 @@ public class LegacyLifecycleMappingParserTest
     {
         super.setUp();
         
-        parser = (LegacyLifecycleMappingParser) lookup( LegacyLifecycleMappingParser.ROLE, "default" );
+        parser = lookup( LegacyLifecycleMappingParser.class, "default" );
 
-        testComponent = (LegacyLifecycleParsingTestComponent) lookup( LegacyLifecycleParsingTestComponent.ROLE, "default" );
-        testMapping = (LifecycleMapping) lookup( LifecycleMapping.ROLE, "test-mapping" );
-        testMapping2 = (LifecycleMapping) lookup( LifecycleMapping.ROLE, "test-mapping2" );
+        testComponent = lookup( LegacyLifecycleParsingTestComponent.class, "default" );
+        testMapping = lookup( LifecycleMapping.class, "test-mapping" );
+        testMapping2 = lookup( LifecycleMapping.class, "test-mapping2" );
     }
 
     public void tearDown()

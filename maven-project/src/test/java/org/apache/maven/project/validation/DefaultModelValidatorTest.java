@@ -223,7 +223,7 @@ public class DefaultModelValidatorTest
 
         MavenXpp3Reader reader = new MavenXpp3Reader();
 
-        validator = (ModelValidator) lookup( ModelValidator.ROLE );
+        validator = lookup( ModelValidator.class );
 
         model = reader.read( input );
 

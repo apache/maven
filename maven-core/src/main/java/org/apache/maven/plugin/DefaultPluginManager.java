@@ -815,12 +815,12 @@ public class DefaultPluginManager
         getLogger().debug(
                            "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
                                            + pluginRealm.getId() + " - descRealmId="
-                                           + mojoDescriptor.getRealmId() );
+                                           + mojoDescriptor.getRealm() );
 
         Mojo mojo;
         try
         {
-            mojo = (Mojo) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint(), pluginRealm );
+            mojo = container.lookup( Mojo.class, mojoDescriptor.getRoleHint() );
         }
         catch ( ComponentLookupException e )
         {
@@ -1344,11 +1344,11 @@ public class DefaultPluginManager
             // so that this meethod could entirely be handled by a plexus lookup?
             if ( StringUtils.isNotEmpty( configuratorId ) )
             {
-                configurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE, configuratorId, realm );
+                configurator = container.lookup( ComponentConfigurator.class, configuratorId );
             }
             else
             {
-                configurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE, "basic", realm );
+                configurator = container.lookup( ComponentConfigurator.class, "basic" );
             }
 
             ConfigurationListener listener = new DebugConfigurationListener( getLogger() );

@@ -66,7 +66,7 @@ public class MavenMetadataSourceTest
         deps.add( dep1 );
         deps.add( dep2 );
         
-        ArtifactFactory factory = ( ArtifactFactory ) lookup( ArtifactFactory.ROLE );
+        ArtifactFactory factory = lookup( ArtifactFactory.class );
         
         ArtifactFilter dependencyFilter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE );
         
@@ -105,7 +105,7 @@ public class MavenMetadataSourceTest
 
         MavenProject project = new MavenProject( model );
 
-        ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        ArtifactFactory factory = lookup( ArtifactFactory.class );
 
         project.setArtifacts( project.createArtifacts( factory, null, null ) );
 
@@ -158,7 +158,7 @@ public class MavenMetadataSourceTest
 
         injector.injectDefaults( model );
 
-        ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        ArtifactFactory factory = lookup( ArtifactFactory.class );
 
         project.setArtifacts( project.createArtifacts( factory, null, null ) );
 

@@ -84,7 +84,7 @@ public class CustomActivator
 
         try
         {
-            activator = (ProfileActivator) container.lookup( ProfileActivator.ROLE, type );
+            activator = container.lookup( ProfileActivator.class, type );
         }
         catch ( ComponentLookupException e )
         {

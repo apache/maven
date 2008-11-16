@@ -39,6 +39,7 @@ import org.apache.maven.path.PathTranslator;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.logging.Logger;
@@ -73,8 +74,8 @@ public class PluginParameterExpressionEvaluatorTest
         throws Exception
     {
         super.setUp();
-        factory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        pathTranslator = (PathTranslator) lookup( PathTranslator.ROLE );
+        factory = lookup( ArtifactFactory.class );
+        pathTranslator = lookup( PathTranslator.class );
     }
 
     public void testPluginDescriptorExpressionReference()
@@ -108,7 +109,7 @@ public class PluginParameterExpressionEvaluatorTest
                                                                  null,
                                                                  Artifact.SCOPE_COMPILE );
 
-        List deps = new ArrayList();
+        List<Artifact> deps = new ArrayList<Artifact>();
         deps.add( depArtifact );
 
         exec.getMojoDescriptor().getPluginDescriptor().setArtifacts( deps );
@@ -139,7 +140,7 @@ public class PluginParameterExpressionEvaluatorTest
                                                                  null,
                                                                  Artifact.SCOPE_COMPILE );
 
-        List deps = new ArrayList();
+        List<Artifact> deps = new ArrayList<Artifact>();
         deps.add( depArtifact );
 
         exec.getMojoDescriptor().getPluginDescriptor().setArtifacts( deps );
@@ -419,12 +420,11 @@ public class PluginParameterExpressionEvaluatorTest
                                                            Properties executionProperties )
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
+        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
 
         ArtifactRepository repo = new DefaultArtifactRepository( "local", "target/repo", repoLayout );
 
-        PlexusContainer container = getContainer();
+        MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
         MavenSession session = createSession( container, repo );
 
         MojoDescriptor mojo = new MojoDescriptor();
@@ -442,7 +442,7 @@ public class PluginParameterExpressionEvaluatorTest
                                        String version )
         throws Exception
     {
-        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        ArtifactFactory artifactFactory = lookup( ArtifactFactory.class );
 
         // TODO: used to be SCOPE_COMPILE, check
         return artifactFactory.createBuildArtifact( groupId, artifactId, version, "jar" );

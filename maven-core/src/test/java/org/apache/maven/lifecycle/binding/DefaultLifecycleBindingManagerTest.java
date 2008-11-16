@@ -44,7 +44,7 @@ public class DefaultLifecycleBindingManagerTest
     {
         super.setUp();
 
-        mgr = (LifecycleBindingManager) lookup( LifecycleBindingManager.ROLE, "default" );
+        mgr = lookup( LifecycleBindingManager.class, "default" );
     }
 
     public void testLookup()

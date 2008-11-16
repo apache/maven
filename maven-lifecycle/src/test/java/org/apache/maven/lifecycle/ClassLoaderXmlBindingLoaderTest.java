@@ -37,7 +37,7 @@ public class ClassLoaderXmlBindingLoaderTest
     public void testComponentAccess_ParseSingleCleanBinding()
         throws Exception
     {
-        LifecycleBindingLoader loader = (LifecycleBindingLoader) lookup( LifecycleBindingLoader.ROLE, "single-clean-mapping" );
+        LifecycleBindingLoader loader = lookup( LifecycleBindingLoader.class, "single-clean-mapping" );
 
         LifecycleBindings bindings = loader.getBindings();
 

@@ -20,8 +20,8 @@ public class DefaultMavenProjectHelperTest
     {
         super.setUp();
 
-        mavenProjectHelper = (MavenProjectHelper) lookup( MavenProjectHelper.ROLE );
-        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        mavenProjectHelper = lookup( MavenProjectHelper.class );
+        artifactFactory = lookup( ArtifactFactory.class );
     }
 
     public void testShouldThrowExceptionWhenDuplicateAttachmentIsAdded()

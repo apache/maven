@@ -186,7 +186,7 @@ public class DefaultMavenRealmManager
                     // that allows most of the extension to stay hidden, and the
                     // specific local extension components are still accessible
                     // from the project-level realm.
-                    comp.setRealmId( realm.getId() );
+                    comp.setRealm( realm );
 
                     // Finally, add the extension component's descriptor (with projectRealm
                     // set as the lookup realm) to the container.

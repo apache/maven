@@ -51,12 +51,12 @@ public abstract class AbstractMavenProjectTestCase
 
         if ( getContainer().hasComponent( MavenProjectBuilder.ROLE, "test" ) )
         {
-            projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE, "test" );
+            projectBuilder = lookup( MavenProjectBuilder.class, "test" );
         }
         else
         {
             // default over to the main project builder...
-            projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+            projectBuilder = lookup( MavenProjectBuilder.class );
         }
     }
 
@@ -95,8 +95,7 @@ public abstract class AbstractMavenProjectTestCase
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
+        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
 
         ArtifactRepository r = new DefaultArtifactRepository( "local",
                                                               "file://" + getLocalRepositoryPath().getAbsolutePath(),

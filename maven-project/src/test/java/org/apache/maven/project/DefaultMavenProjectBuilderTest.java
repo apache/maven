@@ -50,7 +50,7 @@ public class DefaultMavenProjectBuilderTest
     {
         super.setUp();
 
-        projectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+        projectBuilder = lookup( MavenProjectBuilder.class );
 
         localRepoDir = new File( System.getProperty( "java.io.tmpdir" ), "local-repo." + System.currentTimeMillis() );
         localRepoDir.mkdirs();
@@ -115,8 +115,7 @@ public class DefaultMavenProjectBuilderTest
     protected ArtifactRepository getLocalRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
+        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
 
         ArtifactRepository r = new DefaultArtifactRepository( "local", "file://" + localRepoDir.getAbsolutePath(),
                                                               repoLayout );

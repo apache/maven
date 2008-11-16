@@ -28,6 +28,7 @@ import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.activation.ProfileActivator;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -41,7 +42,7 @@ import java.util.Map.Entry;
 public class DefaultProfileManager
     implements ProfileManager
 {
-    private PlexusContainer container;
+    private MutablePlexusContainer container;
 
     private Map profilesById = new LinkedHashMap();
 
@@ -53,7 +54,7 @@ public class DefaultProfileManager
      */
     public DefaultProfileManager( PlexusContainer container, ProfileActivationContext profileActivationContext )
     {
-        this.container = container;
+        this.container = (MutablePlexusContainer) container;
         if ( profileActivationContext == null )
         {
             this.profileActivationContext = createDefaultActivationContext();
@@ -70,7 +71,7 @@ public class DefaultProfileManager
      */
     public DefaultProfileManager( PlexusContainer container )
     {
-        this.container = container;
+        this.container = (MutablePlexusContainer) container;
 
         profileActivationContext = createDefaultActivationContext();
     }
@@ -259,16 +260,14 @@ public class DefaultProfileManager
     private boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
-        List activators = null;
+        List<ProfileActivator> activators = null;
 
         try
         {
-            activators = container.lookupList( ProfileActivator.ROLE );
+            activators = container.lookupList( ProfileActivator.class );
 
-            for ( Iterator activatorIterator = activators.iterator(); activatorIterator.hasNext(); )
+            for ( ProfileActivator activator : activators )
             {
-                ProfileActivator activator = (ProfileActivator) activatorIterator.next();
-
                 if ( activator.canDetermineActivation( profile, context ) )
                 {
                     if ( activator.isActive( profile, context ) )

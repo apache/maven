@@ -17,7 +17,7 @@ public class DefaultMojoBindingFactoryTest
     {
         super.setUp();
 
-        factory = (MojoBindingFactory) lookup( MojoBindingFactory.ROLE, "default" );
+        factory = lookup( MojoBindingFactory.class, "default" );
     }
 
     public void testPrefixGoalSpec_PrefixReferenceNotAllowed()

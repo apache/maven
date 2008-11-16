@@ -86,12 +86,12 @@ public class MavenEmbedderProjectWithExtensionReadingTest
                 .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() ) );
         }
 
-        protected Map getPluginExtensionComponents( Plugin plugin )
+        protected Map<String, ArtifactHandler> getPluginExtensionComponents( Plugin plugin )
             throws PluginManagerException
         {
             try
             {
-                return getPlexusContainer().lookupMap( ArtifactHandler.ROLE );
+                return getPlexusContainer().lookupMap( ArtifactHandler.class );
             }
             catch ( ComponentLookupException e )
             {

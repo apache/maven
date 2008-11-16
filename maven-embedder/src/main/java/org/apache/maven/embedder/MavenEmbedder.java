@@ -324,7 +324,7 @@ public class MavenEmbedder
         ArtifactNotFoundException, InvalidPluginException, PluginManagerException,
         PluginNotFoundException, PluginVersionNotFoundException
     {
-        PluginManager pluginManager = (PluginManager) container.lookup( PluginManager.ROLE );
+        PluginManager pluginManager = container.lookup( PluginManager.class );
 
 //        MavenSession session = new MavenSession( container, request, null, null, projectSessions );
         MavenSession session = new MavenSession( container, request, null, null );
@@ -611,7 +611,7 @@ public class MavenEmbedder
             ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .addComponentDiscoverer( new MavenPluginDiscoverer() )
                 .addComponentDiscoveryListener( new MavenPluginCollector() )
-                .setClassWorld( classWorld ).setParentContainer( configuration.getParentContainer() ).setName( "embedder" );
+                .setClassWorld( classWorld ).setName( "embedder" );
 
             container = new DefaultPlexusContainer( cc );
         }
@@ -646,23 +646,23 @@ public class MavenEmbedder
 
             modelWriter = new MavenXpp3Writer();
 
-            maven = (Maven) container.lookup( Maven.ROLE );
+            maven = container.lookup( Maven.class );
 
-            mavenProjectBuilder = (MavenProjectBuilder) container.lookup( MavenProjectBuilder.ROLE );
+            mavenProjectBuilder = container.lookup( MavenProjectBuilder.class );
 
             // ----------------------------------------------------------------------
             // Artifact related components
             // ----------------------------------------------------------------------
 
-            artifactFactory = (ArtifactFactory) container.lookup( ArtifactFactory.ROLE );
+            artifactFactory = container.lookup( ArtifactFactory.class );
 
-            artifactResolver = (ArtifactResolver) container.lookup( ArtifactResolver.ROLE, "default" );
+            artifactResolver = container.lookup( ArtifactResolver.class );
 
-            populator = (MavenExecutionRequestPopulator) container.lookup( MavenExecutionRequestPopulator.ROLE );
+            populator = container.lookup( MavenExecutionRequestPopulator.class );
 
-            buildPlanner = (BuildPlanner) container.lookup( BuildPlanner.class );
+            buildPlanner = container.lookup( BuildPlanner.class );
 
-            artifactHandlerManager = (ArtifactHandlerManager) container.lookup( ArtifactHandlerManager.ROLE );
+            artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
 
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.

@@ -38,9 +38,9 @@ public class ProjectClasspathTest
         File f = getFileForClasspathResource( dir + "project-with-scoped-dependencies.xml" );
 
 //        assertEquals( TestArtifactResolver.class, getContainer().lookup( ArtifactResolver.ROLE ).getClass() );
-        TestProjectBuilder builder = (TestProjectBuilder) getContainer().lookup( MavenProjectBuilder.ROLE, "test" );
+        TestProjectBuilder builder = (TestProjectBuilder) getContainer().lookup( MavenProjectBuilder.class, "test" );
         
-        TestArtifactResolver testArtifactResolver = (TestArtifactResolver) getContainer().lookup( TestArtifactResolver.class.getName() );
+        TestArtifactResolver testArtifactResolver = getContainer().lookup( TestArtifactResolver.class );
         
         builder.setArtifactResolver( testArtifactResolver );
         builder.setArtifactMetadataSource( testArtifactResolver.source() );

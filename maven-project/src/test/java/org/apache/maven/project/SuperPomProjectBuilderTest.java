@@ -38,7 +38,7 @@ public class SuperPomProjectBuilderTest
     {
         super.setUp();
 
-        projectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.ROLE );
+        projectBuilder = lookup( MavenProjectBuilder.class );
     }
 
     public void testStandaloneSuperPomContainsInjectedExternalProfileRepositories()

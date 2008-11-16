@@ -105,7 +105,7 @@ public abstract class AbstractConsoleDownloadMonitor
     public void transferError( TransferEvent transferEvent )
     {
         // TODO: can't use getLogger() because this isn't currently instantiated as a component
-        transferEvent.getException().printStackTrace();
+        // transferEvent.getException().printStackTrace();
     }
 
     /**

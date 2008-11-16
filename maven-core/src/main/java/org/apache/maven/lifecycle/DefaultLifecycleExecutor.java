@@ -367,7 +367,7 @@ public class DefaultLifecycleExecutor
      * from the core Maven realm, and contains the specific build-extension
      * components referenced in that project, the lookup realms must be managed for
      * each project that's used to fire off a mojo execution. This helps ensure
-     * that unsafe {@link PlexusContainer#lookup(String)} and related calls will
+     * that unsafe {@link PlexusContainer#lookup} and related calls will
      * have access to these build-extension components.
      * <br />
      * This method simply restores the original Maven-core lookup realm when a
@@ -386,7 +386,7 @@ public class DefaultLifecycleExecutor
      * from the core Maven realm, and contains the specific build-extension
      * components referenced in that project, the lookup realms must be managed for
      * each project that's used to fire off a mojo execution. This helps ensure
-     * that unsafe {@link PlexusContainer#lookup(String)} and related calls will
+     * that unsafe {@link PlexusContainer#lookup} and related calls will
      * have access to these build-extension components.
      * <br />
      * This method is meant to find a project-specific realm, if one exists, for

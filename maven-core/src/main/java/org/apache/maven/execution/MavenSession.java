@@ -129,6 +129,18 @@ public class MavenSession
         return container.lookup( role, roleHint );
     }
 
+    public <T> T lookup( Class<T> type )
+        throws ComponentLookupException
+    {
+        return container.lookup( type );
+    }
+
+    public <T> T lookup( Class<T> type, String roleHint )
+        throws ComponentLookupException
+    {
+        return container.lookup( type, roleHint );
+    }
+
     public List lookupList( String role )
         throws ComponentLookupException
     {

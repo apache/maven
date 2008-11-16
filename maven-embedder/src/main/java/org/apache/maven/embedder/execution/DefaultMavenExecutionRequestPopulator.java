@@ -50,6 +50,7 @@ import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
@@ -89,7 +90,7 @@ public class DefaultMavenExecutionRequestPopulator
 
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
-    private PlexusContainer container;
+    private MutablePlexusContainer container;
 
     private WagonManager wagonManager;
 
@@ -574,7 +575,7 @@ public class DefaultMavenExecutionRequestPopulator
     private void resolveParameters( Settings settings )
         throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
     {
-        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
+        WagonManager wagonManager = container.lookup( WagonManager.class );
 
         try
         {
@@ -715,6 +716,6 @@ public class DefaultMavenExecutionRequestPopulator
     public void contextualize( Context context )
         throws ContextException
     {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        container = (MutablePlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

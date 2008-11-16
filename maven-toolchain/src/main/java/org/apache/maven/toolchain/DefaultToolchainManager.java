@@ -77,7 +77,7 @@ public class DefaultToolchainManager extends AbstractLogEnabled
         try
         {
             PersistedToolchains pers = readToolchainSettings ();
-            Map factories = container.lookupMap( ToolchainFactory.ROLE );
+            Map<String, ToolchainFactory> factories = container.lookupMap( ToolchainFactory.class );
             List toRet = new ArrayList(  );
             if ( pers != null )
             {
@@ -88,7 +88,7 @@ public class DefaultToolchainManager extends AbstractLogEnabled
                     while ( it.hasNext() )
                     {
                         ToolchainModel toolchainModel = (ToolchainModel) it.next();
-                        ToolchainFactory fact = (ToolchainFactory) factories.get( toolchainModel.getType() );
+                        ToolchainFactory fact = factories.get( toolchainModel.getType() );
                         if ( fact != null )
                         {
                             toRet.add( fact.createToolchain( toolchainModel ) );
@@ -100,11 +100,9 @@ public class DefaultToolchainManager extends AbstractLogEnabled
                     }
                 }
             }
-            Iterator it = factories.values().iterator();
-            while ( it.hasNext() )
+            for ( ToolchainFactory toolchainFactory : factories.values() )
             {
-                ToolchainFactory fact = (ToolchainFactory) it.next();
-                ToolchainPrivate tool = fact.createDefaultToolchain();
+                ToolchainPrivate tool = toolchainFactory.createDefaultToolchain();
                 if ( tool != null )
                 {
                     toRet.add( tool );
@@ -136,7 +134,7 @@ public class DefaultToolchainManager extends AbstractLogEnabled
         {
             try
             {
-                ToolchainFactory fact = (ToolchainFactory) container.lookup(ToolchainFactory.ROLE, type);
+                ToolchainFactory fact = container.lookup(ToolchainFactory.class, type);
                 return fact.createToolchain( model );
             }
             catch ( ComponentLookupException ex )
