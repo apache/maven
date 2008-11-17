@@ -16,8 +16,19 @@ import java.util.ArrayList;
 public class BuildExtensionListener
     implements ModelEventListener
 {
+    private boolean inBuild;
+
+    public BuildExtensionListener(boolean inBuild)
+    {
+        this.inBuild = inBuild;
+    }
+
     public void fire( List<ModelContainer> modelContainers )
     {
+        if(!inBuild) {
+            return;
+        }
+        
         List<BuildExtension> buildExtensions = new ArrayList<BuildExtension>();
         for ( ModelContainer mc : modelContainers )
         {
@@ -30,7 +41,7 @@ public class BuildExtensionListener
         for( BuildExtension be : buildExtensions )
         {
             System.out.println( "Extension ---> " + be.groupId + " : " + be.artifactId + " : " + be.version );
-        }
+        }        
     }
 
     public List<String> getUris()

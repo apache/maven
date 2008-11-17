@@ -176,7 +176,8 @@ public final class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 importModels,
                                                                                                 properties,
-                                                                                                Arrays.asList((ModelEventListener) new BuildExtensionListener())) );
+                                                                                                Arrays.asList((ModelEventListener)
+                                                                                                        new BuildExtensionListener(domainModel.isPomInBuild()))) );
         try
         {
             MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), artifactFactory,
