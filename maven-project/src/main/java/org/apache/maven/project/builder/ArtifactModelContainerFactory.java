@@ -146,12 +146,12 @@ public final class ArtifactModelContainerFactory
 
             if ( type == null )
             {
-                type = "";
+                type = "jar";
             }
 
             if ( scope == null )
             {
-                scope = "";
+                scope = "compile";
             }
         }
 
