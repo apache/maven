@@ -42,7 +42,8 @@ public final class ArtifactModelContainerFactory
         ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.xUri,
 
         ProjectUri.Build.Plugins.Plugin.xUri, ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.xUri,
-        ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.Exclusions.Exclusion.xUri
+        ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.Exclusions.Exclusion.xUri,
+        ProjectUri.Build.Extensions.Extension.xUri        
          ) );
 
     public Collection<String> getUris()

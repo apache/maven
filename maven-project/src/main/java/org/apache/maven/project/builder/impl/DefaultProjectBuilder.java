@@ -33,7 +33,7 @@ import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.builder.ProjectBuilder;
-import org.apache.maven.project.builder.listeners.PluginExtensionListener;
+import org.apache.maven.project.builder.listeners.BuildExtensionListener;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.shared.model.*;
@@ -176,7 +176,7 @@ public final class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 importModels,
                                                                                                 properties,
-                                                                                                Arrays.asList((ModelEventListener) new PluginExtensionListener())) );
+                                                                                                Arrays.asList((ModelEventListener) new BuildExtensionListener())) );
         try
         {
             MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), artifactFactory,
