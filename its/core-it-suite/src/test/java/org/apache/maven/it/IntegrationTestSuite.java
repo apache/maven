@@ -187,6 +187,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2068ReactorRelativeParentsTest.class );
         suite.addTestSuite( MavenITmng2052InterpolateWithSettingsProfilePropertiesTest.class );
         suite.addTestSuite( MavenITmng2045testJarDependenciesBrokenInReactorTest.class );
+        suite.addTestSuite( MavenITmng2006ChildPathAwareUrlInheritanceTest.class );
         suite.addTestSuite( MavenITmng1999DefaultReportsInheritanceTest.class );
         suite.addTestSuite( MavenITmng1703PluginMgmtDepInheritanceTest.class );
         suite.addTestSuite( MavenITmng1493NonStandardModulePomNamesTest.class );
