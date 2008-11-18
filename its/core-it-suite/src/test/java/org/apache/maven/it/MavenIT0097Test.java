@@ -30,7 +30,7 @@ public class MavenIT0097Test
 
     /**
      * Test that the implied relative path for the parent POM works, even two
-     * levels deep.
+     * levels deep (c.f. MNG-2068).
      */
     public void testit0097()
         throws Exception

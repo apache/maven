@@ -23,49 +23,27 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1995">MNG-1995</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2054">MNG-2054</a>.
  * 
- * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenIT0091Test
+public class MavenITmng2054PluginExecutionInheritanceTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenIT0091Test()
-    {
-        super( "(2.999.0,)" );
-    }
-
     /**
-     * Verify that POM fields that are of type boolean can be interpolated with expressions.
+     * Test that plugin executions from &gt;1 step of inheritance don't run multiple times.
      */
-    public void testitMNG1995()
+    public void testitMNG2054()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0091" );
-
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2054" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-
-        verifier.executeGoal( "validate" );
+        verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
-        Properties props = verifier.loadProperties( "target/expression.properties" );
-        assertEquals( "true", props.getProperty( "project.build.resources.0.filtering" ) );
-        boolean foundTestRepo = false;
-        for ( int i = Integer.parseInt( props.getProperty( "project.repositories" ) ) - 1; i >= 0; i-- )
-        {
-            if ( "maven-core-it".equals( props.getProperty( "project.repositories." + i + ".id" ) ) )
-            {
-                assertEquals( "true", props.getProperty( "project.repositories." + i + ".releases.enabled" ) );
-                foundTestRepo = true;
-            }
-        }
-        assertTrue( foundTestRepo );
     }
 
 }
