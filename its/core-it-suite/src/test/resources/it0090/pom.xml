@@ -1,58 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0090</name> 
+
   <groupId>org.apache.maven.its.it0090</groupId>
   <artifactId>maven-it-it0090</artifactId>
-  <description>Test that ensures that envars are interpolated correctly into plugin
-        configurations.</description>
   <version>1.0</version>
-  
-  <repositories>
-    <repository>
-      <id>test-plugins</id>
-      <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-      <releases><enabled>false</enabled></releases>
-      <snapshots><enabled>true</enabled></snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>test-plugins</id>
-      <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-      <releases><enabled>false</enabled></releases>
-      <snapshots><enabled>true</enabled></snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-  
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <type>jar</type>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+
+  <name>Maven Integration Test :: it0090</name> 
+  <description>
+    Test that ensures that envars are interpolated correctly into plugin
+    configurations.
+  </description>
+
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-generate-envar-properties</artifactId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>process-resources</phase>
+            <phase>validate</phase>
             <configuration>
-              <mavenTestEnvar>${env.MAVEN_TEST_ENVAR}</mavenTestEnvar>
+              <propertiesFile>target/env.properties</propertiesFile>
+              <stringParam>${env.MAVEN_TEST_ENVAR}</stringParam>
             </configuration>
             <goals>
-              <goal>generate-envar-properties</goal>
+              <goal>config</goal>
             </goals>
           </execution>
         </executions>

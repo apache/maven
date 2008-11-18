@@ -25,6 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class MavenIT0090Test
     extends AbstractMavenIntegrationTestCase
@@ -37,14 +38,18 @@ public class MavenIT0090Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0090" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath(), true );
         Map envVars = new HashMap();
         envVars.put( "MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE" );
-        verifier.executeGoal( "test", envVars );
-        verifier.assertFilePresent( "target/mojo-generated.properties" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate", envVars );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties props = verifier.loadProperties( "target/env.properties" );
+        assertEquals( "MAVEN_TEST_ENVAR_VALUE", props.getProperty( "stringParam" ) );
     }
-}
 
+}
