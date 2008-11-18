@@ -40,4 +40,10 @@ public class Bean
         setterCalled = true;
     }
 
+    public String toString()
+    {
+        return getClass().getName() + "[fieldParam=" + fieldParam + ", setterParam=" + setterParam
+                + ", setterCalled=" + setterCalled + "]";
+    }
+
 }
