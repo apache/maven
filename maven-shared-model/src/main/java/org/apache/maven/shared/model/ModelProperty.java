@@ -131,7 +131,7 @@ public final class ModelProperty
     public String getResolvedValue()
     {
         if( !uri.contains("#property") && resolvedValue != null && !resolvedValue.startsWith ("<![CDATA[")
-                && (resolvedValue.contains( "=" ) || resolvedValue.contains( "<" )))
+                && (resolvedValue.contains( "=" ) || resolvedValue.contains( "<" ) || resolvedValue.contains( "&" )))
         {
             resolvedValue =  "<![CDATA[" + resolvedValue + "]]>";
         }
