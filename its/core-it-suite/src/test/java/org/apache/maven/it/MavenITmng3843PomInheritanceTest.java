@@ -53,6 +53,7 @@ public class MavenITmng3843PomInheritanceTest
         verifier.deleteDirectory( "test-1/target" );
         verifier.deleteDirectory( "test-2/target" );
         verifier.deleteDirectory( "test-2/child-1/target" );
+        verifier.deleteDirectory( "test-3/sub-parent/child-a/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -162,6 +163,10 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "parent-dep-b", props.getProperty( "project.dependencies.0.artifactId" ) );
         assertEquals( "1", props.getProperty( "project.dependencyManagement.dependencies" ) );
         assertEquals( "parent-dep-a", props.getProperty( "project.dependencyManagement.dependencies.0.artifactId" ) );
+
+        basedir = new File( verifier.getBasedir(), "test-3/sub-parent/child-a" );
+        props = verifier.loadProperties( "test-3/sub-parent/child-a/target/pom.properties" );
+        assertEquals( "../pom.xml", props.getProperty( "project.originalModel.parent.relativePath" ) );
     }
 
     private void assertPathEquals( File basedir, String expected, String actual )
