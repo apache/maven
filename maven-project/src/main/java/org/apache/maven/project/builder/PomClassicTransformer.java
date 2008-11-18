@@ -407,11 +407,13 @@ public final class PomClassicTransformer
             //Project Name Inheritance Rule
             //Packaging Inheritance Rule
             //Profiles not inherited rule
+            //parent.relativePath not inherited rule
             for ( ModelProperty mp : tmp )
             {
                 String uri = mp.getUri();
                 if ( domainModels.indexOf( domainModel ) > 0 && ( uri.equals( ProjectUri.name ) ||
-                    uri.equals( ProjectUri.packaging ) || uri.startsWith( ProjectUri.Profiles.xUri ) ) )
+                    uri.equals( ProjectUri.packaging ) || uri.startsWith( ProjectUri.Profiles.xUri ) )
+                        || uri.startsWith( ProjectUri.Parent.relativePath ))
                 {
                     clearedProperties.add( mp );
                 }
