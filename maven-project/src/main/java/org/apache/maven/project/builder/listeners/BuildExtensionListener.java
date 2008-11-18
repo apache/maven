@@ -1,17 +1,16 @@
 package org.apache.maven.project.builder.listeners;
 
-import org.apache.maven.shared.model.ModelEventListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.maven.project.builder.ArtifactModelContainerFactory;
+import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelContainerFactory;
+import org.apache.maven.shared.model.ModelEventListener;
 import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.project.builder.ProjectUri;
-import org.apache.maven.project.builder.ArtifactModelContainerFactory;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Collection;
-import java.util.Arrays;
-import java.util.ArrayList;
 
 public class BuildExtensionListener
     implements ModelEventListener

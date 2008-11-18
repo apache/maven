@@ -713,7 +713,8 @@ public class DefaultPluginManager
 
             if ( oldLookupRealm != null )
             {
-                container.setLookupRealm( oldLookupRealm );
+                //container.setLookupRealm( oldLookupRealm );
+                container.setLookupRealm( null );
             }
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
