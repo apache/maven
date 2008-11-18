@@ -214,7 +214,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
         suite.addTestSuite( MavenIT0097Test.class );
         suite.addTestSuite( MavenIT0096Test.class );
-        suite.addTestSuite( MavenIT0095Test.class );
         suite.addTestSuite( MavenIT0092Test.class );
         suite.addTestSuite( MavenIT0091Test.class );
         suite.addTestSuite( MavenIT0090Test.class );
