@@ -72,7 +72,7 @@ import java.text.SimpleDateFormat;
  */
 public class DefaultMavenProjectBuilder
     implements MavenProjectBuilder, Initializable, LogEnabled
-{
+{    
     protected MavenProfilesBuilder profilesBuilder;
 
     protected ArtifactResolver artifactResolver;
@@ -538,6 +538,8 @@ public class DefaultMavenProjectBuilder
                 PomInterpolatorTag.PROJECT_PROPERTIES.name()));
         }
 
+        interpolatorProperties.add(new InterpolatorProperty("${mavenVersion}", MavenProjectBuilder.STANDALONE_SUPERPOM_VERSION, PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+        interpolatorProperties.add(new InterpolatorProperty("${maven.version}", MavenProjectBuilder.STANDALONE_SUPERPOM_VERSION, PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
         MavenProject mavenProject;
         try
         {
