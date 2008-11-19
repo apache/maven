@@ -813,6 +813,11 @@ public class DefaultPluginManager
         // lookups that occur in contextualize calls in line with the right realm.
         container.setLookupRealm( pluginRealm );
 
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader( pluginRealm );
+        try
+        {
+
         getLogger().debug(
                            "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
                                            + pluginRealm.getId() + " - descRealmId="
@@ -900,6 +905,10 @@ public class DefaultPluginManager
         populatePluginFields( mojo, mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
 
         return mojo;
+
+        } finally {
+            Thread.currentThread().setContextClassLoader( oldClassLoader );
+        }
     }
 
     private void checkDeprecatedParameters( MojoDescriptor mojoDescriptor,

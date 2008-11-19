@@ -66,7 +66,7 @@ public class TestComponentOverride
     public void testComponentOverride()
         throws ComponentLookupException
     {
-        ArtifactFactory factory = (ArtifactFactory) container.lookup( ArtifactFactory.class );
+        ArtifactFactory factory = container.lookup( ArtifactFactory.class );
 
         assertNotNull( factory );
 
