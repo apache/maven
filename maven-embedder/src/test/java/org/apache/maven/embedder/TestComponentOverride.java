@@ -51,15 +51,6 @@ public class TestComponentOverride
 
         request.addExtension( new File( basedir, "src/test/extensions" ).toURI().toURL() );
 
-        // register callback to get a hold of the container
-        request.setConfigurationCustomizer( new ContainerCustomizer()
-        {
-            public void customize( PlexusContainer container )
-            {
-                TestComponentOverride.this.container = container;
-            }
-        } );
-
         maven = new MavenEmbedder( request );
     }
 
