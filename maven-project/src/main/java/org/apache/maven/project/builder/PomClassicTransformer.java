@@ -77,28 +77,28 @@ public final class PomClassicTransformer
                                                                           ProjectUri.Profiles.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.Plugins.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Dependencies.xUri,
+                                                                          ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Executions.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.Resources.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.TestResources.xUri,
                                                                           ProjectUri.Profiles.Profile.Dependencies.xUri,
                                                                           ProjectUri.Profiles.Profile.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.xUri,
+                                                                          ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.PluginRepositories.xUri,
                                                                           ProjectUri.Profiles.Profile.Reporting.Plugins.xUri,
+                                                                          ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.xUri,
                                                                           ProjectUri.Profiles.Profile.Repositories.xUri,
+
+                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.xUri,
+                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
+                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
+                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
 
                                                                           ProjectUri.Reporting.Plugins.xUri,
                                                                           ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri,
 
-                                                                          ProjectUri.Repositories.xUri,
-
-                                                                          "http://apache.org/maven/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/exclusions#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/pluginManagement/plugins/plugin/executions#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/pluginManagement/plugins#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/plugins/plugin/dependencies/dependency/exclusions#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/dependencyManagement/dependencies/dependency/exclusions#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/reporting/plugins/plugin/reportSets#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/plugins/plugin/executions#collection" ) );
+                                                                          ProjectUri.Repositories.xUri
+                                                                           ) );
 
     private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
 
