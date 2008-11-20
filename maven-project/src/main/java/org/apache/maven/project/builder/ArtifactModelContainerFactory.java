@@ -149,7 +149,7 @@ public final class ArtifactModelContainerFactory
                 type = "jar";
             }
 
-            if ( scope == null )
+            if ( scope == null || scope.equals("provided"))
             {
                 scope = "compile";
             }
