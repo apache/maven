@@ -176,35 +176,18 @@ public final class ArtifactModelContainerFactory
             }
 
             ArtifactModelContainer c = (ArtifactModelContainer) modelContainer;
-            if ( c.groupId.equals( groupId ) && c.artifactId.equals( artifactId ) )
+            if ( c.groupId.equals( groupId ) && c.artifactId.equals( artifactId ) && c.type.equals( type ) )
             {
                 if ( c.version.equals( version ) )
                 {
-                    if ( c.type.equals( type )  )
-                    {
-                        return ModelContainerAction.JOIN;
-                    }
-                    else
-                    {
-                        return ModelContainerAction.NOP;
-                    }
+                    return ModelContainerAction.JOIN;
                 }
                 else
                 {
-                    if ( c.type.equals( type ) )
-                    {
-                        return ModelContainerAction.DELETE;
-                    }
-                    else
-                    {
-                        return ModelContainerAction.NOP;
-                    }
+                    return ModelContainerAction.DELETE;
                 }
             }
-            else
-            {
-                return ModelContainerAction.NOP;
-            }
+            return ModelContainerAction.NOP;
         }
 
         public ModelContainer createNewInstance( List<ModelProperty> modelProperties )
