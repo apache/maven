@@ -123,9 +123,17 @@ public final class ArtifactModelContainerFactory
             }
             if ( groupId == null )
             {
-                groupId = "org.apache.maven.plugins";
-                //  throw new IllegalArgumentException("properties does not contain group id. Artifact ID = "
-                //          + artifactId + ", Version = " + version);
+                if ( ProjectUri.Build.Plugins.Plugin.xUri.equals( uri )
+                    || ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri.equals( uri )
+                    || ProjectUri.Reporting.Plugins.Plugin.xUri.equals( uri ) )
+                {
+                    groupId = "org.apache.maven.plugins";
+                }
+                else
+                {
+                    throw new IllegalArgumentException( "Properties do not contain group id. Artifact ID = "
+                        + artifactId + ", Version = " + version );
+                }
             }
 
             if ( artifactId == null )
