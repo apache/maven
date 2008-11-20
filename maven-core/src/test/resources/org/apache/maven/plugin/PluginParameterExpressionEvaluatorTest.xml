@@ -30,7 +30,7 @@ under the License.
           <role>org.apache.maven.project.validation.ModelValidator</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.path.PathTranslator</role>
+          <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>

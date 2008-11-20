@@ -233,6 +233,7 @@ public final class ModelTransformerContext
 
         List<ModelProperty> transformedProperties =
                 importModelProperties(importModels, fromModelTransformer.transformToModelProperties( domainModels));
+        transformedProperties = fromModelTransformer.preprocessModelProperties(transformedProperties);
 
         String baseUriForModel = fromModelTransformer.getBaseUri();
         List<ModelProperty> modelProperties =

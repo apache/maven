@@ -41,10 +41,7 @@ import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.builder.PomArtifactResolver;
-import org.apache.maven.project.builder.ProjectBuilder;
-import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.project.builder.PomClassicTransformer;
+import org.apache.maven.project.builder.*;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -53,7 +50,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
@@ -61,7 +57,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
 import java.net.URL;
 import java.util.*;
 import java.text.SimpleDateFormat;
@@ -134,7 +129,7 @@ public class DefaultMavenProjectBuilder
                 getSuperProject( config, projectDescriptor, true ).getModel() ), artifactResolver ), config );
 
             project.setFile( projectDescriptor );
-            project = buildInternal( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
+            project = buildWithProfiles( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
 
             Build build = project.getBuild();
             // NOTE: setting this script-source root before path translation, because
@@ -193,8 +188,8 @@ public class DefaultMavenProjectBuilder
         artifactRepositories.addAll( repositoryHelper.buildArtifactRepositories( getSuperProject( config, artifact.getFile(), false ).getModel() ) );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
-        project = buildInternal( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
-
+        project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
+     //   project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
         artifact.setFile( f );
         project.setVersion( artifact.getVersion() );
 
@@ -352,7 +347,7 @@ public class DefaultMavenProjectBuilder
         return logger;
     }
 
-    private MavenProject buildInternal( Model model, ProjectBuilderConfiguration config, File projectDescriptor,
+    private MavenProject buildWithProfiles( Model model, ProjectBuilderConfiguration config, File projectDescriptor,
                                         File parentDescriptor, boolean isReactorProject )
         throws ProjectBuildingException
     {

@@ -205,8 +205,8 @@ under the License.
     </component>
 
     <component>
-      <role>org.apache.maven.path.PathTranslator</role>
-      <implementation>org.apache.maven.path.DefaultPathTranslator</implementation>
+      <role>org.apache.maven.project.path.PathTranslator</role>
+      <implementation>org.apache.maven.project.path.DefaultPathTranslator</implementation>
     </component>      
 
     <component>
@@ -224,7 +224,7 @@ under the License.
           <role>org.apache.maven.ArtifactFilterManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.path.PathTranslator</role>
+          <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.plugin.MavenPluginCollector</role>

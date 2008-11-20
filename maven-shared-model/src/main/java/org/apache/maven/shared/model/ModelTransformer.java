@@ -30,6 +30,8 @@ import java.util.List;
 public interface ModelTransformer
 {
 
+    List<ModelProperty> preprocessModelProperties(List<ModelProperty> modelProperties);
+
     String getBaseUri();
 
     /**

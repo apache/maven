@@ -20,7 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.ArtifactFilterManager;
-import org.apache.maven.path.PathTranslator;
+import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;

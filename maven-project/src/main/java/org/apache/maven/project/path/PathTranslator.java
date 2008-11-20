@@ -1,4 +1,4 @@
-package org.apache.maven.path;
+package org.apache.maven.project.path;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.maven.path;
+package org.apache.maven.project.path;
 
 import java.io.File;
 

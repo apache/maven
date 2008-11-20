@@ -746,6 +746,11 @@ public final class PomClassicTransformer
         return false;
     }
 
+    public List<ModelProperty> preprocessModelProperties(List<ModelProperty> modelProperties)
+    {
+        return new ArrayList<ModelProperty>(modelProperties);        
+    }
+
     /**
      * Returns the base uri of all model properties: http://apache.org/maven/project/
      *
