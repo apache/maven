@@ -399,54 +399,54 @@ public class ProjectUri
                     public static class Dependencies
                     {
                         public static String xUri =
-                            "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies";
+                            "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection";
 
                         public static class Dependency
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency";
 
                             public static String groupId =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/groupId";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/groupId";
 
                             public static String artifactId =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/artifactId";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/artifactId";
 
                             public static String version =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/version";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/version";
 
                             public static String type =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/type";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/type";
 
                             public static String classifier =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/classifier";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/classifier";
 
                             public static String scope =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/scope";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/scope";
 
                             public static String systemPath =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/systemPath";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/systemPath";
 
                             public static class Exclusions
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/exclusions";
+                                    "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection";
 
                                 public static class Exclusion
                                 {
                                     public static String xUri =
-                                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/exclusions/exclusion";
+                                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion";
 
                                     public static String artifactId =
-                                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/exclusions/exclusion/artifactId";
+                                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
                                     public static String groupId =
-                                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/exclusions/exclusion/groupId";
+                                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                                 }
                             }
 
                             public static String optional =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies/dependency/optional";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/optional";
                         }
                     }
 
@@ -543,18 +543,18 @@ public class ProjectUri
                         public static class Exclusions
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions";
+                                "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection";
 
                             public static class Exclusion
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions/exclusion";
+                                    "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion";
 
                                 public static String artifactId =
-                                    "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions/exclusion/artifactId";
+                                    "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
                                 public static String groupId =
-                                    "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions/exclusion/groupId";
+                                    "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                             }
                         }
 
@@ -715,114 +715,114 @@ public class ProjectUri
                     public static class Plugins
                     {
                         public static String xUri =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection";
 
                         public static class Plugin
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin";
 
                             public static String groupId =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/groupId";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/groupId";
 
                             public static String artifactId =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/artifactId";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/artifactId";
 
                             public static String version =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/version";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/version";
 
                             public static String extensions =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/extensions";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/extensions";
 
                             public static class Executions
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/executions";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection";
 
                                 public static class Execution
                                 {
                                     public static String xUri =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/executions/execution";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution";
 
                                     public static String id =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/executions/execution/id";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/id";
 
                                     public static String phase =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/executions/execution/phase";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/phase";
 
                                     public static String goals =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/executions/execution/goals";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals";
 
                                     public static String inherited =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/executions/execution/inherited";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
 
                                     public static String configuration =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/executions/execution/configuration";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/configuration";
                                 }
                             }
 
                             public static class Dependencies
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection";
 
                                 public static class Dependency
                                 {
                                     public static String xUri =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency";
 
                                     public static String groupId =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/groupId";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/groupId";
 
                                     public static String artifactId =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/artifactId";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/artifactId";
 
                                     public static String version =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/version";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/version";
 
                                     public static String type =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/type";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/type";
 
                                     public static String classifier =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/classifier";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/classifier";
 
                                     public static String scope =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/scope";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/scope";
 
                                     public static String systemPath =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/systemPath";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/systemPath";
 
                                     public static class Exclusions
                                     {
                                         public static String xUri =
-                                            "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/exclusions";
+                                            "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection";
 
                                         public static class Exclusion
                                         {
                                             public static String xUri =
-                                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/exclusions/exclusion";
+                                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion";
 
                                             public static String artifactId =
-                                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/exclusions/exclusion/artifactId";
+                                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
                                             public static String groupId =
-                                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/exclusions/exclusion/groupId";
+                                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                                         }
                                     }
 
                                     public static String optional =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/optional";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/optional";
                                 }
                             }
 
                             public static String goals =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/goals";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/goals";
 
                             public static String inherited =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/inherited";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/inherited";
 
                             public static String configuration =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/configuration";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/configuration";
                         }
                     }
                 }
@@ -830,103 +830,103 @@ public class ProjectUri
                 public static class Plugins
                 {
                     public static String xUri =
-                        "http://apache.org/maven/project/profiles#collection/profile/build/plugins";
+                        "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection";
 
                     public static class Plugin
                     {
                         public static String xUri =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin";
 
                         public static String groupId =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/groupId";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/groupId";
 
                         public static String artifactId =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/artifactId";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/artifactId";
 
                         public static String version =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/version";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/version";
 
                         public static String extensions =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/extensions";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/extensions#collection";
 
                         public static class Executions
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/executions";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection";
 
                             public static class Execution
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/executions/execution";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution";
 
                                 public static String id =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/executions/execution/id";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/id";
 
                                 public static String phase =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/executions/execution/phase";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/phase";
 
                                 public static String goals =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/executions/execution/goals";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/goals";
 
                                 public static String inherited =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/executions/execution/inherited";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/inherited";
 
                                 public static String configuration =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/executions/execution/configuration";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/configuration";
                             }
                         }
 
                         public static class Dependencies
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection";
 
                             public static class Dependency
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency";
 
                                 public static String groupId =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/groupId";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/groupId";
 
                                 public static String artifactId =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/artifactId";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/artifactId";
 
                                 public static String version =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/version";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/version";
 
                                 public static String type =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/type";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/type";
 
                                 public static String classifier =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/classifier";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/classifier";
 
                                 public static String scope =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/scope";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/scope";
 
                                 public static String systemPath =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/systemPath";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/systemPath";
 
                                 public static class Exclusions
                                 {
                                     public static String xUri =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/exclusions";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection";
 
                                     public static class Exclusion
                                     {
                                         public static String xUri =
-                                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/exclusions/exclusion";
+                                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion";
 
                                         public static String artifactId =
-                                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/exclusions/exclusion/artifactId";
+                                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
                                         public static String groupId =
-                                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/exclusions/exclusion/groupId";
+                                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                                     }
                                 }
 
                                 public static String optional =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/dependencies/dependency/optional";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/optional";
                             }
                         }
 
@@ -1058,44 +1058,44 @@ public class ProjectUri
                 public static class Dependency
                 {
                     public static String xUri =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency";
 
                     public static String groupId =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/groupId";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/groupId";
 
                     public static String artifactId =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/artifactId";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/artifactId";
 
                     public static String version =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/version";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/version";
 
                     public static String type =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/type";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/type";
 
                     public static String classifier =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/classifier";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/classifier";
 
                     public static String scope =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/scope";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/scope";
 
                     public static String systemPath =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/systemPath";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/systemPath";
 
                     public static class Exclusions
                     {
                         public static String xUri =
-                            "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/exclusions";
+                            "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/exclusions#collection";
 
                         public static class Exclusion
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/exclusions/exclusion";
+                                "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/exclusions#collection/exclusion";
 
                             public static String artifactId =
-                                "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/exclusions/exclusion/artifactId";
+                                "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
                             public static String groupId =
-                                "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/exclusions/exclusion/groupId";
+                                "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                         }
                     }
 
@@ -1207,18 +1207,18 @@ public class ProjectUri
                         public static class Exclusions
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions";
+                                "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions#collection";
 
                             public static class Exclusion
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions/exclusion";
+                                    "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion";
 
                                 public static String artifactId =
-                                    "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions/exclusion/artifactId";
+                                    "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
                                 public static String groupId =
-                                    "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions/exclusion/groupId";
+                                    "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                             }
                         }
 
@@ -1455,18 +1455,18 @@ public class ProjectUri
             public static class Exclusions
             {
                 public static String xUri =
-                    "http://apache.org/maven/project/dependencies#collection/dependency/exclusions";
+                    "http://apache.org/maven/project/dependencies#collection/dependency/exclusions#collection";
 
                 public static class Exclusion
                 {
                     public static String xUri =
-                        "http://apache.org/maven/project/dependencies#collection/dependency/exclusions/exclusion";
+                        "http://apache.org/maven/project/dependencies#collection/dependency/exclusions#collection/exclusion";
 
                     public static String artifactId =
-                        "http://apache.org/maven/project/dependencies#collection/dependency/exclusions/exclusion/artifactId";
+                        "http://apache.org/maven/project/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
                     public static String groupId =
-                        "http://apache.org/maven/project/dependencies#collection/dependency/exclusions/exclusion/groupId";
+                        "http://apache.org/maven/project/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                 }
             }
 
@@ -1572,18 +1572,18 @@ public class ProjectUri
                 public static class Exclusions
                 {
                     public static String xUri =
-                        "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions";
+                        "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions#collection";
 
                     public static class Exclusion
                     {
                         public static String xUri =
-                            "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions/exclusion";
+                            "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion";
 
                         public static String artifactId =
-                            "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions/exclusion/artifactId";
+                            "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
                         public static String groupId =
-                            "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions/exclusion/groupId";
+                            "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                     }
                 }
 
