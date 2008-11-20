@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its.mng3704</groupId>
+  <groupId>org.apache.maven.its.mng3703</groupId>
   <artifactId>project</artifactId>
   <name>project</name>
   <version>1</version>
@@ -33,6 +33,7 @@
     </plugins>
   </build>
   <reporting>
+    <excludeDefaults>true</excludeDefaults>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3703</groupId>

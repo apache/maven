@@ -35,6 +35,7 @@
   </build>
   
   <reporting>
+    <excludeDefaults>true</excludeDefaults>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3743</groupId>

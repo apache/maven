@@ -26,6 +26,7 @@
   </build>
   
   <reporting>
+    <excludeDefaults>true</excludeDefaults>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3684</groupId>
