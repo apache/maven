@@ -1,5 +1,7 @@
 package org.apache.maven.shared.model;
 
+import java.util.List;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -27,6 +29,8 @@ package org.apache.maven.shared.model;
 public interface DomainModel
 {
 
+    List<ModelProperty> getModelProperties();
+    
     /**
      * Returns event history of joins and deletes used in constructing this domain model.
      *

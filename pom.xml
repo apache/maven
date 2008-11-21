@@ -272,6 +272,8 @@ under the License.
     <module>maven-plugin-api</module>
     <module>maven-project</module>
     <module>maven-reporting-api</module>
+    <module>maven-project-builder</module>
+    <module>maven-mercury</module>
     <module>maven-embedder</module>
     <module>maven-shared-model</module>
     <module>maven-toolchain</module>
@@ -291,6 +293,7 @@ under the License.
     <plexusUtilsVersion>1.5.5</plexusUtilsVersion>
     <wagonVersion>1.0-beta-4</wagonVersion>
     <mavenSharedModel>1.0-SNAPSHOT</mavenSharedModel>
+    <mercuryVersion>1.0.0-alpha-2-SNAPSHOT</mercuryVersion>
     <woodstoxVersion>3.2.6</woodstoxVersion>
   </properties>
 
@@ -351,6 +354,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-project-builder</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -463,6 +471,16 @@ under the License.
           </exclusion>
         </exclusions>
       </dependency>
+        <dependency>
+            <groupId>org.apache.maven.mercury</groupId>
+            <artifactId>mercury-artifact</artifactId>
+            <version>${mercuryVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.mercury</groupId>
+            <artifactId>mercury-external</artifactId>
+            <version>${mercuryVersion}</version>
+        </dependency>
       <!-- Needed for backward compat aspect. -->
       <dependency>
         <groupId>aspectj</groupId>

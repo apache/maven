@@ -59,7 +59,6 @@ import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.ModelUtils;
 import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;

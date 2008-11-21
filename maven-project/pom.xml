@@ -68,7 +68,11 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-shared-model</artifactId>
-    </dependency> 
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project-builder</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

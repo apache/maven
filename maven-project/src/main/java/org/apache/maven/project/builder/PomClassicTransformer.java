@@ -102,18 +102,6 @@ public final class PomClassicTransformer
 
     private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
 
-    private Collection<Profile> profiles;
-
-    //private static List<DomainModel> cache = new ArrayList<DomainModel>();
-
-    /**
-     * Default constructor
-     */
-    public PomClassicTransformer( Collection<Profile> profiles )
-    {
-        this.profiles = profiles;
-    }
-
     /**
      * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
      */

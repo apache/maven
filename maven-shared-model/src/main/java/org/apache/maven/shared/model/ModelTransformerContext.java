@@ -231,6 +231,12 @@ public final class ModelTransformerContext
             eventListeners = new ArrayList<ModelEventListener>(eventListeners);
         }
 
+        if(interpolatorProperties == null) 
+        {
+            interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        }
+
+
         List<ModelProperty> transformedProperties =
                 importModelProperties(importModels, fromModelTransformer.transformToModelProperties( domainModels));
         transformedProperties = fromModelTransformer.preprocessModelProperties(transformedProperties);

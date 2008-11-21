@@ -24,6 +24,7 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.shared.model.InputStreamDomainModel;
+import org.apache.maven.shared.model.ModelProperty;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
@@ -36,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.List;
 
 /**
  * Provides a wrapper for the maven model.
@@ -271,6 +273,11 @@ public final class PomClassicDomainModel
     public File getFile()
     {
         return file;
+    }
+
+    public List<ModelProperty> getModelProperties()
+    {
+        return null;
     }
 
     /**
