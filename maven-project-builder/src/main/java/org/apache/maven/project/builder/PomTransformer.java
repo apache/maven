@@ -99,6 +99,8 @@ public final class PomTransformer
 
                                                                           ProjectUri.Repositories.xUri) ));
 
+    private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
+
     /**
      * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
      */
@@ -108,6 +110,15 @@ public final class PomTransformer
         if ( properties == null )
         {
             throw new IllegalArgumentException( "properties: null" );
+        }
+
+        if( eventListeners == null )
+        {
+            eventListeners = new ArrayList<ModelEventListener>();
+        }
+        else
+        {
+            eventListeners = new ArrayList<ModelEventListener>(eventListeners);
         }
 
         List<ModelProperty> props = new ArrayList<ModelProperty>( properties );
@@ -185,7 +196,7 @@ public final class PomTransformer
         {
             ModelDataSource executionSource = new DefaultModelDataSource();
             executionSource.init( pluginContainer.getProperties(),
-                                  Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+                                  Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
             List<ModelContainer> executionContainers =
                 executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
             if ( executionContainers.size() < 2 )
@@ -208,6 +219,16 @@ public final class PomTransformer
             }
         }
         props.removeAll( removeProperties );
+        for(ModelEventListener listener : eventListeners)
+        {
+            ModelDataSource ds = new DefaultModelDataSource();
+            ds.init( props, listener.getModelContainerFactories() );
+            for(String uri : listener.getUris() )
+            {
+                listener.fire(ds.queryFor(uri));
+            }
+        }
+
         return factory.createDomainModel( props );
     }
 
@@ -276,7 +297,7 @@ public final class PomTransformer
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
                 ModelDataSource source = new DefaultModelDataSource();
-                source.init( tmp, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+                source.init( tmp, Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
                 List<ModelContainer> containers =
                     source.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
                 for ( ModelContainer container : containers )
