@@ -219,6 +219,7 @@ public final class PomTransformer
             }
         }
         props.removeAll( removeProperties );
+
         for(ModelEventListener listener : eventListeners)
         {
             ModelDataSource ds = new DefaultModelDataSource();
@@ -245,9 +246,11 @@ public final class PomTransformer
 
         List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
         List<String> projectNames = new ArrayList<String>();
-        StringBuffer scmUrl = new StringBuffer();
-        StringBuffer scmConnectionUrl = new StringBuffer();
-        StringBuffer scmDeveloperUrl = new StringBuffer();
+        StringBuilder projectUrl = new StringBuilder( 128 );
+        StringBuilder siteUrl = new StringBuilder( 128 );
+        StringBuilder scmUrl = new StringBuilder( 128 );
+        StringBuilder scmConnectionUrl = new StringBuilder( 128 );
+        StringBuilder scmDeveloperUrl = new StringBuilder( 128 );
 
         boolean containsBuildResources = false;
         boolean containsTestResources = false;
@@ -352,55 +355,27 @@ public final class PomTransformer
                 tmp.removeAll( removeProperties );
             }
 
-            //SCM Rule
-            ModelProperty scmUrlProperty = getPropertyFor( ProjectUri.Scm.url, tmp );
-            if ( scmUrl.length() == 0 && scmUrlProperty != null )
-            {
-                scmUrl.append( scmUrlProperty.getResolvedValue() );
-                for ( String projectName : projectNames )
-                {
-                    scmUrl.append( "/" ).append( projectName );
-                }
-                int index = tmp.indexOf( scmUrlProperty );
-                tmp.remove( index );
-                tmp.add( index, new ModelProperty( ProjectUri.Scm.url, scmUrl.toString() ) );
-            }
-
-            //SCM Connection Rule
-            scmUrlProperty = getPropertyFor( ProjectUri.Scm.connection, tmp );
-            if ( scmConnectionUrl.length() == 0 && scmUrlProperty != null )
-            {
-                scmConnectionUrl.append( scmUrlProperty.getResolvedValue() );
-                for ( String projectName : projectNames )
-                {
-                    scmConnectionUrl.append( "/" ).append( projectName );
-                }
-                int index = tmp.indexOf( scmUrlProperty );
-                tmp.remove( index );
-                tmp.add( index, new ModelProperty( ProjectUri.Scm.connection, scmConnectionUrl.toString() ) );
-            }
-            //SCM Developer Rule
-            scmUrlProperty = getPropertyFor( ProjectUri.Scm.developerConnection, tmp );
-            if ( scmDeveloperUrl.length() == 0 && scmUrlProperty != null )
-            {
-                scmDeveloperUrl.append( scmUrlProperty.getResolvedValue() );
-                for ( String projectName : projectNames )
-                {
-                    scmDeveloperUrl.append( "/" ).append( projectName );
-                }
-                int index = tmp.indexOf( scmUrlProperty );
-                tmp.remove( index );
-                tmp.add( index, new ModelProperty( ProjectUri.Scm.developerConnection, scmDeveloperUrl.toString() ) );
-            }
+            // Project URL Rule
+            adjustUrl( projectUrl, tmp, ProjectUri.url, projectNames );
+            // Site Rule
+            adjustUrl( siteUrl, tmp, ProjectUri.DistributionManagement.Site.url, projectNames );
+            // SCM Rule
+            adjustUrl( scmUrl, tmp, ProjectUri.Scm.url, projectNames );
+            // SCM Connection Rule
+            adjustUrl( scmConnectionUrl, tmp, ProjectUri.Scm.connection, projectNames );
+            // SCM Developer Rule
+            adjustUrl( scmDeveloperUrl, tmp, ProjectUri.Scm.developerConnection, projectNames );
 
             //Project Name Inheritance Rule
             //Packaging Inheritance Rule
             //Profiles not inherited rule
+            //parent.relativePath not inherited rule
             for ( ModelProperty mp : tmp )
             {
                 String uri = mp.getUri();
                 if ( domainModels.indexOf( domainModel ) > 0 && ( uri.equals( ProjectUri.name ) ||
-                    uri.equals( ProjectUri.packaging ) || uri.startsWith( ProjectUri.Profiles.xUri ) ) )
+                    uri.equals( ProjectUri.packaging ) || uri.startsWith( ProjectUri.Profiles.xUri ) )
+                        || uri.startsWith( ProjectUri.Parent.relativePath ))
                 {
                     clearedProperties.add( mp );
                 }
@@ -460,7 +435,59 @@ public final class PomTransformer
             modelProperties.removeAll( clearedProperties );
         }
 
+        //Rule: Build plugin config overrides reporting plugin config
+        ModelDataSource source = new DefaultModelDataSource();
+        source.init( modelProperties, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+
+        List<ModelContainer> reportContainers = source.queryFor( ProjectUri.Reporting.Plugins.Plugin.xUri );
+        for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
+        {
+            ModelContainer transformedReportContainer = new ArtifactModelContainerFactory().create(
+                    transformPlugin( pluginContainer.getProperties() ) );
+
+            for(ModelContainer reportContainer : reportContainers) {
+                ModelContainerAction action = transformedReportContainer.containerAction( reportContainer );
+                if ( action.equals( ModelContainerAction.JOIN ) )
+                {
+                    source.join( transformedReportContainer, reportContainer );
+                    break;
+                }
+            }
+        }
+
+        modelProperties = source.getModelProperties();
         return modelProperties;
+    }
+
+    /**
+     * Adjusts an inherited URL to compensate for a child's relation/distance to the parent that defines the URL.
+     *
+     * @param url The buffer for the adjusted URL, must not be {@code null}.
+     * @param properties The model properties to update, must not be {@code null}.
+     * @param uri The URI of the model property defining the URL to adjust, must not be {@code null}.
+     * @param ids The artifact identifiers of the parent projects, starting with the least significant parent, must not
+     *            be {@code null}.
+     */
+    private void adjustUrl( StringBuilder url, List<ModelProperty> properties, String uri, List<String> ids )
+    {
+        if ( url.length() == 0 )
+        {
+            ModelProperty property = getPropertyFor( uri, properties );
+            if ( property != null )
+            {
+                url.append( property.getResolvedValue() );
+                for ( String id : ids )
+                {
+                    if ( url.length() > 0 && url.charAt( url.length() - 1 ) != '/' )
+                    {
+                        url.append( '/' );
+                    }
+                    url.append( id );
+                }
+                int index = properties.indexOf( property );
+                properties.set( index, new ModelProperty( uri, url.toString() ) );
+            }
+        }
     }
 
     public void interpolateModelProperties(List<ModelProperty> modelProperties,
@@ -632,7 +659,7 @@ public final class PomTransformer
         return transformedProperties;
     }
 
-    public static List<ModelProperty> transformPluginManagement( List<ModelProperty> modelProperties )
+    private static List<ModelProperty> transformPluginManagement( List<ModelProperty> modelProperties )
     {
         List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
         for ( ModelProperty mp : modelProperties )
@@ -642,6 +669,28 @@ public final class PomTransformer
                 transformedProperties.add( new ModelProperty(
                     mp.getUri().replace( ProjectUri.Build.PluginManagement.xUri, ProjectUri.Build.xUri ),
                     mp.getResolvedValue() ) );
+            }
+        }
+        return transformedProperties;
+    }
+
+    private static List<ModelProperty> transformPlugin( List<ModelProperty> modelProperties )
+    {
+        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
+        for ( ModelProperty mp : modelProperties )
+        {
+            if ( mp.getUri().startsWith( ProjectUri.Build.Plugins.xUri ) )
+            {   if(mp.getUri().startsWith(ProjectUri.Build.Plugins.Plugin.configuration)
+                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.groupId)
+                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.artifactId)
+                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.version)
+                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.xUri ) )
+                {
+                transformedProperties.add( new ModelProperty(
+                    mp.getUri().replace( ProjectUri.Build.Plugins.xUri, ProjectUri.Reporting.Plugins.xUri ),
+                    mp.getResolvedValue() ) );
+                }
+
             }
         }
         return transformedProperties;
