@@ -264,7 +264,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            superModel = PomClassicTransformer.interpolateModel(superModel, interpolatorProperties, basedir);
+            superModel = ProjectBuilder.Interpolator.interpolateModel(superModel, interpolatorProperties, basedir);
         }
         catch (IOException e)
         {

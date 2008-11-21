@@ -20,15 +20,12 @@ package org.apache.maven.project.builder;
  */
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.Model;
 import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.File;
-import java.io.ByteArrayInputStream;
 import java.util.*;
 
 /**
@@ -37,68 +34,6 @@ import java.util.*;
 public final class PomClassicTransformer
     implements ModelTransformer
 {
-
-    /**
-     * The URIs this tranformer supports
-     */
-    private static Set<String> uris = new HashSet<String>( Arrays.asList( ProjectUri.Build.Extensions.xUri,
-                                                                          ProjectUri.Build.PluginManagement.Plugins.xUri,
-                                                                          ProjectUri.Build.PluginManagement.Plugins.Plugin.configuration,
-                                                                          ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
-                                                                          ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
-
-                                                                          ProjectUri.Build.Plugins.xUri,
-                                                                          ProjectUri.Build.Plugins.Plugin.configuration,
-                                                                          ProjectUri.Reporting.Plugins.xUri,
-                                                                          ProjectUri.Reporting.Plugins.Plugin.configuration,
-                                                                          ProjectUri.Build.Plugins.Plugin.Dependencies.xUri,
-                                                                          ProjectUri.Build.Resources.xUri,
-                                                                          ProjectUri.Build.Resources.Resource.includes,
-                                                                          ProjectUri.Build.Resources.Resource.excludes,
-                                                                          ProjectUri.Build.TestResources.xUri,
-
-                                                                          ProjectUri.CiManagement.Notifiers.xUri,
-
-                                                                          ProjectUri.Contributors.xUri,
-
-                                                                          ProjectUri.Dependencies.xUri,
-                                                                          ProjectUri.Dependencies.Dependency.Exclusions.xUri,
-
-                                                                          ProjectUri.DependencyManagement.Dependencies.xUri,
-                                                                          ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
-
-                                                                          ProjectUri.Developers.xUri,
-                                                                          ProjectUri.Developers.Developer.roles,
-                                                                          ProjectUri.Licenses.xUri,
-                                                                          ProjectUri.MailingLists.xUri,
-                                                                          ProjectUri.Modules.xUri,
-                                                                          ProjectUri.PluginRepositories.xUri,
-
-                                                                          ProjectUri.Profiles.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.Plugins.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Dependencies.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Executions.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.Resources.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.TestResources.xUri,
-                                                                          ProjectUri.Profiles.Profile.Dependencies.xUri,
-                                                                          ProjectUri.Profiles.Profile.Dependencies.Dependency.Exclusions.xUri,
-                                                                          ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.xUri,
-                                                                          ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
-                                                                          ProjectUri.Profiles.Profile.PluginRepositories.xUri,
-                                                                          ProjectUri.Profiles.Profile.Reporting.Plugins.xUri,
-                                                                          ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.xUri,
-                                                                          ProjectUri.Profiles.Profile.Repositories.xUri,
-
-                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
-
-                                                                          ProjectUri.Reporting.Plugins.xUri,
-                                                                          ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri,
-
-                                                                          ProjectUri.Repositories.xUri
-                                                                           ) );
 
     private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
 
@@ -285,7 +220,7 @@ public final class PomClassicTransformer
             }
 
             List<ModelProperty> tmp = ModelMarshaller.marshallXmlToModelProperties(
-                ( (PomClassicDomainModel) domainModel ).getInputStream(), ProjectUri.baseUri, uris );
+                ( (PomClassicDomainModel) domainModel ).getInputStream(), ProjectUri.baseUri, PomTransformer.URIS );
 
             List clearedProperties = new ArrayList<ModelProperty>();
 
@@ -521,205 +456,7 @@ public final class PomClassicTransformer
                                            DomainModel domainModel)
             throws IOException
     {
-        interpolateModelProperties( modelProperties, interpolatorProperties, (PomClassicDomainModel) domainModel);
-    }
-
-    public static String interpolateXmlString( String xml, List<InterpolatorProperty> interpolatorProperties )
-            throws IOException
-    {
-        List<ModelProperty> modelProperties =
-            ModelMarshaller.marshallXmlToModelProperties( new ByteArrayInputStream(xml.getBytes()), ProjectUri.baseUri, uris );
-
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.put( "project.", "pom.");
-
-        List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>(interpolatorProperties);
-        ips.addAll(ModelTransformerContext.createInterpolatorProperties(modelProperties, ProjectUri.baseUri, aliases,
-                        PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false));
-
-        for(ModelProperty mp : modelProperties)
-        {
-            if(mp.getUri().startsWith(ProjectUri.properties) && mp.getValue() != null )
-            {
-                String uri = mp.getUri();
-                ips.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1,
-                        uri.length() ) + "}", mp.getValue() ) );
-            }
-        }
-
-        ModelTransformerContext.interpolateModelProperties( modelProperties, ips );
-        return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-    }
-
-    public static String interpolateModelAsString(Model model, List<InterpolatorProperty> interpolatorProperties, File projectDirectory)
-            throws IOException
-    {
-        PomClassicDomainModel domainModel = new PomClassicDomainModel( model );
-        domainModel.setProjectDirectory( projectDirectory );
-        List<ModelProperty> modelProperties =
-                ModelMarshaller.marshallXmlToModelProperties( domainModel.getInputStream(), ProjectUri.baseUri, uris );
-        interpolateModelProperties( modelProperties, interpolatorProperties, domainModel);
-
-        return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-    }
-
-    public static Model interpolateModel(Model model, List<InterpolatorProperty> interpolatorProperties, File projectDirectory)
-        throws IOException
-    {
-        String pomXml = interpolateModelAsString( model, interpolatorProperties, projectDirectory );
-        PomClassicDomainModel domainModel = new PomClassicDomainModel( new ByteArrayInputStream( pomXml.getBytes() ));
-        return domainModel.getModel();
-    }
-
-    private static boolean containsProjectVersion( List<InterpolatorProperty> interpolatorProperties )
-    {
-        InterpolatorProperty versionInterpolatorProperty =
-                new ModelProperty( ProjectUri.version, "").asInterpolatorProperty( ProjectUri.baseUri);
-        for( InterpolatorProperty ip : interpolatorProperties)
-        {
-            if ( ip.equals( versionInterpolatorProperty ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static final Map<String, String> aliases = new HashMap<String, String>();
-
-    private static void addProjectAlias( String element, boolean leaf )
-    {
-        String suffix = leaf ? "\\}" : "\\.";
-        aliases.put( "\\$\\{project\\." + element + suffix, "\\$\\{" + element + suffix );
-    }
-
-    static
-    {
-        aliases.put( "\\$\\{project\\.", "\\$\\{pom\\.");
-        addProjectAlias( "modelVersion", true );
-        addProjectAlias( "groupId", true );
-        addProjectAlias( "artifactId", true );
-        addProjectAlias( "version", true );
-        addProjectAlias( "packaging", true );
-        addProjectAlias( "name", true );
-        addProjectAlias( "description", true );
-        addProjectAlias( "inceptionYear", true );
-        addProjectAlias( "url", true );
-        addProjectAlias( "parent", false );
-        addProjectAlias( "prerequisites", false );
-        addProjectAlias( "organization", false );
-        addProjectAlias( "build", false );
-        addProjectAlias( "reporting", false );
-        addProjectAlias( "scm", false );
-        addProjectAlias( "distributionManagement", false );
-        addProjectAlias( "issueManagement", false );
-        addProjectAlias( "ciManagement", false );
-    }
-
-    private static void interpolateModelProperties(List<ModelProperty> modelProperties,
-                                                   List<InterpolatorProperty> interpolatorProperties,
-                                                   PomClassicDomainModel domainModel)
-           throws IOException
-    {
-        if(!containsProjectVersion(interpolatorProperties))
-        {
-            aliases.put("\\$\\{project.version\\}", "\\$\\{version\\}");
-        }
-
-        List<ModelProperty> firstPassModelProperties = new ArrayList<ModelProperty>();
-        List<ModelProperty> secondPassModelProperties = new ArrayList<ModelProperty>();
-
-        ModelProperty buildProperty = new ModelProperty(ProjectUri.Build.xUri, null);
-        for(ModelProperty mp : modelProperties)
-        {
-            if( mp.getValue() != null && !mp.getUri().contains( "#property" ) && !mp.getUri().contains( "#collection" ))
-            {
-                if( !buildProperty.isParentOf( mp ) || mp.getUri().equals(ProjectUri.Build.finalName ) )
-                {
-                    firstPassModelProperties.add(mp);
-                }
-                else
-                {
-                    secondPassModelProperties.add(mp);
-                }
-            }
-        }
-
-
-        List<InterpolatorProperty> standardInterpolatorProperties = new ArrayList<InterpolatorProperty>();
-        if(domainModel.isPomInBuild())
-        {
-            String basedir = domainModel.getProjectDirectory().getAbsolutePath();
-            standardInterpolatorProperties.add(new InterpolatorProperty("${project.basedir}", basedir,
-                    PomInterpolatorTag.PROJECT_PROPERTIES.name() ));
-            standardInterpolatorProperties.add(new InterpolatorProperty("${basedir}", basedir,
-                    PomInterpolatorTag.PROJECT_PROPERTIES.name() ));
-            standardInterpolatorProperties.add(new InterpolatorProperty("${pom.basedir}", basedir,
-                    PomInterpolatorTag.PROJECT_PROPERTIES.name() ));
-
-        }
-
-        for(ModelProperty mp : modelProperties)
-        {
-            if(mp.getUri().startsWith(ProjectUri.properties) && mp.getValue() != null )
-            {
-                String uri = mp.getUri();
-                standardInterpolatorProperties.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1,
-                        uri.length() ) + "}", mp.getValue(), PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-            }
-        }
-
-        //FIRST PASS - Withhold using build directories as interpolator properties
-        List<InterpolatorProperty> ips1 = new ArrayList<InterpolatorProperty>(interpolatorProperties);
-        ips1.addAll(standardInterpolatorProperties);
-        ips1.addAll(ModelTransformerContext.createInterpolatorProperties(firstPassModelProperties, ProjectUri.baseUri, aliases,
-                        PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false));
-        Collections.sort(ips1, new Comparator<InterpolatorProperty>()
-        {
-            public int compare(InterpolatorProperty o, InterpolatorProperty o1) {
-                return PomInterpolatorTag.valueOf(o.getTag()).compareTo(PomInterpolatorTag.valueOf(o1.getTag()));
-            }
-        });
-
-        ModelTransformerContext.interpolateModelProperties( modelProperties, ips1 );
-
-        //SECOND PASS - Set absolute paths on build directories
-        if( domainModel.isPomInBuild() )
-        {   String basedir = domainModel.getProjectDirectory().getAbsolutePath();
-            Map<ModelProperty, ModelProperty> buildDirectories = new HashMap<ModelProperty, ModelProperty>();
-            for(ModelProperty mp : secondPassModelProperties)
-            {
-                if(mp.getUri().equals( ProjectUri.Build.directory ))
-                {
-                    File file = new File(mp.getResolvedValue());
-                    if( !file.isAbsolute() )
-                    {
-                        buildDirectories.put(mp, new ModelProperty(mp.getUri(), new File(basedir, file.getPath()).getAbsolutePath()));
-                    }
-                }
-            }
-
-            for ( Map.Entry<ModelProperty, ModelProperty> e : buildDirectories.entrySet() )
-            {
-                secondPassModelProperties.remove( e.getKey() );
-                secondPassModelProperties.add(e.getValue() );
-            }
-        }
-
-        //THIRD PASS - Use build directories as interpolator properties
-        List<InterpolatorProperty> ips2 = new ArrayList<InterpolatorProperty>(interpolatorProperties);
-        ips2.addAll(standardInterpolatorProperties);        
-        ips2.addAll(ModelTransformerContext.createInterpolatorProperties(secondPassModelProperties, ProjectUri.baseUri, aliases,
-                        PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false));
-        ips2.addAll(interpolatorProperties);
-        Collections.sort(ips2, new Comparator<InterpolatorProperty>()
-        {
-            public int compare(InterpolatorProperty o, InterpolatorProperty o1) {
-                return PomInterpolatorTag.valueOf(o.getTag()).compareTo(PomInterpolatorTag.valueOf(o1.getTag()));
-            }
-        });
-
-        ModelTransformerContext.interpolateModelProperties( modelProperties, ips2 );
+        ProjectBuilder.Interpolator.interpolateModelProperties( modelProperties, interpolatorProperties, (PomClassicDomainModel) domainModel);
     }
 
     private static boolean hasExecutionId( ModelContainer executionContainer )

@@ -59,8 +59,8 @@ import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.realm.MavenRealmManager;
@@ -563,7 +563,7 @@ public class DefaultPluginManager
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(),
                         PomInterpolatorTag.USER_PROPERTIES.name()));
                 String interpolatedDom  =
-                        PomClassicTransformer.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
+                        ProjectBuilder.Interpolator.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
                 dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
             }
             catch ( XmlPullParserException e )
