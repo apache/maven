@@ -41,17 +41,17 @@ public final class PomTransformer
     /**
      * The URIs this transformer supports
      */
-    public static final Set<String> URIS = Collections.unmodifiableSet(new HashSet<String>( Arrays.asList( ProjectUri.Build.Extensions.xUri,
+    public static final Set<String> URIS = Collections.unmodifiableSet(new HashSet<String>( Arrays.asList(  ProjectUri.Build.Extensions.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.configuration,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
-                                                                          ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
 
                                                                           ProjectUri.Build.Plugins.xUri,
                                                                           ProjectUri.Build.Plugins.Plugin.configuration,
+                                                                          ProjectUri.Reporting.Plugins.xUri,
+                                                                          ProjectUri.Reporting.Plugins.Plugin.configuration,
                                                                           ProjectUri.Build.Plugins.Plugin.Dependencies.xUri,
-                                                                          ProjectUri.Build.Plugins.Plugin.Executions.xUri,
                                                                           ProjectUri.Build.Resources.xUri,
                                                                           ProjectUri.Build.Resources.Resource.includes,
                                                                           ProjectUri.Build.Resources.Resource.excludes,
@@ -77,33 +77,32 @@ public final class PomTransformer
                                                                           ProjectUri.Profiles.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.Plugins.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Dependencies.xUri,
+                                                                          ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Executions.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.Resources.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.TestResources.xUri,
                                                                           ProjectUri.Profiles.Profile.Dependencies.xUri,
                                                                           ProjectUri.Profiles.Profile.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.xUri,
+                                                                          ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.PluginRepositories.xUri,
                                                                           ProjectUri.Profiles.Profile.Reporting.Plugins.xUri,
+                                                                          ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.xUri,
                                                                           ProjectUri.Profiles.Profile.Repositories.xUri,
+
+                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.xUri,
+                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
+                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
+                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
 
                                                                           ProjectUri.Reporting.Plugins.xUri,
                                                                           ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri,
 
-                                                                          ProjectUri.Repositories.xUri,
-
-                                                                          "http://apache.org/maven/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/exclusions#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/pluginManagement/plugins/plugin/executions#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/pluginManagement/plugins#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/plugins/plugin/dependencies/dependency/exclusions#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/dependencyManagement/dependencies/dependency/exclusions#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/reporting/plugins/plugin/reportSets#collection",
-                                                                          "http://apache.org/maven/project/profiles/profile/build/plugins/plugin/executions#collection" ) ));
+                                                                          ProjectUri.Repositories.xUri) ));
 
     /**
-     * @see ModelTransformer#transformToDomainModel(java.util.List)
+     * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
      */
-    public DomainModel transformToDomainModel( List<ModelProperty> properties, List<ModelEventListener> eventListeners )
+    public DomainModel transformToDomainModel( List<ModelProperty> properties,  List<ModelEventListener> eventListeners )
         throws IOException
     {
         if ( properties == null )
@@ -209,7 +208,7 @@ public final class PomTransformer
             }
         }
         props.removeAll( removeProperties );
-        return factory.createDomainModel( props ); 
+        return factory.createDomainModel( props );
     }
 
     /**
@@ -531,8 +530,9 @@ public final class PomTransformer
         return false;
     }
 
-    public List<ModelProperty> preprocessModelProperties(List<ModelProperty> modelProperties) {
-        return null;
+    public List<ModelProperty> preprocessModelProperties(List<ModelProperty> modelProperties)
+    {
+        return new ArrayList<ModelProperty>(modelProperties);
     }
 
     /**
