@@ -275,7 +275,6 @@ under the License.
     <module>maven-project-builder</module>
     <module>maven-mercury</module>
     <module>maven-embedder</module>
-    <module>maven-shared-model</module>
     <module>maven-toolchain</module>
     <module>maven-compat</module>
   </modules>
