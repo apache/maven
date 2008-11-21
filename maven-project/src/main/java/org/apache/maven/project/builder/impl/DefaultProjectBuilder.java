@@ -28,7 +28,6 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.builder.*;
-import org.apache.maven.project.builder.listeners.BuildExtensionListener;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.shared.model.*;
@@ -171,8 +170,7 @@ public final class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 importModels,
                                                                                                 properties,
-                                                                                                Arrays.asList((ModelEventListener)
-                                                                                                        new BuildExtensionListener(domainModel.isPomInBuild()))) );
+                                                                                                null) );
         try
         {
             MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), artifactFactory,
