@@ -203,9 +203,17 @@ public final class PomClassicTransformer
         boolean containsBuildResources = false;
         boolean containsTestResources = false;
         boolean containsPluginRepositories = false;
+        boolean containsLicenses = false;
+        boolean containsDevelopers = false;
+        boolean containsContributors = false;
+        boolean containsMailingLists = false;
+
+        int domainModelIndex = -1;
 
         for ( DomainModel domainModel : domainModels )
         {
+            domainModelIndex++;
+
             if ( !( domainModel instanceof PomClassicDomainModel ) )
             {
                 throw new IllegalArgumentException( "domainModels: Invalid domain model" );
@@ -235,7 +243,7 @@ public final class PomClassicTransformer
             }
 
             //Modules Not Inherited Rule
-            if ( domainModels.indexOf( domainModel ) != 0 )
+            if ( domainModelIndex > 0 )
             {
                 ModelProperty modulesProperty = getPropertyFor( ProjectUri.Modules.xUri, tmp );
                 if ( modulesProperty != null )
@@ -257,7 +265,7 @@ public final class PomClassicTransformer
             }
 
             //Not inherited plugin execution rule
-            if ( domainModels.indexOf( domainModel ) > 0 )
+            if ( domainModelIndex > 0 )
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
                 ModelDataSource source = new DefaultModelDataSource();
@@ -287,7 +295,7 @@ public final class PomClassicTransformer
                 tmp.removeAll( removeProperties );
             }
             //Not inherited plugin rule
-            if ( domainModels.indexOf( domainModel ) > 0 )
+            if ( domainModelIndex > 0 )
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
                 ModelDataSource source = new DefaultModelDataSource();
@@ -327,63 +335,56 @@ public final class PomClassicTransformer
             // SCM Developer Rule
             adjustUrl( scmDeveloperUrl, tmp, ProjectUri.Scm.developerConnection, projectNames );
 
-            //Project Name Inheritance Rule
-            //Packaging Inheritance Rule
-            //Profiles not inherited rule
-            //parent.relativePath not inherited rule
+            // Project Name Rule: not inherited
+            // Packaging Rule: not inherited
+            // Profiles Rule: not inherited
+            // Parent.relativePath Rule: not inherited
+            // Prerequisites Rule: not inherited
+            // DistributionManagent.Relocation Rule: not inherited
+            if ( domainModelIndex > 0 )
+            {
+                for ( ModelProperty mp : tmp )
+                {
+                    String uri = mp.getUri();
+                    if ( uri.equals( ProjectUri.name ) || uri.equals( ProjectUri.packaging )
+                        || uri.startsWith( ProjectUri.Profiles.xUri )
+                        || uri.startsWith( ProjectUri.Parent.relativePath )
+                        || uri.startsWith( ProjectUri.Prerequisites.xUri )
+                        || uri.startsWith( ProjectUri.DistributionManagement.Relocation.xUri ) )
+                    {
+                        clearedProperties.add( mp );
+                    }
+                }
+            }
+
+            // Remove Plugin Repository Inheritance Rule
+            // License Rule: only inherited if not specified in child
+            // Developers Rule: only inherited if not specified in child
+            // Contributors Rule: only inherited if not specified in child
+            // Mailing Lists Rule: only inherited if not specified in child
+            // Build Resources Rule: only inherited if not specified in child
+            // Build Test Resources Rule: only inherited if not specified in child
             for ( ModelProperty mp : tmp )
             {
                 String uri = mp.getUri();
-                if ( domainModels.indexOf( domainModel ) > 0 && ( uri.equals( ProjectUri.name ) ||
-                    uri.equals( ProjectUri.packaging ) || uri.startsWith( ProjectUri.Profiles.xUri ) )
-                        || uri.startsWith( ProjectUri.Parent.relativePath ))
+                if ( ( containsBuildResources && uri.startsWith( ProjectUri.Build.Resources.xUri ) )
+                    || ( containsTestResources && uri.startsWith( ProjectUri.Build.TestResources.xUri ) )
+                    || ( containsPluginRepositories && uri.startsWith( ProjectUri.PluginRepositories.xUri ) )
+                    || ( containsLicenses && uri.startsWith( ProjectUri.Licenses.xUri ) )
+                    || ( containsDevelopers && uri.startsWith( ProjectUri.Developers.xUri ) )
+                    || ( containsContributors && uri.startsWith( ProjectUri.Contributors.xUri ) )
+                    || ( containsMailingLists && uri.startsWith( ProjectUri.MailingLists.xUri ) ) )
                 {
                     clearedProperties.add( mp );
                 }
             }
-
-            //Remove Plugin Repository Inheritance Rule
-            //Build Resources Inheritence Rule
-            //Build Test Resources Inheritance Rule
-            //Only inherit IF: the above is contained in super pom (domainModels.size() -1) && the child doesn't has it's own respective field
-            if ( domainModels.indexOf( domainModel ) == 0 )
-            {
-                containsBuildResources = hasProjectUri( ProjectUri.Build.Resources.xUri, tmp );
-                containsTestResources = hasProjectUri( ProjectUri.Build.TestResources.xUri, tmp );
-                containsPluginRepositories = hasProjectUri( ProjectUri.PluginRepositories.xUri, tmp );
-            }
-            for ( ModelProperty mp : tmp )
-            {
-                if ( domainModels.indexOf( domainModel ) > 0 )
-                {
-                    String uri = mp.getUri();
-                    boolean isNotSuperPom = domainModels.indexOf( domainModel ) != ( domainModels.size() - 1 );
-                    if ( isNotSuperPom )
-                    {
-                        if ( uri.startsWith( ProjectUri.Build.Resources.xUri ) ||
-                            uri.startsWith( ProjectUri.Build.TestResources.xUri ) ||
-                            uri.startsWith( ProjectUri.PluginRepositories.xUri ) )
-                        {
-                            clearedProperties.add( mp );
-                        }
-                    }
-                    else
-                    {
-                        if ( containsBuildResources && uri.startsWith( ProjectUri.Build.Resources.xUri ) )
-                        {
-                            clearedProperties.add( mp );
-                        }
-                        else if ( containsTestResources && uri.startsWith( ProjectUri.Build.TestResources.xUri ) )
-                        {
-                            clearedProperties.add( mp );
-                        }
-                        else if ( containsPluginRepositories && uri.startsWith( ProjectUri.PluginRepositories.xUri ) )
-                        {
-                            clearedProperties.add( mp );
-                        }
-                    }
-                }
-            }
+            containsBuildResources |= hasProjectUri( ProjectUri.Build.Resources.xUri, tmp );
+            containsTestResources |= hasProjectUri( ProjectUri.Build.TestResources.xUri, tmp );
+            containsPluginRepositories |= hasProjectUri( ProjectUri.PluginRepositories.xUri, tmp );
+            containsLicenses |= hasProjectUri( ProjectUri.Licenses.xUri, tmp );
+            containsDevelopers |= hasProjectUri( ProjectUri.Developers.xUri, tmp );
+            containsContributors |= hasProjectUri( ProjectUri.Contributors.xUri, tmp );
+            containsMailingLists |= hasProjectUri( ProjectUri.MailingLists.xUri, tmp );
 
             ModelProperty artifactId = getPropertyFor( ProjectUri.artifactId, tmp );
             if ( artifactId != null )
