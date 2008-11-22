@@ -207,6 +207,12 @@ public final class PomClassicTransformer
         boolean containsDevelopers = false;
         boolean containsContributors = false;
         boolean containsMailingLists = false;
+        boolean containsOrganization = false;
+        boolean containsIssueManagement = false;
+        boolean containsCiManagement = false;
+        boolean containsDistRepo = false;
+        boolean containsDistSnapRepo = false;
+        boolean containsDistSite = false;
 
         int domainModelIndex = -1;
 
@@ -359,21 +365,33 @@ public final class PomClassicTransformer
 
             // Remove Plugin Repository Inheritance Rule
             // License Rule: only inherited if not specified in child
+            // Organization Rule: only inherited if not specified in child
             // Developers Rule: only inherited if not specified in child
             // Contributors Rule: only inherited if not specified in child
             // Mailing Lists Rule: only inherited if not specified in child
             // Build Resources Rule: only inherited if not specified in child
             // Build Test Resources Rule: only inherited if not specified in child
+            // CI Management Rule: only inherited if not specified in child
+            // Issue Management Rule: only inherited if not specified in child
+            // Distribution Management Repository Rule: only inherited if not specified in child
+            // Distribution Management Snapshot Repository Rule: only inherited if not specified in child
+            // Distribution Management Site Rule: only inherited if not specified in child
             for ( ModelProperty mp : tmp )
             {
                 String uri = mp.getUri();
                 if ( ( containsBuildResources && uri.startsWith( ProjectUri.Build.Resources.xUri ) )
                     || ( containsTestResources && uri.startsWith( ProjectUri.Build.TestResources.xUri ) )
                     || ( containsPluginRepositories && uri.startsWith( ProjectUri.PluginRepositories.xUri ) )
+                    || ( containsOrganization && uri.startsWith( ProjectUri.Organization.xUri ) )
                     || ( containsLicenses && uri.startsWith( ProjectUri.Licenses.xUri ) )
                     || ( containsDevelopers && uri.startsWith( ProjectUri.Developers.xUri ) )
                     || ( containsContributors && uri.startsWith( ProjectUri.Contributors.xUri ) )
-                    || ( containsMailingLists && uri.startsWith( ProjectUri.MailingLists.xUri ) ) )
+                    || ( containsMailingLists && uri.startsWith( ProjectUri.MailingLists.xUri ) ) 
+                    || ( containsCiManagement && uri.startsWith( ProjectUri.CiManagement.xUri ) )
+                    || ( containsIssueManagement && uri.startsWith( ProjectUri.IssueManagement.xUri ) )
+                    || ( containsDistRepo && uri.startsWith( ProjectUri.DistributionManagement.Repository.xUri ) )
+                    || ( containsDistSnapRepo && uri.startsWith( ProjectUri.DistributionManagement.SnapshotRepository.xUri ) )
+                    || ( containsDistSite && uri.startsWith( ProjectUri.DistributionManagement.Site.xUri ) ) )
                 {
                     clearedProperties.add( mp );
                 }
@@ -381,10 +399,16 @@ public final class PomClassicTransformer
             containsBuildResources |= hasProjectUri( ProjectUri.Build.Resources.xUri, tmp );
             containsTestResources |= hasProjectUri( ProjectUri.Build.TestResources.xUri, tmp );
             containsPluginRepositories |= hasProjectUri( ProjectUri.PluginRepositories.xUri, tmp );
+            containsOrganization |= hasProjectUri( ProjectUri.Organization.xUri, tmp );
             containsLicenses |= hasProjectUri( ProjectUri.Licenses.xUri, tmp );
             containsDevelopers |= hasProjectUri( ProjectUri.Developers.xUri, tmp );
             containsContributors |= hasProjectUri( ProjectUri.Contributors.xUri, tmp );
             containsMailingLists |= hasProjectUri( ProjectUri.MailingLists.xUri, tmp );
+            containsCiManagement |= hasProjectUri( ProjectUri.CiManagement.xUri, tmp );
+            containsIssueManagement |= hasProjectUri( ProjectUri.IssueManagement.xUri, tmp );
+            containsDistRepo |= hasProjectUri( ProjectUri.DistributionManagement.Repository.xUri, tmp );
+            containsDistSnapRepo |= hasProjectUri( ProjectUri.DistributionManagement.SnapshotRepository.xUri, tmp );
+            containsDistSite |= hasProjectUri( ProjectUri.DistributionManagement.Site.xUri, tmp );
 
             ModelProperty artifactId = getPropertyFor( ProjectUri.artifactId, tmp );
             if ( artifactId != null )
