@@ -89,11 +89,33 @@ TODO:
     <!-- Pull the dependencies for the MetadataGenerator CLI -->
     <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
-       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="1.0-beta-1"/>
+       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="1.0-beta-2-SNAPSHOT"/>
     </artifact:dependencies>          
     
   </target>
 
+  <target name="generate-resources" depends="pull" description="generates plexus component metadata.">
+    <mkdir dir="${basedir}/bootstrap/target"/>
+    <mkdir dir="${basedir}/bootstrap/target/classes"/>
+  	
+    <path id="maven.classpath">
+      <pathelement location="bootstrap/target/classes"/>
+      <path refid="sources"/>    	
+      <path refid="pmdg.pathid"/>
+      <path refid="pom.pathid"/>
+    </path>
+  	
+    <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
+      <classpath refid="maven.classpath"/>
+      <arg value="--source"/>
+      <arg value="${basedir}/bootstrap/target/generate-sources"/>
+      <arg value="--classes"/>
+      <arg value="${basedir}/bootstrap/target/classes"/>
+      <arg value="--output"/>
+      <arg value="${basedir}/bootstrap/target/classes/META-INF/plexus/components.xml"/>
+    </java>
+  </target>	
+	
   <target name="generate-sources" depends="pull" description="generates Java sources from Modello mdo model files">
     <mkdir dir="bootstrap/target"/>
     <mkdir dir="bootstrap/target/generated-sources"/>
