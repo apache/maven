@@ -123,7 +123,7 @@ public final class ArtifactModelContainerFactory
             if ( groupId == null )
             {
                 groupId = "org.apache.maven.plugins";
-                /*
+                /* FIXME: This was meant to fix MNG-3863 but it's been reported to break Nexus/Mercury build so needs review
                 if ( ProjectUri.Build.Plugins.Plugin.xUri.equals( uri )
                     || ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri.equals( uri )
                     || ProjectUri.Reporting.Plugins.Plugin.xUri.equals( uri ) )
