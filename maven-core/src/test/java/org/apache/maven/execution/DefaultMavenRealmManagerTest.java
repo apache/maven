@@ -6,6 +6,7 @@ import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -35,10 +36,10 @@ public class DefaultMavenRealmManagerTest
 
         assertNotSame( ext1, ext2 );
 
-        ext1.setFile( new File( jarResource.getPath() ) );
+        ext1.setFile( FileUtils.toFile( jarResource ) );
         ext1.setResolved( true );
 
-        ext2.setFile( new File( jarResource.getPath() ) );
+        ext2.setFile( FileUtils.toFile( jarResource ) );
         ext2.setResolved( true );
 
         Logger logger = new ConsoleLogger( Logger.LEVEL_DEBUG, "test" );
