@@ -484,14 +484,16 @@ public class DefaultLifecycleBindingManager
                 String report = (String) i.next();
 
                 StringTokenizer tok = new StringTokenizer( report, ":" );
-                if ( tok.countTokens() != 2 )
+                int count = tok.countTokens();
+                if ( count != 2 && count != 3 )
                 {
-                    logger.warn( "Invalid default report ignored: '" + report + "' (must be groupId:artifactId)" );
+                    logger.warn( "Invalid default report ignored: '" + report + "' (must be groupId:artifactId[:version])" );
                 }
                 else
                 {
                     String groupId = tok.nextToken();
                     String artifactId = tok.nextToken();
+                    String version = tok.hasMoreTokens() ? tok.nextToken() : null;
 
                     boolean found = false;
                     for ( Iterator j = reportPlugins.iterator(); j.hasNext() && !found; )
@@ -509,6 +511,7 @@ public class DefaultLifecycleBindingManager
                         ReportPlugin reportPlugin = new ReportPlugin();
                         reportPlugin.setGroupId( groupId );
                         reportPlugin.setArtifactId( artifactId );
+                        reportPlugin.setVersion( version );
                         reportPlugins.add( reportPlugin );
                     }
                 }
