@@ -19,6 +19,8 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.lang.reflect.Array;
+
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.logging.Logger;
 
@@ -42,7 +44,7 @@ public class DebugConfigurationListener
     {
         if ( logger.isDebugEnabled() )
         {
-            logger.debug( "  (s) " + fieldName + " = " + value );
+            logger.debug( "  (s) " + fieldName + " = " + toString( value ) );
         }
     }
 
@@ -50,7 +52,40 @@ public class DebugConfigurationListener
     {
         if ( logger.isDebugEnabled() )
         {
-            logger.debug( "  (f) " + fieldName + " = " + value );
+            logger.debug( "  (f) " + fieldName + " = " + toString( value ) );
         }
     }
+
+    /**
+     * Creates a human-friendly string represenation of the specified object.
+     * 
+     * @param obj The object to create a string representation for, may be <code>null</code>.
+     * @return The string representation, never <code>null</code>.
+     */
+    private String toString( Object obj )
+    {
+        String str;
+        if ( obj != null && obj.getClass().isArray() )
+        {
+            int n = Array.getLength( obj );
+            StringBuffer buf = new StringBuffer( 256 );
+            buf.append( '[' );
+            for ( int i = 0; i < n; i++ )
+            {
+                if ( i > 0 )
+                {
+                    buf.append( ", " );
+                }
+                buf.append( String.valueOf( Array.get( obj, i ) ) );
+            }
+            buf.append( ']' );
+            str = buf.toString();
+        }
+        else
+        {
+            str = String.valueOf( obj );
+        }
+        return str;
+    }
+
 }
