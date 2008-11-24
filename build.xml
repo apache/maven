@@ -249,4 +249,8 @@ TODO:
 
   <target name="with-its" depends="all,run-its"/>
   
+  <target name="with-temp-maven-home">
+    <property name="maven.home" value="${java.io.tmpdir}/maven"/>
+  </target>
+  
 </project>
