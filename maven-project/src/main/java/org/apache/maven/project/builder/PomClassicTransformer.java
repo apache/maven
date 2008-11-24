@@ -35,6 +35,13 @@ public final class PomClassicTransformer
     implements ModelTransformer
 {
 
+    private final DomainModelFactory factory;
+
+    public PomClassicTransformer(DomainModelFactory factory)
+    {
+        this.factory = factory;
+    }
+
     private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
 
     /**
@@ -168,16 +175,7 @@ public final class PomClassicTransformer
             }
         }
 
-        String xml = null;
-        try
-        {
-            xml = ModelMarshaller.unmarshalModelPropertiesToXml( props, ProjectUri.baseUri );
-            return new PomClassicDomainModel( new MavenXpp3Reader().read( new StringReader( xml ) ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new IOException( e + ":\r\n" + xml );
-        }
+        return factory.createDomainModel( props );
     }
 
     /**

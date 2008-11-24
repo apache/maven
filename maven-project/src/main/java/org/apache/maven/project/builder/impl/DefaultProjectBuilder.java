@@ -161,7 +161,7 @@ public final class DefaultProjectBuilder
             domainModels.add( new PomClassicDomainModel( model ) );
         }
 
-        PomClassicTransformer transformer = new PomClassicTransformer( );
+        PomClassicTransformer transformer = new PomClassicTransformer( new PomClassicDomainModelFactory() );
         ModelTransformerContext ctx = new ModelTransformerContext(
             Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
 
