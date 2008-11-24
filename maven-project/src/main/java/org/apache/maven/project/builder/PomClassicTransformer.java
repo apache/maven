@@ -32,151 +32,15 @@ import java.util.*;
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
  */
 public final class PomClassicTransformer
-    implements ModelTransformer
+    extends PomTransformer
 {
-
-    private final DomainModelFactory factory;
 
     public PomClassicTransformer(DomainModelFactory factory)
     {
-        this.factory = factory;
+        super(factory);
     }
 
     private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
-
-    /**
-     * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
-     */
-    public DomainModel transformToDomainModel( List<ModelProperty> properties, List<ModelEventListener> eventListeners)
-        throws IOException
-    {
-        if ( properties == null )
-        {
-            throw new IllegalArgumentException( "properties: null" );
-        }
-
-        if( eventListeners == null )
-        {
-            eventListeners = new ArrayList<ModelEventListener>();
-        }
-        else
-        {
-            eventListeners = new ArrayList<ModelEventListener>(eventListeners);
-        }
-
-        List<ModelProperty> props = new ArrayList<ModelProperty>( properties );
-
-        //dependency management
-        ModelDataSource source = new DefaultModelDataSource();
-        source.init( props, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
-
-        for ( ModelContainer dependencyContainer : source.queryFor( ProjectUri.Dependencies.Dependency.xUri ) )
-        {
-            for ( ModelContainer managementContainer : source.queryFor(
-                ProjectUri.DependencyManagement.Dependencies.Dependency.xUri ) )
-            {
-                managementContainer = new ArtifactModelContainerFactory().create(
-                    transformDependencyManagement( managementContainer.getProperties() ) );
-                ModelContainerAction action = dependencyContainer.containerAction( managementContainer );
-                if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
-                {
-                    source.join( dependencyContainer, managementContainer );
-                }
-            }
-        }
-
-        for ( ModelContainer dependencyContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
-        {
-            for ( ModelContainer managementContainer : source.queryFor(
-                ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri ) )
-            {
-                managementContainer = new ArtifactModelContainerFactory().create(
-                    transformPluginManagement( managementContainer.getProperties() ) );
-
-                //Remove duplicate executions tags
-                boolean hasExecutionsTag = false;
-                for ( ModelProperty mp : dependencyContainer.getProperties() )
-                {
-                    if ( mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.Executions.xUri ) )
-                    {
-                        hasExecutionsTag = true;
-                        break;
-                    }
-                }
-                List<ModelProperty> pList = new ArrayList<ModelProperty>();
-                if ( !hasExecutionsTag )
-                {
-                    pList = managementContainer.getProperties();
-                }
-                else
-                {
-                    for ( ModelProperty mp : managementContainer.getProperties() )
-                    {
-                        if ( !mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.Executions.xUri ) )
-                        {
-                            pList.add( mp );
-                        }
-                    }
-                }
-                managementContainer = new ArtifactModelContainerFactory().create( pList );
-
-                ModelContainerAction action = dependencyContainer.containerAction( managementContainer );
-                if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
-                {
-                   // ModelContainer reverseSortedContainer = new ArtifactModelContainerFactory().create(
-                   //     ModelTransformerContext.sort(dependencyContainer.getProperties(), ProjectUri.Build.Plugins.Plugin.xUri) );
-                    source.join( dependencyContainer, managementContainer );
-                }
-            }
-        }
-
-        props = source.getModelProperties();
-
-        //Rule: Do not join plugin executions without ids
-        Set<ModelProperty> removeProperties = new HashSet<ModelProperty>();
-        ModelDataSource dataSource = new DefaultModelDataSource();
-        dataSource.init( props, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
-        List<ModelContainer> containers = dataSource.queryFor( ProjectUri.Build.Plugins.Plugin.xUri );
-        for ( ModelContainer pluginContainer : containers )
-        {
-            ModelDataSource executionSource = new DefaultModelDataSource();
-            executionSource.init( pluginContainer.getProperties(),
-                                  Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
-            List<ModelContainer> executionContainers =
-                executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
-            if ( executionContainers.size() < 2 )
-            {
-                continue;
-            }
-
-            boolean hasAtLeastOneWithoutId = true;
-            for ( ModelContainer executionContainer : executionContainers )
-            {
-                if ( hasAtLeastOneWithoutId )
-                {
-                    hasAtLeastOneWithoutId = hasExecutionId( executionContainer );
-                }
-                if ( !hasAtLeastOneWithoutId && !hasExecutionId( executionContainer ) &&
-                    executionContainers.indexOf( executionContainer ) > 0 )
-                {
-                    removeProperties.addAll( executionContainer.getProperties() );
-                }
-            }
-        }
-        props.removeAll( removeProperties );
-
-        for(ModelEventListener listener : eventListeners)
-        {
-            ModelDataSource ds = new DefaultModelDataSource();
-            ds.init( props, listener.getModelContainerFactories() );
-            for(String uri : listener.getUris() )
-            {
-                listener.fire(ds.queryFor(uri));
-            }
-        }
-
-        return factory.createDomainModel( props );
-    }
 
     /**
      * @see ModelTransformer#transformToModelProperties(java.util.List)
@@ -482,18 +346,6 @@ public final class PomClassicTransformer
         ProjectBuilder.Interpolator.interpolateModelProperties( modelProperties, interpolatorProperties, (PomClassicDomainModel) domainModel);
     }
 
-    private static boolean hasExecutionId( ModelContainer executionContainer )
-    {
-        for ( ModelProperty mp : executionContainer.getProperties() )
-        {
-            if ( mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.Executions.Execution.id ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public List<ModelProperty> preprocessModelProperties(List<ModelProperty> modelProperties)
     {
         return new ArrayList<ModelProperty>(modelProperties);        
@@ -559,35 +411,6 @@ public final class PomClassicTransformer
             }
         }
         return null;
-    }
-
-    private static List<ModelProperty> transformDependencyManagement( List<ModelProperty> modelProperties )
-    {
-        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.DependencyManagement.xUri ) )
-            {
-                transformedProperties.add( new ModelProperty(
-                    mp.getUri().replace( ProjectUri.DependencyManagement.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
-            }
-        }
-        return transformedProperties;
-    }
-
-    private static List<ModelProperty> transformPluginManagement( List<ModelProperty> modelProperties )
-    {
-        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.Build.PluginManagement.xUri ) )
-            {
-                transformedProperties.add( new ModelProperty(
-                    mp.getUri().replace( ProjectUri.Build.PluginManagement.xUri, ProjectUri.Build.xUri ),
-                    mp.getResolvedValue() ) );
-            }
-        }
-        return transformedProperties;
     }
 
     private static List<ModelProperty> transformPlugin( List<ModelProperty> modelProperties )

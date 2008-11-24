@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
  */
-public final class PomTransformer
+public class PomTransformer
     implements ModelTransformer
 {
 
