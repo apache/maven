@@ -43,15 +43,23 @@ TODO:
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
   </target>
 
-  <target name="isMavenHomeSet" depends="initTaskDefs">
+  <target name="isMavenHomeSet">
     <property environment="env"/>
     <condition property="maven.home" value="${env.M2_HOME}">
       <isset property="env.M2_HOME"/>
     </condition>
     <fail unless="maven.home" message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script"/>
   </target>
+  
+  <target name="pre-init" depends="initTaskDefs">
+    <copy file="pom.xml" tofile="dependencies.xml"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
+    <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>
+    <delete file="${basedir}/dependencies.xml"/>
+  </target>
 
-  <target name="init" depends="isMavenHomeSet">
+  <target name="init" depends="pre-init, isMavenHomeSet">
     <xmlproperty prefix="pom" file="pom.xml"/>    
     <basename file="${maven.home}" property="maven.home.basename"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
@@ -71,15 +79,10 @@ TODO:
   <target name="pull" depends="init" unless="skip.pull">    
     <property name="verbose" value="false"/>    
     <!-- Pull the dependencies that Maven needs to build -->
-    <copy file="pom.xml" tofile="dependencies.xml"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
-    <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>                                                                                                     
     <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}" useScope="compile">
        <localRepository path="${maven.repo.local}"/>
        <pom refid="pom"/>                                                                                                                                       
     </artifact:dependencies>      
-    <delete file="${basedir}/dependencies.xml"/>
     
     <!-- Pull the dependencies for Modello -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
@@ -249,8 +252,8 @@ TODO:
 
   <target name="with-its" depends="all,run-its"/>
   
-  <target name="with-temp-maven-home">
-    <property name="maven.home" value="${java.io.tmpdir}/maven"/>
+  <target name="set-temp-maven-home" depends="pre-init">
+    <property name="maven.home" value="${java.io.tmpdir}/apache-maven-${pom.version}"/>
     <echo>Using temporary maven install directory: ${maven.home}</echo>
   </target>
   
