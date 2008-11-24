@@ -251,6 +251,7 @@ TODO:
   
   <target name="with-temp-maven-home">
     <property name="maven.home" value="${java.io.tmpdir}/maven"/>
+    <echo>Using temporary maven install directory: ${maven.home}</echo>
   </target>
   
 </project>
