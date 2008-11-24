@@ -164,7 +164,7 @@ public final class MavenDomainModel implements DomainModel {
         this.eventHistory = eventHistory;
     }
 
-    public List<ModelProperty> getModelProperties() {
+    public List<ModelProperty> getModelProperties() throws IOException {
         return new ArrayList<ModelProperty>(modelProperties);
     }
 

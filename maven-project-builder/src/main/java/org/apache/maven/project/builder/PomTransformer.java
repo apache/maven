@@ -99,12 +99,10 @@ public class PomTransformer
 
                                                                           ProjectUri.Repositories.xUri) ));
 
-    private static Map<String, List<ModelProperty>> cache = new HashMap<String, List<ModelProperty>>();
-
     /**
      * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
      */
-    public DomainModel transformToDomainModel( List<ModelProperty> properties,  List<ModelEventListener> eventListeners )
+    public final DomainModel transformToDomainModel( List<ModelProperty> properties,  List<ModelEventListener> eventListeners )
         throws IOException
     {
         if ( properties == null )
@@ -234,9 +232,10 @@ public class PomTransformer
     }
 
     /**
-     * @see ModelTransformer#transformToModelProperties(java.util.List
+     * @see ModelTransformer#transformToModelProperties(java.util.List)
      */
-    public List<ModelProperty> transformToModelProperties(List<DomainModel> domainModels )
+    public final List<ModelProperty> transformToModelProperties(List<DomainModel> domainModels
+    )
         throws IOException
     {
         if ( domainModels == null || domainModels.isEmpty() )
@@ -255,13 +254,26 @@ public class PomTransformer
         boolean containsBuildResources = false;
         boolean containsTestResources = false;
         boolean containsPluginRepositories = false;
+        boolean containsLicenses = false;
+        boolean containsDevelopers = false;
+        boolean containsContributors = false;
+        boolean containsMailingLists = false;
+        boolean containsOrganization = false;
+        boolean containsIssueManagement = false;
+        boolean containsCiManagement = false;
+        boolean containsDistRepo = false;
+        boolean containsDistSnapRepo = false;
+        boolean containsDistSite = false;
+
+        int domainModelIndex = -1;
 
         for ( DomainModel domainModel : domainModels )
         {
-            List<ModelProperty> tmp =
-                domainModel.getModelProperties();
+            domainModelIndex++;
 
-            List<ModelProperty> clearedProperties = new ArrayList<ModelProperty>();
+            List<ModelProperty> tmp = domainModel.getModelProperties();
+
+            List clearedProperties = new ArrayList<ModelProperty>();
 
             //Missing Version Rule
             if ( getPropertyFor( ProjectUri.version, tmp ) == null )
@@ -274,7 +286,7 @@ public class PomTransformer
             }
 
             //Modules Not Inherited Rule
-            if ( domainModels.indexOf( domainModel ) != 0 )
+            if ( domainModelIndex > 0 )
             {
                 ModelProperty modulesProperty = getPropertyFor( ProjectUri.Modules.xUri, tmp );
                 if ( modulesProperty != null )
@@ -296,7 +308,7 @@ public class PomTransformer
             }
 
             //Not inherited plugin execution rule
-            if ( domainModels.indexOf( domainModel ) > 0 )
+            if ( domainModelIndex > 0 )
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
                 ModelDataSource source = new DefaultModelDataSource();
@@ -326,7 +338,7 @@ public class PomTransformer
                 tmp.removeAll( removeProperties );
             }
             //Not inherited plugin rule
-            if ( domainModels.indexOf( domainModel ) > 0 )
+            if ( domainModelIndex > 0 )
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
                 ModelDataSource source = new DefaultModelDataSource();
@@ -366,63 +378,74 @@ public class PomTransformer
             // SCM Developer Rule
             adjustUrl( scmDeveloperUrl, tmp, ProjectUri.Scm.developerConnection, projectNames );
 
-            //Project Name Inheritance Rule
-            //Packaging Inheritance Rule
-            //Profiles not inherited rule
-            //parent.relativePath not inherited rule
+            // Project Name Rule: not inherited
+            // Packaging Rule: not inherited
+            // Profiles Rule: not inherited
+            // Parent.relativePath Rule: not inherited
+            // Prerequisites Rule: not inherited
+            // DistributionManagent.Relocation Rule: not inherited
+            if ( domainModelIndex > 0 )
+            {
+                for ( ModelProperty mp : tmp )
+                {
+                    String uri = mp.getUri();
+                    if ( uri.equals( ProjectUri.name ) || uri.equals( ProjectUri.packaging )
+                        || uri.startsWith( ProjectUri.Profiles.xUri )
+                        || uri.startsWith( ProjectUri.Parent.relativePath )
+                        || uri.startsWith( ProjectUri.Prerequisites.xUri )
+                        || uri.startsWith( ProjectUri.DistributionManagement.Relocation.xUri ) )
+                    {
+                        clearedProperties.add( mp );
+                    }
+                }
+            }
+
+            // Remove Plugin Repository Inheritance Rule
+            // License Rule: only inherited if not specified in child
+            // Organization Rule: only inherited if not specified in child
+            // Developers Rule: only inherited if not specified in child
+            // Contributors Rule: only inherited if not specified in child
+            // Mailing Lists Rule: only inherited if not specified in child
+            // Build Resources Rule: only inherited if not specified in child
+            // Build Test Resources Rule: only inherited if not specified in child
+            // CI Management Rule: only inherited if not specified in child
+            // Issue Management Rule: only inherited if not specified in child
+            // Distribution Management Repository Rule: only inherited if not specified in child
+            // Distribution Management Snapshot Repository Rule: only inherited if not specified in child
+            // Distribution Management Site Rule: only inherited if not specified in child
             for ( ModelProperty mp : tmp )
             {
                 String uri = mp.getUri();
-                if ( domainModels.indexOf( domainModel ) > 0 && ( uri.equals( ProjectUri.name ) ||
-                    uri.equals( ProjectUri.packaging ) || uri.startsWith( ProjectUri.Profiles.xUri ) )
-                        || uri.startsWith( ProjectUri.Parent.relativePath ))
+                if ( ( containsBuildResources && uri.startsWith( ProjectUri.Build.Resources.xUri ) )
+                    || ( containsTestResources && uri.startsWith( ProjectUri.Build.TestResources.xUri ) )
+                    || ( containsPluginRepositories && uri.startsWith( ProjectUri.PluginRepositories.xUri ) )
+                    || ( containsOrganization && uri.startsWith( ProjectUri.Organization.xUri ) )
+                    || ( containsLicenses && uri.startsWith( ProjectUri.Licenses.xUri ) )
+                    || ( containsDevelopers && uri.startsWith( ProjectUri.Developers.xUri ) )
+                    || ( containsContributors && uri.startsWith( ProjectUri.Contributors.xUri ) )
+                    || ( containsMailingLists && uri.startsWith( ProjectUri.MailingLists.xUri ) )
+                    || ( containsCiManagement && uri.startsWith( ProjectUri.CiManagement.xUri ) )
+                    || ( containsIssueManagement && uri.startsWith( ProjectUri.IssueManagement.xUri ) )
+                    || ( containsDistRepo && uri.startsWith( ProjectUri.DistributionManagement.Repository.xUri ) )
+                    || ( containsDistSnapRepo && uri.startsWith( ProjectUri.DistributionManagement.SnapshotRepository.xUri ) )
+                    || ( containsDistSite && uri.startsWith( ProjectUri.DistributionManagement.Site.xUri ) ) )
                 {
                     clearedProperties.add( mp );
                 }
             }
-
-            //Remove Plugin Repository Inheritance Rule
-            //Build Resources Inheritence Rule
-            //Build Test Resources Inheritance Rule
-            //Only inherit IF: the above is contained in super pom (domainModels.size() -1) && the child doesn't has it's own respective field
-            if ( domainModels.indexOf( domainModel ) == 0 )
-            {
-                containsBuildResources = hasProjectUri( ProjectUri.Build.Resources.xUri, tmp );
-                containsTestResources = hasProjectUri( ProjectUri.Build.TestResources.xUri, tmp );
-                containsPluginRepositories = hasProjectUri( ProjectUri.PluginRepositories.xUri, tmp );
-            }
-            for ( ModelProperty mp : tmp )
-            {
-                if ( domainModels.indexOf( domainModel ) > 0 )
-                {
-                    String uri = mp.getUri();
-                    boolean isNotSuperPom = domainModels.indexOf( domainModel ) != ( domainModels.size() - 1 );
-                    if ( isNotSuperPom )
-                    {
-                        if ( uri.startsWith( ProjectUri.Build.Resources.xUri ) ||
-                            uri.startsWith( ProjectUri.Build.TestResources.xUri ) ||
-                            uri.startsWith( ProjectUri.PluginRepositories.xUri ) )
-                        {
-                            clearedProperties.add( mp );
-                        }
-                    }
-                    else
-                    {
-                        if ( containsBuildResources && uri.startsWith( ProjectUri.Build.Resources.xUri ) )
-                        {
-                            clearedProperties.add( mp );
-                        }
-                        else if ( containsTestResources && uri.startsWith( ProjectUri.Build.TestResources.xUri ) )
-                        {
-                            clearedProperties.add( mp );
-                        }
-                        else if ( containsPluginRepositories && uri.startsWith( ProjectUri.PluginRepositories.xUri ) )
-                        {
-                            clearedProperties.add( mp );
-                        }
-                    }
-                }
-            }
+            containsBuildResources |= hasProjectUri( ProjectUri.Build.Resources.xUri, tmp );
+            containsTestResources |= hasProjectUri( ProjectUri.Build.TestResources.xUri, tmp );
+            containsPluginRepositories |= hasProjectUri( ProjectUri.PluginRepositories.xUri, tmp );
+            containsOrganization |= hasProjectUri( ProjectUri.Organization.xUri, tmp );
+            containsLicenses |= hasProjectUri( ProjectUri.Licenses.xUri, tmp );
+            containsDevelopers |= hasProjectUri( ProjectUri.Developers.xUri, tmp );
+            containsContributors |= hasProjectUri( ProjectUri.Contributors.xUri, tmp );
+            containsMailingLists |= hasProjectUri( ProjectUri.MailingLists.xUri, tmp );
+            containsCiManagement |= hasProjectUri( ProjectUri.CiManagement.xUri, tmp );
+            containsIssueManagement |= hasProjectUri( ProjectUri.IssueManagement.xUri, tmp );
+            containsDistRepo |= hasProjectUri( ProjectUri.DistributionManagement.Repository.xUri, tmp );
+            containsDistSnapRepo |= hasProjectUri( ProjectUri.DistributionManagement.SnapshotRepository.xUri, tmp );
+            containsDistSite |= hasProjectUri( ProjectUri.DistributionManagement.Site.xUri, tmp );
 
             ModelProperty artifactId = getPropertyFor( ProjectUri.artifactId, tmp );
             if ( artifactId != null )
@@ -460,36 +483,13 @@ public class PomTransformer
     }
 
     /**
-     * Adjusts an inherited URL to compensate for a child's relation/distance to the parent that defines the URL.
+     * Overide this method to change the way interpolation is handled.
      *
-     * @param url The buffer for the adjusted URL, must not be {@code null}.
-     * @param properties The model properties to update, must not be {@code null}.
-     * @param uri The URI of the model property defining the URL to adjust, must not be {@code null}.
-     * @param ids The artifact identifiers of the parent projects, starting with the least significant parent, must not
-     *            be {@code null}.
+     * @param modelProperties
+     * @param interpolatorProperties
+     * @param domainModel
+     * @throws IOException
      */
-    private void adjustUrl( StringBuilder url, List<ModelProperty> properties, String uri, List<String> ids )
-    {
-        if ( url.length() == 0 )
-        {
-            ModelProperty property = getPropertyFor( uri, properties );
-            if ( property != null )
-            {
-                url.append( property.getResolvedValue() );
-                for ( String id : ids )
-                {
-                    if ( url.length() > 0 && url.charAt( url.length() - 1 ) != '/' )
-                    {
-                        url.append( '/' );
-                    }
-                    url.append( id );
-                }
-                int index = properties.indexOf( property );
-                properties.set( index, new ModelProperty( uri, url.toString() ) );
-            }
-        }
-    }
-
     public void interpolateModelProperties(List<ModelProperty> modelProperties,
                                            List<InterpolatorProperty> interpolatorProperties,
                                            DomainModel domainModel)
@@ -552,6 +552,58 @@ public class PomTransformer
         ModelTransformerContext.interpolateModelProperties( modelProperties, ips1 );
     }
 
+    /**
+     * Override this method for different preprocessing of model properties.
+     *
+     * @param modelProperties
+     * @return
+     */
+    public List<ModelProperty> preprocessModelProperties(List<ModelProperty> modelProperties)
+    {
+        return new ArrayList<ModelProperty>(modelProperties);
+    }
+
+    /**
+     * Returns the base uri of all model properties: http://apache.org/maven/project/
+     *
+     * @return Returns the base uri of all model properties: http://apache.org/maven/project/
+     */
+    public final String getBaseUri()
+    {
+        return ProjectUri.baseUri;
+    }
+
+    /**
+     * Adjusts an inherited URL to compensate for a child's relation/distance to the parent that defines the URL.
+     *
+     * @param url The buffer for the adjusted URL, must not be {@code null}.
+     * @param properties The model properties to update, must not be {@code null}.
+     * @param uri The URI of the model property defining the URL to adjust, must not be {@code null}.
+     * @param ids The artifact identifiers of the parent projects, starting with the least significant parent, must not
+     *            be {@code null}.
+     */
+    private void adjustUrl( StringBuilder url, List<ModelProperty> properties, String uri, List<String> ids )
+    {
+        if ( url.length() == 0 )
+        {
+            ModelProperty property = getPropertyFor( uri, properties );
+            if ( property != null )
+            {
+                url.append( property.getResolvedValue() );
+                for ( String id : ids )
+                {
+                    if ( url.length() > 0 && url.charAt( url.length() - 1 ) != '/' )
+                    {
+                        url.append( '/' );
+                    }
+                    url.append( id );
+                }
+                int index = properties.indexOf( property );
+                properties.set( index, new ModelProperty( uri, url.toString() ) );
+            }
+        }
+    }
+
     private static boolean containsProjectVersion( List<InterpolatorProperty> interpolatorProperties )
     {
         InterpolatorProperty versionInterpolatorProperty =
@@ -576,21 +628,6 @@ public class PomTransformer
             }
         }
         return false;
-    }
-
-    public List<ModelProperty> preprocessModelProperties(List<ModelProperty> modelProperties)
-    {
-        return new ArrayList<ModelProperty>(modelProperties);
-    }
-
-    /**
-     * Returns the base uri of all model properties: http://apache.org/maven/project/
-     *
-     * @return Returns the base uri of all model properties: http://apache.org/maven/project/
-     */
-    public String getBaseUri()
-    {
-        return ProjectUri.baseUri;
     }
 
     private static boolean hasProjectUri( String projectUri, List<ModelProperty> modelProperties )

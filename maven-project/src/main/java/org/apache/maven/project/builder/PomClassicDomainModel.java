@@ -25,6 +25,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.shared.model.InputStreamDomainModel;
 import org.apache.maven.shared.model.ModelProperty;
+import org.apache.maven.shared.model.ModelMarshaller;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Provides a wrapper for the maven model.
@@ -68,6 +70,8 @@ public final class PomClassicDomainModel
     private File parentFile;
 
     private File projectDirectory;
+
+    private List<ModelProperty> modelProperties;
 
     /**
      * Constructor
@@ -275,9 +279,14 @@ public final class PomClassicDomainModel
         return file;
     }
 
-    public List<ModelProperty> getModelProperties()
+    public List<ModelProperty> getModelProperties() throws IOException
     {
-        return null;
+        if(modelProperties == null)
+        {
+            modelProperties = ModelMarshaller.marshallXmlToModelProperties(
+                getInputStream(), ProjectUri.baseUri, PomTransformer.URIS );
+        }
+        return new ArrayList<ModelProperty>(modelProperties);
     }
 
     /**
