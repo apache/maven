@@ -69,7 +69,7 @@ public class BuildExtensionListenerTest
         MavenProject project = new MavenProject( model );
         ReactorManager rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        request.setLocalRepositoryPath( new File( "/Users/jvanzyl/.m2/repository" ) );        
+        request.setLocalRepositoryPath( new File( System.getProperty( "user.home" ), ".m2/repository" ) );        
         MavenSession session = new MavenSession( getContainer(), request, new DefaultEventDispatcher(), rm );
 
         return session;
