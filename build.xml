@@ -46,6 +46,7 @@ TODO:
   
   <target name="initLocalRepo">
     <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
+    <echo>Using the local repository at: ${maven.repo.local}</echo>
   </target>
 
   <target name="isMavenHomeSet" depends="initTaskDefs">
