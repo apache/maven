@@ -53,8 +53,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
     public void testParentUnresolvable()
         throws Exception
     {
-        String testName = "parent";
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883/" + testName );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883" );
+        testDir = new File( testDir, "parent" );
 
         Verifier verifier;
 
@@ -150,8 +150,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
     public void testDependencyUnresolvable()
         throws Exception
     {
-        String testName = "dependency";
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883/" + testName );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883" );
+        testDir = new File( testDir, "dependency" );
 
         Verifier verifier;
 
@@ -251,8 +251,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
     public void testPluginUnresolvable()
         throws Exception
     {
-        String testName = "plugin";
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883/" + testName );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2883" );
+        testDir = new File( testDir, "plugin" );
 
         Verifier verifier;
 
