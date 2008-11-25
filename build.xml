@@ -43,6 +43,10 @@ TODO:
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
     <property name="taskdefs.inited" value="true"/>
   </target>
+  
+  <target name="initLocalRepo" unless="maven.repo.local">
+    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
+  </target>
 
   <target name="isMavenHomeSet" depends="initTaskDefs">
     <property environment="env"/>
@@ -52,22 +56,23 @@ TODO:
     <fail unless="maven.home" message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script"/>
   </target>
   
-  <target name="read-pom" depends="initTaskDefs" unless="pom.version">
+  <target name="read-pom" depends="initTaskDefs,initLocalRepo" unless="pom.version">
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
-    <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>
+    <artifact:pom file="${basedir}/dependencies.xml" id="pom">
+      <localRepository path="${maven.repo.local}"/>
+    </artifact:pom>
     <delete file="${basedir}/dependencies.xml"/>
   </target>
 
-  <target name="init" depends="isMavenHomeSet">
+  <target name="init" depends="isMavenHomeSet,initLocalRepo">
     <xmlproperty prefix="pom" file="pom.xml"/>    
     <basename file="${maven.home}" property="maven.home.basename"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
     <!-- Initialize properties -->
     <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
-    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
     <property name="surefire.useFile" value="true"/>    
     <echo>maven.home = ${maven.home}</echo>
     <echo>maven.assembly = ${maven.assembly}</echo>
