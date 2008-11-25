@@ -44,7 +44,7 @@ TODO:
     <property name="taskdefs.inited" value="true"/>
   </target>
   
-  <target name="initLocalRepo" unless="maven.repo.local">
+  <target name="initLocalRepo">
     <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
   </target>
 
