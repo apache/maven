@@ -155,14 +155,9 @@ public class DefaultMaven
 
         String event = MavenEvents.MAVEN_EXECUTION;
 
-        dispatcher.dispatchStart(
-            event,
-            request.getBaseDirectory() );
+        dispatcher.dispatchStart( event, request.getBaseDirectory() );
 
-        MavenSession session = createSession(
-            request,
-            reactorManager,
-            dispatcher );
+        MavenSession session = createSession( request, reactorManager, dispatcher );
 
         if ( request.getGoals() != null )
         {
@@ -205,10 +200,7 @@ public class DefaultMaven
 
         try
         {
-            lifecycleExecutor.execute(
-                session,
-                reactorManager,
-                dispatcher );
+            lifecycleExecutor.execute( session, reactorManager, dispatcher );
         }
         catch ( LifecycleExecutionException e )
         {
@@ -391,11 +383,7 @@ public class DefaultMaven
                                           ReactorManager reactorManager,
                                           EventDispatcher dispatcher )
     {
-        MavenSession session = new MavenSession(
-            container,
-            request,
-            dispatcher,
-            reactorManager );
+        MavenSession session = new MavenSession( container, request, dispatcher, reactorManager );
 
         return session;
     }

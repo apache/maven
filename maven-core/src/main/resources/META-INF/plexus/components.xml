@@ -22,7 +22,7 @@ under the License.
 
     <!--
      | These are the artifacts handlers that were previously in maven-artifact and they don't belong there as these
-    | are Maven specific artifact handlers. We need to put these into their respective plugins and make this fully dynamic. jvz.
+     | are Maven specific artifact handlers. We need to put these into their respective plugins and make this fully dynamic. jvz.
     -->
 
     <component>

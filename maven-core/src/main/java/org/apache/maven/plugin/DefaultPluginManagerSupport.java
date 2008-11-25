@@ -43,6 +43,8 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.realm.RealmScanningUtils;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -52,20 +54,26 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component(role = PluginManagerSupport.class)
 public class DefaultPluginManagerSupport
     implements PluginManagerSupport, LogEnabled, Contextualizable
 {
-
+    @Requirement
     private ArtifactResolver artifactResolver;
-
+    
+    @Requirement
     private ArtifactFactory artifactFactory;
-
+    
+    @Requirement
     private MavenProjectBuilder mavenProjectBuilder;
-
+    
+    @Requirement
     private RuntimeInformation runtimeInformation;
-
+    
+    @Requirement
     private PluginVersionManager pluginVersionManager;
-
+    
+    //@Requirement
     private Logger logger;
 
     private Context containerContext;
@@ -89,8 +97,6 @@ public class DefaultPluginManagerSupport
         }
 
         List remoteRepositories = new ArrayList();
-
-//        remoteRepositories.addAll( project.getPluginArtifactRepositories() );
 
         remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
 

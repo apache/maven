@@ -103,7 +103,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * Class intended to be used by clients who wish to embed Maven into their applications
+ * Class intended to be used by clients who wish to embed Maven into their applications.
  *
  * @author Jason van Zyl
  */
@@ -152,7 +152,7 @@ public class MavenEmbedder
     private MavenExecutionRequestPopulator populator;
 
     private BuildPlanner buildPlanner;
-
+    
     // ----------------------------------------------------------------------
     // Configuration
     // ----------------------------------------------------------------------
@@ -506,7 +506,7 @@ public class MavenEmbedder
                                    boolean allowUnbindableMojos )
         throws MavenEmbedderException
     {
-        MavenExecutionRequest req = new DefaultMavenExecutionRequest( request );
+        MavenExecutionRequest req = DefaultMavenExecutionRequest.copy( request );
         req.setGoals( goals );
 
         EventDispatcher dispatcher = new DefaultEventDispatcher( req.getEventMonitors() );
@@ -709,7 +709,7 @@ public class MavenEmbedder
 
         try
         {
-            container.discoverComponents( childRealm, true );
+            container.discoverComponents( childRealm );
         }
         catch ( PlexusConfigurationException e )
         {

@@ -38,7 +38,7 @@ TODO:
   <property name="it.workdir.version" value="3.0.x"/>
 
   <target name="initTaskDefs">
-  	<xmlproperty file="pom.xml" prefix="pom.xml" />
+    <xmlproperty file="pom.xml" prefix="pom.xml" />
     <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.1-SNAPSHOT.jar"/>
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
   </target>
@@ -89,20 +89,20 @@ TODO:
     <!-- Pull the dependencies for the MetadataGenerator CLI -->
     <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
-       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="1.0-beta-2-SNAPSHOT"/>
+       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="1.0-beta-2"/>
     </artifact:dependencies>          
     
   </target>
 
-  <target name="generate-resources" depends="pull" description="generates plexus component metadata.">
+  <target name="process-classes" depends="pull" description="generates plexus component metadata.">
     <mkdir dir="${basedir}/bootstrap/target"/>
     <mkdir dir="${basedir}/bootstrap/target/classes"/>
   	
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes"/>
       <path refid="sources"/>    	
-      <path refid="pmdg.pathid"/>
       <path refid="pom.pathid"/>
+      <path refid="pmdg.pathid"/>
     </path>
   	
     <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
@@ -166,7 +166,7 @@ TODO:
     </path>
 
     <mkdir dir="bootstrap/target/classes"/>
-    <javac destdir="bootstrap/target/classes" debug="${debug}">
+    <javac destdir="bootstrap/target/classes" debug="true">
       <src refid="sources"/>
       <classpath refid="pom.pathid"/>
     </javac>
@@ -183,7 +183,7 @@ TODO:
     </path>
   </target>
 
-  <target name="maven-compile" depends="compile-boot" description="compiles Maven using the bootstrap Maven, skipping automated tests">
+  <target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <classpath refid="maven.classpath"/>
       <arg value="-e"/>      

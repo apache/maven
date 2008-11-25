@@ -472,17 +472,11 @@ public class PluginParameterExpressionEvaluatorTest
         model.setVersion( "1" );
 
         MavenProject project = new MavenProject( model );
-
-        ReactorManager rm = new ReactorManager( Collections.singletonList( project ),
-                                                ReactorManager.FAIL_FAST );
-
-        MockControl reqCtl = MockControl.createControl( MavenExecutionRequest.class );
-        MavenExecutionRequest req = (MavenExecutionRequest) reqCtl.getMock();
-
-        MavenSession session = new MavenSession( getContainer(), req, new DefaultEventDispatcher(),
-                                                 rm );
+        ReactorManager rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
+        MockControl mockMavenExecutionRequest = MockControl.createControl( MavenExecutionRequest.class );
+        MavenExecutionRequest req = (MavenExecutionRequest) mockMavenExecutionRequest.getMock();
+        MavenSession session = new MavenSession( getContainer(), req, new DefaultEventDispatcher(), rm );
 
         return session;
     }
-
 }

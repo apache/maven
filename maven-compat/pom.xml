@@ -45,14 +45,6 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-        <version>1.0-beta-2-SNAPSHOT</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-            <version>1.0-beta-2-SNAPSHOT</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>

@@ -24,7 +24,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>9</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
   <groupId>org.apache.maven</groupId>
@@ -156,7 +156,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <version>1.0-beta-2-SNAPSHOT</version>
+          <version>${plexusVersion}</version>
           <executions>
             <execution>
               <goals>
@@ -245,7 +245,7 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.3</version>
+          <version>2.4.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -254,15 +254,6 @@ under the License.
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.2</version>
-        <configuration>
-          <forkMode>once</forkMode>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
   <modules>
     <module>maven-core</module>
@@ -276,7 +267,7 @@ under the License.
     <module>maven-mercury</module>
     <module>maven-embedder</module>
     <module>maven-toolchain</module>
-    <module>maven-compat</module>
+    <module>maven-compat</module>    
   </modules>
   <properties>
     <artifactVersion>3.0-alpha-2-SNAPSHOT</artifactVersion>
@@ -286,7 +277,7 @@ under the License.
     <doxiaVersion>1.0-alpha-9</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.1</junitVersion>
-    <plexusVersion>1.0-beta-2-SNAPSHOT</plexusVersion>
+    <plexusVersion>1.0-beta-2</plexusVersion>
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.1</plexusInterpolationVersion>
     <plexusUtilsVersion>1.5.5</plexusUtilsVersion>
@@ -295,7 +286,6 @@ under the License.
     <mercuryVersion>1.0.0-alpha-2-SNAPSHOT</mercuryVersion>
     <woodstoxVersion>3.2.6</woodstoxVersion>
   </properties>
-
   <!--start-->
   <dependencies>
     <dependency>
@@ -368,6 +358,11 @@ under the License.
       <!--end-->
       <!--  Plexus -->
       <dependency>
+        <groupId>org.apache.maven.artifact</groupId>
+        <artifactId>maven-artifact</artifactId>
+        <version>${artifactVersion}</version>
+      </dependency>                    
+      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>${plexusUtilsVersion}</version>
@@ -430,11 +425,6 @@ under the License.
         <version>${wagonVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.maven.artifact</groupId>
-        <artifactId>maven-artifact</artifactId>
-        <version>${artifactVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.maven.doxia</groupId>
         <artifactId>doxia-sink-api</artifactId>
         <version>${doxiaVersion}</version>
@@ -470,22 +460,27 @@ under the License.
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven.mercury</groupId>
+        <artifactId>mercury-artifact</artifactId>
+        <version>${mercuryVersion}</version>
+      </dependency>
         <dependency>
-            <groupId>org.apache.maven.mercury</groupId>
-            <artifactId>mercury-artifact</artifactId>
-            <version>${mercuryVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.mercury</groupId>
-            <artifactId>mercury-external</artifactId>
-            <version>${mercuryVersion}</version>
-        </dependency>
+        <groupId>org.apache.maven.mercury</groupId>
+        <artifactId>mercury-external</artifactId>
+        <version>${mercuryVersion}</version>
+      </dependency>
       <!-- Needed for backward compat aspect. -->
       <dependency>
         <groupId>aspectj</groupId>
         <artifactId>aspectjrt</artifactId>
         <version>${aspectjVersion}</version>
       </dependency>
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-plugin-manager</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>      
     </dependencies>
     <!--start-->
   </dependencyManagement>

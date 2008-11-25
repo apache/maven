@@ -122,7 +122,7 @@ public class DefaultMavenExecutionRequestPopulator
         profileManager( request, configuration );
 
         processSettings( request, configuration );
-
+                
         return request;
     }
 

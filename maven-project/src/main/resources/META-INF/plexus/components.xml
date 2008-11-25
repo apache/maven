@@ -267,6 +267,6 @@ under the License.
           <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
         </requirement>
       </requirements>
-    </component>
+    </component>    
   </components>
 </component-set>

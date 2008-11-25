@@ -1,26 +1,29 @@
 package org.apache.maven.execution;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.errors.CoreErrorReporter;
+import org.apache.maven.listeners.BuildExtensionListener;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -28,13 +31,10 @@ import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.shared.model.ModelEventListener;
 import org.apache.maven.wagon.events.TransferListener;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author Jason van Zyl
@@ -44,9 +44,9 @@ public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
 {
     private ArtifactRepository localRepository;
-
+    
     private File localRepositoryPath;
-
+    
     private boolean offline = false;
 
     private boolean interactiveMode = true;
@@ -115,58 +115,56 @@ public class DefaultMavenExecutionRequest
 
     private ProfileManager profileManager;
 
-    private List remoteRepositories;
+    private List<ArtifactRepository> remoteRepositories;
 
     /**
      * Suppress SNAPSHOT updates.
+     * 
      * @issue MNG-2681
      */
     private boolean noSnapshotUpdates;
 
     private MavenRealmManager realmManager;
-
-    public DefaultMavenExecutionRequest()
+        
+    public static MavenExecutionRequest copy( MavenExecutionRequest original )
     {
-        // default constructor.
+        DefaultMavenExecutionRequest copy = new DefaultMavenExecutionRequest();
+        copy.setLocalRepository( original.getLocalRepository() );
+        copy.setLocalRepositoryPath( original.getLocalRepositoryPath() );
+        copy.setOffline(  original.isOffline() );
+        copy.setInteractiveMode( original.isInteractiveMode() );
+        copy.setProxies( original.getProxies() );
+        copy.setServers( original.getServers() );
+        copy.setMirrors( original.getMirrors() );
+        copy.setProfiles( original.getProfiles() );
+        copy.setPluginGroups( original.getPluginGroups() );
+        copy.setUsePluginUpdateOverride( original.isUsePluginUpdateOverride() );
+        copy.setProjectPresent( original.isProjectPresent() );
+        copy.setUserSettingsFile( original.getUserSettingsFile() );
+        copy.setGlobalSettingsFile( original.getGlobalSettingsFile() );
+        copy.setBaseDirectory( new File( original.getBaseDirectory() ) );
+        copy.setGoals( original.getGoals() );
+        copy.setUseReactor( original.useReactor() );
+        copy.setRecursive( original.isRecursive() );
+        copy.setPom( original.getPom() );
+        copy.setReactorFailureBehavior( original.getReactorFailureBehavior() );
+        copy.setProperties( original.getProperties() );
+        copy.setStartTime( original.getStartTime() );
+        copy.setShowErrors( original.isShowErrors() );
+        copy.setEventMonitors( original.getEventMonitors());
+        copy.setActiveProfiles( original.getActiveProfiles());
+        copy.setInactiveProfiles(  original.getInactiveProfiles());
+        copy.setTransferListener( original.getTransferListener());
+        copy.setLoggingLevel( original.getLoggingLevel());
+        copy.setGlobalChecksumPolicy( original.getGlobalChecksumPolicy());
+        copy.setUpdateSnapshots( original.isUpdateSnapshots());
+        copy.setProfileManager( original.getProfileManager() );
+        copy.setRemoteRepositories( original.getRemoteRepositories() );
+        copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
+        copy.setRealmManager( original.getRealmManager() );
+        return original;        
     }
-
-    public DefaultMavenExecutionRequest( MavenExecutionRequest original )
-    {
-        localRepository = original.getLocalRepository();
-        localRepositoryPath = original.getLocalRepositoryPath();
-        offline = original.isOffline();
-        interactiveMode = original.isInteractiveMode();
-        proxies = original.getProxies();
-        servers = original.getServers();
-        mirrors = original.getMirrors();
-        profiles = original.getProfiles();
-        pluginGroups = original.getPluginGroups();
-        usePluginUpdateOverride = original.isUsePluginUpdateOverride();
-        isProjectPresent = original.isProjectPresent();
-        userSettingsFile = original.getUserSettingsFile();
-        globalSettingsFile = original.getGlobalSettingsFile();
-        basedir = new File( original.getBaseDirectory() );
-        goals = original.getGoals();
-        useReactor = original.useReactor();
-        recursive = original.isRecursive();
-        pom = original.getPom();
-        reactorFailureBehavior = original.getReactorFailureBehavior();
-        properties = original.getProperties();
-        startTime = original.getStartTime();
-        showErrors = original.isShowErrors();
-        eventMonitors = original.getEventMonitors();
-        activeProfiles = original.getActiveProfiles();
-        inactiveProfiles = original.getInactiveProfiles();
-        transferListener = original.getTransferListener();
-        loggingLevel = original.getLoggingLevel();
-        globalChecksumPolicy = original.getGlobalChecksumPolicy();
-        updateSnapshots = original.isUpdateSnapshots();
-        profileManager = original.getProfileManager();
-        remoteRepositories = original.getRemoteRepositories();
-        noSnapshotUpdates = original.isNoSnapshotUpdates();
-        realmManager = original.getRealmManager();
-    }
-
+   
     public String getBaseDirectory()
     {
         if ( basedir == null )
@@ -231,6 +229,36 @@ public class DefaultMavenExecutionRequest
     public List getEventMonitors()
     {
         return eventMonitors;
+    }
+
+    public void setBasedir( File basedir )
+    {
+        this.basedir = basedir;
+    }
+
+    public void setEventMonitors( List eventMonitors )
+    {
+        this.eventMonitors = eventMonitors;
+    }
+
+    public void setActiveProfiles( List activeProfiles )
+    {
+        this.activeProfiles = activeProfiles;
+    }
+
+    public void setInactiveProfiles( List inactiveProfiles )
+    {
+        this.inactiveProfiles = inactiveProfiles;
+    }
+
+    public void setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
+    {
+        this.remoteRepositories = remoteRepositories;
+    }
+
+    public void setProjectBuildingConfiguration( ProjectBuilderConfiguration projectBuildingConfiguration )
+    {
+        this.projectBuildingConfiguration = projectBuildingConfiguration;
     }
 
     public List getActiveProfiles()
@@ -656,7 +684,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( remoteRepositories == null )
         {
-            remoteRepositories = new ArrayList();
+            remoteRepositories = new ArrayList<ArtifactRepository>();
         }
 
         remoteRepositories.add( repository );
@@ -664,7 +692,7 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public List getRemoteRepositories()
+    public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
     }
@@ -730,6 +758,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration.setGlobalProfileManager( getProfileManager() );
             projectBuildingConfiguration.setUserProperties( getUserProperties() );
             projectBuildingConfiguration.setBuildStartTime( getStartTime() );
+            projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
         }
 
         return projectBuildingConfiguration;

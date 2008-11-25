@@ -151,10 +151,7 @@ public class DefaultLifecycleExecutor
             throw new NoGoalsSpecifiedException( buffer.toString() );
         }
 
-        List taskSegments = segmentTaskListByAggregationNeeds(
-            goals,
-            session,
-            rootProject );
+        List taskSegments = segmentTaskListByAggregationNeeds( goals, session, rootProject );
 
         try
         {
@@ -162,19 +159,10 @@ public class DefaultLifecycleExecutor
         }
         catch ( LifecycleException e )
         {
-            e.printStackTrace();
-            throw new LifecycleExecutionException(
-                                                   "Failed to construct one or more initial build plans."
-                                                                   + " Reason: " + e.getMessage(),
-                                                   e );
+            throw new LifecycleExecutionException( "Failed to construct one or more initial build plans." + " Reason: " + e.getMessage(), e );
         }
 
-        executeTaskSegments(
-            taskSegments,
-            reactorManager,
-            session,
-            rootProject,
-            dispatcher );
+        executeTaskSegments( taskSegments, reactorManager, session, rootProject, dispatcher );
     }
 
     /**
@@ -210,7 +198,7 @@ public class DefaultLifecycleExecutor
                 for ( Iterator projectIterator = sortedProjects.iterator(); projectIterator.hasNext(); )
                 {
                     MavenProject currentProject = (MavenProject) projectIterator.next();
-
+                    
                     executeTaskSegmentForProject( segment, currentProject, reactorManager, dispatcher, session );
                 }
             }
@@ -255,11 +243,7 @@ public class DefaultLifecycleExecutor
                 session.setCurrentProject( project );
 
                 // NEW: Build up the execution plan, including configuration.
-                List mojoBindings = getLifecycleBindings(
-                    segment.getTasks(),
-                    project,
-                    session,
-                    target );
+                List mojoBindings = getLifecycleBindings( segment.getTasks(), project, session, target );
 
                 String currentPhase = null;
 

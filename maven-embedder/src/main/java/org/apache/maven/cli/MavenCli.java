@@ -132,7 +132,7 @@ public class MavenCli
         {
             CLIReportingUtils.showVersion();
         }
-
+        
         MavenExecutionRequest request = CLIRequestUtils.buildRequest( commandLine, debug, quiet, showErrors );
 
         Configuration configuration = buildEmbedderConfiguration( request, commandLine, classWorld );

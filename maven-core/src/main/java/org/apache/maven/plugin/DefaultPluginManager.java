@@ -315,7 +315,7 @@ public class DefaultPluginManager
             {
                 getLogger().debug( "Discovering components in realm: " + pluginRealm );
 
-                container.discoverComponents( pluginRealm, false );
+                container.discoverComponents( pluginRealm );
             }
             catch ( PlexusConfigurationException e )
             {

@@ -19,6 +19,11 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.errors.CoreErrorReporter;
@@ -30,11 +35,6 @@ import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
-
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Jason van Zyl

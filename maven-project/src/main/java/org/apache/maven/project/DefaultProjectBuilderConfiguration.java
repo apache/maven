@@ -21,28 +21,30 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.shared.model.ModelEventListener;
+import org.codehaus.plexus.PlexusContainer;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 public class DefaultProjectBuilderConfiguration
     implements ProjectBuilderConfiguration
 {
-
     private ProfileManager globalProfileManager;
 
     private ArtifactRepository localRepository;
 
+    private List<ArtifactRepository> remoteRepositories;
+    
     private Properties userProperties;
 
     private Properties executionProperties = System.getProperties();
 
     private Date buildStartTime;
 
-    public DefaultProjectBuilderConfiguration()
-    {
-    }
-
+    private List<ModelEventListener> listeners;
+        
     public ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager )
     {
         this.globalProfileManager = globalProfileManager;
@@ -63,6 +65,17 @@ public class DefaultProjectBuilderConfiguration
     public ArtifactRepository getLocalRepository()
     {
         return localRepository;
+    }
+        
+    public List<ArtifactRepository> getRemoteRepositories()
+    {
+        return remoteRepositories;
+    }
+
+    public ProjectBuilderConfiguration setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
+    {
+        this.remoteRepositories = remoteRepositories;
+        return this;
     }
 
     public ProjectBuilderConfiguration setUserProperties( Properties userProperties )
@@ -103,4 +116,14 @@ public class DefaultProjectBuilderConfiguration
         return this;
     }
 
+    public List<ModelEventListener> getModelEventListeners()
+    {
+        return listeners;
+    }
+
+    public ProjectBuilderConfiguration setModelEventListeners( List<ModelEventListener> listeners )
+    {
+        this.listeners = listeners;
+        return this;
+    }
 }
