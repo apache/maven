@@ -11,7 +11,9 @@
   
   <properties>
     <integrationTestSVNDir>trunk</integrationTestSVNDir>
-    <itDir>${pom.basedir}/tests</itDir>
+    
+    <!-- Using java.io.tmpdir to avoid long path names that will make windows scream. -->
+    <itDir>${java.io.tmpdir}/${pom.artifactId}-${pom.version}</itDir>
   </properties>
   
   <profiles>
@@ -20,8 +22,7 @@
       <activation>
         <activeByDefault>true</activeByDefault>
         <file>
-          <!-- NOT INTERPOLATED. These values must be explicit. -->
-          <exists>/tmp/maven-integration-tests-2.1.x/pom.xml</exists>
+          <exists>${itDir}/pom.xml</exists>
         </file>
       </activation>
       <build>
@@ -31,7 +32,7 @@
             <executions>
               <execution>
                 <id>scm</id>
-                <phase>initialize</phase>
+                <phase>package</phase>
                 <goals>
                   <goal>update</goal>
                 </goals>
@@ -45,8 +46,7 @@
       <id>checkout</id>
       <activation>
         <file>
-          <!-- NOT INTERPOLATED. These values must be explicit. -->
-          <missing>/tmp/maven-integration-tests-2.1.x/pom.xml</missing>
+          <missing>${itDir}/pom.xml</missing>
         </file>
       </activation>
       <build>
@@ -56,7 +56,7 @@
             <executions>
               <execution>
                 <id>scm</id>
-                <phase>initialize</phase>
+                <phase>package</phase>
                 <goals>
                   <goal>checkout</goal>
                 </goals>
@@ -75,9 +75,7 @@
         <version>1.1</version>
         <configuration>
           <connectionUrl>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/${integrationTestSVNDir}</connectionUrl>
-          <!-- Hard-coding to /tmp/ to avoid long path names that will make windows scream. -->
-          <!-- NOT INTERPOLATED DURING PROFILE ACTIVATION, so making these values explicit throughout to avoid confusion. -->
-          <checkoutDirectory>/tmp/maven-integration-tests-2.1.x</checkoutDirectory>
+          <checkoutDirectory>${itDir}</checkoutDirectory>
         </configuration>
       </plugin>
     </plugins>
