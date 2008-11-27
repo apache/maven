@@ -30,7 +30,6 @@ public final class MavenDependencyProcessor implements DependencyProcessor {
 
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         interpolatorProperties.add(new InterpolatorProperty("${mavenVersion}", "3.0-SNAPSHOT", PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
-        interpolatorProperties.add(new InterpolatorProperty("${maven.version}", "3.0-SNAPSHOT", PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
         
         if(system != null) {
             interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( system,

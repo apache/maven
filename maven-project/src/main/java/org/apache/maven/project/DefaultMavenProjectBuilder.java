@@ -534,7 +534,6 @@ public class DefaultMavenProjectBuilder
         }
 
         interpolatorProperties.add(new InterpolatorProperty("${mavenVersion}", MavenProjectBuilder.STANDALONE_SUPERPOM_VERSION, PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
-        interpolatorProperties.add(new InterpolatorProperty("${maven.version}", MavenProjectBuilder.STANDALONE_SUPERPOM_VERSION, PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
         MavenProject mavenProject;
         try
         {
