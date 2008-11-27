@@ -1,5 +1,15 @@
 package org.apache.maven.cli;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.errors.CoreErrorReporter;
@@ -10,22 +20,11 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.codehaus.plexus.util.Os;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.TimeZone;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
@@ -77,7 +76,7 @@ public final class CLIReportingUtils
             for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
             {
                 Exception e = (Exception) i.next();
-
+                
                 showError( e, request.isShowErrors(), request.getErrorReporter(), logger );
             }
 
@@ -176,7 +175,7 @@ public final class CLIReportingUtils
     }
 
     public static void buildErrorMessage( Exception e, boolean showStackTraces, CoreErrorReporter reporter, StringWriter writer )
-    {
+    {        
         if ( reporter != null )
         {
             Throwable reported = reporter.findReportedException( e );
@@ -203,11 +202,17 @@ public final class CLIReportingUtils
             }
         }
 
+        System.out.println( e.getClass() );
+        
         boolean handled = false;
 
         if ( e instanceof ProjectBuildingException )
         {
             handled = handleProjectBuildingException( (ProjectBuildingException) e, showStackTraces, writer );
+        }
+        if ( e instanceof ProjectBuildFailureException )
+        {
+            handled = handleBuildFailureException( (ProjectBuildFailureException) e, showStackTraces, writer );
         }
         else if ( e instanceof LifecycleExecutionException )
         {
@@ -215,6 +220,7 @@ public final class CLIReportingUtils
         }
         else if ( e instanceof MavenExecutionException )
         {
+
             handled = handleMavenExecutionException( (MavenExecutionException) e, showStackTraces, writer );
         }
 
@@ -247,6 +253,14 @@ public final class CLIReportingUtils
         writer.write( NEWLINE );
     }
 
+    private static boolean handleBuildFailureException( ProjectBuildFailureException e, boolean showStackTraces, StringWriter writer )
+    {
+        MojoFailureException mojoFailureException = e.getMojoFailureException();
+        writer.write( mojoFailureException.getMessage() );
+        writer.write( mojoFailureException.getLongMessage() );        
+        return true;
+    }
+    
     private static boolean handleLifecycleExecutionException( LifecycleExecutionException e, boolean showStackTraces, StringWriter writer )
     {
         handleGenericException( e, showStackTraces, writer );
