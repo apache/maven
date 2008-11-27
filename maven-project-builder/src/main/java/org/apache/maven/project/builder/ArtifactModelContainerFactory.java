@@ -73,6 +73,8 @@ public final class ArtifactModelContainerFactory
 
         private String scope;
 
+        private String classifier;
+
         private List<ModelProperty> properties;
 
         private static String findBaseUriFrom( List<ModelProperty> modelProperties )
@@ -111,6 +113,10 @@ public final class ArtifactModelContainerFactory
                 else if ( scope == null && mp.getUri().equals( uri + "/scope" ) )
                 {
                     this.scope = mp.getResolvedValue();
+                }
+                else if ( classifier == null && mp.getUri().equals( uri + "/classifier" ) )
+                {
+                    this.classifier = mp.getResolvedValue();
                 }
                 else if ( type == null && mp.getUri().equals( ProjectUri.Dependencies.Dependency.type )
                         || mp.getUri().equals(ProjectUri.DependencyManagement.Dependencies.Dependency.type)
@@ -159,6 +165,11 @@ public final class ArtifactModelContainerFactory
                 type = "jar";
             }
 
+            if ( classifier == null )
+            {
+                classifier = "";
+            }
+
             if ( scope == null || scope.equals("provided"))
             {
                 scope = "compile";
@@ -178,7 +189,8 @@ public final class ArtifactModelContainerFactory
             }
 
             ArtifactModelContainer c = (ArtifactModelContainer) modelContainer;
-            if ( c.groupId.equals( groupId ) && c.artifactId.equals( artifactId ) && c.type.equals( type ) )
+            if ( c.groupId.equals( groupId ) && c.artifactId.equals( artifactId ) && c.type.equals( type )
+                    && c.classifier.equals( classifier ))
             {
                 if ( c.version.equals( version ) )
                 {

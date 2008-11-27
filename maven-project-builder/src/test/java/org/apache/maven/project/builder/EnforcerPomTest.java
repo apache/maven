@@ -53,8 +53,15 @@ public class EnforcerPomTest
         DefaultModelDataSource source = new DefaultModelDataSource();
         source.init(domainModel.getModelProperties(), Arrays.asList(new ArtifactModelContainerFactory(), new IdModelContainerFactory()));
         List<ModelContainer> containers = source.queryFor(ProjectUri.Dependencies.Dependency.xUri);
-        assertTrue(containers.size() == 1 );
-        assertTrue(contains(ProjectUri.Dependencies.Dependency.version, "v1", containers.get(0)));
+        assertTrue(containers.size() == 2 );
+
+        ModelContainer mc0 = containers.get(0);
+        assertTrue(contains(ProjectUri.Dependencies.Dependency.version, "v1", mc0));
+        assertFalse(contains(ProjectUri.Dependencies.Dependency.classifier, "tests", mc0));
+
+        ModelContainer mc1 = containers.get(1);
+        assertTrue(contains(ProjectUri.Dependencies.Dependency.version, "v1", mc1));
+        assertTrue(contains(ProjectUri.Dependencies.Dependency.classifier, "tests", mc1));
     }
 
     private boolean contains(String name, String value, ModelContainer modelContainer) {
