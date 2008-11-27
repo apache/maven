@@ -39,7 +39,7 @@ public class PropertyMatcherTest {
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.Property.xUri , null));
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.Property.name , "foo"));
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.Property.value , "bars"));
-
+ 
         ModelContainer modelContainer = new DefaultModelContainer(modelProperties);
 
         List<InterpolatorProperty> props = new ArrayList<InterpolatorProperty>();
