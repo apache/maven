@@ -364,9 +364,19 @@ public class MavenMetadataSource
     private void handleInvalidOrMissingMavenPOM( Artifact artifact, ProjectBuildingException e )
         throws ArtifactMetadataRetrievalException
     {
+        if ( strictlyEnforceThePresenceOfAValidMavenPOM )
+        {
             throw new ArtifactMetadataRetrievalException(
                 "Invalid POM file for artifact: '" + artifact.getDependencyConflictId() + "': " + e.getMessage(), e,
                 artifact );
+        }
+        else
+        {
+            getLogger().warn( "\n\tDEPRECATION: The POM for the artifact '" + artifact.getDependencyConflictId() +
+                "' was invalid or not found on any repositories.\n" +
+                "\tThis may not be supported by future versions of Maven and should be corrected as soon as possible.\n" +
+                "\tError given: " + e.getMessage() + "\n" );
+        }
     }
 
     private void loadProjectBuilder()
