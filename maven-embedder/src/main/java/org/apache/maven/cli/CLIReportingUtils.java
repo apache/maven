@@ -201,8 +201,6 @@ public final class CLIReportingUtils
                 return;
             }
         }
-
-        System.out.println( e.getClass() );
         
         boolean handled = false;
 
