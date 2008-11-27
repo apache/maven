@@ -1,12 +1,68 @@
 package org.apache.maven.project.builder;
 
-import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.*;
+import org.apache.maven.shared.model.impl.DefaultModelDataSource;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.io.IOException;
+
+import static org.junit.Assert.*;
 
 public class EnforcerPomTest
 {
-    public void testConstructionOfTheEnforcerPom()
-        throws Exception
+    @org.junit.Test
+    public void dependencyManagementWithScopeAndClassifier() throws IOException
     {
-        DomainModel model = null;
+        List<ModelProperty> mp = new ArrayList<ModelProperty>();
+        mp.add(new ModelProperty(ProjectUri.xUri, null));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.xUri, null));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.xUri, null));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.xUri, null));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.groupId, "gid"));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.artifactId, "aid"));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.version, "v1"));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.scope, "test"));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.classifier, "tests"));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.xUri, null));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.groupId, "gid"));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.artifactId, "aid"));
+        mp.add(new ModelProperty(ProjectUri.DependencyManagement.Dependencies.Dependency.version, "v1"));
+
+        List<ModelProperty> mp2 = new ArrayList<ModelProperty>();
+        mp2.add(new ModelProperty(ProjectUri.xUri, null));
+        mp2.add(new ModelProperty(ProjectUri.Dependencies.xUri, null));
+        mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.xUri, null));
+        mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.groupId, "gid"));
+        mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.artifactId, "aid"));
+        mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.xUri, null));
+        mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.groupId, "gid"));
+        mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.artifactId, "aid"));
+        mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.classifier, "tests"));
+
+        DomainModel childModel = new DefaultDomainModel(mp2);
+        DomainModel parentModel = new DefaultDomainModel(mp);
+
+        ModelTransformerContext ctx = new ModelTransformerContext(Arrays.asList(new ArtifactModelContainerFactory(),
+                new IdModelContainerFactory()));
+
+        ModelTransformer transformer = new PomTransformer(new DefaultDomainModelFactory());
+        DomainModel domainModel = ctx.transform( Arrays.asList(childModel, parentModel), transformer, transformer );
+
+        DefaultModelDataSource source = new DefaultModelDataSource();
+        source.init(domainModel.getModelProperties(), Arrays.asList(new ArtifactModelContainerFactory(), new IdModelContainerFactory()));
+        List<ModelContainer> containers = source.queryFor(ProjectUri.Dependencies.Dependency.xUri);
+        assertTrue(containers.size() == 1 );
+        assertTrue(contains(ProjectUri.Dependencies.Dependency.version, "v1", containers.get(0)));
+    }
+
+    private boolean contains(String name, String value, ModelContainer modelContainer) {
+        for(ModelProperty mp : modelContainer.getProperties()) {
+            if(mp.getUri().equals(name) && mp.getValue() != null && mp.getValue().equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

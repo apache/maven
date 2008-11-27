@@ -1,6 +1,7 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.project.builder.profile;
 
 import org.apache.maven.project.builder.profile.JdkMatcher;
+import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelProperty;

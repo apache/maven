@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.project.builder.profile;
 
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelContainerAction;

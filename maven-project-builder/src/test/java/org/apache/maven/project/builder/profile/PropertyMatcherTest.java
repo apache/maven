@@ -1,6 +1,6 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.project.builder.profile;
 
-import org.apache.maven.project.builder.profile.PropertyMatcher;
+import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelProperty;
@@ -39,7 +39,7 @@ public class PropertyMatcherTest {
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.Property.xUri , null));
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.Property.name , "foo"));
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.Property.value , "bars"));
- 
+
         ModelContainer modelContainer = new DefaultModelContainer(modelProperties);
 
         List<InterpolatorProperty> props = new ArrayList<InterpolatorProperty>();

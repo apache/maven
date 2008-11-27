@@ -1,6 +1,9 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.project.builder.profile;
 
 import org.apache.maven.project.builder.profile.ProfileContext;
+import org.apache.maven.project.builder.ProjectUri;
+import org.apache.maven.project.builder.ArtifactModelContainerFactory;
+import org.apache.maven.project.builder.IdModelContainerFactory;
 import org.apache.maven.shared.model.DataSourceException;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelContainer;

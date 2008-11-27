@@ -545,6 +545,10 @@ public class PomTransformer
         Collections.sort(ips1, new Comparator<InterpolatorProperty>()
         {
             public int compare(InterpolatorProperty o, InterpolatorProperty o1) {
+                if(o.getTag() == null || o1.getTag() == null)
+                {
+                    return 0;
+                }
                 return PomInterpolatorTag.valueOf(o.getTag()).compareTo(PomInterpolatorTag.valueOf(o1.getTag()));
             }
         });
