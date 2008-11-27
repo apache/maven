@@ -83,7 +83,7 @@ TODO:
     <!-- Pull the dependencies for Modello -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
-       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-20"/>
+       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-21"/>
     </artifact:dependencies>
     
     <!-- Pull the dependencies for the MetadataGenerator CLI -->
@@ -153,6 +153,7 @@ TODO:
     <modello file="maven-project/src/main/mdo/profiles.mdo"/>
     <modello file="maven-core/src/main/mdo/settings.mdo"/>
     <modello file="maven-toolchain/src/main/mdo/toolchains.xml"/>
+    <modello file="maven-compat/src/main/mdo/metadata.mdo"/>
   </target>
 
   <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">

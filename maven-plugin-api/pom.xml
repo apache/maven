@@ -30,9 +30,10 @@ under the License.
   <artifactId>maven-plugin-api</artifactId>
   <name>Maven Plugin API</name>
   <dependencies>
+    <!--  Maven Artifact live in the compat module now. -->
     <dependency>
-      <groupId>org.apache.maven.artifact</groupId>
-      <artifactId>maven-artifact</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

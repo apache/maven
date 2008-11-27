@@ -1365,7 +1365,7 @@ public class DefaultPluginManager
             getLogger().debug( "Configuring mojo '" + mojoDescriptor.getId() + "' with "
                                + ( configuratorId == null ? "basic" : configuratorId )
                                + " configurator -->" );
-
+            
             // This needs to be able to use methods
             configurator.configureComponent( plugin, configuration, expressionEvaluator, realm, listener );
 

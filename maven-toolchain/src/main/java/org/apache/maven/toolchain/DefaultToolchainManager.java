@@ -150,14 +150,14 @@ public class DefaultToolchainManager extends AbstractLogEnabled
     }
 
     private MavenProject getCurrentProject(MavenSession session) {
-        //use reflection since MavenSession.getCurrentProject() is not part of 3.0.8
+        //use reflection since MavenSession.getCurrentProject() is not part of 2.0.8
         try 
         {
             Method meth = session.getClass().getMethod("getCurrentProject", new Class[0]);
-            return (MavenProject) meth.invoke(session, null);
+            return (MavenProject) meth.invoke (session );
         } catch (Exception ex) 
         {
-            //just ignore, we're running in pre- 3.0.9
+            //just ignore, we're running in pre- 2.0.9
         }
         return null;
     }

@@ -654,7 +654,7 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    // Settings files
+    // Settin10gs files
 
     public File getUserSettingsFile()
     {

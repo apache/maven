@@ -1,0 +1,318 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<model>
+  <id>repository-metadata</id>
+  <name>Metadata</name>
+  <description>Per-directory repository metadata.</description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.artifact.repository.metadata</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true">
+      <name>Metadata</name>
+      <version>1.0.0</version>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The groupId that is directory represents, if any.</description>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The artifactId that is directory represents, if any.</description>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>The version that is directory represents, if any.</description>
+        </field>
+        <field>
+          <name>versioning</name>
+          <version>1.0.0</version>
+          <association>
+            <type>Versioning</type>
+          </association>
+          <description>Versioning information for the artifact.</description>
+        </field>
+        <field>
+          <name>plugins</name>
+          <version>1.0.0</version>
+          <description>The set of plugin mappings for the group</description>
+          <association>
+            <type>Plugin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public boolean merge( Metadata sourceMetadata )
+    {
+        boolean changed = false;
+
+        for ( java.util.Iterator i = sourceMetadata.getPlugins().iterator(); i.hasNext(); )
+        {
+            Plugin plugin = (Plugin) i.next();
+            boolean found = false;
+
+            for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext() && !found; )
+            {
+                Plugin preExisting = (Plugin) it.next();
+
+                if ( preExisting.getPrefix().equals( plugin.getPrefix() ) )
+                {
+                    found = true;
+                }
+            }
+
+            if ( !found )
+            {
+                Plugin mappedPlugin = new Plugin();
+
+                mappedPlugin.setArtifactId( plugin.getArtifactId() );
+
+                mappedPlugin.setPrefix( plugin.getPrefix() );
+
+                mappedPlugin.setName( plugin.getName() );
+
+                addPlugin( mappedPlugin );
+
+                changed = true;
+            }
+        }
+
+        Versioning versioning = sourceMetadata.getVersioning();
+        if ( versioning != null )
+        {
+            Versioning v = getVersioning();
+            if ( v == null )
+            {
+                v = new Versioning();
+                setVersioning( v );
+                changed = true;
+            }
+
+            for ( java.util.Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+            {
+                String version = (String) i.next();
+                if ( !v.getVersions().contains( version ) )
+                {
+                    changed = true;
+                    v.getVersions().add( version );
+                }
+            }
+          
+            if ( "null".equals( versioning.getLastUpdated() ) )
+            {
+                versioning.setLastUpdated( null );
+            }
+
+            if ( "null".equals( v.getLastUpdated() ) )
+            {
+                v.setLastUpdated( null );
+            }
+
+            if ( versioning.getLastUpdated() == null || versioning.getLastUpdated().length() == 0 )
+            {
+                // this should only be for historical reasons - we assume local is newer
+                versioning.setLastUpdated( v.getLastUpdated() );
+            }
+
+            if ( v.getLastUpdated() == null || v.getLastUpdated().length() == 0 ||
+                 versioning.getLastUpdated().compareTo( v.getLastUpdated() ) >= 0 )
+            {
+                changed = true;
+                v.setLastUpdated( versioning.getLastUpdated() );
+
+                if ( versioning.getRelease() != null )
+                {
+                    changed = true;
+                    v.setRelease( versioning.getRelease() );
+                }
+                if ( versioning.getLatest() != null )
+                {
+                    changed = true;
+                    v.setLatest( versioning.getLatest() );
+                }
+
+                Snapshot s = v.getSnapshot();
+                Snapshot snapshot = versioning.getSnapshot();
+                if ( snapshot != null )
+                {
+                    if ( s == null )
+                    {
+                        s = new Snapshot();
+                        v.setSnapshot( s );
+                        changed = true;
+                    }
+
+                    // overwrite
+                    if ( s.getTimestamp() == null ? snapshot.getTimestamp() != null
+                        : !s.getTimestamp().equals( snapshot.getTimestamp() ) )
+                    {
+                        s.setTimestamp( snapshot.getTimestamp() );
+                        changed = true;
+                    }
+                    if ( s.getBuildNumber() != snapshot.getBuildNumber() )
+                    {
+                        s.setBuildNumber( snapshot.getBuildNumber() );
+                        changed = true;
+                    }
+                    if ( s.isLocalCopy() != snapshot.isLocalCopy() )
+                    {
+                        s.setLocalCopy( snapshot.isLocalCopy() );
+                        changed = true;
+                    }
+                }
+            }
+        }
+        return changed;
+    }
+          ]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Versioning</name>
+      <version>1.0.0</version>
+      <description>Versioning information for an artifact</description>
+      <fields>
+        <field>
+          <name>latest</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>What the latest version in the directory is, including snapshots</description>
+        </field>
+        <field>
+          <name>release</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>What the latest version in the directory is, of the releases</description>
+        </field>
+        <field>
+          <name>snapshot</name>
+          <version>1.0.0</version>
+          <association>
+            <type>Snapshot</type>
+          </association>
+          <description>The current snapshot data in use for this version</description>
+        </field>
+        <field>
+          <name>versions</name>
+          <version>1.0.0</version>
+          <description>Versions available for the artifact</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>lastUpdated</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>When the metadata was last updated</description>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code>
+            public void updateTimestamp()
+            {
+                setLastUpdatedTimestamp( new java.util.Date() );
+            }
+
+            public void setLastUpdatedTimestamp( java.util.Date date )
+            {
+                java.util.TimeZone timezone = java.util.TimeZone.getTimeZone( "UTC" );
+                java.text.DateFormat fmt = new java.text.SimpleDateFormat( "yyyyMMddHHmmss" );
+                fmt.setTimeZone( timezone );
+                setLastUpdated( fmt.format( date ) );
+            }
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <name>Snapshot</name>
+      <version>1.0.0</version>
+      <description>Snapshot data for the current version</description>
+      <fields>
+        <field>
+          <name>timestamp</name>
+          <version>1.0.0</version>
+          <description>The time it was deployed</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>buildNumber</name>
+          <version>1.0.0</version>
+          <description>The incremental build number</description>
+          <type>int</type>
+        </field>
+        <field>
+          <name>localCopy</name>
+          <version>1.0.0</version>
+          <description>Whether to use a local copy instead (with filename that includes the base version)</description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Plugin</name>
+      <version>1.0.0</version>
+      <description>Mapping information for a single plugin within this group</description>
+      <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm.</comment>
+      <fields>
+        <field>
+          <name>name</name>
+          <type>String</type>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>Display name for the plugin.</description>
+        </field>
+        <field>
+          <name>prefix</name>
+          <type>String</type>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>The plugin invocation prefix (i.e. eclipse for eclipse:eclipse)</description>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <type>String</type>
+          <required>true</required>
+          <version>1.0.0</version>
+          <description>The plugin artifactId</description>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>
