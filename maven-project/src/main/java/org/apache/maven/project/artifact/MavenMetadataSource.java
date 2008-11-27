@@ -372,7 +372,7 @@ public class MavenMetadataSource
         }
         else
         {
-            getLogger().warn( "\n\tDEPRECATION: The POM for the artifact '" + artifact.getDependencyConflictId() +
+            getLogger().debug( "\n\tDEPRECATION: The POM for the artifact '" + artifact.getDependencyConflictId() +
                 "' was invalid or not found on any repositories.\n" +
                 "\tThis may not be supported by future versions of Maven and should be corrected as soon as possible.\n" +
                 "\tError given: " + e.getMessage() + "\n" );

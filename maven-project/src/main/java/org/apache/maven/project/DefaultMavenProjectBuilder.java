@@ -563,7 +563,7 @@ public class DefaultMavenProjectBuilder
         {
             for ( String s : (List<String>) validationResult.getMessages() )
             {
-                System.out.println( s );
+                logger.debug( s );
             }
             throw new InvalidProjectModelException( projectId, "Failed to validate POM", pomFile, validationResult );
         }
