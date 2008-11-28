@@ -65,33 +65,4 @@ public class ArtifactDeployerTest
         assertTrue( deployedFile.exists() );
         assertEquals( "dummy\n", FileUtils.fileRead( deployedFile ) );
     }
-
-    public void testArtifactDeploymentForArtifactThatHasAlreadyBeenDeployed()
-        throws Exception
-    {
-        String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
-
-        Artifact artifact = createArtifact( "artifact", "10.1.3" );
-
-        File file = new File( artifactBasedir, "artifact-1.0.jar" );
-        assertEquals( "dummy\n", FileUtils.fileRead( file ) );
-
-        ArtifactRepository remoteRepository = remoteRepository();
-        createRemoteArtifact( artifact );
-
-        File deployedFile = new File( remoteRepository.getBasedir(), remoteRepository.pathOf( artifact ) );
-        assertTrue( deployedFile.exists() );
-        assertEquals( artifact.getId(), FileUtils.fileRead( deployedFile ) );
-        
-        try
-        {
-            artifactDeployer.deploy( file, artifact, remoteRepository, localRepository() );
-            fail( "Should have failed due to previous deployment of artifact." );
-        }
-        catch( ArtifactDeploymentException e )
-        {
-            assertTrue( deployedFile.exists() );
-            assertEquals( artifact.getId(), FileUtils.fileRead( deployedFile ) );
-        }
-    }
 }
