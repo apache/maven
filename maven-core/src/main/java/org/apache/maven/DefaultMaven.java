@@ -20,32 +20,6 @@ package org.apache.maven;
  */
 
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.execution.*;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.lifecycle.TaskValidationResult;
-import org.apache.maven.monitor.event.DeprecationEventDispatcher;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.execution.DuplicateProjectException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.reactor.MissingModuleException;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.logging.LogEnabled;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,25 +28,54 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.DuplicateProjectException;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.TaskValidationResult;
+import org.apache.maven.monitor.event.DeprecationEventDispatcher;
+import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.monitor.event.MavenEvents;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.reactor.MavenExecutionException;
+import org.apache.maven.reactor.MissingModuleException;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.Os;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
+
 /**
- * @author jason van zyl
+ * @author Jason van Zyl
  * @version $Id$
  * @todo EventDispatcher should be a component as it is internal to maven.
  */
+@Component(role = Maven.class)
 public class DefaultMaven
-    implements Maven,
-    Contextualizable, LogEnabled
+    implements Maven, LogEnabled
 {
-    // ----------------------------------------------------------------------
-    // Components
-    // ----------------------------------------------------------------------
-
+    @Requirement
     protected MavenProjectBuilder projectBuilder;
-
+    
+    @Requirement
     protected LifecycleExecutor lifecycleExecutor;
 
+    @Requirement
     protected PlexusContainer container;
 
+    @Requirement
     protected RuntimeInformation runtimeInformation;
 
     private Logger logger;
@@ -386,16 +389,6 @@ public class DefaultMaven
         MavenSession session = new MavenSession( container, request, dispatcher, reactorManager );
 
         return session;
-    }
-
-    // ----------------------------------------------------------------------
-    // Lifecylce Management
-    // ----------------------------------------------------------------------
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     private List getProjectFiles( MavenExecutionRequest request )

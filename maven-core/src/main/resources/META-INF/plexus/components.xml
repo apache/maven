@@ -291,23 +291,7 @@ under the License.
         </requirement>
       </requirements>
     </component>
-
-    <component>
-      <role>org.apache.maven.Maven</role>
-      <implementation>org.apache.maven.DefaultMaven</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.project.MavenProjectBuilder</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.execution.RuntimeInformation</role>
-        </requirement>
-      </requirements>
-    </component>
-
+    
     <component>
       <role>org.apache.maven.execution.RuntimeInformation</role>
       <implementation>org.apache.maven.execution.DefaultRuntimeInformation</implementation>
