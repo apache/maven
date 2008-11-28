@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.IOUtil;
@@ -36,6 +37,7 @@ import org.codehaus.plexus.util.IOUtil;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
+@Component(role = RuntimeInformation.class)
 public class DefaultRuntimeInformation
     implements RuntimeInformation, Initializable
 {    

@@ -292,10 +292,6 @@ under the License.
       </requirements>
     </component>
     
-    <component>
-      <role>org.apache.maven.execution.RuntimeInformation</role>
-      <implementation>org.apache.maven.execution.DefaultRuntimeInformation</implementation>
-    </component>
     <!--
     |
     |MojoExecutionExceptionDiagnoser
