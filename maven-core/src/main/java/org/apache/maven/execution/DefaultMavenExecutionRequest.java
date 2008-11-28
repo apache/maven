@@ -23,7 +23,6 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.listeners.BuildExtensionListener;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -31,10 +30,7 @@ import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.shared.model.ModelEventListener;
 import org.apache.maven.wagon.events.TransferListener;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author Jason van Zyl
