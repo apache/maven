@@ -25,27 +25,33 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-836">MNG-836</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
+ */
 public class MavenIT0068Test
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test repository accumulation.
+     * Test that parent POMs referenced by a plugin POM can be resolved from ordinary repos, i.e. non-plugin repos.
+     * As a motivation for this, imagine the plugin repository hosts only snapshots while the ordinary repository
+     * hosts releases and a snapshot plugin might easily use a released parent.
      */
-    public void testit0068()
+    public void testitMNG836()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0068" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.codehaus.modello", "modello-core", "1.0-alpha-3", "jar" );
-        Properties verifierProperties = new Properties();
-        verifierProperties.put( "failOnErrorOutput", "false" );
-        verifier.setVerifierProperties( verifierProperties );
-        verifier.executeGoal( "generate-sources" );
-        verifier.assertFilePresent( "target/generated-sources/modello/org/apache/maven/settings/Settings.java" );
-// don't verify error free log
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng836" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
