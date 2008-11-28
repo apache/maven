@@ -385,14 +385,8 @@ public class ProjectUri
                             public static String phase =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/phase";
 
-                            public static class Goals
-                            {
-                                public static String xURI =
-                                    "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals#collection";
-
-                                public static String goal =
-                                    "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals#collection/goal";
-                            }
+                            public static String goals =
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals";
 
                             public static String inherited =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
@@ -456,15 +450,8 @@ public class ProjectUri
                         }
                     }
 
-                    public static class Goals
-                    {
-                        public static String xURI =
-                            "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/goals#collection";
-
-                        public static String goal =
-                            "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/goals#collection/goal";
-
-                    }
+                    public static String goals =
+                        "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/goals";
 
                     public static String inherited =
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/inherited";
@@ -511,14 +498,8 @@ public class ProjectUri
                         public static String phase =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/phase";
 
-                        public static class Goals
-                        {
-                            public static String xURI =
-                                "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/goals#collection";
-
-                            public static String goal =
-                                "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/goals#collection/goal";
-                        }
+                        public static String goals =
+                            "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/goals";
 
                         public static String inherited =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/inherited";
@@ -581,14 +562,8 @@ public class ProjectUri
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/optional";
                     }
                 }
-                public static class Goals
-                {
-                    public static String xURI =
-                        "http://apache.org/maven/project/build/plugins#collection/plugin/goals#collection";
 
-                    public static String goal =
-                        "http://apache.org/maven/project/build/plugins#collection/plugin/goals#collection/goal";
-                }
+                public static String goals = "http://apache.org/maven/project/build/plugins#collection/plugin/goals";
 
                 public static String inherited =
                     "http://apache.org/maven/project/build/plugins#collection/plugin/inherited";
@@ -775,14 +750,8 @@ public class ProjectUri
                                     public static String phase =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/phase";
 
-                                     public static class Goals
-                                     {
-                                        public static String xURI =
-                                            "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals#collection";
-
-                                        public static String goal =
-                                             "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals#collection/goal";
-                                     }
+                                    public static String goals =
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals";
 
                                     public static String inherited =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
@@ -846,14 +815,8 @@ public class ProjectUri
                                 }
                             }
 
-                            public static class Goals
-                            {
-                                public static String xURI =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/goals#collection";
-
-                                public static String goal =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/goal";
-                            }
+                            public static String goals =
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/goals";
 
                             public static String inherited =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/inherited";
@@ -902,14 +865,8 @@ public class ProjectUri
                                 public static String phase =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/phase";
 
-                                public static class Goals
-                                {
-                                    public static String xURI =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/goals#collection";
-
-                                    public static String goal =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/goals#collection/goal";
-                                }
+                                public static String goals =
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/goals";
 
                                 public static String inherited =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/inherited";
@@ -973,20 +930,14 @@ public class ProjectUri
                             }
                         }
 
-                        public static class Goals
-                        {
-                            public static String xURI =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/goals#collection";
-
-                            public static String goal =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/goals#collection/goal";
-                        }
+                        public static String goals =
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/goals";
 
                         public static String inherited =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/inherited";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/inherited";
 
                         public static String configuration =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/configuration";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins/plugin/configuration";
                     }
                 }
             }
