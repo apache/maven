@@ -23,36 +23,73 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3475">MNG-3475</a> and
+ * <a href="http://jira.codehaus.org/browse/MNG-1927">MNG-1927</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
+ */
 public class MavenITmng3475BaseAlignedDirTest
     extends AbstractMavenIntegrationTestCase
 {
-    
+
     public MavenITmng3475BaseAlignedDirTest()
     {
-        super( "[2.1.0-M1,)"); // 2.1.0+ only
+        super( "(2.0.1,)");
     }
 
+    /**
+     * Verify that project directories are basedir aligned when inspected by plugins.
+     */
     public void testitMNG3475()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3475" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3475" );
 
-        File pluginDir = new File( testDir, "plugin" );
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
-
-        verifier.executeGoal( "install" );
-
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        File projectDir = new File( testDir, "project" );
-        verifier = new Verifier( projectDir.getAbsolutePath() );
-
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        /*
+         * NOTE: The script source directory is deliberately excluded from the checks due to MNG-3741.
+         */
+
+        Properties configProps = verifier.loadProperties( "target/config.properties" );
+        Properties modelProps = verifier.loadProperties( "target/model.properties" );
+
+        assertPathEquals( testDir, "target", configProps.getProperty( "mapParam.buildDirectory" ) );
+        assertPathEquals( testDir, "target", modelProps.getProperty( "project.build.directory" ) );
+
+        assertPathEquals( testDir, "target/classes", configProps.getProperty( "mapParam.buildOutputDirectory" ) );
+        assertPathEquals( testDir, "target/classes", modelProps.getProperty( "project.build.outputDirectory" ) );
+
+        assertPathEquals( testDir, "target/test-classes", configProps.getProperty( "mapParam.buildTestOutputDirectory" ) );
+        assertPathEquals( testDir, "target/test-classes", modelProps.getProperty( "project.build.testOutputDirectory" ) );
+
+        assertPathEquals( testDir, "src/main/java", configProps.getProperty( "mapParam.buildSourceDirectory" ) );
+        assertPathEquals( testDir, "src/main/java", modelProps.getProperty( "project.build.sourceDirectory" ) );
+
+        assertPathEquals( testDir, "src/test/java", configProps.getProperty( "mapParam.buildTestSourceDirectory" ) );
+        assertPathEquals( testDir, "src/test/java", modelProps.getProperty( "project.build.testSourceDirectory" ) );
+
+        if ( matchesVersionRange( "[2.1.0-M1,)" ) )
+        {
+            assertPathEquals( testDir, "target/site", configProps.getProperty( "mapParam.reportingOutputDirectory" ) );
+            assertPathEquals( testDir, "target/site", modelProps.getProperty( "project.reporting.outputDirectory" ) );
+        }
+    }
+
+    private void assertPathEquals( File basedir, String subdir, String path )
+    {
+        File actual = new File( path );
+        assertTrue( "path not absolute: " + actual, actual.isAbsolute() );
+        assertEquals( new File( basedir, subdir ), actual );
     }
 
 }

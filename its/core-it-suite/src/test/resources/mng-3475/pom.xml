@@ -18,15 +18,76 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>org.apache.maven.its.mng3475</groupId>
   <artifactId>mng3475</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
-  <name>Apache Maven: mng3475</name>
-  <modules>
-    <module>plugin</module>
-    <module>project</module>
-  </modules>
+
+  <name>Maven Integration Test :: MNG-3475</name> 
+  <description>
+    Verify that project directories are basedir aligned when inspected by plugins.
+  </description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- This checks the project directories retrieved via plugin configuration -->
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <propertiesFile>target/config.properties</propertiesFile>
+          <mapParam>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <buildOutputDirectory>${project.build.outputDirectory}</buildOutputDirectory>
+            <buildTestOutputDirectory>${project.build.testOutputDirectory}</buildTestOutputDirectory>
+            <buildSourceDirectory>${project.build.sourceDirectory}</buildSourceDirectory>
+            <buildTestSourceDirectory>${project.build.testSourceDirectory}</buildTestSourceDirectory>
+            <buildScriptSourceDirectory>${project.build.scriptSourceDirectory}</buildScriptSourceDirectory>
+            <reportingOutputDirectory>${project.reporting.outputDirectory}</reportingOutputDirectory>
+          </mapParam>
+        </configuration>
+        <executions>
+          <execution>
+            <id>interpolated-config</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>config</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- This checks the project directories as retrieved via pure MavenProjet API -->
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <outputFile>target/model.properties</outputFile>
+          <expressions>
+            <expression>project/build/directory</expression>
+            <expression>project/build/outputDirectory</expression>
+            <expression>project/build/testOutputDirectory</expression>
+            <expression>project/build/sourceDirectory</expression>
+            <expression>project/build/testSourceDirectory</expression>
+            <expression>project/build/scriptSourceDirectory</expression>
+            <expression>project/reporting/outputDirectory</expression>
+          </expressions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>effective-model</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

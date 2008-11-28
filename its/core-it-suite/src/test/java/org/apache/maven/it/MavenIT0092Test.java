@@ -31,7 +31,7 @@ public class MavenIT0092Test
 {
     
     /**
-     * Test that legacy repositories with legacy snapshots download correctly.
+     * Test that legacy repositories with legacy snapshots download correctly (c.f. MNG-2068).
      */
     public void testit0092()
         throws Exception
