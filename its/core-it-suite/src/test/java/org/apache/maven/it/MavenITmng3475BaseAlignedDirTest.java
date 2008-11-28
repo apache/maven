@@ -83,6 +83,12 @@ public class MavenITmng3475BaseAlignedDirTest
             assertPathEquals( testDir, "target/site", configProps.getProperty( "mapParam.reportingOutputDirectory" ) );
             assertPathEquals( testDir, "target/site", modelProps.getProperty( "project.reporting.outputDirectory" ) );
         }
+
+        assertPathEquals( testDir, "src/main/resources", modelProps.getProperty( "project.build.resources.0.directory" ) );
+
+        assertPathEquals( testDir, "src/test/resources", modelProps.getProperty( "project.build.testResources.0.directory" ) );
+
+        assertPathEquals( testDir, "src/main/filters/it.properties", modelProps.getProperty( "project.build.filters.0" ) );
     }
 
     private void assertPathEquals( File basedir, String subdir, String path )

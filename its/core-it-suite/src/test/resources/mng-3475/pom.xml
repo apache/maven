@@ -33,6 +33,9 @@ under the License.
   </description>
 
   <build>
+    <filters>
+      <filter>src/main/filters/it.properties</filter>
+    </filters>
     <plugins>
       <plugin>
         <!-- This checks the project directories retrieved via plugin configuration -->
@@ -75,6 +78,9 @@ under the License.
             <expression>project/build/sourceDirectory</expression>
             <expression>project/build/testSourceDirectory</expression>
             <expression>project/build/scriptSourceDirectory</expression>
+            <expression>project/build/resources/0/directory</expression>
+            <expression>project/build/testResources/0/directory</expression>
+            <expression>project/build/filters/0</expression>
             <expression>project/reporting/outputDirectory</expression>
           </expressions>
         </configuration>
