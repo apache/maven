@@ -176,6 +176,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2695OfflinePluginSnapshotsTest.class );
         suite.addTestSuite( MavenITmng2591MergeInheritedPluginConfigTest.class );
         suite.addTestSuite( MavenITmng2562TimestampTest.class );
+        suite.addTestSuite( MavenITmng2539PluginDependenciesComeFromPluginReposTest.class );
         suite.addTestSuite( MavenITmng2339BadProjectInterpolationTest.class );
         suite.addTestSuite( MavenITmng2318LocalParentResolutionTest.class );
         suite.addTestSuite( MavenITmng2293CustomPluginParamImplTest.class );
@@ -202,6 +203,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1415QuotedSystemPropertiesTest.class );
         suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
         suite.addTestSuite( MavenITmng1323AntrunDependenciesTest.class );
+        suite.addTestSuite( MavenITmng0836PluginParentResolutionTest.class );
         suite.addTestSuite( MavenITmng0469ReportConfigTest.class );
         suite.addTestSuite( MavenIT0140Test.class );
         suite.addTestSuite( MavenIT0139Test.class );
@@ -217,7 +219,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependencyTest.class );
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest.class );
-        suite.addTestSuite( MavenIT0110PluginDependenciesComeFromPluginReposTest.class );
         suite.addTestSuite( MavenIT0097Test.class );
         suite.addTestSuite( MavenIT0092Test.class );
         suite.addTestSuite( MavenIT0090Test.class );
@@ -240,7 +241,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0072Test.class );
         suite.addTestSuite( MavenIT0071Test.class );
         suite.addTestSuite( MavenIT0069Test.class );
-        suite.addTestSuite( MavenIT0068Test.class );
         suite.addTestSuite( MavenIT0067Test.class );
         suite.addTestSuite( MavenIT0066Test.class );
         suite.addTestSuite( MavenIT0065Test.class );
