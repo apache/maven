@@ -23,10 +23,16 @@ import org.sonatype.plexus.plugin.manager.PluginMetadata;
 import org.sonatype.plexus.plugin.manager.PluginResolutionRequest;
 import org.sonatype.plexus.plugin.manager.PluginResolutionResult;
 
-// I need access to the local repository
-// i need the remote repositories
-// i need filters to keep stuff out of the realm that exists
-
+/**
+ * This listener has two parts: the collection of the extension elements which happens during POM construction,
+ * and the processing of the build extensions once the construction is finished and the build plan is being
+ * created. The extensions that are found can be contributed to a Mercury session where a set of artifacts
+ * are retrieved and any number of extensions may be required. We don't want to load them as they are discovered
+ * because that prevents any sort of analysis so we collect, analyze and process.
+ * 
+ * @author Jason van Zyl
+ *
+ */
 @Component(role = MavenModelEventListener.class, hint="extensions", instantiationStrategy="per-lookup" )
 public class BuildExtensionListener
     implements MavenModelEventListener
@@ -112,8 +118,15 @@ public class BuildExtensionListener
         }
     }   
     
-    // Processing the information that was collected.
-    
+    /**
+     * Take the extension elements that were found during the POM construction process and now
+     * retrieve all the artifacts necessary, load them in a realm, and discovery the components
+     * that are in the realm. Any components that are discovered will be available to lookups
+     * in the container from any location and the right classloader will be used to execute
+     * any components discovered in the extension realm.
+     * 
+     * @param session Maven session used as the execution context for the current Maven project.
+     */
     public void processModelContainers( MavenSession session )
     {       
         for ( BuildExtension be : buildExtensions )
@@ -155,9 +168,8 @@ public class BuildExtensionListener
         }
         else
         {
-            // I'm doing this because I am about to rip the artifact clusterfuck out and
-            // replace it with mercury and I don't want to pull in 5 component to make a
-            // remote repository. This will do until alpha-2.
+            // This will only ever be use for the test that I have. So yes this will break
+            // folks behind proxies until alpha-2. Such is life.
             repos.add( "http://repo1.maven.org/maven2" );
         }
         
