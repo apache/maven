@@ -93,6 +93,7 @@ public class DefaultMaven
         List projects;
         try
         {
+            
             projects = getProjects( request );
 
             if ( projects.isEmpty() )

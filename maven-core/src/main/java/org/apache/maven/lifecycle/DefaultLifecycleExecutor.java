@@ -79,6 +79,7 @@ import java.util.Stack;
  * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without
  * much of the event handling)
  */
+
 @Component(role = LifecycleExecutor.class)
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
