@@ -88,6 +88,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng3877BasedirAlignedModelTest.class );
         suite.addTestSuite( MavenITmng3866PluginConfigInheritanceTest.class );
         suite.addTestSuite( MavenITmng3864PerExecPluginConfigTest.class );
         suite.addTestSuite( MavenITmng3863AutoPluginGroupIdTest.class );
