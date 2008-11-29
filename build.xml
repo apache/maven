@@ -214,57 +214,6 @@ TODO:
     </chmod>
   </target>
   
-  <target name="its-setup">
-    <condition property="its.win32">
-      <os family="windows"/>
-    </condition>
-    <condition property="its.unix">
-      <not>
-        <os family="windows"/>
-      </not>
-    </condition>
-  </target>
-  
-  <target name="its-win32" if="its.win32">
-    <echo>Retrieving integration tests</echo>
-    <exec dir="${basedir}/maven-integration-tests" executable="cmd">
-      <arg value="/c"/>
-      <arg value="${maven.home}\bin\mvn.bat"/>
-      <arg value="initialize"/>
-    </exec>
-    
-    <echo>Running integration tests</echo>
-    <!-- Hard-coding to /tmp/ to avoid long path names that will make windows scream. -->
-    <exec failonerror="true" dir="/tmp/maven-integration-tests-${it.workdir.version}" executable="cmd">
-      <arg value="/c"/>
-      <arg value="${maven.home}\bin\mvn.bat"/>
-      <arg value="-Prun-its"/>
-      <arg value="clean"/>
-      <arg value="install"/>
-    </exec>
-  </target>
-
-  <target name="its-unix" if="its.unix">
-    <echo>Retrieving integration tests</echo>
-    <exec dir="${basedir}/maven-integration-tests" executable="${maven.home}/bin/mvn">
-      <arg value="initialize"/>
-    </exec>
-    
-    <echo>Running integration tests</echo>
-    <!-- Hard-coding to /tmp/ to avoid long path names that will make windows scream. -->
-    <exec failonerror="true" dir="/tmp/maven-integration-tests-${it.workdir.version}" executable="${maven.home}/bin/mvn">
-      <arg value="-Prun-its"/>
-      <arg value="clean"/>
-      <arg value="install"/>
-    </exec>
-  </target>
-
-  <target name="run-its" depends="init,its-setup,its-win32,its-unix">
-    <echo>Integration-test results should be displayed above.</echo>
-  </target>
-  
   <target name="all" depends="clean-bootstrap,init,extract-assembly"/>
-
-  <target name="with-its" depends="all,run-its"/>
   
 </project>
