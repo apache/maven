@@ -80,6 +80,8 @@ import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
@@ -97,9 +99,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-/** @plexus.component */
-//@Component(role=PluginManager.class)
-//!!jvz not picked up by the anno processor
+@Component(role=PluginManager.class)
 public class DefaultPluginManager
     extends AbstractLogEnabled
     implements PluginManager
@@ -115,54 +115,42 @@ public class DefaultPluginManager
         RESERVED_GROUP_IDS = rgids;
     }
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected ArtifactFilterManager coreArtifactFilterManager;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected PathTranslator pathTranslator;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected MavenPluginCollector pluginCollector;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected PluginVersionManager pluginVersionManager;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected ArtifactFactory artifactFactory;
 
-    //@Requirement
-    /** @plexus.requirement */    
+    @Requirement
     protected ArtifactResolver artifactResolver;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected ArtifactMetadataSource artifactMetadataSource;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected RuntimeInformation runtimeInformation;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected MavenProjectBuilder mavenProjectBuilder;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     protected PluginMappingManager pluginMappingManager;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     private PluginManagerSupport pluginManagerSupport;
 
     public DefaultPluginManager()
