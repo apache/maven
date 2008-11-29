@@ -161,8 +161,6 @@ TODO:
       <dirset dir=".">
         <include name="bootstrap/target/generated-sources"/>
         <include name="*/src/main/*"/>
-        <include name="maven-reporting/maven-reporting-api/src/main/*"/>
-        <exclude name="maven-core-it-verifier/**"/>
       </dirset>
     </path>
 
