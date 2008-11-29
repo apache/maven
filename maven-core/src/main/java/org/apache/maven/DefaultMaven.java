@@ -43,6 +43,7 @@ import org.apache.maven.monitor.event.DeprecationEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.project.MavenProject;
+
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
@@ -92,8 +93,7 @@ public class DefaultMaven
     {
         List projects;
         try
-        {
-            
+        {            
             projects = getProjects( request );
 
             if ( projects.isEmpty() )
