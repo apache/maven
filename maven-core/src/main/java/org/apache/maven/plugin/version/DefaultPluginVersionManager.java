@@ -46,27 +46,21 @@ import org.codehaus.plexus.util.StringUtils;
 import java.util.Iterator;
 import java.util.List;
 
-/** @plexus.component */
-//@Component(role = PluginVersionManager.class)
-//!!jvz not picked up by anno processor
+@Component(role = PluginVersionManager.class)
 public class DefaultPluginVersionManager
     extends AbstractLogEnabled
     implements PluginVersionManager
 {
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     private ArtifactFactory artifactFactory;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     private ArtifactMetadataSource artifactMetadataSource;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     private MavenProjectBuilder mavenProjectBuilder;
 
-    //@Requirement
-    /** @plexus.requirement */
+    @Requirement
     private RuntimeInformation runtimeInformation;
 
     public String resolvePluginVersion( String groupId,
