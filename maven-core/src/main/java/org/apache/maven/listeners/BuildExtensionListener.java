@@ -45,7 +45,7 @@ public class BuildExtensionListener
     
     private List<BuildExtension> buildExtensions = new ArrayList<BuildExtension>();
     
-    public void fire( List<ModelContainer> modelContainers )
+    public void fire( List<? extends ModelContainer> modelContainers )
     {        
         if ( !inBuild )
         {

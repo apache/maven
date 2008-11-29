@@ -103,7 +103,7 @@ public class PomTransformer
     /**
      * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
      */
-    public final DomainModel transformToDomainModel( List<ModelProperty> properties,  List<ModelEventListener> eventListeners )
+    public final DomainModel transformToDomainModel( List<ModelProperty> properties,  List<? extends ModelEventListener> eventListeners )
         throws IOException
     {
         if ( properties == null )
@@ -298,7 +298,7 @@ public class PomTransformer
     /**
      * @see ModelTransformer#transformToModelProperties(java.util.List)
      */
-    public final List<ModelProperty> transformToModelProperties(List<DomainModel> domainModels
+    public final List<ModelProperty> transformToModelProperties(List<? extends DomainModel> domainModels
     )
         throws IOException
     {
