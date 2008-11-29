@@ -19,8 +19,9 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,9 +34,6 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringInputStream;
-import org.codehaus.plexus.util.StringOutputStream;
 
 public class StringWagon
     extends StreamWagon
@@ -71,7 +69,14 @@ public class StringWagon
             resource.setContentLength( content.length() );
             resource.setLastModified( System.currentTimeMillis() );
 
-            inputData.setInputStream( new StringInputStream( content ) );
+            try
+            {
+                inputData.setInputStream( new ByteArrayInputStream( content.getBytes( "UTF-8" ) ) );
+            }
+            catch ( UnsupportedEncodingException e )
+            {
+                throw new Error( "broken JVM", e );
+            }
         }
         else
         {
@@ -83,7 +88,7 @@ public class StringWagon
     public void fillOutputData( OutputData outputData )
         throws TransferFailedException
     {
-        outputData.setOutputStream( new StringOutputStream() );
+        outputData.setOutputStream( new ByteArrayOutputStream() );
     }
 
     @Override

@@ -210,7 +210,7 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
 
         control.verify();
     }
@@ -220,6 +220,7 @@ public class DefaultWagonManagerTest
     {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-pom" );
         artifact.getFile().createNewFile();
+        artifact.getFile().setLastModified( System.currentTimeMillis() - 60 * 1000 );
 
         ArtifactRepository repo = createStringRepo();
 
@@ -235,7 +236,7 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, true );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
 
         control.verify();
     }
@@ -300,7 +301,7 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
 
         control.verify();
     }
@@ -310,6 +311,7 @@ public class DefaultWagonManagerTest
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "jar" );
         artifact.getFile().createNewFile();
+        artifact.getFile().setLastModified( System.currentTimeMillis() - 60 * 1000 );
 
         ArtifactRepository repo = createStringRepo();
 
@@ -325,7 +327,7 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, true );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
 
         control.verify();
     }
@@ -355,7 +357,7 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
 
         control.verify();
     }
@@ -365,6 +367,7 @@ public class DefaultWagonManagerTest
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "1.0-SNAPSHOT", "jar" );
         artifact.getFile().createNewFile();
+        artifact.getFile().setLastModified( System.currentTimeMillis() - 60 * 1000 );
 
         ArtifactRepository repo = createStringRepo();
 
@@ -383,7 +386,7 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
 
         control.verify();
     }
@@ -393,6 +396,7 @@ public class DefaultWagonManagerTest
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "1.0-SNAPSHOT", "jar" );
         artifact.getFile().createNewFile();
+        artifact.getFile().setLastModified( System.currentTimeMillis() - 60 * 1000 );
 
         ArtifactRepository repo = createStringRepo();
 
@@ -413,7 +417,7 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
 
         control.verify();
     }
@@ -423,6 +427,7 @@ public class DefaultWagonManagerTest
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "1.0-SNAPSHOT", "jar" );
         artifact.getFile().createNewFile();
+        artifact.getFile().setLastModified( System.currentTimeMillis() - 60 * 1000 );
 
         ArtifactRepository repo = createStringRepo();
 
@@ -440,7 +445,7 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, true );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
 
         control.verify();
     }
