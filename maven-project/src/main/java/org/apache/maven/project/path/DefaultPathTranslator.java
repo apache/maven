@@ -19,14 +19,14 @@ package org.apache.maven.project.path;
  * under the License.
  */
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Resource;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Resource;
 
 public class DefaultPathTranslator
     implements PathTranslator
