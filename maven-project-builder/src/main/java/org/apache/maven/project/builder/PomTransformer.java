@@ -44,6 +44,7 @@ public class PomTransformer
     public static final Set<String> URIS = Collections.unmodifiableSet(new HashSet<String>( Arrays.asList(  ProjectUri.Build.Extensions.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.configuration,
+            //ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
 
@@ -149,6 +150,7 @@ public class PomTransformer
                     transformPluginManagement( managementContainer.getProperties() ) );
 
                 //Remove duplicate executions tags
+
                 boolean hasExecutionsTag = false;
                 for ( ModelProperty mp : dependencyContainer.getProperties() )
                 {
@@ -176,9 +178,71 @@ public class PomTransformer
                 managementContainer = new ArtifactModelContainerFactory().create( pList );
 
                 ModelContainerAction action = dependencyContainer.containerAction( managementContainer );
+               // System.out.println(action);
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
-                {
-                    source.join( dependencyContainer, managementContainer );
+                {    //System.out.println("A:");
+                    ModelDataSource dependencyDatasource = new DefaultModelDataSource();
+                    dependencyDatasource.init( dependencyContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
+                            new IdModelContainerFactory() ) );
+
+                    ModelDataSource managementDatasource = new DefaultModelDataSource();
+                    managementDatasource.init( managementContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
+                            new IdModelContainerFactory() ) );
+
+                    List<ModelContainer> managementExecutionContainers = managementDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
+                    List<ModelProperty> managementPropertiesWithoutExecutions = new ArrayList<ModelProperty>(managementContainer.getProperties());
+                    for(ModelContainer a : managementExecutionContainers)
+                    {
+                        managementPropertiesWithoutExecutions.removeAll(a.getProperties());
+                    }
+
+                    source.join( dependencyContainer, new ArtifactModelContainerFactory().create(managementPropertiesWithoutExecutions) );
+
+                    List<ModelContainer> dependencyExecutionContainers = dependencyDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
+                    List<ModelContainer> joinedExecutionContainers = new ArrayList<ModelContainer>();
+                    //System.out.println(managementExecutionContainers.size());
+                    for(ModelContainer a : managementExecutionContainers)
+                    {
+                        for(ModelContainer b : dependencyExecutionContainers)
+                        {
+                            if(b.containerAction(a).equals(ModelContainerAction.JOIN))
+                            {
+                                source.join(b, a);
+                                joinedExecutionContainers.add(a);
+                            }
+                        }
+                    }
+
+                    ModelProperty executionsProperty = null;
+                    for(ModelProperty a : dependencyContainer.getProperties())
+                    {
+                        if(a.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.xUri)) {
+                            executionsProperty = a;
+                            break;
+                        }
+                    }
+
+                    if(executionsProperty == null)
+                    {
+                        for(ModelProperty a : managementPropertiesWithoutExecutions)
+                        {
+                            if(a.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.xUri)) {
+                                executionsProperty = a;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(executionsProperty != null)
+                    {
+                        managementExecutionContainers.removeAll(joinedExecutionContainers);
+                        Collections.reverse(managementExecutionContainers);
+                        for(ModelContainer a : managementExecutionContainers)
+                        {
+                            source.insertModelPropertiesAfter(executionsProperty,
+                                    ModelTransformerContext.sort(a.getProperties(), ProjectUri.Build.Plugins.Plugin.Executions.xUri));
+                        }
+                    }
                 }
             }
         }

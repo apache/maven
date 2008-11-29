@@ -40,6 +40,8 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Provides a wrapper for the maven model.
@@ -283,8 +285,13 @@ public final class PomClassicDomainModel
     {
         if(modelProperties == null)
         {
+            Set<String> s = new HashSet<String>();
+            //TODO: Should add all collections from ProjectUri
+            s.addAll(PomTransformer.URIS);
+            s.add(ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri);
+            s.add(ProjectUri.Build.Plugins.Plugin.Executions.xUri);
             modelProperties = ModelMarshaller.marshallXmlToModelProperties(
-                getInputStream(), ProjectUri.baseUri, PomTransformer.URIS );
+                getInputStream(), ProjectUri.baseUri, s );
         }
         return new ArrayList<ModelProperty>(modelProperties);
     }

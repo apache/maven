@@ -10,7 +10,8 @@ import java.util.*;
 public class PluginExecutionIdModelContainerFactory implements ModelContainerFactory {
 
     private static final Collection<String> uris = Collections.unmodifiableList(Arrays.asList(
-            ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri));
+            ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri,
+            ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.Execution.xUri));
 
     public Collection<String> getUris() {
         return uris;
