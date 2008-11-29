@@ -544,12 +544,6 @@ under the License.
       </build>
     </profile>
     <profile>
-      <id>run-its</id>
-      <modules>
-        <module>maven-core-it-runner</module>
-      </modules>
-    </profile>
-    <profile>
       <id>strict</id>
       <build>
         <plugins>
