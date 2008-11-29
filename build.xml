@@ -83,13 +83,13 @@ TODO:
     <!-- Pull the dependencies for Modello -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
-       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-21"/>
+       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
     </artifact:dependencies>
     
     <!-- Pull the dependencies for the MetadataGenerator CLI -->
     <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
-       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="1.0-beta-2"/>
+       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
     </artifact:dependencies>          
     
   </target>
