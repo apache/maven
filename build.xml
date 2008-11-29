@@ -169,11 +169,6 @@ TODO:
       <classpath refid="pom.pathid"/>
     </javac>
 
-    <!-- DGF generating a fake pom.properties so Maven thinks it has a version number -->
-    <mkdir dir="bootstrap/target/classes/META-INF/maven/org.apache.maven/maven-core"/>
-    <echo message="version=${pom.project.version}"
-          file="bootstrap/target/classes/META-INF/maven/org.apache.maven/maven-core/pom.properties"/>
-
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes"/>
       <path refid="sources"/>
