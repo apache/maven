@@ -749,7 +749,7 @@ public class DefaultWagonManager
                 id = repository.getId();
             }
 
-            getLogger().info( "Using mirror: " + mirror.getId() + " for repository: " + repository.getId() + "\n(mirror url: " + mirror.getUrl() + ")" );
+            getLogger().debug( "Using mirror: " + mirror.getId() + " for repository: " + repository.getId() + "\n(mirror url: " + mirror.getUrl() + ")" );
             repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
                                                                      repository.getLayout(), repository.getSnapshots(),
                                                                      repository.getReleases() );

@@ -35,6 +35,11 @@ public class LegacyLifecycleMappingParser
     public LifecycleBindings parseDefaultMappings( final List lifecycles )
         throws LifecycleSpecificationException
     {
+        if( lifecycles == null )
+        {
+            throw new IllegalArgumentException("lifecycles: null");
+        }
+        
         LifecycleBindings bindings = new LifecycleBindings();
 
         bindings.setPackaging( "unmatched" );
