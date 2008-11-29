@@ -36,7 +36,6 @@ import org.codehaus.plexus.util.IOUtil;
  * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
- * @plexus.component
  */
 @Component(role = RuntimeInformation.class)
 public class DefaultRuntimeInformation

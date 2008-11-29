@@ -41,7 +41,6 @@ import java.util.Map;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
- * @plexus.component
  */
 @Component(role = PluginMappingManager.class)
 public class DefaultPluginMappingManager
