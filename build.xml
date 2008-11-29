@@ -29,7 +29,6 @@ having a set of builds converge on the same repository for integration purposes.
 
 TODO:
 - Ant Tasks for Modello (generally useful and will greatly shorten the script)
-- Ant Tasks for Plexus Component Descriptors (generally useful and will allow us to eliminate the hand-coded descriptors)
 
 -->
 
