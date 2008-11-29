@@ -43,14 +43,12 @@ import java.util.Map;
  * @version $Id$
  * @plexus.component
  */
-//@Component(role = PluginMappingManager.class)
-//!!jvz not picked up by the annotation processor
+@Component(role = PluginMappingManager.class)
 public class DefaultPluginMappingManager
     extends AbstractLogEnabled
     implements PluginMappingManager
 {
-    /** @plexus.requirement */
-    //@Requirement
+    @Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;
 
     private Map pluginDefinitionsByPrefix = new HashMap();
