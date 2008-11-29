@@ -52,6 +52,17 @@ public abstract class AbstractDependencyMojo
     protected MavenProject project;
 
     /**
+     * The number of trailing path levels that should be used to denote a class path element. If positive, each class
+     * path element is trimmed down to the specified number of path levels by discarding leading directories, e.g. set
+     * this parameter to 1 to keep only the simple file name. The trimmed down paths will always use the forward slash
+     * as directory separator. For non-positive values, the full/absolute path is returned, using the platform-specific
+     * separator.
+     * 
+     * @parameter expression="${depres.significantPathLevels}"
+     */
+    private int significantPathLevels;
+
+    /**
      * Writes the specified artifacts to the given output file.
      * 
      * @param pathname The path to the output file, relative to the project base directory, may be <code>null</code> or
@@ -150,8 +161,8 @@ public abstract class AbstractDependencyMojo
             {
                 for ( Iterator it = classPath.iterator(); it.hasNext(); )
                 {
-                    Object element = it.next();
-                    writer.write( element.toString() );
+                    String element = it.next().toString();
+                    writer.write( stripLeadingDirs( element, significantPathLevels ) );
                     writer.newLine();
                     getLog().info( "[MAVEN-CORE-IT-LOG]   " + element );
                 }
@@ -175,6 +186,31 @@ public abstract class AbstractDependencyMojo
                 }
             }
         }
+    }
+
+    private String stripLeadingDirs( String path, int significantPathLevels )
+    {
+        String result;
+        if ( significantPathLevels > 0 )
+        {
+            result = "";
+            File file = new File( path );
+            for ( int i = 0; i < significantPathLevels && file != null; i++ )
+            {
+                if ( result.length() > 0 )
+                {
+                    // NOTE: Always use forward slash here to ease platform-independent testing
+                    result = '/' + result;
+                }
+                result = file.getName() + result;
+                file = file.getParentFile();
+            }
+        }
+        else
+        {
+            result = path;
+        }
+        return result;
     }
 
 }
