@@ -1,5 +1,13 @@
 package org.apache.maven.lifecycle.binding;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleBindingLoader;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
@@ -21,26 +29,14 @@ import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * Responsible for the gross construction of LifecycleBindings, or mappings of MojoBinding instances to different parts
@@ -50,7 +46,8 @@ import java.util.StringTokenizer;
  * @author jdcasey
  *
  */
-@Component(role = LifecycleBindingManager.class)
+//@Component(role = LifecycleBindingManager.class)
+//!! This is configuration that needs to be bound in so we can't generate this quite yet.
 public class DefaultLifecycleBindingManager
     implements LifecycleBindingManager, LogEnabled
 {
@@ -66,19 +63,19 @@ public class DefaultLifecycleBindingManager
     @Requirement
     private LegacyLifecycleMappingParser legacyLifecycleMappingParser;
 
-    private Logger logger;
-    
     private Map bindingsByPackaging;
 
     private Map legacyMappingsByPackaging;
-
+    
+    private Logger logger;
+    
     // configured. Moved out of DefaultLifecycleExecutor...
     private List<org.apache.maven.lifecycle.binding.Lifecycle> lifecycles;
 
     // configured. Moved out of DefaultLifecycleExecutor...
     private List defaultReports;
     
-    public List<org.apache.maven.lifecycle.binding.Lifecycle> getLifecycles()
+    public List getLifecycles()
     {
         return lifecycles;
     }

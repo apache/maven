@@ -447,6 +447,11 @@ under the License.
         <requirement>
           <role>org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser</role>
         </requirement>
+         <requirement>                                                                                                                                        
+           <role>org.codehaus.plexus.PlexusContainer</role>                                                                                                   
+           <role-hint>default</role-hint>                                                                                                                     
+           <field-name>container</field-name>                                                                                                                 
+         </requirement>              
       </requirements>
       <configuration>
         <lifecycles>
