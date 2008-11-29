@@ -1,9 +1,102 @@
+<!-- 
+
+Artifact handlers are required by the dependency resolution mechanism and therefore needed by the core.
+The type specified by a dependency could be altered to load a particular plugin in order to get the 
+artifact handler. This would make it easier to encapsulate all handling for a type in one place and
+not be bound to the core. It wouldn't be terrible as the plugin would need to be downloaded, classloaded,
+components discovered which is probably a reasonable price to pay for complete and comprehensible
+encapsulation. All these special entries here is probably understood by no one which is a real
+problem.
+
+-->
 <component-set>
   <components>
+    <!------------------------------------------------------------------------ 
+     | POM
+     |----------------------------------------------------------------------->
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>pom</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
+      <configuration>
+        <type>pom</type>
+      </configuration>
+    </component>     
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>pom</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: pom-lifecycle -->
+            <phases>
+              <package>org.apache.maven.plugins:maven-site-plugin:attach-descriptor</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <optional-mojos>
+              <optional-mojo>org.apache.maven.plugins:maven-site-plugin:attach-descriptor</optional-mojo>
+            </optional-mojos>
+            <!-- END SNIPPET: pom-lifecycle -->
+          </lifecycle>
+        </lifecycles>
+      </configuration>
+    </component>    
+    
+    <!------------------------------------------------------------------------ 
+     | JAR
+     |----------------------------------------------------------------------->
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>jar</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
+      <configuration>
+        <type>jar</type>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
+      </configuration>
+    </component>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>jar</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: jar-lifecycle -->
+            <phases>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>
+                org.apache.maven.plugins:maven-jar-plugin:jar
+              </package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: jar-lifecycle -->
+          </lifecycle>
+        </lifecycles>
+      </configuration>
+    </component>
+          
+    <!------------------------------------------------------------------------ 
+     | EJB 
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ejb</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <type>ejb</type>
         <extension>jar</extension>
@@ -11,22 +104,98 @@
         <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
-
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping
+      </role>
+      <role-hint>ejb</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+      </implementation>
+      <configuration>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: ejb-lifecycle -->
+            <phases>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources
+              </process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile
+              </compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile
+              </test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test
+              </test>
+              <package>
+                org.apache.maven.plugins:maven-ejb-plugin:ejb
+              </package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install
+              </install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy
+              </deploy>
+            </phases>
+            <!-- END SNIPPET: ejb-lifecycle -->
+          </lifecycle>
+        </lifecycles>
+      </configuration>
+    </component>    
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>jar</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <role-hint>ejb-client</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
-        <type>jar</type>
+        <type>ejb-client</type>
+        <extension>jar</extension>
+        <packaging>ejb</packaging>
+        <classifier>client</classifier>
         <language>java</language>
         <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>ejb3</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
+      <configuration>
+        <type>ejb3</type>
+        <includesDependencies>true</includesDependencies>
+        <language>java</language>
+        <addedToClasspath>false</addedToClasspath>
+      </configuration>
+    </component>   
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>ejb3</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <!-- START SNIPPET: ejb3-lifecycle -->
+        <phases>
+          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+          <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+          <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+          <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+          <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+          <package>
+            org.apache.maven.plugins:maven-ejb3-plugin:ejb3
+          </package>
+          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: ejb3-lifecycle -->
+      </configuration>
+    </component>     
 
+    <!------------------------------------------------------------------------ 
+     | TEST JAR
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>test-jar</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <classifier>tests</classifier>
         <extension>jar</extension>
@@ -37,10 +206,14 @@
       </configuration>
     </component>
 
+    <!------------------------------------------------------------------------ 
+     | MAVEN PLUGIN
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>maven-plugin</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <type>maven-plugin</type>
         <extension>jar</extension>
@@ -48,20 +221,50 @@
         <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
-
     <component>
-      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>pom</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>maven-plugin</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <type>pom</type>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: maven-plugin-lifecycle -->
+            <phases>
+              <generate-resources>org.apache.maven.plugins:maven-plugin-plugin:descriptor</generate-resources>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>
+                org.apache.maven.plugins:maven-jar-plugin:jar,
+                org.apache.maven.plugins:maven-plugin-plugin:addPluginArtifactMetadata
+              </package>
+              <install>
+                org.apache.maven.plugins:maven-install-plugin:install,
+                org.apache.maven.plugins:maven-plugin-plugin:updateRegistry
+              </install>
+              <deploy>
+                org.apache.maven.plugins:maven-deploy-plugin:deploy
+              </deploy>
+            </phases>
+            <!-- END SNIPPET: maven-plugin-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
-    </component>
+    </component>    
 
+    <!------------------------------------------------------------------------ 
+     | SOURCE JAR
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>java-source</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <classifier>sources</classifier>
         <type>java-source</type>
@@ -71,10 +274,14 @@
       </configuration>
     </component>
 
+    <!------------------------------------------------------------------------ 
+     | JAVADOC JAR 
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>javadoc</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <classifier>javadoc</classifier>
         <type>javadoc</type>
@@ -84,10 +291,14 @@
       </configuration>
     </component>
 
+    <!------------------------------------------------------------------------ 
+     | WAR 
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>war</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <type>war</type>
         <includesDependencies>true</includesDependencies>
@@ -95,11 +306,41 @@
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>war</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: war-lifecycle -->
+            <phases>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>org.apache.maven.plugins:maven-war-plugin:war</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: war-lifecycle -->
+          </lifecycle>
+        </lifecycles>
+      </configuration>
+    </component>    
 
+    <!------------------------------------------------------------------------ 
+     | EAR 
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ear</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <type>ear</type>
         <includesDependencies>true</includesDependencies>
@@ -107,25 +348,38 @@
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
-
     <component>
-      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>ejb-client</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>ear</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <type>ejb-client</type>
-        <extension>jar</extension>
-        <packaging>ejb</packaging>
-        <classifier>client</classifier>
-        <language>java</language>
-        <addedToClasspath>true</addedToClasspath>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: ear-lifecycle -->
+            <phases>
+              <generate-resources>
+                org.apache.maven.plugins:maven-ear-plugin:generate-application-xml
+              </generate-resources>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <package>org.apache.maven.plugins:maven-ear-plugin:ear</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: ear-lifecycle -->
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
 
+    <!------------------------------------------------------------------------ 
+     | RAR
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>rar</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <type>rar</type>
         <includesDependencies>true</includesDependencies>
@@ -133,11 +387,41 @@
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>rar</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <!-- START SNIPPET: rar-lifecycle -->
+            <phases>
+              <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+              <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+              <process-test-resources>
+                org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources>
+              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+              <package>org.apache.maven.plugins:maven-rar-plugin:rar</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+            </phases>
+            <!-- END SNIPPET: rar-lifecycle -->
+          </lifecycle>
+        </lifecycles>
+      </configuration>
+    </component>    
 
+    <!------------------------------------------------------------------------ 
+     | PAR
+     |----------------------------------------------------------------------->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>par</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+      </implementation>
       <configuration>
         <type>par</type>
         <includesDependencies>true</includesDependencies>
@@ -145,17 +429,26 @@
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
-
     <component>
-      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>ejb3</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>par</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <type>ejb3</type>
-        <includesDependencies>true</includesDependencies>
-        <language>java</language>
-        <addedToClasspath>false</addedToClasspath>
+        <!-- START SNIPPET: par-lifecycle -->
+        <phases>
+          <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
+          <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
+          <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
+          <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+          <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
+          <package>
+            org.apache.maven.plugins:maven-par-plugin:par
+          </package>
+          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+        </phases>
+        <!-- END SNIPPET: par-lifecycle -->
       </configuration>
-    </component>
+    </component>    
   </components>
 </component-set>
