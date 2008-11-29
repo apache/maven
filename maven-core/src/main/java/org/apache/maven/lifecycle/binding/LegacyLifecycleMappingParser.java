@@ -10,6 +10,7 @@ import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.model.Phase;
 import org.apache.maven.lifecycle.model.SiteBinding;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -24,13 +25,12 @@ import java.util.StringTokenizer;
  * @author jdcasey
  * @plexus.component role=org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser"
  */
-//!!jvz This is not picked up by the annotation processor
-//@Component(role = LegacyLifecycleMappingParser.class)
+@Component(role = LegacyLifecycleMappingParser.class)
 public class LegacyLifecycleMappingParser
 {
     public static final String ROLE = LegacyLifecycleMappingParser.class.getName();
-
-    /** @plexus.requirement */
+    
+    @Requirement
     private MojoBindingFactory mojoBindingFactory;
 
     public LifecycleBindings parseDefaultMappings( final List lifecycles )
