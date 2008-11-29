@@ -14,6 +14,8 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -34,17 +36,20 @@ import java.util.Stack;
  * @author jdcasey
  *
  */
+@Component(role = BuildPlanner.class)
 public class DefaultBuildPlanner
     implements BuildPlanner, LogEnabled
 {
-
-    private Logger logger;
-
+    @Requirement
     private PluginLoader pluginLoader;
 
+    @Requirement
     private LifecycleBindingManager lifecycleBindingManager;
 
+    @Requirement
     private MojoBindingFactory mojoBindingFactory;
+
+    private Logger logger;
 
     public void constructInitialProjectBuildPlans( final MavenSession session )
         throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException

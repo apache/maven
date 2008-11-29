@@ -20,7 +20,9 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.discovery.AbstractComponentDiscoverer;
+import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
@@ -31,6 +33,7 @@ import java.io.Reader;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
+@Component( role=ComponentDiscoverer.class)
 public class MavenPluginDiscoverer
     extends AbstractComponentDiscoverer
 {

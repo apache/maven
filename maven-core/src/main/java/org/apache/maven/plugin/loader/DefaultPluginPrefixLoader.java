@@ -8,6 +8,8 @@ import org.apache.maven.plugin.PluginMappingManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -15,16 +17,19 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+@Component(role = PluginPrefixLoader.class)
 public class DefaultPluginPrefixLoader
     implements PluginPrefixLoader, LogEnabled
 {
-
     private Logger logger;
 
+    @Requirement
     private PluginMappingManager pluginMappingManager;
 
+    @Requirement
     private MavenPluginCollector pluginCollector;
 
+    @Requirement
     private PluginManagerSupport pluginManagerSupport;
 
     /**

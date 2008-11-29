@@ -24,12 +24,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Lifecycle mapping for a POM.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
+@Component(role = LifecycleMapping.class)
 public class DefaultLifecycleMapping
     implements LifecycleMapping
 {

@@ -15,6 +15,8 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -25,14 +27,14 @@ import org.codehaus.plexus.logging.Logger;
  * @author jdcasey
  *
  */
+@Component(role = PluginLoader.class)
 public class DefaultPluginLoader
     implements PluginLoader, LogEnabled
 {
+    @Requirement
+    private PluginManager pluginManager;
 
     private Logger logger;
-
-    // FIXME: Move the functionality used from this into the PluginLoader when PluginManager refactor is complete.
-    private PluginManager pluginManager;
 
     /**
      * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding,

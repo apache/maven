@@ -24,6 +24,8 @@ import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -48,29 +50,33 @@ import java.util.StringTokenizer;
  * @author jdcasey
  *
  */
+@Component(role = LifecycleBindingManager.class)
 public class DefaultLifecycleBindingManager
-    implements LifecycleBindingManager, LogEnabled, Contextualizable
+    implements LifecycleBindingManager, LogEnabled
 {
-    private Map bindingsByPackaging;
-
-    private Map legacyMappingsByPackaging;
-
+    @Requirement
     private PluginLoader pluginLoader;
 
+    @Requirement
     private MojoBindingFactory mojoBindingFactory;
 
+    @Requirement
+    private PlexusContainer container;
+
+    @Requirement
     private LegacyLifecycleMappingParser legacyLifecycleMappingParser;
 
     private Logger logger;
+    
+    private Map bindingsByPackaging;
+
+    private Map legacyMappingsByPackaging;
 
     // configured. Moved out of DefaultLifecycleExecutor...
     private List<org.apache.maven.lifecycle.binding.Lifecycle> lifecycles;
 
     // configured. Moved out of DefaultLifecycleExecutor...
     private List defaultReports;
-
-    // contextualized, used for setting lookup realm before retrieving lifecycle bindings for packaging.
-    private PlexusContainer container;
     
     public List<org.apache.maven.lifecycle.binding.Lifecycle> getLifecycles()
     {
@@ -593,12 +599,6 @@ public class DefaultLifecycleBindingManager
         Class reportClass = classRealm.loadClass( MavenReport.class.getName() );
 
         return reportClass.isAssignableFrom( mojoClass );
-    }
-
-    public void contextualize( Context ctx )
-        throws ContextException
-    {
-        container = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
     }
 
     /**

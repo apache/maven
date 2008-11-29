@@ -22,6 +22,7 @@ package org.apache.maven.settings.validation;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.util.Iterator;
 import java.util.List;
@@ -29,11 +30,10 @@ import java.util.List;
 /**
  * @author Milos Kleint
  */
+@Component(role = SettingsValidator.class)
 public class DefaultSettingsValidator
     implements SettingsValidator
 {
-
-
     public SettingsValidationResult validate( Settings model )
     {
         SettingsValidationResult result = new SettingsValidationResult();

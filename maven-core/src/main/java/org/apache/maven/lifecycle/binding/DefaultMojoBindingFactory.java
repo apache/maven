@@ -9,6 +9,8 @@ import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.plugin.loader.PluginPrefixLoader;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import java.util.StringTokenizer;
 
@@ -19,10 +21,11 @@ import java.util.StringTokenizer;
  * @author jdcasey
  *
  */
+@Component(role = MojoBindingFactory.class)
 public class DefaultMojoBindingFactory
     implements MojoBindingFactory
 {
-
+    @Requirement
     PluginPrefixLoader pluginPrefixLoader;
 
     /**

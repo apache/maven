@@ -26,6 +26,8 @@ import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.util.ArrayList;
@@ -38,13 +40,17 @@ import java.util.Map;
  * Manage plugin prefix to artifact ID mapping associations.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id: DefaultPluginMappingManager.java 495147 2007-01-11 07:47:53Z
- *          jvanzyl $
+ * @version $Id$
+ * @plexus.component
  */
+//@Component(role = PluginMappingManager.class)
+//!!jvz not picked up by the annotation processor
 public class DefaultPluginMappingManager
     extends AbstractLogEnabled
     implements PluginMappingManager
 {
+    /** @plexus.requirement */
+    //@Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;
 
     private Map pluginDefinitionsByPrefix = new HashMap();

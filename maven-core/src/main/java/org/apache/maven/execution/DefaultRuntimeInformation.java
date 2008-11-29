@@ -36,8 +36,10 @@ import org.codehaus.plexus.util.IOUtil;
  * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
+ * @plexus.component
  */
-@Component(role = RuntimeInformation.class)
+//@Component(role = RuntimeInformation.class)
+//!!jvz not picked up by the anno processor
 public class DefaultRuntimeInformation
     implements RuntimeInformation, Initializable
 {    

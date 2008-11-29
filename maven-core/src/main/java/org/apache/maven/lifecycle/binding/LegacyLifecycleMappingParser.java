@@ -9,6 +9,7 @@ import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.model.Phase;
 import org.apache.maven.lifecycle.model.SiteBinding;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,13 +22,15 @@ import java.util.StringTokenizer;
  * because this syntax should be deprecated and removed from support, eventually.
  * 
  * @author jdcasey
- * 
+ * @plexus.component role=org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser"
  */
+//!!jvz This is not picked up by the annotation processor
+//@Component(role = LegacyLifecycleMappingParser.class)
 public class LegacyLifecycleMappingParser
 {
-
     public static final String ROLE = LegacyLifecycleMappingParser.class.getName();
 
+    /** @plexus.requirement */
     private MojoBindingFactory mojoBindingFactory;
 
     public LifecycleBindings parseDefaultMappings( final List lifecycles )

@@ -21,6 +21,7 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +31,9 @@ import java.util.Set;
  * @version $Id$
  * @todo this should probably be a component with some dynamic control of filtering
  */
-public class DefaultArtifactFilterManager implements ArtifactFilterManager
+@Component(role = ArtifactFilterManager.class)
+public class DefaultArtifactFilterManager 
+    implements ArtifactFilterManager
 {
 
     private static final Set DEFAULT_EXCLUSIONS;

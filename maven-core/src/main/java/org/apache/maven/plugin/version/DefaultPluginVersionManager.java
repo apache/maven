@@ -38,22 +38,35 @@ import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
 
+/** @plexus.component */
+//@Component(role = PluginVersionManager.class)
+//!!jvz not picked up by anno processor
 public class DefaultPluginVersionManager
     extends AbstractLogEnabled
     implements PluginVersionManager
 {
+    //@Requirement
+    /** @plexus.requirement */
     private ArtifactFactory artifactFactory;
 
+    //@Requirement
+    /** @plexus.requirement */
     private ArtifactMetadataSource artifactMetadataSource;
 
+    //@Requirement
+    /** @plexus.requirement */
     private MavenProjectBuilder mavenProjectBuilder;
 
+    //@Requirement
+    /** @plexus.requirement */
     private RuntimeInformation runtimeInformation;
 
     public String resolvePluginVersion( String groupId,

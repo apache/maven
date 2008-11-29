@@ -19,9 +19,20 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.ArtifactFilterManager;
-import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -41,9 +52,9 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.Model;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -51,7 +62,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -59,15 +69,16 @@ import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.ProjectBuilder;
+import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.reporting.MavenReport;
-import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
+import org.apache.maven.shared.model.InterpolatorProperty;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -80,31 +91,18 @@ import org.codehaus.plexus.component.repository.exception.ComponentRepositoryExc
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+/** @plexus.component */
+//@Component(role=PluginManager.class)
+//!!jvz not picked up by the anno processor
 public class DefaultPluginManager
     extends AbstractLogEnabled
-    implements PluginManager, Contextualizable
+    implements PluginManager
 {
     private static final List RESERVED_GROUP_IDS;
 
@@ -117,36 +115,55 @@ public class DefaultPluginManager
         RESERVED_GROUP_IDS = rgids;
     }
 
-    protected MutablePlexusContainer container;
+    //@Requirement
+    /** @plexus.requirement */
+    protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
 
+    //@Requirement
+    /** @plexus.requirement */
     protected ArtifactFilterManager coreArtifactFilterManager;
 
-    private Log mojoLogger;
-
-    // component requirements
+    //@Requirement
+    /** @plexus.requirement */
     protected PathTranslator pathTranslator;
 
+    //@Requirement
+    /** @plexus.requirement */
     protected MavenPluginCollector pluginCollector;
 
+    //@Requirement
+    /** @plexus.requirement */
     protected PluginVersionManager pluginVersionManager;
 
+    //@Requirement
+    /** @plexus.requirement */
     protected ArtifactFactory artifactFactory;
 
+    //@Requirement
+    /** @plexus.requirement */    
     protected ArtifactResolver artifactResolver;
 
+    //@Requirement
+    /** @plexus.requirement */
     protected ArtifactMetadataSource artifactMetadataSource;
 
+    //@Requirement
+    /** @plexus.requirement */
     protected RuntimeInformation runtimeInformation;
 
+    //@Requirement
+    /** @plexus.requirement */
     protected MavenProjectBuilder mavenProjectBuilder;
 
+    //@Requirement
+    /** @plexus.requirement */
     protected PluginMappingManager pluginMappingManager;
 
+    //@Requirement
+    /** @plexus.requirement */
     private PluginManagerSupport pluginManagerSupport;
-
-    // END component requirements
 
     public DefaultPluginManager()
     {
@@ -862,8 +879,8 @@ public class DefaultPluginManager
             ( (ContextEnabled) mojo ).setPluginContext( pluginContext );
         }
 
-        mojo.setLog( mojoLogger );
-
+        mojo.setLog( new DefaultLog( getLogger() ) );
+ 
         XmlPlexusConfiguration pomConfiguration;
 
         if ( dom == null )
@@ -1365,6 +1382,8 @@ public class DefaultPluginManager
             getLogger().debug( "Configuring mojo '" + mojoDescriptor.getId() + "' with "
                                + ( configuratorId == null ? "basic" : configuratorId )
                                + " configurator -->" );
+
+            System.out.println( configuration );
             
             // This needs to be able to use methods
             configurator.configureComponent( plugin, configuration, expressionEvaluator, realm, listener );
@@ -1458,18 +1477,6 @@ public class DefaultPluginManager
         }
 
         return message.toString();
-    }
-
-    // ----------------------------------------------------------------------
-    // Lifecycle
-    // ----------------------------------------------------------------------
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (MutablePlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-
-        mojoLogger = new DefaultLog( container.getLoggerManager().getLoggerForComponent( Mojo.ROLE ) );
     }
 
     // ----------------------------------------------------------------------

@@ -51,6 +51,8 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -77,25 +79,27 @@ import java.util.Stack;
  * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without
  * much of the event handling)
  */
+@Component(role = LifecycleExecutor.class)
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
-    implements LifecycleExecutor, Contextualizable
+    implements LifecycleExecutor
 {
-    // ----------------------------------------------------------------------
-    // Components
-    // ----------------------------------------------------------------------
-
+    @Requirement
     private PluginManager pluginManager;
 
+    @Requirement
     private PluginLoader pluginLoader;
 
+    @Requirement
     private BuildPlanner buildPlanner;
 
+    @Requirement
     private MojoBindingFactory mojoBindingFactory;
     
+    @Requirement
     private LifecycleBindingManager lifecycleBindingManager;
-
-    // this is needed for setting the lookup realm before we start building a project.
+    
+    @Requirement
     private PlexusContainer container;
 
     // ----------------------------------------------------------------------
@@ -939,12 +943,6 @@ public class DefaultLifecycleExecutor
         {
             return tasks;
         }
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
     
     public List getLifecycles()
