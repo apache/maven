@@ -23,7 +23,6 @@ import java.util.StringTokenizer;
  * because this syntax should be deprecated and removed from support, eventually.
  * 
  * @author jdcasey
- * @plexus.component role=org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser"
  */
 @Component(role = LegacyLifecycleMappingParser.class)
 public class LegacyLifecycleMappingParser
