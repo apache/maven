@@ -75,6 +75,10 @@
     </resources>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes>
@@ -84,22 +88,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <!-- Single Test -->
-      <id>st</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/MavenEmbedderTest.java</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

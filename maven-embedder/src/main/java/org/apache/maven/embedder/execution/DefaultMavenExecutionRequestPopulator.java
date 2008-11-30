@@ -19,6 +19,12 @@ package org.apache.maven.embedder.execution;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -34,7 +40,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
@@ -48,23 +53,18 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.MutablePlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * Things that we deal with in this populator to ensure that we have a valid {@MavenExecutionRequest}
@@ -80,19 +80,24 @@ import java.util.Properties;
  *
  * @version $Id$
  */
+@Component(role = MavenExecutionRequestPopulator.class)
 public class DefaultMavenExecutionRequestPopulator
     extends AbstractLogEnabled
-    implements MavenExecutionRequestPopulator,
-    Contextualizable
+    implements MavenExecutionRequestPopulator
 {
+    @Requirement
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
+    @Requirement
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
-    private MutablePlexusContainer container;
+    @Requirement
+    private PlexusContainer container;
 
+    @Requirement
     private WagonManager wagonManager;
 
+    @Requirement
     private MavenSettingsBuilder settingsBuilder;
 
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request,
@@ -657,14 +662,10 @@ public class DefaultMavenExecutionRequestPopulator
         //
         // ------------------------------------------------------------------------
 
-        Logger logger = container.getLoggerManager().getLoggerForComponent( Mojo.ROLE );
-
         if ( ( request.getEventMonitors() == null ) || request.getEventMonitors().isEmpty() )
         {
-            request.addEventMonitor( new DefaultEventMonitor( logger ) );
+            request.addEventMonitor( new DefaultEventMonitor( getLogger() ) );
         }
-
-        container.getLoggerManager().setThreshold( request.getLoggingLevel() );
 
         // Now, add in any event monitors from the Configuration instance.
         List configEventMonitors = configuration.getEventMonitors();
@@ -706,15 +707,5 @@ public class DefaultMavenExecutionRequestPopulator
 
         request.setProfileManager( globalProfileManager );
         request.setProfileActivationContext( activationContext );
-    }
-
-    // ----------------------------------------------------------------------------
-    // Lifecycle
-    // ----------------------------------------------------------------------------
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (MutablePlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

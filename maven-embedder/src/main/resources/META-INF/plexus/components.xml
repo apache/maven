@@ -20,27 +20,6 @@ under the License.
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.embedder.execution.MavenExecutionRequestPopulator</role>
-      <implementation>org.apache.maven.embedder.execution.DefaultMavenExecutionRequestPopulator</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.settings.MavenSettingsBuilder</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
-          <role-hint>default</role-hint>
-        </requirement>
-      </requirements>
-    </component>
-
-    <component>
       <role>org.apache.maven.wagon.Wagon</role>
       <role-hint>http</role-hint>
       <implementation>org.apache.maven.wagon.providers.http.LightweightHttpWagon</implementation>
@@ -51,7 +30,7 @@ under the License.
         <httpHeaders>
           <property>
             <name>User-Agent</name>
-            <value>Apache-Maven/${project.version} maven-artifact/${artifactVersion}</value>
+            <value>Apache-Maven/${project.version}</value>
           </property>
         </httpHeaders>
       </configuration>
@@ -61,13 +40,13 @@ under the License.
       <role-hint>https</role-hint>
       <implementation>org.apache.maven.wagon.providers.http.LightweightHttpsWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
-      <description>LIghtweightHttpsWagon</description>
+      <description>LightweightHttpsWagon</description>
       <isolated-realm>false</isolated-realm>
       <configuration>
         <httpHeaders>
           <property>
             <name>User-Agent</name>
-            <value>Apache-Maven/${project.version} maven-artifact/${artifactVersion}</value>
+            <value>Apache-Maven/${project.version}</value>
           </property>
         </httpHeaders>
       </configuration>
