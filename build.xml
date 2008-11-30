@@ -164,7 +164,7 @@ TODO:
     </path>
 
     <mkdir dir="bootstrap/target/classes"/>
-    <javac destdir="bootstrap/target/classes" debug="true">
+    <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.5" target="1.5" debug="true">
       <src refid="sources"/>
       <classpath refid="pom.pathid"/>
     </javac>
