@@ -28,6 +28,7 @@
             <executions>
               <execution>
                 <id>profile1-touch</id>
+                <phase>validate</phase>
                 <goals>
                   <goal>touch</goal>
                 </goals>
@@ -53,6 +54,7 @@
             <executions>
               <execution>
                 <id>profile2-touch</id>
+                <phase>validate</phase>
                 <goals>
                   <goal>touch</goal>
                 </goals>
@@ -81,6 +83,7 @@
             <executions>
               <execution>
                 <id>profile3-touch</id>
+                <phase>validate</phase>
                 <goals>
                   <goal>touch</goal>
                 </goals>
@@ -103,6 +106,7 @@
             <executions>
               <execution>
                 <id>profile4-touch</id>
+                <phase>validate</phase>
                 <goals>
                   <goal>touch</goal>
                 </goals>
@@ -125,6 +129,7 @@
             <executions>
               <execution>
                 <id>profile5-touch</id>
+                <phase>validate</phase>
                 <goals>
                   <goal>touch</goal>
                 </goals>
