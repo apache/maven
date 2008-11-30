@@ -24,6 +24,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.*;
 
+@Deprecated
+/** @deprecated */
 public final class ModelUtils
 {
 
