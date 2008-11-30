@@ -21,7 +21,6 @@ package org.apache.maven.artifact.manager;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -30,7 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -66,16 +64,13 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /** @plexus.component */
 public class DefaultWagonManager
     extends AbstractLogEnabled
-    implements WagonManager, Contextualizable, Initializable
+    implements WagonManager, Contextualizable
 {
     private static final String WILDCARD = "*";
 
@@ -128,7 +123,7 @@ public class DefaultWagonManager
     /** @plexus.requirement */
     private UpdateCheckManager updateCheckManager;
 
-    private String httpUserAgent;
+    private String httpUserAgent = "Apache-Maven/3.0-alpha-1";
 
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
@@ -1204,56 +1199,25 @@ public class DefaultWagonManager
         }
     }
 
-    // TODO: Remove this, once the maven-shade-plugin 1.2 release is out, allowing configuration of httpHeaders in the components.xml
     private PlexusConfiguration updateUserAgentForHttp( Wagon wagon, PlexusConfiguration config )
     {
         if ( config == null )
         {
             config = new XmlPlexusConfiguration( "configuration" );
         }
+
+        XmlPlexusConfiguration propertyConfig = new XmlPlexusConfiguration( "property" );
+        PlexusConfiguration headerConfig = config.getChild( "httpHeaders", true );
+        headerConfig.addChild( propertyConfig );
         
-        if ( httpUserAgent != null )
-        {
-            try
-            {
-                wagon.getClass().getMethod( "setHttpHeaders", new Class[]{ Properties.class } );
+        XmlPlexusConfiguration nameConfig = new XmlPlexusConfiguration( "name" );
+        nameConfig.setValue( "User-Agent" );
+        propertyConfig.addChild( nameConfig );
+        
+        XmlPlexusConfiguration versionConfig = new XmlPlexusConfiguration( "value" );
+        versionConfig.setValue( httpUserAgent );
+        propertyConfig.addChild( versionConfig );
                 
-                PlexusConfiguration headerConfig = config.getChild( "httpHeaders", true );
-                PlexusConfiguration[] children = headerConfig.getChildren( "property" );
-                boolean found = false;
-                for ( int i = 0; i < children.length; i++ )
-                {
-                    PlexusConfiguration c = children[i].getChild( "name", false );
-                    if ( c != null && "User-Agent".equals( c.getValue( null ) ) )
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if ( !found )
-                {
-                    XmlPlexusConfiguration propertyConfig = new XmlPlexusConfiguration( "property" );
-                    headerConfig.addChild( propertyConfig );
-                    
-                    XmlPlexusConfiguration nameConfig = new XmlPlexusConfiguration( "name" );
-                    nameConfig.setValue( "User-Agent" );
-                    propertyConfig.addChild( nameConfig );
-                    
-                    XmlPlexusConfiguration versionConfig = new XmlPlexusConfiguration( "value" );
-                    versionConfig.setValue( httpUserAgent );
-                    propertyConfig.addChild( versionConfig );
-                }
-            }
-            catch ( SecurityException e )
-            {
-                // forget it. this method is public, if it exists.
-            }
-            catch ( NoSuchMethodException e )
-            {
-                // forget it.
-            }
-        }
-        
         return config;
     }
 
@@ -1283,44 +1247,6 @@ public class DefaultWagonManager
     public void setUpdateCheckManager( UpdateCheckManager updateCheckManager )
     {
         this.updateCheckManager = updateCheckManager;        
-    }
-
-    // TODO: Remove this, once the maven-shade-plugin 1.2 release is out, allowing configuration of httpHeaders in the components.xml
-    public void initialize()
-        throws InitializationException
-    {
-        if ( httpUserAgent == null )
-        {
-            InputStream resourceAsStream = null;
-            try
-            {
-                Properties properties = new Properties();
-                resourceAsStream = getClass().getClassLoader().getResourceAsStream( MAVEN_ARTIFACT_PROPERTIES );
-
-                if ( resourceAsStream != null )
-                {
-                    try
-                    {
-                        properties.load( resourceAsStream );
-
-                        httpUserAgent =
-                            "maven-artifact/" + properties.getProperty( "version" ) + " (Java "
-                                + System.getProperty( "java.version" ) + "; " + System.getProperty( "os.name" ) + " "
-                                + System.getProperty( "os.version" ) + ")";
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().warn(
-                                          "Failed to load Maven artifact properties from:\n" + MAVEN_ARTIFACT_PROPERTIES
-                                              + "\n\nUser-Agent HTTP header may be incorrect for artifact resolution." );
-                    }
-                }
-            }
-            finally
-            {
-                IOUtil.close( resourceAsStream );
-            }
-        }
     }
     
     /**
