@@ -9,11 +9,12 @@ encapsulation. All these special entries here is probably understood by no one w
 problem.
 
 -->
+
 <component-set>
   <components>
-    <!------------------------------------------------------------------------ 
+    <!--
      | POM
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>pom</role-hint>
@@ -46,9 +47,9 @@ problem.
       </configuration>
     </component>    
     
-    <!------------------------------------------------------------------------ 
+    <!--
      | JAR
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>jar</role-hint>
@@ -89,9 +90,9 @@ problem.
       </configuration>
     </component>
           
-    <!------------------------------------------------------------------------ 
+    <!--
      | EJB 
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ejb</role-hint>
@@ -188,9 +189,9 @@ problem.
       </configuration>
     </component>     
 
-    <!------------------------------------------------------------------------ 
+    <!--
      | TEST JAR
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>test-jar</role-hint>
@@ -206,9 +207,9 @@ problem.
       </configuration>
     </component>
 
-    <!------------------------------------------------------------------------ 
+    <!--
      | MAVEN PLUGIN
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>maven-plugin</role-hint>
@@ -257,9 +258,9 @@ problem.
       </configuration>
     </component>    
 
-    <!------------------------------------------------------------------------ 
+    <!--
      | SOURCE JAR
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>java-source</role-hint>
@@ -274,9 +275,9 @@ problem.
       </configuration>
     </component>
 
-    <!------------------------------------------------------------------------ 
+    <!--
      | JAVADOC JAR 
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>javadoc</role-hint>
@@ -291,9 +292,9 @@ problem.
       </configuration>
     </component>
 
-    <!------------------------------------------------------------------------ 
+    <!--
      | WAR 
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>war</role-hint>
@@ -333,9 +334,9 @@ problem.
       </configuration>
     </component>    
 
-    <!------------------------------------------------------------------------ 
+    <!--
      | EAR 
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ear</role-hint>
@@ -372,9 +373,9 @@ problem.
       </configuration>
     </component>
 
-    <!------------------------------------------------------------------------ 
+    <!--
      | RAR
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>rar</role-hint>
@@ -414,9 +415,9 @@ problem.
       </configuration>
     </component>    
 
-    <!------------------------------------------------------------------------ 
+    <!--
      | PAR
-     |----------------------------------------------------------------------->
+     |-->
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>par</role-hint>
