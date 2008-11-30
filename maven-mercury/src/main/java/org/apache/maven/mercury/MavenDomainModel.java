@@ -19,19 +19,29 @@ package org.apache.maven.mercury;
  * under the License.
  */
 
-import org.apache.maven.shared.model.*;
-import org.apache.maven.shared.model.impl.DefaultModelDataSource;
-import org.apache.maven.project.builder.*;
-import org.apache.maven.project.builder.profile.ProfileContext;
-import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
-
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+
+import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
+import org.apache.maven.project.builder.ArtifactModelContainerFactory;
+import org.apache.maven.project.builder.ExclusionModelContainerFactory;
+import org.apache.maven.project.builder.IdModelContainerFactory;
+import org.apache.maven.project.builder.PomTransformer;
+import org.apache.maven.project.builder.ProjectUri;
+import org.apache.maven.project.builder.profile.ProfileContext;
+import org.apache.maven.shared.model.DataSourceException;
+import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.shared.model.ModelContainer;
+import org.apache.maven.shared.model.ModelDataSource;
+import org.apache.maven.shared.model.ModelMarshaller;
+import org.apache.maven.shared.model.ModelProperty;
+import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 
 /**
  * Provides a wrapper for the maven model.

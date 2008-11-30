@@ -1,15 +1,27 @@
 package org.apache.maven.mercury;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
 import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.builder.api.DependencyProcessorException;
 import org.apache.maven.mercury.builder.api.MetadataReader;
 import org.apache.maven.mercury.builder.api.MetadataReaderException;
-import org.apache.maven.project.builder.*;
-import org.apache.maven.shared.model.*;
+import org.apache.maven.project.builder.ArtifactModelContainerFactory;
+import org.apache.maven.project.builder.IdModelContainerFactory;
+import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.PomTransformer;
+import org.apache.maven.project.builder.ProjectUri;
+import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.shared.model.ModelContainer;
+import org.apache.maven.shared.model.ModelProperty;
+import org.apache.maven.shared.model.ModelTransformerContext;
 
 public final class MavenDependencyProcessor
     implements DependencyProcessor
