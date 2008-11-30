@@ -25,7 +25,9 @@ import org.apache.maven.model.Model;
 /**
  * @author Jason van Zyl
  * @version $Id$
+ * @deprecated
  */
+@Deprecated
 public interface ModelInheritanceAssembler
 {
     String ROLE = ModelInheritanceAssembler.class.getName();
