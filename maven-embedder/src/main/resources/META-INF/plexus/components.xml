@@ -25,7 +25,6 @@ under the License.
       <implementation>org.apache.maven.wagon.providers.http.LightweightHttpWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <description>LightweightHttpWagon</description>
-      <isolated-realm>false</isolated-realm>
       <configuration>
         <httpHeaders>
           <property>
@@ -41,7 +40,6 @@ under the License.
       <implementation>org.apache.maven.wagon.providers.http.LightweightHttpsWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <description>LightweightHttpsWagon</description>
-      <isolated-realm>false</isolated-realm>
       <configuration>
         <httpHeaders>
           <property>
