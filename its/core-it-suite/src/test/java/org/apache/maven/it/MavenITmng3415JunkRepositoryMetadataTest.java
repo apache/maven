@@ -88,15 +88,13 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_BASE );
         File projectDir = new File( testDir, "project" );
 
-        File logFile = new File( projectDir, "log.txt" );
+        Verifier verifier;
+
+        verifier = new Verifier( projectDir.getAbsolutePath() );
 
         File localRepo = findLocalRepoDirectory();
 
         setupDummyDependency( testDir, localRepo, true );
-
-        Verifier verifier;
-
-        verifier = new Verifier( projectDir.getAbsolutePath() );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.put( "@baseurl@", "invalid" + filterProps.getProperty( "@baseurl@" ).substring( "file".length() ) );
@@ -112,7 +110,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         assertMetadataMissing( localRepo );
 
@@ -167,13 +164,13 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_BASE );
         File projectDir = new File( testDir, "project" );
 
-        File localRepo = findLocalRepoDirectory();
-
-        setupDummyDependency( testDir, localRepo, true );
-
         Verifier verifier;
 
         verifier = new Verifier( projectDir.getAbsolutePath() );
+
+        File localRepo = findLocalRepoDirectory();
+
+        setupDummyDependency( testDir, localRepo, true );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
         File settings = verifier.filterFile( "../settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
@@ -189,7 +186,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File firstLogFile = new File( projectDir, verifier.getLogFileName() );
 
