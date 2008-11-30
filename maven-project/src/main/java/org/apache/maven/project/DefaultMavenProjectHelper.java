@@ -28,6 +28,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Resource;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 import java.io.File;
@@ -35,11 +37,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@Component(role = MavenProjectHelper.class)
 public class DefaultMavenProjectHelper
     extends AbstractLogEnabled
     implements MavenProjectHelper
 {
-
+    @Requirement
     private ArtifactHandlerManager artifactHandlerManager;
 
     public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier,

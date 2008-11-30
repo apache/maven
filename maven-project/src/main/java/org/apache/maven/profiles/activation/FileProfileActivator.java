@@ -22,6 +22,7 @@ package org.apache.maven.profiles.activation;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -33,6 +34,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 import java.io.IOException;
 
+@Component(role = ProfileActivator.class, hint = "file")
 public class FileProfileActivator
     implements ProfileActivator, LogEnabled
 {

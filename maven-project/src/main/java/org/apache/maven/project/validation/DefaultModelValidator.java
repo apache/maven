@@ -30,6 +30,8 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
+import org.apache.maven.profiles.activation.ProfileActivator;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -40,13 +42,11 @@ import java.util.List;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
+@Component(role = ModelValidator.class )
 public class DefaultModelValidator
     implements ModelValidator
 {
     private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
-
-    ///////////////////////////////////////////////////////////////////////////
-    // ModelValidator Implementation
 
     public ModelValidationResult validate( Model model )
     {

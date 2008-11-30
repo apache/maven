@@ -24,6 +24,8 @@ import org.apache.maven.model.ActivationCustom;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -44,10 +46,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * in configuring the activator. This activator will lookup/configure custom activators on-the-fly,
  * without caching any of the lookups from the container.
  */
+@Component(role = ProfileActivator.class, hint = "custom")
 public class CustomActivator
-    implements ProfileActivator, Contextualizable, LogEnabled
+    implements ProfileActivator, LogEnabled
 {
-
+    @Requirement
     private PlexusContainer container;
 
     private Logger logger;
@@ -123,12 +126,6 @@ public class CustomActivator
         ProfileActivator activator = loadProfileActivator( custom, context );
 
         return activator.isActive( profile, context );
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     protected Logger getLogger()

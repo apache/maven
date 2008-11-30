@@ -44,6 +44,8 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.*;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -65,29 +67,38 @@ import java.text.SimpleDateFormat;
 /**
  * @version $Id$
  */
+@Component(role = MavenProjectBuilder.class)
 public class DefaultMavenProjectBuilder
     implements MavenProjectBuilder, Initializable, LogEnabled
-{    
+{
+    @Requirement
     protected MavenProfilesBuilder profilesBuilder;
 
+    @Requirement
     protected ArtifactResolver artifactResolver;
 
+    @Requirement
     protected ArtifactMetadataSource artifactMetadataSource;
 
+    @Requirement
     private ArtifactFactory artifactFactory;
 
+    @Requirement
     private ModelValidator validator;
 
-    // TODO: make it a component
-    private MavenXpp3Reader modelReader;
-
+    @Requirement
     private ProfileAdvisor profileAdvisor;
 
+    @Requirement
     private MavenTools mavenTools;
 
+    @Requirement
     private ProjectBuilder projectBuilder;
 
+    @Requirement
     private RepositoryHelper repositoryHelper;
+    
+    private MavenXpp3Reader modelReader;
 
     private Logger logger;
 

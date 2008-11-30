@@ -22,10 +22,12 @@ package org.apache.maven.profiles.activation;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Properties;
 
+@Component(role = ProfileActivator.class, hint = "system-property")
 public class SystemPropertyProfileActivator
     extends DetectedProfileActivator
 {

@@ -50,32 +50,32 @@ import org.apache.maven.shared.model.ImportModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelEventListener;
 import org.apache.maven.shared.model.ModelTransformerContext;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 /**
  * Default implementation of the project builder.
  */
+@Component(role = ProjectBuilder.class)
 public final class DefaultProjectBuilder
     implements ProjectBuilder, LogEnabled
 {
-
+    @Requirement
     private ArtifactFactory artifactFactory;
-
-    /**
-     * Logger instance
-     */
-    private Logger logger;
-
+    
+    @Requirement
     private ModelValidator validator;
 
+    @Requirement
     private MavenTools mavenTools;
        
+    @Requirement
     List<ModelEventListener> listeners;
+
+    private Logger logger;
     
-    /**
-     * Default constructor
-     */
     public DefaultProjectBuilder()
     {
     }

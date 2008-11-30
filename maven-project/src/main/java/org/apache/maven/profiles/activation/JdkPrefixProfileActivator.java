@@ -21,12 +21,14 @@ package org.apache.maven.profiles.activation;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+@Component(role = ProfileActivator.class, hint = "jdk-prefix")
 public class JdkPrefixProfileActivator
     extends DetectedProfileActivator
 {

@@ -22,8 +22,10 @@ package org.apache.maven.profiles.activation;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.Os;
 
+@Component(role = ProfileActivator.class, hint = "os")
 public class OperatingSystemProfileActivator
     implements ProfileActivator
 {

@@ -36,6 +36,8 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.build.ProfileAdvisor;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -56,22 +58,26 @@ import java.util.*;
  * This is a temporary class. These methods are originally from the DefaultMavenProjectHelper. This class will be
  * eliminated when Mercury is integrated.
  */
+@Component(role = RepositoryHelper.class)
 public class DefaultRepositoryHelper
     implements RepositoryHelper, Initializable, LogEnabled
 {
+    @Requirement
+    private ArtifactFactory artifactFactory;
 
+    @Requirement
+    private ArtifactResolver artifactResolver;
+
+    @Requirement
+    private MavenTools mavenTools;
+
+    @Requirement
+    private ProfileAdvisor profileAdvisor;
+    
     private Logger logger;
 
     public static final String MAVEN_MODEL_VERSION = "4.0.0";
-
-    private ArtifactFactory artifactFactory;
-
-    private ArtifactResolver artifactResolver;
-
-    private MavenTools mavenTools;
-
-    private ProfileAdvisor profileAdvisor;
-
+  
     private MavenXpp3Reader modelReader;
 
     private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();

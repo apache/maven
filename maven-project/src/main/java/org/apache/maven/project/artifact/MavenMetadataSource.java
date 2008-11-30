@@ -41,6 +41,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.profiles.activation.ProfileActivator;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
@@ -49,6 +50,8 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -64,22 +67,27 @@ import java.util.*;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
+@Component(role = ArtifactMetadataSource.class )
 public class MavenMetadataSource
     extends AbstractLogEnabled
     implements ArtifactMetadataSource, Contextualizable
 {
     public static final String ROLE_HINT = "default";
 
-    private MavenProjectBuilder mavenProjectBuilder;
-
+    @Requirement
     private ArtifactFactory artifactFactory;
 
+    @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
     
     // lazily instantiated and cached.
     private MavenProject superProject;
 
+    @Requirement
     private PlexusContainer container;
+
+    //!! not injected which is a problem
+    private MavenProjectBuilder mavenProjectBuilder;
 
     /**
      * Unfortunately we have projects that are still sending us JARs without the accompanying POMs.

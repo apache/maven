@@ -21,7 +21,9 @@ package org.apache.maven.profiles.activation;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.AlwaysOnActivation;
+import org.codehaus.plexus.component.annotations.Component;
 
+@Component(role = ProfileActivator.class, hint = "always-on")
 public class AlwaysOnProfileActivator
     implements ProfileActivator
 {

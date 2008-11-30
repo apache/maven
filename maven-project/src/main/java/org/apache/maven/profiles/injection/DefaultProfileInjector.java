@@ -21,6 +21,7 @@ package org.apache.maven.profiles.injection;
 
 import org.apache.maven.model.*;
 import org.apache.maven.project.ModelUtils;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -46,10 +47,10 @@ import java.util.Properties;
  * in the code to justify the extra code involved with separating them, in order to simplify
  * the logic.
  */
+@Component(role = ProfileInjector.class)
 public class DefaultProfileInjector
     implements ProfileInjector
 {
-
     public void inject( Profile profile, Model model )
     {
 
@@ -58,8 +59,6 @@ public class DefaultProfileInjector
         injectModules( profile, model );
 
         model.setRepositories( ModelUtils.mergeRepositoryLists( profile.getRepositories(), model.getRepositories() ) );
-//        model.setPluginRepositories( ModelUtils.mergeRepositoryLists( profile.getPluginRepositories(), model
-//            .getPluginRepositories() ) );
 
         injectReporting( profile, model );
 

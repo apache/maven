@@ -37,6 +37,8 @@ import org.apache.maven.profiles.injection.ProfileInjector;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -51,18 +53,22 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+@Component(role = ProfileAdvisor.class)
 public class DefaultProfileAdvisor
     implements ProfileAdvisor, LogEnabled, Contextualizable
 {
-
     public static final String ROLE_HINT = "default";
 
+    @Requirement
     private MavenTools mavenTools;
 
+    @Requirement
     private MavenProfilesBuilder profilesBuilder;
 
+    @Requirement
     private ProfileInjector profileInjector;
 
+    @Requirement
     private PlexusContainer container;
 
     private Logger logger;
@@ -71,8 +77,6 @@ public class DefaultProfileAdvisor
                                         ProfileActivationContext activationContext )
         throws ProjectBuildingException
     {
-//        logger.debug( "Building profile manager for model: " + model.getId() + " with pom file: "
-//                      + pomFile );
         ProfileManager profileManager = buildProfileManager( model, pomFile, useProfilesXml, activationContext );
 
         return applyActivatedProfiles( model, pomFile, profileManager );
@@ -85,10 +89,7 @@ public class DefaultProfileAdvisor
         {
             return Collections.EMPTY_LIST;
         }
-
-//        logger.debug( "Building profile manager for model: " + model.getId()
-//                      + " with external profile manager including profiles: "
-//                      + externalProfileManager.getProfilesById() );
+        
         return applyActivatedProfiles( model, projectDir, externalProfileManager );
     }
 

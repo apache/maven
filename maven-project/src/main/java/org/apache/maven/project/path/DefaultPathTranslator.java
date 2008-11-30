@@ -27,7 +27,9 @@ import java.util.List;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
+import org.codehaus.plexus.component.annotations.Component;
 
+@Component(role = PathTranslator.class)
 public class DefaultPathTranslator
     implements PathTranslator
 {
