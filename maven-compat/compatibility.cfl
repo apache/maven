@@ -7,3 +7,35 @@ h2. Maven Remote Resources Plugin
 * org.apache.maven.project.inheritance.ModelInheritanceAssembler.assembleModelInheritance: used to walk the POMs to find out all the license information. This 
   functionality has been superceded by the model properties-based system for POM construction. We provide the same functionality using the model
   properties-based system but have just placed the component as-is in the maven-compat package to ensure the default lifecycle functions.
+  
+h1. Affected Components & Classes
+
+h2. Maven Artifact
+
+Maven Artifact will be entirely extricated from the core of Maven 3.x and replaced with Mercury, but we will make a best effort to 
+ensure the compatibility of plugins that use Maven Artifact. There are, however, components and classes that are just so broken or conflict
+with standard ways of doing resolution and conflict reduction that we can't support them.
+
+h3. Supported Compatibility
+* org.apache.maven.artifact.deployer.ArtifactDeployer
+* org.apache.maven.artifact.factory.ArtifactFactory
+* org.apache.maven.artifact.handler.ArtifactHandler
+* org.apache.maven.artifact.installer.ArtifactInstaller
+* org.apache.maven.artifact.manager.WagonManager
+* org.apache.maven.artifact.repository.ArtifactRepository
+* org.apache.maven.artifact.repository.ArtifactRepositoryPolicy
+* org.apache.maven.artifact.repository.ArtifactRepositoryFactory
+* org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout
+* org.apache.maven.artifact.resolver.ArtifactResolver
+* org.apache.maven.artifact.resolver.filter.ArtifactFilter
+* org.apache.maven.artifact.resolver.filter.Artifact
+
+h3. Unsupported Compatibility
+* org.apache.maven.artifact.metadata.ArtifactMetadataSource
+* org.apache.maven.artifact.metadata.ResolutionGroup
+* org.apache.maven.artifact.repository.metadata.*
+* org.apache.maven.artifact.resolver.ResolutionNode
+* org.apache.maven.artifact.resolver.ResolutionListener
+* org.apache.maven.artifact.resolver.metadata.*
+* org.apache.maven.artifact.resolver.transform.*
+* org.apache.maven.artifact.resolver.versioning.*
