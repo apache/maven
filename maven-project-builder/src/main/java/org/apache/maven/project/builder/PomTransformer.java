@@ -178,9 +178,9 @@ public class PomTransformer
                 managementContainer = new ArtifactModelContainerFactory().create( pList );
 
                 ModelContainerAction action = dependencyContainer.containerAction( managementContainer );
-               // System.out.println(action);
+
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
-                {    //System.out.println("A:");
+                {
                     ModelDataSource dependencyDatasource = new DefaultModelDataSource();
                     dependencyDatasource.init( dependencyContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
                             new IdModelContainerFactory() ) );
@@ -200,7 +200,7 @@ public class PomTransformer
 
                     List<ModelContainer> dependencyExecutionContainers = dependencyDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                     List<ModelContainer> joinedExecutionContainers = new ArrayList<ModelContainer>();
-                    //System.out.println(managementExecutionContainers.size());
+                 
                     for(ModelContainer a : managementExecutionContainers)
                     {
                         for(ModelContainer b : dependencyExecutionContainers)
