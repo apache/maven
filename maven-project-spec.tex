@@ -85,6 +85,9 @@ Let \begin{math}\mathcal{C''}\end{math} be the original set of model properties 
 
 \end{enumerate}
 
+\subsection{Model Containers}
+In addition to the general inheritance rules, there is also the concept of Model Containers, which allow the framework to delegate to specific model container implementations the decision of whether \#collections and \#sets should be joined, deleted, or have no operation applied. This will be covered more fully in section 3.
+
 \subsection{Mixins and Multiple Inheritance}
 Currently, Maven 3.0 supports linearlized inheritance, making mixins and multiple inheritance easy. Support for multiple inheritance would require an additional to the pom, within the parents section.
 
@@ -130,6 +133,8 @@ These rules outlined in this section are provided in the PomTransformer class. T
 \subsection{Inheriting Version and Group Ids}
 If \emph{project.version} is not specified within the child pom, the child pom will use the \emph{project.parent.version} as its own version. Similarly, if \emph{project.groupId} is not within the child pom, the child pom will use the \emph{project.parent.groupId} as its own \emph{project.groupId}.
 
+\subsection{Inheriting URLs}
+
 \subsection{Properties Excluded From Being Overridden}
 If the child project defines any of the properties below, they are not overridden by or joined with elements of the parent pom(s). 
 
@@ -150,20 +155,21 @@ If the child project defines any of the properties below, they are not overridde
 \end{enumerate}
 
 \subsection{Properties Excluded From Inheritance}
-A child project does not inherit the following properties from its specified parent project. All other properties are inherited, unless otherwise noted below.
+A child project does not inherit the following properties from its specified parent project\footnote{Technically, project.version, project.groupId and project.artifactId are not inherited from the parent pom. They do, however, have the values of project.parent.version, project.parent.groupId and project.parent.artifactId implicitly applied from the same pom.}. All other properties are inherited, unless otherwise noted below.
 \begin{enumerate}
 \item project.parent
-\item project.modules
 \item project.name
 \item project.packaging
 \item project.profiles
 \item project.version
 \item project.groupId
+\item project.prerequisites
+\item project.distributionManagement.relocation
 \end{enumerate}
 
-\subsection{Marking Containers as Private (Or Not Inherited)}
-A parent project can set an inherited property within the following elements of the pom. This will mark the container as private, thus preventing inheritance:
-\begin{itemize}
+\subsection{Marking Containers as Final (Or Not Inherited)}
+A parent project can set an inherited property within the following elements of the pom. This will mark the container as final, thus preventing inheritance:
+\begin{enumerate}
 \item project.build.plugins.plugin
 \item project.build.plugins.plugin.executions.execution
 \item project.build.pluginManagement.plugins.plugin
@@ -176,8 +182,9 @@ A parent project can set an inherited property within the following elements of 
 \item project.reporting.plugins.plugin.reportSets.reportSet
 \item project.profiles.profile.reporting.plugins.plugin
 \item project.profiles.profile.reporting.plugins.plugin.reportSets.reportSet
-\end{itemize}
+\end{enumerate}
 
+Some examples demonstrating use within the project model:
 \begin{verbatim}
     <plugin>
         <groupId>org.apache.maven</groupId>
@@ -277,11 +284,12 @@ To maintain backwards compatibility, the following elements are assigned a defau
 \subsection{Id Inheritance (Model Container)}
 
 \subsubsection{Defined Nodes}
-Within the project there are a number of nodes which contain id. These nodes may be inherited or even joined.
+Within the project there are a number of nodes which contain id. Each of the nodes below is an element of a collection, meaning there may be more than one. The ID is used to determine whether the containers should be joined, rather than just added to the collection..
 \begin{enumerate}
 \item project.pluginRepositories.pluginRepository
 \item project.repositories.repository
 \item project.reporting.plugins.plugin.reportSets.reportSet
+\item project.profiles.profile
 \item project.build.plugins.plugin.executions.execution
 \end{enumerate}
 
