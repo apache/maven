@@ -106,10 +106,16 @@ TODO:
   	
     <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
       <classpath refid="maven.classpath"/>
+      <!-- We need to generate component descriptors from the maven-artifact sources which use javadoc annotations. -->
       <arg value="--source"/>
-      <arg value="${basedir}/bootstrap/target/generate-sources"/>
+      <arg value="${basedir}/maven-compat/src/main/java"/>
+      <!-- We have separated the artifact handlers and lifecycle mappings into a separate file. -->
+      <arg value="--descriptors"/>
+      <arg value="${basedir}/maven-core/src/main/resources/META-INF/plexus"/>
+      <!-- Search the classes for annotations that we've compiled. -->
       <arg value="--classes"/>
       <arg value="${basedir}/bootstrap/target/classes"/>
+      <!-- We'll make one big fat components descriptor. -->
       <arg value="--output"/>
       <arg value="${basedir}/bootstrap/target/classes/META-INF/plexus/components.xml"/>
     </java>
@@ -171,6 +177,7 @@ TODO:
 
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes"/>
+      <pathelement location="maven-compat/src/main/resources"/>
       <path refid="sources"/>
       <path refid="pom.pathid"/>
     </path>

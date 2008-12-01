@@ -45,10 +45,14 @@
       <artifactId>easymock</artifactId>
       <version>1.2_Java1.3</version>
       <scope>test</scope>
-    </dependency>    
+    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
@@ -56,7 +60,7 @@
           <version>1.0.0</version>
           <model>src/main/mdo/metadata.mdo</model>
         </configuration>
-      </plugin>    
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -64,10 +68,6 @@
           <source>1.5</source>
           <target>1.5</target>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
       </plugin>
     </plugins>
   </build>
