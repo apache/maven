@@ -87,7 +87,7 @@ TODO:
     
     <!-- Pull the dependencies for the MetadataGenerator CLI -->
     <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
-       <localRepository path="${maven.repo.local}"/>
+       <localRepository path="${maven.repo.local}"/>       
        <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
     </artifact:dependencies>          
     
@@ -103,7 +103,8 @@ TODO:
       <path refid="pom.pathid"/>
       <path refid="pmdg.pathid"/>
     </path>
-  	
+
+    <echo>Using plexus version ${pom.properties.plexusVersion}</echo> 
     <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
       <classpath refid="maven.classpath"/>
       <!-- We need to generate component descriptors from the maven-artifact sources which use javadoc annotations. -->
