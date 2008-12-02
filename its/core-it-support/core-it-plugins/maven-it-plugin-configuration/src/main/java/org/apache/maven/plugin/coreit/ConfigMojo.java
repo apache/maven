@@ -271,6 +271,10 @@ public class ConfigMojo
      */
     private void dumpConfiguration( Properties props )
     {
+        /*
+         * NOTE: This intentionally does not dump the absolute path of a file to check the actual value that was
+         * injected by Maven.
+         */
         dumpValue( props, "propertiesFile", propertiesFile );
         dumpValue( props, "booleanParam", booleanParam );
         dumpValue( props, "byteParam", byteParam );

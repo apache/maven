@@ -57,7 +57,7 @@ class PropertyUtil
     }
 
     /**
-     * /** Serializes the specified object into the given properties, using the provided key. The object may be a scalar
+     * Serializes the specified object into the given properties, using the provided key. The object may be a scalar
      * value like a string or some array/collection/map or a bean.
      * 
      * @param props The properties to serialize into, must not be <code>null</code>.
