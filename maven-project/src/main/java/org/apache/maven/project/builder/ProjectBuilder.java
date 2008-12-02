@@ -157,7 +157,8 @@ public interface ProjectBuilder
             {
                 if( mp.getValue() != null && !mp.getUri().contains( "#property" ) && !mp.getUri().contains( "#collection" ))
                 {
-                    if( !buildProperty.isParentOf( mp ) || mp.getUri().equals(ProjectUri.Build.finalName ) )
+                    if( (!buildProperty.isParentOf( mp ) && !mp.getUri().equals(ProjectUri.Reporting.outputDirectory)
+                            || mp.getUri().equals(ProjectUri.Build.finalName ) ))
                     {
                         firstPassModelProperties.add(mp);
                     }
@@ -212,7 +213,7 @@ public interface ProjectBuilder
                 Map<ModelProperty, ModelProperty> buildDirectories = new HashMap<ModelProperty, ModelProperty>();
                 for(ModelProperty mp : secondPassModelProperties)
                 {
-                    if(mp.getUri().equals( ProjectUri.Build.directory ))
+                    if(mp.getUri().startsWith( ProjectUri.Build.xUri ) || mp.getUri().equals( ProjectUri.Reporting.outputDirectory ))
                     {
                         File file = new File(mp.getResolvedValue());
                         if( !file.isAbsolute() )
