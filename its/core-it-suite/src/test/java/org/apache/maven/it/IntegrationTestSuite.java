@@ -209,6 +209,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1323AntrunDependenciesTest.class );
         suite.addTestSuite( MavenITmng0836PluginParentResolutionTest.class );
         suite.addTestSuite( MavenITmng0469ReportConfigTest.class );
+        suite.addTestSuite( MavenIT0142DirectDependencyScopesTest.class );
         suite.addTestSuite( MavenIT0140Test.class );
         suite.addTestSuite( MavenIT0139Test.class );
         suite.addTestSuite( MavenIT0138PluginLifecycleTest.class );
