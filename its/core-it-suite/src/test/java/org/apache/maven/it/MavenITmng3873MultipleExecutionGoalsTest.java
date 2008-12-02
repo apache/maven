@@ -46,21 +46,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest
     public void testitWithoutPluginManagement()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3873" );
-
-        Verifier verifier = new Verifier( new File( testDir, "test-1" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        /*
-         * NOTE: We deliberately don't check the exact order here, that's another issue.
-         */
-        List lines = verifier.loadLines( "target/it.log", "UTF-8" );
-        assertTrue( lines.toString(), lines.contains( "test" ) );
-        assertTrue( lines.toString(), lines.contains( "----" ) );
+        testitMNG3873( "test-1" );
     }
 
     /**
@@ -70,9 +56,15 @@ public class MavenITmng3873MultipleExecutionGoalsTest
     public void testitWithPluginManagement()
         throws Exception
     {
+        testitMNG3873( "test-2" );
+    }
+
+    private void testitMNG3873( String project )
+        throws Exception
+    {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3873" );
 
-        Verifier verifier = new Verifier( new File( testDir, "test-2" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( new File( testDir, project ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
