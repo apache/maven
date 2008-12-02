@@ -44,6 +44,7 @@ under the License.
     <module>maven-it-plugin-expression</module>
     <module>maven-it-plugin-file</module>
     <module>maven-it-plugin-fork</module>
+    <module>maven-it-plugin-log-file</module>
     <module>maven-it-plugin-no-project</module>
     <module>maven-it-plugin-packaging</module>
     <module>maven-it-plugin-parameter-implementation</module>
