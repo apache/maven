@@ -22,9 +22,19 @@ import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelTransformerContext;
+import org.codehaus.plexus.component.annotations.Component;
 
+/**
+ * 
+ * Maven supplied plexus component that implements POM dependency processing for Mercury
+ *
+ * @author Shane Isbell
+ * @version $Id$
+ *
+ */
+@Component( role=DependencyProcessor.class, hint="maven" )
 public final class MavenDependencyProcessor
-    implements DependencyProcessor
+implements DependencyProcessor
 {
     public List<ArtifactBasicMetadata> getDependencies( ArtifactBasicMetadata bmd, MetadataReader mdReader, Map system, Map user )
         throws MetadataReaderException, DependencyProcessorException
