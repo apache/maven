@@ -76,6 +76,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenITmng3814BogusProjectCycleTest.class );
         // suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
+        // suite.addTestSuite( MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest.class );
         // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
         // suite.addTestSuite( MavenITmng3023ReactorDependencyResolutionTest.class );
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
