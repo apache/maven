@@ -27,10 +27,16 @@ import java.util.Properties;
 import java.util.List;
 import java.util.ArrayList;
 
-public class MavenIT0031Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-377">MNG-377</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0377PluginLookupFromPrefixTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0031Test()
+    public MavenITmng0377PluginLookupFromPrefixTest()
     {
     }
 
@@ -38,10 +44,10 @@ public class MavenIT0031Test
      * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from it's prefix using the
      * pluginGroups in the provided settings.xml.
      */
-    public void testit0031()
+    public void testitMNG377()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0031" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0377" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         List cliOptions = new ArrayList();

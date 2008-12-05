@@ -23,29 +23,38 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
-public class MavenIT0035Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-294">MNG-294</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0294MergeGlobalAndUserSettingsTest
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenITmng0294MergeGlobalAndUserSettingsTest()
+    {
+        super( "[,2.99.99)" );
+    }
 
     /**
-     * Test artifact relocation.
+     * Test merging of global- and user-level settings.xml files.
      */
-    public void testit0035()
+    public void testitMNG294()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0035" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0294" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.1", "jar" );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.1", "pom" );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom" );
-        verifier.executeGoal( "package" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.1", "pom" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom" );
+        Properties systemProperties = new Properties();
+        systemProperties.put( "org.apache.maven.user-settings", "user-settings.xml" );
+        systemProperties.put( "org.apache.maven.global-settings", "global-settings.xml" );
+        verifier.setSystemProperties( systemProperties );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.assertFilePresent( "target/test.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
     }
 }
-

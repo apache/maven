@@ -23,32 +23,32 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
 
-public class MavenIT0026Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-522">MNG-522</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0522PluginMgmtConfigTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0026Test()
-    {
-        super( "[,2.99.99)" );
-    }
 
     /**
-     * Test merging of global- and user-level settings.xml files.
+     * Test for pluginManagement injection of plugin configuration.
      */
-    public void testit0026()
+    public void testitMNG522()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0026" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0522" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        Properties systemProperties = new Properties();
-        systemProperties.put( "org.apache.maven.user-settings", "user-settings.xml" );
-        systemProperties.put( "org.apache.maven.global-settings", "global-settings.xml" );
-        verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.assertFilePresent( "target/test.txt" );
+        verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0029", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0029-child", "1.0-SNAPSHOT", "jar" );
+        verifier.executeGoal( "install" );
+        verifier.assertFilePresent( "target/plugin-management-configuration.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
+
 }

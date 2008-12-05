@@ -23,29 +23,31 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
-public class MavenIT0027Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-496">MNG-496</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0496IgnoreUnknownPluginParametersTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test @execute with a custom lifecycle, including configuration
+     * Test that unused configuration parameters from the POM don't cause the
+     * mojo to fail...they will show up as warnings in the -X output instead.
      */
-    public void testit0027()
+    public void testitMNG496()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0027" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0496" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-fork:fork",
-            "org.apache.maven.its.plugins:maven-it-plugin-fork:fork-goal"} );
-        verifier.executeGoals( goals );
-        verifier.assertFilePresent( "target/forked/touch.txt" );
-        verifier.assertFilePresent( "target/forked2/touch.txt" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
+        verifier.assertFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}

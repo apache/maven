@@ -24,6 +24,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-607">MNG-607</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
 public class MavenIT0036Test
     extends AbstractMavenIntegrationTestCase
 {

@@ -26,6 +26,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-607">MNG-607</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
 public class MavenIT0038Test
     extends AbstractMavenIntegrationTestCase
 {
