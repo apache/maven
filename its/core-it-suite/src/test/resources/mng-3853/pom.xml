@@ -48,7 +48,7 @@ under the License.
               <goal>config</goal>
             </goals>
             <configuration>
-              <outputFile>target/dist.properties</outputFile>
+              <propertiesFile>target/dist.properties</propertiesFile>
               <listParam>
                 <!-- Get the distro repo, just like the Maven Deploy Plugin would do -->
                 <listParam>${project.distributionManagementArtifactRepository}</listParam>

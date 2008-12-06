@@ -51,7 +51,6 @@ public class InstanceofMojo
      * The path to the properties file used to track the results of the instanceof tests.
      * 
      * @parameter expression="${clsldr.instanceofPropertiesFile}"
-     *            default-value="${project.build.directory}/instanceof.properties"
      */
     private File instanceofPropertiesFile;
 

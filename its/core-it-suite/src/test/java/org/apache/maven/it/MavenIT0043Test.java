@@ -50,9 +50,6 @@ public class MavenIT0043Test
         File child2 = new File( testDir, "test" );
         verifier = new Verifier( child2.getAbsolutePath() );
 
-        Properties systemProperties = new Properties();
-        systemProperties.put( "expression.expressions", "project/repositories,project/pluginRepositories" );
-        verifier.setSystemProperties( systemProperties );
         verifier.setCliOptions( Collections.singletonList( "-s settings.xml" ) );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();

@@ -64,11 +64,19 @@ public class EvalMojo
 {
 
     /**
+     * The project's base directory, used for manual path translation.
+     * 
+     * @parameter default-value="${basedir}"
+     * @readonly
+     */
+    private File basedir;
+
+    /**
      * The path to the output file for the properties with the expression values. For each expression given by the
      * parameter {@link #expressions} an similar named properties key will be used to save the expression value. If an
      * expression evaluated to <code>null</code>, there will be no corresponding key in the properties file.
      * 
-     * @parameter expression="${expression.outputFile}" default-value="${project.build.directory}/expression.properties"
+     * @parameter expression="${expression.outputFile}"
      */
     private File outputFile;
 
@@ -130,6 +138,14 @@ public class EvalMojo
         if ( outputFile == null )
         {
             throw new MojoFailureException( "Path name for output file has not been specified" );
+        }
+
+        /*
+         * NOTE: We don't want to test path translation here.
+         */
+        if ( !outputFile.isAbsolute() )
+        {
+            outputFile = new File( basedir, outputFile.getPath() ).getAbsoluteFile();
         }
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile );

@@ -39,7 +39,11 @@ public class MavenIT0075Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0075" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "sub1/target" );
+        verifier.deleteDirectory( "sub2/target" );
         Properties systemProperties = new Properties();
+        systemProperties.put( "expression.outputFile", "target/expression.properties" );
         systemProperties.put( "activate", "anything" );
         verifier.setSystemProperties( systemProperties );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );

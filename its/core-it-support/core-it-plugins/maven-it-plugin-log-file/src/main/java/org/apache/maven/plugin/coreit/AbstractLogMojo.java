@@ -50,7 +50,7 @@ public abstract class AbstractLogMojo
     /**
      * The path to the output file, relative to the current working directory.
      * 
-     * @parameter expression="${log.logFile}" default-value="target/it.log" alias="outputFile"
+     * @parameter expression="${log.logFile}"
      */
     private File logFile;
 

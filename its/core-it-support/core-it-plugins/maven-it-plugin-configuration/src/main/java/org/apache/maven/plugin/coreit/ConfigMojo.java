@@ -65,10 +65,37 @@ public class ConfigMojo
      * The path to the properties file into which to save the mojo configuration. Unlike all the other parameters, this
      * parameter features both a default value and an alias.
      * 
-     * @parameter alias="outputFile"
-     *            expression="${config.propertiesFile} default-value="${project.build.directory}/config.properties"
+     * @parameter expression="${config.propertiesFile}
      */
     private File propertiesFile;
+
+    /**
+     * A parameter with an alias.
+     * 
+     * @parameter alias="aliasParamLegacy"
+     */
+    private String aliasParam;
+
+    /**
+     * A parameter with a constant default value.
+     * 
+     * @parameter default-value="maven-core-it"
+     */
+    private String defaultParam;
+
+    /**
+     * A parameter with a default value using multiple expressions.
+     * 
+     * @parameter default-value="${project.groupId}:${project.artifactId}:${project.version}"
+     */
+    private String defaultParamWithExpression;
+
+    /**
+     * A parameter that combines all of the annotations.
+     * 
+     * @parameter alias="fullyAnnotatedParam" expression="${config.aliasDefaultExpressionParam}" default-value="test"
+     */
+    private String aliasDefaultExpressionParam;
 
     /**
      * A simple parameter of type {@link java.lang.Boolean}.
@@ -167,6 +194,13 @@ public class ConfigMojo
      * @parameter
      */
     private String[] stringParams;
+
+    /**
+     * An array parameter of component type {@link java.io.File}.
+     * 
+     * @parameter
+     */
+    private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
@@ -276,6 +310,10 @@ public class ConfigMojo
          * injected by Maven.
          */
         dumpValue( props, "propertiesFile", propertiesFile );
+        dumpValue( props, "aliasParam", aliasParam );
+        dumpValue( props, "defaultParam", defaultParam );
+        dumpValue( props, "defaultParamWithExpression", defaultParamWithExpression );
+        dumpValue( props, "aliasDefaultExpressionParam", aliasDefaultExpressionParam );
         dumpValue( props, "booleanParam", booleanParam );
         dumpValue( props, "byteParam", byteParam );
         dumpValue( props, "shortParam", shortParam );
@@ -290,6 +328,7 @@ public class ConfigMojo
         dumpValue( props, "urlParam", urlParam );
         dumpValue( props, "uriParam", uriParam );
         dumpValue( props, "stringParams", stringParams );
+        dumpValue( props, "fileParams", fileParams );
         dumpValue( props, "listParam", listParam );
         dumpValue( props, "setParam", setParam );
         dumpValue( props, "mapParam", mapParam );
