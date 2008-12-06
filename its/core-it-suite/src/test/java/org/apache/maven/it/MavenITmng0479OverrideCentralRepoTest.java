@@ -26,17 +26,23 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Properties;
 
-public class MavenIT0043Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-479">MNG-479</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
+ */
+public class MavenITmng0479OverrideCentralRepoTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test for repository inheritence - ensure using the same id overrides the defaults
+     * Test for repository inheritance - ensure using the same id overrides the defaults
      */
-    public void testit0043()
+    public void testitMNG479()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0043" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0479" );
 
         // Phase 1: Ensure the test plugin is downloaded before the test cuts off access to central
         File child1 = new File( testDir, "setup" );

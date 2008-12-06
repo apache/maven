@@ -219,6 +219,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0507ArtifactRelocationTest.class );
         suite.addTestSuite( MavenITmng0505VersionRangeTest.class );
         suite.addTestSuite( MavenITmng0496IgnoreUnknownPluginParametersTest.class );
+        suite.addTestSuite( MavenITmng0479OverrideCentralRepoTest.class );
         suite.addTestSuite( MavenITmng0471CustomLifecycleTest.class );
         suite.addTestSuite( MavenITmng0469ReportConfigTest.class );
         suite.addTestSuite( MavenITmng0377PluginLookupFromPrefixTest.class );
@@ -277,7 +278,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0052Test.class );
         suite.addTestSuite( MavenIT0051Test.class );
         suite.addTestSuite( MavenIT0047Test.class );
-        suite.addTestSuite( MavenIT0043Test.class );
         suite.addTestSuite( MavenIT0041Test.class );
         suite.addTestSuite( MavenIT0040Test.class );
         suite.addTestSuite( MavenIT0039Test.class );
