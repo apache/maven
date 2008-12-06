@@ -25,24 +25,7 @@ under the License.
     <packaging>pom</packaging>
     <version>1.0</version>
     <name>Apache Maven: mng-2562-timestamp</name>
-    
-    <repositories>
-      <repository>
-        <id>test-plugins</id>
-        <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-        <releases><enabled>false</enabled></releases>
-        <snapshots><enabled>true</enabled></snapshots>
-      </repository>
-    </repositories>
-    <pluginRepositories>
-      <pluginRepository>
-        <id>test-plugins</id>
-        <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-        <releases><enabled>false</enabled></releases>
-        <snapshots><enabled>true</enabled></snapshots>
-      </pluginRepository>
-    </pluginRepositories>
-    
+
     <build>
         <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
         <plugins>
