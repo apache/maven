@@ -73,6 +73,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // Tests that currently don't pass for any Maven version, i.e. the corresponding issue hasn't been resolved yet
         // -------------------------------------------------------------------------------------------------------------
+        // suite.addTestSuite( MavenITmng3890TransitiveDependencyScopeUpdateTest.class );
         // suite.addTestSuite( MavenITmng3814BogusProjectCycleTest.class );
         // suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
