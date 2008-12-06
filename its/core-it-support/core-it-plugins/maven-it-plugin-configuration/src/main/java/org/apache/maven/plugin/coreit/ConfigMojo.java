@@ -62,8 +62,7 @@ public class ConfigMojo
     private File basedir;
 
     /**
-     * The path to the properties file into which to save the mojo configuration. Unlike all the other parameters, this
-     * parameter features both a default value and an alias.
+     * The path to the properties file into which to save the mojo configuration.
      * 
      * @parameter expression="${config.propertiesFile}
      */

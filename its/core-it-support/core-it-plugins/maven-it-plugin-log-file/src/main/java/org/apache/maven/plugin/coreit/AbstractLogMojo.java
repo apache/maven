@@ -48,7 +48,7 @@ public abstract class AbstractLogMojo
     private File basedir;
 
     /**
-     * The path to the output file, relative to the current working directory.
+     * The path to the output file, relative to the project's base directory.
      * 
      * @parameter expression="${log.logFile}"
      */
