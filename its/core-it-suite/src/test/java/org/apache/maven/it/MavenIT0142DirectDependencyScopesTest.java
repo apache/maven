@@ -35,6 +35,10 @@ public class MavenIT0142DirectDependencyScopesTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    /*
+     * NOTE: Class path ordering is another issue (MNG-1412), so we merely check set containment here.
+     */
+
     public MavenIT0142DirectDependencyScopesTest()
     {
     }
@@ -51,49 +55,44 @@ public class MavenIT0142DirectDependencyScopesTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0142" );
-        verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        /*
-         * NOTE: Class path ordering is another issue (MNG-1412), so we merely check set containment here.
-         */
-
         List compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
-        assertEquals( 3, compileArtifacts.size() );
         assertTrue( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.it0142:system:jar:0.1" ) );
         assertTrue( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.it0142:provided:jar:0.1" ) );
         assertTrue( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.it0142:compile:jar:0.1" ) );
+        assertEquals( 3, compileArtifacts.size() );
 
         List compileClassPath = verifier.loadLines( "target/compile-cp.txt", "UTF-8" );
-        assertEquals( 4, compileClassPath.size() );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "classes" ) );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "system-0.1.jar" ) );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "provided-0.1.jar" ) );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "compile-0.1.jar" ) );
+        assertEquals( 4, compileClassPath.size() );
 
         List runtimeArtifacts = verifier.loadLines( "target/runtime-artifacts.txt", "UTF-8" );
-        assertEquals( 2, runtimeArtifacts.size() );
         assertTrue( runtimeArtifacts.toString(), runtimeArtifacts.contains( "org.apache.maven.its.it0142:compile:jar:0.1" ) );
         assertTrue( runtimeArtifacts.toString(), runtimeArtifacts.contains( "org.apache.maven.its.it0142:runtime:jar:0.1" ) );
+        assertEquals( 2, runtimeArtifacts.size() );
 
         List runtimeClassPath = verifier.loadLines( "target/runtime-cp.txt", "UTF-8" );
-        assertEquals( 3, runtimeClassPath.size() );
         assertTrue( runtimeClassPath.toString(), runtimeClassPath.contains( "classes" ) );
         assertTrue( runtimeClassPath.toString(), runtimeClassPath.contains( "compile-0.1.jar" ) );
         assertTrue( runtimeClassPath.toString(), runtimeClassPath.contains( "runtime-0.1.jar" ) );
+        assertEquals( 3, runtimeClassPath.size() );
 
         List testArtifacts = verifier.loadLines( "target/test-artifacts.txt", "UTF-8" );
-        assertEquals( 5, testArtifacts.size() );
         assertTrue( testArtifacts.toString(), testArtifacts.contains( "org.apache.maven.its.it0142:system:jar:0.1" ) );
         assertTrue( testArtifacts.toString(), testArtifacts.contains( "org.apache.maven.its.it0142:provided:jar:0.1" ) );
         assertTrue( testArtifacts.toString(), testArtifacts.contains( "org.apache.maven.its.it0142:compile:jar:0.1" ) );
         assertTrue( testArtifacts.toString(), testArtifacts.contains( "org.apache.maven.its.it0142:runtime:jar:0.1" ) );
         assertTrue( testArtifacts.toString(), testArtifacts.contains( "org.apache.maven.its.it0142:test:jar:0.1" ) );
+        assertEquals( 5, testArtifacts.size() );
 
         List testClassPath = verifier.loadLines( "target/test-cp.txt", "UTF-8" );
-        assertEquals( 7, testClassPath.size() );
         assertTrue( testClassPath.toString(), testClassPath.contains( "classes" ) );
         assertTrue( testClassPath.toString(), testClassPath.contains( "test-classes" ) );
         assertTrue( testClassPath.toString(), testClassPath.contains( "system-0.1.jar" ) );
@@ -101,6 +100,7 @@ public class MavenIT0142DirectDependencyScopesTest
         assertTrue( testClassPath.toString(), testClassPath.contains( "compile-0.1.jar" ) );
         assertTrue( testClassPath.toString(), testClassPath.contains( "runtime-0.1.jar" ) );
         assertTrue( testClassPath.toString(), testClassPath.contains( "test-0.1.jar" ) );
+        assertEquals( 7, testClassPath.size() );
     }
 
 }

@@ -22,56 +22,28 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.it0142</groupId>
+  <groupId>org.apache.maven.its.it0143</groupId>
   <artifactId>consumer</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: it0142</name> 
+  <name>Maven Integration Test :: it0143</name> 
   <description>
-    Test that the different scopes of direct dependencies end up on the right class paths.
+    Test that the different scopes of transitive dependencies end up on the right class paths.
   </description>
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven.its.it0142</groupId>
-      <artifactId>provided</artifactId>
+      <groupId>org.apache.maven.its.it0143</groupId>
+      <artifactId>direct</artifactId>
       <version>0.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.its.it0142</groupId>
-      <artifactId>compile</artifactId>
-      <version>0.1</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.its.it0142</groupId>
-      <artifactId>runtime</artifactId>
-      <version>0.1</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.its.it0142</groupId>
-      <artifactId>test</artifactId>
-      <version>0.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.its.it0142</groupId>
-      <artifactId>system</artifactId>
-      <version>0.1</version>
-      <scope>system</scope>
-      <!--
-      NOTE: We don't want to test POM interpolation here, so we have the test controller filter the POM.
-      -->
-      <systemPath>@basedir@/lib/system-0.1.jar</systemPath>
+      <scope>@scope@</scope>
     </dependency>
   </dependencies>
 
   <repositories>
     <repository>
       <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
+      <url>@baseurl@/repo</url>
       <releases>
         <checksumPolicy>ignore</checksumPolicy>
       </releases>
@@ -80,7 +52,7 @@ under the License.
       </snapshots>
     </repository>
   </repositories>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -92,12 +64,12 @@ under the License.
             <id>test</id>
             <phase>validate</phase>
             <configuration>
-              <compileClassPath>target/compile-cp.txt</compileClassPath>
-              <compileArtifacts>target/compile-artifacts.txt</compileArtifacts>
-              <runtimeClassPath>target/runtime-cp.txt</runtimeClassPath>
-              <runtimeArtifacts>target/runtime-artifacts.txt</runtimeArtifacts>
-              <testClassPath>target/test-cp.txt</testClassPath>
-              <testArtifacts>target/test-artifacts.txt</testArtifacts>
+              <compileClassPath>target-@scope@/compile-cp.txt</compileClassPath>
+              <compileArtifacts>target-@scope@/compile-artifacts.txt</compileArtifacts>
+              <runtimeClassPath>target-@scope@/runtime-cp.txt</runtimeClassPath>
+              <runtimeArtifacts>target-@scope@/runtime-artifacts.txt</runtimeArtifacts>
+              <testClassPath>target-@scope@/test-cp.txt</testClassPath>
+              <testArtifacts>target-@scope@/test-artifacts.txt</testArtifacts>
               <significantPathLevels>1</significantPathLevels>
             </configuration>
             <goals>
