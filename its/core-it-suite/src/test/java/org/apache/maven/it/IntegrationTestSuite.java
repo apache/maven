@@ -209,6 +209,8 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1415QuotedSystemPropertiesTest.class );
         suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
         suite.addTestSuite( MavenITmng1323AntrunDependenciesTest.class );
+        suite.addTestSuite( MavenITmng0866EvaluateDefaultValueTest.class );
+        suite.addTestSuite( MavenITmng0848SystemPropOverridesDefaultValueTest.class );
         suite.addTestSuite( MavenITmng0836PluginParentResolutionTest.class );
         suite.addTestSuite( MavenITmng0522PluginMgmtConfigTest.class );
         suite.addTestSuite( MavenITmng0507ArtifactRelocationTest.class );
