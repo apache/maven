@@ -24,20 +24,24 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0049Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-674">MNG-674</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0674PluginParameterAliasTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
      * Test parameter alias usage.
      */
-    public void testit0049()
+    public void testitMNG674()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0049" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0674" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        //todo: i don't think we need to delete this plugin
-        //verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.assertFilePresent( "target/touchFile.txt" );
         verifier.verifyErrorFreeLog();

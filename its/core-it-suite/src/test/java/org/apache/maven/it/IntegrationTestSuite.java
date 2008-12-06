@@ -212,6 +212,8 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0866EvaluateDefaultValueTest.class );
         suite.addTestSuite( MavenITmng0848SystemPropOverridesDefaultValueTest.class );
         suite.addTestSuite( MavenITmng0836PluginParentResolutionTest.class );
+        suite.addTestSuite( MavenITmng0674PluginParameterAliasTest.class );
+        suite.addTestSuite( MavenITmng0557UserSettingsCliOptionTest.class );
         suite.addTestSuite( MavenITmng0522PluginMgmtConfigTest.class );
         suite.addTestSuite( MavenITmng0507ArtifactRelocationTest.class );
         suite.addTestSuite( MavenITmng0505VersionRangeTest.class );
@@ -220,6 +222,9 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0469ReportConfigTest.class );
         suite.addTestSuite( MavenITmng0377PluginLookupFromPrefixTest.class );
         suite.addTestSuite( MavenITmng0294MergeGlobalAndUserSettingsTest.class );
+        suite.addTestSuite( MavenITmng0282NonReactorExecWhenProjectIndependentTest.class );
+        suite.addTestSuite( MavenITmng0249ResolveDepsFromReactorTest.class );
+        suite.addTestSuite( MavenITmng0095ReactorFailureBehaviorTest.class );
         suite.addTestSuite( MavenIT0142DirectDependencyScopesTest.class );
         suite.addTestSuite( MavenIT0140Test.class );
         suite.addTestSuite( MavenIT0139Test.class );
@@ -270,13 +275,8 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0053Test.class );
         suite.addTestSuite( MavenIT0052Test.class );
         suite.addTestSuite( MavenIT0051Test.class );
-        suite.addTestSuite( MavenIT0049Test.class );
         suite.addTestSuite( MavenIT0047Test.class );
-        suite.addTestSuite( MavenIT0046Test.class );
-        suite.addTestSuite( MavenIT0045Test.class );
-        suite.addTestSuite( MavenIT0044Test.class );
         suite.addTestSuite( MavenIT0043Test.class );
-        suite.addTestSuite( MavenIT0042Test.class );
         suite.addTestSuite( MavenIT0041Test.class );
         suite.addTestSuite( MavenIT0040Test.class );
         suite.addTestSuite( MavenIT0039Test.class );

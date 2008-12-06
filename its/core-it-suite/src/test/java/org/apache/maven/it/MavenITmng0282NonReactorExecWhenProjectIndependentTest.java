@@ -26,23 +26,31 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MavenIT0044Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-282">MNG-282</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0282NonReactorExecWhenProjectIndependentTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test --settings CLI option
+     * Test non-reactor behavior when plugin declares "@requiresProject false"
      */
-    public void testit0044()
+    public void testitMNG282()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0044" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0282" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-no-project", "1.0", "maven-plugin" );
         List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
+        cliOptions.add( "--no-plugin-registry" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.assertFilePresent( "target/test.txt" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-no-project:light-touch" );
+        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject/target/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

@@ -24,6 +24,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-598">MNG-598</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
 public class MavenIT0040Test
     extends AbstractMavenIntegrationTestCase
 {

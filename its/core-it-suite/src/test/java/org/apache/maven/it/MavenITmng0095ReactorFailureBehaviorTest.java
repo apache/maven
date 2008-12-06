@@ -26,25 +26,33 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MavenIT0045Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-95">MNG-95</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0095ReactorFailureBehaviorTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test non-reactor behavior when plugin declares "@requiresProject false"
+     * Test fail-never reactor behavior. Forces an exception to be thrown in
+     * the first module, but checks that the second modules is built.
      */
-    public void testit0045()
+    public void testitMNG95()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0045" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-no-project", "1.0", "maven-plugin" );
+        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-it-it-plugin", "1.0", "maven-plugin" );
         List cliOptions = new ArrayList();
-        cliOptions.add( "--no-plugin-registry" );
+        cliOptions.add( "--no-plugin-registry --fail-never" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-no-project:light-touch" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.assertFilePresent( "target/touch.txt" );
         verifier.assertFileNotPresent( "subproject/target/touch.txt" );
+        verifier.assertFilePresent( "subproject2/target/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

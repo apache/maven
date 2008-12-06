@@ -24,17 +24,23 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0042Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-249">MNG-249</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng0249ResolveDepsFromReactorTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
      * Test that the reactor can establish the artifact location of known projects for dependencies
      */
-    public void testit0042()
+    public void testitMNG249()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0042" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0249" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "package" );
         verifier.assertFilePresent( "test-component-a/target/test-component-a-0.1.jar" );
