@@ -40,7 +40,7 @@ public class DefaultArtifactFilterManager
 
     static
     {
-        Set artifacts = new HashSet();
+        Set<String> artifacts = new HashSet<String>();
 
         artifacts.add( "classworlds" );
         artifacts.add( "plexus-classworlds" );
@@ -50,6 +50,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
         artifacts.add( "maven-build-context" );
+        artifacts.add( "maven-compat" );
         artifacts.add( "maven-core" );
         artifacts.add( "maven-error-diagnoser" );
         artifacts.add( "maven-lifecycle" );
