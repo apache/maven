@@ -44,7 +44,7 @@ public class MavenIT0138PluginLifecycleTest
     public void testit0138()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0138-pluginLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0138" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );

@@ -44,7 +44,7 @@ public class MavenIT0137EarLifecycleTest
     public void testit0137()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0137-earLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0137" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );

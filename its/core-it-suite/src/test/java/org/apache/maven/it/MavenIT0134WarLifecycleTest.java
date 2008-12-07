@@ -44,7 +44,7 @@ public class MavenIT0134WarLifecycleTest
     public void testit0134()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0134-warLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0134" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );

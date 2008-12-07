@@ -44,7 +44,7 @@ public class MavenIT0136RarLifecycleTest
     public void testit0136()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0136-rarLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0136" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );

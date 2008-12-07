@@ -44,7 +44,7 @@ public class MavenIT0132PomLifecycleTest
     public void testit0132()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0132-pomLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0132" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );

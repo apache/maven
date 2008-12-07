@@ -44,7 +44,7 @@ public class MavenIT0135EjbLifecycleTest
     public void testit0135()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0135-ejbLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0135" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );

@@ -44,7 +44,7 @@ public class MavenIT0133JarLifecycleTest
     public void testit0133()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0133-jarLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0133" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );

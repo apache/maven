@@ -44,7 +44,7 @@ public class MavenIT0130CleanLifecycleTest
     public void testit0130()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0130-cleanLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0130" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
