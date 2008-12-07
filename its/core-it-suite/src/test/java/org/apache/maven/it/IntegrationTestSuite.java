@@ -227,6 +227,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0282NonReactorExecWhenProjectIndependentTest.class );
         suite.addTestSuite( MavenITmng0249ResolveDepsFromReactorTest.class );
         suite.addTestSuite( MavenITmng0095ReactorFailureBehaviorTest.class );
+        suite.addTestSuite( MavenIT0144LifecycleExecutionOrderTest.class );
         suite.addTestSuite( MavenIT0143TransitiveDependencyScopesTest.class );
         suite.addTestSuite( MavenIT0142DirectDependencyScopesTest.class );
         suite.addTestSuite( MavenIT0140Test.class );
