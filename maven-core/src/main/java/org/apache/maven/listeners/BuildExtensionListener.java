@@ -9,9 +9,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.builder.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.ProjectUri;
+import org.apache.maven.shared.model.DataSourceException;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelContainerFactory;
-import org.apache.maven.shared.model.ModelEventListener;
 import org.apache.maven.shared.model.ModelProperty;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -45,7 +45,8 @@ public class BuildExtensionListener
     
     private List<BuildExtension> buildExtensions = new ArrayList<BuildExtension>();
     
-    public void fire( List<? extends ModelContainer> modelContainers )
+    public void fire( List<ModelContainer> modelContainers )
+        throws DataSourceException
     {        
         if ( !inBuild )
         {
@@ -174,5 +175,5 @@ public class BuildExtensionListener
         }
         
         return repos;        
-    }            
+    }
 }
