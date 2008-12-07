@@ -37,7 +37,7 @@ public class MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest
     public void testit0115()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0115-customArtifactHandlerAndCustomLifecycle" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0115" );
 
         Verifier verifier;
 

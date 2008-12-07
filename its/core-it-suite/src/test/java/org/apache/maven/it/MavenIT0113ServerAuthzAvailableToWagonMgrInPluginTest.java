@@ -32,7 +32,7 @@ public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
     public void testit0113()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0113-serverAuthzAvailableToWagonMgrInPlugin" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0113" );
 
         Verifier verifier;
 

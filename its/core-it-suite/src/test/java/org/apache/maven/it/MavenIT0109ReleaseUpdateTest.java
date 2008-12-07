@@ -49,7 +49,7 @@ public class MavenIT0109ReleaseUpdateTest
     public void testReleaseUpdated()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0109-releaseUpdate" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0109" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( GROUPID, ARTIFACTID, OLD_VERSION, TYPE );
         verifier.deleteArtifact( GROUPID, ARTIFACTID, OLD_VERSION, POM_TYPE );

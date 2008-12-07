@@ -33,7 +33,7 @@ public class MavenIT0129ResourceProvidedToAPluginAsAPluginDependencyTest
         throws Exception
     {
         File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/it0129-resourcesForAPluginProvidedAsAPluginDependency" );
+            ResourceExtractor.simpleExtractResources( getClass(), "/it0129" );
 
         Verifier verifier;
 
@@ -50,7 +50,7 @@ public class MavenIT0129ResourceProvidedToAPluginAsAPluginDependencyTest
         verifier.resetStreams();
 
         //now run the test
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0129-resourcesForAPluginProvidedAsAPluginDependency/test-project" );
+        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0129/test-project" );
         verifier = new Verifier( testDir.getAbsolutePath() );
         cliOptions = new ArrayList();
         verifier.executeGoal( "verify" );
