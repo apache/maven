@@ -45,8 +45,8 @@ public class BuildExtensionListener
     
     private List<BuildExtension> buildExtensions = new ArrayList<BuildExtension>();
     
-    public void fire( List<ModelContainer> modelContainers )
-        throws DataSourceException
+    public void fire(List<? extends ModelContainer> modelContainers) 
+        throws DataSourceException     
     {        
         if ( !inBuild )
         {
