@@ -80,7 +80,7 @@ public class DefaultArtifactFilterManager
         DEFAULT_EXCLUSIONS = artifacts;
     }
 
-    private Set excludedArtifacts = new HashSet( DEFAULT_EXCLUSIONS );
+    protected Set excludedArtifacts = new HashSet( DEFAULT_EXCLUSIONS );
 
     /**
      * @deprecated Use this class as a component instead, and then use getArtifactFilter().
