@@ -75,7 +75,7 @@ under the License.
     <dependency>
       <groupId>org.mortbay.jetty</groupId>
       <artifactId>jetty</artifactId>
-      <version>6.1.11</version>
+      <version>6.1.14</version>
 <!-- TODO: not transitive in tests artifact, so must be left in main scope
       <scope>test</scope>
 -->
