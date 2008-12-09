@@ -37,6 +37,7 @@ public class MavenITmng2843PluginConfigPropertiesInjectionTest
 
     public MavenITmng2843PluginConfigPropertiesInjectionTest()
     {
+        super( "(2.0.5,)" );
     }
 
     /**

@@ -35,6 +35,11 @@ public class MavenITmng3819PluginDepPlexusUtilsTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng3819PluginDepPlexusUtilsTest()
+    {
+        super( "(2.0.1,)" );
+    }
+
     /**
      * Verify that plexus-utils:1.1 is present on plugin class path if plexus-utils is not explicitly declared in
      * plugin POM for backward-compat with Maven 2.0.5- (due to MNG-2892, plexus-utils is no longer part of the core

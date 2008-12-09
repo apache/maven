@@ -29,6 +29,11 @@ public class MavenIT0087Test
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenIT0087Test()
+    {
+        super( "(2.0.2,)" );
+    }
+
     /**
      * Verify that a project-level plugin dependency class/resource can be loaded from both the plugin classloader
      * and the context classloader available to the plugin.

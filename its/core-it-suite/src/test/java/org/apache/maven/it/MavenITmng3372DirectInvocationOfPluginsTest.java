@@ -46,6 +46,11 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
     extends TestCase
 {
 
+    public MavenITmng3372DirectInvocationOfPluginsTest()
+    {
+        super( "(2.0.5,)" );
+    }
+
     public void testitMNG3372()
         throws Exception
     {

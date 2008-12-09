@@ -29,6 +29,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenIT0129ResourceProvidedToAPluginAsAPluginDependencyTest
     extends AbstractMavenIntegrationTestCase
 {
+
+    public MavenIT0129ResourceProvidedToAPluginAsAPluginDependencyTest()
+    {
+        super( "(2.0.3,)" );
+    }
+
     public void testit0129()
         throws Exception
     {

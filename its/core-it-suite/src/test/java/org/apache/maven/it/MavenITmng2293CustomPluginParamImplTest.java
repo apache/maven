@@ -35,6 +35,11 @@ public class MavenITmng2293CustomPluginParamImplTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng2293CustomPluginParamImplTest()
+    {
+        super( "(2.0.4,)" );
+    }
+
     /**
      * Verify that default implementation of an implementation for a complex object works as
      * expected [MNG-2293]

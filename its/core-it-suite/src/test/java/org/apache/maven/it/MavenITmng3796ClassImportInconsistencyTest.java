@@ -35,6 +35,11 @@ public class MavenITmng3796ClassImportInconsistencyTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng3796ClassImportInconsistencyTest()
+    {
+        super( "(2.0.2,)" );
+    }
+
     /**
      * Verify that classes shared with the Maven core realm are properly imported into the plugin realm.
      */

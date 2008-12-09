@@ -50,6 +50,8 @@ public class MavenITmng0377PluginLookupFromPrefixTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0377" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings settings.xml" );
         verifier.setCliOptions( cliOptions );

@@ -35,6 +35,11 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng1703PluginMgmtDepInheritanceTest()
+    {
+        super( "(2.0.2,)" );
+    }
+
     /**
      * Verify that a project-level plugin dependency class/resource inherited from the parent can be loaded from both the plugin classloader
      * and the context classloader available to the plugin.

@@ -28,6 +28,11 @@ public class MavenIT0062Test
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenIT0062Test()
+    {
+        super( "(2.0.2,)" );
+    }
+
     /**
      * Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
      * specified.

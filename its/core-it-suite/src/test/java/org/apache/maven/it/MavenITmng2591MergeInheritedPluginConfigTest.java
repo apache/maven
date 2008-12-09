@@ -35,6 +35,11 @@ public class MavenITmng2591MergeInheritedPluginConfigTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng2591MergeInheritedPluginConfigTest()
+    {
+        super( "(2.0.7,)" );
+    }
+
     /**
      * Test aggregation of list configuration items for build plugins when using
      * 'combine.children=append' attribute.

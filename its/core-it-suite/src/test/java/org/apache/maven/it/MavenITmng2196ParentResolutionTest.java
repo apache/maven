@@ -29,6 +29,11 @@ public class MavenITmng2196ParentResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng2196ParentResolutionTest()
+    {
+        super( "(,2.0.2)(2.0.2,)" );
+    }
+
     /**
      * Verify that multimodule builds where one project references another as
      * a parent can build, even if that parent is not correctly referenced by
@@ -52,6 +57,7 @@ public class MavenITmng2196ParentResolutionTest
             try
             {
                 verifier.executeGoal( "package" );
+                verifier.verifyErrorFreeLog();
             }
             catch ( VerificationException e )
             {

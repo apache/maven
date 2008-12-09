@@ -35,6 +35,11 @@ public class MavenITmng3813PluginClassPathOrderingTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng3813PluginClassPathOrderingTest()
+    {
+        super( "(2.0.8,)" );
+    }
+
     /**
      * Verify that the ordering of the plugin class path matches the ordering of the dependencies as given in the POM.
      */

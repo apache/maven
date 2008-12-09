@@ -34,6 +34,12 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng2926PluginPrefixOrderTest
     extends AbstractMavenIntegrationTestCase
 {
+
+    public MavenITmng2926PluginPrefixOrderTest()
+    {
+        super( "(2.0.6,)" );
+    }
+
     public void testitMNG2926()
         throws Exception
     {

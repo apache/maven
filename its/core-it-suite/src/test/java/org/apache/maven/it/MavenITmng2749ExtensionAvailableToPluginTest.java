@@ -37,7 +37,7 @@ public class MavenITmng2749ExtensionAvailableToPluginTest
 
     public MavenITmng2749ExtensionAvailableToPluginTest()
     {
-        super( "[,2.99.99)" );
+        super( "(2.0.2,2.99)" );
     }
 
     /**

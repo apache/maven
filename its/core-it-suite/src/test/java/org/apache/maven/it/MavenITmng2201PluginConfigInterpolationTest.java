@@ -34,6 +34,11 @@ public class MavenITmng2201PluginConfigInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng2201PluginConfigInterpolationTest()
+    {
+        super( "(2.0.8,)" );
+    }
+
     /**
      * Verify that plugin configurations are correctly interpolated
      */

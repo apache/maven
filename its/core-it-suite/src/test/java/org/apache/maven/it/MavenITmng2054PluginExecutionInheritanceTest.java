@@ -33,6 +33,11 @@ public class MavenITmng2054PluginExecutionInheritanceTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng2054PluginExecutionInheritanceTest()
+    {
+        super( "(2.0.3,)" );
+    }
+
     /**
      * Test that plugin executions from &gt;1 step of inheritance don't run multiple times.
      */

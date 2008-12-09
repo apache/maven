@@ -29,6 +29,12 @@ import java.util.ArrayList;
 public class MavenITmng2539PluginDependenciesComeFromPluginReposTest
     extends AbstractMavenIntegrationTestCase
 {
+
+    public MavenITmng2539PluginDependenciesComeFromPluginReposTest()
+    {
+        super( "(2.0.4,)" );
+    }
+
     public void testitMNG2539()
         throws Exception
     {

@@ -31,7 +31,7 @@ public class MavenIT0051Test
 {
     public MavenIT0051Test()                                                                                                                          
     {                                                                                                                                                 
-        super( "[,2.99.99)" );
+        super( "(2.0.2,2.99.99)" );
     }    
 
     /**

@@ -23,8 +23,10 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.TreeSet;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3843">MNG-3843</a>.
@@ -139,7 +141,10 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "http://parent.url/snaps", props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
         assertUrlCommon( "http://parent.url/site", props.getProperty( "project.distributionManagement.site.url" ) );
         assertUrlCommon( "http://parent.url/download", props.getProperty( "project.distributionManagement.downloadUrl" ) );
-        assertMissing( props, "project.distributionManagement.relocation." );
+        if ( matchesVersionRange( "(2.0.2,)" ) )
+        {
+            assertMissing( props, "project.distributionManagement.relocation." );
+        }
         assertMissing( props, "project.profiles." );
         assertEquals( "child-1-0.1", props.getProperty( "project.build.finalName" ) );
         assertPathEquals( basedir, "src/main", props.getProperty( "project.build.sourceDirectory" ) );
@@ -214,15 +219,30 @@ public class MavenITmng3843PomInheritanceTest
         assertPathEquals( basedir, "docs", props.getProperty( "project.reporting.outputDirectory" ) );
         assertEquals( "false", props.getProperty( "project.reporting.excludeDefaults" ) );
         assertTrue( Integer.parseInt( props.getProperty( "project.repositories" ) ) > 1 );
-        assertEquals( "1", props.getProperty( "project.build.plugins" ) );
+        if ( matchesVersionRange( "(2.0.4,)" ) )
+        {
+            assertEquals( "1", props.getProperty( "project.build.plugins" ) );
+        }
         assertEquals( "4", props.getProperty( "project.dependencies" ) );
-        assertEquals( "parent-dep-b", props.getProperty( "project.dependencies.0.artifactId" ) );
-        assertEquals( "child-dep-b", props.getProperty( "project.dependencies.1.artifactId" ) );
-        assertEquals( "child-dep-c", props.getProperty( "project.dependencies.2.artifactId" ) );
-        assertEquals( "child-dep-d", props.getProperty( "project.dependencies.3.artifactId" ) );
+        Collection actualDeps = new TreeSet();
+        actualDeps.add( props.getProperty( "project.dependencies.0.artifactId" ) );
+        actualDeps.add( props.getProperty( "project.dependencies.1.artifactId" ) );
+        actualDeps.add( props.getProperty( "project.dependencies.2.artifactId" ) );
+        actualDeps.add( props.getProperty( "project.dependencies.3.artifactId" ) );
+        Collection expectedDeps = new TreeSet();
+        expectedDeps.add( "parent-dep-b" );
+        expectedDeps.add( "child-dep-b" );
+        expectedDeps.add( "child-dep-c" );
+        expectedDeps.add( "child-dep-d" );
+        assertEquals( expectedDeps, actualDeps );
         assertEquals( "2", props.getProperty( "project.dependencyManagement.dependencies" ) );
-        assertEquals( "parent-dep-a", props.getProperty( "project.dependencyManagement.dependencies.0.artifactId" ) );
-        assertEquals( "child-dep-a", props.getProperty( "project.dependencyManagement.dependencies.1.artifactId" ) );
+        Collection actualMngtDeps = new TreeSet();
+        actualMngtDeps.add( props.getProperty( "project.dependencyManagement.dependencies.0.artifactId" ) );
+        actualMngtDeps.add( props.getProperty( "project.dependencyManagement.dependencies.1.artifactId" ) );
+        Collection expectedMngtDeps = new TreeSet();
+        expectedMngtDeps.add( "parent-dep-a" );
+        expectedMngtDeps.add( "child-dep-a" );
+        assertEquals( expectedMngtDeps, actualMngtDeps );
 
         basedir = new File( verifier.getBasedir(), "test-3/sub-parent/child-a" );
         props = verifier.loadProperties( "test-3/sub-parent/child-a/target/pom.properties" );
