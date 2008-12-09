@@ -53,6 +53,7 @@ public class MavenITmng3863AutoPluginGroupIdTest
         try
         {
             verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
             fail( "Validation step did not detect missing groupId for dependency" );
         }
         catch ( VerificationException e )
