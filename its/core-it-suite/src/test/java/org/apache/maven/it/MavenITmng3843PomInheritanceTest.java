@@ -57,6 +57,8 @@ public class MavenITmng3843PomInheritanceTest
         verifier.deleteDirectory( "test-2/child-1/target" );
         verifier.deleteDirectory( "test-2/child-2/target" );
         verifier.deleteDirectory( "test-3/sub-parent/child-a/target" );
+        verifier.getSystemProperties().setProperty( "org.apache.maven.user-settings",
+            new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
