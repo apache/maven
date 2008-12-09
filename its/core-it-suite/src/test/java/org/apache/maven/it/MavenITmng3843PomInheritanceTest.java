@@ -38,7 +38,6 @@ public class MavenITmng3843PomInheritanceTest
 
     public MavenITmng3843PomInheritanceTest()
     {
-    	   super( "(2.99,)" ); // only test in 3.0+
     }
 
     /**

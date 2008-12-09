@@ -38,7 +38,6 @@ public class MavenITmng3853ProfileInjectedDistReposTest
 
     public MavenITmng3853ProfileInjectedDistReposTest()
     {
-    	 super( "(2.99,)" ); // only test in 3.0+
     }
 
     /**
