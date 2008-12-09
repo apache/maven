@@ -74,6 +74,7 @@ public class MavenIT0069Test
             try
             {
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                verifier.verifyErrorFreeLog();
                 fail( "Build did not fail!" );
             }
             catch( VerificationException e )
