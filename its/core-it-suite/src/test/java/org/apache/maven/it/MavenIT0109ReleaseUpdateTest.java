@@ -60,7 +60,7 @@ public class MavenIT0109ReleaseUpdateTest
                        "20051230031110" );
 
         // create a repository (TODO: into verifier)
-        File repository = new File( testDir, "repository" );
+        File repository = new File( testDir, "repo" );
         repository.mkdirs();
 
         // create artifact in repository (TODO: into verifier)

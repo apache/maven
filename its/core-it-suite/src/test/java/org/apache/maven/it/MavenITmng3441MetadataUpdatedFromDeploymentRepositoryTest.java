@@ -46,9 +46,9 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
         File testDir =
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-3441" );
 
-        File targetRepository = new File( testDir, "target-repository" );
+        File targetRepository = new File( testDir, "target-repo" );
         FileUtils.deleteDirectory( targetRepository );
-        FileUtils.copyDirectoryStructure( new File( testDir, "deployment-repository" ), targetRepository );
+        FileUtils.copyDirectoryStructure( new File( testDir, "deploy-repo" ), targetRepository );
 
         Verifier verifier;
 

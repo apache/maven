@@ -19,7 +19,7 @@
   <repositories>
     <repository>
       <id>id</id>
-      <url>file:///${basedir}/../../repository</url>
+      <url>file:///${basedir}/../../repo</url>
       <releases><enabled>true</enabled></releases>
     </repository>
   </repositories>

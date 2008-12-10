@@ -38,7 +38,7 @@
   <pluginRepositories>
     <pluginRepository>
       <id>it.releases</id>
-      <url>file:///${basedir}/repository</url>
+      <url>file:///${basedir}/repo</url>
       <releases>
         <updatePolicy>always</updatePolicy>
       </releases>

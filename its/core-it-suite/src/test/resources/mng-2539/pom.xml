@@ -15,7 +15,7 @@
   <repositories>
     <repository>
       <id>javamail-local</id>
-      <url>file://${basedir}/repository</url>
+      <url>file://${basedir}/repo</url>
       <releases>
         <checksumPolicy>ignore</checksumPolicy>
       </releases>
@@ -30,7 +30,7 @@
   <pluginRepositories>
     <pluginRepository>
       <id>javamail-local</id>
-      <url>file://${basedir}/repository</url>
+      <url>file://${basedir}/repo</url>
     </pluginRepository>
   </pluginRepositories>
   -->

@@ -15,7 +15,7 @@
   <repositories>
     <repository>
       <id>it0092</id>
-      <url>file://localhost/${basedir}/repository</url>
+      <url>file://localhost/${basedir}/repo</url>
       <layout>legacy</layout>
     </repository>
   </repositories>
