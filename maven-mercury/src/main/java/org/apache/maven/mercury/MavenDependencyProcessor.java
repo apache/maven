@@ -25,7 +25,7 @@ import org.apache.maven.shared.model.ModelTransformerContext;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * 
+ *
  * Maven supplied plexus component that implements POM dependency processing for Mercury
  *
  * @author Shane Isbell
@@ -34,9 +34,10 @@ import org.codehaus.plexus.component.annotations.Component;
  */
 @Component( role=DependencyProcessor.class, hint="maven" )
 public final class MavenDependencyProcessor
-implements DependencyProcessor
+    implements DependencyProcessor
 {
-    public List<ArtifactBasicMetadata> getDependencies( ArtifactBasicMetadata bmd, MetadataReader mdReader, Map system, Map user )
+    public List<ArtifactBasicMetadata> getDependencies( ArtifactBasicMetadata bmd, MetadataReader mdReader, Map system,
+                                                        Map user )
         throws MetadataReaderException, DependencyProcessorException
     {
         if ( bmd == null )
@@ -50,23 +51,26 @@ implements DependencyProcessor
         }
 
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-        interpolatorProperties.add( new InterpolatorProperty( "${mavenVersion}", "3.0-SNAPSHOT", PomInterpolatorTag.SYSTEM_PROPERTIES.name() ) );
+        interpolatorProperties.add( new InterpolatorProperty( "${mavenVersion}", "3.0-SNAPSHOT",
+                                                              PomInterpolatorTag.SYSTEM_PROPERTIES.name() ) );
 
         if ( system != null )
         {
-            interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( system, PomInterpolatorTag.SYSTEM_PROPERTIES.name() ) );
+            interpolatorProperties.addAll(
+                InterpolatorProperty.toInterpolatorProperties( system, PomInterpolatorTag.SYSTEM_PROPERTIES.name() ) );
         }
         if ( user != null )
         {
-            interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( user, PomInterpolatorTag.USER_PROPERTIES.name() ) );
+            interpolatorProperties.addAll(
+                InterpolatorProperty.toInterpolatorProperties( user, PomInterpolatorTag.USER_PROPERTIES.name() ) );
         }
 
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
         try
         {
-            //            MavenDomainModel superPom =
-            //                    new MavenDomainModel(MavenDependencyProcessor.class.getResourceAsStream( "pom-4.0.0.xml" ));
-            //            domainModels.add(superPom);
+            // MavenDomainModel superPom =
+            //     new MavenDomainModel(MavenDependencyProcessor.class.getResourceAsStream( "pom-4.0.0.xml" ));
+            // domainModels.add(superPom);
 
             byte[] superBytes = mdReader.readMetadata( bmd );
 
@@ -91,11 +95,15 @@ implements DependencyProcessor
         }
 
         PomTransformer transformer = new PomTransformer( new MavenDomainModelFactory() );
-        ModelTransformerContext ctx = new ModelTransformerContext( Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+        ModelTransformerContext ctx =
+            new ModelTransformerContext( Arrays.asList( new ArtifactModelContainerFactory(),
+                                                        new IdModelContainerFactory() ) );
 
         try
         {
-            MavenDomainModel model = ( (MavenDomainModel) ctx.transform( domainModels, transformer, transformer, null, interpolatorProperties, null ) );
+            MavenDomainModel model =
+                ( (MavenDomainModel) ctx.transform( domainModels, transformer, transformer, null,
+                                                    interpolatorProperties, null ) );
             return model.getDependencyMetadata();
         }
         catch ( IOException e )
@@ -110,7 +118,8 @@ implements DependencyProcessor
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
         if ( domainModel.hasParent() )
         {
-            MavenDomainModel parentDomainModel = new MavenDomainModel( mdReader.readMetadata( domainModel.getParentMetadata() ) );
+            MavenDomainModel parentDomainModel =
+                new MavenDomainModel( mdReader.readMetadata( domainModel.getParentMetadata() ) );
             domainModels.add( parentDomainModel );
             domainModels.addAll( getParentsOfDomainModel( parentDomainModel, mdReader ) );
         }
@@ -122,10 +131,12 @@ implements DependencyProcessor
         List<ModelProperty> properties = new ArrayList<ModelProperty>();
         for ( ModelProperty mp : modelProperties )
         {
-            if ( mp.getUri().startsWith( ProjectUri.Profiles.Profile.xUri ) && !mp.getUri().equals( ProjectUri.Profiles.Profile.id )
+            if ( mp.getUri().startsWith( ProjectUri.Profiles.Profile.xUri )
+                && !mp.getUri().equals( ProjectUri.Profiles.Profile.id )
                 && !mp.getUri().startsWith( ProjectUri.Profiles.Profile.Activation.xUri ) )
             {
-                properties.add( new ModelProperty( mp.getUri().replace( ProjectUri.Profiles.Profile.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
+                properties.add( new ModelProperty( mp.getUri().replace( ProjectUri.Profiles.Profile.xUri,
+                                                                        ProjectUri.xUri ), mp.getResolvedValue() ) );
             }
         }
         return properties;

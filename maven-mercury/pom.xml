@@ -20,6 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-mercury</artifactId>
   <name>Maven Mercury</name>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.mercury</groupId>
@@ -44,6 +45,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -51,5 +53,6 @@
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
     </plugins>
-  </build>  
+  </build>
+
 </project>
