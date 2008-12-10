@@ -8,7 +8,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.it0123</groupId>
-      <artifactId>maven-it-it0123-dependency</artifactId>
+      <artifactId>artifact</artifactId>
       <version>[1.0-SNAPSHOT]</version>
     </dependency>
   </dependencies>
