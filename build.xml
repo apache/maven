@@ -36,7 +36,7 @@ TODO:
 <project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
   
   <target name="initTaskDefs" unless="taskdefs.inited">
-  	<xmlproperty file="pom.xml" prefix="pom.xml" />
+    <xmlproperty file="pom.xml" prefix="pom.xml" />
     <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.0.8.jar"/>
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
     <property name="taskdefs.inited" value="true"/>
@@ -53,6 +53,7 @@ TODO:
       <isset property="env.M2_HOME"/>
     </condition>
     <fail unless="maven.home" message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script"/>
+    <echo>Using Maven home at: ${maven.home}</echo>
   </target>
   
   <target name="read-poms" depends="initTaskDefs,initLocalRepo" unless="pom.version">
@@ -222,12 +223,14 @@ TODO:
   
   <target name="its-win32" if="its.win32">
     <echo>Retrieving integration tests</echo>
-    <exec dir="${basedir}/${itPom.artifactId}" executable="cmd">
+    <exec failonerror="true" dir="${basedir}/${itPom.artifactId}" executable="cmd">
+      <env key="M2_HOME" value="${maven.home}"/>
       <arg value="/c"/>
       <arg value="${maven.home}\bin\mvn.bat"/>
       <arg value="process-resources"/>
     </exec>
-    <exec dir="${basedir}/${itPom.artifactId}/target/classes" executable="cmd">
+    <exec failonerror="true" dir="${basedir}/${itPom.artifactId}/target/classes" executable="cmd">
+      <env key="M2_HOME" value="${maven.home}"/>
       <arg value="/c"/>
       <arg value="${maven.home}\bin\mvn.bat"/>
       <arg value="package"/>
@@ -236,6 +239,7 @@ TODO:
     <echo>Running integration tests</echo>
     <!-- Hard-coding to /tmp/ to avoid long path names that will make windows scream. -->
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="cmd">
+      <env key="M2_HOME" value="${maven.home}"/>
       <arg value="/c"/>
       <arg value="${maven.home}\bin\mvn.bat"/>
       <arg value="-Prun-its"/>
@@ -246,16 +250,19 @@ TODO:
 
   <target name="its-unix" if="its.unix">
     <echo>Retrieving integration tests</echo>
-    <exec dir="${basedir}/${itPom.artifactId}" executable="${maven.home}/bin/mvn">
+    <exec failonerror="true" dir="${basedir}/${itPom.artifactId}" executable="${maven.home}/bin/mvn">
+      <env key="M2_HOME" value="${maven.home}"/>
       <arg value="process-resources"/>
     </exec>
-    <exec dir="${basedir}/${itPom.artifactId}/target/classes" executable="${maven.home}/bin/mvn">
+    <exec failonerror="true" dir="${basedir}/${itPom.artifactId}/target/classes" executable="${maven.home}/bin/mvn">
+      <env key="M2_HOME" value="${maven.home}"/>
       <arg value="package"/>
     </exec>
     
     <echo>Running integration tests</echo>
-    <!-- Hard-coding to /tmp/ to avoid long path names that will make windows scream. -->
+    <!-- Using java.io.tmpdir to avoid long path names that will make windows scream. -->
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="${maven.home}/bin/mvn">
+      <env key="M2_HOME" value="${maven.home}"/>
       <arg value="-Prun-its"/>
       <arg value="clean"/>
       <arg value="install"/>
