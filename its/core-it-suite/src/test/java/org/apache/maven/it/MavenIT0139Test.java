@@ -78,7 +78,10 @@ public class MavenIT0139Test
          * NOTE: We intentionally do not check whether the build paths have been basedir aligned, that's another
          * story...
          */
-        assertTrue( props.getProperty( prefix + "projectBuildOut" ).endsWith( "bin" ) );
+        if ( matchesVersionRange( "(2.0.8,)" ) )
+        {
+            assertTrue( props.getProperty( prefix + "projectBuildOut" ).endsWith( "bin" ) );
+        }
         assertTrue( props.getProperty( prefix + "projectSiteOut" ).endsWith( "doc" ) );
     }
 

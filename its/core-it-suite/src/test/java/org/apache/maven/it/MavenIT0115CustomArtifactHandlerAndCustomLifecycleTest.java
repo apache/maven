@@ -31,7 +31,7 @@ public class MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest
 {
 
     public MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest() {
-        super( "(2.0.1,2.99.99)" );//extension support removed from 3.0
+        super( "(2.0.1,2.0.5),(2.0.6,2.99.99)" );//extension support removed from 3.0
     }
 
     public void testit0115()

@@ -46,7 +46,7 @@ public class MavenITmng2196ParentResolutionTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
         
-        if ( matchesVersionRange( "[2.0.4, 2.99.99)" ) )
+        if ( matchesVersionRange( "(, 2.99.99)" ) )
         {
             verifier.executeGoal( "package" );
             verifier.verifyErrorFreeLog();

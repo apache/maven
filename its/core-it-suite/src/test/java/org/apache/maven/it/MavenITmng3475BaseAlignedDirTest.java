@@ -38,7 +38,7 @@ public class MavenITmng3475BaseAlignedDirTest
 
     public MavenITmng3475BaseAlignedDirTest()
     {
-        super( "(2.0.1,)");
+        super( "(2.0.1,2.0.3),(2.0.3,)");
     }
 
     /**

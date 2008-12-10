@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 /**
  * This is a sample integration test. The IT tests typically
  * operate by having a sample project in the
@@ -43,7 +41,7 @@ import junit.framework.TestCase;
  *
  */
 public class MavenITmng3372DirectInvocationOfPluginsTest
-    extends TestCase
+    extends AbstractMavenIntegrationTestCase
 {
 
     public MavenITmng3372DirectInvocationOfPluginsTest()

@@ -38,7 +38,6 @@ public class MavenIT0144LifecycleExecutionOrderTest
 
     public MavenIT0144LifecycleExecutionOrderTest()
     {
-        super( "(2.0.4,)" );
     }
 
     /**
@@ -75,12 +74,21 @@ public class MavenIT0144LifecycleExecutionOrderTest
         expected.add( "generate-test-resources" );
         expected.add( "process-test-resources" );
         expected.add( "test-compile" );
-        expected.add( "process-test-classes" );
+        if ( matchesVersionRange( "(2.0.4,)" ) )
+        {
+            expected.add( "process-test-classes" );
+        }
         expected.add( "test" );
         expected.add( "package" );
-        expected.add( "pre-integration-test" );
+        if ( matchesVersionRange( "(2.0.1,)" ) )
+        {
+            expected.add( "pre-integration-test" );
+        }
         expected.add( "integration-test" );
-        expected.add( "post-integration-test" );
+        if ( matchesVersionRange( "(2.0.1,)" ) )
+        {
+            expected.add( "post-integration-test" );
+        }
         expected.add( "verify" );
         expected.add( "install" );
         expected.add( "deploy" );
