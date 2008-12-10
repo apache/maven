@@ -182,8 +182,8 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
     public void testmng3599useHttpProxyForWebDAV()
         throws Exception
     {
-        // Doesn't work until 2.0.10+
-        if ( matchesVersionRange( "(2.0.9, 2.99.99)" ) )
+        // Doesn't work until 2.1.0-M1+
+        if ( matchesVersionRange( "[2.1.0-M1, 2.99.99)" ) )
         {
             File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
 
