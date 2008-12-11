@@ -50,6 +50,20 @@ under the License.
   <!-- TODO: TAKE THIS OUT BEFORE WE RELEASE! -->
   <repositories>
     <repository>
+      <id>sonatype.snapshots</id>
+      <url>http://repository.sonatype.org/service/local/repositories/snapshots/content/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>sonatype.releases</id>
+      <url>http://repository.sonatype.org/service/local/repositories/releases/content/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>apache.snapshots</id>
       <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
       <snapshots>
