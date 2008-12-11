@@ -142,17 +142,17 @@ public class BuildExtensionListener
             try
             {
                 result = pluginManager.resolve( request );
+
+                ClassRealm realm = pluginManager.createClassRealm( result.getArtifacts() );
+
+                realm.display();
+            
+                List<ComponentDescriptor<?>> components = pluginManager.discoverComponents( realm );            
             }
             catch ( Exception e )
             {
                 e.printStackTrace();
             }
-
-            ClassRealm realm = pluginManager.createClassRealm( result.getArtifacts() );
-
-            realm.display();
-            
-            List<ComponentDescriptor<?>> components = pluginManager.discoverComponents( realm );            
         }
     } 
     
