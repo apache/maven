@@ -39,6 +39,13 @@ under the License.
     <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-it-suite</url>
   </scm>
 
+  <properties>
+    <!-- The original Maven distribution to test. -->
+    <mavenHome>${maven.home}</mavenHome>
+    <!-- The (possibly instrumented copy of the) Maven distribution we actually use for the tests. -->
+    <preparedMavenHome>${mavenHome}</preparedMavenHome>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -98,6 +105,10 @@ under the License.
               <name>maven.version</name>
               <value>${maven.version}</value>
             </property>
+            <property>
+              <name>maven.home</name>
+              <value>${preparedMavenHome}</value>
+            </property>
           </systemProperties>
         </configuration>
       </plugin>
@@ -115,6 +126,23 @@ under the License.
     </plugins>
   </build>
 
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.0.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+
   <profiles>
     <profile>
       <id>run-its</id>
@@ -129,6 +157,114 @@ under the License.
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>emma</id>
+      <properties>
+        <preparedMavenHome>${project.build.directory}/distro</preparedMavenHome>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.3</version>
+            <executions>
+              <execution>
+                <id>copy-maven-distro</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <copy todir="${preparedMavenHome}" overwrite="true">
+                      <fileset dir="${mavenHome}"/>
+                    </copy>
+                    <move todir="${preparedMavenHome}/lib">
+                      <fileset dir="${preparedMavenHome}/lib"/>
+                      <regexpmapper from="^(maven)((-[^-]*)*?)(-[0-9].*)\.jar$$" to="\1\2.jar"/>
+                    </move>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant-nodeps</artifactId>
+                <version>1.7.1</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.0</version>
+            <executions>
+              <execution>
+                <id>inject-emma-into-core-realm</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>emma</groupId>
+                      <artifactId>emma</artifactId>
+                      <version>2.0.5312</version>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${preparedMavenHome}/lib</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.maven.plugin</groupId>
+            <artifactId>emma4it-maven-plugin</artifactId>
+            <version>1.0</version>
+            <configuration>
+              <jarFiles>
+                <jarFile>${preparedMavenHome}/lib/maven.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-core.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-compat.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-embedder.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-lifecycle.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-mercury.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-model.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-plugin-api.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-project.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-project-builder.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-reporting-api.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-toolchain.jar</jarFile>
+                <jarFile>${preparedMavenHome}/lib/maven-shared-model.jar</jarFile>
+              </jarFiles>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
+      <repositories>
+        <repository>
+          <id>sonatype.org</id>
+          <url>http://repository.sonatype.org/content/groups/public</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
     </profile>
   </profiles>
 </project>
