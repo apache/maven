@@ -49,7 +49,7 @@ public abstract class AbstractMavenProjectTestCase
     {
         super.setUp();
 
-        if ( getContainer().hasComponent( MavenProjectBuilder.ROLE, "test" ) )
+        if ( getContainer().hasComponent( MavenProjectBuilder.class, "test" ) )
         {
             projectBuilder = lookup( MavenProjectBuilder.class, "test" );
         }
