@@ -244,7 +244,7 @@ under the License.
             <!-- needed for release: default value "(,${project.version})" for 2.0.10 is 2.0.10-SNAPSHOT -->
             <comparisonVersion>2.0.9</comparisonVersion>
             <excludes>
-              <!-- TODO: These represent method ADDITIONS from 2.0.9, and should be removed after 
+              <!-- TODO: These represent method ADDITIONS from 2.0.9, and should be removed after
                    2.0.10 is released. -->
               <exclude>org/apache/maven/lifecycle/LifecycleExecutor*</exclude>
               <exclude>org/apache/maven/artifact/metadata/ArtifactMetadataSource*</exclude>
@@ -299,7 +299,7 @@ under the License.
     <mavenSharedModel>1.0-SNAPSHOT</mavenSharedModel>
     <mercuryVersion>1.0.0-alpha-2-SNAPSHOT</mercuryVersion>
     <woodstoxVersion>3.2.6</woodstoxVersion>
-    <modelloVersion>1.0-alpha-21</modelloVersion>
+    <modelloVersion>1.0-alpha-22</modelloVersion>
   </properties>
   <!--start-->
   <dependencies>
