@@ -1462,14 +1462,34 @@ public final class ModelUtils
 
     public static void mergeExtensionLists( Build childBuild, Build parentBuild )
     {
-        for ( Iterator i = parentBuild.getExtensions().iterator(); i.hasNext(); )
+        Map extMap = new LinkedHashMap();
+
+        List ext = childBuild.getExtensions();
+
+        if ( ext != null )
         {
-            Extension e = (Extension) i.next();
-            if ( !childBuild.getExtensions().contains( e ) )
+            for ( Iterator it = ext.iterator(); it.hasNext(); )
             {
-                childBuild.addExtension( e );
+                Extension extension = (Extension) it.next();
+                extMap.put( extension.getKey(), extension );
             }
         }
+
+        ext = parentBuild.getExtensions();
+
+        if ( ext != null )
+        {
+            for ( Iterator it = ext.iterator(); it.hasNext(); )
+            {
+                Extension extension = (Extension) it.next();
+                if ( !extMap.containsKey( extension.getKey() ) )
+                {
+                    extMap.put( extension.getKey(), extension );
+                }
+            }
+        }
+
+        childBuild.setExtensions( new ArrayList( extMap.values() ) );
     }
 
     public static void mergeResourceLists( List childResources, List parentResources )
