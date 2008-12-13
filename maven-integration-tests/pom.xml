@@ -10,7 +10,6 @@
   
   <properties>
     <integrationTestSVNDir>trunk</integrationTestSVNDir>
-    
     <!-- Using java.io.tmpdir to avoid long path names that will make windows scream. -->
     <itDir>${java.io.tmpdir}/${pom.artifactId}-${pom.version}</itDir>
   </properties>
@@ -68,6 +67,15 @@
   </profiles>
   
   <build>
+    <resources>
+      <resource>
+        <directory>${basedir}</directory>
+        <includes>
+          <include>pom.xml</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-scm-plugin</artifactId>
