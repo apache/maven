@@ -40,7 +40,7 @@ public class MavenITmng3900ProfilePropertiesInterpolationTest
     }
 
     /**
-     * Test that build extensions are properly merged during inheritance.
+     * Test that build properties defined via active profiles are used for interpolation.
      */
     public void testitMNG3900()
         throws Exception
