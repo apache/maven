@@ -5,13 +5,11 @@ import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class DefaultMavenExecutionRequestPopulatorTest
     extends PlexusTestCase
 {
-
     private MavenExecutionRequestPopulator populator;
 
     private WagonManager wagonManager;
@@ -28,10 +26,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
     public void testWagonManagerOfflineFlagIsPopulatedFromSettings()
         throws MavenEmbedderException
     {
-        Settings settings = new Settings();
-        settings.setOffline( true );
-
-        MavenExecutionRequest req = new DefaultMavenExecutionRequest().setSettings( settings );
+        MavenExecutionRequest req = new DefaultMavenExecutionRequest().setOffline( true );
 
         assertTrue( wagonManager.isOnline() );
 

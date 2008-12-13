@@ -293,5 +293,14 @@ public class MavenSession
     {
         return request.getProjectBuildingConfiguration();
     }
-
+    
+    public List<String> getPluginGroups()
+    {
+        return request.getPluginGroups();
+    }
+    
+    public boolean isOffline()
+    {
+        return request.isOffline();
+    }
 }

@@ -19,6 +19,12 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+
 import org.apache.maven.AggregatedBuildFailureException;
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.NoGoalsSpecifiedException;
@@ -48,22 +54,12 @@ import org.apache.maven.plugin.loader.PluginLoader;
 import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
 
 /**
  * Responsible for orchestrating the process of building the ordered list of
@@ -110,9 +106,7 @@ public class DefaultLifecycleExecutor
     /**
      * {@inheritDoc}
      */
-    public void execute( final MavenSession session,
-                         final ReactorManager reactorManager,
-                         final EventDispatcher dispatcher )
+    public void execute( MavenSession session, ReactorManager reactorManager, EventDispatcher dispatcher )
         throws BuildFailureException, LifecycleExecutionException
     {
         // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
@@ -219,27 +213,15 @@ public class DefaultLifecycleExecutor
     {
         if ( !reactorManager.isBlackListed( project ) )
         {
-//            line();
-//
-//            getLogger().info( "Building " + project.getName() );
-//
-//            getLogger().info( "  " + segment );
-//
-//            line();
-
             String target = project.getName() + "\nId: " + project.getId() + "\n" + segment;
 
             getLogger().debug( "Constructing build plan for " + target );
 
-            // !! This is ripe for refactoring to an aspect.
-            // Event monitoring.
             String event = MavenEvents.PROJECT_EXECUTION;
 
             long buildStartTime = System.currentTimeMillis();
 
-            dispatcher.dispatchStart(
-                event,
-                target );
+            dispatcher.dispatchStart( event, target );
 
             ClassRealm oldLookupRealm = setProjectLookupRealm( session, project );
 

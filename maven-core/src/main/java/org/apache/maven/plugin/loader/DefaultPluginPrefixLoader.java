@@ -7,7 +7,7 @@ import org.apache.maven.plugin.PluginManagerSupport;
 import org.apache.maven.plugin.PluginMappingManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Settings;
+//import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -160,10 +160,8 @@ public class DefaultPluginPrefixLoader
                                          MavenSession session )
         throws PluginLoaderException
     {
-        Settings settings = session.getSettings();
-
         Plugin plugin = pluginMappingManager.getByPrefix( prefix,
-                                                          settings.getPluginGroups(),
+                                                          session.getPluginGroups(),
                                                           project.getRemoteArtifactRepositories(),
                                                           session.getLocalRepository() );
 

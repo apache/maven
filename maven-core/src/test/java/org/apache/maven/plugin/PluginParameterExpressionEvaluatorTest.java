@@ -344,18 +344,13 @@ public class PluginParameterExpressionEvaluatorTest
         throws CycleDetectedException, DuplicateProjectException
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setSettings( new Settings() )
             .setProperties( new Properties() )
             .setStartTime( new Date() )
             .setGoals( Collections.EMPTY_LIST )
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
-//        return new MavenSession( container, request, new DefaultEventDispatcher(),
-//                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ), Collections.EMPTY_MAP );
-
-        return new MavenSession( container, request, new DefaultEventDispatcher(),
-                                 new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ) );
+        return new MavenSession( container, request, new DefaultEventDispatcher(), new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ) );
     }
 
     public void testLocalRepositoryExtraction()

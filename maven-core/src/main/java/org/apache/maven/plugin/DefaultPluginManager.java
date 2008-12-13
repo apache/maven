@@ -168,7 +168,7 @@ public class DefaultPluginManager
     {
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
         // use for the mapping manager in here
-        return pluginMappingManager.getByPrefix( prefix, session.getSettings().getPluginGroups(),
+        return pluginMappingManager.getByPrefix( prefix, session.getPluginGroups(),
                                                  project.getRemoteArtifactRepositories(),
                                                  session.getLocalRepository() );
     }
@@ -505,7 +505,7 @@ public class DefaultPluginManager
                                                               + ". It requires a project with an existing pom.xml, but the build is not using one." );
         }
 
-        if ( mojoDescriptor.isOnlineRequired() && session.getSettings().isOffline() )
+        if ( mojoDescriptor.isOnlineRequired() && session.isOffline() )
         {
             // TODO: Should we error out, or simply warn and skip??
             throw new PluginExecutionException( mojoExecution, project,
