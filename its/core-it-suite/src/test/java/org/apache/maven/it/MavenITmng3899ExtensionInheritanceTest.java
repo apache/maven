@@ -37,7 +37,7 @@ public class MavenITmng3899ExtensionInheritanceTest
 
     public MavenITmng3899ExtensionInheritanceTest()
     {
-        super( "(2.99,)" );
+        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,)" );
     }
 
     /**
