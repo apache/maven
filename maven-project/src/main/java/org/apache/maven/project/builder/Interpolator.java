@@ -177,7 +177,8 @@ public class Interpolator {
                 if(mp.getUri().startsWith( ProjectUri.Build.xUri ) || mp.getUri().equals( ProjectUri.Reporting.outputDirectory ))
                 {
                     File file = new File(mp.getResolvedValue());
-                    if( !file.isAbsolute() && !mp.getResolvedValue().startsWith("${project.build."))
+                    if( !file.isAbsolute() && !mp.getResolvedValue().startsWith("${project.build.")
+                            && !mp.getResolvedValue().equals("${project.basedir}"))
                     {
                         buildDirectories.put(mp, new ModelProperty(mp.getUri(), new File(basedir, file.getPath()).getAbsolutePath()));
                     }
