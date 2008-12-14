@@ -81,20 +81,6 @@ public final class DefaultProjectBuilder
     }
 
     /**
-     * Constructor
-     *
-     * @param artifactFactory the artifact factory
-     */
-    protected DefaultProjectBuilder( ArtifactFactory artifactFactory )
-    {
-        if ( artifactFactory == null )
-        {
-            throw new IllegalArgumentException( "artifactFactory: null" );
-        }
-        this.artifactFactory = artifactFactory;
-    }
-
-    /**
      * @see ProjectBuilder#buildFromLocalPath(java.io.InputStream, java.util.List, java.util.Collection, java.util.Collection, org.apache.maven.project.builder.PomArtifactResolver, java.io.File, org.apache.maven.project.ProjectBuilderConfiguration)
      */
     public MavenProject buildFromLocalPath( InputStream pom, List<Model> inheritedModels,
@@ -186,8 +172,10 @@ public final class DefaultProjectBuilder
                                                                                                 listeners ) );                                                                                                
         try
         {
-            MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), artifactFactory,
-                                                          mavenTools, null,
+            MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), 
+                                                          artifactFactory, 
+                                                          mavenTools, 
+                                                          null, 
                                                           projectBuilderConfiguration );
             mavenProject.setParentFile( parentFile );
             return mavenProject;
@@ -227,11 +215,6 @@ public final class DefaultProjectBuilder
                                                                    PomArtifactResolver artifactResolver )
         throws IOException
     {
-        if ( artifactFactory == null )
-        {
-            throw new IllegalArgumentException( "artifactFactory: not initialized" );
-        }
-
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
 
         Parent parent = domainModel.getModel().getParent();
@@ -241,8 +224,8 @@ public final class DefaultProjectBuilder
             return domainModels;
         }
 
-        Artifact artifactParent =
-            artifactFactory.createParentArtifact( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+        Artifact artifactParent = artifactFactory.createParentArtifact( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+        
         artifactResolver.resolve( artifactParent );
 
         PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( artifactParent.getFile() );
@@ -273,12 +256,6 @@ public final class DefaultProjectBuilder
                                                                   File projectDirectory )
         throws IOException
     {
-
-        if ( artifactFactory == null )
-        {
-            throw new IllegalArgumentException( "artifactFactory: not initialized" );
-        }
-
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
 
         Parent parent = domainModel.getModel().getParent();

@@ -19,10 +19,13 @@ package org.apache.maven.project.builder;
  * under the License.
  */
 
-import org.apache.maven.shared.model.*;
-
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+
+import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.DomainModelFactory;
+import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.shared.model.ModelProperty;
 
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
@@ -43,6 +46,5 @@ public final class PomClassicTransformer
     {
         Interpolator.interpolateModelProperties( modelProperties, interpolatorProperties, (PomClassicDomainModel) domainModel);
     }
-
 }
 
