@@ -66,8 +66,6 @@ public class CLIManager
 
     public static final String SUPPRESS_PLUGIN_UPDATES = "npu";
 
-    public static final String SUPPRESS_PLUGIN_REGISTRY = "npr";
-
     public static final String SUPRESS_SNAPSHOT_UPDATES = "nsu";
 
     public static final char CHECKSUM_FAILURE_POLICY = 'C';
@@ -107,7 +105,6 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
         options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription( "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
         options.addOption( OptionBuilder.withLongOpt( "no-snapshot-updates" ).withDescription( "Supress SNAPSHOT updates" ).create( SUPRESS_SNAPSHOT_UPDATES ) );
-        options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Don't use ~/.m2/plugin-registry.xml for plugin versions" ).create( SUPPRESS_PLUGIN_REGISTRY ) );
         options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription( "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
         options.addOption( OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create( CHECKSUM_WARNING_POLICY ) );
         options.addOption( OptionBuilder.withLongOpt( "settings" ).withDescription( "Alternate path for the user settings file" ).hasArg().create( ALTERNATE_USER_SETTINGS ) );
