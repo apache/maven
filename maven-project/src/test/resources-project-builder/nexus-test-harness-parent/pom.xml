@@ -1,0 +1,344 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-test-harness</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <artifactId>nexus-test-harness-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>Nexus Test Harness Parent</name>
+
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>junit</groupId>
+  			<artifactId>junit</artifactId>
+  			<version>4.4</version>
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
+
+  <properties>
+    <nexus-bundle-name>nexus-webapp</nexus-bundle-name>
+    <bundle-expanded-dir>target/bundle</bundle-expanded-dir>
+    <config-expanded-dir>target/test-nexus-config</config-expanded-dir>
+
+    <emma-sources-base>target/emma/sources</emma-sources-base>
+
+    <proxy-repo-target-dir-name>proxyRepo</proxy-repo-target-dir-name>
+    <proxy-repo-target-dir>${project.build.directory}/test-classes/${proxy-repo-target-dir-name}</proxy-repo-target-dir>
+
+    <jetty-application-host>0.0.0.0</jetty-application-host>
+
+    <proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
+    <proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>
+
+    <nexus-abs-basedir>${project.build.directory}/bundle/${nexus-bundle-name}-${project.version}</nexus-abs-basedir>
+    <nexus-application-protocol>http</nexus-application-protocol>
+    <nexus-application-host>localhost</nexus-application-host>
+    <nexus-application-name>nexus</nexus-application-name>
+    <nexus-base-url>${nexus-application-protocol}://${nexus-application-host}:${nexus-application-port}/${nexus-application-name}/</nexus-base-url>
+    <nexus-plexus-config-file>${nexus-abs-basedir}/conf/plexus.xml</nexus-plexus-config-file>
+    <nexus-relative-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-relative-basedir>
+
+    <lib-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/lib</lib-target-dir>
+    <config-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/conf</config-target-dir>
+    <work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
+
+    <maven-version>2.0.9</maven-version>
+    <fake-central-repo>${project.build.testOutputDirectory}/fake-central</fake-central-repo>
+    <fake-maven>${project.build.directory}/apache-maven-${maven-version}</fake-maven>
+
+    <config-resource>${project.build.directory}/config-resources</config-resource>
+    <bundle-conf-resource>${project.build.directory}/bundle-conf-resource</bundle-conf-resource>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-webapp</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-simple-memory-realm</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <testResources>
+      <testResource>
+        <directory>${config-resource}</directory>
+        <filtering>true</filtering>
+      </testResource>
+
+      <testResource>
+        <directory>${bundle-conf-resource}</directory>
+        <filtering>true</filtering>
+        <targetPath>${nexus-abs-basedir}</targetPath>
+      </testResource>
+
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+        <excludes>
+          <exclude>**/*.zip</exclude>
+          <exclude>**/*.jar</exclude>
+          <exclude>**/fake-central/**</exclude>
+        </excludes>
+      </testResource>
+
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*.zip</include>
+          <include>**/*.jar</include>
+          <include>**/fake-central/**</include>
+        </includes>
+      </testResource>
+
+    </testResources>
+
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.1-SONATYPE-709464</version>
+        <executions>
+          <execution>
+            <id>unpack-bundle</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>nexus-webapp</includeArtifactIds>
+              <outputDirectory>${bundle-expanded-dir}</outputDirectory>
+              <excludes>**/conf/plexus.properties</excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-simple-memory-realm</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${lib-target-dir}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>get-emma</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>emma</groupId>
+                  <artifactId>emma</artifactId>
+                  <version>2.0.5312</version>
+                  <outputDirectory>${nexus-abs-basedir}/runtime/apps/nexus/lib/</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>get-sources-for-emma</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-indexer</artifactId>
+                  <version>${nexus.indexer.version}</version>
+                  <classifier>sources</classifier>
+                  <outputDirectory>${emma-sources-base}/nexus-indexer</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-rest-api</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>sources</classifier>
+                  <outputDirectory>${emma-sources-base}/nexus-rest-api</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-configuration</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>sources</classifier>
+                  <outputDirectory>${emma-sources-base}/nexus-configuration</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-app</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>sources</classifier>
+                  <outputDirectory>${emma-sources-base}/nexus-app</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-proxy</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>sources</classifier>
+                  <outputDirectory>${emma-sources-base}/nexus-proxy</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>unpack-config</id>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <phase>generate-test-resources</phase>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-test-harness-base</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>resources</classifier>
+                  <type>zip</type>
+                  <outputDirectory>${config-resource}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-test-harness-base</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle-conf</classifier>
+                  <type>zip</type>
+                  <outputDirectory>${bundle-conf-resource}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.maven.plugin</groupId>
+        <artifactId>emma4it-maven-plugin</artifactId>
+        <version>1.0</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}</directory>
+              <includes>
+                <include>coverage.ec</include>
+              </includes>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>port-allocator-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>reserve-nexus-ports</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>allocate-ports</goal>
+            </goals>
+            <configuration>
+              <ports>
+                <port>
+                  <name>proxy-repo-port</name>
+                </port>
+                <port>
+                  <name>proxy-repo-control-port</name>
+                </port>
+                <port>
+                  <name>nexus-application-port</name>
+                </port>
+                <port>
+                  <name>nexus-control-port</name>
+                </port>
+                <port>
+                  <name>email-server-port</name>
+                </port>
+                <port>
+                  <name>webproxy-server-port</name>
+                </port>
+              </ports>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.maven.plugin</groupId>
+        <artifactId>emma4it-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <searchPath>${basedir}</searchPath>
+          <sourceFolders>
+            <sourceFolder>${emma-sources-base}/nexus-proxy</sourceFolder>
+            <sourceFolder>${emma-sources-base}/nexus-app</sourceFolder>
+            <sourceFolder>${emma-sources-base}/nexus-configuration</sourceFolder>
+            <sourceFolder>${emma-sources-base}/nexus-rest-api</sourceFolder>
+            <sourceFolder>${emma-sources-base}/nexus-rest-model</sourceFolder>
+            <sourceFolder>${emma-sources-base}/nexus-indexer</sourceFolder>
+          </sourceFolders>
+          <jarFiles>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-proxy-${project.version}.jar</jarFile>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-app-${project.version}.jar</jarFile>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-configuration-${project.version}.jar</jarFile>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-rest-api-${project.version}.jar</jarFile>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-rest-model-${project.version}.jar</jarFile>
+            <jarFile>${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-indexer-${nexus.indexer.version}.jar</jarFile>
+          </jarFiles>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </reporting>
+
+</project>
