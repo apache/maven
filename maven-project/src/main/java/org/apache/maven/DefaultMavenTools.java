@@ -19,6 +19,10 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -26,14 +30,9 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
-import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MissingRepositoryElementException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author Jason van Zyl
