@@ -10,20 +10,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * This is a temporary class. These methods are originally from the DefaultMavenProjectHelper. This class will be
- * eliminated when Mercury is integrated.
+ * This is a temporary class. These methods are originally from the DefaultMavenProjectHelper. This
+ * class will be eliminated when Mercury is integrated.
  */
 public interface RepositoryHelper
 {
-    void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
-                                   ArtifactRepository localRepository )
+    void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
     List buildArtifactRepositories( Model model )
-        throws ProjectBuildingException;
-
-    LinkedHashSet collectInitialRepositories( Model model, Model superModel, List parentSearchRepositories,
-                                              File pomFile, boolean validProfilesXmlLocation,
-                                              ProfileActivationContext profileActivationContext )
         throws ProjectBuildingException;
 }

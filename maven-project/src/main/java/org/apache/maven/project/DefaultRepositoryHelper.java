@@ -19,22 +19,24 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -42,17 +44,7 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.*;
 
 /**
  * This is a temporary class. These methods are originally from the DefaultMavenProjectHelper. This class will be
@@ -153,36 +145,6 @@ public class DefaultRepositoryHelper
         }
     }
 
-    /*
-    * Order is:
-    *
-    * 1. model profile repositories
-    * 2. model repositories
-    * 3. superModel profile repositories
-    * 4. superModel repositories
-    * 5. parentSearchRepositories
-    */
-    public LinkedHashSet collectInitialRepositories( Model model, Model superModel, List parentSearchRepositories,
-                                                     File pomFile, boolean validProfilesXmlLocation,
-                                                     ProfileActivationContext profileActivationContext )
-        throws ProjectBuildingException
-    {
-        LinkedHashSet collected = new LinkedHashSet();
-
-        collectInitialRepositoriesFromModel( collected, model, pomFile, validProfilesXmlLocation,
-                                             profileActivationContext );
-
-        collectInitialRepositoriesFromModel( collected, superModel, null, validProfilesXmlLocation,
-                                             profileActivationContext );
-
-        if ( ( parentSearchRepositories != null ) && !parentSearchRepositories.isEmpty() )
-        {
-            collected.addAll( parentSearchRepositories );
-        }
-
-        return collected;
-    }
-
     private List normalizeToArtifactRepositories( List remoteArtifactRepositories, String projectId )
         throws ProjectBuildingException
     {
@@ -250,39 +212,6 @@ public class DefaultRepositoryHelper
 
         return ArtifactUtils.versionlessKey( gid, aid );
     }
-
-    private void collectInitialRepositoriesFromModel( LinkedHashSet collected, Model model, File pomFile,
-                                                      boolean validProfilesXmlLocation,
-                                                      ProfileActivationContext profileActivationContext )
-        throws ProjectBuildingException
-    {
-
-        Set reposFromProfiles = profileAdvisor.getArtifactRepositoriesFromActiveProfiles( model, pomFile,
-                                                                                          validProfilesXmlLocation,
-                                                                                          profileActivationContext );
-
-        if ( ( reposFromProfiles != null ) && !reposFromProfiles.isEmpty() )
-        {
-            collected.addAll( reposFromProfiles );
-        }
-
-        List modelRepos = model.getRepositories();
-
-        if ( ( modelRepos != null ) && !modelRepos.isEmpty() )
-        {
-            try
-            {
-                collected.addAll( mavenTools.buildArtifactRepositories( modelRepos ) );
-            }
-            catch ( InvalidRepositoryException e )
-            {
-                throw new ProjectBuildingException( safeVersionlessKey( model.getGroupId(), model.getArtifactId() ),
-                                                    "Failed to construct ArtifactRepository instances for repositories declared in: " +
-                                                        model.getId(), e );
-            }
-        }
-    }
-
 
     public void initialize()
         throws InitializationException
