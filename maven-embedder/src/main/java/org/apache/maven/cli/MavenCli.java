@@ -190,13 +190,24 @@ public class MavenCli
         }
         else
         {
-            userSettingsFile =  MavenEmbedder.DEFAULT_USER_SETTINGS_FILE;
+            userSettingsFile = MavenEmbedder.DEFAULT_USER_SETTINGS_FILE;
+        }
+
+        File globalSettingsFile;
+
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
+        {
+            globalSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
+        }
+        else
+        {
+            globalSettingsFile = MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE;
         }
 
         Configuration configuration = new DefaultConfiguration()
             .setErrorReporter( new DefaultCoreErrorReporter() )
             .setUserSettingsFile( userSettingsFile )
-            .setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE )
+            .setGlobalSettingsFile( globalSettingsFile )
             .setClassWorld( classWorld );
 
         if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
