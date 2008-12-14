@@ -17,7 +17,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model>
+<model xsd.namespace="http://maven.apache.org/PROFILES/1.0.0" 
+       xsd.target-namespace="http://maven.apache.org/PROFILES/1.0.0">
   <id>profiles</id>
   <name>Profiles</name>
   <description><![CDATA[
