@@ -55,7 +55,7 @@ public class DefaultMavenExecutionRequest
 
     private List profiles;
 
-    private List pluginGroups;
+    private List pluginGroups = new ArrayList();
 
     private boolean usePluginUpdateOverride;
 
