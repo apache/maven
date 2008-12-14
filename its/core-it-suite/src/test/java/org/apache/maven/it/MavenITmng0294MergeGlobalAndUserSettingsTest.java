@@ -36,7 +36,6 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
 {
     public MavenITmng0294MergeGlobalAndUserSettingsTest()
     {
-        super( "[,2.99.99)" );
     }
 
     /**
@@ -51,6 +50,13 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         systemProperties.put( "org.apache.maven.user-settings", "user-settings.xml" );
         systemProperties.put( "org.apache.maven.global-settings", "global-settings.xml" );
         verifier.setSystemProperties( systemProperties );
+        if ( matchesVersionRange( "(2.99,)" ) )
+        {
+            verifier.getCliOptions().add( "--settings" );
+            verifier.getCliOptions().add( new File( testDir, "user-settings.xml" ).getAbsolutePath() );
+            verifier.getCliOptions().add( "--global-settings" );
+            verifier.getCliOptions().add( new File( testDir, "global-settings.xml" ).getAbsolutePath() );
+        }
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.assertFilePresent( "target/test.txt" );
         verifier.verifyErrorFreeLog();
