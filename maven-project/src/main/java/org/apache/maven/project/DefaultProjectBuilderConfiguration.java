@@ -19,14 +19,13 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.shared.model.ModelEventListener;
-import org.codehaus.plexus.PlexusContainer;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.shared.model.ModelEventListener;
 
 public class DefaultProjectBuilderConfiguration
     implements ProjectBuilderConfiguration
@@ -39,6 +38,7 @@ public class DefaultProjectBuilderConfiguration
     
     private Properties userProperties;
 
+    //!!jvz Find out who added this. It's wrong, the execution properties are what come from the embedder setup not system properties. 
     private Properties executionProperties = System.getProperties();
 
     private Date buildStartTime;
