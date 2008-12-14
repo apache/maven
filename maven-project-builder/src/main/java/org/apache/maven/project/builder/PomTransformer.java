@@ -145,8 +145,17 @@ public class PomTransformer
         {
             for ( ModelContainer managementContainer : source.queryFor( ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri ) )
             {
-                managementContainer = new ArtifactModelContainerFactory().create(
-                    transformPluginManagement( managementContainer.getProperties() ) );
+                List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
+                for ( ModelProperty mp : managementContainer.getProperties() )
+                {
+                    if ( mp.getUri().startsWith( ProjectUri.DependencyManagement.xUri ) )
+                    {
+                        transformedProperties.add( new ModelProperty(
+                            mp.getUri().replace( ProjectUri.DependencyManagement.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
+                    }
+                }
+                
+                managementContainer = new ArtifactModelContainerFactory().create( transformedProperties );
 
                 //Remove duplicate executions tags
 
@@ -296,6 +305,20 @@ public class PomTransformer
         return factory.createDomainModel( props );
     }
 
+    private static List<ModelProperty> transformDependencyManagement( List<ModelProperty> modelProperties )
+    {
+        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
+        for ( ModelProperty mp : modelProperties )
+        {
+            if ( mp.getUri().startsWith( ProjectUri.DependencyManagement.xUri ) )
+            {
+                transformedProperties.add( new ModelProperty(
+                    mp.getUri().replace( ProjectUri.DependencyManagement.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
+            }
+        }
+        return transformedProperties;
+    }
+    
     /**
      * @see ModelTransformer#transformToModelProperties(java.util.List)
      */
@@ -749,35 +772,6 @@ public class PomTransformer
             }
         }
         return null;
-    }
-
-    private static List<ModelProperty> transformDependencyManagement( List<ModelProperty> modelProperties )
-    {
-        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.DependencyManagement.xUri ) )
-            {
-                transformedProperties.add( new ModelProperty(
-                    mp.getUri().replace( ProjectUri.DependencyManagement.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
-            }
-        }
-        return transformedProperties;
-    }
-
-    private static List<ModelProperty> transformPluginManagement( List<ModelProperty> modelProperties )
-    {
-        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.Build.PluginManagement.xUri ) )
-            {
-                transformedProperties.add( new ModelProperty(
-                    mp.getUri().replace( ProjectUri.Build.PluginManagement.xUri, ProjectUri.Build.xUri ),
-                    mp.getResolvedValue() ) );
-            }
-        }
-        return transformedProperties;
     }
 
     private static List<ModelProperty> transformPlugin( List<ModelProperty> modelProperties )
