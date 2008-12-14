@@ -108,7 +108,7 @@ public class DefaultCoreErrorReporter
         addTips( CoreErrorTips.getNoGoalsTips(), writer );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
-        writer.write( "Use \"mvn -?\" to show general usage information about Maven's command line." );
+        writer.write( "Use \"mvn --help\" to show general usage information about Maven's command line." );
         writer.write( NEWLINE );
         writer.write( NEWLINE );
 

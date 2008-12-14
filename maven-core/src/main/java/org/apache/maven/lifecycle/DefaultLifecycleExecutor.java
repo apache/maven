@@ -145,7 +145,7 @@ public class DefaultLifecycleExecutor
             buffer.append( "Please see\n" );
             buffer.append( "http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html\n" );
             buffer.append( "for a complete description of available lifecycle phases.\n\n" );
-            buffer.append( "Use \"mvn -?\" to show general usage information about Maven's command line.\n\n" );
+            buffer.append( "Use \"mvn --help\" to show general usage information about Maven's command line.\n\n" );
 
             throw new NoGoalsSpecifiedException( buffer.toString() );
         }
