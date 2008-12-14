@@ -155,13 +155,6 @@ public class DefaultMavenExecutionRequestPopulator
             request.setProperties( requestProperties );
         }
 
-        if ( requestProperties.getProperty( MavenEmbedder.STANDALONE_MODE ) == null )
-        {
-            // TODO: Remove this!
-            System.setProperty( MavenEmbedder.STANDALONE_MODE, "true" );
-            requestProperties.setProperty( MavenEmbedder.STANDALONE_MODE, "true" );
-        }
-
         Properties userProperties = request.getUserProperties();
         if ( userProperties != null )
         {
@@ -176,8 +169,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void realmManager( MavenExecutionRequest request,
-                               Configuration configuration )
+    private void realmManager( MavenExecutionRequest request, Configuration configuration )
     {
         if ( request.getRealmManager() == null )
         {
@@ -192,8 +184,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void processSettings( MavenExecutionRequest request,
-                                  Configuration configuration )
+    private void processSettings( MavenExecutionRequest request, Configuration configuration )
     {
         ProfileManager profileManager = request.getProfileManager();
 
@@ -263,8 +254,7 @@ public class DefaultMavenExecutionRequestPopulator
     // POM
     // ------------------------------------------------------------------------
 
-    private void pom( MavenExecutionRequest request,
-                      Configuration configuration )
+    private void pom( MavenExecutionRequest request, Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // POM
@@ -301,8 +291,7 @@ public class DefaultMavenExecutionRequestPopulator
     // Settings
     // ------------------------------------------------------------------------
 
-    private void settings( MavenExecutionRequest request,
-                           Configuration configuration )
+    private void settings( MavenExecutionRequest request, Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Settings
@@ -397,12 +386,6 @@ public class DefaultMavenExecutionRequestPopulator
     private void checksumPolicy( MavenExecutionRequest request,
                                  Configuration configuration )
     {
-        // ------------------------------------------------------------------------
-        // Repository Checksum Policies
-        //
-        // We take the checksum passed in via the request.
-        // ------------------------------------------------------------------------
-
         mavenTools.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
     }
 
@@ -410,14 +393,11 @@ public class DefaultMavenExecutionRequestPopulator
     // Artifact Transfer Mechanism
     // ------------------------------------------------------------------------
 
-    private void artifactTransferMechanism( MavenExecutionRequest request,
-                                            Configuration configuration )
+    private void artifactTransferMechanism( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
     {
         // ------------------------------------------------------------------------
         // Artifact Transfer Mechanism
-        //
-        //
         // ------------------------------------------------------------------------
 
         if ( request.isOffline() )
@@ -445,9 +425,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
         catch ( Exception e )
         {
-            throw new MavenEmbedderException(
-                "Unable to configure Maven for execution",
-                e );
+            throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
         }
     }
 
@@ -467,36 +445,20 @@ public class DefaultMavenExecutionRequestPopulator
                     throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
                 }
 
-                wagonManager.addProxy(
-                    proxy.getProtocol(),
-                    proxy.getHost(),
-                    proxy.getPort(),
-                    proxy.getUsername(),
-                    proxy.getPassword(),
-                    proxy.getNonProxyHosts() );
+                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
             }
 
             for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
             {
                 Server server = (Server) i.next();
 
-                wagonManager.addAuthenticationInfo(
-                    server.getId(),
-                    server.getUsername(),
-                    server.getPassword(),
-                    server.getPrivateKey(),
-                    server.getPassphrase() );
+                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(), server.getPrivateKey(), server.getPassphrase() );
 
-                wagonManager.addPermissionInfo(
-                    server.getId(),
-                    server.getFilePermissions(),
-                    server.getDirectoryPermissions() );
+                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
 
                 if ( server.getConfiguration() != null )
                 {
-                    wagonManager.addConfiguration(
-                        server.getId(),
-                        (Xpp3Dom) server.getConfiguration() );
+                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
                 }
             }
 
@@ -512,10 +474,7 @@ public class DefaultMavenExecutionRequestPopulator
             {
                 Mirror mirror = (Mirror) i.next();
 
-                wagonManager.addMirror(
-                    mirror.getId(),
-                    mirror.getMirrorOf(),
-                    mirror.getUrl() );
+                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
             }
         }
         finally
@@ -524,9 +483,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    public ArtifactRepository createLocalRepository( MavenExecutionRequest request,
-                                                     Settings settings,
-                                                     Configuration configuration ) 
+    public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings, Configuration configuration ) 
         throws MavenEmbedderException
     {
         String localRepositoryPath = null;
@@ -596,8 +553,7 @@ public class DefaultMavenExecutionRequestPopulator
     // Profile Manager
     // ------------------------------------------------------------------------
 
-    private void profileManager( MavenExecutionRequest request,
-                                 Configuration configuration )
+    private void profileManager( MavenExecutionRequest request, Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Profile Manager

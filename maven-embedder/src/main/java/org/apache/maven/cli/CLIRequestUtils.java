@@ -19,13 +19,6 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.maven.MavenTransferListener;
-import org.apache.maven.embedder.MavenEmbedder;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +27,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.maven.MavenTransferListener;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 
 public final class CLIRequestUtils
 {
@@ -258,9 +257,6 @@ public final class CLIRequestUtils
 
     static void populateProperties( CommandLine commandLine, Properties executionProperties, Properties userProperties )
     {
-        System.setProperty( MavenEmbedder.STANDALONE_MODE, "true" );
-        executionProperties.setProperty( MavenEmbedder.STANDALONE_MODE, "true" );
-
         // add the env vars to the property set, with the "env." prefix
         // XXX support for env vars should probably be removed from the ModelInterpolator
         try
