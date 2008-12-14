@@ -29,7 +29,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-lifecycle</artifactId>
   <name>Maven Lifecycle Model</name>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -49,7 +49,9 @@ under the License.
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
           <version>1.0.0</version>
-          <model>src/main/mdo/maven-lifecycle.mdo</model>
+          <models>
+            <model>src/main/mdo/maven-lifecycle.mdo</model>
+          </models>
         </configuration>
       </plugin>
     </plugins>

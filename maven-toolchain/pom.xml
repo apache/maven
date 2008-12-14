@@ -50,7 +50,9 @@
         <configuration>
           <version>1.0.0</version>
           <packageWithVersion>false</packageWithVersion>
-          <model>src/main/mdo/toolchains.xml</model>
+          <models>
+            <model>src/main/mdo/toolchains.xml</model>
+          </models>
         </configuration>
       </plugin>
     </plugins>

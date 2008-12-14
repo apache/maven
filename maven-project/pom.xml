@@ -56,11 +56,11 @@ under the License.
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
       <scope>test</scope>
-    </dependency>  
+    </dependency>
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
       <artifactId>wstx-asl</artifactId>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>model-builder</artifactId>
@@ -75,15 +75,17 @@ under the License.
      <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-      </plugin>        
+      </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
           <version>1.0.0</version>
-          <model>src/main/mdo/profiles.mdo</model>
+          <models>
+            <model>src/main/mdo/profiles.mdo</model>
+          </models>
         </configuration>
       </plugin>
     </plugins>
-  </build>  
+  </build>
 </project>

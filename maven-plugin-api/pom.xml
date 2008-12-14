@@ -46,7 +46,9 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
-          <model>src/main/mdo/lifecycle.mdo</model>
+          <models>
+            <model>src/main/mdo/lifecycle.mdo</model>
+          </models>
           <version>1.0.0</version>
         </configuration>
       </plugin>

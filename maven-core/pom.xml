@@ -126,7 +126,9 @@
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
           <version>1.0.0</version>
-          <model>src/main/mdo/settings.mdo</model>
+          <models>
+            <model>src/main/mdo/settings.mdo</model>
+          </models>
         </configuration>
       </plugin>
       <plugin>
