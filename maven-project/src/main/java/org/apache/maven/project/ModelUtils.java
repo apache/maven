@@ -1520,21 +1520,24 @@ public final class ModelUtils
     {
         Map depsMap = new LinkedHashMap();
 
-        if ( parent != null )
-        {
-            for ( Iterator it = parent.iterator(); it.hasNext(); )
-            {
-                Dependency dependency = (Dependency) it.next();
-                depsMap.put( dependency.getManagementKey(), dependency );
-            }
-        }
-
         if ( child != null )
         {
             for ( Iterator it = child.iterator(); it.hasNext(); )
             {
                 Dependency dependency = (Dependency) it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
+            }
+        }
+
+        if ( parent != null )
+        {
+            for ( Iterator it = parent.iterator(); it.hasNext(); )
+            {
+                Dependency dependency = (Dependency) it.next();
+                if ( !depsMap.containsKey( dependency.getManagementKey() ) )
+                {
+                    depsMap.put( dependency.getManagementKey(), dependency );
+                }
             }
         }
 

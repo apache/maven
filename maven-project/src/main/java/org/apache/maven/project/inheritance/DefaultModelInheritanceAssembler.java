@@ -34,7 +34,6 @@ import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -249,34 +248,7 @@ public class DefaultModelInheritanceAssembler
 
     private void assembleDependencyInheritance( Model child, Model parent )
     {
-        Map depsMap = new LinkedHashMap();
-
-        List deps = child.getDependencies();
-
-        if ( deps != null )
-        {
-            for ( Iterator it = deps.iterator(); it.hasNext(); )
-            {
-                Dependency dependency = (Dependency) it.next();
-                depsMap.put( dependency.getManagementKey(), dependency );
-            }
-        }
-
-        deps = parent.getDependencies();
-
-        if ( deps != null )
-        {
-            for ( Iterator it = deps.iterator(); it.hasNext(); )
-            {
-                Dependency dependency = (Dependency) it.next();
-                if ( !depsMap.containsKey( dependency.getManagementKey() ) )
-                {
-                    depsMap.put( dependency.getManagementKey(), dependency );
-                }
-            }
-        }
-
-        child.setDependencies( new ArrayList( depsMap.values() ) );
+        child.setDependencies( ModelUtils.mergeDependencyList( child.getDependencies(), parent.getDependencies() ) );
     }
 
     private void assembleBuildInheritance( Model child, Model parent )
