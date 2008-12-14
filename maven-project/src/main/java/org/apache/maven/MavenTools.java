@@ -21,9 +21,12 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -45,4 +48,15 @@ public interface MavenTools
 
     ArtifactRepository buildArtifactRepository( Repository repo )
         throws InvalidRepositoryException;
+    
+    ArtifactRepository createLocalRepository( String url, String repositoryId )
+        throws IOException;   
+
+    ArtifactRepository createRepository( String url, String repositoryId );
+    
+    ArtifactRepository createRepository( String url, String repositoryId, ArtifactRepositoryPolicy snapshotsPolicy, ArtifactRepositoryPolicy releasesPolicy );
+    
+    void setGlobalUpdatePolicy( String policy );
+    
+    void setGlobalChecksumPolicy( String policy );
 }

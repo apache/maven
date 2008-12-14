@@ -75,15 +75,6 @@ public class DefaultMavenProjectBuilder
     protected MavenProfilesBuilder profilesBuilder;
 
     @Requirement
-    protected ArtifactResolver artifactResolver;
-
-    @Requirement
-    protected ArtifactMetadataSource artifactMetadataSource;
-
-    @Requirement
-    private ArtifactFactory artifactFactory;
-
-    @Requirement
     private ModelValidator validator;
 
     @Requirement
@@ -101,6 +92,15 @@ public class DefaultMavenProjectBuilder
     private MavenXpp3Reader modelReader;
 
     private Logger logger;
+    
+    @Requirement
+    protected ArtifactResolver artifactResolver;
+
+    @Requirement
+    protected ArtifactMetadataSource artifactMetadataSource;
+
+    @Requirement
+    private ArtifactFactory artifactFactory;    
 
     //DO NOT USE, it is here only for backward compatibility reasons. The existing
     // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
@@ -135,22 +135,21 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-            MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver(
-                config.getLocalRepository(), repositoryHelper.buildArtifactRepositories(
-                getSuperProject( config, projectDescriptor, true ).getModel() ), artifactResolver ), config );
+        MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver( config.getLocalRepository(), repositoryHelper
+            .buildArtifactRepositories( getSuperProject( config, projectDescriptor, true ).getModel() ), artifactResolver ), config );
 
-            project.setFile( projectDescriptor );
-            project = buildWithProfiles( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
+        project.setFile( projectDescriptor );
+        project = buildWithProfiles( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
 
-            Build build = project.getBuild();
-            // NOTE: setting this script-source root before path translation, because
-            // the plugin tools compose basedir and scriptSourceRoot into a single file.
-            project.addScriptSourceRoot( build.getScriptSourceDirectory() );
-            project.addCompileSourceRoot( build.getSourceDirectory() );
-            project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
-            project.setFile( projectDescriptor );
+        Build build = project.getBuild();
+        // NOTE: setting this script-source root before path translation, because
+        // the plugin tools compose basedir and scriptSourceRoot into a single file.
+        project.addScriptSourceRoot( build.getScriptSourceDirectory() );
+        project.addCompileSourceRoot( build.getSourceDirectory() );
+        project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
+        project.setFile( projectDescriptor );
 
-            setBuildOutputDirectoryOnParent( project );
+        setBuildOutputDirectoryOnParent( project );
         return project;
     }
 
@@ -189,8 +188,7 @@ public class DefaultMavenProjectBuilder
             return project;
         }        
         
-        File f = (artifact.getFile() != null) ? artifact.getFile() :
-                new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );;
+        File f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
         repositoryHelper.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
@@ -200,7 +198,6 @@ public class DefaultMavenProjectBuilder
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
-     //   project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
         artifact.setFile( f );
         project.setVersion( artifact.getVersion() );
 
@@ -242,8 +239,10 @@ public class DefaultMavenProjectBuilder
         }
 
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(),
                 PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+        
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
                 PomInterpolatorTag.USER_PROPERTIES.name()));
 
@@ -482,6 +481,7 @@ public class DefaultMavenProjectBuilder
         }
 
         URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
+        
         String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
 
         Reader reader = null;
@@ -492,13 +492,13 @@ public class DefaultMavenProjectBuilder
 
             if ( modelSource.indexOf( "<modelVersion>" + MAVEN_MODEL_VERSION ) < 0 )
             {
-                throw new InvalidProjectModelException( projectId, "Not a v" + MAVEN_MODEL_VERSION + " POM.",
-                                                        new File( "." ) );
+                throw new InvalidProjectModelException( projectId, "Not a v" + MAVEN_MODEL_VERSION + " POM.", new File( "." ) );
             }
 
             StringReader sReader = new StringReader( modelSource );
 
             superModel = modelReader.read( sReader, STRICT_MODEL_PARSING );
+            
             return superModel;
         }
         catch ( XmlPullParserException e )
@@ -526,14 +526,11 @@ public class DefaultMavenProjectBuilder
             throw new IllegalArgumentException( "projectDescriptor: null, Project Id =" + projectId );
         }
 
-        if ( projectBuilder == null )
-        {
-            throw new IllegalArgumentException( "projectBuilder: not initialized" );
-        }
-
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), 
                 PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+        
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
                 PomInterpolatorTag.USER_PROPERTIES.name()));
 
@@ -545,13 +542,19 @@ public class DefaultMavenProjectBuilder
         }
 
         interpolatorProperties.add(new InterpolatorProperty("${mavenVersion}", MavenProjectBuilder.STANDALONE_SUPERPOM_VERSION, PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+        
         MavenProject mavenProject;
+        
         try
         {
-            mavenProject = projectBuilder.buildFromLocalPath( new FileInputStream( projectDescriptor ), Arrays.asList(
-                getSuperProject( config, projectDescriptor, true ).getModel() ), null, interpolatorProperties, resolver,
-                                                                                 projectDescriptor.getParentFile(),
-                                                                                 config );
+            mavenProject = projectBuilder.buildFromLocalPath( new FileInputStream( projectDescriptor ), 
+                                                              Arrays.asList(
+                                                                            getSuperProject( config, projectDescriptor, true ).getModel() ), 
+                                                                            null, 
+                                                                            interpolatorProperties, 
+                                                                            resolver,
+                                                                            projectDescriptor.getParentFile(),
+                                                                            config );
         }
         catch ( IOException e )
         {

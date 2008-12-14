@@ -37,21 +37,20 @@ public interface MavenProjectBuilder
     // site
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;
-    
+
     // remote resources plugin
     MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository, boolean allowStub )
-        throws ProjectBuildingException;    
-    //
+        throws ProjectBuildingException;
 
     MavenProject build( File project, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
-    MavenProjectBuildingResult buildProjectWithDependencies( File project, ProjectBuilderConfiguration config )
+    MavenProjectBuildingResult buildProjectWithDependencies( File project, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
     MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
+    MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 }

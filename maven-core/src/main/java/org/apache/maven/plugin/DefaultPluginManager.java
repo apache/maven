@@ -558,17 +558,21 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
         Xpp3Dom dom = mojoExecution.getConfiguration();
+        
         if ( dom != null )
         {
             try
             {  
                 List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+                
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getExecutionProperties(),
                         PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+                
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(),
                         PomInterpolatorTag.USER_PROPERTIES.name()));
-                String interpolatedDom  =
-                        Interpolator.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
+                
+                String interpolatedDom  = Interpolator.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
+                
                 dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
             }
             catch ( XmlPullParserException e )

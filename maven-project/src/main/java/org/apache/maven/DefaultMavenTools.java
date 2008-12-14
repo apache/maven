@@ -19,6 +19,8 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +29,7 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
@@ -44,6 +47,9 @@ public class DefaultMavenTools
     @Requirement
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
+    @Requirement
+    private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
+    
     // ----------------------------------------------------------------------------
     // Code snagged from ProjectUtils: this will have to be moved somewhere else
     // but just trying to collect it all in one place right now.
@@ -140,4 +146,78 @@ public class DefaultMavenTools
 
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
     }
+    
+    // From MavenExecutionRequestPopulator
+    
+    public ArtifactRepository createLocalRepository( String url, String repositoryId )
+        throws IOException
+    {
+        return createRepository( canonicalFileUrl( url ), repositoryId );
+    }
+
+    private String canonicalFileUrl( String url )
+        throws IOException
+    {
+        if ( !url.startsWith( "file:" ) )
+        {
+            url = "file://" + url;
+        }
+        else if ( url.startsWith( "file:" ) && !url.startsWith( "file://" ) )
+        {
+            url = "file://" + url.substring( "file:".length() );
+        }
+
+        // So now we have an url of the form file://<path>
+
+        // We want to eliminate any relative path nonsense and lock down the path so we
+        // need to fully resolve it before any sub-modules use the path. This can happen
+        // when you are using a custom settings.xml that contains a relative path entry
+        // for the local repository setting.
+
+        File localRepository = new File( url.substring( "file://".length() ) );
+
+        if ( !localRepository.isAbsolute() )
+        {
+            url = "file://" + localRepository.getCanonicalPath();
+        }
+
+        return url;
+    }
+
+    public ArtifactRepository createRepository( String url,
+                                                String repositoryId )
+    {
+        // snapshots vs releases
+        // offline = to turning the update policy off
+
+        //TODO: we'll need to allow finer grained creation of repositories but this will do for now
+
+        String updatePolicyFlag = ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS;
+
+        String checksumPolicyFlag = ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
+
+        ArtifactRepositoryPolicy snapshotsPolicy = new ArtifactRepositoryPolicy( true, updatePolicyFlag, checksumPolicyFlag );
+
+        ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy( true, updatePolicyFlag, checksumPolicyFlag );
+
+        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
+    }
+    
+    public ArtifactRepository createRepository( String url,
+                                                String repositoryId,
+                                                ArtifactRepositoryPolicy snapshotsPolicy,
+                                                ArtifactRepositoryPolicy releasesPolicy )
+    {
+        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );        
+    }
+
+    public void setGlobalUpdatePolicy( String policy )
+    {
+        artifactRepositoryFactory.setGlobalUpdatePolicy( policy );
+    }
+
+    public void setGlobalChecksumPolicy( String policy )
+    {
+        artifactRepositoryFactory.setGlobalChecksumPolicy( policy );        
+    }    
 }

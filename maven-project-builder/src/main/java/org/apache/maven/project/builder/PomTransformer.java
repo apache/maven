@@ -169,13 +169,16 @@ public class PomTransformer
                     }
                 }
                 
-                List<ModelProperty> pList = new ArrayList<ModelProperty>();
+                List<ModelProperty> pList;
+                
                 if ( !hasExecutionsTag )
                 {
                     pList = managementContainer.getProperties();
                 }
                 else
                 {
+                    pList = new ArrayList<ModelProperty>();
+                    
                     for ( ModelProperty mp : managementContainer.getProperties() )
                     {
                         if ( !mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.Executions.xUri ) )
@@ -191,8 +194,8 @@ public class PomTransformer
 
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
                 {
-                    ModelDataSource dependencyDatasource = new DefaultModelDataSource();
-                    dependencyDatasource.init( pluginContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
+                    ModelDataSource pluginDatasource = new DefaultModelDataSource();
+                    pluginDatasource.init( pluginContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
                             new IdModelContainerFactory() ) );
 
                     ModelDataSource managementDatasource = new DefaultModelDataSource();
@@ -208,12 +211,12 @@ public class PomTransformer
 
                     source.join( pluginContainer, new ArtifactModelContainerFactory().create(managementPropertiesWithoutExecutions) );
 
-                    List<ModelContainer> dependencyExecutionContainers = dependencyDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
+                    List<ModelContainer> pluginExecutionContainers = pluginDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                     List<ModelContainer> joinedExecutionContainers = new ArrayList<ModelContainer>();
                  
                     for(ModelContainer a : managementExecutionContainers)
                     {
-                        for(ModelContainer b : dependencyExecutionContainers)
+                        for(ModelContainer b : pluginExecutionContainers)
                         {
                             if(b.containerAction(a).equals(ModelContainerAction.JOIN))
                             {
@@ -269,8 +272,8 @@ public class PomTransformer
             ModelDataSource executionSource = new DefaultModelDataSource();
             executionSource.init( pluginContainer.getProperties(),
                                   Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
-            List<ModelContainer> executionContainers =
-                executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
+            List<ModelContainer> executionContainers = executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
+            
             if ( executionContainers.size() < 2 )
             {
                 continue;
