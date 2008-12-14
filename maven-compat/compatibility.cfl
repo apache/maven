@@ -39,3 +39,7 @@ h3. Unsupported Compatibility
 * org.apache.maven.artifact.resolver.metadata.*
 * org.apache.maven.artifact.resolver.transform.*
 * org.apache.maven.artifact.resolver.versioning.*
+
+h2. Changes to the CLI
+* Log file support has been added i.e mvn -l log.txt clean install
+* Plugin registry option has not been supported in the core and it lagged around in the CLI

@@ -148,10 +148,9 @@ public class PomTransformer
                 List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
                 for ( ModelProperty mp : managementContainer.getProperties() )
                 {
-                    if ( mp.getUri().startsWith( ProjectUri.DependencyManagement.xUri ) )
+                    if ( mp.getUri().startsWith( ProjectUri.Build.PluginManagement.xUri ) )
                     {
-                        transformedProperties.add( new ModelProperty(
-                            mp.getUri().replace( ProjectUri.DependencyManagement.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
+                        transformedProperties.add( new ModelProperty( mp.getUri().replace( ProjectUri.Build.PluginManagement.xUri, ProjectUri.Build.xUri ), mp.getResolvedValue() ) );
                     }
                 }
                 

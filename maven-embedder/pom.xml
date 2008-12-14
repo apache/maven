@@ -56,11 +56,6 @@
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
     </dependency>
-    <!-- Needed for compat and cache-control aspects. -->
-    <dependency>
-      <groupId>aspectj</groupId>
-      <artifactId>aspectjrt</artifactId>
-    </dependency>
     <dependency>
       <groupId>easymock</groupId>
       <artifactId>easymock</artifactId>

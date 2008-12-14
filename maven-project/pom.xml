@@ -53,10 +53,6 @@ under the License.
       <artifactId>plexus-container-default</artifactId>
     </dependency>
     <dependency>
-      <groupId>aspectj</groupId>
-      <artifactId>aspectjrt</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
       <scope>test</scope>
@@ -66,8 +62,8 @@ under the License.
       <artifactId>wstx-asl</artifactId>
     </dependency> 
     <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-shared-model</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>model-builder</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
