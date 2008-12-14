@@ -34,8 +34,6 @@ import java.util.List;
  */
 public interface MavenTools
 {
-    String ROLE = MavenTools.class.getName();
-
     // ----------------------------------------------------------------------------
     // Methods taken from ProjectUtils
     // ----------------------------------------------------------------------------
