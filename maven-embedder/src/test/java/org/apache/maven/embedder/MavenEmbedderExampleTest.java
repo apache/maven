@@ -35,6 +35,8 @@ public class MavenEmbedderExampleTest
     public void testEmbedderExample()
         throws Exception
     {
+        /*
+          
         // START SNIPPET: simple-embedder-example
 
         File projectDirectory = new File( getBasedir(), "src/examples/simple-project" );
@@ -116,6 +118,8 @@ public class MavenEmbedderExampleTest
             // If the configuration is valid then do your thang ...
         }
         // END SNIPPET: mimic-cli
+    */
+        
     }
 
     public void testEmbedderExampleThatShowsAccessingThePlexusContainer()
@@ -142,6 +146,5 @@ public class MavenEmbedderExampleTest
         // Do what you like with the container ...
 
         // END SNIPPET: plexus-container
-    }
-
+    }            
 }
