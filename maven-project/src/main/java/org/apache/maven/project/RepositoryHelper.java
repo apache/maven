@@ -15,9 +15,6 @@ import java.util.List;
  */
 public interface RepositoryHelper
 {
-
-    String ROLE = RepositoryHelper.class.getName();
-
     void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                    ArtifactRepository localRepository )
         throws ProjectBuildingException;
