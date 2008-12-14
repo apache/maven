@@ -84,19 +84,12 @@ public class MavenCli
             return 1;
         }
 
-        // TODO: maybe classworlds could handle this requirement...
-        if ( "1.4".compareTo( System.getProperty( "java.specification.version" ) ) > 0 )
+        if ( "1.5".compareTo( System.getProperty( "java.specification.version" ) ) > 0 )
         {
-            System.err.println(
-                "Sorry, but JDK 1.4 or above is required to execute Maven. You appear to be using " + "Java:" );
-            System.err.println(
-                "java version \"" + System.getProperty( "java.version", "<unknown java version>" ) + "\"" );
-            System.err.println( System.getProperty( "java.runtime.name", "<unknown runtime name>" ) + " (build " +
-                System.getProperty( "java.runtime.version", "<unknown runtime version>" ) + ")" );
-            System.err.println( System.getProperty( "java.vm.name", "<unknown vm name>" ) + " (build " +
-                System.getProperty( "java.vm.version", "<unknown vm version>" ) + ", " +
-                System.getProperty( "java.vm.info", "<unknown vm info>" ) + ")" );
-
+            System.err.println();
+            System.err.println( "You need JDK 1.5 or above to execute Maven 3.x." );
+            System.err.println();
+            
             return 1;
         }
 
