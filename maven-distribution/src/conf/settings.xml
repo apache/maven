@@ -21,20 +21,20 @@ under the License.
  | This is the configuration file for Maven. It can be specified at two levels:
  |
  |  1. User Level. This settings.xml file provides configuration for a single user, 
- |                 and is normally provided in $HOME/.m2/settings.xml.
+ |                 and is normally provided in ${user.home}/.m2/settings.xml.
  |
- |                 NOTE: This location can be overridden with the system property:
+ |                 NOTE: This location can be overridden with the CLI option:
  |
- |                 -Dorg.apache.maven.user-settings=/path/to/user/settings.xml
+ |                 --settings /path/to/user/settings.xml
  |
- |  2. Global Level. This settings.xml file provides configuration for all maven
- |                 users on a machine (assuming they're all using the same maven
+ |  2. Global Level. This settings.xml file provides configuration for all Maven
+ |                 users on a machine (assuming they're all using the same Maven
  |                 installation). It's normally provided in 
  |                 ${maven.home}/conf/settings.xml.
  |
- |                 NOTE: This location can be overridden with the system property:
+ |                 NOTE: This location can be overridden with the CLI option:
  |
- |                 -Dorg.apache.maven.global-settings=/path/to/global/settings.xml
+ |                 --global-settings /path/to/global/settings.xml
  |
  | The sections in this sample file are intended to give you a running start at
  | getting the most out of your Maven installation. Where appropriate, the default
