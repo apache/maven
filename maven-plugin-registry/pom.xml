@@ -33,7 +33,9 @@ under the License.
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
           <version>1.0.0</version>
-          <model>plugin-registry.mdo</model>
+          <models>
+            <model>plugin-registry.mdo</model>
+          </models>
         </configuration>
       </plugin>
     </plugins>

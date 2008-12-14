@@ -58,7 +58,9 @@ under the License.
         <configuration>
           <version>1.0.0</version>
           <packageWithVersion>false</packageWithVersion>
-          <model>src/main/mdo/toolchains.xml</model>
+          <models>
+            <model>src/main/mdo/toolchains.xml</model>
+          </models>
         </configuration>
       </plugin>
       <plugin>
@@ -66,7 +68,7 @@ under the License.
         <groupId>org.apache.maven.plugins</groupId>
         <executions>
           <execution>
-            <id>shading</id>                
+            <id>shading</id>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
