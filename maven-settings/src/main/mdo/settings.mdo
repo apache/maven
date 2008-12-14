@@ -19,7 +19,8 @@
   under the License.
 -->
 
-<model>
+<model xsd.namespace="http://maven.apache.org/SETTINGS/1.0.0" 
+       xsd.target-namespace="http://maven.apache.org/SETTINGS/1.0.0">
   <id>settings</id>
   <name>Settings</name>
   <description>
