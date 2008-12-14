@@ -66,7 +66,7 @@ public class MavenCliTest
             System.setProperty( "java.specification.version", "1.3" );
             assertEquals( 1, MavenCli.main( new String[] { "-h" }, classWorld ) );
             System.setProperty( "java.specification.version", "1.4" );
-            assertEquals( 0, MavenCli.main( new String[] { "-h" }, classWorld ) );
+            assertEquals( 1, MavenCli.main( new String[] { "-h" }, classWorld ) );
             System.setProperty( "java.specification.version", "1.5" );
             assertEquals( 0, MavenCli.main( new String[] { "-h" }, classWorld ) );
             System.setProperty( "java.specification.version", "1.6" );
