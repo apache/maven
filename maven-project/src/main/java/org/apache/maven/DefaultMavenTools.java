@@ -22,33 +22,56 @@ package org.apache.maven;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.DeploymentRepository;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.project.MissingRepositoryElementException;
+import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author Jason van Zyl
  */
 @Component(role = MavenTools.class)
 public class DefaultMavenTools
-    implements MavenTools
+    implements MavenTools, LogEnabled
 {
+    @Requirement
+    private ArtifactFactory artifactFactory;
+
+    @Requirement
+    private ArtifactResolver artifactResolver;
+    
     @Requirement
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     @Requirement
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
+        
+    @Requirement
+    private Logger logger;
+    
+    private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();
     
     // ----------------------------------------------------------------------------
     // Code snagged from ProjectUtils: this will have to be moved somewhere else
@@ -219,5 +242,136 @@ public class DefaultMavenTools
     public void setGlobalChecksumPolicy( String policy )
     {
         artifactRepositoryFactory.setGlobalChecksumPolicy( policy );        
-    }    
+    }
+    
+    // Taken from RepositoryHelper
+    
+    public void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+
+        if ( cache.containsKey( artifact.getId() ) )
+        {
+            artifact.setFile( cache.get( artifact.getId() ).getFile() );
+        }
+
+        String projectId = safeVersionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
+        remoteArtifactRepositories = normalizeToArtifactRepositories( remoteArtifactRepositories, projectId );
+
+        Artifact projectArtifact;
+
+        // if the artifact is not a POM, we need to construct a POM artifact based on the artifact parameter given.
+        if ( "pom".equals( artifact.getType() ) )
+        {
+            projectArtifact = artifact;
+        }
+        else
+        {
+            logger.debug( "Attempting to build MavenProject instance for Artifact (" + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ") of type: "
+                          + artifact.getType() + "; constructing POM artifact instead." );
+
+            projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
+        }
+
+        try
+        {
+            artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
+
+            File file = projectArtifact.getFile();
+            artifact.setFile( file );
+            cache.put( artifact.getId(), artifact );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new ProjectBuildingException( projectId, "Error getting POM for '" + projectId + "' from the repository: " + e.getMessage(), e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " + e.getMessage(), e );
+        }
+    }
+
+    public List buildArtifactRepositories( Model model )
+        throws ProjectBuildingException
+    {
+        try
+        {
+            return buildArtifactRepositories( model.getRepositories() );
+        }
+        catch ( InvalidRepositoryException e )
+        {
+            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+
+            throw new ProjectBuildingException( projectId, e.getMessage(), e );
+        }
+    }
+
+    private List normalizeToArtifactRepositories( List remoteArtifactRepositories, String projectId )
+        throws ProjectBuildingException
+    {
+        List normalized = new ArrayList( remoteArtifactRepositories.size() );
+
+        boolean normalizationNeeded = false;
+        for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
+        {
+            Object item = it.next();
+
+            if ( item instanceof ArtifactRepository )
+            {
+                normalized.add( item );
+            }
+            else if ( item instanceof Repository )
+            {
+                Repository repo = (Repository) item;
+                try
+                {
+                    item = buildArtifactRepository( repo );
+
+                    normalized.add( item );
+                    normalizationNeeded = true;
+                }
+                catch ( InvalidRepositoryException e )
+                {
+                    throw new ProjectBuildingException( projectId, "Error building artifact repository for id: " + repo.getId(), e );
+                }
+            }
+            else
+            {
+                throw new ProjectBuildingException( projectId, "Error building artifact repository from non-repository information item: " + item );
+            }
+        }
+
+        if ( normalizationNeeded )
+        {
+            return normalized;
+        }
+        else
+        {
+            return remoteArtifactRepositories;
+        }
+    }
+
+    private String safeVersionlessKey( String groupId, String artifactId )
+    {
+        String gid = groupId;
+
+        if ( StringUtils.isEmpty( gid ) )
+        {
+            gid = "unknown";
+        }
+
+        String aid = artifactId;
+
+        if ( StringUtils.isEmpty( aid ) )
+        {
+            aid = "unknown";
+        }
+
+        return ArtifactUtils.versionlessKey( gid, aid );
+    }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
+    }
 }

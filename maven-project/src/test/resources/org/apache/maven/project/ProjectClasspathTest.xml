@@ -19,41 +19,6 @@ under the License.
 
 <plexus>
   <components>
-<!--Eliminate this component after Mercury Integration-->
-    <component>
-      <role>org.apache.maven.project.RepositoryHelper</role>
-      <implementation>org.apache.maven.project.DefaultRepositoryHelper</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.profiles.build.ProfileAdvisor</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
-          <role-hint>default</role-hint>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.MavenTools</role>
-        </requirement>
-      </requirements>
-    </component>       
-    <!-- Due to PLX-108, have to work around it...
-    <component>
-      <role>org.apache.maven.artifact.ArtifactResolver</role>
-      <implementation>org.apache.maven.project.TestArtifactResolvertion>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.artifact.manager.WagonManager</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-        </requirement>
-      </requirements>
-    </component>
-    -->
     <component>
       <role>org.apache.maven.profiles.injection.ProfileInjector</role>
       <role-hint>test</role-hint>
@@ -80,11 +45,6 @@ under the License.
       <role>org.apache.maven.project.TestArtifactResolver</role>
       <implementation>org.apache.maven.project.TestArtifactResolver</implementation>
       <requirements>
-        <!--
-        <requirement>
-          <role>org.apache.maven.artifact.manager.ArtifactManager</role>
-        </requirement>
-        -->
         <requirement>
           <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
         </requirement>
@@ -114,9 +74,6 @@ under the License.
       <role-hint>test</role-hint>
       <implementation>org.apache.maven.project.TestProjectBuilder</implementation>
       <requirements>
-        <requirement>
-             <role>org.apache.maven.project.RepositoryHelper</role>
-        </requirement>
         <requirement>
              <role>org.apache.maven.project.builder.ProjectBuilder</role>
         </requirement>

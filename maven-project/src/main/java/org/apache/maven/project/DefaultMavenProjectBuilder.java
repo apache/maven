@@ -19,8 +19,20 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.MavenTools;
-import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -41,9 +53,13 @@ import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.builder.*;
+import org.apache.maven.project.builder.Interpolator;
+import org.apache.maven.project.builder.PomArtifactResolver;
+import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
+import org.apache.maven.shared.model.InterpolatorProperty;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -53,15 +69,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URL;
-import java.util.*;
-import java.text.SimpleDateFormat;
 
 
 /**
@@ -85,9 +92,6 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     private ProjectBuilder projectBuilder;
-
-    @Requirement
-    private RepositoryHelper repositoryHelper;
     
     private MavenXpp3Reader modelReader;
 
@@ -135,7 +139,7 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver( config.getLocalRepository(), repositoryHelper
+        MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver( config.getLocalRepository(), mavenTools
             .buildArtifactRepositories( getSuperProject( config, projectDescriptor, true ).getModel() ), artifactResolver ), config );
 
         project.setFile( projectDescriptor );
@@ -189,12 +193,12 @@ public class DefaultMavenProjectBuilder
         }        
         
         File f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-        repositoryHelper.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
+        mavenTools.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
 
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
-        artifactRepositories.addAll( repositoryHelper.buildArtifactRepositories( getSuperProject( config, artifact.getFile(), false ).getModel() ) );
+        artifactRepositories.addAll( mavenTools.buildArtifactRepositories( getSuperProject( config, artifact.getFile(), false ).getModel() ) );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
