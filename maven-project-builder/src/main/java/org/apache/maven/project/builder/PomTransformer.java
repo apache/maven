@@ -19,11 +19,28 @@ package org.apache.maven.project.builder;
  * under the License.
  */
 
-import org.apache.maven.shared.model.*;
-import org.apache.maven.shared.model.impl.DefaultModelDataSource;
-
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.DomainModelFactory;
+import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.shared.model.ModelContainer;
+import org.apache.maven.shared.model.ModelContainerAction;
+import org.apache.maven.shared.model.ModelDataSource;
+import org.apache.maven.shared.model.ModelEventListener;
+import org.apache.maven.shared.model.ModelProperty;
+import org.apache.maven.shared.model.ModelTransformer;
+import org.apache.maven.shared.model.ModelTransformerContext;
+import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
@@ -38,13 +55,13 @@ public class PomTransformer
     {
         this.factory = factory;
     }
+    
     /**
      * The URIs this transformer supports
      */
     public static final Set<String> URIS = Collections.unmodifiableSet(new HashSet<String>( Arrays.asList(  ProjectUri.Build.Extensions.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.configuration,
-            //ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
 
@@ -263,14 +280,20 @@ public class PomTransformer
 
         //Rule: Do not join plugin executions without ids
         Set<ModelProperty> removeProperties = new HashSet<ModelProperty>();
+        
         ModelDataSource dataSource = new DefaultModelDataSource();
+        
         dataSource.init( props, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+        
         List<ModelContainer> containers = dataSource.queryFor( ProjectUri.Build.Plugins.Plugin.xUri );
+        
         for ( ModelContainer pluginContainer : containers )
         {
             ModelDataSource executionSource = new DefaultModelDataSource();
+            
             executionSource.init( pluginContainer.getProperties(),
                                   Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
+            
             List<ModelContainer> executionContainers = executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
             
             if ( executionContainers.size() < 2 )
@@ -279,19 +302,21 @@ public class PomTransformer
             }
 
             boolean hasAtLeastOneWithoutId = true;
+            
             for ( ModelContainer executionContainer : executionContainers )
             {
                 if ( hasAtLeastOneWithoutId )
                 {
                     hasAtLeastOneWithoutId = hasExecutionId( executionContainer );
                 }
-                if ( !hasAtLeastOneWithoutId && !hasExecutionId( executionContainer ) &&
-                    executionContainers.indexOf( executionContainer ) > 0 )
+                
+                if ( !hasAtLeastOneWithoutId && !hasExecutionId( executionContainer ) && executionContainers.indexOf( executionContainer ) > 0 )
                 {
                     removeProperties.addAll( executionContainer.getProperties() );
                 }
             }
         }
+        
         props.removeAll( removeProperties );
 
         for(ModelEventListener listener : eventListeners)
