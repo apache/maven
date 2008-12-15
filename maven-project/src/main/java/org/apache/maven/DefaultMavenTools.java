@@ -78,15 +78,13 @@ public class DefaultMavenTools
     // but just trying to collect it all in one place right now.
     // ----------------------------------------------------------------------------
 
-    public List buildArtifactRepositories( List repositories )
+    public List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories )
         throws InvalidRepositoryException
     {
-        List repos = new ArrayList();
+        List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
 
-        for ( Iterator i = repositories.iterator(); i.hasNext(); )
+        for( Repository mavenRepo : repositories )
         {
-            Repository mavenRepo = (Repository) i.next();
-
             ArtifactRepository artifactRepo = buildArtifactRepository( mavenRepo );
 
             if ( !repos.contains( artifactRepo ) )
@@ -94,6 +92,7 @@ public class DefaultMavenTools
                 repos.add( artifactRepo );
             }
         }
+        
         return repos;
     }
 
@@ -105,8 +104,7 @@ public class DefaultMavenTools
             String id = repo.getId();
             String url = repo.getUrl();
 
-            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(),
-                                                                                 repo.isUniqueVersion() );
+            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(), repo.isUniqueVersion() );
         }
         else
         {
@@ -207,8 +205,7 @@ public class DefaultMavenTools
         return url;
     }
 
-    public ArtifactRepository createRepository( String url,
-                                                String repositoryId )
+    public ArtifactRepository createRepository( String url, String repositoryId )
     {
         // snapshots vs releases
         // offline = to turning the update policy off
@@ -291,7 +288,7 @@ public class DefaultMavenTools
         }
     }
 
-    public List buildArtifactRepositories( Model model )
+    public List<ArtifactRepository> buildArtifactRepositories( Model model )
         throws ProjectBuildingException
     {
         try

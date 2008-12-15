@@ -41,7 +41,7 @@ public interface MavenTools
     // Methods taken from ProjectUtils
     // ----------------------------------------------------------------------------
 
-    List buildArtifactRepositories( List repositories )
+    List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories )
         throws InvalidRepositoryException;
 
     ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo )
