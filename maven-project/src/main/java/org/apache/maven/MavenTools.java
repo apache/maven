@@ -67,6 +67,7 @@ public interface MavenTools
         throws ProjectBuildingException;
 
     List buildArtifactRepositories( Model model )
-        throws ProjectBuildingException;
+        
+    throws ProjectBuildingException;
     
 }
