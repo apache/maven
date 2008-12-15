@@ -66,8 +66,7 @@ public interface MavenTools
     void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    List buildArtifactRepositories( Model model )
-        
-    throws ProjectBuildingException;
+    List buildArtifactRepositories( Model model )        
+        throws ProjectBuildingException;
     
 }
