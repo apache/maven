@@ -6,9 +6,9 @@
 
 % See the ``Article customise'' template for come common customisations
 
-\title{Maven Project Builder Specification}
-\author{Shane Isbell}
-
+\title{}
+\author{}
+\date{} % delete this line to display the current date
 
 \begin{document}
 
@@ -33,7 +33,7 @@ So a valid set would contain ordered pairs:
 
 Technically \begin{math}\mathcal{A}\end{math} is also ordered.
 
-Anyone is free to create a transformer from any another format (yaml, .NET projects files, etc) to this canonical data format, giving them all the benefits of project inheritance and interpolation that Maven uses in building a project.
+Any one is free to create a transformer from any another format (yaml, .NET projects files, etc) to this canonical data format, giving them all the benefits of project inheritance and interpolation that Maven uses in building a project.
 
 \subsubsection{Collections}
 A model property may  be specified as a collection, which allows specialized join rules for adding model properties. Collections of collections are allowed.
@@ -85,9 +85,6 @@ Let \begin{math}\mathcal{C''}\end{math} be the original set of model properties 
 
 \end{enumerate}
 
-\subsection{Model Containers}
-In addition to the general inheritance rules, there is also the concept of Model Containers, which allow the framework to delegate to specific model container implementations the decision of whether \#collections and \#sets should be joined, deleted, or have no operation applied. This will be covered more fully in section 3.
-
 \subsection{Mixins and Multiple Inheritance}
 Currently, Maven 3.0 supports linearlized inheritance, making mixins and multiple inheritance easy. Support for multiple inheritance would require an additional to the pom, within the parents section.
 
@@ -128,63 +125,28 @@ Mixins would function the same as multiple/single inheritance:
 The only difference between a parent project and a mixin is that the mixin is abstract (not a complete model).
 
 \section{Maven Project Inheritance Rules}
-These rules outlined in this section are provided in the PomTransformer class. The maven-shared-model framework will delegate to this transformer for the processing of the Maven specific domain model rules.
+These rules outlined in this section are provided in the PomClassicTransformer class. The shared-model framework will delegate to this transformer for the processing of the Maven specific domain model rules.
 
 \subsection{Inheriting Version and Group Ids}
 If \emph{project.version} is not specified within the child pom, the child pom will use the \emph{project.parent.version} as its own version. Similarly, if \emph{project.groupId} is not within the child pom, the child pom will use the \emph{project.parent.groupId} as its own \emph{project.groupId}.
 
-\subsection{Inheriting URLs}
-
-\subsection{Properties Excluded From Being Overridden}
-If the child project defines any of the properties below, they are not overridden by or joined with elements of the parent pom(s). 
-
-\begin{enumerate}
-\item project.build.resources
-\item project.build.testResoures
-\item project.pluginRepositories 
-\item project.organization 
-\item project.licenses
-\item project.developers
-\item project.contributors
-\item project.mailingLists
-\item project.ciManagement
-\item project.issueManagement
-\item project.distributionsManagement.repository
-\item project.distributionsManagement.snapshotRepository
-\item project.distributionsManagement.site
-\end{enumerate}
-
 \subsection{Properties Excluded From Inheritance}
-A child project does not inherit the following properties from its specified parent project\footnote{Technically, project.version, project.groupId and project.artifactId are not inherited from the parent pom. They do, however, have the values of project.parent.version, project.parent.groupId and project.parent.artifactId implicitly applied from the same pom.}. All other properties are inherited, unless otherwise noted below.
+A child project does not inherit the following properties from its specified parent project. All other properties are inherited, unless otherwise noted below.
 \begin{enumerate}
 \item project.parent
+\item project.modules
 \item project.name
 \item project.packaging
 \item project.profiles
 \item project.version
 \item project.groupId
-\item project.prerequisites
-\item project.distributionManagement.relocation
+\item project.build.resources
+\item project.build.testResoures
+\item project.pluginRepositories
 \end{enumerate}
 
-\subsection{Marking Containers as Final (Or Not Inherited)}
-A parent project can set an inherited property within the following elements of the pom. This will mark the container as final, thus preventing inheritance:
-\begin{enumerate}
-\item project.build.plugins.plugin
-\item project.build.plugins.plugin.executions.execution
-\item project.build.pluginManagement.plugins.plugin
-\item project.build.pluginManagement.plugins.plugin.executions.execution
-\item project.profiles.profile.build.plugins.plugin
-\item project.profiles.profile.build.plugins.plugin.executions.execution
-\item project.profiles.profile.build.pluginManagement.plugins.plugin
-\item project.profiles.profile.build.pluginManagement.plugins.plugin.executions.execution
-\item project.reporting.plugins.plugin
-\item project.reporting.plugins.plugin.reportSets.reportSet
-\item project.profiles.profile.reporting.plugins.plugin
-\item project.profiles.profile.reporting.plugins.plugin.reportSets.reportSet
-\end{enumerate}
+A parent project can set an inherited property within the \emph{project.build.plugins.plugin} or \emph{project.build.plugins.plugin.executions.execution} section of the pom to mark the member as private, thus preventing inheritance.
 
-Some examples demonstrating use within the project model:
 \begin{verbatim}
     <plugin>
         <groupId>org.apache.maven</groupId>
@@ -207,9 +169,17 @@ Some examples demonstrating use within the project model:
     </plugin>
 \end{verbatim}
 
+\subsection{Super Pom Rules}
+The super pom is implicitly  the parent of every project and functions as a normal parent project except that it allows the child project to inherit the following properties, which are normally excluded. If the child project defines the property,  it overrides all elements of the respective super pom property. There is no join of these three superPom-child collections.
+\begin{itemize}
+\item project.build.resources
+\item project.build.testResoures
+\item project.pluginRepositories 
+\end{itemize}
+
 \subsection{Artifact Inheritance (Model Container)}
 \subsubsection{Defined Nodes}
-Within the project there are a number of nodes which contain artifactId, groupId and version. These nodes may be inherited or joined.
+Within the project there are a number of nodes which contain artifactId, groupId and version. These nodes may be inherited or even joined.
 \begin{enumerate}
 \item project.dependencies.dependency
 \item project.build.plugins.plugin
@@ -218,78 +188,59 @@ Within the project there are a number of nodes which contain artifactId, groupId
 \item project.dependencyManagement.dependencies.dependency
 \item project.build.pluginManagement.plugins.plugin
 \item project.build.pluginManagement.plugins.plugin.dependencies.dependency
-\item project.reporting.plugins.plugin
-\item project.build.extensions.extension
 \end{enumerate}
-
 \subsubsection{Rules}
 Let the parent project be \begin{math}\mathcal{A}\end{math} and the child project be  \begin{math}\mathcal{B}\end{math} . Let both \begin{math}\alpha_i \subset \mathcal{A}\end{math} and \begin{math}\beta_i \subset \mathcal{B}\end{math} be one of the elements listed above. For example,  \begin{math}\alpha_1\end{math} would contain all the elements of a project dependency within the parent project.
 
-Both \begin{math}\alpha_i \subset \mathcal{A}\end{math} and \begin{math}\beta_i \subset \mathcal{A}\end{math}, contain at least the following elements:
-\begin{enumerate}
-\item project.groupId (required)
-\item project.artifactId (required)
-\item project.version (default value - null)
-\item project.type (default value - jar)
-\item project.classifier (default value - null)
-\end{enumerate}
-
-(1-3) may be values referencing project.parent.groupId, project.parent.artifactId, project.parent.version, where they are not explicitly defined.
-
-More precisely we have:
+Both \begin{math}\alpha_i \subset \mathcal{A}\end{math} and \begin{math}\beta_i \subset \mathcal{A}\end{math}, contain at least the elements groupId and artifactId, with an implied version value of null, if version is not specified within the pom. Also note that only (1), (3), (5) and (7) have an element of type, otherwise the type value is considered null. More precisely we have:
 
 \begin{math} \forall_i  \forall_j \alpha_i = \{\langle groupId, value_j \rangle_i, \langle artifactId, value_{j+1}\rangle_i, \langle version, value_{j+2}\rangle_i, \ldots\}.\end{math}
 
-Now define the following rules:
-
-\begin{enumerate}
-\item 
- \begin{math} R_1 \equiv  
-groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i} \wedge type(value)^{\alpha_i} = type(value)^{\beta_i}  \wedge classifier(value)^{\alpha_i} = classifier(value)^{\beta_i} 
-\end{math}
-\item 
- \begin{math} R_2 \equiv  
-version(value)^{\alpha_i} = version(value)^{\beta_i} 
-\end{math}
-\end{enumerate}
-
-
-The inheritance rules are JOIN, NOP, and DELETE:
+The inheritance rules are:
 
 \begin{enumerate}
 \item
 \begin{math}
-R_1 \wedge R_2 \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i - (\alpha_i \cap \beta_i)
+groupId(value)^{\alpha_i} \neq groupId(value)^{\beta_i} \vee artifactId(value)^{\alpha_i} \neq artifactId(value)^{\beta_i}  \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i 
 \end{math}
 \item
 \begin{math}
-\neg R_1\Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i 
+groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i}  \wedge version(value)^{\alpha_i} \neq version(value)^{\beta_i}  \wedge  type(value)^{\alpha_i} = type(value)^{\beta_i} \Rightarrow \mathcal{B}_{new} = \mathcal{B} - \alpha_i 
 \end{math}
 \item
 \begin{math}
-R_1 \wedge \neg R_2 \Rightarrow \mathcal{B}_{new} = \mathcal{B} \end{math}
+groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i}  \wedge version(value)^{\alpha_i} \neq version(value)^{\beta_i}  \wedge  type(value)^{\alpha_i} \neq type(value)^{\beta_i} \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i 
+\end{math}
+\item
+\begin{math}
+groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i}  \wedge version(value)^{\alpha_i} = version(value)^{\beta_i}  \wedge type(value)^{\alpha_i} = type(value)^{\beta_i} \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i - (\alpha_i \cap \beta_i)
+\end{math}
+\item
+\begin{math}
+groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i}  \wedge version(value)^{\alpha_i} = version(value)^{\beta_i}  \wedge type(value)^{\alpha_i} \neq type(value)^{\beta_i} \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i 
+\end{math}
+
 \end{enumerate}
 
-\subsubsection{Default Group IDs}
-To maintain backwards compatibility, the following elements are assigned a default groupId of \emph{org.apache.maven.plugins}, if the groupId is not specified. 
+Or more simply:
+
 \begin{enumerate}
-\item project.build.plugins.plugin
-\item project.profiles.profile.build.plugins.plugin
-\item project.build.pluginManagement.plugins.plugin
-\item project.build.profiles.profile.pluginManagement.plugins.plugin
-\item project.reporting.plugins.plugin
-\item project.profiles.profile.reporting.plugins.plugin
+\item if either groupId or artifactId is different, then inherit the node.
+\item if groupId, artifactId and type match but the version doesn't, then don't inherit the node.
+\item if groupId and artifactId  match but the version and types don't, then inherit the node.
+\item if groupId, artifactId, version and type match, then inherit and join the node.
+\item if groupId, artifactId, version match but type doesn't, then inherit the node
 \end{enumerate}
+
 
 \subsection{Id Inheritance (Model Container)}
 
 \subsubsection{Defined Nodes}
-Within the project there are a number of nodes which contain id. Each of the nodes below is an element of a collection, meaning there may be more than one. The ID is used to determine whether the containers should be joined, rather than just added to the collection..
+Within the project there are a number of nodes which contain id. These nodes may be inherited or even joined.
 \begin{enumerate}
 \item project.pluginRepositories.pluginRepository
 \item project.repositories.repository
 \item project.reporting.plugins.plugin.reportSets.reportSet
-\item project.profiles.profile
 \item project.build.plugins.plugin.executions.execution
 \end{enumerate}
 
@@ -314,8 +265,6 @@ Plugin nodes are treated as a set. If a child pom contains the same element as a
 \end{verbatim}
 
 If the parent pom contains an element that the child pom does not have, the element will be inherited.
-
-
 
 \section{Management Rules}
 \subsection{Dependency/Plugin Management}
