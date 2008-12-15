@@ -64,6 +64,23 @@ under the License.
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support/core-it-plugins</developerConnection>
     <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-it-support/core-it-plugins</url>
   </scm>
+  <distributionManagement>
+    <repository>
+      <id>maven.it</id>
+      <name>Apache Maven Integration Testing Repository</name>
+      <url>http://repository.sonatype.org/content/repositories/maven-it-plugins</url>
+    </repository>
+    <snapshotRepository>
+      <id>maven.it</id>
+      <name>${distMgmtSnapshotsName}</name>
+      <url>${distMgmtSnapshotsUrl}</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <properties>
+    <distMgmtSnapshotsName>Apache Maven Integration Testing Snapshot Repository</distMgmtSnapshotsName>
+    <distMgmtSnapshotsUrl>http://repository.sonatype.org/content/repositories/maven-it-plugin-snapshots</distMgmtSnapshotsUrl>
+  </properties>
 
   <build>
     <pluginManagement>
