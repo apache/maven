@@ -23,6 +23,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MavenIT0051Test
     extends AbstractMavenIntegrationTestCase
@@ -40,6 +42,9 @@ public class MavenIT0051Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0051" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        List cliOptions = new ArrayList();
+        cliOptions.add( "-DperformRelease=true" );
+        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "package" );
         verifier.assertFilePresent( "target/source-jar.txt" );
         verifier.assertFilePresent( "target/javadoc-jar.txt" );
