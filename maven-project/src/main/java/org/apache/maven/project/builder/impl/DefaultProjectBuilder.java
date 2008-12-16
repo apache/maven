@@ -21,7 +21,6 @@ package org.apache.maven.project.builder.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,15 +79,12 @@ public final class DefaultProjectBuilder
     {
     }
 
-    /**
-     * @see ProjectBuilder#buildFromLocalPath(java.io.InputStream, java.util.List, java.util.Collection, java.util.Collection, org.apache.maven.project.builder.PomArtifactResolver, java.io.File, org.apache.maven.project.ProjectBuilderConfiguration)
-     */
-    public MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels,
-                                            Collection<ImportModel> importModels,
-                                            Collection<InterpolatorProperty> interpolatorProperties,
-                                            PomArtifactResolver resolver, File projectDirectory,
-                                            ProjectBuilderConfiguration projectBuilderConfiguration )
-        throws IOException
+    public PomClassicDomainModel buildModel( File pom, List<Model> inheritedModels,
+                                             Collection<ImportModel> importModels,
+                                             Collection<InterpolatorProperty> interpolatorProperties,
+                                             PomArtifactResolver resolver, File projectDirectory,                                  
+                                             ProjectBuilderConfiguration projectBuilderConfiguration )
+        throws IOException    
     {
         if ( pom == null )
         {
@@ -143,14 +139,14 @@ public final class DefaultProjectBuilder
             {
                 mavenParents = getDomainModelParentsFromRepository( domainModel, resolver );
             }
-
+            
             if ( mavenParents.size() > 0 )
             {
                 PomClassicDomainModel dm = (PomClassicDomainModel) mavenParents.get( 0 );
                 parentFile = dm.getFile();
                 domainModel.setParentFile( parentFile );
             }
-
+            
             domainModels.addAll( mavenParents );
         }
 
@@ -169,15 +165,37 @@ public final class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 importModels,
                                                                                                 properties,
-                                                                                                listeners ) );                                                                                                
+                                                                                                listeners ) );  
+        transformedDomainModel.setParentFile( parentFile );
+        
+        return transformedDomainModel;
+    }
+    
+    public MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels,
+                                            Collection<ImportModel> importModels,
+                                            Collection<InterpolatorProperty> interpolatorProperties,
+                                            PomArtifactResolver resolver, File projectDirectory,
+                                            ProjectBuilderConfiguration projectBuilderConfiguration )
+        throws IOException
+    {
+        PomClassicDomainModel domainModel = buildModel( pom, 
+                                                        inheritedModels, 
+                                                        importModels, 
+                                                        interpolatorProperties, 
+                                                        resolver, 
+                                                        projectDirectory, 
+                                                        projectBuilderConfiguration );
+        
         try
         {
-            MavenProject mavenProject = new MavenProject( transformedDomainModel.getModel(), 
+            MavenProject mavenProject = new MavenProject( domainModel.getModel(), 
                                                           artifactFactory, 
                                                           mavenTools, 
                                                           null, 
                                                           projectBuilderConfiguration );
-            mavenProject.setParentFile( parentFile );
+            
+            mavenProject.setParentFile( domainModel.getParentFile() );
+            
             return mavenProject;
         }
         catch ( InvalidRepositoryException e )
