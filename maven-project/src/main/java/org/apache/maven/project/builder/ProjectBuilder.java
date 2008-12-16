@@ -50,7 +50,7 @@ public interface ProjectBuilder
      * @return a maven project for the specified input stream
      * @throws IOException if there is a problem in the construction of the maven project
      */
-    MavenProject buildFromLocalPath( InputStream pom, List<Model> inheritedModels, Collection<ImportModel> importModels,
+    MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels, Collection<ImportModel> importModels,
                                      Collection<InterpolatorProperty> interpolatorProperties,
                                      PomArtifactResolver resolver, File baseDirectory,
                                      ProjectBuilderConfiguration projectBuilderConfiguration )

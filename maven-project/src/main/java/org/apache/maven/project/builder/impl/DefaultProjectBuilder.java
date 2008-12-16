@@ -83,7 +83,7 @@ public final class DefaultProjectBuilder
     /**
      * @see ProjectBuilder#buildFromLocalPath(java.io.InputStream, java.util.List, java.util.Collection, java.util.Collection, org.apache.maven.project.builder.PomArtifactResolver, java.io.File, org.apache.maven.project.ProjectBuilderConfiguration)
      */
-    public MavenProject buildFromLocalPath( InputStream pom, List<Model> inheritedModels,
+    public MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels,
                                             Collection<ImportModel> importModels,
                                             Collection<InterpolatorProperty> interpolatorProperties,
                                             PomArtifactResolver resolver, File projectDirectory,

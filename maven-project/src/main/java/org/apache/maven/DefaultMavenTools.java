@@ -122,13 +122,12 @@ public class DefaultMavenTools
 
             if ( id == null || id.trim().length() < 1 )
             {
-                throw new MissingRepositoryElementException( "Repository ID must not be empty (URL is: " + url + ")." );
+                throw new InvalidRepositoryException( "Repository ID must not be empty (URL is: " + url + ").", url );
             }
 
-            if ( url == null || url.trim().length() < 1 )
+            if ( url == null || url.trim().length() < 1 )                
             {
-                throw new MissingRepositoryElementException( "Repository URL must not be empty (ID is: " + id + ").",
-                                                             id );
+                throw new InvalidRepositoryException( "Repository URL must not be empty (ID is: " + id + ").", id );
             }
 
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
@@ -169,7 +168,7 @@ public class DefaultMavenTools
     }
     
     // From MavenExecutionRequestPopulator
-    
+
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException
     {
@@ -371,4 +370,30 @@ public class DefaultMavenTools
     {
         this.logger = logger;
     }
+    
+    /**
+     * Resolves the specified artifact
+     *
+     * @param artifact the artifact to resolve
+     * @throws IOException if there is a problem resolving the artifact
+     */
+    public void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws IOException
+    {
+        File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+        artifact.setFile( artifactFile );
+
+        try
+        {
+            artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new IOException( e.getMessage() );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new IOException( e.getMessage() );
+        }
+    }    
 }

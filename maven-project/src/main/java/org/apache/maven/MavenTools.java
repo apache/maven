@@ -37,10 +37,6 @@ import java.util.List;
  */
 public interface MavenTools
 {
-    // ----------------------------------------------------------------------------
-    // Methods taken from ProjectUtils
-    // ----------------------------------------------------------------------------
-
     List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories )
         throws InvalidRepositoryException;
 
@@ -66,7 +62,11 @@ public interface MavenTools
     void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
-    List buildArtifactRepositories( Model model )        
+    List<ArtifactRepository> buildArtifactRepositories( Model model )        
         throws ProjectBuildingException;
     
+    // PomArtifactResolver
+    
+    void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws IOException;    
 }

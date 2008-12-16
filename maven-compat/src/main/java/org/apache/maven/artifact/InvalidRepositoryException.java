@@ -57,7 +57,7 @@ public class InvalidRepositoryException
         this.repositoryId = null;
     }
 
-    protected InvalidRepositoryException( String message,
+    public InvalidRepositoryException( String message,
                                           String repositoryId )
     {
         super( message );

@@ -20,7 +20,6 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -551,7 +550,7 @@ public class DefaultMavenProjectBuilder
         
         try
         {
-            mavenProject = projectBuilder.buildFromLocalPath( new FileInputStream( projectDescriptor ), 
+            mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor, 
                                                               Arrays.asList(
                                                                             getSuperProject( config, projectDescriptor, true ).getModel() ), 
                                                                             null, 

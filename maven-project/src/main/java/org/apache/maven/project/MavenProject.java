@@ -19,6 +19,21 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Stack;
+
 import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -60,21 +75,6 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Stack;
 
 /**
  * The concern of the project is provide runtime values based on the model. <p/>
@@ -195,14 +195,13 @@ public class MavenProject
         setModel( model );
     }
 
-    public MavenProject( Model model, ArtifactFactory artifactFactory, MavenTools mavenTools, MavenProjectBuilder mavenProjectBuilder,
-                         ProjectBuilderConfiguration projectBuilderConfiguration )
+    public MavenProject( Model model, ArtifactFactory artifactFactory, MavenTools mavenTools, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
         setModel( model );
-        this.artifactFactory = artifactFactory;
         this.mavenProjectBuilder = mavenProjectBuilder;
         this.projectBuilderConfiguration = projectBuilderConfiguration;
+        this.artifactFactory = artifactFactory;
         originalModel = model;
         DistributionManagement dm = model.getDistributionManagement();
 
@@ -354,16 +353,6 @@ public class MavenProject
                     e.printStackTrace();
                 }
             }
-            /*
-            else
-            {
-                try {
-                    parent = mavenProjectBuilder.buildStandaloneSuperProject(projectBuilderConfiguration);
-                } catch (ProjectBuildingException e) {
-                    e.printStackTrace();  
-                }
-            }
-            */
         }
         return parent;
     }
