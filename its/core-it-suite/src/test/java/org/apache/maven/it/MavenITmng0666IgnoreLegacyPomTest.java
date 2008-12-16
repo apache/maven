@@ -27,7 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class MavenIT0059Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-666">MNG-666</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0666IgnoreLegacyPomTest
     extends AbstractMavenIntegrationTestCase
 {
 
@@ -35,10 +41,10 @@ public class MavenIT0059Test
      * Verify that maven-1 POMs will be ignored but not stop the resolution
      * process.
      */
-    public void testit0059()
+    public void testitMNG666()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0059" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0666" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.it0059" );
         Properties verifierProperties = new Properties();

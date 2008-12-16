@@ -23,27 +23,35 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-public class MavenIT0058Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-761">MNG-761</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng0761MissingSnapshotDistRepoTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng0761MissingSnapshotDistRepoTest()
+    {
+        super( "(2.0.2,)" );
+    }
+
     /**
-     * Verify that profiles from settings.xml do not pollute module lists
-     * across projects in a reactorized build.
+     * Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
+     * specified.
      */
-    public void testit0058()
+    public void testitMNG761()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0058" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0761" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings ./settings.xml" );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "subproject/target/subproject-1.0.jar" );
+        verifier.deleteArtifact( "org.apache.maven", "maven-it-it0062-SNAPSHOT", "1.0", "jar" );
+        verifier.executeGoal( "deploy" );
+        verifier.assertFilePresent( "target/classes/org/apache/maven/it0062/Person.class" );
+        verifier.assertFilePresent( "target/maven-it-it0062-1.0-SNAPSHOT.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

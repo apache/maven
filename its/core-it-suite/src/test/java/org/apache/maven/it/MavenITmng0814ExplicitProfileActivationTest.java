@@ -23,29 +23,33 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MavenIT0062Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-814">MNG-814</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0814ExplicitProfileActivationTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenIT0062Test()
-    {
-        super( "(2.0.2,)" );
-    }
-
     /**
-     * Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
-     * specified.
+     * Test activation of a profile from the command line.
      */
-    public void testit0062()
+    public void testitMNG814()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0062" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0814" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-it-it0062-SNAPSHOT", "1.0", "jar" );
-        verifier.executeGoal( "deploy" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0062/Person.class" );
-        verifier.assertFilePresent( "target/maven-it-it0062-1.0-SNAPSHOT.jar" );
+        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
+        List cliOptions = new ArrayList();
+        cliOptions.add( "-P test-profile" );
+        verifier.setCliOptions( cliOptions );
+        verifier.executeGoal( "compile" );
+        verifier.assertFilePresent( "target/classes/org/apache/maven/it0067/Person.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

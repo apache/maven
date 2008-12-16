@@ -26,17 +26,23 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MavenIT0069Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-768">MNG-768</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0768OfflineModeTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
      * Test offline mode.
      */
-    public void testit0069()
+    public void testitMNG768()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0069" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0768" );
 
         {
             // phase 1: run build in online mode to fill local repo

@@ -25,7 +25,8 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-249">MNG-249</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-249">MNG-249</a> and
+ * <a href="http://jira.codehaus.org/browse/MNG-870">MNG-870</a>.
  * 
  * @author Brett Porter
  * @version $Id$

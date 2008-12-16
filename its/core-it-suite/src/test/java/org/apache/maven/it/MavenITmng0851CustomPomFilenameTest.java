@@ -23,23 +23,32 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MavenIT0065Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-851">MNG-851</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0851CustomPomFilenameTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test that the basedir of the parent is set correctly.
+     * Test that nonstandard POM files will be installed correctly.
      */
-    public void testit0065()
+    public void testitMNG851()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0065" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0851" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0065", "plugin", "1.0", "maven-plugin" );
+        List cliOptions = new ArrayList();
+        cliOptions.add( "-f other-pom.xml" );
+        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "install" );
-        verifier.assertFilePresent( "subproject/target/child-basedir" );
-        verifier.assertFilePresent( "parent-basedir" );
+        verifier.assertFilePresent( "" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

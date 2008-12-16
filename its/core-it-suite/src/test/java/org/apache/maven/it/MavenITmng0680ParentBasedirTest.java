@@ -24,28 +24,31 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0061Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-680">MNG-680</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng0680ParentBasedirTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that deployment of artifacts to a legacy-layout repository
-     * results in a groupId directory of 'the.full.group.id' instead of
-     * 'the/full/group/id'.
+     * Test that the basedir of the parent is set correctly.
      */
-    public void testit0061()
+    public void testitMNG680()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0061" );
-
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0680" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
-        verifier.assertFilePresent( "target/test-repo/org.apache.maven.its.it0061/jars/maven-it-it0061-1.0.jar" );
-        verifier.assertFilePresent( "target/test-repo/org.apache.maven.its.it0061/poms/maven-it-it0061-1.0.pom" );
+        verifier.deleteArtifact( "org.apache.maven.its.it0065", "plugin", "1.0", "maven-plugin" );
+        verifier.executeGoal( "install" );
+        verifier.assertFilePresent( "subproject/target/child-basedir" );
+        verifier.assertFilePresent( "parent-basedir" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-    }
 
+    }
 }
+

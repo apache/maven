@@ -26,24 +26,30 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MavenIT0067Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-773">MNG-773</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0773SettingsProfileReactorPollutionTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test activation of a profile from the command line.
+     * Verify that profiles from settings.xml do not pollute module lists
+     * across projects in a reactorized build.
      */
-    public void testit0067()
+    public void testitMNG773()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0067" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0773" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
         List cliOptions = new ArrayList();
-        cliOptions.add( "-P test-profile" );
+        cliOptions.add( "--settings settings.xml" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0067/Person.class" );
+        verifier.executeGoal( "package" );
+        verifier.assertFilePresent( "subproject/target/subproject-1.0.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
