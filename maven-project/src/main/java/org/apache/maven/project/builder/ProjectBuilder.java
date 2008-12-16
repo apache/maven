@@ -34,9 +34,12 @@ import java.util.*;
  */
 public interface ProjectBuilder
 {
-
-    String ROLE = ProjectBuilder.class.getName();
-
+    public PomClassicDomainModel buildModel( File pom, List<Model> inheritedModels,
+                                             Collection<ImportModel> importModels,
+                                             Collection<InterpolatorProperty> interpolatorProperties,
+                                             PomArtifactResolver resolver, File projectDirectory,                                  
+                                             ProjectBuilderConfiguration projectBuilderConfiguration )
+        throws IOException;       
 
     /**
      * Returns a maven project for the specified input stream.
