@@ -302,10 +302,8 @@ public class DefaultMavenProjectBuilder
         {
             project = constructMavenProjectFromModel( project.getModel(), null, null, config );
             project.setActiveProfiles( activeProfiles );
-            project.setRemoteArtifactRepositories(
-                mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
-            project.setPluginArtifactRepositories(
-                mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
+            project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
+            project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -318,8 +316,7 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    public MavenProjectBuildingResult buildProjectWithDependencies( File projectDescriptor,
-                                                                    ProjectBuilderConfiguration config )
+    public MavenProjectBuildingResult buildProjectWithDependencies( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
         MavenProject project = build( projectDescriptor, config );
@@ -556,7 +553,6 @@ public class DefaultMavenProjectBuilder
                                                                             null, 
                                                                             interpolatorProperties, 
                                                                             resolver,
-                                                                            projectDescriptor.getParentFile(),
                                                                             config );
         }
         catch ( IOException e )
