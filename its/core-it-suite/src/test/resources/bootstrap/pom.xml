@@ -38,6 +38,17 @@ under the License.
   <!-- TODO: Remove once IT support plugins/artifacts have been released -->
   <repositories>
     <repository>
+      <id>maven.it</id>
+      <name>Apache Maven Integration Testing Snapshot Repository</name>
+      <url>http://repository.sonatype.org/content/repositories/maven.snapshots</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>apache.snapshots</id>
       <name>Apache Snapshot Repository</name>
       <url>http://people.apache.org/repo/m2-snapshot-repository</url>
@@ -50,6 +61,17 @@ under the License.
     </repository>
   </repositories>
   <pluginRepositories>
+    <pluginRepository>
+      <id>maven.it</id>
+      <name>Apache Maven Integration Testing Snapshot Repository</name>
+      <url>http://repository.sonatype.org/content/repositories/maven.snapshots</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
     <pluginRepository>
       <id>apache.snapshots</id>
       <name>Apache Snapshot Repository</name>
