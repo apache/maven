@@ -7,6 +7,8 @@ h2. Maven Remote Resources Plugin
 * org.apache.maven.project.inheritance.ModelInheritanceAssembler#assembleModelInheritance: used to walk the POMs to find out all the license information. This 
   functionality has been superceded by the model properties-based system for POM construction. We provide the same functionality using the model
   properties-based system but have just placed the component as-is in the maven-compat package to ensure the default lifecycle functions.
+* org.apache.maven.project.ProjectUtils: placed in the maven-compat package.
+
 h2. Maven Help Plugin
 * org.apache.maven.project.path.PathTranslator: used as a parameter in the EvaluateMojo. The path translator has been replaced the model builder
   and PomTransformer.
