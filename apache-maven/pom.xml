@@ -40,6 +40,17 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>basedir</name>
+              <value>${basedir}</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>1.2-SNAPSHOT</version>
         <executions>
