@@ -337,15 +337,4 @@ public final class DefaultProjectBuilder
     {
         this.logger = logger;
     }
-
-    private void validateModel( Model model )
-        throws IOException
-    {
-        ModelValidationResult validationResult = validator.validate( model );
-
-        if ( validationResult.getMessageCount() > 0 )
-        {
-            throw new IOException( "Failed to validate: " + validationResult.toString() );
-        }
-    }
 }
