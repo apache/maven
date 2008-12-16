@@ -38,6 +38,7 @@ import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.builder.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.IdModelContainerFactory;
 import org.apache.maven.project.builder.DefaultPomArtifactResolver;
+import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomClassicDomainModelFactory;
 import org.apache.maven.project.builder.PomClassicTransformer;
@@ -74,14 +75,9 @@ public final class DefaultProjectBuilder
 
     private Logger logger;
     
-    public DefaultProjectBuilder()
-    {
-    }
-
     public PomClassicDomainModel buildModel( File pom, List<Model> inheritedModels,
-                                             Collection<ImportModel> importModels,
                                              Collection<InterpolatorProperty> interpolatorProperties,
-                                             DefaultPomArtifactResolver resolver ) 
+                                             PomArtifactResolver resolver ) 
         throws IOException    
     {
         if ( pom == null )
@@ -156,7 +152,7 @@ public final class DefaultProjectBuilder
         PomClassicDomainModel transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( domainModels,
                                                                                                 transformer,
                                                                                                 transformer,
-                                                                                                importModels,
+                                                                                                Collections.EMPTY_LIST,
                                                                                                 properties,
                                                                                                 listeners ) );  
         transformedDomainModel.setParentFile( parentFile );
@@ -165,15 +161,13 @@ public final class DefaultProjectBuilder
     }
     
     public MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels,
-                                            Collection<ImportModel> importModels,
                                             Collection<InterpolatorProperty> interpolatorProperties,
-                                            DefaultPomArtifactResolver resolver, 
+                                            PomArtifactResolver resolver, 
                                             ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException
     {
         PomClassicDomainModel domainModel = buildModel( pom, 
                                                         inheritedModels, 
-                                                        importModels, 
                                                         interpolatorProperties, 
                                                         resolver ); 
         
@@ -221,7 +215,7 @@ public final class DefaultProjectBuilder
     }
 
     private List<DomainModel> getDomainModelParentsFromRepository( PomClassicDomainModel domainModel,
-                                                                   DefaultPomArtifactResolver artifactResolver )
+                                                                   PomArtifactResolver artifactResolver )
         throws IOException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
@@ -261,7 +255,7 @@ public final class DefaultProjectBuilder
      * @throws IOException
      */
     private List<DomainModel> getDomainModelParentsFromLocalPath( PomClassicDomainModel domainModel,
-                                                                  DefaultPomArtifactResolver artifactResolver,
+                                                                  PomArtifactResolver artifactResolver,
                                                                   File projectDirectory )
         throws IOException
     {

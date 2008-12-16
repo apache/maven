@@ -19,15 +19,15 @@ package org.apache.maven.project.builder;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.shared.model.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import org.apache.maven.shared.model.InterpolatorProperty;
 
 /**
  * Provides services for building maven projects from models.
@@ -36,9 +36,8 @@ public interface ProjectBuilder
 {
     public PomClassicDomainModel buildModel( File pom, 
                                              List<Model> inheritedModels,
-                                             Collection<ImportModel> importModels,
                                              Collection<InterpolatorProperty> interpolatorProperties,
-                                             DefaultPomArtifactResolver resolver ) 
+                                             PomArtifactResolver resolver ) 
         throws IOException;       
 
     /**
@@ -55,9 +54,8 @@ public interface ProjectBuilder
      */
     MavenProject buildFromLocalPath( File pom, 
                                      List<Model> inheritedModels, 
-                                     Collection<ImportModel> importModels,
                                      Collection<InterpolatorProperty> interpolatorProperties,
-                                     DefaultPomArtifactResolver resolver, 
+                                     PomArtifactResolver resolver, 
                                      ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException;
 

@@ -548,12 +548,10 @@ public class DefaultMavenProjectBuilder
         try
         {
             mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor, 
-                                                              Arrays.asList(
-                                                                            getSuperProject( config, projectDescriptor, true ).getModel() ), 
-                                                                            null, 
-                                                                            interpolatorProperties, 
-                                                                            resolver,
-                                                                            config );
+                                                              Arrays.asList( getSuperProject( config, projectDescriptor, true ).getModel() ), 
+                                                              interpolatorProperties, 
+                                                              resolver,
+                                                              config );
         }
         catch ( IOException e )
         {
