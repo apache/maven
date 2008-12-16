@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-282">MNG-282</a>.
@@ -45,9 +43,6 @@ public class MavenITmng0282NonReactorExecWhenProjectIndependentTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0282" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-no-project", "1.0", "maven-plugin" );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--no-plugin-registry" );
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-no-project:light-touch" );
         verifier.assertFilePresent( "target/touch.txt" );
         verifier.assertFileNotPresent( "subproject/target/touch.txt" );
