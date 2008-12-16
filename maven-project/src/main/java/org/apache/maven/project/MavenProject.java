@@ -161,11 +161,13 @@ public class MavenProject
 
     private Stack previousExecutionProjects = new Stack();
 
+    //!! Components that need to be taken out of here
     private ArtifactFactory artifactFactory;
 
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ProjectBuilderConfiguration projectBuilderConfiguration;
+    //
 
     private File parentFile;
 

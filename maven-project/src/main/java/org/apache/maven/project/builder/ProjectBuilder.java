@@ -38,8 +38,7 @@ public interface ProjectBuilder
                                              List<Model> inheritedModels,
                                              Collection<ImportModel> importModels,
                                              Collection<InterpolatorProperty> interpolatorProperties,
-                                             PomArtifactResolver resolver, 
-                                             ProjectBuilderConfiguration projectBuilderConfiguration )
+                                             DefaultPomArtifactResolver resolver ) 
         throws IOException;       
 
     /**
@@ -58,7 +57,7 @@ public interface ProjectBuilder
                                      List<Model> inheritedModels, 
                                      Collection<ImportModel> importModels,
                                      Collection<InterpolatorProperty> interpolatorProperties,
-                                     PomArtifactResolver resolver, 
+                                     DefaultPomArtifactResolver resolver, 
                                      ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException;
 

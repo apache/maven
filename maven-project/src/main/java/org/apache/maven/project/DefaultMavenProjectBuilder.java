@@ -53,7 +53,7 @@ import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.Interpolator;
-import org.apache.maven.project.builder.PomArtifactResolver;
+import org.apache.maven.project.builder.DefaultPomArtifactResolver;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.project.validation.ModelValidationResult;
@@ -138,7 +138,7 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new PomArtifactResolver( config.getLocalRepository(), mavenTools
+        MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new DefaultPomArtifactResolver( config.getLocalRepository(), mavenTools
             .buildArtifactRepositories( getSuperProject( config, projectDescriptor, true ).getModel() ), artifactResolver ), config );
 
         project.setFile( projectDescriptor );
@@ -199,7 +199,7 @@ public class DefaultMavenProjectBuilder
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
         artifactRepositories.addAll( mavenTools.buildArtifactRepositories( getSuperProject( config, artifact.getFile(), false ).getModel() ) );
 
-        project = readModelFromLocalPath( "unknown", artifact.getFile(), new PomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
+        project = readModelFromLocalPath( "unknown", artifact.getFile(), new DefaultPomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
         artifact.setFile( f );
         project.setVersion( artifact.getVersion() );
@@ -517,7 +517,7 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private MavenProject readModelFromLocalPath( String projectId, File projectDescriptor, PomArtifactResolver resolver,
+    private MavenProject readModelFromLocalPath( String projectId, File projectDescriptor, DefaultPomArtifactResolver resolver,
                                                  ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {

@@ -37,7 +37,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.builder.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.IdModelContainerFactory;
-import org.apache.maven.project.builder.PomArtifactResolver;
+import org.apache.maven.project.builder.DefaultPomArtifactResolver;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomClassicDomainModelFactory;
 import org.apache.maven.project.builder.PomClassicTransformer;
@@ -81,8 +81,7 @@ public final class DefaultProjectBuilder
     public PomClassicDomainModel buildModel( File pom, List<Model> inheritedModels,
                                              Collection<ImportModel> importModels,
                                              Collection<InterpolatorProperty> interpolatorProperties,
-                                             PomArtifactResolver resolver, 
-                                             ProjectBuilderConfiguration projectBuilderConfiguration )
+                                             DefaultPomArtifactResolver resolver ) 
         throws IOException    
     {
         if ( pom == null )
@@ -168,7 +167,7 @@ public final class DefaultProjectBuilder
     public MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels,
                                             Collection<ImportModel> importModels,
                                             Collection<InterpolatorProperty> interpolatorProperties,
-                                            PomArtifactResolver resolver, 
+                                            DefaultPomArtifactResolver resolver, 
                                             ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException
     {
@@ -176,8 +175,7 @@ public final class DefaultProjectBuilder
                                                         inheritedModels, 
                                                         importModels, 
                                                         interpolatorProperties, 
-                                                        resolver, 
-                                                        projectBuilderConfiguration );
+                                                        resolver ); 
         
         try
         {
@@ -223,7 +221,7 @@ public final class DefaultProjectBuilder
     }
 
     private List<DomainModel> getDomainModelParentsFromRepository( PomClassicDomainModel domainModel,
-                                                                   PomArtifactResolver artifactResolver )
+                                                                   DefaultPomArtifactResolver artifactResolver )
         throws IOException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
@@ -263,7 +261,7 @@ public final class DefaultProjectBuilder
      * @throws IOException
      */
     private List<DomainModel> getDomainModelParentsFromLocalPath( PomClassicDomainModel domainModel,
-                                                                  PomArtifactResolver artifactResolver,
+                                                                  DefaultPomArtifactResolver artifactResolver,
                                                                   File projectDirectory )
         throws IOException
     {
