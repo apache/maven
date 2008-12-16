@@ -34,10 +34,11 @@ import java.util.*;
  */
 public interface ProjectBuilder
 {
-    public PomClassicDomainModel buildModel( File pom, List<Model> inheritedModels,
+    public PomClassicDomainModel buildModel( File pom, 
+                                             List<Model> inheritedModels,
                                              Collection<ImportModel> importModels,
                                              Collection<InterpolatorProperty> interpolatorProperties,
-                                             PomArtifactResolver resolver, File projectDirectory,                                  
+                                             PomArtifactResolver resolver, 
                                              ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException;       
 
@@ -53,9 +54,11 @@ public interface ProjectBuilder
      * @return a maven project for the specified input stream
      * @throws IOException if there is a problem in the construction of the maven project
      */
-    MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels, Collection<ImportModel> importModels,
+    MavenProject buildFromLocalPath( File pom, 
+                                     List<Model> inheritedModels, 
+                                     Collection<ImportModel> importModels,
                                      Collection<InterpolatorProperty> interpolatorProperties,
-                                     PomArtifactResolver resolver, File baseDirectory,
+                                     PomArtifactResolver resolver, 
                                      ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException;
 

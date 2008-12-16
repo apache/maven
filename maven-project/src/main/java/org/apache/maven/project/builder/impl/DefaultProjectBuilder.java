@@ -42,7 +42,6 @@ import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomClassicDomainModelFactory;
 import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.builder.ProjectBuilder;
-import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.ImportModel;
@@ -82,7 +81,7 @@ public final class DefaultProjectBuilder
     public PomClassicDomainModel buildModel( File pom, List<Model> inheritedModels,
                                              Collection<ImportModel> importModels,
                                              Collection<InterpolatorProperty> interpolatorProperties,
-                                             PomArtifactResolver resolver, File projectDirectory,                                  
+                                             PomArtifactResolver resolver, 
                                              ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException    
     {
@@ -94,11 +93,6 @@ public final class DefaultProjectBuilder
         if ( resolver == null )
         {
             throw new IllegalArgumentException( "resolver: null" );
-        }
-
-        if ( projectDirectory == null )
-        {
-            throw new IllegalArgumentException( "projectDirectory: null" );
         }
 
         if ( inheritedModels == null )
@@ -122,7 +116,7 @@ public final class DefaultProjectBuilder
         }
 
         PomClassicDomainModel domainModel = new PomClassicDomainModel( pom );
-        domainModel.setProjectDirectory( projectDirectory );
+        domainModel.setProjectDirectory( pom.getParentFile() );
 
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
         domainModels.add( domainModel );
@@ -131,9 +125,9 @@ public final class DefaultProjectBuilder
         if ( domainModel.getModel().getParent() != null )
         {
             List<DomainModel> mavenParents;
-            if ( isParentLocal( domainModel.getModel().getParent(), projectDirectory ) )
+            if ( isParentLocal( domainModel.getModel().getParent(), pom.getParentFile() ) )
             {
-                mavenParents = getDomainModelParentsFromLocalPath( domainModel, resolver, projectDirectory );
+                mavenParents = getDomainModelParentsFromLocalPath( domainModel, resolver, pom.getParentFile() );
             }
             else
             {
@@ -174,7 +168,7 @@ public final class DefaultProjectBuilder
     public MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels,
                                             Collection<ImportModel> importModels,
                                             Collection<InterpolatorProperty> interpolatorProperties,
-                                            PomArtifactResolver resolver, File projectDirectory,
+                                            PomArtifactResolver resolver, 
                                             ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException
     {
@@ -183,7 +177,6 @@ public final class DefaultProjectBuilder
                                                         importModels, 
                                                         interpolatorProperties, 
                                                         resolver, 
-                                                        projectDirectory, 
                                                         projectBuilderConfiguration );
         
         try
