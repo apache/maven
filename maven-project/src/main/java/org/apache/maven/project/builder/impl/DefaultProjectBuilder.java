@@ -125,6 +125,7 @@ public final class DefaultProjectBuilder
         domainModels.add( domainModel );
 
         File parentFile = null;
+        int lineageCount = 0;
         if ( domainModel.getModel().getParent() != null )
         {
             List<DomainModel> mavenParents;
@@ -142,7 +143,7 @@ public final class DefaultProjectBuilder
                 PomClassicDomainModel dm = (PomClassicDomainModel) mavenParents.get( 0 );
                 parentFile = dm.getFile();
                 domainModel.setParentFile( parentFile );
-                domainModel.setLineageCount( mavenParents.size() );
+                lineageCount = mavenParents.size();
             }
             
             domainModels.addAll( mavenParents );
@@ -162,8 +163,10 @@ public final class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 transformer,
                                                                                                 Collections.EMPTY_LIST,
-                                                                                                properties,
-                                                                                                listeners ) );  
+                                                                                                properties,                                                                 
+                                                                                                listeners ) );
+        // Lineage count is inclusive to add the POM read in itself.
+        transformedDomainModel.setLineageCount( lineageCount + 1 );
         transformedDomainModel.setParentFile( parentFile );
         
         return transformedDomainModel;
