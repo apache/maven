@@ -52,7 +52,15 @@ public class PomConstructionTest
         
         PomArtifactResolver resolver = new FileBasedPomArtifactResolver( artifacts );
                 
+        // make a version that doesn't require a null mixin set. for most pom construction tests we're
+        // not going to use mixins.
         PomClassicDomainModel model = projectBuilder.buildModel( nexusLauncher, null, resolver );  
+        
+        // This will get extremely tedious unless we can shorten these into small expressions to
+        // retrieve the target values for testing.
+        
+        // model.build.plugins[0].executions
+        // model/build/plugins[0].executions
         
         Model m = model.getModel();
         
@@ -62,7 +70,9 @@ public class PomConstructionTest
         
         //assertEquals( 7, executions.size() );
     }
-
+    
+    // Need to get this to walk around a directory and automatically build up the artifact set. If we
+    // follow some standard conventions this can be simple.
     class FileBasedPomArtifactResolver
         implements PomArtifactResolver
     {
@@ -76,7 +86,6 @@ public class PomConstructionTest
         public void resolve( Artifact artifact )
             throws IOException
         {
-            System.out.println( artifact );
             artifact.setFile( artifacts.get(  artifact.getArtifactId() ) );
         }
     }
