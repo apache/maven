@@ -71,12 +71,12 @@ public final class MavenDependencyProcessor
 
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         interpolatorProperties.add( new InterpolatorProperty( "${mavenVersion}", "3.0-SNAPSHOT",
-                                                              PomInterpolatorTag.SYSTEM_PROPERTIES.name() ) );
+                                                              PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
 
         if ( system != null )
         {
             interpolatorProperties.addAll(
-                InterpolatorProperty.toInterpolatorProperties( system, PomInterpolatorTag.SYSTEM_PROPERTIES.name() ) );
+                InterpolatorProperty.toInterpolatorProperties( system, PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
         }
         if ( user != null )
         {

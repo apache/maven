@@ -22,9 +22,6 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +43,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
@@ -55,7 +51,6 @@ import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.DefaultPomArtifactResolver;
-import org.apache.maven.project.builder.Interpolator;
 import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProjectBuilder;
@@ -218,98 +213,34 @@ public class DefaultMavenProjectBuilder
 
     /**
      * This is used for pom-less execution like running archetype:generate.
+     * 
+     * I am taking out the profile handling and the interpolation of the base directory until we spec
+     * this out properly.
      */
     public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
-               
-        ProfileManager profileManager = config.getGlobalProfileManager();
-
-        List activeProfiles = new ArrayList();
-        if ( profileManager != null )
-        {
-            List activated = profileAdvisor.applyActivatedProfiles( superModel, null, false,
-                                                                    profileManager.getProfileActivationContext() );
-            if ( !activated.isEmpty() )
-            {
-                activeProfiles.addAll( activated );
-            }
-
-            activated = profileAdvisor.applyActivatedExternalProfiles( superModel, null, profileManager );
-            if ( !activated.isEmpty() )
-            {
-                activeProfiles.addAll( activated );
-            }
-        }
-
-        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+                       
+        MavenProject project = null;
         
-        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(),
-                PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
-        
-        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
-                PomInterpolatorTag.USER_PROPERTIES.name()));
-
-        if(config.getBuildStartTime() != null)
-        {
-            interpolatorProperties.add(new InterpolatorProperty("${build.timestamp}",
-                new SimpleDateFormat("yyyyMMdd-hhmm").format( config.getBuildStartTime() ),
-                PomInterpolatorTag.PROJECT_PROPERTIES.name()));
-        }
-
-        File basedir = null;
-        for(InterpolatorProperty ip : interpolatorProperties )
-        {
-            if(ip.getKey().equals("${basedir}"))
-            {
-                basedir = new File(ip.getValue());
-                break;
-            }
-        }
-
-        if(basedir == null)
-        {
-            String bd = System.getProperty("basedir");
-            if( bd != null )
-            {
-                basedir = new File(bd);
-            }
-        }
-
-        try
-        {
-            superModel = Interpolator.interpolateModel(superModel, interpolatorProperties, basedir );
-        }
-        catch (IOException e)
-        {
-            throw new ProjectBuildingException(STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID, "Interpolation failure:", e);
-        }
-
-        MavenProject project;
         try
         {
             project = new MavenProject( superModel, artifactFactory, mavenTools, this, config );
         }
         catch ( InvalidRepositoryException e )
         {
-            throw new ProjectBuildingException( STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID,
-                                                "Maven super-POM contains an invalid repository!", e );
+            // Not going to happen.
         }
-
-        getLogger().debug( "Activated the following profiles for standalone super-pom: " + activeProfiles );
 
         try
         {
-            project = constructMavenProjectFromModel( project.getModel(), null, null, config );
-            project.setActiveProfiles( activeProfiles );
             project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
             project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
         }
         catch ( InvalidRepositoryException e )
         {
-            throw new ProjectBuildingException( STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID,
-                                                "Maven super-POM contains an invalid repository!", e );
+            // Not going to happen.
         }
 
         project.setExecutionRoot( true );
@@ -391,7 +322,16 @@ public class DefaultMavenProjectBuilder
         
         try
         {
-            project = constructMavenProjectFromModel( model, projectDescriptor, parentDescriptor, config );
+            project = new MavenProject( model, artifactFactory, mavenTools, this, config );
+            
+            validateModel( model, projectDescriptor );
+
+            Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
+                                                                            project.getVersion(), project.getPackaging() );
+            project.setArtifact( projectArtifact );
+            
+            project.setParentFile( parentDescriptor );
+            
         }
         catch ( InvalidRepositoryException e )
         {
@@ -405,22 +345,6 @@ public class DefaultMavenProjectBuilder
         projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( project.getModel(), project.getFile(), externalProfileManager ) );
         
         project.setActiveProfiles( projectProfiles );
-
-        return project;
-    }
-
-    private MavenProject constructMavenProjectFromModel( Model model, File pomFile, File parentFile,
-                                                           ProjectBuilderConfiguration config )
-            throws ProjectBuildingException, InvalidRepositoryException
-    {
-
-        MavenProject project = new MavenProject( model, artifactFactory, mavenTools, this, config );
-        validateModel( model, pomFile );
-
-        Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
-                                                                        project.getVersion(), project.getPackaging() );
-        project.setArtifact( projectArtifact );
-        project.setParentFile( parentFile );
 
         return project;
     }
@@ -489,7 +413,7 @@ public class DefaultMavenProjectBuilder
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), 
-                PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+                PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
         
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(),
                 PomInterpolatorTag.USER_PROPERTIES.name()));
@@ -501,14 +425,14 @@ public class DefaultMavenProjectBuilder
                 PomInterpolatorTag.PROJECT_PROPERTIES.name()));
         }
 
-        interpolatorProperties.add(new InterpolatorProperty("${mavenVersion}", MavenProjectBuilder.STANDALONE_SUPERPOM_VERSION, PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+        interpolatorProperties.add(new InterpolatorProperty("${mavenVersion}", MavenProjectBuilder.STANDALONE_SUPERPOM_VERSION, PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
         
         MavenProject mavenProject;
         
         try
         {
             mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor, 
-                                                              Arrays.asList( getSuperProject( config, projectDescriptor ).getModel() ), 
+                                                              Arrays.asList( getSuperModel() ), 
                                                               interpolatorProperties, 
                                                               resolver,
                                                               config );

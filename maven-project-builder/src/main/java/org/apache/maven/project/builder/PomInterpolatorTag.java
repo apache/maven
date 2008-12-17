@@ -8,7 +8,5 @@ public enum PomInterpolatorTag
 
     PROJECT_PROPERTIES,
 
-    SYSTEM_PROPERTIES
-
-
+    EXECUTION_PROPERTIES
 }

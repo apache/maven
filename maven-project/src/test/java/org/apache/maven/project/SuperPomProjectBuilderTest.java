@@ -41,33 +41,6 @@ public class SuperPomProjectBuilderTest
         projectBuilder = lookup( MavenProjectBuilder.class );
     }
 
-    public void testStandaloneSuperPomContainsInjectedExternalProfileRepositories()
-        throws Exception
-    {
-        Profile profile = new Profile();
-        profile.setId( "test-profile" );
-
-        Repository repo = new Repository();
-        repo.setId( "test" );
-        repo.setUrl( "http://www.nowhere.com" );
-
-        profile.addRepository( repo );
-
-        ProfileManager pm = new DefaultProfileManager( getContainer(), new DefaultProfileActivationContext( new Properties(), true ) );
-
-        pm.addProfile( profile );
-        pm.explicitlyActivate( profile.getId() );
-
-        ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
-        pbc.setGlobalProfileManager( pm );
-        MavenProject project = projectBuilder.buildStandaloneSuperProject( pbc );
-
-        assertRepository( repo.getId(), project.getRepositories() );
-        assertRepository( repo.getId(), project.getPluginRepositories() );
-        assertArtifactRepository( repo.getId(), project.getRemoteArtifactRepositories() );
-        assertArtifactRepository( repo.getId(), project.getPluginArtifactRepositories() );
-    }
-
     public void testStandaloneSuperPomContainsCentralRepo()
         throws ProjectBuildingException
     {

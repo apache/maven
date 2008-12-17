@@ -566,7 +566,7 @@ public class DefaultPluginManager
                 List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
                 
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getExecutionProperties(),
-                        PomInterpolatorTag.SYSTEM_PROPERTIES.name()));
+                        PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
                 
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(),
                         PomInterpolatorTag.USER_PROPERTIES.name()));
