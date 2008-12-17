@@ -47,4 +47,3 @@ public final class PomClassicTransformer
         Interpolator.interpolateModelProperties( modelProperties, interpolatorProperties, (PomClassicDomainModel) domainModel);
     }
 }
-

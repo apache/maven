@@ -22,6 +22,8 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
@@ -137,8 +140,12 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new DefaultPomArtifactResolver( config.getLocalRepository(), mavenTools
-            .buildArtifactRepositories( getSuperModel() ), artifactResolver ), config );
+        List repositories = mavenTools.buildArtifactRepositories( getSuperModel() );
+        
+        MavenProject project = readModelFromLocalPath( "unknown", 
+                                                       projectDescriptor, 
+                                                       new DefaultPomArtifactResolver( config.getLocalRepository(), 
+                                                                                       repositories, artifactResolver ), config );
 
         project.setFile( projectDescriptor );
         
@@ -209,19 +216,14 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
+    /**
+     * This is used for pom-less execution like running archetype:generate.
+     */
     public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
         Model superModel = getSuperModel();
-
-        superModel.setGroupId( STANDALONE_SUPERPOM_GROUPID );
-
-        superModel.setArtifactId( STANDALONE_SUPERPOM_ARTIFACTID );
-
-        superModel.setVersion( STANDALONE_SUPERPOM_VERSION );
-
-        superModel = superModel;
-
+               
         ProfileManager profileManager = config.getGlobalProfileManager();
 
         List activeProfiles = new ArrayList();
@@ -277,7 +279,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            superModel = Interpolator.interpolateModel(superModel, interpolatorProperties, basedir);
+            superModel = Interpolator.interpolateModel(superModel, interpolatorProperties, basedir );
         }
         catch (IOException e)
         {
@@ -461,8 +463,8 @@ public class DefaultMavenProjectBuilder
         try
         {
             reader = ReaderFactory.newXmlReader( getClass().getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" ) );
-            
-            superModel = modelReader.read( reader, STRICT_MODEL_PARSING );            
+                        
+            superModel = modelReader.read( reader, STRICT_MODEL_PARSING );                  
         }
         catch ( Exception e )
         {
