@@ -39,7 +39,7 @@ public class MavenITmng3645POMSyntaxErrorTest
 {
     public MavenITmng3645POMSyntaxErrorTest()
     {
-        super( "(2.0.10,)" ); // only test in 2.0.10+
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // only test in 2.0.10+, but not 2.1.0-M1
     }
 
     public void testitMNG3645 ()
