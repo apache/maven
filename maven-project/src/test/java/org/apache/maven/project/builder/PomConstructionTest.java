@@ -14,6 +14,7 @@ import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.harness.PomTestWrapper;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class PomConstructionTest
@@ -42,13 +43,7 @@ public class PomConstructionTest
     {        
         Map<String,File> artifacts = new HashMap<String,File>();
                 
-        File nexusAggregator = new File( testDirectory, "nexus/pom.xml" );
-        File nexusParent = new File( testDirectory, "nexus/nexus-test-harness-parent/pom.xml" );
         File nexusLauncher = new File( testDirectory, "nexus/nexus-test-harness-launcher/pom.xml" );
-
-        artifacts.put( "nexus-test-harness-parent", nexusParent );
-        artifacts.put( "nexus-test-harness-launcher" , nexusLauncher );
-        artifacts.put( "nexus-test-harness", nexusAggregator );
         
         PomArtifactResolver resolver = new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, "nexus" ) );
                 
@@ -56,21 +51,16 @@ public class PomConstructionTest
         // not going to use mixins.
         PomClassicDomainModel model = projectBuilder.buildModel( nexusLauncher, null, resolver );  
         
+        // Make sure we actually processed our 3 POMs.
         assertEquals( 3, model.getLineageCount() );
         
-        // This will get extremely tedious unless we can shorten these into small expressions to
-        // retrieve the target values for testing.
+        PomTestWrapper pom = new PomTestWrapper( model );
         
-        // model.build.plugins[0].executions
-        // model/build/plugins[0].executions
+        assertEquals( "maven-dependency-plugin", pom.getValue( "build/plugins[1]/artifactId" ) );
         
-        Model m = model.getModel();
-        
-        Plugin plugin = (Plugin) m.getBuild().getPlugins().get( 0 );
-        
-        List executions = plugin.getExecutions();
-        
-        //assertEquals( 7, executions.size() );
+        List executions = (List) pom.getValue( "build/plugins[1]/executions" );
+                
+        assertEquals( 7, executions.size() );
     }
     
     // Need to get this to walk around a directory and automatically build up the artifact set. If we
