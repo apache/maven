@@ -298,8 +298,7 @@ public final class CLIRequestUtils
         executionProperties.putAll( System.getProperties() );
     }
 
-    private static void setCliProperty( String property,
-                                        Properties executionProperties )
+    private static void setCliProperty( String property, Properties executionProperties )
     {
         String name;
 

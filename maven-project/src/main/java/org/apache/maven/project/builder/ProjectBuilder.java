@@ -35,7 +35,7 @@ import org.apache.maven.shared.model.InterpolatorProperty;
 public interface ProjectBuilder
 {
     public PomClassicDomainModel buildModel( File pom, 
-                                             List<Model> inheritedModels,
+                                             List<Model> mixins,
                                              Collection<InterpolatorProperty> interpolatorProperties,
                                              PomArtifactResolver resolver ) 
         throws IOException;       
@@ -53,7 +53,7 @@ public interface ProjectBuilder
      * @throws IOException if there is a problem in the construction of the maven project
      */
     MavenProject buildFromLocalPath( File pom, 
-                                     List<Model> inheritedModels, 
+                                     List<Model> mixins, 
                                      Collection<InterpolatorProperty> interpolatorProperties,
                                      PomArtifactResolver resolver, 
                                      ProjectBuilderConfiguration projectBuilderConfiguration )

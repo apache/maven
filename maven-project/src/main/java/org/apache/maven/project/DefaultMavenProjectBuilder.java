@@ -22,7 +22,6 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,8 +51,9 @@ import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.builder.Interpolator;
 import org.apache.maven.project.builder.DefaultPomArtifactResolver;
+import org.apache.maven.project.builder.Interpolator;
+import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.project.validation.ModelValidationResult;
@@ -67,7 +67,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 
 /**
@@ -139,9 +138,10 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new DefaultPomArtifactResolver( config.getLocalRepository(), mavenTools
-            .buildArtifactRepositories( getSuperProject( config, projectDescriptor, true ).getModel() ), artifactResolver ), config );
+            .buildArtifactRepositories( getSuperModel() ), artifactResolver ), config );
 
         project.setFile( projectDescriptor );
+        
         project = buildWithProfiles( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
 
         Build build = project.getBuild();
@@ -174,7 +174,7 @@ public class DefaultMavenProjectBuilder
         }
     }
     
-    // This is used by the RR plugin
+    //!! This is used by the RR plugin
     public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository, boolean allowStubs )
         throws ProjectBuildingException
     {
@@ -197,7 +197,7 @@ public class DefaultMavenProjectBuilder
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
-        artifactRepositories.addAll( mavenTools.buildArtifactRepositories( getSuperProject( config, artifact.getFile(), false ).getModel() ) );
+        artifactRepositories.addAll( mavenTools.buildArtifactRepositories( getSuperModel() ) );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), new DefaultPomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
@@ -281,8 +281,7 @@ public class DefaultMavenProjectBuilder
         }
         catch (IOException e)
         {
-            throw new ProjectBuildingException(STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID,
-                                                "Interpolation failure:", e);
+            throw new ProjectBuildingException(STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID, "Interpolation failure:", e);
         }
 
         MavenProject project;
@@ -364,7 +363,9 @@ public class DefaultMavenProjectBuilder
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
         ProfileActivationContext profileActivationContext;
+        
         ProfileManager externalProfileManager = config.getGlobalProfileManager();
+        
         if ( externalProfileManager != null )
         {
             // used to trigger the caching of SystemProperties in the container context...
@@ -385,6 +386,7 @@ public class DefaultMavenProjectBuilder
         }
 
         MavenProject project;
+        
         try
         {
             project = constructMavenProjectFromModel( model, projectDescriptor, parentDescriptor, config );
@@ -395,10 +397,11 @@ public class DefaultMavenProjectBuilder
         }
 
         List<Profile> projectProfiles = new ArrayList<Profile>();
-        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( project.getModel(), project.getFile(),
-                                                                       isReactorProject, profileActivationContext ) );
-        projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( project.getModel(), project.getFile(),
-                                                                               externalProfileManager ) );
+        
+        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( project.getModel(), project.getFile(), isReactorProject, profileActivationContext ) );
+        
+        projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( project.getModel(), project.getFile(), externalProfileManager ) );
+        
         project.setActiveProfiles( projectProfiles );
 
         return project;
@@ -420,105 +423,60 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private MavenProject getSuperProject( ProjectBuilderConfiguration config, File projectDescriptor,
-                                          boolean isReactorProject )
-        throws ProjectBuildingException
+    private MavenProject superProject;
+    
+    private MavenProject getSuperProject( ProjectBuilderConfiguration config, File projectDescriptor )
     {
-
-        MavenProject superProject;
+        if ( superProject != null )
+        {
+            return superProject;
+        }
+        
         Model model = getSuperModel();
+
         try
         {
             superProject = new MavenProject( model, artifactFactory, mavenTools, this, config );
         }
         catch ( InvalidRepositoryException e )
         {
-            throw new ProjectBuildingException( STANDALONE_SUPERPOM_GROUPID + ":" + STANDALONE_SUPERPOM_ARTIFACTID,
-                                                "Maven super-POM contains an invalid repository!", e );
+            // Not going to happen as this exception is thrown when checking distributionManagement and the super pom
+            // doesn't have a distributionManagement section.
         }
-
-        String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-
-        ProfileActivationContext profileActivationContext;
-        ProfileManager externalProfileManager = config.getGlobalProfileManager();
-        if ( externalProfileManager != null )
-        {
-            // used to trigger the caching of SystemProperties in the container context...
-            try
-            {
-                externalProfileManager.getActiveProfiles();
-            }
-            catch ( ProfileActivationException e )
-            {
-                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.",
-                                                    projectDescriptor, e );
-            }
-            profileActivationContext = externalProfileManager.getProfileActivationContext();
-        }
-        else
-        {
-            profileActivationContext = new DefaultProfileActivationContext( config.getExecutionProperties(), false );
-        }
-
-        List<Profile> superProjectProfiles = new ArrayList<Profile>();
-        superProjectProfiles.addAll( profileAdvisor.applyActivatedProfiles( model, projectDescriptor, isReactorProject,
-                                                                            profileActivationContext ) );
-        superProjectProfiles.addAll(
-            profileAdvisor.applyActivatedExternalProfiles( model, projectDescriptor, externalProfileManager ) );
-        superProject.setActiveProfiles( superProjectProfiles );
 
         return superProject;
-    }
+    }    
 
     private Model superModel;
 
     private Model getSuperModel()
-        throws ProjectBuildingException
     {
         if ( superModel != null )
         {
             return superModel;
         }
 
-        URL url = DefaultMavenProjectBuilder.class.getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" );
-        
-        String projectId = safeVersionlessKey( STANDALONE_SUPERPOM_GROUPID, STANDALONE_SUPERPOM_ARTIFACTID );
-
         Reader reader = null;
+        
         try
         {
-            reader = ReaderFactory.newXmlReader( url.openStream() );
-            String modelSource = IOUtil.toString( reader );
-
-            if ( modelSource.indexOf( "<modelVersion>" + MAVEN_MODEL_VERSION ) < 0 )
-            {
-                throw new InvalidProjectModelException( projectId, "Not a v" + MAVEN_MODEL_VERSION + " POM.", new File( "." ) );
-            }
-
-            StringReader sReader = new StringReader( modelSource );
-
-            superModel = modelReader.read( sReader, STRICT_MODEL_PARSING );
+            reader = ReaderFactory.newXmlReader( getClass().getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" ) );
             
-            return superModel;
+            superModel = modelReader.read( reader, STRICT_MODEL_PARSING );            
         }
-        catch ( XmlPullParserException e )
+        catch ( Exception e )
         {
-            throw new InvalidProjectModelException( projectId, "Parse error reading POM. Reason: " + e.getMessage(),
-                                                    e );
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm() +
-                "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
+            // Not going to happen we're reading the super pom embedded in the JAR
         }
         finally
         {
-            IOUtil.close( reader );
+            IOUtil.close( reader );            
         }
+        
+        return superModel;        
     }
 
-    private MavenProject readModelFromLocalPath( String projectId, File projectDescriptor, DefaultPomArtifactResolver resolver,
-                                                 ProjectBuilderConfiguration config )
+    private MavenProject readModelFromLocalPath( String projectId, File projectDescriptor, PomArtifactResolver resolver, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
         if ( projectDescriptor == null )
@@ -548,7 +506,7 @@ public class DefaultMavenProjectBuilder
         try
         {
             mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor, 
-                                                              Arrays.asList( getSuperProject( config, projectDescriptor, true ).getModel() ), 
+                                                              Arrays.asList( getSuperProject( config, projectDescriptor ).getModel() ), 
                                                               interpolatorProperties, 
                                                               resolver,
                                                               config );

@@ -19,10 +19,10 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
 import java.io.File;
 import java.util.Iterator;
+
+import org.apache.maven.artifact.Artifact;
 
 /**
  * @todo relocate to maven-artifact in entirety

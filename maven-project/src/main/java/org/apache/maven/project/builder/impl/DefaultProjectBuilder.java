@@ -37,15 +37,12 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.builder.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.IdModelContainerFactory;
-import org.apache.maven.project.builder.DefaultPomArtifactResolver;
 import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomClassicDomainModelFactory;
 import org.apache.maven.project.builder.PomClassicTransformer;
 import org.apache.maven.project.builder.ProjectBuilder;
-import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.shared.model.DomainModel;
-import org.apache.maven.shared.model.ImportModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelEventListener;
 import org.apache.maven.shared.model.ModelTransformerContext;
@@ -65,9 +62,6 @@ public final class DefaultProjectBuilder
     private ArtifactFactory artifactFactory;
     
     @Requirement
-    private ModelValidator validator;
-
-    @Requirement
     private MavenTools mavenTools;
        
     @Requirement
@@ -75,7 +69,7 @@ public final class DefaultProjectBuilder
 
     private Logger logger;
     
-    public PomClassicDomainModel buildModel( File pom, List<Model> inheritedModels,
+    public PomClassicDomainModel buildModel( File pom, List<Model> mixins,
                                              Collection<InterpolatorProperty> interpolatorProperties,
                                              PomArtifactResolver resolver ) 
         throws IOException    
@@ -90,14 +84,14 @@ public final class DefaultProjectBuilder
             throw new IllegalArgumentException( "resolver: null" );
         }
 
-        if ( inheritedModels == null )
+        if ( mixins == null )
         {
-            inheritedModels = new ArrayList<Model>();
+            mixins = new ArrayList<Model>();
         }
         else
         {
-            inheritedModels = new ArrayList<Model>( inheritedModels );
-            Collections.reverse( inheritedModels );
+            mixins = new ArrayList<Model>( mixins );
+            Collections.reverse( mixins );
         }
 
         List<InterpolatorProperty> properties;
@@ -139,7 +133,7 @@ public final class DefaultProjectBuilder
             domainModels.addAll( mavenParents );
         }
 
-        for ( Model model : inheritedModels )
+        for ( Model model : mixins )
         {
             domainModels.add( new PomClassicDomainModel( model ) );
         }
@@ -209,7 +203,6 @@ public final class DefaultProjectBuilder
         }
         catch ( IOException e )
         {
-            e.printStackTrace();
             return false;
         }
     }
