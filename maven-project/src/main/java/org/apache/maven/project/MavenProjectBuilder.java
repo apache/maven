@@ -24,12 +24,6 @@ import java.util.List;
 
 public interface MavenProjectBuilder
 {
-    String STANDALONE_SUPERPOM_GROUPID = "org.apache.maven";
-
-    String STANDALONE_SUPERPOM_ARTIFACTID = "super-pom";
-
-    String STANDALONE_SUPERPOM_VERSION = "3.0-SNAPSHOT";
-
     boolean STRICT_MODEL_PARSING = true;
 
     // Used directly by plugins

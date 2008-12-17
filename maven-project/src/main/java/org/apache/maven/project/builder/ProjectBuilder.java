@@ -59,4 +59,5 @@ public interface ProjectBuilder
                                      ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException;
 
+    Model getSuperModel();
 }

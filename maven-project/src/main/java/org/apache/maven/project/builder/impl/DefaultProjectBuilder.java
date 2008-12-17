@@ -21,6 +21,7 @@ package org.apache.maven.project.builder.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.builder.ArtifactModelContainerFactory;
@@ -50,6 +52,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 
 /**
  * Default implementation of the project builder.
@@ -69,7 +73,8 @@ public final class DefaultProjectBuilder
 
     private Logger logger;
     
-    public PomClassicDomainModel buildModel( File pom, List<Model> mixins,
+    public PomClassicDomainModel buildModel( File pom, 
+                                             List<Model> mixins,
                                              Collection<InterpolatorProperty> interpolatorProperties,
                                              PomArtifactResolver resolver ) 
         throws IOException    
@@ -154,14 +159,15 @@ public final class DefaultProjectBuilder
         return transformedDomainModel;
     }
     
-    public MavenProject buildFromLocalPath( File pom, List<Model> inheritedModels,
+    public MavenProject buildFromLocalPath( File pom, 
+                                            List<Model> mixins,
                                             Collection<InterpolatorProperty> interpolatorProperties,
                                             PomArtifactResolver resolver, 
                                             ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException
     {
         PomClassicDomainModel domainModel = buildModel( pom, 
-                                                        inheritedModels, 
+                                                        mixins, 
                                                         interpolatorProperties, 
                                                         resolver ); 
         
@@ -310,9 +316,43 @@ public final class DefaultProjectBuilder
         return domainModels;
     }
 
-
     public void enableLogging( Logger logger )
     {
         this.logger = logger;
     }
+
+    // Super Model Handling
+    
+    private static final String MAVEN_MODEL_VERSION = "4.0.0";
+
+    private MavenXpp3Reader modelReader = new MavenXpp3Reader();
+
+    private Model superModel;
+
+    public Model getSuperModel()
+    {
+        if ( superModel != null )
+        {
+            return superModel;
+        }
+
+        Reader reader = null;
+        
+        try
+        {
+            reader = ReaderFactory.newXmlReader( getClass().getClassLoader().getResource( "org/apache/maven/project/pom-" + MAVEN_MODEL_VERSION + ".xml" ) );
+                        
+            superModel = modelReader.read( reader, true );                  
+        }
+        catch ( Exception e )
+        {
+            // Not going to happen we're reading the super pom embedded in the JAR
+        }
+        finally
+        {
+            IOUtil.close( reader );            
+        }
+        
+        return superModel;        
+    }        
 }

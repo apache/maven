@@ -21,7 +21,6 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +41,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
@@ -61,9 +59,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 
 
@@ -72,7 +67,7 @@ import org.codehaus.plexus.util.StringUtils;
  */
 @Component(role = MavenProjectBuilder.class)
 public class DefaultMavenProjectBuilder
-    implements MavenProjectBuilder, Initializable, LogEnabled
+    implements MavenProjectBuilder, LogEnabled
 {
     @Requirement
     protected MavenProfilesBuilder profilesBuilder;
@@ -89,8 +84,6 @@ public class DefaultMavenProjectBuilder
     @Requirement
     private ProjectBuilder projectBuilder;
     
-    private MavenXpp3Reader modelReader;
-
     private Logger logger;
     
     @Requirement
@@ -109,15 +102,8 @@ public class DefaultMavenProjectBuilder
 
     private Map processedProjectCache = new HashMap();
 
-    private static final String MAVEN_MODEL_VERSION = "4.0.0";
-
     private static HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();    
     
-    public void initialize()
-    {
-        modelReader = new MavenXpp3Reader();
-    }
-
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
@@ -134,8 +120,8 @@ public class DefaultMavenProjectBuilder
     
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
-    {
-        List repositories = mavenTools.buildArtifactRepositories( getSuperModel() );
+    {        
+        List repositories = mavenTools.buildArtifactRepositories( projectBuilder.getSuperModel() );
         
         MavenProject project = readModelFromLocalPath( "unknown", 
                                                        projectDescriptor, 
@@ -199,7 +185,7 @@ public class DefaultMavenProjectBuilder
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
-        artifactRepositories.addAll( mavenTools.buildArtifactRepositories( getSuperModel() ) );
+        artifactRepositories.addAll( mavenTools.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), new DefaultPomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
@@ -220,7 +206,7 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        Model superModel = getSuperModel();
+        Model superModel = projectBuilder.getSuperModel();
                        
         MavenProject project = null;
         
@@ -358,7 +344,7 @@ public class DefaultMavenProjectBuilder
             return superProject;
         }
         
-        Model model = getSuperModel();
+        Model model = projectBuilder.getSuperModel();
 
         try
         {
@@ -372,35 +358,6 @@ public class DefaultMavenProjectBuilder
 
         return superProject;
     }    
-
-    private Model superModel;
-
-    private Model getSuperModel()
-    {
-        if ( superModel != null )
-        {
-            return superModel;
-        }
-
-        Reader reader = null;
-        
-        try
-        {
-            reader = ReaderFactory.newXmlReader( getClass().getResource( "pom-" + MAVEN_MODEL_VERSION + ".xml" ) );
-                        
-            superModel = modelReader.read( reader, STRICT_MODEL_PARSING );                  
-        }
-        catch ( Exception e )
-        {
-            // Not going to happen we're reading the super pom embedded in the JAR
-        }
-        finally
-        {
-            IOUtil.close( reader );            
-        }
-        
-        return superModel;        
-    }
 
     private MavenProject readModelFromLocalPath( String projectId, File projectDescriptor, PomArtifactResolver resolver, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
@@ -424,15 +381,13 @@ public class DefaultMavenProjectBuilder
                 new SimpleDateFormat("yyyyMMdd-hhmm").format( config.getBuildStartTime() ),
                 PomInterpolatorTag.PROJECT_PROPERTIES.name()));
         }
-
-        interpolatorProperties.add(new InterpolatorProperty("${mavenVersion}", MavenProjectBuilder.STANDALONE_SUPERPOM_VERSION, PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
         
         MavenProject mavenProject;
         
         try
         {
             mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor, 
-                                                              Arrays.asList( getSuperModel() ), 
+                                                              Arrays.asList( projectBuilder.getSuperModel() ), 
                                                               interpolatorProperties, 
                                                               resolver,
                                                               config );
