@@ -86,7 +86,7 @@ Let \begin{math}\mathcal{C''}\end{math} be the original set of model properties 
 \end{enumerate}
 
 \subsection{Mixins and Multiple Inheritance}
-Currently, Maven 3.0 supports linearlized inheritance, making mixins and multiple inheritance easy. Support for multiple inheritance would require an additional to the pom, within the parents section.
+Currently, Maven 3.0 supports linearlized inheritance, making mixins and multiple inheritance easy. Support for multiple inheritance would require an addition to the pom, within the parents section.
 
 \begin{verbatim}
 <parents>
@@ -141,7 +141,7 @@ A child project does not inherit the following properties from its specified par
 \item project.version
 \item project.groupId
 \item project.build.resources
-\item project.build.testResoures
+\item project.build.testResources
 \item project.pluginRepositories
 \end{enumerate}
 
@@ -173,7 +173,7 @@ A parent project can set an inherited property within the \emph{project.build.pl
 The super pom is implicitly  the parent of every project and functions as a normal parent project except that it allows the child project to inherit the following properties, which are normally excluded. If the child project defines the property,  it overrides all elements of the respective super pom property. There is no join of these three superPom-child collections.
 \begin{itemize}
 \item project.build.resources
-\item project.build.testResoures
+\item project.build.testResources
 \item project.pluginRepositories 
 \end{itemize}
 
