@@ -8,13 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.maven.project.builder.PomClassicDomainModel;
-import org.apache.maven.shared.model.DataSourceException;
-import org.apache.maven.shared.model.ModelDataSource;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.impl.DefaultModelDataSource;
-
 import org.apache.maven.model.Model;
+import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.shared.model.ModelProperty;
 
 public class PomTestWrapper {
 
@@ -76,6 +72,10 @@ public class PomTestWrapper {
 	public boolean containsXPathExpression(String expression) {
 		return context.getValue(expression) != null;
 	}
+
+    public Object getValue(String expression) {
+        return context.getValue(expression);
+    }	
 	
 	public boolean xPathExpressionEqualsValue(String expression, String value) {
 		return context.getValue(expression) != null && context.getValue(expression).equals(value);
