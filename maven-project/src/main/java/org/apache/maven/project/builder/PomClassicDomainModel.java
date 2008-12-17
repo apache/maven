@@ -74,6 +74,8 @@ public final class PomClassicDomainModel
     private File projectDirectory;
 
     private List<ModelProperty> modelProperties;
+    
+    private int lineageCount;
 
     /**
      * Constructor
@@ -258,7 +260,6 @@ public final class PomClassicDomainModel
         }
         catch ( XmlPullParserException e )
         {
-            e.printStackTrace();
             throw new IOException( e.getMessage() );
         }
     }
@@ -314,6 +315,16 @@ public final class PomClassicDomainModel
             throw new IllegalArgumentException( "eventHistory: null" );
         }
         this.eventHistory = eventHistory;
+    }
+
+    public int getLineageCount()
+    {
+        return lineageCount;
+    }
+
+    public void setLineageCount( int lineageCount )
+    {
+        this.lineageCount = lineageCount;
     }
 
     /**

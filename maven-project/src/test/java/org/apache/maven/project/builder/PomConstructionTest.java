@@ -50,11 +50,13 @@ public class PomConstructionTest
         artifacts.put( "nexus-test-harness-launcher" , nexusLauncher );
         artifacts.put( "nexus-test-harness", nexusAggregator );
         
-        PomArtifactResolver resolver = new FileBasedPomArtifactResolver( artifacts );
+        PomArtifactResolver resolver = new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, "nexus" ) );
                 
         // make a version that doesn't require a null mixin set. for most pom construction tests we're
         // not going to use mixins.
         PomClassicDomainModel model = projectBuilder.buildModel( nexusLauncher, null, resolver );  
+        
+        assertEquals( 3, model.getLineageCount() );
         
         // This will get extremely tedious unless we can shorten these into small expressions to
         // retrieve the target values for testing.
@@ -68,7 +70,7 @@ public class PomConstructionTest
         
         List executions = plugin.getExecutions();
         
-        //assertEquals( 7, executions.size() );
+        assertEquals( 7, executions.size() );
     }
     
     // Need to get this to walk around a directory and automatically build up the artifact set. If we
@@ -78,6 +80,24 @@ public class PomConstructionTest
     {
         private Map<String,File> artifacts = new HashMap<String,File>();
         
+        private File basedir;
+                
+        public FileBasedPomArtifactResolver( File basedir )
+        {
+            this.basedir = basedir;
+                        
+            for ( File file : basedir.listFiles() )
+            {
+                String fileName = file.getName();                
+                if ( file.getName().endsWith( ".pom" ) )
+                {
+                    int i = fileName.indexOf( ".pom" );                    
+                    String id = fileName.substring( 0, i - 1 );
+                    artifacts.put( id, file );
+                }
+            }
+        }
+
         public FileBasedPomArtifactResolver( Map<String, File> artifacts )
         {
             this.artifacts = artifacts;

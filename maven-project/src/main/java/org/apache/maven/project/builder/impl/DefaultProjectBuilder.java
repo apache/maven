@@ -142,6 +142,7 @@ public final class DefaultProjectBuilder
                 PomClassicDomainModel dm = (PomClassicDomainModel) mavenParents.get( 0 );
                 parentFile = dm.getFile();
                 domainModel.setParentFile( parentFile );
+                domainModel.setLineageCount( mavenParents.size() );
             }
             
             domainModels.addAll( mavenParents );
@@ -210,10 +211,12 @@ public final class DefaultProjectBuilder
         try
         {
             File f = new File( projectDirectory, parent.getRelativePath() ).getCanonicalFile();
+            
             if ( f.isDirectory() )
             {
                 f = new File( f, "pom.xml" );
             }
+            
             return f.exists();
         }
         catch ( IOException e )
