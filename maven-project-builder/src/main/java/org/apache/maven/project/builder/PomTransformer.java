@@ -301,24 +301,23 @@ public class PomTransformer
                 continue;
             }
 
-            boolean hasAtLeastOneWithoutId = true;
+            boolean processedExecutionWithoutId = false;
             
             for ( ModelContainer executionContainer : executionContainers )
             {
-                if ( hasAtLeastOneWithoutId )
+                if ( !hasExecutionId( executionContainer ) )
                 {
-                    hasAtLeastOneWithoutId = hasExecutionId( executionContainer );
+                    processedExecutionWithoutId = true;
                 }
-                
-                if ( !hasAtLeastOneWithoutId && !hasExecutionId( executionContainer ) && executionContainers.indexOf( executionContainer ) > 0 )
+                else if ( !hasExecutionId( executionContainer ) && processedExecutionWithoutId )
                 {
                     removeProperties.addAll( executionContainer.getProperties() );
-                }
+                }                                
             }
         }
         
         props.removeAll( removeProperties );
-
+        
         for(ModelEventListener listener : eventListeners)
         {
             ModelDataSource ds = new DefaultModelDataSource();
@@ -752,7 +751,7 @@ public class PomTransformer
     private static boolean hasProjectUri( String projectUri, List<ModelProperty> modelProperties )
     {
         for ( ModelProperty mp : modelProperties )
-        {
+        {            
             if ( mp.getUri().equals( projectUri ) )
             {
                 return true;
