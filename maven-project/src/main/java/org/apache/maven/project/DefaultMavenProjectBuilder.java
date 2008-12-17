@@ -387,7 +387,7 @@ public class DefaultMavenProjectBuilder
         try
         {
             mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor, 
-                                                              Arrays.asList( projectBuilder.getSuperModel() ), 
+                                                              null, 
                                                               interpolatorProperties, 
                                                               resolver,
                                                               config );

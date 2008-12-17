@@ -35,7 +35,6 @@ import org.apache.maven.shared.model.InterpolatorProperty;
 public interface ProjectBuilder
 {
     public PomClassicDomainModel buildModel( File pom, 
-                                             List<Model> mixins,
                                              Collection<InterpolatorProperty> interpolatorProperties,
                                              PomArtifactResolver resolver ) 
         throws IOException;       

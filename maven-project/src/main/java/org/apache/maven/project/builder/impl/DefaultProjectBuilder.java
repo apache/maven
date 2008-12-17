@@ -72,6 +72,14 @@ public final class DefaultProjectBuilder
     List<ModelEventListener> listeners;
 
     private Logger logger;
+
+    public PomClassicDomainModel buildModel( File pom, 
+                                             Collection<InterpolatorProperty> interpolatorProperties,
+                                             PomArtifactResolver resolver )
+        throws IOException    
+    {
+        return buildModel( pom, null, interpolatorProperties, resolver );        
+    }    
     
     public PomClassicDomainModel buildModel( File pom, 
                                              List<Model> mixins,
@@ -92,6 +100,7 @@ public final class DefaultProjectBuilder
         if ( mixins == null )
         {
             mixins = new ArrayList<Model>();
+            mixins.add( getSuperModel() );            
         }
         else
         {
