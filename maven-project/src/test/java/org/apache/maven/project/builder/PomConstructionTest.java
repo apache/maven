@@ -8,12 +8,6 @@ import java.util.Map;
 
 import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.project.DefaultProjectBuilderConfiguration;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.codehaus.plexus.PlexusTestCase;
 
