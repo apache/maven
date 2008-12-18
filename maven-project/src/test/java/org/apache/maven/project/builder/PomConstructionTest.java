@@ -36,6 +36,12 @@ public class PomConstructionTest
         mavenTools = lookup( MavenTools.class );
     }
 
+    // Some better conventions for the test poms needs to be created and each of these tests
+    // that represent a verification of a specification item needs to be a couple lines at most.
+    // The expressions help a lot, but we need a clean to pick up a directory of POMs, automatically load
+    // them into a resolver, create the expression to extract the data to validate the Model, and the URI
+    // to validate the properties. We also need a way to navigate from the Tex specification documents to
+    // the test in question and vice versa. A little Eclipse plugin would do the trick.
     public void testThatAllPluginExecutionsWithIdsAreJoined()
         throws Exception
     {        
