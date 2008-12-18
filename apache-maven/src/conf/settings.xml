@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -67,6 +69,18 @@ under the License.
    | Default: false
   <offline>false</offline>
   -->
+
+  <!-- pluginGroups
+   | This is a list of additional group identifiers that will be searched when resolving plugins by their prefix, i.e.
+   | when invoking a command line like "mvn prefix:goal". Maven will automatically add the group identifiers
+   | "org.apache.maven.plugins" and "org.codehaus.mojo" if these are not already contained in the list.
+   |-->
+  <pluginGroups>
+    <!-- pluginGroup
+     | Specifies a further group identifier to use for plugin lookup.
+    <pluginGroup>com.your.plugins</pluginGroup>
+    -->
+  </pluginGroups>
 
   <!-- proxies
    | This is a list of proxies which can be used on this machine to connect to the network.
