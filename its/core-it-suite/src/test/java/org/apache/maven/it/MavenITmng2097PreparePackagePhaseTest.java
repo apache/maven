@@ -53,6 +53,22 @@ public class MavenITmng2097PreparePackagePhaseTest
         verifier.assertFilePresent( "target/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+        
+        new File( testDir, "target/touch.txt" ).delete();
+        verifier.assertFileNotPresent( "target/touch.txt" );
+        
+        verifier.executeGoal( "package" );
+        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+        
+        new File( testDir, "target/touch.txt" ).delete();
+        verifier.assertFileNotPresent( "target/touch.txt" );
+        
+        verifier.executeGoal( "test" );
+        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
     }
 
 }

@@ -6,6 +6,7 @@
   <description>Test plugin configuration that executes in the prepare-package phase.
         </description>
   <version>1.0</version>
+  <packaging>pom</packaging>
   <build>
     <plugins>
       <plugin>
