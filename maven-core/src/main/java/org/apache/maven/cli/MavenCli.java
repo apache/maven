@@ -54,6 +54,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -575,45 +576,58 @@ public class MavenCli
 
     private static void showVersion()
     {
-        InputStream resourceAsStream;
+        Properties properties = new Properties();
+        String timestamp = null;
+        String rev = null;
+        String version = null;
+
+        InputStream resourceAsStream = null;
         try
         {
-            Properties properties = new Properties();
-            resourceAsStream = MavenCli.class.getClassLoader().getResourceAsStream(
-                "META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+            resourceAsStream = MavenCli.class.getClassLoader().getResourceAsStream( "org/apache/maven/messages/build.properties" );
 
             if ( resourceAsStream != null )
             {
                 properties.load( resourceAsStream );
 
-                if( properties.getProperty( "builtOn" ) != null )
-                {
-                    System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" )
-                        + " built on " + properties.getProperty( "builtOn" ) );
-                }
-                else
-                {
-                    System.out.println( "Maven version: " + properties.getProperty( "version", "unknown" ) );
-                }
+                timestamp = reduce( properties.getProperty( "timestamp" ) );
+                version = reduce( properties.getProperty( "version" ) );
+                rev = reduce( properties.getProperty( "buildNumber" ) );
             }
-            else
-            {
-                System.out.println( "Maven version: unknown" );
-            }
-
-            System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
-
-            System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
-                                + System.getProperty( "file.encoding", "<unknown encoding>" ) );
-
-            System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION +
-                                "\" arch: \"" + Os.OS_ARCH + "\" family: \"" + Os.OS_FAMILY + "\"" );
-
         }
         catch ( IOException e )
         {
             System.err.println( "Unable determine version from JAR file: " + e.getMessage() );
         }
+        finally
+        {
+            IOUtil.close( resourceAsStream );
+        }
+
+        String msg = "Apache Maven ";
+        msg += ( version != null ? version : "<version unknown>" );
+        if ( rev != null || timestamp != null )
+        {
+            msg += " (";
+            msg += ( rev != null ? "r" + rev : "" );
+            msg += ( timestamp != null ? ( rev != null ? "; " : "" ) + new java.util.Date( Long.valueOf( timestamp ).longValue() ) : "" );
+            msg += ")";
+        }
+
+        System.out.println( msg );
+
+        System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
+
+        System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
+                            + System.getProperty( "file.encoding", "<unknown encoding>" ) );
+
+        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION +
+                            "\" arch: \"" + Os.OS_ARCH + "\" family: \"" + Os.OS_FAMILY + "\"" );
+    }
+
+    private static String reduce( String s )
+    {
+        return ( s != null ? ( s.startsWith( "${" ) && s.endsWith( "}" ) ? null : s ) : null );
     }
 
     // ----------------------------------------------------------------------

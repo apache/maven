@@ -238,5 +238,34 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>buildnumber</id>
+      <activation>
+        <file>
+          <exists>.svn</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>buildnumber-maven-plugin</artifactId>
+            <version>1.0-beta-1</version>
+            <executions>
+              <execution>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>create</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <doCheck>false</doCheck>
+              <doUpdate>false</doUpdate>
+            </configuration>
+          </plugin>        
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
