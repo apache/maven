@@ -52,7 +52,16 @@ TODO:
     <condition property="maven.home" value="${env.M2_HOME}">
       <isset property="env.M2_HOME"/>
     </condition>
-    <fail unless="maven.home" message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script"/>
+    <fail message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script">
+      <condition>
+        <or>
+          <not>
+            <isset property="maven.home" />
+          </not>
+          <equals arg1="${maven.home}" arg2="" trim="true" />
+        </or>
+      </condition>
+    </fail>
     <echo>Using Maven home at: ${maven.home}</echo>
   </target>
   
