@@ -31,36 +31,46 @@ public class PomConstructionTest
     protected void setUp()
         throws Exception
     {
-        testDirectory = new File( getBasedir(), BASE_POM_DIR );
-        
+        testDirectory = new File( getBasedir(), BASE_POM_DIR );        
         projectBuilder = lookup( ProjectBuilder.class );
-
         mavenTools = lookup( MavenTools.class );
     }
 
-    public void testNexusPoms()
+    public void testThatAllPluginExecutionsWithIdsAreJoined()
         throws Exception
     {        
-        Map<String,File> artifacts = new HashMap<String,File>();
-                
-        File nexusLauncher = new File( testDirectory, "nexus/nexus-test-harness-launcher/pom.xml" );
-        
-        PomArtifactResolver resolver = new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, "nexus" ) );
-                
-        // make a version that doesn't require a null mixin set. for most pom construction tests we're
-        // not going to use mixins.
-        PomClassicDomainModel model = projectBuilder.buildModel( nexusLauncher, null, resolver );  
-        
-        // Make sure we actually processed our 3 POMs.
-        assertEquals( 3, model.getLineageCount() );
-        
-        PomTestWrapper pom = new PomTestWrapper( model );
-        
-        assertEquals( "maven-dependency-plugin", pom.getValue( "build/plugins[4]/artifactId" ) );
-        
-        List executions = (List) pom.getValue( "build/plugins[4]/executions" );
-                
+        File nexusLauncher = new File( testDirectory, "nexus/nexus-test-harness-launcher/pom.xml" );        
+        PomArtifactResolver resolver = artifactResolver( "nexus" );                
+        PomClassicDomainModel model = projectBuilder.buildModel( nexusLauncher, null, resolver );         
+        assertEquals( 3, model.getLineageCount() );        
+        PomTestWrapper pom = new PomTestWrapper( model );        
+        assertModelEquals( pom, "maven-dependency-plugin", "build/plugins[4]/artifactId" );        
+        List executions = (List) pom.getValue( "build/plugins[4]/executions" );                
         assertEquals( 7, executions.size() );
+    }
+
+    public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins()
+        throws Exception
+    {
+        File pom = new File( testDirectory, "micromailer/micromailer-1.0.3.pom" );
+        System.out.println( pom.exists());
+        PomArtifactResolver resolver = artifactResolver( "micromailer" );
+        PomClassicDomainModel model = projectBuilder.buildModel( pom, null, resolver );
+        // This should be 2
+        //assertEquals( 2, model.getLineageCount() );
+        PomTestWrapper tester = new PomTestWrapper( model );
+        assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
+    }
+    
+    private PomArtifactResolver artifactResolver( String basedir )
+    {
+        PomArtifactResolver resolver = new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );                
+        return resolver;
+    }
+    
+    protected void assertModelEquals( PomTestWrapper pom, Object expected, String expression )
+    {
+        assertEquals( expected, pom.getValue( expression ) );        
     }
     
     // Need to get this to walk around a directory and automatically build up the artifact set. If we
@@ -82,7 +92,8 @@ public class PomConstructionTest
                 if ( file.getName().endsWith( ".pom" ) )
                 {
                     int i = fileName.indexOf( ".pom" );                    
-                    String id = fileName.substring( 0, i - 1 );
+                    String id = fileName.substring( 0, i );
+                    System.out.println( id );
                     artifacts.put( id, file );
                 }
             }
@@ -96,7 +107,9 @@ public class PomConstructionTest
         public void resolve( Artifact artifact )
             throws IOException
         {
-            artifact.setFile( artifacts.get(  artifact.getArtifactId() ) );
+            String id = artifact.getArtifactId() + "-" + artifact.getVersion();
+            System.out.println( id );
+            artifact.setFile( artifacts.get( id  ) );
         }
     }
 }

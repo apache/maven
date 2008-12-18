@@ -303,13 +303,15 @@ public final class DefaultProjectBuilder
             logger.debug( "Parent pom ids do not match: Parent File = " + parentFile.getAbsolutePath() + ", Parent ID = "
                     + parentDomainModel.getId() + ", Child ID = " + domainModel.getId() + ", Expected Parent ID = "
                     + domainModel.getModel().getParent().getId() );
+            
             List<DomainModel> parentDomainModels = getDomainModelParentsFromRepository( domainModel, artifactResolver );
+            
             if(parentDomainModels.size() == 0)
             {
                 throw new IOException("Unable to find parent pom on local path or repo: "
                         + domainModel.getModel().getParent().getId());
             }
-            //logger.info("Attempting to lookup from the repository: Found parents: " + parentDomainModels.size());
+            
             domainModels.addAll( parentDomainModels );
             return domainModels;
         }
