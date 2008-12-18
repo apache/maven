@@ -53,7 +53,6 @@ public class PomConstructionTest
         throws Exception
     {
         File pom = new File( testDirectory, "micromailer/micromailer-1.0.3.pom" );
-        System.out.println( pom.exists());
         PomArtifactResolver resolver = artifactResolver( "micromailer" );
         PomClassicDomainModel model = projectBuilder.buildModel( pom, null, resolver );
         // This should be 2
@@ -93,7 +92,6 @@ public class PomConstructionTest
                 {
                     int i = fileName.indexOf( ".pom" );                    
                     String id = fileName.substring( 0, i );
-                    System.out.println( id );
                     artifacts.put( id, file );
                 }
             }
@@ -108,7 +106,6 @@ public class PomConstructionTest
             throws IOException
         {
             String id = artifact.getArtifactId() + "-" + artifact.getVersion();
-            System.out.println( id );
             artifact.setFile( artifacts.get( id  ) );
         }
     }
