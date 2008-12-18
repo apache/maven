@@ -192,7 +192,7 @@ public final class ArtifactModelContainerFactory
             if ( c.groupId.equals( groupId ) && c.artifactId.equals( artifactId ) && c.type.equals( type )
                     && c.classifier.equals( classifier ))
             {
-                if ( c.version.equals( version ) )
+                if ( c.version.equals( version ) || version.equals("") || c.version.equals(""))
                 {
                     return ModelContainerAction.JOIN;
                 }

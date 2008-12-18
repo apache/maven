@@ -56,9 +56,9 @@ public class PomConstructionTest
         
         PomTestWrapper pom = new PomTestWrapper( model );
         
-        assertEquals( "maven-dependency-plugin", pom.getValue( "build/plugins[1]/artifactId" ) );
+        assertEquals( "maven-dependency-plugin", pom.getValue( "build/plugins[4]/artifactId" ) );
         
-        List executions = (List) pom.getValue( "build/plugins[1]/executions" );
+        List executions = (List) pom.getValue( "build/plugins[4]/executions" );
                 
         assertEquals( 7, executions.size() );
     }
