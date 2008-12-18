@@ -67,6 +67,17 @@ public class PomConstructionTest
         assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
     
+    public void testTwoPluginsWithDependencies()
+    	throws Exception
+	{        
+	    File pomFile = new File( testDirectory, "single-test-poms/pluginDependencies.xml" );        
+	    PomArtifactResolver resolver = artifactResolver( "single-test-poms" );                
+	    PomClassicDomainModel model = projectBuilder.buildModel( pomFile, null, resolver );                
+	    PomTestWrapper pom = new PomTestWrapper( model );               
+	    List dependencies = (List) pom.getValue( "build/plugins[1]/dependencies" );                
+	    assertEquals( 1, dependencies.size() );
+	}    
+    
     private PomArtifactResolver artifactResolver( String basedir )
     {
         PomArtifactResolver resolver = new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );                

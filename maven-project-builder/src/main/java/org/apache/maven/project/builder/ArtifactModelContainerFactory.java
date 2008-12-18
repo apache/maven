@@ -38,10 +38,11 @@ public final class ArtifactModelContainerFactory
         ProjectUri.DependencyManagement.Dependencies.Dependency.xUri, ProjectUri.Dependencies.Dependency.xUri,
         ProjectUri.Reporting.Plugins.Plugin.xUri,
         ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri,
-        ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.xUri,
+        //ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.xUri,
 
-        ProjectUri.Build.Plugins.Plugin.xUri, ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.xUri,
-        ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.Exclusions.Exclusion.xUri,
+        ProjectUri.Build.Plugins.Plugin.xUri, 
+        //ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.xUri,
+       // ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.Exclusions.Exclusion.xUri,
         ProjectUri.Build.Extensions.Extension.xUri    
          ) );
 

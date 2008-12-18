@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.sonatype.nexus</groupId>
+	<artifactId>nexus-configuration</artifactId>
+	<version>1.0</version>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.modello</groupId>
+				<artifactId>modello-maven-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<groupId>commons-collections</groupId>
+						<artifactId>commons-collections</artifactId>
+						<version>3.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>modello-plugin-upgrade</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+				<dependencies>
+					<dependency>
+						<groupId>commons-collections</groupId>
+						<artifactId>commons-collections</artifactId>
+						<version>3.2</version>
+					</dependency>
+				</dependencies>				
+			</plugin>			
+		</plugins>
+	</build>
+</project>
