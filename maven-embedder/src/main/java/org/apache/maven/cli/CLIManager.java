@@ -119,7 +119,7 @@ public class CLIManager
         
         // Adding this back in for compatibility with the verifier that hard codes this option.
         
-        options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Display version information WITHOUT stopping build" ).create( "npr" ) );        
+        options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npr" ) );
     }
 
     public CommandLine parse( String[] args )
