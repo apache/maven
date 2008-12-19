@@ -19,13 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.ResourceExtractor;
-
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-import java.util.Properties;
+
+import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1830">MNG-1830</a>.
@@ -53,12 +53,18 @@ public class MavenITmng1830ShowVersionTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         List cliOptions = Collections.singletonList( "-X" );
-        verifier.setCliOptions( cliOptions  );
+        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "clean" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         String line = (String) verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false ).get( 1 );
         assertTrue( line, line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) );
+
+        // check timestamp parses
+        String timestamp = line.substring( line.lastIndexOf( ';' ) + 1, line.length() - 1 ).trim();
+        SimpleDateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ssZ" );
+        Date date = fmt.parse( timestamp );
+        assertEquals( timestamp, fmt.format( date ) );
     }
 }
