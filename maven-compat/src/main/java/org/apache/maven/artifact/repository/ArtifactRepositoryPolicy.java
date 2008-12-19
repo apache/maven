@@ -82,12 +82,16 @@ public class ArtifactRepositoryPolicy
 
     public void setUpdatePolicy( String updatePolicy )
     {
-        this.updatePolicy = updatePolicy;
+        if(updatePolicy != null) {
+        	this.updatePolicy = updatePolicy;
+        }
     }
 
     public void setChecksumPolicy( String checksumPolicy )
     {
-        this.checksumPolicy = checksumPolicy;
+    	if(checksumPolicy != null) {
+    		this.checksumPolicy = checksumPolicy;	
+    	}       
     }
 
     public boolean isEnabled()

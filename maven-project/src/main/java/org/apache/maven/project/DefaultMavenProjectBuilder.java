@@ -120,13 +120,18 @@ public class DefaultMavenProjectBuilder
     
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
-    {        
-        List repositories = mavenTools.buildArtifactRepositories( projectBuilder.getSuperModel() );
+    {  
+       List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( );
+       artifactRepositories.addAll( mavenTools.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
+       if(config.getRemoteRepositories() != null) 
+       {
+    	   artifactRepositories.addAll(config.getRemoteRepositories());
+       }
         
         MavenProject project = readModelFromLocalPath( "unknown", 
                                                        projectDescriptor, 
                                                        new DefaultPomArtifactResolver( config.getLocalRepository(), 
-                                                                                       repositories, artifactResolver ), config );
+                                                                                       artifactRepositories, artifactResolver ), config );
 
         project.setFile( projectDescriptor );
         
@@ -178,14 +183,13 @@ public class DefaultMavenProjectBuilder
         {            
             return project;
         }        
-        
-        File f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-        mavenTools.findModelFromRepository( artifact, remoteArtifactRepositories, localRepository );
-
-        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
-
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
         artifactRepositories.addAll( mavenTools.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
+        
+        File f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+        mavenTools.findModelFromRepository( artifact, artifactRepositories, localRepository );
+
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), new DefaultPomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
