@@ -26,7 +26,8 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3924">MNG-3924</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3924">MNG-3924</a> and
+ * <a href="http://jira.codehaus.org/browse/MNG-3662">MNG-3662</a>
  * 
  * @author Benjamin Bentmann
  * @version $Id$
@@ -56,8 +57,8 @@ public class MavenITmng3924XmlMarkupInterpolationTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/xml.properties" );
-        assertEquals( "<?xml version='1.0'?>", props.getProperty( "project.properties.xmlMarkup" ) );
-        assertEquals( "<?xml version='1.0'?>", props.getProperty( "project.properties.xmlTest" ) );
+        assertEquals( "<?xml version='1.0'?>Tom&Jerry", props.getProperty( "project.properties.xmlMarkup" ) );
+        assertEquals( "<?xml version='1.0'?>Tom&Jerry", props.getProperty( "project.properties.xmlTest" ) );
     }
 
 }

@@ -34,7 +34,7 @@ under the License.
 
   <properties>
     <!-- That's the property containing escaped XML markup -->
-    <xmlMarkup>&lt;?xml version='1.0'?&gt;</xmlMarkup>
+    <xmlMarkup>&lt;?xml version='1.0'?&gt;Tom&amp;Jerry</xmlMarkup>
     <!-- That's a property where the above property will be resolved -->
     <xmlTest>${xmlMarkup}</xmlTest>
   </properties>
