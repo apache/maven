@@ -76,9 +76,15 @@ public class MavenIT0144LifecycleExecutionOrderTest
         expected.add( "test-compile" );
         if ( matchesVersionRange( "(2.0.4,)" ) )
         {
+            // MNG-1508
             expected.add( "process-test-classes" );
         }
         expected.add( "test" );
+        if ( matchesVersionRange( "(2.1.0-M1,)" ) )
+        {
+            // MNG-2097
+            expected.add( "prepare-package" );
+        }
         expected.add( "package" );
         if ( matchesVersionRange( "(2.0.1,)" ) )
         {

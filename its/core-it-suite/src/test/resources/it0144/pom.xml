@@ -206,6 +206,17 @@ under the License.
             </configuration>
           </execution>
           <execution>
+            <id>prepare-package</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>log-string</goal>
+            </goals>
+            <configuration>
+              <logFile>target/phases.log</logFile>
+              <string>prepare-package</string>
+            </configuration>
+          </execution>
+          <execution>
             <id>package</id>
             <phase>package</phase>
             <goals>
