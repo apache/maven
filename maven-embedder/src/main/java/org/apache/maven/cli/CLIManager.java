@@ -116,6 +116,10 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription( "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
         options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file to where all build output will go." ).create( LOG_FILE ) );
         options.addOption( OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create( SHOW_VERSION ) );
+        
+        // Adding this back in for compatibility with the verifier that hard codes this option.
+        
+        options.addOption( OptionBuilder.withLongOpt( "--no-plugin-registry" ).withDescription( "Display version information WITHOUT stopping build" ).create( "npr" ) );        
     }
 
     public CommandLine parse( String[] args )
