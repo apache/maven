@@ -38,7 +38,7 @@
 @if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
 
 @REM set %HOME% to equivalent of $HOME
-if "%HOME%" == "" (set HOME=%HOMEDRIVE%%HOMEPATH%)
+if "%HOME%" == "" (set "HOME=%HOMEDRIVE%%HOMEPATH%")
 
 @REM Execute a user defined script before this one
 if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
@@ -64,7 +64,7 @@ if exist "%JAVA_HOME%\bin\java.exe" goto chkMHome
 
 echo.
 echo ERROR: JAVA_HOME is set to an invalid directory.
-echo JAVA_HOME = %JAVA_HOME%
+echo JAVA_HOME = "%JAVA_HOME%"
 echo Please set the JAVA_HOME variable in your environment to match the
 echo location of your Java installation
 echo.
@@ -73,8 +73,8 @@ goto error
 :chkMHome
 if not "%M2_HOME%"=="" goto valMHome
 
-if "%OS%"=="Windows_NT" SET M2_HOME=%~dp0..
-if "%OS%"=="WINNT" SET M2_HOME=%~dp0..
+if "%OS%"=="Windows_NT" SET "M2_HOME=%~dp0.."
+if "%OS%"=="WINNT" SET "M2_HOME=%~dp0.."
 if not "%M2_HOME%"=="" goto valMHome
 
 echo.
@@ -87,8 +87,8 @@ goto error
 :valMHome
 
 :stripMHome
-if not _%M2_HOME:~-1%==_\ goto checkMBat
-set M2_HOME=%M2_HOME:~0,-1%
+if not "_%M2_HOME:~-1%"=="_\" goto checkMBat
+set "M2_HOME=%M2_HOME:~0,-1%"
 goto stripMHome
 
 :checkMBat
@@ -96,7 +96,7 @@ if exist "%M2_HOME%\bin\mvn.bat" goto init
 
 echo.
 echo ERROR: M2_HOME is set to an invalid directory.
-echo M2_HOME = %M2_HOME%
+echo M2_HOME = "%M2_HOME%"
 echo Please set the M2_HOME variable in your environment to match the
 echo location of the Maven installation
 echo.
