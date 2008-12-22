@@ -118,6 +118,24 @@ public class PomConstructionTest
     }
     */
 
+    /* FIXME: cf. MNG-3887
+    public void testOrderOfPluginExecutions()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-order" );
+        assertEquals( "ab", pom.getValue( "build/plugins[1]/executions[1]/id" ) );
+        assertEquals( "aa", pom.getValue( "build/plugins[1]/executions[2]/id" ) );
+        assertEquals( "ad", pom.getValue( "build/plugins[1]/executions[3]/id" ) );
+        assertEquals( "ac", pom.getValue( "build/plugins[1]/executions[4]/id" ) );
+        assertEquals( "ae", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
+        assertEquals( "bb", pom.getValue( "build/plugins[2]/executions[1]/id" ) );
+        assertEquals( "ba", pom.getValue( "build/plugins[2]/executions[2]/id" ) );
+        assertEquals( "bd", pom.getValue( "build/plugins[2]/executions[3]/id" ) );
+        assertEquals( "bc", pom.getValue( "build/plugins[2]/executions[4]/id" ) );
+        assertEquals( "be", pom.getValue( "build/plugins[2]/executions[5]/id" ) );
+    }
+    */
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
