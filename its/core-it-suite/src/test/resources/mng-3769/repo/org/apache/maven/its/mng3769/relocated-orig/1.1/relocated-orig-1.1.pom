@@ -1,0 +1,12 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3769</groupId>
+  <artifactId>relocated-orig</artifactId>
+  <version>1.1</version>
+  <distributionManagement>
+    <relocation>
+      <artifactId>relocated-new</artifactId>
+    </relocation>
+  </distributionManagement>
+</project>
+
