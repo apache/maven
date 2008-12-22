@@ -34,37 +34,20 @@ under the License.
   </description>
 
   <build>
+    <!-- This project uses plugin management for the test plugin -->
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.its.plugins</groupId>
-          <artifactId>maven-it-plugin-b</artifactId>
+          <artifactId>maven-it-plugin-a</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
-        <!-- This plugin is not affected by plugin management -->
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-a</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>b</goal>
-              <goal>a</goal>
-              <goal>d</goal>
-              <goal>c</goal>
-              <goal>e</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- This plugin is affected by plugin management -->
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-b</artifactId>
         <version>1.0-SNAPSHOT</version>
         <executions>
           <execution>

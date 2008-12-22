@@ -101,40 +101,56 @@ public class PomConstructionTest
     */
 
     /* FIXME: cf. MNG-3886
-    public void testOrderOfGoalsFromPluginExecution()
+    public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "plugin-exec-goals-order" );
+        PomTestWrapper pom = buildPom( "plugin-exec-goals-order/wo-plugin-mngt" );
+        assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/goals" ) ).size() );
         assertEquals( "b", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
         assertEquals( "a", pom.getValue( "build/plugins[1]/executions[1]/goals[2]" ) );
         assertEquals( "d", pom.getValue( "build/plugins[1]/executions[1]/goals[3]" ) );
         assertEquals( "c", pom.getValue( "build/plugins[1]/executions[1]/goals[4]" ) );
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
-        assertEquals( "b", pom.getValue( "build/plugins[2]/executions[1]/goals[1]" ) );
-        assertEquals( "a", pom.getValue( "build/plugins[2]/executions[1]/goals[2]" ) );
-        assertEquals( "d", pom.getValue( "build/plugins[2]/executions[1]/goals[3]" ) );
-        assertEquals( "c", pom.getValue( "build/plugins[2]/executions[1]/goals[4]" ) );
-        assertEquals( "e", pom.getValue( "build/plugins[2]/executions[1]/goals[5]" ) );
     }
-    */
 
-    /* FIXME: cf. MNG-3887
-    public void testOrderOfPluginExecutions()
+    public void testOrderOfGoalsFromPluginExecutionWithPluginManagement()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "plugin-exec-order" );
-        assertEquals( "ab", pom.getValue( "build/plugins[1]/executions[1]/id" ) );
-        assertEquals( "aa", pom.getValue( "build/plugins[1]/executions[2]/id" ) );
-        assertEquals( "ad", pom.getValue( "build/plugins[1]/executions[3]/id" ) );
-        assertEquals( "ac", pom.getValue( "build/plugins[1]/executions[4]/id" ) );
-        assertEquals( "ae", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
-        assertEquals( "bb", pom.getValue( "build/plugins[2]/executions[1]/id" ) );
-        assertEquals( "ba", pom.getValue( "build/plugins[2]/executions[2]/id" ) );
-        assertEquals( "bd", pom.getValue( "build/plugins[2]/executions[3]/id" ) );
-        assertEquals( "bc", pom.getValue( "build/plugins[2]/executions[4]/id" ) );
-        assertEquals( "be", pom.getValue( "build/plugins[2]/executions[5]/id" ) );
+        PomTestWrapper pom = buildPom( "plugin-exec-goals-order/w-plugin-mngt" );
+        assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/goals" ) ).size() );
+        assertEquals( "b", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
+        assertEquals( "a", pom.getValue( "build/plugins[1]/executions[1]/goals[2]" ) );
+        assertEquals( "d", pom.getValue( "build/plugins[1]/executions[1]/goals[3]" ) );
+        assertEquals( "c", pom.getValue( "build/plugins[1]/executions[1]/goals[4]" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
-    */
+    //*/
+
+    /* FIXME: cf. MNG-3887
+    public void testOrderOfPluginExecutionsWithoutPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-order/wo-plugin-mngt" );
+        assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "b", pom.getValue( "build/plugins[1]/executions[1]/id" ) );
+        assertEquals( "a", pom.getValue( "build/plugins[1]/executions[2]/id" ) );
+        assertEquals( "d", pom.getValue( "build/plugins[1]/executions[3]/id" ) );
+        assertEquals( "c", pom.getValue( "build/plugins[1]/executions[4]/id" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
+    }
+
+    public void testOrderOfPluginExecutionsWithPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-order/w-plugin-mngt" );
+        assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "b", pom.getValue( "build/plugins[1]/executions[1]/id" ) );
+        assertEquals( "a", pom.getValue( "build/plugins[1]/executions[2]/id" ) );
+        assertEquals( "d", pom.getValue( "build/plugins[1]/executions[3]/id" ) );
+        assertEquals( "c", pom.getValue( "build/plugins[1]/executions[4]/id" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
+    }
+    //*/
 
     /* FIXME: cf. MNG-3925
     public void testOrderOfMergedPluginExecutionsWithoutPluginManagement()

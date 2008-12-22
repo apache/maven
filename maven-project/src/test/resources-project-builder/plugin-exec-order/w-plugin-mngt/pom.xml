@@ -33,68 +33,40 @@ under the License.
   </description>
 
   <build>
+    <!-- This project uses plugin management for the test plugin -->
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.its.plugins</groupId>
-          <artifactId>maven-it-plugin-b</artifactId>
+          <artifactId>maven-it-plugin-a</artifactId>
           <version>1.0-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
-        <!-- This plugin is not affected by plugin management -->
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-a</artifactId>
         <version>1.0-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>ab</id>
+            <id>b</id>
             <phase>validate</phase>
           </execution>
           <execution>
-            <id>aa</id>
+            <id>a</id>
             <phase>validate</phase>
           </execution>
           <execution>
-            <id>ad</id>
+            <id>d</id>
             <phase>validate</phase>
           </execution>
           <execution>
-            <id>ac</id>
+            <id>c</id>
             <phase>validate</phase>
           </execution>
           <execution>
-            <id>ae</id>
-            <phase>validate</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- This plugin is affected by plugin management -->
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-b</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>bb</id>
-            <phase>validate</phase>
-          </execution>
-          <execution>
-            <id>ba</id>
-            <phase>validate</phase>
-          </execution>
-          <execution>
-            <id>bd</id>
-            <phase>validate</phase>
-          </execution>
-          <execution>
-            <id>bc</id>
-            <phase>validate</phase>
-          </execution>
-          <execution>
-            <id>be</id>
+            <id>e</id>
             <phase>validate</phase>
           </execution>
         </executions>
