@@ -53,7 +53,6 @@ under the License.
       <directory>src/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>m2</include>
         <include>mvn</include>
         <include>mvnDebug</include>
       </includes>
