@@ -204,6 +204,26 @@ public class PomConstructionTest
     }
     //*/
 
+    public void testOverridingOfInheritedPluginExecutionsWithoutPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-merging/wo-plugin-mngt/sub" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default']/phase" ) );
+        assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
+    }
+
+    /* FIXME: cf. MNG-3938
+    public void testOverridingOfInheritedPluginExecutionsWithPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-merging/w-plugin-mngt/sub" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default']/phase" ) );
+        assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
+    }
+    //*/
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
