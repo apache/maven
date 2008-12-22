@@ -43,7 +43,7 @@ public class MavenITmng3906MergedPluginClassPathOrderingTest
     /**
      * Test that project-level plugin dependencies are properly merged during inheritance.
      */
-    public void testitMNG3813()
+    public void testitMNG3906()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3906" );
