@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3877">MNG-3877</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3380">MNG-3380</a>.
  * 
  * expected project.getArtifacts() results:
  *
