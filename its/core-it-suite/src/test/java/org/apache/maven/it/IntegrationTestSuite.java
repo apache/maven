@@ -205,7 +205,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2130ParentLookupFromReactorCacheTest.class );
         suite.addTestSuite( MavenITmng2124PomInterpolationWithParentValuesTest.class );
         suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
-        suite.addTestSuite( MavenITmng2097PreparePackagePhaseTest.class );
         suite.addTestSuite( MavenITmng2068ReactorRelativeParentsTest.class );
         suite.addTestSuite( MavenITmng2054PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng2052InterpolateWithSettingsProfilePropertiesTest.class );
