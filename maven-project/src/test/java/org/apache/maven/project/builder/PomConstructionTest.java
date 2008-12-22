@@ -73,17 +73,16 @@ public class PomConstructionTest
         PomTestWrapper tester = new PomTestWrapper( model );
         assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
-    
-    public void testTwoPluginsWithDependencies()
-    	throws Exception
-	{        
-	    File pomFile = new File( testDirectory, "single-test-poms/pluginDependencies.xml" );        
-	    PomArtifactResolver resolver = artifactResolver( "single-test-poms" );                
-	    PomClassicDomainModel model = projectBuilder.buildModel( pomFile, null, resolver );                
-	    PomTestWrapper pom = new PomTestWrapper( model );               
-	    List<?> dependencies = (List<?>) pom.getValue( "build/plugins[1]/dependencies" );                
-	    assertEquals( 1, dependencies.size() );
-	}    
+
+    public void testErroneousJoiningOfDifferentPluginsWithEqualDependencies()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "equal-plugin-deps" );
+        assertEquals( "maven-it-plugin-a", pom.getValue( "build/plugins[1]/artifactId" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
+        assertEquals( "maven-it-plugin-b", pom.getValue( "build/plugins[2]/artifactId" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
+    }
 
     /* FIXME: cf. MNG-3821
     public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
