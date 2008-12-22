@@ -84,7 +84,6 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
     }
 
-    /* FIXME: cf. MNG-3821
     public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
         throws Exception
     {
@@ -98,7 +97,6 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "reporting/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
-    */
 
     /* FIXME: cf. MNG-3886
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
@@ -204,6 +202,7 @@ public class PomConstructionTest
     }
     //*/
 
+    /* FIXME: cf. MNG-3938
     public void testOverridingOfInheritedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -213,7 +212,6 @@ public class PomConstructionTest
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
 
-    /* FIXME: cf. MNG-3938
     public void testOverridingOfInheritedPluginExecutionsWithPluginManagement()
         throws Exception
     {
