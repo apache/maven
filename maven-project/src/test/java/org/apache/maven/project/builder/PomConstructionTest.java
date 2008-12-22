@@ -14,20 +14,33 @@ import org.codehaus.plexus.PlexusTestCase;
 public class PomConstructionTest
     extends PlexusTestCase
 {
+
     private static String BASE_POM_DIR = "src/test/resources-project-builder";
 
     private ProjectBuilder projectBuilder;
 
     private MavenTools mavenTools;
 
+    private PomArtifactResolver pomArtifactResolver;
+
     private File testDirectory;
-    
+
     protected void setUp()
         throws Exception
     {
-        testDirectory = new File( getBasedir(), BASE_POM_DIR );        
+        testDirectory = new File( getBasedir(), BASE_POM_DIR );
         projectBuilder = lookup( ProjectBuilder.class );
         mavenTools = lookup( MavenTools.class );
+        pomArtifactResolver = new PomArtifactResolver()
+        {
+
+            public void resolve( Artifact artifact )
+                throws IOException
+            {
+                throw new IllegalStateException( "Parent POM should be locally reachable " + artifact );
+            }
+
+        };
     }
 
     // Some better conventions for the test poms needs to be created and each of these tests
@@ -45,7 +58,7 @@ public class PomConstructionTest
         assertEquals( 3, model.getLineageCount() );        
         PomTestWrapper pom = new PomTestWrapper( model );        
         assertModelEquals( pom, "maven-dependency-plugin", "build/plugins[4]/artifactId" );        
-        List executions = (List) pom.getValue( "build/plugins[4]/executions" );                
+        List<?> executions = (List<?>) pom.getValue( "build/plugins[4]/executions" );                
         assertEquals( 7, executions.size() );
     }
 
@@ -68,16 +81,42 @@ public class PomConstructionTest
 	    PomArtifactResolver resolver = artifactResolver( "single-test-poms" );                
 	    PomClassicDomainModel model = projectBuilder.buildModel( pomFile, null, resolver );                
 	    PomTestWrapper pom = new PomTestWrapper( model );               
-	    List dependencies = (List) pom.getValue( "build/plugins[1]/dependencies" );                
+	    List<?> dependencies = (List<?>) pom.getValue( "build/plugins[1]/dependencies" );                
 	    assertEquals( 1, dependencies.size() );
 	}    
-    
+
+    /* FIXME: cf. MNG-3821
+    public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "equal-plugin-exec-ids" );
+        assertEquals( "maven-it-plugin-a", pom.getValue( "build/plugins[1]/artifactId" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "maven-it-plugin-b", pom.getValue( "build/plugins[2]/artifactId" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "maven-it-plugin-a", pom.getValue( "reporting/plugins[1]/artifactId" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
+        assertEquals( "maven-it-plugin-b", pom.getValue( "reporting/plugins[2]/artifactId" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
+    }
+    */
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
-        PomArtifactResolver resolver = new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );                
-        return resolver;
+        return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
     }
-    
+
+    private PomTestWrapper buildPom( String pomPath )
+        throws IOException
+    {
+        File pomFile = new File( testDirectory, pomPath );
+        if ( pomFile.isDirectory() )
+        {
+            pomFile = new File( pomFile, "pom.xml" );
+        }
+        return new PomTestWrapper( projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
+    }
+
     protected void assertModelEquals( PomTestWrapper pom, Object expected, String expression )
     {
         assertEquals( expected, pom.getValue( expression ) );        
@@ -89,7 +128,7 @@ public class PomConstructionTest
         implements PomArtifactResolver
     {
         private Map<String,File> artifacts = new HashMap<String,File>();
-        
+                
         private File basedir;
                 
         public FileBasedPomArtifactResolver( File basedir )

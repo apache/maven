@@ -43,7 +43,12 @@ public class PomTestWrapper {
 		this.domainModel = new PomClassicDomainModel(model);
 		context = JXPathContext.newContext(domainModel.getModel());
 	}		
-	
+
+    public PomClassicDomainModel getDomainModel()
+    {
+        return this.domainModel;
+    }
+
 	public String getValueOfProjectUri(String projectUri, boolean withResolvedValue) throws IOException {
 		if(projectUri.contains("#collection") || projectUri.contains("#set")) {
 			throw new IllegalArgumentException("projectUri: contains a collection or set");
@@ -65,7 +70,7 @@ public class PomTestWrapper {
 	}
 	*/
 	
-	public Iterator getIteratorForXPathExpression(String expression) {
+	public Iterator<?> getIteratorForXPathExpression(String expression) {
 		return context.iterate(expression);
 	}
 	
