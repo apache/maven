@@ -100,6 +100,24 @@ public class PomConstructionTest
     }
     */
 
+    /* FIXME: cf. MNG-3886
+    public void testOrderOfGoalsFromPluginExecution()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-goals-order" );
+        assertEquals( "b", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
+        assertEquals( "a", pom.getValue( "build/plugins[1]/executions[1]/goals[2]" ) );
+        assertEquals( "d", pom.getValue( "build/plugins[1]/executions[1]/goals[3]" ) );
+        assertEquals( "c", pom.getValue( "build/plugins[1]/executions[1]/goals[4]" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
+        assertEquals( "b", pom.getValue( "build/plugins[2]/executions[1]/goals[1]" ) );
+        assertEquals( "a", pom.getValue( "build/plugins[2]/executions[1]/goals[2]" ) );
+        assertEquals( "d", pom.getValue( "build/plugins[2]/executions[1]/goals[3]" ) );
+        assertEquals( "c", pom.getValue( "build/plugins[2]/executions[1]/goals[4]" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[2]/executions[1]/goals[5]" ) );
+    }
+    */
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
