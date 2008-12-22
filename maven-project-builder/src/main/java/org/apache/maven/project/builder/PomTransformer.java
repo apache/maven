@@ -212,11 +212,11 @@ public class PomTransformer
                 {
                     ModelDataSource pluginDatasource = new DefaultModelDataSource();
                     pluginDatasource.init( pluginContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
-                            new IdModelContainerFactory() ) );
+                            new PluginExecutionIdModelContainerFactory() ) );
 
                     ModelDataSource managementDatasource = new DefaultModelDataSource();
                     managementDatasource.init( managementContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
-                            new IdModelContainerFactory() ) );
+                            new PluginExecutionIdModelContainerFactory() ) );
 
                     List<ModelContainer> managementExecutionContainers = managementDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                     List<ModelProperty> managementPropertiesWithoutExecutions = new ArrayList<ModelProperty>(managementContainer.getProperties());
