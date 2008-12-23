@@ -200,6 +200,7 @@ public class DefaultExtensionManager
 
                 if ( getLogger().isDebugEnabled() )
                 {
+                    getLogger().debug( "Extension container contents:" );
                     extensionContainer.getContainerRealm().display();
                 }
             }
@@ -267,12 +268,18 @@ public class DefaultExtensionManager
             try
             {
                 Map wagons = extensionContainer.lookupMap( Wagon.ROLE );
+                getLogger().debug( "Wagons to register: " + wagons.keySet() );
                 wagonManager.registerWagons( wagons.keySet(), extensionContainer );
             }
             catch ( ComponentLookupException e )
             {
                 // no wagons found in the extension
+                getLogger().debug( "No wagons found in the extensions or other internal error: " + e.getMessage(), e );
             }
+        }
+        else
+        {
+            getLogger().debug( "Wagons could not be registered as the extension container was never created" );
         }
     }
 

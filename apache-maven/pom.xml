@@ -91,11 +91,6 @@
                   <pattern>org.apache.commons.codec</pattern>
                 </relocation>
 
-                <!-- For jsch wagon -->
-                <relocation>
-                  <pattern>com.jcraft</pattern>
-                </relocation>
-
                 <!-- For wagon API -->
                 <relocation>
                   <pattern>org.cyberneko</pattern>
@@ -121,9 +116,6 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.1</version>
-        <!--
-        <version>2.2-beta-2</version>
-        -->
         <executions>
           <execution>
             <id>bin-assembly</id>

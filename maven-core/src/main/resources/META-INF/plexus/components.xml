@@ -604,17 +604,5 @@ under the License.
       </requirements>
     </component>
     
-    <!--  TODO: Re-enable this once maven-shade-plugin 1.2 is release and can be 
-          used to merge this configuration with that of the wagon artifacts.
-          We also need a way not to filter in the os.name, etc during the build, just the project version
-    <component>
-      <role>org.apache.maven.artifact.manager.WagonManager</role>
-      <role-hint>default</role-hint>
-      <implementation>org.apache.maven.artifact.manager.DefaultWagonManager</implementation>
-      <configuration>
-        <httpUserAgent>Apache-Maven/${project.version} maven-artifact/${project.version} (Java @java.version@; @os.name@ @os.version@)</httpUserAgent>
-      </configuration>
-    </component>
-     -->
   </components>
 </component-set>

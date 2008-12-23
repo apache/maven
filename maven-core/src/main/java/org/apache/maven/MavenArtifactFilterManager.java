@@ -64,6 +64,7 @@ public class MavenArtifactFilterManager
         Set artifacts = new HashSet();
 
         artifacts.add( "classworlds" );
+        artifacts.add( "jsch" );
         artifacts.add( "commons-cli" );
         artifacts.add( "doxia-sink-api" );
         artifacts.add( "doxia-logging-api" );

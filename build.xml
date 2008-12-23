@@ -274,6 +274,7 @@ TODO:
     </exec>
     
     <echo>Running integration tests</echo>
+    <echo>maven.home is: ${maven.home}</echo>
     <!-- Using java.io.tmpdir to avoid long path names that will make windows scream. -->
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="${maven.home}/bin/mvn">
       <env key="M2_HOME" value="${maven.home}"/>

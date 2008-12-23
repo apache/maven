@@ -361,6 +361,7 @@ public class DefaultWagonManagerTest
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         
+        artifact.getFile().delete();
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "lower-case-checksum" );
         wagon.addExpectedContent( "path.sha1", "2a25dc564a3b34f68237fc849066cbc7bb7a36a1" );
