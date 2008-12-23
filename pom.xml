@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>9</version>
+    <version>10</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -475,29 +475,6 @@ under the License.
       <id>release</id>
       <build>
         <plugins>
-<!-- TODO: Commented until a release version is available
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>1.0-alpha-5-SNAPSHOT</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireNoRepositories>
-                      <allowedRepositories>
-                        <allowedRepository>apache.snapshots</allowedRepository>
-                      </allowedRepositories>
-                    </requireNoRepositories>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
--->
           <!-- This is here until it is enabled in the parent -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
