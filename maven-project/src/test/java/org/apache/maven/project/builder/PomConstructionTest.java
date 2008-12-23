@@ -83,7 +83,7 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "build/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
     }
-
+     /*
     public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
         throws Exception
     {
@@ -97,7 +97,7 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "reporting/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
-
+     */
     /* FIXME: cf. MNG-3886
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
         throws Exception
