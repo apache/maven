@@ -114,4 +114,17 @@ public class MavenCliTest
         // sys props should override cmdline props
         //assertEquals( "2.0", p.getProperty( "test.property.2" ) );
     }
+
+    public void testGetBuildProperties()
+        throws Exception
+    {
+        Properties properties = MavenCli.getBuildProperties();
+
+        assertNotNull( properties.getProperty( "version" ) );
+        assertNotNull( properties.getProperty( "buildNumber" ) );
+        assertNotNull( properties.getProperty( "timestamp" ) );
+        assertFalse( properties.getProperty( "version" ).equals( "${project.version}" ) );
+        assertFalse( properties.getProperty( "buildNumber" ).equals( "${buildNumber}" ) );
+        assertFalse( properties.getProperty( "timestamp" ).equals( "${timestamp}" ) );
+    }
 }

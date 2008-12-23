@@ -576,13 +576,9 @@ public class MavenCli
         return localRepository;
     }
 
-    private static void showVersion()
+    public static Properties getBuildProperties()
     {
         Properties properties = new Properties();
-        String timestamp = null;
-        String rev = null;
-        String version = null;
-
         InputStream resourceAsStream = null;
         try
         {
@@ -591,10 +587,6 @@ public class MavenCli
             if ( resourceAsStream != null )
             {
                 properties.load( resourceAsStream );
-
-                timestamp = reduce( properties.getProperty( "timestamp" ) );
-                version = reduce( properties.getProperty( "version" ) );
-                rev = reduce( properties.getProperty( "buildNumber" ) );
             }
         }
         catch ( IOException e )
@@ -605,6 +597,17 @@ public class MavenCli
         {
             IOUtil.close( resourceAsStream );
         }
+
+        return properties;
+    }
+
+    private static void showVersion()
+    {
+        Properties properties = getBuildProperties();
+
+        String timestamp = reduce( properties.getProperty( "timestamp" ) );
+        String version = reduce( properties.getProperty( "version" ) );
+        String rev = reduce( properties.getProperty( "buildNumber" ) );
 
         String msg = "Apache Maven ";
         msg += ( version != null ? version : "<version unknown>" );
