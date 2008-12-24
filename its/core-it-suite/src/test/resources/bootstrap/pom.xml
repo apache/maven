@@ -188,6 +188,17 @@ under the License.
       <artifactId>maven-it-plugin-project-interpolation</artifactId>
       <version>${itPluginVersion}</version>
       <scope>runtime</scope>
+      <exclusions>
+        <!--
+        NOTE: This artifact (and its dependency maven-verifier) are in use by the class loader employed by Surefire
+        to orchestrate this test. Re-downloading (newer snapshots of) these artifacts during the tests will wreck
+        havoc on the class loader, i.e. tests fail due to NoClassDefFoundError's in the test controller.
+        -->
+        <exclusion>
+          <groupId>org.apache.maven.its</groupId>
+          <artifactId>maven-it-helper</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
