@@ -37,49 +37,6 @@ import junit.framework.TestCase;
 public class MavenCliTest
     extends TestCase
 {
-    /**
-     * Test that JDK 1.4 or above is required to execute MavenCli
-     *
-     * @throws Exception
-     */
-    public void testMain()
-        throws Exception
-    {
-        ClassWorld classWorld = new ClassWorld();
-
-        PrintStream oldErr = System.err;
-        PrintStream oldOut = System.out;
-
-        OutputStream errOS = new StringOutputStream();
-        PrintStream err = new PrintStream( errOS );
-        System.setErr( err );
-        OutputStream outOS = new StringOutputStream();
-        PrintStream out = new PrintStream( outOS );
-        System.setOut( out );
-
-        try
-        {
-            System.setProperty( "java.specification.version", "1.0" );
-            assertEquals( 1, MavenCli.main( new String[] { "-h" }, classWorld ) );
-            System.setProperty( "java.specification.version", "1.1" );
-            assertEquals( 1, MavenCli.main( new String[] { "-h" }, classWorld ) );
-            System.setProperty( "java.specification.version", "1.2" );
-            assertEquals( 1, MavenCli.main( new String[] { "-h" }, classWorld ) );
-            System.setProperty( "java.specification.version", "1.3" );
-            assertEquals( 1, MavenCli.main( new String[] { "-h" }, classWorld ) );
-            System.setProperty( "java.specification.version", "1.4" );
-            assertEquals( 0, MavenCli.main( new String[] { "-h" }, classWorld ) );
-            System.setProperty( "java.specification.version", "1.5" );
-            assertEquals( 0, MavenCli.main( new String[] { "-h" }, classWorld ) );
-            System.setProperty( "java.specification.version", "1.6" );
-            assertEquals( 0, MavenCli.main( new String[] { "-h" }, classWorld ) );
-        }
-        finally
-        {
-            System.setErr( oldErr );
-            System.setOut( oldOut );
-        }
-    }
 
     public void testGetExecutionProperties()
         throws Exception
