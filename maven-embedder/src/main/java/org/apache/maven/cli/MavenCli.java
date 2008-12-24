@@ -84,15 +84,6 @@ public class MavenCli
             return 1;
         }
 
-        if ( "1.5".compareTo( System.getProperty( "java.specification.version" ) ) > 0 )
-        {
-            System.err.println();
-            System.err.println( "You need JDK 1.5 or above to execute Maven 3.x." );
-            System.err.println();
-            
-            return 1;
-        }
-
         boolean debug = commandLine.hasOption( CLIManager.DEBUG );
 
         boolean quiet = !debug && commandLine.hasOption( CLIManager.QUIET );
