@@ -29,8 +29,8 @@ under the License.
 
   <name>Maven Integration Test :: MNG-3916</name> 
   <description>
-    Test that plugin executions are properly merged during inheritance, even if the plugin sections have different
-    versions.
+    Test that plugin executions are properly merged during inheritance, even if the child plugin section has no
+    version.
   </description>
 
   <build>
@@ -49,17 +49,6 @@ under the License.
             <configuration>
               <logFile>target/exec.log</logFile>
               <string>parent-1</string>
-            </configuration>
-          </execution>
-          <execution>
-            <id>parent-2</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>log-string</goal>
-            </goals>
-            <configuration>
-              <logFile>target/exec.log</logFile>
-              <string>parent-2</string>
             </configuration>
           </execution>
           <execution>

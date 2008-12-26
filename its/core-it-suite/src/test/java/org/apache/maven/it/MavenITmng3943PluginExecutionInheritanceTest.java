@@ -28,28 +28,28 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3916">MNG-3916</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3943">MNG-3943</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng3916PluginExecutionInheritanceTest
+public class MavenITmng3943PluginExecutionInheritanceTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng3916PluginExecutionInheritanceTest()
+    public MavenITmng3943PluginExecutionInheritanceTest()
     {
         super( "(2.0.4,)" );
     }
 
     /**
-     * Test that plugin executions are properly merged during inheritance, even if the child plugin section has no
-     * version.
+     * Test that plugin executions are properly merged during inheritance, even if the child uses a different
+     * plugin version than the parent.
      */
-    public void testitMNG3916()
+    public void testitMNG3943()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3916" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3943" );
 
         Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );

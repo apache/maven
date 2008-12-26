@@ -23,17 +23,17 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven.its.mng3916</groupId>
+    <groupId>org.apache.maven.its.mng3943</groupId>
     <artifactId>parent</artifactId>
     <version>0.1</version>
   </parent>
 
   <artifactId>child</artifactId>
 
-  <name>Maven Integration Test :: MNG-3916</name> 
+  <name>Maven Integration Test :: MNG-3943</name> 
   <description>
-    Test that plugin executions are properly merged during inheritance, even if the child plugin section has no
-    version.
+    Test that plugin executions are properly merged during inheritance, even if the child uses a different
+    plugin version than the parent.
   </description>
 
   <build>
@@ -41,7 +41,8 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-log-file</artifactId>
-        <!-- NOTE: <version> element deliberately omitted here -->
+        <!-- NOTE: Use different version than parent -->
+        <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
             <id>child-1</id>
