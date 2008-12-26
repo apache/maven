@@ -320,6 +320,22 @@ public class PomConstructionTest
         assertEquals( "http://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
     }
 
+    public void testNonInheritedElementsInSubtreesOverriddenByChild()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "limited-inheritance/child" );
+        assertEquals( null, pom.getValue( "organization/url" ) );
+        assertEquals( null, pom.getValue( "issueManagement/system" ) );
+        assertEquals( 0, ( (List<?>) pom.getValue( "ciManagement/notifiers" ) ).size() );
+        assertEquals( null, pom.getValue( "distributionManagement/repository/name" ) );
+        assertEquals( true, pom.getValue( "distributionManagement/repository/uniqueVersion" ) );
+        assertEquals( "default", pom.getValue( "distributionManagement/repository/layout" ) );
+        assertEquals( null, pom.getValue( "distributionManagement/snapshotRepository/name" ) );
+        assertEquals( true, pom.getValue( "distributionManagement/snapshotRepository/uniqueVersion" ) );
+        assertEquals( "default", pom.getValue( "distributionManagement/snapshotRepository/layout" ) );
+        assertEquals( null, pom.getValue( "distributionManagement/site/name" ) );
+    }
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
