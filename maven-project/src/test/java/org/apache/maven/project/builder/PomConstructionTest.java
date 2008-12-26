@@ -410,6 +410,16 @@ public class PomConstructionTest
                       new File( pom.getValue( "properties/siteOut" ).toString() ) );
     }
 
+    /* FIXME: cf. MNG-3944
+    public void testInterpolationOfBasedirInPomWithUnusualName()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "basedir-interpolation/pom-with-unusual-name.xml" );
+        assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/prop0" ).toString() ) );
+        assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/prop1" ).toString() ) );
+    }
+    //*/
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
