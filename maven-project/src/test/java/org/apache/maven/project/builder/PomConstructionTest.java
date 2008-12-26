@@ -49,18 +49,6 @@ public class PomConstructionTest
     // them into a resolver, create the expression to extract the data to validate the Model, and the URI
     // to validate the properties. We also need a way to navigate from the Tex specification documents to
     // the test in question and vice versa. A little Eclipse plugin would do the trick.
-    public void testThatAllPluginExecutionsWithIdsAreJoined()
-        throws Exception
-    {        
-        File nexusLauncher = new File( testDirectory, "nexus/nexus-test-harness-launcher/pom.xml" );        
-        PomArtifactResolver resolver = artifactResolver( "nexus" );                
-        PomClassicDomainModel model = projectBuilder.buildModel( nexusLauncher, null, resolver );         
-        assertEquals( 3, model.getLineageCount() );        
-        PomTestWrapper pom = new PomTestWrapper( model );        
-        assertModelEquals( pom, "maven-dependency-plugin", "build/plugins[4]/artifactId" );        
-        List<?> executions = (List<?>) pom.getValue( "build/plugins[4]/executions" );                
-        assertEquals( 7, executions.size() );
-    }
 
     public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins()
         throws Exception
@@ -83,7 +71,8 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "build/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
     }
-     /*
+
+    /* FIXME: cf. MNG-3821
     public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
         throws Exception
     {
@@ -97,8 +86,8 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "reporting/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
-     */
-    /* FIXME: cf. MNG-3886
+    //*/
+
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
         throws Exception
     {
@@ -111,6 +100,7 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
 
+    /* FIXME: cf. MNG-3886
     public void testOrderOfGoalsFromPluginExecutionWithPluginManagement()
         throws Exception
     {
@@ -124,7 +114,6 @@ public class PomConstructionTest
     }
     //*/
 
-    /* FIXME: cf. MNG-3887
     public void testOrderOfPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -137,6 +126,7 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
     }
 
+    /* FIXME: cf. MNG-3887
     public void testOrderOfPluginExecutionsWithPluginManagement()
         throws Exception
     {
@@ -149,6 +139,29 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
     }
     //*/
+
+    public void testMergeOfPluginExecutionsWhenChildInheritsPluginVersion()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-merging-wo-version/sub" );
+        assertEquals( 4, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+    }
+
+    /* FIXME: cf. MNG-3943
+    public void testMergeOfPluginExecutionsWhenChildAndParentUseDifferentPluginVersions()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-merging-version-insensitive/sub" );
+        assertEquals( 4, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+    }
+    //*/
+
+    public void testInterpolationWithXmlMarkup()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "xml-markup-interpolation" );
+        assertEquals( "<?xml version='1.0'?>Tom&Jerry", pom.getValue( "properties/xmlTest" ) );
+    }
 
     /* FIXME: cf. MNG-3925
     public void testOrderOfMergedPluginExecutionsWithoutPluginManagement()
@@ -202,7 +215,6 @@ public class PomConstructionTest
     }
     //*/
 
-    /* FIXME: cf. MNG-3938
     public void testOverridingOfInheritedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -212,6 +224,7 @@ public class PomConstructionTest
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
 
+    /* FIXME: cf. MNG-3938
     public void testOverridingOfInheritedPluginExecutionsWithPluginManagement()
         throws Exception
     {
