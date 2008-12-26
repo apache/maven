@@ -235,6 +235,42 @@ public class PomConstructionTest
     }
     //*/
 
+    /* FIXME: cf. MNG-3906
+    public void testOrderOfMergedPluginDependenciesWithoutPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "merged-plugin-class-path-order/wo-plugin-mngt/sub" );
+        assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
+        assertEquals( "c", pom.getValue( "build/plugins[1]/dependency[1]/artifactId" ) );
+        assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[1]/version" ) );
+        assertEquals( "a", pom.getValue( "build/plugins[1]/dependency[2]/artifactId" ) );
+        assertEquals( "2", pom.getValue( "build/plugins[1]/dependency[2]/version" ) );
+        assertEquals( "b", pom.getValue( "build/plugins[1]/dependency[3]/artifactId" ) );
+        assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[3]/version" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[4]/artifactId" ) );
+        assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[4]/version" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[5]/artifactId" ) );
+        assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[5]/version" ) );
+    }
+
+    public void testOrderOfMergedPluginDependenciesWithPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "merged-plugin-class-path-order/w-plugin-mngt/sub" );
+        assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
+        assertEquals( "c", pom.getValue( "build/plugins[1]/dependency[1]/artifactId" ) );
+        assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[1]/version" ) );
+        assertEquals( "a", pom.getValue( "build/plugins[1]/dependency[2]/artifactId" ) );
+        assertEquals( "2", pom.getValue( "build/plugins[1]/dependency[2]/version" ) );
+        assertEquals( "b", pom.getValue( "build/plugins[1]/dependency[3]/artifactId" ) );
+        assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[3]/version" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[4]/artifactId" ) );
+        assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[4]/version" ) );
+        assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[5]/artifactId" ) );
+        assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[5]/version" ) );
+    }
+    //*/
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
