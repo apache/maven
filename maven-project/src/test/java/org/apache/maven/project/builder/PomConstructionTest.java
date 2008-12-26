@@ -346,6 +346,17 @@ public class PomConstructionTest
                       pom.getValue( "properties/prop2" ).toString().trim().replaceAll( "[\n\r]", "" ).length() );
     }
 
+    public void testFullInterpolationOfNestedExpressions()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "full-interpolation" );
+        for ( int i = 0; i < 24; i++ )
+        {
+            String index = ( ( i < 10 ) ? "0" : "" ) + i;
+            assertEquals( "PASSED", pom.getValue( "properties/property" + index ) );
+        }
+    }
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
