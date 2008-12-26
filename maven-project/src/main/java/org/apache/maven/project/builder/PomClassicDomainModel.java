@@ -153,7 +153,7 @@ public final class PomClassicDomainModel
 
     public boolean isPomInBuild()
     {
-        return projectDirectory != null && new File(projectDirectory, "pom.xml").exists();
+        return projectDirectory != null && new File(projectDirectory, "pom.xml").isFile();
     }
 
     /**

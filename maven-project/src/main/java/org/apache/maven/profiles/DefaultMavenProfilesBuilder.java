@@ -50,7 +50,7 @@ public class DefaultMavenProfilesBuilder
 
         ProfilesRoot profilesRoot = null;
 
-        if ( profilesXml.exists() )
+        if ( profilesXml.isFile() )
         {
             getLogger().debug( "reading: " + profilesXml.getAbsolutePath() );
 

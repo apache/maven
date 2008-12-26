@@ -220,7 +220,7 @@ public final class DefaultProjectBuilder
                 f = new File( f, "pom.xml" );
             }
             
-            return f.exists();
+            return f.isFile();
         }
         catch ( IOException e )
         {
@@ -290,7 +290,7 @@ public final class DefaultProjectBuilder
             parentFile = new File( parentFile.getAbsolutePath(), "pom.xml" );
         }
 
-        if ( !parentFile.exists() )
+        if ( !parentFile.isFile() )
         {
             throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );
         }
