@@ -38,7 +38,8 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-configuration</artifactId>
-        <!-- NOTE: It's part of the test design to omit the <version> element -->
+        <!-- NOTE: Use different version than child -->
+        <version>0.1</version>
         <configuration>
           <stringParam>PASSED</stringParam>
         </configuration>

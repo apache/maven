@@ -43,6 +43,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-configuration</artifactId>
+        <!-- NOTE: Use different version than parent -->
         <version>2.1-SNAPSHOT</version>
         <configuration>
           <propertiesFile>target/plugin-config.properties</propertiesFile>
