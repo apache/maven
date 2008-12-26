@@ -336,6 +336,16 @@ public class PomConstructionTest
         assertEquals( null, pom.getValue( "distributionManagement/site/name" ) );
     }
 
+    public void testXmlTextCoalescing()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "xml-coalesce-text" );
+        assertEquals( "A  Test  Project Property", pom.getValue( "properties/prop0" ) );
+        assertEquals( "That's a test!", pom.getValue( "properties/prop1" ) );
+        assertEquals( 32 * 1024,
+                      pom.getValue( "properties/prop2" ).toString().trim().replaceAll( "[\n\r]", "" ).length() );
+    }
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
