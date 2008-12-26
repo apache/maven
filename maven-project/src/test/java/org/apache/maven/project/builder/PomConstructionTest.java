@@ -290,6 +290,18 @@ public class PomConstructionTest
     }
     //*/
 
+    public void testInterpolationOfNestedBuildDirectories()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "nested-build-dir-interpolation" );
+        assertEquals( new File( pom.getBasedir(), "target/classes/dir0" ),
+                      new File( (String) pom.getValue( "properties/dir0" ) ) );
+        assertEquals( new File( pom.getBasedir(), "src/test/dir1" ),
+                      new File( (String) pom.getValue( "properties/dir1" ) ) );
+        assertEquals( new File( pom.getBasedir(), "target/site/dir2" ),
+                      new File( (String) pom.getValue( "properties/dir2" ) ) );
+    }
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
@@ -303,7 +315,7 @@ public class PomConstructionTest
         {
             pomFile = new File( pomFile, "pom.xml" );
         }
-        return new PomTestWrapper( projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
+        return new PomTestWrapper( pomFile, projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
     }
 
     protected void assertModelEquals( PomTestWrapper pom, Object expected, String expression )

@@ -36,9 +36,17 @@ public class PomTestWrapper
 
     private PomClassicDomainModel domainModel;
 
+    private File pomFile;
+
     private JXPathContext context;
 
     public PomTestWrapper( PomClassicDomainModel domainModel )
+        throws IOException
+    {
+        this( null, domainModel );
+    }
+
+    public PomTestWrapper( File pomFile, PomClassicDomainModel domainModel )
         throws IOException
     {
         if ( domainModel == null )
@@ -46,6 +54,7 @@ public class PomTestWrapper
             throw new IllegalArgumentException( "domainModel: null" );
         }
         this.domainModel = domainModel;
+        this.pomFile = pomFile;
         context = JXPathContext.newContext( domainModel.getModel() );
     }
 
@@ -76,6 +85,11 @@ public class PomTestWrapper
     public PomClassicDomainModel getDomainModel()
     {
         return this.domainModel;
+    }
+
+    public File getBasedir()
+    {
+        return ( pomFile != null ) ? pomFile.getParentFile() : null;
     }
 
     public String getValueOfProjectUri( String projectUri, boolean withResolvedValue )
