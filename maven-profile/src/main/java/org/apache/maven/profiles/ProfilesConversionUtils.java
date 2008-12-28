@@ -75,6 +75,8 @@ public class ProfilesConversionUtils
                 os.setFamily( profileOs.getFamily() );
                 os.setName( profileOs.getName() );
                 os.setVersion( profileOs.getVersion() );
+
+                activation.setOs( os );
             }
             
             org.apache.maven.profiles.ActivationFile profileFile = profileActivation.getFile();
