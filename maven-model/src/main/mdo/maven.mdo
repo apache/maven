@@ -51,8 +51,8 @@
     <p>This is a reference for the Maven project descriptor used in Maven.</p>
     <p>An XSD is available at:</p>
     <ul>
-      <li><a href="http://maven.apache.org/maven-v3_0_0.xsd">http://maven.apache.org/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
-      <li><a href="http://maven.apache.org/maven-v4_0_0.xsd">http://maven.apache.org/maven-v4_0_0.xsd</a> for Maven 2.0.</li>
+      <li><a href="http://maven.apache.org/xsd/maven-v3_0_0.xsd">http://maven.apache.org/xsd/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
+      <li><a href="http://maven.apache.org/xsd/maven-4_0_0.xsd">http://maven.apache.org/xsd/maven-4_0_0.xsd</a> for Maven 2.0.</li>
     </ul>
     ]]>
   </description>
@@ -2126,7 +2126,7 @@
           <description>
             <![CDATA[
             FOR INTERNAL USE ONLY. This is a unique identifier assigned to each
-            resource to allow Maven to merge changes to this resource that take 
+            resource to allow Maven to merge changes to this resource that take
             place during the execution of a plugin. This field must be managed
             by the generated parser and formatter classes in order to allow it
             to survive model interpolation.
@@ -2141,7 +2141,7 @@
           <code>
             <![CDATA[
     private static int mergeIdCounter = 0;
-    
+
     public void initMergeId()
     {
         if ( getMergeId() == null )
@@ -2149,7 +2149,7 @@
             setMergeId( "resource-" + (mergeIdCounter++) );
         }
     }
-    
+
     /**
      * @see java.lang.Object#toString()
      */
