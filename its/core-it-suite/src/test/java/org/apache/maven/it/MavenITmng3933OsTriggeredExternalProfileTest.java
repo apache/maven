@@ -21,45 +21,52 @@ package org.apache.maven.it;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.it.util.Os;
 
 import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3944">MNG-3944</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3933">MNG-3933</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng3944BasedirInterpolationTest
+public class MavenITmng3933OsTriggeredExternalProfileTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng3944BasedirInterpolationTest()
+    public MavenITmng3933OsTriggeredExternalProfileTest()
     {
+        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,)" );
     }
 
     /**
-     * Test that interpolation of ${basedir} works for a POM that is not named "pom.xml"
+     * Test that OS-triggered profiles from an external profiles.xml are activated.
      */
-    public void testitMNG3944()
+    public void testitMNG3933()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3944" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3933" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-f" );
-        verifier.getCliOptions().add( new File( testDir, "pom-with-unusual-name.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/basedir.properties" );
-        Properties props = verifier.loadProperties( "target/basedir.properties" );
-        assertEquals( testDir, new File( props.getProperty( "project.properties.prop0" ) ) );
-        assertEquals( testDir, new File( props.getProperty( "project.properties.prop1" ) ) );
+        Properties props = verifier.loadProperties( "target/profile.properties" );
+        if ( Os.isFamily( Os.FAMILY_WINDOWS ) || Os.isFamily( Os.FAMILY_MAC ) || Os.isFamily( Os.FAMILY_UNIX ) )
+        {
+            assertEquals( "PASSED", props.getProperty( "project.properties.profileProperty" ) );
+        }
+        else
+        {
+            System.out.println();
+            System.out.println( "[WARNING] Skipping test on unrecognized OS: " + Os.OS_NAME );
+            System.out.println();
+        }
     }
 
 }
