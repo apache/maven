@@ -19,38 +19,40 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<profiles>
-  <profile>
-    <id>PROFILE-A</id>
-    <activation>
-      <os>
-        <family>winDOWS</family>
-      </os>
-    </activation>
-    <properties>
-      <profileProperty>PASSED</profileProperty>
-    </properties>
-  </profile>
-  <profile>
-    <id>PROFILE-B</id>
-    <activation>
-      <os>
-        <family>unIX</family>
-      </os>
-    </activation>
-    <properties>
-      <profileProperty>PASSED</profileProperty>
-    </properties>
-  </profile>
-  <profile>
-    <id>PROFILE-C</id>
-    <activation>
-      <os>
-        <family>mAC</family>
-      </os>
-    </activation>
-    <properties>
-      <profileProperty>PASSED</profileProperty>
-    </properties>
-  </profile>
-</profiles>
+<profilesXml>
+  <profiles>
+    <profile>
+      <id>PROFILE-A</id>
+      <activation>
+        <os>
+          <family>winDOWS</family>
+        </os>
+      </activation>
+      <properties>
+        <profileProperty>PASSED</profileProperty>
+      </properties>
+    </profile>
+    <profile>
+      <id>PROFILE-B</id>
+      <activation>
+        <os>
+          <family>unIX</family>
+        </os>
+      </activation>
+      <properties>
+        <profileProperty>PASSED</profileProperty>
+      </properties>
+    </profile>
+    <profile>
+      <id>PROFILE-C</id>
+      <activation>
+        <os>
+          <family>mAC</family>
+        </os>
+      </activation>
+      <properties>
+        <profileProperty>PASSED</profileProperty>
+      </properties>
+    </profile>
+  </profiles>
+</profilesXml>
