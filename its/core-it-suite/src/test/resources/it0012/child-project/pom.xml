@@ -11,7 +11,7 @@
         <groupId>org.apache.maven.its.plugins</groupId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
-		<outputDirectory>${basedir}/target/</outputDirectory>
+          <outputDirectory>${basedir}/target/</outputDirectory>
           <pluginFile>child-touch-${project.version}.txt</pluginFile>
         </configuration>
       </plugin>
