@@ -39,13 +39,14 @@ public class MavenIT0008Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0008" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin" );
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "process-sources" );
         verifier.assertFilePresent( "target/touch.txt" );
         verifier.assertFilePresent( "target/test-basedir-alignment/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
