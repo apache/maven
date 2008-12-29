@@ -59,7 +59,7 @@ import org.codehaus.plexus.util.ReaderFactory;
  * Default implementation of the project builder.
  */
 @Component(role = ProjectBuilder.class)
-public final class DefaultProjectBuilder
+public class DefaultProjectBuilder
     implements ProjectBuilder, LogEnabled
 {
     @Requirement
