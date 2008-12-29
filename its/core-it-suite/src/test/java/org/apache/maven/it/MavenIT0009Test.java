@@ -37,14 +37,14 @@ public class MavenIT0009Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0009" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin" );
-        verifier.executeGoal( "generate-resources" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
         verifier.assertFilePresent( "target/pluginItem" );
         verifier.assertFilePresent( "target/goalItem" );
         verifier.assertFileNotPresent( "target/bad-item" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
