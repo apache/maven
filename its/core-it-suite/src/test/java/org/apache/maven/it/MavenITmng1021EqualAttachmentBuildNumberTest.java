@@ -43,6 +43,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1021" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1021" );
         verifier.executeGoal( "initialize" );

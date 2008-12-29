@@ -36,17 +36,17 @@ public class MavenIT0007Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0007" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-plugin-parent", "2.0", "pom" );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0007/Person.class" );
-        verifier.assertFilePresent( "target/test-classes/org/apache/maven/it0007/PersonTest.class" );
-        verifier.assertFilePresent( "target/maven-it-it0007-1.0.jar" );
-        verifier.assertFilePresent( "target/maven-it-it0007-1.0.jar!/it0007.properties" );
-        verifier.assertArtifactPresent( "org.apache.maven.plugins", "maven-plugin-parent", "2.0", "pom" );
+        verifier.setAutoclean( false );
+        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0007" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
+        verifier.assertArtifactPresent( "org.apache.maven.its.it0007", "parent", "2.0", "pom" );
     }
-}
 
+}

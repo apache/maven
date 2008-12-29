@@ -19,20 +19,25 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project>
-  <modelVersion>4.0.0</modelVersion>
-
-  <parent>
-    <groupId>org.apache.maven.its.it0007</groupId>
-    <artifactId>parent</artifactId>
-    <version>2.0</version>
-  </parent>
-
-  <artifactId>test</artifactId>
-  <version>1.0</version>
-
-  <name>Maven Integration Test :: it0007</name> 
-  <description>
-    Verify that a parent POM is successfully downloaded.
-  </description>
-</project>
+<settings>
+  <profiles>
+    <profile>
+      <id>maven-core-it-repo</id>
+      <repositories>
+        <repository>
+          <id>maven-core-it</id>
+          <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <checksumPolicy>ignore</checksumPolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>maven-core-it-repo</activeProfile>
+  </activeProfiles>
+</settings>
