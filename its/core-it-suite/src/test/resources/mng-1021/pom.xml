@@ -22,11 +22,11 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.it0079</groupId>
-  <artifactId>maven-it-it0079</artifactId>
+  <groupId>org.apache.maven.its.mng1021</groupId>
+  <artifactId>test</artifactId>
   <version>SNAPSHOT</version>
 
-  <name>Maven Integration Test :: it0079</name> 
+  <name>Maven Integration Test :: MNG-1021</name> 
   <description>
     Test that attached artifacts have the same build number as the main
     artifact when deployed.
@@ -36,7 +36,7 @@ under the License.
     <snapshotRepository>
       <id>test</id>
       <name>Test Repo</name>
-      <url>file:target/test-repo</url>
+      <url>file:repo</url>
     </snapshotRepository>
   </distributionManagement>
 

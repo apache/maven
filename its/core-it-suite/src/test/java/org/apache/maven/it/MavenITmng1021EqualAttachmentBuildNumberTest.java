@@ -35,7 +35,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest
 {
 
     /**
-     * Test that source attachments have the same build number as the main
+     * Test that source attachments have the same build number and timestamp as the main
      * artifact when deployed.
      */
     public void testitMNG1021()
@@ -43,13 +43,48 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1021" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteDirectory( "repo" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng1021" );
         verifier.executeGoal( "initialize" );
-        verifier.assertFilePresent(
-            "target/test-repo/org/apache/maven/its/it0079/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1.jar" );
-        verifier.assertFilePresent(
-            "target/test-repo/org/apache/maven/its/it0079/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1-it.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng1021", "test", "SNAPSHOT", "pom" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng1021", "test", "SNAPSHOT", "jar" );
+
+        String dir = "repo/org/apache/maven/its/mng1021/test/";
+        String snapshot = getSnapshotVersion( new File( testDir, dir + "SNAPSHOT" ) );
+        assertTrue( snapshot, snapshot.endsWith( "-1" ) );
+
+        verifier.assertFilePresent( dir + "maven-metadata.xml" );
+        verifier.assertFilePresent( dir + "maven-metadata.xml.md5" );
+        verifier.assertFilePresent( dir + "maven-metadata.xml.sha1" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/maven-metadata.xml" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/maven-metadata.xml.md5" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/maven-metadata.xml.sha1" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + ".pom" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + ".pom.md5" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + ".pom.sha1" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + ".jar" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + ".jar.md5" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + ".jar.sha1" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + "-it.jar" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + "-it.jar.md5" );
+        verifier.assertFilePresent( dir + "SNAPSHOT/test-" + snapshot + "-it.jar.sha1" );
+    }
+
+    private String getSnapshotVersion( File artifactDir )
+    {
+        File[] files = artifactDir.listFiles();
+        for ( int i = 0; i < files.length; i++ )
+        {
+            String name = files[i].getName();
+            if ( name.endsWith( ".pom" ) )
+            {
+                return name.substring( "test-".length(), name.length() - ".pom".length() );
+            }
+        }
+        throw new IllegalStateException( "POM not found in " + artifactDir );
     }
 
 }
