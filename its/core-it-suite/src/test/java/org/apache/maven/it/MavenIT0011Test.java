@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
 
 public class MavenIT0011Test
     extends AbstractMavenIntegrationTestCase
@@ -36,11 +37,16 @@ public class MavenIT0011Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0011" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0011/PersonFinder.class" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0011" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        List artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0011:a:jar:0.1" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0011:b:jar:0.2" ) );
     }
-}
 
+}
