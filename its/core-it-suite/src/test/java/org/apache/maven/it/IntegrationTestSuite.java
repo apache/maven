@@ -317,7 +317,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0007Test.class );
         suite.addTestSuite( MavenIT0005Test.class );
         suite.addTestSuite( MavenIT0004Test.class );
-        suite.addTestSuite( MavenIT0003Test.class );
 
         /*
          * Add tests in reverse alpha order above.

@@ -49,10 +49,27 @@ public class MavenITmng3892ReleaseDeploymentTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "repo" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3892" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "pom" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "jar" );
+
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/maven-metadata.xml" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/maven-metadata.xml.md5" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/maven-metadata.xml.sha1" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.pom" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.pom.md5" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.pom.sha1" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.jar" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.jar.md5" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.jar.sha1" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0-it.jar" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0-it.jar.md5" );
+        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0-it.jar.sha1" );
     }
 
 }
