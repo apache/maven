@@ -36,11 +36,12 @@ public class MavenIT0019Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0019" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0019/Person.class" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "process-resources" );
+        verifier.assertFilePresent( "target/classes/test.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
