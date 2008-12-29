@@ -23,26 +23,32 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
-public class MavenIT0078Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-932">MNG-932</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng0932TestJarDeploymentTest
     extends AbstractMavenIntegrationTestCase
 {
-
     /**
-     * Test that configuration for a lifecycle-bound plugin is injected from
-     * PluginManagement section even when it's not explicitly defined in the
-     * plugins section.
+     * Test test jar attachment.
      */
-    public void testit0078()
+    public void testitMNG0932()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0078" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0932" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "process-resources" );
-        verifier.assertFilePresent( "target/plugin-management.txt" );
-        verifier.assertFileNotPresent( "target/resources-resources.txt" );
+        verifier.deleteArtifact( "org.apache.maven.its.it0077", "sub1", "1.0", "test-jar" );
+        verifier.executeGoal( "install" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.it0077", "sub1", "1.0", "test-jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-
 }
+

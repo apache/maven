@@ -24,24 +24,29 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0079Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1052">MNG-1052</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng1052PluginMngtConfigTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test that source attachments have the same build number as the main
-     * artifact when deployed.
+     * Test that configuration for a lifecycle-bound plugin is injected from
+     * PluginManagement section even when it's not explicitly defined in the
+     * plugins section.
      */
-    public void testit0079()
+    public void testitMNG1052()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0079" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1052" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "initialize" );
-        verifier.assertFilePresent(
-            "target/test-repo/org/apache/maven/its/it0079/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1.jar" );
-        verifier.assertFilePresent(
-            "target/test-repo/org/apache/maven/its/it0079/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1-it.jar" );
+        verifier.executeGoal( "process-resources" );
+        verifier.assertFilePresent( "target/plugin-management.txt" );
+        verifier.assertFileNotPresent( "target/resources-resources.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

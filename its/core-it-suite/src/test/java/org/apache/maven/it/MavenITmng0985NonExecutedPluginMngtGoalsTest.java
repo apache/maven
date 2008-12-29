@@ -23,32 +23,29 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
 
-public class MavenIT0075Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-985">MNG-985</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0985NonExecutedPluginMngtGoalsTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Verify that direct invocation of a mojo from the command line still
-     * results in the processing of modules included via profiles.
+     * Test that plugins in pluginManagement aren't included in the build
+     * unless they are referenced by groupId/artifactId within the plugins
+     * section of a pom.
      */
-    public void testit0075()
+    public void testitMNG0985()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0075" );
-
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0985" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "sub1/target" );
-        verifier.deleteDirectory( "sub2/target" );
-        Properties systemProperties = new Properties();
-        systemProperties.put( "expression.outputFile", "target/expression.properties" );
-        systemProperties.put( "activate", "anything" );
-        verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
-        verifier.assertFilePresent( "sub1/target/expression.properties" );
-        verifier.assertFilePresent( "sub2/target/expression.properties" );
+        verifier.executeGoal( "initialize" );
+        verifier.assertFileNotPresent( "target/unexpected.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

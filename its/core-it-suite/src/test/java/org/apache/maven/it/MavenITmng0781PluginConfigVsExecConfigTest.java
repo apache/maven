@@ -23,26 +23,31 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
-public class MavenIT0077Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-781">MNG-781</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0781PluginConfigVsExecConfigTest
     extends AbstractMavenIntegrationTestCase
 {
+
     /**
-     * Test test jar attachment.
+     * Test that plugin-level configuration instances are not nullified by
+     * execution-level configuration instances.
      */
-    public void testit0077()
+    public void testitMNG0781()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0077" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0781" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0077", "sub1", "1.0", "test-jar" );
-        verifier.executeGoal( "install" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.it0077", "sub1", "1.0", "test-jar" );
+        verifier.executeGoal( "process-resources" );
+        verifier.assertFilePresent( "target/exec-level.txt" );
+        verifier.assertFilePresent( "target/resources-resources.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-}
 
+}

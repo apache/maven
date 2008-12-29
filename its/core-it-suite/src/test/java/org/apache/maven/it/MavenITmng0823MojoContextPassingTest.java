@@ -23,25 +23,36 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
-public class MavenIT0074Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-823">MNG-823</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng0823MojoContextPassingTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test that plugin-level configuration instances are not nullified by
-     * execution-level configuration instances.
+     * Tests context passing between mojos in the same plugin.
      */
-    public void testit0074()
+    public void testitMNG0823()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0074" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0823" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "process-resources" );
-        verifier.assertFilePresent( "target/exec-level.txt" );
-        verifier.assertFilePresent( "target/resources-resources.txt" );
+        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-context-passing", "1.0",
+                                 "maven-plugin" );
+        List goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-context-passing:throw",
+            "org.apache.maven.its.plugins:maven-it-plugin-context-passing:catch"} );
+        verifier.executeGoals( goals );
+        verifier.assertFilePresent( "target/thrown-value" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-    }
 
+    }
 }
+

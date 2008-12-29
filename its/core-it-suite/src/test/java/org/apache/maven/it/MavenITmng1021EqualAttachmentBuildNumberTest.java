@@ -23,30 +23,33 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
-public class MavenIT0073Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1021">MNG-1021</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
+public class MavenITmng1021EqualAttachmentBuildNumberTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Tests context passing between mojos in the same plugin.
+     * Test that source attachments have the same build number as the main
+     * artifact when deployed.
      */
-    public void testit0073()
+    public void testitMNG1021()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0073" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1021" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-context-passing", "1.0",
-                                 "maven-plugin" );
-        List goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-context-passing:throw",
-            "org.apache.maven.its.plugins:maven-it-plugin-context-passing:catch"} );
-        verifier.executeGoals( goals );
-        verifier.assertFilePresent( "target/thrown-value" );
+        verifier.executeGoal( "initialize" );
+        verifier.assertFilePresent(
+            "target/test-repo/org/apache/maven/its/it0079/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1.jar" );
+        verifier.assertFilePresent(
+            "target/test-repo/org/apache/maven/its/it0079/maven-it-it0079/SNAPSHOT/maven-it-it0079-*-1-it.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
