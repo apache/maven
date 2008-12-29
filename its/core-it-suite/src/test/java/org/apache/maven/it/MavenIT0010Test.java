@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
 
 public class MavenIT0010Test
     extends AbstractMavenIntegrationTestCase
@@ -31,22 +32,28 @@ public class MavenIT0010Test
     /**
      * Since the artifact resolution does not use the project builder, we must
      * ensure that the full hierarchy of all dependencies is resolved. This
-     * includes the dependencies of the parent-pom's of dependencies. This test
-     * will check this, by depending on classworlds, which is a dependency of
-     * maven-component, which is the parent of maven-plugin, which is an
-     * explicit dependency of this test.
-     * # TODO: must correct the assumptions of this test
+     * includes the dependencies of the parent-pom's of dependencies.
      */
     public void testit0010()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0010" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0010/PersonFinder.class" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0010" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-    }
-}
+        verifier.assertArtifactPresent( "org.apache.maven.its.it0010", "a", "0.1", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.it0010", "b", "0.2", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.it0010", "parent", "1.0", "pom" );
 
+        List artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0010:a:jar:0.1" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0010:b:jar:0.2" ) );
+    }
+
+}
