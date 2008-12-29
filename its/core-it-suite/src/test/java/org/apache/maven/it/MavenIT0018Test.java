@@ -38,7 +38,8 @@ public class MavenIT0018Test
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0018" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0018" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.assertArtifactPresent( "org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar" );
         verifier.verifyErrorFreeLog();
