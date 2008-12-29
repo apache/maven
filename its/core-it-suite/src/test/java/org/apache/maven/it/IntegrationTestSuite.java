@@ -304,7 +304,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0025Test.class );
         suite.addTestSuite( MavenIT0024Test.class );
         suite.addTestSuite( MavenIT0023Test.class );
-        suite.addTestSuite( MavenIT0022Test.class );
         suite.addTestSuite( MavenIT0021Test.class );
         suite.addTestSuite( MavenIT0019Test.class );
         suite.addTestSuite( MavenIT0018Test.class );
