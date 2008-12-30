@@ -350,7 +350,7 @@ public final class ModelUtils
 
     private static List mergeDependencyList( List child, List parent )
     {
-        Map depsMap = new HashMap();
+        Map depsMap = new LinkedHashMap();
 
         if ( parent != null )
         {

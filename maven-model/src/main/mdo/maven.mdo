@@ -761,7 +761,7 @@
     {
         if ( pluginMap == null )
         {
-            pluginMap = new java.util.HashMap();
+            pluginMap = new java.util.LinkedHashMap();
             if ( plugins != null )
             {
                 for ( java.util.Iterator it = plugins.iterator(); it.hasNext(); )
@@ -2639,7 +2639,7 @@
     {
         if ( executionMap == null )
         {
-            executionMap = new java.util.HashMap();
+            executionMap = new java.util.LinkedHashMap();
             if ( getExecutions() != null )
             {
                 for ( java.util.Iterator i = getExecutions().iterator(); i.hasNext(); )
@@ -2850,7 +2850,7 @@
     {
         if ( reportPluginMap == null )
         {
-            reportPluginMap = new java.util.HashMap();
+            reportPluginMap = new java.util.LinkedHashMap();
             if ( getPlugins() != null )
             {
                 for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext(); )
@@ -3191,7 +3191,7 @@
     {
         if ( reportSetMap == null )
         {
-            reportSetMap = new java.util.HashMap();
+            reportSetMap = new java.util.LinkedHashMap();
             if ( getReportSets() != null )
             {
                 for ( java.util.Iterator i = getReportSets().iterator(); i.hasNext(); )

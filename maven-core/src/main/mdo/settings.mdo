@@ -378,7 +378,7 @@
     {
         if ( profileMap == null )
         {
-            profileMap = new java.util.HashMap();
+            profileMap = new java.util.LinkedHashMap();
 
             if ( getProfiles() != null )
             {
