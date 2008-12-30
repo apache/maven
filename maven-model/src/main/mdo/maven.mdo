@@ -2733,7 +2733,7 @@
           <name>id</name>
           <version>4.0.0</version>
           <type>String</type>
-          <defaultValue>default</defaultValue>
+          <defaultValue>default-execution-id</defaultValue>
           <description>The identifier of this execution for labelling the goals during the build,
             and for matching executions to merge during inheritance.</description>
         </field>
@@ -2759,7 +2759,7 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-    public static final String DEFAULT_EXECUTION_ID = "default";
+    public static final String DEFAULT_EXECUTION_ID = "default-execution-id";
             ]]>
           </code>
         </codeSegment>
