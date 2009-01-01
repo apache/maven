@@ -20,14 +20,15 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Tests that artifact checksums are properly verified.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2744">MNG-2744</a>.
+ * 
+ * @author Benjamin Bentmann
+ * @version $Id$
  */
 public class MavenITmng2744checksumVerificationTest
     extends AbstractMavenIntegrationTestCase
@@ -39,7 +40,7 @@ public class MavenITmng2744checksumVerificationTest
     }
 
     /**
-     * Tests that hex digits are compared without regard to case.
+     * Tests that hex digits of checksums are compared without regard to case.
      */
     public void testitMNG2744()
         throws Exception
@@ -47,15 +48,16 @@ public class MavenITmng2744checksumVerificationTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2744" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-
-        verifier.deleteArtifact( "org.apache.maven.its.mng2744", "a", "1", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2744", "a", "1", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2744", "b", "1", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2744", "b", "1", "jar" );
-
-        verifier.executeGoal( "compile" );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2744" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng2744", "a", "1", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng2744", "a", "1", "pom" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng2744", "b", "1", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng2744", "b", "1", "pom" );
     }
 
 }
