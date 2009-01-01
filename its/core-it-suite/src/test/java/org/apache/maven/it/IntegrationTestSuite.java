@@ -227,6 +227,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1491ReactorArtifactIdCollisionTest.class );
         suite.addTestSuite( MavenITmng1415QuotedSystemPropertiesTest.class );
         suite.addTestSuite( MavenITmng1412DependenciesOrderTest.class );
+        suite.addTestSuite( MavenITmng1349ChecksumFormatsTest.class );
         suite.addTestSuite( MavenITmng1323AntrunDependenciesTest.class );
         suite.addTestSuite( MavenITmng1052PluginMngtConfigTest.class );
         suite.addTestSuite( MavenITmng1021EqualAttachmentBuildNumberTest.class );
