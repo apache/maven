@@ -279,7 +279,7 @@ public class DefaultWagonManager
                 // TODO: shouldn't need a file intermediatary - improve wagon to take a stream
                 File temp = File.createTempFile( "maven-artifact", null );
                 temp.deleteOnExit();
-                FileUtils.fileWrite( temp.getAbsolutePath(), (String) sums.get( extension ) );
+                FileUtils.fileWrite( temp.getAbsolutePath(), "UTF-8", (String) sums.get( extension ) );
 
                 wagon.put( temp, remotePath + "." + extension );
             }
@@ -692,13 +692,14 @@ public class DefaultWagonManager
             tempChecksumFile.deleteOnExit();
             wagon.get( remotePath + checksumFileExtension, tempChecksumFile );
 
-            String expectedChecksum = FileUtils.fileRead( tempChecksumFile );
+            String expectedChecksum = FileUtils.fileRead( tempChecksumFile, "UTF-8" );
 
             // remove whitespaces at the end
             expectedChecksum = expectedChecksum.trim();
 
-            // check for 'MD5 (name) = CHECKSUM'
-            if ( expectedChecksum.startsWith( "MD5" ) )
+            // check for 'ALGO (name) = CHECKSUM' like used by openssl
+            if ( expectedChecksum.regionMatches( true, 0, "MD", 0, 2 )
+                || expectedChecksum.regionMatches( true, 0, "SHA", 0, 3 ) )
             {
                 int lastSpacePos = expectedChecksum.lastIndexOf( ' ' );
                 expectedChecksum = expectedChecksum.substring( lastSpacePos + 1 );
