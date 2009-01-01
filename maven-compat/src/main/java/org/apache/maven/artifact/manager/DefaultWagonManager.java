@@ -800,8 +800,9 @@ public class DefaultWagonManager
             // remove whitespaces at the end
             expectedChecksum = expectedChecksum.trim();
 
-            // check for 'MD5 (name) = CHECKSUM'
-            if ( expectedChecksum.startsWith( "MD5" ) )
+            // check for 'ALGO (name) = CHECKSUM' like used by openssl
+            if ( expectedChecksum.regionMatches( true, 0, "MD", 0, 2 )
+                || expectedChecksum.regionMatches( true, 0, "SHA", 0, 3 ) )
             {
                 int lastSpacePos = expectedChecksum.lastIndexOf( ' ' );
                 expectedChecksum = expectedChecksum.substring( lastSpacePos + 1 );
