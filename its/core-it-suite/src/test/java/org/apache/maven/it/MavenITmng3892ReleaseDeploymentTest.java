@@ -20,9 +20,11 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.Verifier;
+import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Locale;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3892">MNG-3892</a>.
@@ -58,18 +60,41 @@ public class MavenITmng3892ReleaseDeploymentTest
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "pom" );
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "jar" );
 
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/maven-metadata.xml" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/maven-metadata.xml.md5" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/maven-metadata.xml.sha1" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.pom" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.pom.md5" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.pom.sha1" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.jar" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.jar.md5" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0.jar.sha1" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0-it.jar" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0-it.jar.md5" );
-        verifier.assertFilePresent( "repo/org/apache/maven/its/mng3892/test/1.0/test-1.0-it.jar.sha1" );
+        String groupDir = "repo/org/apache/maven/its/mng3892/test/";
+        verifier.assertFilePresent( groupDir + "maven-metadata.xml" );
+        verifier.assertFilePresent( groupDir + "maven-metadata.xml.md5" );
+        verifier.assertFilePresent( groupDir + "maven-metadata.xml.sha1" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0.pom" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0.pom.md5" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0.pom.sha1" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0.jar" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0.jar.md5" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0.jar.sha1" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0-it.jar" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0-it.jar.md5" );
+        verifier.assertFilePresent( groupDir + "1.0/test-1.0-it.jar.sha1" );
+
+        verify( testDir, groupDir + "1.0/test-1.0.jar.md5", "dd89c30cc71c3cd8a729622243c76770" );
+        verify( testDir, groupDir + "1.0/test-1.0.jar.sha1", "0b0717ff89d3cbadc3564270bf8930163753bf71" );
+        verify( testDir, groupDir + "1.0/test-1.0-it.jar.md5", "dd89c30cc71c3cd8a729622243c76770" );
+        verify( testDir, groupDir + "1.0/test-1.0-it.jar.sha1", "0b0717ff89d3cbadc3564270bf8930163753bf71" );
+    }
+
+    private void verify( File testDir, String file, String checksum )
+        throws Exception
+    {
+        assertEquals( file, checksum, readChecksum( new File( testDir, file ) ) );
+    }
+
+    private String readChecksum( File checksumFile )
+        throws Exception
+    {
+        String checksum = FileUtils.fileRead( checksumFile, "UTF-8" ).trim();
+        if ( checksum.indexOf( ' ' ) >= 0 )
+        {
+            checksum = checksum.substring( 0, checksum.indexOf( ' ' ) );
+        }
+        return checksum.toLowerCase( Locale.ENGLISH );
     }
 
 }
