@@ -84,14 +84,14 @@ public class DefaultWagonManager
     private static final String MAVEN_ARTIFACT_PROPERTIES = "META-INF/maven/org.apache.maven.artifact/maven-artifact/pom.properties";
 
     private static int anonymousMirrorIdSeed = 0;
-    
+        
     private PlexusContainer container;
 
     // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
     // attached to ArtifactRepository before the method is called (so AR would be composed of WR, not inherit it)
     private Map<String,ProxyInfo> proxies = new HashMap<String,ProxyInfo>();
 
-    private Map<String,AuthenticationInfo> authenticationInfoMap = new HashMap<String,AuthenticationInfo>();
+    private static Map<String,AuthenticationInfo> authenticationInfoMap = new HashMap<String,AuthenticationInfo>();
 
     private Map<String,RepositoryPermissions> serverPermissionsMap = new HashMap<String,RepositoryPermissions>();
 
@@ -239,7 +239,9 @@ public class DefaultWagonManager
                     getLogger().debug( "not adding permissions to wagon connection" );
                 }
 
-                wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider()
+                AuthenticationInfo authenticationInfo = getAuthenticationInfo( repository.getId() ); 
+                                
+                wagon.connect( artifactRepository, authenticationInfo, new ProxyInfoProvider()
                 {
                     public ProxyInfo getProxyInfo( String protocol )
                     {
