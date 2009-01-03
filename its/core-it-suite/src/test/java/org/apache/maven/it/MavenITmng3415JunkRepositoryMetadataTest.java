@@ -153,8 +153,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      *       IS NOT in the build output for the test-repo
      *    b. Verify that the file used for updateInterval calculations was NOT changed from
      *       the first build.
-     *
-     * @fixme: Find a better mechanism for testing this than matching console output!
      */
     public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException()
         throws Exception
@@ -189,7 +187,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         File firstLogFile = new File( projectDir, verifier.getLogFileName() );
 
-        // FIXME: There really should be a better way than this!
+        // FIXME: There really should be a better way than matching console output!
         assertOutputLinePresent( verifier, firstLogFile, "snapshot org.apache.maven.its.mng3415:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
 
         File updateCheckFile = getUpdateCheckFile( localRepo );
@@ -205,7 +203,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         File secondLogFile = new File( projectDir, verifier.getLogFileName() );
 
-        // FIXME: There really should be a better way than this!
+        // FIXME: There really should be a better way than matching console output!
         assertOutputLineMissing( verifier, secondLogFile, "snapshot org.apache.maven.its.mng3415:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
 
         assertEquals( "Last-modified time should be unchanged from first build through second build for the file we use for updateInterval checks.", firstLastMod, updateCheckFile.lastModified() );

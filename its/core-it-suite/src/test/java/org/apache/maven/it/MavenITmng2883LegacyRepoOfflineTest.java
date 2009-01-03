@@ -105,6 +105,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
         catch ( VerificationException e )
         {
+            // expected
         }
 
         List missingMessages = new ArrayList();
@@ -204,6 +205,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
         catch ( VerificationException e )
         {
+            // expected
         }
 
         List missingMessages = new ArrayList();
@@ -296,6 +298,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
         catch ( VerificationException e )
         {
+            // expected
         }
 
         List missingMessages = new ArrayList();

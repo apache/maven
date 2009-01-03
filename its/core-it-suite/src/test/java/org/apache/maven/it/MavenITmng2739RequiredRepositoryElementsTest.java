@@ -62,6 +62,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest
         }
         catch ( VerificationException e )
         {
+            // expected
         }
 
         verifier.resetStreams();
@@ -101,6 +102,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest
         }
         catch ( VerificationException e )
         {
+            // expected
         }
 
         verifier.resetStreams();

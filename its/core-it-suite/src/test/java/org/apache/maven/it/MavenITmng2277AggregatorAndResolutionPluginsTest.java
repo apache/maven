@@ -20,8 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -68,7 +66,6 @@ public class MavenITmng2277AggregatorAndResolutionPluginsTest
          * recurse. We are only installing the parent pom to
          * the local repo here.
          */
-        List cliOptions = new ArrayList();
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-all:aggregator-dependencies" );
 
         verifier.verifyErrorFreeLog();

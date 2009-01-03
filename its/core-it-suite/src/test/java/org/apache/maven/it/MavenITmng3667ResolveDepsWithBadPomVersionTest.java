@@ -20,8 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.FileUtils;

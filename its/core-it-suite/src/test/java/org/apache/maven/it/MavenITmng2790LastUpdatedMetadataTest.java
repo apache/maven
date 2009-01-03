@@ -25,7 +25,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.Date;
-import java.util.Properties;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 

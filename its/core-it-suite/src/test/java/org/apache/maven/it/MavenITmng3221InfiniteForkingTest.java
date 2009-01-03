@@ -38,7 +38,6 @@ public class MavenITmng3221InfiniteForkingTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3221" );
-        File logBackupDir = testDir.getAbsoluteFile().getParentFile();
 
         File reportDir = new File( testDir, "report" );
         File projectDir = new File( testDir, "user" );
@@ -79,7 +78,6 @@ public class MavenITmng3221InfiniteForkingTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3221" );
-        File logBackupDir = testDir.getAbsoluteFile().getParentFile();
 
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "user" );

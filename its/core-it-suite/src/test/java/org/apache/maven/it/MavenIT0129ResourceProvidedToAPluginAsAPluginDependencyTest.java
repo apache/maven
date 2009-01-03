@@ -20,8 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -50,7 +48,6 @@ public class MavenIT0129ResourceProvidedToAPluginAsAPluginDependencyTest
         verifier.deleteArtifact( "org.apache.maven.its.it0129", "it0129-plugin", "1.0", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.it0129", "it0129-parent", "1.0", "pom" );
 
-        List cliOptions = new ArrayList();
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -58,7 +55,6 @@ public class MavenIT0129ResourceProvidedToAPluginAsAPluginDependencyTest
         //now run the test
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0129/test-project" );
         verifier = new Verifier( testDir.getAbsolutePath() );
-        cliOptions = new ArrayList();
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

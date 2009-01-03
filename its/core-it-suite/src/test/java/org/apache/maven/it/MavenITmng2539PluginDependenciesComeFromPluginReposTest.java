@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
 
 public class MavenITmng2539PluginDependenciesComeFromPluginReposTest
     extends AbstractMavenIntegrationTestCase
