@@ -36,24 +36,23 @@ public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
 
         Verifier verifier;
 
-        // Install the parent POM
-        verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0113", "maven-it0113-plugin", "1.0-SNAPSHOT", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0113", "test-project", "1.0-SNAPSHOT", "jar" );
-
         // Install the plugin to test for Authz info in the WagonManager
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "maven-it0113-plugin" ).getAbsolutePath() );
+        verifier = new Verifier( new File( testDir, "maven-it0113-plugin" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0113" );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         // Build the test project that uses the plugin.
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "test-project" ).getAbsolutePath() );
+        verifier = new Verifier( new File( testDir, "test-project" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
