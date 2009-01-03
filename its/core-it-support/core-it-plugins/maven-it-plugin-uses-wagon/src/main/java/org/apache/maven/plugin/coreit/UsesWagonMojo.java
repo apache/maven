@@ -42,9 +42,11 @@ public class UsesWagonMojo
     {
         try
         {
+            getLog().info( "[MAVEN-CORE-IT-LOG] Looking up wagon for protocol scp" );
             Wagon wagon = wagonManager.getWagon( "scp" );
 
             ScpWagon myWagon = (ScpWagon) wagon;
+            getLog().info( "[MAVEN-CORE-IT-LOG] Looked up and successfully casted scp wagon: " + myWagon );
         }
         catch( Exception e )
         {
