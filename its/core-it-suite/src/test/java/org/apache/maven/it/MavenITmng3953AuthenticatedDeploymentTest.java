@@ -74,7 +74,7 @@ public class MavenITmng3953AuthenticatedDeploymentTest
                 if ( "PUT".equalsIgnoreCase( request.getMethod() ) )
                 {
                     response.setStatus( HttpServletResponse.SC_OK );
-                    MavenITmng3953AuthenticatedDeploymentTest.this.deployed = true;
+                    deployed = true;
                 }
                 else
                 {
@@ -155,7 +155,6 @@ public class MavenITmng3953AuthenticatedDeploymentTest
         verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.getCliOptions().add( "-DdeploymentPort=" + port );
         verifier.executeGoal( "validate" );
-        verifier.displayStreamBuffers();
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
