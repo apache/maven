@@ -1,9 +1,0 @@
-<settings>
-  <servers>
-    <server>
-      <id>test</id>
-      <username>testuser</username>
-      <password>testtest</password>
-    </server>
-  </servers>
-</settings>

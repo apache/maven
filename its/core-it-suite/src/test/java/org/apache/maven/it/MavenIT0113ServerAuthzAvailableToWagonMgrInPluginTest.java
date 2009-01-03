@@ -25,35 +25,35 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
     extends AbstractMavenIntegrationTestCase
 {
+
+    /**
+     * Test that the auth infos given in the settings.xml are pushed into the wagon manager and are available
+     * to other components/plugins.
+     */
     public void testit0113()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0113" );
 
-        Verifier verifier;
-
-        // Install the plugin to test for Authz info in the WagonManager
-        verifier = new Verifier( new File( testDir, "maven-it0113-plugin" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.it0113" );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "install" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        // Build the test project that uses the plugin.
-        verifier = new Verifier( new File( testDir, "test-project" ).getAbsolutePath() );
-        verifier.setAutoclean( false );
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "initialize" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/auth.properties" );
+        assertEquals( "testuser", props.getProperty( "test.username" ) );
+        assertEquals( "testtest", props.getProperty( "test.password" ) );
     }
+
 }
