@@ -336,7 +336,6 @@ public class PluginParameterExpressionEvaluator
         else if ( "settings".equals( expression ) )
         {
             value = context.getSettings();
-            System.out.println( value );
         }
         else if ( expression.startsWith( "settings" ) )
         {
