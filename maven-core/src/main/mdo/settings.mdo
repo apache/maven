@@ -394,6 +394,8 @@
         return profileMap;
     }
     
+    //[MNG-3954] :: this is required for the release plugin
+    
     private RuntimeInfo runtimeInfo;
 
     public void setRuntimeInfo( RuntimeInfo runtimeInfo )
