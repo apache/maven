@@ -13,7 +13,7 @@
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0-alpha-1</version>
   </parent>
   <artifactId>maven-embedder</artifactId>
   <name>Maven Embedder</name>
