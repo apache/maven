@@ -13,13 +13,12 @@
     License for the specific language governing permissions and
     limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0-alpha-1</version>
   </parent>
   <artifactId>maven-distribution</artifactId>
   <name>Maven Distribution</name>
@@ -120,8 +119,7 @@
                   <createDependencyReducedPom>false</createDependencyReducedPom>
                   <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                   <transformers>
-                    <transformer
-                      implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer" />
+                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer" />
                   </transformers>
                   <artifactSet>
                     <excludes>
@@ -175,8 +173,7 @@
                   <createDependencyReducedPom>false</createDependencyReducedPom>
                   <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
                   <transformers>
-                    <transformer
-                      implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer" />
+                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer" />
                   </transformers>
                   <artifactSet>
                     <excludes>
