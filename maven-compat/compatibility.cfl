@@ -46,6 +46,19 @@ h3. Unsupported Compatibility
 * org.apache.maven.artifact.resolver.transform.*
 * org.apache.maven.artifact.resolver.versioning.*
 
+h2. Settings
+
+The settings are historically a CLI-based mechanism for setting preferences. It should have never gone beyond the core into plugins
+or other tools. Unfortunately we allowed the ${settings} expression in plugins and from there it made its way into components like
+the release manager. The release manager in turn never evolved to decouple itself from the settings and it requires a recreation
+of the entire Maven environment to work and grabs the RuntimeInfo info class from the settings in order to do this. Other plugins
+may require this and we'll have to find them them and push them toward using the Invoker where the Maven environment is taken care
+of and restrict/forbid the use of settings in plugins. Everything required is in the exeution request and therefore the session and
+that's all plugins should need.
+
+The changes made relate to MNG-3954, where the RuntimeInfo class needed to be partially rescurrected in order to make the release
+plugin happy.
+
 h2. Changes to the CLI
 * Log file support has been added i.e mvn -l log.txt clean install
 * Plugin registry option has not been supported in the core and it lagged around in the CLI
