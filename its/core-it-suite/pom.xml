@@ -159,6 +159,11 @@ under the License.
       </build>
     </profile>
     <profile>
+      <!--
+      NOTE: Maven 3.0-alpha-1 doesn't properly handle profiles+interpolation so it requires Maven 2.x to use this
+      profile to generate coverage data for Maven 3.x:
+        mvn test -Pemma -DmavenHome=<apache-maven-3.x-home>
+      -->
       <id>emma</id>
       <properties>
         <preparedMavenHome>${project.build.directory}/distro</preparedMavenHome>
@@ -170,6 +175,7 @@ under the License.
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skip>false</skip>
+              <testFailureIgnore>true</testFailureIgnore>
             </configuration>
           </plugin>
           <plugin>
@@ -185,24 +191,14 @@ under the License.
                 </goals>
                 <configuration>
                   <tasks>
+                    <delete dir="${preparedMavenHome}"/>
                     <copy todir="${preparedMavenHome}" overwrite="true">
                       <fileset dir="${mavenHome}"/>
                     </copy>
-                    <move todir="${preparedMavenHome}/lib">
-                      <fileset dir="${preparedMavenHome}/lib"/>
-                      <regexpmapper from="^(maven)((-[^-]*)*?)(-[0-9].*)\.jar$$" to="\1\2.jar"/>
-                    </move>
                   </tasks>
                 </configuration>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.apache.ant</groupId>
-                <artifactId>ant-nodeps</artifactId>
-                <version>1.7.1</version>
-              </dependency>
-            </dependencies>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -228,43 +224,68 @@ under the License.
               </execution>
             </executions>
           </plugin>
-        </plugins>
-      </build>
-      <reporting>
-        <plugins>
           <plugin>
             <groupId>org.sonatype.maven.plugin</groupId>
             <artifactId>emma4it-maven-plugin</artifactId>
-            <version>1.0</version>
+            <version>1.2-SNAPSHOT</version>
             <configuration>
-              <jarFiles>
-                <jarFile>${preparedMavenHome}/lib/maven.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-core.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-compat.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-embedder.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-lifecycle.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-mercury.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-model.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-plugin-api.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-project.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-project-builder.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-reporting-api.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-toolchain.jar</jarFile>
-                <jarFile>${preparedMavenHome}/lib/maven-shared-model.jar</jarFile>
-              </jarFiles>
+              <jarSets>
+                <jarSet>
+                  <directory>${preparedMavenHome}/lib</directory>
+                  <includes>
+                    <include>maven*.jar</include>
+                  </includes>
+                </jarSet>
+              </jarSets>
+              <includes>
+                <include>org.apache.maven.*</include>
+              </includes>
+            </configuration>
+            <executions>
+              <execution>
+                <id>instrument</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>instrument</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>report</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${basedir}</directory>
+                  <includes>
+                    <include>coverage.ec</include>
+                  </includes>
+                </fileset>
+              </filesets>
             </configuration>
           </plugin>
         </plugins>
-      </reporting>
+      </build>
       <repositories>
         <repository>
           <id>sonatype.org</id>
           <url>http://repository.sonatype.org/content/groups/public</url>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
         </repository>
       </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>sonatype.org</id>
+          <url>http://repository.sonatype.org/content/groups/public</url>
+        </pluginRepository>
+      </pluginRepositories>
     </profile>
   </profiles>
 </project>
