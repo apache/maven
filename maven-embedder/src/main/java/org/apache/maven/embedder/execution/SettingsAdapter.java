@@ -20,6 +20,7 @@ package org.apache.maven.embedder.execution;
  */
 
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
 
 import java.util.List;
@@ -37,11 +38,13 @@ public class SettingsAdapter
 {
     private MavenExecutionRequest request;
     private Settings settings;
-
+    private RuntimeInfo runtimeInfo;
+    
     public SettingsAdapter( MavenExecutionRequest request, Settings settings )
     {
         this.request = request;
         this.settings = settings;
+        this.runtimeInfo = new RuntimeInfo( request.getUserSettingsFile() );
     }
 
     public String getLocalRepository()
@@ -94,5 +97,10 @@ public class SettingsAdapter
     public List getPluginGroups()
     {
         return settings.getPluginGroups();
+    }
+    
+    public RuntimeInfo getRuntimeInfo()
+    {
+        return runtimeInfo;
     }
 }

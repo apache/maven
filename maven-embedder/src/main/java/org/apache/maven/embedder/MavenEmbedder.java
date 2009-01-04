@@ -35,8 +35,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -322,10 +320,7 @@ public class MavenEmbedder
         PluginNotFoundException, PluginVersionNotFoundException
     {
         PluginManager pluginManager = container.lookup( PluginManager.class );
-
-//        MavenSession session = new MavenSession( container, request, null, null, projectSessions );
         MavenSession session = new MavenSession( container, request, null, null );
-
         pluginManager.verifyPlugin( plugin, project, session );
     }
 
