@@ -24,13 +24,21 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2068">MNG-2068</a>.
+ * 
+ * @author John Casey
+ * @version $Id$
+ */
 public class MavenIT0097Test
     extends AbstractMavenIntegrationTestCase
 {
 
+    // TODO: There is another IT for this issue, check whether these are dups or could be merged
+
     /**
      * Test that the implied relative path for the parent POM works, even two
-     * levels deep (c.f. MNG-2068).
+     * levels deep.
      */
     public void testit0097()
         throws Exception

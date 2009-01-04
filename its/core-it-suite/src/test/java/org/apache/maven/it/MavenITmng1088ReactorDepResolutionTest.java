@@ -23,31 +23,31 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
 
-public class MavenIT0080Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1088">MNG-1088</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng1088ReactorDepResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test that depending on a WAR doesn't also get its dependencies transitively.
+     * Test that the reactor can establish the artifact location of known projects for dependencies
+     * using process-sources to see that it works even when they aren't compiled
      */
-    public void testit0080()
+    public void testitMNG1088()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0080" );
-
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1088" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.it0080" );
-        verifier.executeGoal( "validate" );
+        verifier.executeGoal( "process-sources" );
+        verifier.assertFilePresent( "test-component-c/target/my-test" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Collection artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
-        assertEquals( Collections.singletonList( "org.apache.maven.its.it0080:war:war:0.1" ), artifacts );
     }
-
 }
+

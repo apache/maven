@@ -44,7 +44,7 @@ public class MavenITmng3887PluginExecutionOrderTest
      * Test that multiple plugin executions bound to the same phase are executed in the order given by the POM when no
      * <pluginManagement> is involved.
      */
-    public void testitWithoutPluginManagement()
+    public void testitWithoutPluginMngt()
         throws Exception
     {
         testitMNG3887( "test-1" );
@@ -54,7 +54,7 @@ public class MavenITmng3887PluginExecutionOrderTest
      * Test that multiple plugin executions bound to the same phase are executed in the order given by the POM when
      * <pluginManagement> is involved.
      */
-    public void testitWithPluginManagement()
+    public void testitWithPluginMngt()
         throws Exception
     {
         testitMNG3887( "test-2" );

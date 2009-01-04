@@ -23,25 +23,35 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
-public class MavenIT0082Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-956">MNG-956</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test that the reactor can establish the artifact location of known projects for dependencies
-     * using process-sources to see that it works even when they aren't compiled
+     * Test component injection from project-level plugin dependencies.
      */
-    public void testit0082()
+    public void testitMNG0956()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0082" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0956" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "process-sources" );
-        verifier.assertFilePresent( "test-component-c/target/my-test" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0081" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties apiProps = verifier.loadProperties( "target/component.properties" );
+        assertEquals( "true", apiProps.getProperty( "org.apache.maven.its.it0081.DefaultComponent" ) );
     }
-}
 
+}

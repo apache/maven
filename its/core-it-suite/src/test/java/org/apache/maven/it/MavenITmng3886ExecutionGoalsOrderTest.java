@@ -44,7 +44,7 @@ public class MavenITmng3886ExecutionGoalsOrderTest
      * Test that the goals from a plugin execution are executed in the order given by the POM when no <pluginManagement>
      * is involved.
      */
-    public void testitWithoutPluginManagement()
+    public void testitWithoutPluginMngt()
         throws Exception
     {
         testitMNG3886( "test-1" );
@@ -54,7 +54,7 @@ public class MavenITmng3886ExecutionGoalsOrderTest
      * Test that the goals from a plugin execution are executed in the order given by the POM when <pluginManagement>
      * is involved.
      */
-    public void testitWithPluginManagement()
+    public void testitWithPluginMngt()
         throws Exception
     {
         testitMNG3886( "test-2" );

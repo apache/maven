@@ -44,7 +44,7 @@ public class MavenITmng3925MergedPluginExecutionOrderTest
      * Test that multiple plugin executions bound to the same phase by child and parent are executed in the proper
      * order when no <pluginManagement> is involved.
      */
-    public void testitWithoutPluginManagement()
+    public void testitWithoutPluginMngt()
         throws Exception
     {
         testitMNG3925( "test-1" );
@@ -54,7 +54,7 @@ public class MavenITmng3925MergedPluginExecutionOrderTest
      * Test that multiple plugin executions bound to the same phase by child and parent are executed in the proper
      * order when <pluginManagement> is involved.
      */
-    public void testitWithPluginManagement()
+    public void testitWithPluginMngt()
         throws Exception
     {
         testitMNG3925( "test-2" );

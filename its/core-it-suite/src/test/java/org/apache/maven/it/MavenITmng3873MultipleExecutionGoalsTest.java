@@ -43,7 +43,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest
      * Test that all goals from a plugin execution are actually executed and not only one when no <pluginManagement>
      * is involved.
      */
-    public void testitWithoutPluginManagement()
+    public void testitWithoutPluginMngt()
         throws Exception
     {
         testitMNG3873( "test-1" );
@@ -53,7 +53,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest
      * Test that all goals from a plugin execution are actually executed and not only one when <pluginManagement>
      * is involved.
      */
-    public void testitWithPluginManagement()
+    public void testitWithPluginMngt()
         throws Exception
     {
         testitMNG3873( "test-2" );

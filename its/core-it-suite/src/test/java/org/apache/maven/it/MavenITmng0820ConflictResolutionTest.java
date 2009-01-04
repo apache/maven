@@ -24,17 +24,23 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0084Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-820">MNG-820</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng0820ConflictResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
      * Verify that the collector selecting a particular version gets the correct subtree
      */
-    public void testit0084()
+    public void testitMNG0820()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0084" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0820" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "package" );
         verifier.assertFilePresent( "test-component-a/target/test-component-a-0.1.jar" );

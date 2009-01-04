@@ -46,7 +46,7 @@ public class MavenITmng3938MergePluginExecutionsTest
      * default id, regardless whether the id is given explicitly by the user or implicitly assumed from defaults, when
      * no <pluginManagement> is involved.
      */
-    public void testitWithoutPluginManagement()
+    public void testitWithoutPluginMngt()
         throws Exception
     {
         testitMNG3938( "test-1" );
@@ -57,7 +57,7 @@ public class MavenITmng3938MergePluginExecutionsTest
      * default id, regardless whether the id is given explicitly by the user or implicitly assumed from defaults, when
      * <pluginManagement> is involved.
      */
-    public void testitWithPluginManagement()
+    public void testitWithPluginMngt()
         throws Exception
     {
         testitMNG3938( "test-2" );

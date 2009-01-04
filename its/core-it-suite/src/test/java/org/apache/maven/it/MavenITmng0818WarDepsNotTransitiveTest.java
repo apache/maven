@@ -23,29 +23,37 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.Collection;
+import java.util.Collections;
 
-public class MavenIT0081Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-818">MNG-818</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng0818WarDepsNotTransitiveTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
-     * Test component injection from project-level plugin dependencies.
+     * Test that depending on a WAR doesn't also get its dependencies transitively.
      */
-    public void testit0081()
+    public void testitMNG0818()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0081" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0818" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.it0081" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0080" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Properties apiProps = verifier.loadProperties( "target/component.properties" );
-        assertEquals( "true", apiProps.getProperty( "org.apache.maven.its.it0081.DefaultComponent" ) );
+        Collection artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        assertEquals( Collections.singletonList( "org.apache.maven.its.it0080:war:war:0.1" ), artifacts );
     }
 
 }

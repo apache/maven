@@ -44,7 +44,7 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest
      * Test that during inheritance/merging of a plugin execution the goals specified by child and parent are properly
      * ordered when no <pluginManagement> is involved.
      */
-    public void testitWithoutPluginManagement()
+    public void testitWithoutPluginMngt()
         throws Exception
     {
         testitMNG3937( "test-1" );
@@ -54,7 +54,7 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest
      * Test that during inheritance/merging of a plugin execution the goals specified by child and parent are properly
      * ordered when <pluginManagement> is involved.
      */
-    public void testitWithPluginManagement()
+    public void testitWithPluginMngt()
         throws Exception
     {
         testitMNG3937( "test-2" );

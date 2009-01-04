@@ -25,17 +25,23 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Collection;
 
-public class MavenIT0083Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1233">MNG-1233</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng1233WarDepWithProvidedScopeTest
     extends AbstractMavenIntegrationTestCase
 {
 
     /**
      * Verify that overriding a transitive compile time dependency as provided in a WAR ensures it is not included.
      */
-    public void testit0083()
+    public void testitMNG1233()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0083" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1233" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );

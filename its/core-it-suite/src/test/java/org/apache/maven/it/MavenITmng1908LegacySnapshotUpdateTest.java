@@ -24,17 +24,23 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0092Test
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1908">MNG-1908</a>.
+ * 
+ * @author Brett Porter
+ * @version $Id$
+ */
+public class MavenITmng1908LegacySnapshotUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
     
     /**
-     * Test that legacy repositories with legacy snapshots download correctly (c.f. MNG-2068).
+     * Test that legacy repositories with legacy snapshots download correctly.
      */
-    public void testit0092()
+    public void testitMNG1908()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0092" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1908" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
         verifier.executeGoal( "compile" );
