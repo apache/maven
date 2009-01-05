@@ -1,23 +1,29 @@
 
 \documentclass[12pt]{amsart}
-\usepackage{geometry} % see geometry.pdf on how to lay out the page. There's lots.
+\usepackage{geometry}
 \geometry{a4paper} % or letter or a5paper or ... etc
 % \geometry{landscape} % rotated page geometry
 
 % See the ``Article customise'' template for come common customisations
 
-\title{}
-\author{}
-\date{} % delete this line to display the current date
+\title{Maven Project Builder Specification}
+\author{Shane Isbell}
+\makeglossary
+
 
 \begin{document}
 
 \maketitle
 \tableofcontents
+\section{Introduction}
+\subsection{Purpose}
+The purpose of this document is to cover how the Maven project model is constructed and interpolated. Out of scope are issues such as dependency resolution.
+
+
 \section{Model Transformations}
 \subsection{Canonical Data Format}
 Maven supports a canonical data format for the pom that includes 465 model properties (we refer to each ordered pair of uri/values as a model property). 
-
+\glossary{doo}
 \begin{verbatim}
 	http://apache.org/maven/project/modelVersion
 	http://apache.org/maven/project/groupId
@@ -33,7 +39,7 @@ So a valid set would contain ordered pairs:
 
 Technically \begin{math}\mathcal{A}\end{math} is also ordered.
 
-Any one is free to create a transformer from any another format (yaml, .NET projects files, etc) to this canonical data format, giving them all the benefits of project inheritance and interpolation that Maven uses in building a project.
+Anyone is free to create a transformer from any another format (yaml, .NET projects files, etc) to this canonical data format, giving them all the benefits of project inheritance and interpolation that Maven uses in building a project.
 
 \subsubsection{Collections}
 A model property may  be specified as a collection, which allows specialized join rules for adding model properties. Collections of collections are allowed.
@@ -85,8 +91,11 @@ Let \begin{math}\mathcal{C''}\end{math} be the original set of model properties 
 
 \end{enumerate}
 
+\subsection{Model Containers}
+In addition to the general inheritance rules, there is also the concept of Model Containers, which allow the framework to delegate to specific model container implementations the decision of whether \#collections and \#sets should be joined, deleted, or have no operation applied. This will be covered more fully in section 3.
+
 \subsection{Mixins and Multiple Inheritance}
-Currently, Maven 3.0 supports linearlized inheritance, making mixins and multiple inheritance easy. Support for multiple inheritance would require an addition to the pom, within the parents section.
+Currently, Maven 3.0 supports linearlized inheritance, making mixins and multiple inheritance easy. Support for multiple inheritance would require an additional to the pom, within the parents section.
 
 \begin{verbatim}
 <parents>
@@ -125,28 +134,63 @@ Mixins would function the same as multiple/single inheritance:
 The only difference between a parent project and a mixin is that the mixin is abstract (not a complete model).
 
 \section{Maven Project Inheritance Rules}
-These rules outlined in this section are provided in the PomClassicTransformer class. The shared-model framework will delegate to this transformer for the processing of the Maven specific domain model rules.
+These rules outlined in this section are provided in the PomTransformer class. The maven-shared-model framework will delegate to this transformer for the processing of the Maven specific domain model rules.
 
 \subsection{Inheriting Version and Group Ids}
 If \emph{project.version} is not specified within the child pom, the child pom will use the \emph{project.parent.version} as its own version. Similarly, if \emph{project.groupId} is not within the child pom, the child pom will use the \emph{project.parent.groupId} as its own \emph{project.groupId}.
 
+\subsection{Inheriting URLs}
+
+\subsection{Properties Excluded From Being Overridden}
+If the child project defines any of the properties below, they are not overridden by or joined with elements of the parent pom(s). 
+
+\begin{enumerate}
+\item project.build.resources
+\item project.build.testResoures
+\item project.pluginRepositories 
+\item project.organization 
+\item project.licenses
+\item project.developers
+\item project.contributors
+\item project.mailingLists
+\item project.ciManagement
+\item project.issueManagement
+\item project.distributionsManagement.repository
+\item project.distributionsManagement.snapshotRepository
+\item project.distributionsManagement.site
+\end{enumerate}
+
 \subsection{Properties Excluded From Inheritance}
-A child project does not inherit the following properties from its specified parent project. All other properties are inherited, unless otherwise noted below.
+A child project does not inherit the following properties from its specified parent project\footnote{Technically, project.version, project.groupId and project.artifactId are not inherited from the parent pom. They do, however, have the values of project.parent.version, project.parent.groupId and project.parent.artifactId implicitly applied from the same pom.}. All other properties are inherited, unless otherwise noted below.
 \begin{enumerate}
 \item project.parent
-\item project.modules
 \item project.name
 \item project.packaging
 \item project.profiles
 \item project.version
 \item project.groupId
-\item project.build.resources
-\item project.build.testResources
-\item project.pluginRepositories
+\item project.prerequisites
+\item project.distributionManagement.relocation
 \end{enumerate}
 
-A parent project can set an inherited property within the \emph{project.build.plugins.plugin} or \emph{project.build.plugins.plugin.executions.execution} section of the pom to mark the member as private, thus preventing inheritance.
+\subsection{Marking Containers as Final (Or Not Inherited)}
+A parent project can set an inherited property within the following elements of the pom. This will mark the container as final, thus preventing inheritance:
+\begin{enumerate}
+\item project.build.plugins.plugin
+\item project.build.plugins.plugin.executions.execution
+\item project.build.pluginManagement.plugins.plugin
+\item project.build.pluginManagement.plugins.plugin.executions.execution
+\item project.profiles.profile.build.plugins.plugin
+\item project.profiles.profile.build.plugins.plugin.executions.execution
+\item project.profiles.profile.build.pluginManagement.plugins.plugin
+\item project.profiles.profile.build.pluginManagement.plugins.plugin.executions.execution
+\item project.reporting.plugins.plugin
+\item project.reporting.plugins.plugin.reportSets.reportSet
+\item project.profiles.profile.reporting.plugins.plugin
+\item project.profiles.profile.reporting.plugins.plugin.reportSets.reportSet
+\end{enumerate}
 
+Some examples demonstrating use within the project model:
 \begin{verbatim}
     <plugin>
         <groupId>org.apache.maven</groupId>
@@ -169,17 +213,9 @@ A parent project can set an inherited property within the \emph{project.build.pl
     </plugin>
 \end{verbatim}
 
-\subsection{Super Pom Rules}
-The super pom is implicitly  the parent of every project and functions as a normal parent project except that it allows the child project to inherit the following properties, which are normally excluded. If the child project defines the property,  it overrides all elements of the respective super pom property. There is no join of these three superPom-child collections.
-\begin{itemize}
-\item project.build.resources
-\item project.build.testResources
-\item project.pluginRepositories 
-\end{itemize}
-
 \subsection{Artifact Inheritance (Model Container)}
 \subsubsection{Defined Nodes}
-Within the project there are a number of nodes which contain artifactId, groupId and version. These nodes may be inherited or even joined.
+Within the project there are a number of nodes which contain artifactId, groupId and version. These nodes may be inherited or joined.
 \begin{enumerate}
 \item project.dependencies.dependency
 \item project.build.plugins.plugin
@@ -188,59 +224,80 @@ Within the project there are a number of nodes which contain artifactId, groupId
 \item project.dependencyManagement.dependencies.dependency
 \item project.build.pluginManagement.plugins.plugin
 \item project.build.pluginManagement.plugins.plugin.dependencies.dependency
+\item project.reporting.plugins.plugin
+\item project.build.extensions.extension
 \end{enumerate}
+
 \subsubsection{Rules}
 Let the parent project be \begin{math}\mathcal{A}\end{math} and the child project be  \begin{math}\mathcal{B}\end{math} . Let both \begin{math}\alpha_i \subset \mathcal{A}\end{math} and \begin{math}\beta_i \subset \mathcal{B}\end{math} be one of the elements listed above. For example,  \begin{math}\alpha_1\end{math} would contain all the elements of a project dependency within the parent project.
 
-Both \begin{math}\alpha_i \subset \mathcal{A}\end{math} and \begin{math}\beta_i \subset \mathcal{A}\end{math}, contain at least the elements groupId and artifactId, with an implied version value of null, if version is not specified within the pom. Also note that only (1), (3), (5) and (7) have an element of type, otherwise the type value is considered null. More precisely we have:
+Both \begin{math}\alpha_i \subset \mathcal{A}\end{math} and \begin{math}\beta_i \subset \mathcal{A}\end{math}, contain at least the following elements:
+\begin{enumerate}
+\item project.groupId (required)
+\item project.artifactId (required)
+\item project.version (default value - null)
+\item project.type (default value - jar)
+\item project.classifier (default value - null)
+\end{enumerate}
+
+(1-3) may be values referencing project.parent.groupId, project.parent.artifactId, project.parent.version, where they are not explicitly defined.
+
+More precisely we have:
 
 \begin{math} \forall_i  \forall_j \alpha_i = \{\langle groupId, value_j \rangle_i, \langle artifactId, value_{j+1}\rangle_i, \langle version, value_{j+2}\rangle_i, \ldots\}.\end{math}
 
-The inheritance rules are:
+Now define the following rules:
+
+\begin{enumerate}
+\item 
+ \begin{math} R_1 \equiv  
+groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i} \wedge type(value)^{\alpha_i} = type(value)^{\beta_i}  \wedge classifier(value)^{\alpha_i} = classifier(value)^{\beta_i} 
+\end{math}
+\item 
+ \begin{math} R_2 \equiv  
+version(value)^{\alpha_i} = version(value)^{\beta_i} 
+\end{math}
+\end{enumerate}
+
+
+The inheritance rules are JOIN, NOP, and DELETE:
 
 \begin{enumerate}
 \item
 \begin{math}
-groupId(value)^{\alpha_i} \neq groupId(value)^{\beta_i} \vee artifactId(value)^{\alpha_i} \neq artifactId(value)^{\beta_i}  \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i 
+R_1 \wedge R_2 \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i - (\alpha_i \cap \beta_i)
 \end{math}
 \item
 \begin{math}
-groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i}  \wedge version(value)^{\alpha_i} \neq version(value)^{\beta_i}  \wedge  type(value)^{\alpha_i} = type(value)^{\beta_i} \Rightarrow \mathcal{B}_{new} = \mathcal{B} - \alpha_i 
+\neg R_1\Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i 
 \end{math}
 \item
 \begin{math}
-groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i}  \wedge version(value)^{\alpha_i} \neq version(value)^{\beta_i}  \wedge  type(value)^{\alpha_i} \neq type(value)^{\beta_i} \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i 
-\end{math}
-\item
-\begin{math}
-groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i}  \wedge version(value)^{\alpha_i} = version(value)^{\beta_i}  \wedge type(value)^{\alpha_i} = type(value)^{\beta_i} \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i - (\alpha_i \cap \beta_i)
-\end{math}
-\item
-\begin{math}
-groupId(value)^{\alpha_i} = groupId(value)^{\beta_i}  \wedge artifactId(value)^{\alpha_i} = artifactId(value)^{\beta_i}  \wedge version(value)^{\alpha_i} = version(value)^{\beta_i}  \wedge type(value)^{\alpha_i} \neq type(value)^{\beta_i} \Rightarrow \mathcal{B}_{new} = \mathcal{B} \cup \alpha_i 
-\end{math}
-
+R_1 \wedge \neg R_2 \Rightarrow \mathcal{B}_{new} = \mathcal{B} \end{math}
 \end{enumerate}
 
-Or more simply:
+Note that model container rules are performed after basic sorting and collapsing of the model inheritance. So a NOP operation means that a model container from the parent is left within the model, meaning there is a union of the elements. A delete means that the model container from the parent is removed, leaving the set the same. 
 
+\subsubsection{Default Group IDs}
+To maintain backwards compatibility, the following elements are assigned a default groupId of \emph{org.apache.maven.plugins}, if the groupId is not specified. 
 \begin{enumerate}
-\item if either groupId or artifactId is different, then inherit the node.
-\item if groupId, artifactId and type match but the version doesn't, then don't inherit the node.
-\item if groupId and artifactId  match but the version and types don't, then inherit the node.
-\item if groupId, artifactId, version and type match, then inherit and join the node.
-\item if groupId, artifactId, version match but type doesn't, then inherit the node
+\item project.build.plugins.plugin
+\item project.profiles.profile.build.plugins.plugin
+\item project.build.pluginManagement.plugins.plugin
+\item project.build.profiles.profile.pluginManagement.plugins.plugin
+\item project.reporting.plugins.plugin
+\item project.profiles.profile.reporting.plugins.plugin
 \end{enumerate}
-
 
 \subsection{Id Inheritance (Model Container)}
 
 \subsubsection{Defined Nodes}
-Within the project there are a number of nodes which contain id. These nodes may be inherited or even joined.
+Within the project there are a number of nodes which contain id. Each of the nodes below is an element of a collection, meaning there may be more than one. The ID is used to determine whether the containers should be joined, rather than just added to the collection..
 \begin{enumerate}
 \item project.pluginRepositories.pluginRepository
 \item project.repositories.repository
 \item project.reporting.plugins.plugin.reportSets.reportSet
+\item project.profiles.profile
 \item project.build.plugins.plugin.executions.execution
 \end{enumerate}
 
@@ -265,6 +322,8 @@ Plugin nodes are treated as a set. If a child pom contains the same element as a
 \end{verbatim}
 
 If the parent pom contains an element that the child pom does not have, the element will be inherited.
+
+
 
 \section{Management Rules}
 \subsection{Dependency/Plugin Management}
@@ -345,5 +404,77 @@ The maven property \$\{project.basedir\} is only added to the initial list if th
 
 \subsection{Interpolation and Profiles}
 Active profiles are applied prior to interpolation so that any \emph{project.profiles.profile.properties} defined within an active profile can be used as an interpolation property [Still to be implemented]
+
+\section{Model Container Operations}
+\subsection{Definitions}
+\begin{description}
+\item[Mode Container Rule] Rule that determines whether the model properties between sets \begin{math} \mathcal{A}\end{math} and  \begin{math} \mathcal{B}\end{math} match.  
+\item[M-Operator] Model Container Operator - an operation on Rules. The result of the M-Operator is a set operation. Each resulting set of an M-Operator has to be equal to the resulting set of another M-Operator defined within the system.
+\end{description}
+\subsection{M-Operators}
+\subsubsection{Definitions}
+The Maven system defines the following operators:
+\begin{description}
+\item[JOIN]  M($\mathnormal{\mathcal{R}_{1},\mathcal{R}_{2} ) = \gamma - (\alpha_i \cap \beta_i)}$
+\item[NOP] M($\mathnormal{\neg \mathcal{R}_{1}, \mathcal{R}_{2})  = \gamma} $ 
+\item[DELETE] M($\mathnormal{\mathcal{R}_{1}, \neg \mathcal{R}_{2}) =  \gamma -\alpha_i} $ 
+\end{description}
+Note that $\mathnormal{\gamma=\mathcal{B}\cup \alpha_i}$. This is the set that results after basic sorting and inheritance have been applied to the models. 
+
+There are some interesting properties of the above definitions. For example,  a JOIN is equivalent to a NOP when the intersection of the model containers is null, or a JOIN is equivalent to a DELETE if there is no child model container.
+
+Also these definitions allow us to clearly see how to undo an operation. For example, say we did a DELETE and now we want to revert the operation. We merely need to add back in the properties of the parent model container, giving us a NOP. To revert a JOIN, we add back in the intersection of the parent and child model containers.
+
+\subsubsection{Negation}
+Define negation on the operators as:
+\begin{enumerate}
+\item $\mathnormal{\neg M(\mathcal{R}_{1},\mathcal{R}_{2} ) =M(\mathcal{R}_{1},\neg \mathcal{R}_{2} ) }$
+\item $\mathnormal{\neg M(\neg \mathcal{R}_{1},\mathcal{R}_{2} ) =M(\neg \mathcal{R}_{1}, \mathcal{R}_{2} ) }$
+\item $\mathnormal{\neg M(\mathcal{R}_{1}, \neg \mathcal{R}_{2}) =  M(\mathcal{R}_{1},\mathcal{R}_{2} )} $ 
+\end{enumerate}
+Negation of a JOIN is a DELETE, negation of a NOP is a NOP, negation of a DELETE is a JOIN. To understand the mechanics of negation, we need to look at the underlying set operations. 
+
+Take (3), where we negate a DELETE. Since we have defined a negation of a DELETE as a JOIN, the set operations for a negation would be to add in elements of the parent model container and then to remove the intersection of the child and parent model containers.
+\subsubsection{Addition}
+Define addition operators as:
+\begin{description}
+\item[Sum of JOINs] $\mathnormal{\sum_{i=1}^n \sum_{j=1}^m M(\mathcal{R}^{\alpha_{i} , \beta_{j}}_{1},\mathcal{R}^{\alpha_{i} , \beta_{j}}_{2} ) }$
+\item[Sum of NOPs] $\mathnormal{\sum_{i=1}^n \sum_{j=1}^m M(\neg \mathcal{R}^{\alpha_{i} , \beta_{j}}_{1},\mathcal{R}^{\alpha_{i} , \beta_{j}}_{2} ) }$
+\item[Sum  of DELETEs] $\mathnormal{\sum_{i=1}^n \sum_{j=1}^m M(\mathcal{R}^{\alpha_{i} , \beta_{j}}_{1},\neg \mathcal{R}^{\alpha_{i} , \beta_{j}}_{2} ) }$
+\end{description}
+
+Take the case of Sum of Joins. Let i = 1, meaning there is only one parent model container. Then we have:
+
+\begin{eqnarray}
+\sum_{i=1}^n \sum_{j=1}^m M(\mathcal{R}^{\alpha_{i} , \beta_{j}}_{1},\mathcal{R}^{\alpha_{i} , \beta_{j}}_{2} )  & = &
+\sum_{j=1}^m M(\mathcal{R}^{\alpha_{1} , \beta_{j}}_{1},\mathcal{R}^{\alpha_{1} , \beta_{j}}_{2} ) \\
+& = &
+\mathcal{B} \cup \alpha_{1}-(\alpha_{1} \cap \beta_{1}) - (\alpha_{1} \cap \beta_{2})  - \cdots - (\alpha_{1} \cap \beta_{m})  \\ & = &
+\mathcal{B} \cup \alpha_{1}-(\alpha_{1} \cap (\beta_{1} \cup \beta_{2}  \cup \cdots  \cup \beta_{m})
+\end{eqnarray}
+
+So we simplify the operation to just adding the parent model container to the child model, and then removing the intersection between that parent model container and the union of all child model container. Thus we can simply the calculation for multiple joins, allowing more efficient processing on the underlying data model.
+
+\appendix
+\section{Definitions}
+\begin{description}
+\item[Collection] Any model property with a URI ending in \#collection
+\item[Canonical Data Format] A set of model properties including all possible elements of the Maven model
+\item[Delete] Delete Model Container Action. Processing this rule on a model container will delete it's model properties from a model data source.
+\item[Element] A model property
+\item[Interpolation] 
+\item[Join] Join Model Container Action. Processing this rule on a model container will join it's model properties with another container's model properties.
+\item[Mixin]  An abstract model which needn't contain all the required elements of the model.
+\item[Model Container]  A container for a set of Model Properties associated with a specific URI.
+\item[Model Container Action]  One of the following actions: delete, join, nop that may be performed on a  Model Container.
+\item[Model Data Source] A class that provides operations for deleting, joining and querying Model Containers.
+\item[Model Property]  A property of the model that consists of a URI and a value, which may be null.
+\item[Model Transformer]  A class that is responsible for transforming from a model format to the 
+canonical data model. It can also optionally perform various domain specific rules and processing.
+\item[Node] A model container
+\item[NOP] No operation Model Container Action. Processing this rule on a model container will leave the model properties of the model container untouched.
+\item[Profile] 
+\item[Set] Any model property with a URI ending in \#set
+\end{description}
 
 \end{document}
