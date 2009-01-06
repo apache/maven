@@ -36,14 +36,15 @@ public class MavenIT0064Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0064" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-setter", "1.0", "maven-plugin" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-setter:setter-touch" );
-        verifier.assertFilePresent( "target/fooValue" );
-        verifier.assertFilePresent( "target/barValue.baz" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/fooValue" );
+        verifier.assertFilePresent( "target/barValue.baz" );
     }
 }
-
