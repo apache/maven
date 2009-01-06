@@ -41,13 +41,16 @@ public class MavenIT0025Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0025" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "process-sources" );
-        verifier.assertFilePresent( "target/test.txt" );
-        verifier.assertFilePresent( "target/test2.txt" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/test.txt" );
+        verifier.assertFilePresent( "target/test2.txt" );
     }
-}
 
+}

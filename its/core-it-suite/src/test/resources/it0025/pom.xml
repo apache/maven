@@ -14,6 +14,7 @@
         <executions>
           <execution>
             <id>test1</id>
+            <phase>validate</phase>
 
             <configuration>
               <pluginItem>test.txt</pluginItem>
@@ -25,6 +26,7 @@
           </execution>
           <execution>
             <id>test2</id>
+            <phase>validate</phase>
 
             <configuration>
               <pluginItem>test2.txt</pluginItem>
