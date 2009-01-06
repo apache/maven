@@ -36,12 +36,16 @@ public class MavenIT0056Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0056" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
-        verifier.assertFilePresent( "target/first-exec.txt" );
-        verifier.assertFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/first-exec.txt" );
+        verifier.assertFilePresent( "target/second-exec.txt" );
     }
 
 }
