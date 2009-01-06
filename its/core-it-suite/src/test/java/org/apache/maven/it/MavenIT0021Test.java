@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
 
 public class MavenIT0021Test
     extends AbstractMavenIntegrationTestCase
@@ -37,16 +36,18 @@ public class MavenIT0021Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0021" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
-        Properties systemProperties = new Properties();
-        systemProperties.put( "includeProfile", "true" );
-        verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "compile" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0021" );
+        verifier.getSystemProperties().setProperty( "includeProfile", "true" );
+        verifier.getCliOptions().add( "-Pprofile-2" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertArtifactPresent( "org.apache.maven.its.it0021", "a", "0.1", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.it0021", "b", "0.1", "jar" );
     }
-}
 
+}
