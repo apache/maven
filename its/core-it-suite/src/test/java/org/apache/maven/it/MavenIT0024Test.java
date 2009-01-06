@@ -44,10 +44,13 @@ public class MavenIT0024Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0024" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
-        verifier.assertFilePresent( "target/plugin-exec-configuration.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/plugin-exec-configuration.txt" );
     }
 
 }
