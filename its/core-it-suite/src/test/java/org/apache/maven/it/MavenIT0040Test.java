@@ -41,12 +41,15 @@ public class MavenIT0040Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0040" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "target/maven-it-it0040-1.0-it.jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/maven-it-it0040-1.0-it.jar" );
     }
-}
 
+}
