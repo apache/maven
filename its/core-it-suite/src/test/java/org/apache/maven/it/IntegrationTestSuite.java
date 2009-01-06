@@ -284,7 +284,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0132PomLifecycleTest.class );
         suite.addTestSuite( MavenIT0131SiteLifecycleTest.class );
         suite.addTestSuite( MavenIT0130CleanLifecycleTest.class );
-        suite.addTestSuite( MavenIT0129ResourceProvidedToAPluginAsAPluginDependencyTest.class );
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest.class );
         suite.addTestSuite( MavenIT0097Test.class );
