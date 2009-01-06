@@ -38,6 +38,8 @@ public class MavenIT0063Test
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0063" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.getSystemProperties().setProperty( "jre.home", new File( testDir, "jdk/jre" ).getPath() );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.verifyErrorFreeLog();
