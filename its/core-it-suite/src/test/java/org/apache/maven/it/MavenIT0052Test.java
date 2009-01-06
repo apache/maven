@@ -36,14 +36,17 @@ public class MavenIT0052Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0052" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "target/maven-it-it0052-1.0.jar" );
-        verifier.assertFileNotPresent( "target/source-jar.txt" );
-        verifier.assertFileNotPresent( "target/javadoc-jar.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/jar-jar.txt" );
+        verifier.assertFileNotPresent( "target/source-jar.txt" );
+        verifier.assertFileNotPresent( "target/javadoc-jar.txt" );
     }
-}
 
+}
