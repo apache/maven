@@ -40,7 +40,7 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <configuration>
           <logFile>target/failed.log</logFile>
-          <string>This should not get executed</string>
+          <string>This should not get executed, should have taken the other POM</string>
         </configuration>
         <executions>
           <execution>
