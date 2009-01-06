@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-607">MNG-607</a>.
@@ -45,16 +43,20 @@ public class MavenIT0039Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0039" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-r" );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "project/target/maven-it-it0039-p1-1.0.jar" );
-        verifier.assertFilePresent( "project2/target/maven-it-it0039-p2-1.0.jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "project/target" );
+        verifier.deleteDirectory( "project2/target" );
+        verifier.getCliOptions().add( "-r" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "project/target/passed.log" );
+        verifier.assertFileNotPresent( "project/target/failed.log" );
+        verifier.assertFilePresent( "project2/target/passed.log" );
+        verifier.assertFileNotPresent( "project2/target/failed.log" );
     }
-}
 
+}
