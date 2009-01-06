@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Collection;
 
 public class MavenIT0085Test
     extends AbstractMavenIntegrationTestCase
@@ -38,14 +39,18 @@ public class MavenIT0085Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0085" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.assertFileNotPresent( "war/target/war-1.0/WEB-INF/lib/pom.xml" );
-        verifier.assertFileNotPresent( "war/target/war-1.0/WEB-INF/lib/it0085-dep-1.0.jar" );
-        verifier.assertFilePresent( "war/target/war-1.0/WEB-INF/lib/junit-3.8.1.jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0085" );
+        verifier.getSystemProperties().setProperty( "test.home", testDir.getAbsolutePath() );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Collection lines = verifier.loadLines( "target/test.txt", "UTF-8" );
+        assertTrue( lines.toString(), lines.contains( "system.jar" ) );
     }
-}
 
+}
