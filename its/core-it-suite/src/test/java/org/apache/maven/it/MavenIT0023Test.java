@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
 
 public class MavenIT0023Test
     extends AbstractMavenIntegrationTestCase
@@ -37,15 +35,17 @@ public class MavenIT0023Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0023" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
-        verifier.setCliOptions( cliOptions );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.assertFilePresent( "target/test.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/test.txt" );
     }
-}
 
+}
