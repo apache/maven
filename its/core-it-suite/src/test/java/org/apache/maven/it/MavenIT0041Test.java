@@ -41,15 +41,16 @@ public class MavenIT0041Test
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0041" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact" );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "target/maven-it-it0041-1.0-SNAPSHOT.jar" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "pom" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact" );
+        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "pom" );
     }
-}
 
+}
