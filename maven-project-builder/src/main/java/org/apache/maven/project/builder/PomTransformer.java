@@ -232,11 +232,27 @@ public class PomTransformer
                  
                     for(ModelContainer a : managementExecutionContainers)
                     {
+                    	boolean hasId = false;
+                    	for(ModelProperty mp : a.getProperties()) {
+                    		if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.id)) {
+                    			hasId = true;
+                    			break;
+                    		}
+                    	}
+                    	
+                    	ModelContainer c = a;
+                    	if(!hasId) {
+                    		List<ModelProperty> listWithId = new ArrayList<ModelProperty>(a.getProperties());
+                    		listWithId.add(1, new ModelProperty(ProjectUri.Build.Plugins.Plugin.Executions.Execution.id, "default"));
+                    		c = new IdModelContainerFactory().create(listWithId);
+                    	}
+                    	
+                    	
                         for(ModelContainer b : pluginExecutionContainers)
                         {
-                            if(b.containerAction(a).equals(ModelContainerAction.JOIN))
+                            if(b.containerAction(c).equals(ModelContainerAction.JOIN))
                             {
-                                source.join(b, a);
+                                source.join(b, c);
                                 joinedExecutionContainers.add(a);
                             }
                         }
@@ -272,6 +288,7 @@ public class PomTransformer
                                     ModelTransformerContext.sort(a.getProperties(), ProjectUri.Build.Plugins.Plugin.Executions.xUri));
                         }
                     }
+                    
                 }
             }
         }

@@ -243,7 +243,7 @@ public class PomConstructionTest
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
 
-    /* FIXME: cf. MNG-3938
+    /* FIXME: cf. MNG-3938 */
     public void testOverridingOfInheritedPluginExecutionsWithPluginManagement()
         throws Exception
     {
@@ -252,7 +252,7 @@ public class PomConstructionTest
         assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default']/phase" ) );
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
-    //*/
+    
 
     /* FIXME: cf. MNG-3906
     public void testOrderOfMergedPluginDependenciesWithoutPluginManagement()
