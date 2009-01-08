@@ -141,6 +141,11 @@ public final class PomClassicDomainModel
         this.parentFile = parentFile;
     }
     
+    /**
+     * This should only be set for projects that are in the build. Setting for poms in the repo may cause unstable behavior.
+     * 
+     * @param projectDirectory
+     */
     public void setProjectDirectory(File projectDirectory)
     {
         this.projectDirectory = projectDirectory;
@@ -153,7 +158,7 @@ public final class PomClassicDomainModel
 
     public boolean isPomInBuild()
     {
-        return projectDirectory != null && new File(projectDirectory, "pom.xml").isFile();
+        return projectDirectory != null;
     }
 
     /**
