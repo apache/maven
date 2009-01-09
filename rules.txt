@@ -1,0 +1,2 @@
+Mirrors defined in settings:
+Mirror lookup should always use first declaration, regardless whether exact id match or wildcard match
