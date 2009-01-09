@@ -377,9 +377,15 @@ public class DefaultPluginManager
                                     ArtifactRepository localRepository )
         throws InvalidPluginException, ArtifactNotFoundException, ArtifactResolutionException
     {
+        ArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
 
         Set<Artifact> projectPluginDependencies;
 
+        // The case where we have a plugin that can host multiple versions of a particular tool. Say the 
+        // Antlr plugin which has many versions and you may want the plugin to execute with version 2.7.1 of
+        // Antlr versus 2.7.2. In this case the project itself would specify dependencies within the plugin
+        // element.
+        
         try
         {
             projectPluginDependencies = MavenMetadataSource.createArtifacts(
@@ -387,7 +393,7 @@ public class DefaultPluginManager
                                                                              plugin.getDependencies(),
                                                                              null,
                                                                              coreArtifactFilterManager.getCoreArtifactFilter(),
-                                                                             project );
+                                                                             project );            
         }
         catch ( InvalidDependencyVersionException e )
         {
@@ -399,10 +405,7 @@ public class DefaultPluginManager
 
         try
         {
-            resolutionGroup = artifactMetadataSource.retrieve(
-                                                               pluginArtifact,
-                                                               localRepository,
-                                                               project.getRemoteArtifactRepositories() );
+            resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
@@ -418,8 +421,8 @@ public class DefaultPluginManager
         try
         {
             MavenProject pluginProject =
-                mavenProjectBuilder.buildFromRepository( pluginArtifact, project.getRemoteArtifactRepositories(),
-                                                         localRepository );
+                mavenProjectBuilder.buildFromRepository( pluginArtifact, project.getRemoteArtifactRepositories(), localRepository );
+            
             if ( pluginProject != null )
             {
                 pluginManagedDependencies = pluginProject.getManagedVersionMap();
@@ -429,8 +432,6 @@ public class DefaultPluginManager
         {
             // this can't happen, it would have blowed up at artifactMetadataSource.retrieve()
         }
-
-//        checkPlexusUtils( resolutionGroup, artifactFactory );
 
         Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
 
@@ -446,8 +447,6 @@ public class DefaultPluginManager
 
         repositories.addAll( project.getRemoteArtifactRepositories() );
 
-        ArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME );
-
         ArtifactResolutionResult result = artifactResolver.resolveTransitively(
                                                                                 dependencies,
                                                                                 pluginArtifact,
@@ -455,8 +454,7 @@ public class DefaultPluginManager
                                                                                 localRepository,
                                                                                 repositories.isEmpty()
                                                                                                 ? Collections.EMPTY_LIST
-                                                                                                : new ArrayList(
-                                                                                                                 repositories ),
+                                                                                                : new ArrayList( repositories ),
                                                                                 artifactMetadataSource,
                                                                                 filter );
 

@@ -10,7 +10,7 @@ package org.apache.maven.artifact;
 
 public enum ArtifactScopeEnum
 {
-    compile( 1 ), test( 2 ), runtime( 3 ), provided( 4 ), system( 5 );
+    compile( 1 ), test( 2 ), runtime( 3 ), provided( 4 ), system( 5 ), runtime_plus_system( 6 );
 
     public static final ArtifactScopeEnum DEFAULT_SCOPE = compile;
 
@@ -21,7 +21,7 @@ public enum ArtifactScopeEnum
     {
         this.id = id;
     }
-
+    
     int getId()
     {
         return id;
@@ -62,9 +62,13 @@ public enum ArtifactScopeEnum
         {
             return Artifact.SCOPE_PROVIDED;
         }
-        else
+        else if ( id == 5 )
         {
             return Artifact.SCOPE_SYSTEM;
+        }
+        else
+        {
+            return Artifact.SCOPE_RUNTIME_PLUS_SYSTEM;
         }
     }
     

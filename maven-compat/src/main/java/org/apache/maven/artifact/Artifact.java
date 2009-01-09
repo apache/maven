@@ -55,6 +55,8 @@ public interface Artifact
 
     String SCOPE_RUNTIME = ArtifactScopeEnum.runtime.toString();
 
+    String SCOPE_RUNTIME_PLUS_SYSTEM = ArtifactScopeEnum.runtime_plus_system.toString();
+
     String SCOPE_PROVIDED = ArtifactScopeEnum.provided.toString();
 
     String SCOPE_SYSTEM = ArtifactScopeEnum.system.toString();

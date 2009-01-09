@@ -39,7 +39,7 @@ public class ScopeArtifactFilter
     private final boolean providedScope;
 
     private final boolean systemScope;
-
+    
     public ScopeArtifactFilter( String scope )
     {
         if ( Artifact.SCOPE_COMPILE.equals( scope ) )
@@ -53,6 +53,14 @@ public class ScopeArtifactFilter
         else if ( Artifact.SCOPE_RUNTIME.equals( scope ) )
         {
             systemScope = false;
+            providedScope = false;
+            compileScope = true;
+            runtimeScope = true;
+            testScope = false;
+        }
+        else if ( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM.equals( scope ) )
+        {
+            systemScope = true;
             providedScope = false;
             compileScope = true;
             runtimeScope = true;

@@ -457,8 +457,10 @@ public class MavenMetadataSource
      * @return {@link Set} &lt; {@link Artifact} >
      * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
      */
-    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies,
-                                                 String inheritedScope, ArtifactFilter dependencyFilter,
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, 
+                                                 List<Dependency> dependencies,
+                                                 String inheritedScope, 
+                                                 ArtifactFilter dependencyFilter,
                                                  MavenProject project )
         throws InvalidDependencyVersionException
     {
