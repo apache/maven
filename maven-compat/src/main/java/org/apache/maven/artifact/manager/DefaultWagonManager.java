@@ -1109,7 +1109,11 @@ public class DefaultWagonManager
         
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
-        mirrors.put( mirrorOf, mirror );
+        //to preserve first wins, don't add repeated mirrors.
+        if (!mirrors.containsKey( mirrorOf ))
+        {
+            mirrors.put( mirrorOf, mirror );
+        }
     }
 
     public void setOnline( boolean online )

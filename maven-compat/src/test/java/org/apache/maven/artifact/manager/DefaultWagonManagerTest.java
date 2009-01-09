@@ -585,6 +585,8 @@ public class DefaultWagonManagerTest
         //exact matches win first
         wagonManager.addMirror( "a2", "a,b", "http://a2" );
         wagonManager.addMirror( "a", "a", "http://a" );
+        //make sure repeated entries are skipped
+        wagonManager.addMirror( "a", "a", "http://a3" );
         
         wagonManager.addMirror( "b", "b", "http://b" );
         wagonManager.addMirror( "c", "d,e", "http://de" );
