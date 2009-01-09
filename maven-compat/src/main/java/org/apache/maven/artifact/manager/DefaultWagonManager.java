@@ -897,9 +897,12 @@ public class DefaultWagonManager
             Set<String> keySet = mirrors.keySet();
             if ( keySet != null )
             {
-                for (String pattern : keySet) {
-                    if (matchPattern(originalRepository, pattern)) {
+                for (String pattern : keySet) 
+                {
+                    if (matchPattern(originalRepository, pattern)) 
+                    {
                         selectedMirror = mirrors.get(pattern);
+                        break;
                     }
                 }
             }

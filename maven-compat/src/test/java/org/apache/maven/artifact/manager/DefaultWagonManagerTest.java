@@ -578,6 +578,44 @@ public class DefaultWagonManagerTest
     }
 
     /**
+     * Check that first match wins
+     */
+    public void testMirrorStopOnFirstMatch()
+    {
+        //exact matches win first
+        wagonManager.addMirror( "a2", "a,b", "http://a2" );
+        wagonManager.addMirror( "a", "a", "http://a" );
+        
+        wagonManager.addMirror( "b", "b", "http://b" );
+        wagonManager.addMirror( "c", "d,e", "http://de" );
+        wagonManager.addMirror( "c", "*", "http://wildcard" );
+        wagonManager.addMirror( "c", "e,f", "http://ef" );
+        
+    
+
+        ArtifactRepository repo = null;
+        repo = wagonManager.getMirrorRepository( getRepo( "a", "http://a.a" ) );
+        assertEquals( "http://a", repo.getUrl() );
+
+        repo = wagonManager.getMirrorRepository( getRepo( "b", "http://a.a" ) );
+        assertEquals( "http://b", repo.getUrl() );
+
+        repo = wagonManager.getMirrorRepository( getRepo( "c", "http://c.c" ) );
+        assertEquals( "http://wildcard", repo.getUrl() );
+        
+        repo = wagonManager.getMirrorRepository( getRepo( "d", "http://d" ) );
+        assertEquals( "http://de", repo.getUrl() );
+        
+        repo = wagonManager.getMirrorRepository( getRepo( "e", "http://e" ) );
+        assertEquals( "http://de", repo.getUrl() );
+        
+        repo = wagonManager.getMirrorRepository( getRepo( "f", "http://f" ) );
+        assertEquals( "http://wildcard", repo.getUrl() );
+
+    }
+
+    
+    /**
      * Check that patterns are processed correctly Valid patterns: * = everything external:* = everything not on the
      * localhost and not file based. repo,repo1 = repo or repo1 *,!repo1 = everything except repo1
      */
