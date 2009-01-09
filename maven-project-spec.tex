@@ -70,6 +70,7 @@ Basic construction rules are as follows
 \begin{enumerate}
 \item Let there be a collection of domain models (poms) denoted by set \begin{math}\mathcal{D}_{i}\end{math}, where for some \begin{math} n \in \mathbb{N} \end{math} the collection is ordered from most specific to least specific \begin{math}\mathcal{C} = \{\mathcal{D}_{0}, \mathcal{D}_{1},...,\mathcal{D}_{n} \} \end{math}.  \begin{math}\mathcal{D}_{n}\end{math} is the SuperPom and must be contained within \begin{math}\mathcal{C}\end{math}, even if it is the only element.
 \item Let \begin{math}p_j\end{math} be an ordered pair (or model property). In the case of the pom, \begin{math}j=nodes + properties\end{math} of the pom. Define t as a function operating on elements of \begin{math}\mathcal{C}\end{math} that transforms each element to a set of model properties.  \begin{math}\mathcal{D}'_{i}=t(\mathcal{D}_{i})=\{p_0,p_1,...p_m\}\end{math}. We end up with a transformed collection of domain models: \begin{math}\mathcal{C'} = \{\mathcal{D'}_{0}, \mathcal{D'}_{1},...,\mathcal{D'}_{n} \} \end{math}.  
+\item Add in mixin containing global setting profiles
 \item Next domain specific rules are applied (See section 3). Let tr be a domain transform rule: \begin{math}
 \forall_j \forall_i \mathcal{A}_{i,j}  \subseteq \mathcal{D'}_{i} \end{math} such that \begin{math}  \mathcal{A'}_{i,j} = \{tr(p_0), tr(p_1),...,tr(p_n))\}. \end{math} tr may change either the model property URI or value or may transform the property to a null value (remove it) or it could add additional model properties not from the original set.  We are left with \begin{math}
 \mathcal{C''} =  \forall_j \forall_i \bigcup_{i,j}(\mathcal{D'}_{i} \cup \mathcal{A'}_{i,j} - (\mathcal{D'}_{i} \cap\mathcal{A}_{i,j})) \end{math}. Thus \begin{math}\mathcal{C''} \end{math} is just a set of transformed and untransformed model properties from all of the domain models \begin{math}
@@ -78,9 +79,16 @@ Basic construction rules are as follows
 \item Model container rules are applied for collections and sets. The general sorting in the previous step doesn't know how to handle collections and sets and needs to delegate back to the domain specific model containers (Sections 3.4 and 3.5)
 \item Model properties are sorted (see section 2.2) again. This is to maintain the original order of collections.
 \item Interpolates the model properties (Section 5)
+\item Determine active profile(s)
+\item Applies Profiles
+\item Interpolates the model properties
 \item Applies dependency management rules
 \item Applies plugin management rules
 \end{enumerate}
+
+The last four steps involve cross-applying elements of the pom into the same pom. Inheritance takes place prior to this type of cross-applying operation. These operations have characteristics very similar to mixins, as they are not complete pom models in themselves.
+
+Profiles may contain properties that are used in interpolating the containing pom. Thus interpolation is also done after cross-applying the profile.
 
 \subsection{Sorting}
 Let \begin{math}\mathcal{C''}\end{math} be the original set of model properties and let \begin{math}\mathcal{C'''}\end{math} be the new set, which is initially empty. Now iterate over each element (model property) of \begin{math}\mathcal{C''}\end{math} placing the model property into set  \begin{math}\mathcal{C'''}\end{math}  according to the following rules:
@@ -405,6 +413,35 @@ The maven property \$\{project.basedir\} is only added to the initial list if th
 \subsection{Interpolation and Profiles}
 Active profiles are applied prior to interpolation so that any \emph{project.profiles.profile.properties} defined within an active profile can be used as an interpolation property [Still to be implemented]
 
+\section{Profiles}
+Profiles allow the developer to conditionally add project information to the project model. Each profile has an activation property, with an associated matcher.
+
+We have the following five matchers:
+\begin{enumerate}
+\item Default - allows to specify a profile that will be active (provided no other profiles are matched)
+\item File - allows matching of profile based on the existence or nonexistence of a file
+\item JDK - allows matching profile based on JDK
+\item Operating System - allows matching profile based on operating system
+\item Property - allows matching profile based a user or environmental variable
+\end{enumerate}
+
+\subsection{Default Profile Matcher}
+Occurs if 
+project/profiles/profile/activation/activeByDefault 
+exists in the profile. If no other profiles are matched this one will be used.
+
+\subsection{File}
+This matcher will check for the existence (or nonexistence) of files. If 
+\begin{itemize}
+\item project/profiles/profile/activation/file/missing does not exist or
+\item project/profiles/profile/activation/file/exists, 
+\end{itemize}
+
+the profile will activate.
+
+\subsection{JDK}
+This matcher will check if project/profiles/profile/activation/jdk value matches the current JDK version in use for the build.
+
 \section{Model Container Operations}
 \subsection{Definitions}
 \begin{description}
@@ -473,7 +510,8 @@ So we simplify the operation to just adding the parent model container to the ch
 canonical data model. It can also optionally perform various domain specific rules and processing.
 \item[Node] A model container
 \item[NOP] No operation Model Container Action. Processing this rule on a model container will leave the model properties of the model container untouched.
-\item[Profile] 
+\item[Profile]  - Project information added the project model based on a Profile ActivationProperty
+\item[Profile Activation Property]  - Property that a developer can specify that triggers the applying of a profile to it's containing project model.
 \item[Set] Any model property with a URI ending in \#set
 \end{description}
 
