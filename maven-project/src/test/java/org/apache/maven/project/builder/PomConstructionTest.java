@@ -166,14 +166,14 @@ public class PomConstructionTest
         assertEquals( 4, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
     }
 
-    /* FIXME: cf. MNG-3943
+    /* FIXME: cf. MNG-3943*/
     public void testMergeOfPluginExecutionsWhenChildAndParentUseDifferentPluginVersions()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-merging-version-insensitive/sub" );
         assertEquals( 4, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
     }
-    //*/
+
 
     public void testInterpolationWithXmlMarkup()
         throws Exception
