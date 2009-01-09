@@ -406,7 +406,27 @@ public class PomTransformer
             List<ModelProperty> tmp = domainModel.getModelProperties();
 
             List clearedProperties = new ArrayList<ModelProperty>();
+            
+            //Default Dependency Scope Rule
+            ModelDataSource s = new DefaultModelDataSource();
+            s.init( tmp, Arrays.asList( new ArtifactModelContainerFactory()) );
+            for(ModelContainer mc : s.queryFor(ProjectUri.Dependencies.Dependency.xUri))
+            {
+            	boolean containsScope = false;
+            	for(ModelProperty mp :mc.getProperties()) 
+            	{
+            		if(mp.getUri().equals(ProjectUri.Dependencies.Dependency.scope)) {
+            			containsScope = true;
+            			break;
+            		}
+            	}    
 
+            	if(!containsScope)
+            	{
+            		tmp.add(tmp.indexOf(mc.getProperties().get(0)) + 1, new ModelProperty(ProjectUri.Dependencies.Dependency.scope, "compile"));
+            	}
+            }
+                
             //Missing Version Rule
             if ( getPropertyFor( ProjectUri.version, tmp ) == null )
             {
