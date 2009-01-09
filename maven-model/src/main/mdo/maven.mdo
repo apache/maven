@@ -2988,6 +2988,8 @@
             <type>ActivationFile</type>
           </association>
         </field>
+        <!--
+        This could be included once we teach Maven to deal with multiple versions of the model
         <field>
           <name>custom</name>
           <version>4.0.0</version>
@@ -2997,6 +2999,7 @@
             <type>ActivationCustom</type>
           </association>
         </field>
+        -->
       </fields>
     </class>
     <class>
@@ -3088,6 +3091,8 @@
         </field>
       </fields>
     </class>
+    <!--
+    This can be put back in when we figure out how to have multiple model versions
     <class>
       <name>ActivationCustom</name>
       <version>4.0.0</version>
@@ -3109,6 +3114,7 @@
         </field>
       </fields>
     </class>
+    -->
     <!-- /BuildProfile support -->
     <class xml.tagName="plugin">
       <name>ReportPlugin</name>

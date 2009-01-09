@@ -20,7 +20,7 @@ package org.apache.maven.profiles.activation;
  */
 
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationCustom;
+//import org.apache.maven.model.ActivationCustom;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -58,6 +58,7 @@ public class CustomActivator
     public boolean canDetermineActivation( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
+        /*
         Activation activation = profile.getActivation();
 
         if ( activation != null )
@@ -74,10 +75,12 @@ public class CustomActivator
                 }
             }
         }
+        */
 
         return false;
     }
 
+    /*
     private ProfileActivator loadProfileActivator( ActivationCustom custom, ProfileActivationContext context )
         throws ProfileActivationException
     {
@@ -117,15 +120,20 @@ public class CustomActivator
 
         return activator;
     }
+    */
 
     public boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
+        /*
         ActivationCustom custom = profile.getActivation().getCustom();
 
         ProfileActivator activator = loadProfileActivator( custom, context );
 
         return activator.isActive( profile, context );
+        */
+        
+        return false;
     }
 
     protected Logger getLogger()
