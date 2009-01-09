@@ -106,7 +106,12 @@ public final class MavenDependencyProcessor
                 domainModels.add( new MavenDomainModel( transformProfiles( mc.getProperties() ) ) );
             }
 
-            domainModels.addAll( getParentsOfDomainModel( domainModel, mdReader ) );
+            List<DomainModel> parentModels = getParentsOfDomainModel( domainModel, mdReader );
+            
+            if( parentModels == null )
+                throw new DependencyProcessorException( "cannor read parent for " + bmd.getGAV() );
+            
+            domainModels.addAll( parentModels );
         }
         catch ( IOException e )
         {
