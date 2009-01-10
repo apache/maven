@@ -23,19 +23,12 @@ under the License.
   <mirrors>
     <mirror>
       <id>test-a</id>
-      <url>@baseurl@/null0</url>
-      <mirrorOf>*</mirrorOf>
-    </mirror>
-    <mirror>
-      <!-- NOTE: Intended match deliberately not listed first here, ordering in file should not matter for exact match -->
-      <id>test-b</id>
-      <url>@baseurl@/repo</url>
-      <mirrorOf>maven-core-it</mirrorOf>
-    </mirror>
-    <mirror>
-      <id>test-c</id>
-      <url>@baseurl@/null1</url>
-      <mirrorOf>external:*</mirrorOf>
+      <url>http://maven.apache.org/null</url>
+      <!--
+      The explicit mismatch with maven-core-it should be dominant over the wildcard, even if the wildcard
+      is given first.
+      -->
+      <mirrorOf>*,!maven-core-it</mirrorOf>
     </mirror>
   </mirrors>
 </settings>

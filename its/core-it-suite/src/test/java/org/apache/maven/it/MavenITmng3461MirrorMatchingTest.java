@@ -135,4 +135,27 @@ public class MavenITmng3461MirrorMatchingTest
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "c", "0.1", "jar" );
     }
 
+    /**
+     * Test that mirror definitions are properly evaluated. In particular, the wildcards within a single mirrorOf
+     * spec should not be greedy.
+     */
+    public void testitNonGreedyWildcard()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3461/test-3" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
+        Properties filterProps = verifier.newDefaultFilterProperties();
+        verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", filterProps );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
+    }
+
 }
