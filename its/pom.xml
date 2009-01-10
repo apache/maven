@@ -34,6 +34,8 @@ under the License.
   <version>2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <name>Maven Integration Tests Parent</name>
+
   <modules>
     <module>core-it-support</module>
     <module>core-it-suite</module>

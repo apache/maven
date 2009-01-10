@@ -34,7 +34,7 @@ under the License.
   <version>2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Testing</name>
+  <name>Maven Integration Testing Support</name>
   <url>http://maven.apache.org</url>
 
   <modules>

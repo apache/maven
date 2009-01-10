@@ -31,6 +31,8 @@ under the License.
   <artifactId>maven-it-plugin-plexus-utils-new</artifactId>
   <packaging>maven-plugin</packaging>
 
+  <name>Maven Integration Test Plugin :: Plexus Utils New</name>
+
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
