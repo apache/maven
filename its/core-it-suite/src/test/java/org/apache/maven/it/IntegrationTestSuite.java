@@ -291,7 +291,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0130CleanLifecycleTest.class );
         suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest.class );
-        suite.addTestSuite( MavenIT0097Test.class );
         suite.addTestSuite( MavenIT0090Test.class );
         suite.addTestSuite( MavenIT0087Test.class );
         suite.addTestSuite( MavenIT0086Test.class );

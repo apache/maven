@@ -49,7 +49,15 @@ public class MavenITmng2068ReactorRelativeParentsTest
     public void testitInheritedIdFields()
         throws Exception
     {
-        testitMNG2068( "test-1" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-1" );
+        File projectDir = new File( testDir, "parent" );
+
+        Verifier verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
     }
 
     /**
@@ -58,14 +66,25 @@ public class MavenITmng2068ReactorRelativeParentsTest
     public void testitExplicitIdFields()
         throws Exception
     {
-        testitMNG2068( "test-2" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-2" );
+        File projectDir = new File( testDir, "parent" );
+
+        Verifier verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
     }
 
-    private void testitMNG2068( String project )
+    /**
+     * Test that the implied relative path for the parent POM works, even two levels deep.
+     */
+    public void testitComplex()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/" + project );
-        File projectDir = new File( testDir, "parent" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-3" );
+        File projectDir = testDir;
 
         Verifier verifier = new Verifier( projectDir.getAbsolutePath() );
         verifier.setAutoclean( false );
