@@ -37,51 +37,42 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng2068ReactorRelativeParentsTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng2068ReactorRelativeParentsTest()
     {
         super( "(2.0.6,)" ); // only test in 2.0.7+
     }
 
-    public void testitMNG2068 ()
+    /**
+     * Test successful lineage construction when parent inherits groupId+version from grand-parent.
+     */
+    public void testitInheritedIdFields()
         throws Exception
     {
-        // The testdir is computed from the location of this
-        // file.
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068" );
-        File projectDir = new File( testDir, "frameworks" );
+        testitMNG2068( "test-1" );
+    }
 
-        Verifier verifier;
+    /**
+     * Test successful lineage construction when parent specifies groupId+version itself.
+     */
+    public void testitExplicitIdFields()
+        throws Exception
+    {
+        testitMNG2068( "test-2" );
+    }
 
-        /*
-         * We must first make sure that any artifact created
-         * by this test has been removed from the local
-         * repository. Failing to do this could cause
-         * unstable test results. Fortunately, the verifier
-         * makes it easy to do this.
-         */
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+    private void testitMNG2068( String project )
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/" + project );
+        File projectDir = new File( testDir, "parent" );
 
-        verifier.deleteArtifact( "samplegroup", "master", "0.0.1", "pom" );
-        verifier.deleteArtifact( "samplegroup", "frameworks", "0.0.1", "pom" );
-        verifier.deleteArtifact( "samplegroup", "core", "1.0.0", "pom" );
-
+        Verifier verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
         verifier.executeGoal( "validate" );
-
-        /*
-         * This is the simplest way to check a build
-         * succeeded. It is also the simplest way to create
-         * an IT test: make the build pass when the test
-         * should pass, and make the build fail when the
-         * test should fail. There are other methods
-         * supported by the verifier. They can be seen here:
-         * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
-         */
         verifier.verifyErrorFreeLog();
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
         verifier.resetStreams();
     }
+
 }
