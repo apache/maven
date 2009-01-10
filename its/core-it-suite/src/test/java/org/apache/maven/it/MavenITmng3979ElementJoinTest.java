@@ -46,7 +46,9 @@ public class MavenITmng3979ElementJoinTest
     public void testitMNG3979()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3979/sub" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3979" );
+
+        testDir = new File( testDir, "sub" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
