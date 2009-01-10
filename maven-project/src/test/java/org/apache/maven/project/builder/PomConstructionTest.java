@@ -418,7 +418,15 @@ public class PomConstructionTest
         assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/prop0" ).toString() ) );
         assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/prop1" ).toString() ) );
     }
-   
+
+    /* FIXME: cf. MNG-3979
+    public void testJoiningOfContainersWhenChildHasEmptyElements()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "id-container-joining-with-empty-elements/sub" );
+        assertNotNull( pom );
+    }
+    //*/
 
     private PomArtifactResolver artifactResolver( String basedir )
     {
