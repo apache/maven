@@ -82,6 +82,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenITmng3023ReactorDependencyResolutionTest.class );
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
         // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
+        // suite.addTestSuite( MavenITmng2605BogusProfileActivationTest.class );
         // suite.addTestSuite( MavenITmng0612NewestConflictResolverTest.class );
 
         // -------------------------------------------------------------------------------------------------------------
