@@ -37,20 +37,19 @@ public class MavenIT0097Test
     // TODO: There is another IT for this issue, check whether these are dups or could be merged
 
     /**
-     * Test that the implied relative path for the parent POM works, even two
-     * levels deep.
+     * Test that the implied relative path for the parent POM works, even two levels deep.
      */
     public void testit0097()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0097" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "project/project-level2/project-level3/target/it0097.txt" );
-        verifier.assertFilePresent( "project/project-sibling-level2/target/it0097.txt" );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}

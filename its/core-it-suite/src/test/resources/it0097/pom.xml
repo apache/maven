@@ -1,15 +1,17 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0097</name> 
-  <groupId>org.apache.maven.its.it0097</groupId>
-  <artifactId>maven-it-it0097</artifactId>
-  <description>Test that the implied relative path for the parent POM works, even two
-        levels deep.</description>
+
+  <groupId>org.apache.maven.its.mng2068</groupId>
+  <artifactId>test</artifactId>
   <version>1</version>
   <packaging>pom</packaging>
 
+  <name>Maven Integration Test :: MNG-2068</name> 
+  <description>
+    Test that the implied relative path for the parent POM works, even two levels deep.
+  </description>
+
   <modules>
-    <module>plugin</module>
     <module>project/project-level2/project-level3</module>
     <module>project/relative-project-level2/relative-project-level3/</module>
   </modules>
