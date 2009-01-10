@@ -198,6 +198,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2883LegacyRepoOfflineTest.class );
         suite.addTestSuite( MavenITmng2878DefaultReportXmlImportTest.class );
         suite.addTestSuite( MavenITmng2871PrePackageSubartifactResolutionTest.class );
+        suite.addTestSuite( MavenITmng2865MirrorWildcardTest.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRangesTest.class );
         suite.addTestSuite( MavenITmng2843PluginConfigPropertiesInjectionTest.class );
         suite.addTestSuite( MavenITmng2790LastUpdatedMetadataTest.class );
