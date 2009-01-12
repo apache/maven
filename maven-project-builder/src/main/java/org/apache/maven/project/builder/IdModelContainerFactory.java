@@ -34,16 +34,27 @@ public class IdModelContainerFactory
     implements ModelContainerFactory
 {
 
-    private static final Collection<String> uris = Collections.unmodifiableList( Arrays.asList(
-        ProjectUri.PluginRepositories.PluginRepository.xUri,
-        ProjectUri.Repositories.Repository.xUri,
-        ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri,
-        ProjectUri.Profiles.Profile.xUri,
-        ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri ) );
-
+	private String uri;
+	
+	public IdModelContainerFactory(String uri) 
+	{
+		if(uri == null)
+		{
+			throw new IllegalArgumentException("uri: null");
+		}
+		this.uri = uri;
+	}
+	
+    public static final List<IdModelContainerFactory> ID_CONTAINER_FACTORIES = 
+    	Collections.unmodifiableList(Arrays.asList(new IdModelContainerFactory(ProjectUri.PluginRepositories.PluginRepository.xUri),
+    			new IdModelContainerFactory(ProjectUri.Repositories.Repository.xUri),
+    			new IdModelContainerFactory(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri),
+    			new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri),
+    			new IdModelContainerFactory(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri)));
+	
     public Collection<String> getUris()
     {
-        return uris;
+        return Collections.unmodifiableList(Arrays.asList(uri));
     }
 
     public ModelContainer create( List<ModelProperty> modelProperties )

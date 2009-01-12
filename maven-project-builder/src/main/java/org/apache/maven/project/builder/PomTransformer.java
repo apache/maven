@@ -35,6 +35,7 @@ import org.apache.maven.shared.model.DomainModelFactory;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelContainerAction;
+import org.apache.maven.shared.model.ModelContainerFactory;
 import org.apache.maven.shared.model.ModelDataSource;
 import org.apache.maven.shared.model.ModelEventListener;
 import org.apache.maven.shared.model.ModelProperty;
@@ -55,6 +56,14 @@ public class PomTransformer
     {
         this.factory = factory;
     }
+
+    public static final List<ModelContainerFactory> MODEL_CONTAINER_FACTORIES = 
+    	Collections.unmodifiableList(Arrays.asList(new ArtifactModelContainerFactory(), 
+    			new IdModelContainerFactory(ProjectUri.PluginRepositories.PluginRepository.xUri),
+    			new IdModelContainerFactory(ProjectUri.Repositories.Repository.xUri),
+    			new IdModelContainerFactory(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri),
+    			new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri),
+    			new IdModelContainerFactory(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri)));
     
     /**
      * The URIs this transformer supports
@@ -141,7 +150,7 @@ public class PomTransformer
 
         //dependency management
         ModelDataSource source = new DefaultModelDataSource();
-        source.init( props, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+        source.init( props, PomTransformer.MODEL_CONTAINER_FACTORIES  );
 
         for ( ModelContainer dependencyContainer : source.queryFor( ProjectUri.Dependencies.Dependency.xUri ) )
         {
@@ -211,12 +220,10 @@ public class PomTransformer
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
                 {
                     ModelDataSource pluginDatasource = new DefaultModelDataSource();
-                    pluginDatasource.init( pluginContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
-                            new IdModelContainerFactory() ) );
+                    pluginDatasource.init( pluginContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
 
                     ModelDataSource managementDatasource = new DefaultModelDataSource();
-                    managementDatasource.init( managementContainer.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
-                            new IdModelContainerFactory() ) );
+                    managementDatasource.init( managementContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
 
                     List<ModelContainer> managementExecutionContainers = managementDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                     List<ModelProperty> managementPropertiesWithoutExecutions = new ArrayList<ModelProperty>(managementContainer.getProperties());
@@ -244,7 +251,7 @@ public class PomTransformer
                     	if(!hasId) {
                     		List<ModelProperty> listWithId = new ArrayList<ModelProperty>(a.getProperties());
                     		listWithId.add(1, new ModelProperty(ProjectUri.Build.Plugins.Plugin.Executions.Execution.id, "default"));
-                    		c = new IdModelContainerFactory().create(listWithId);
+                    		c = new IdModelContainerFactory(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri).create(listWithId);
                     	}
                     	
                     	
@@ -300,7 +307,7 @@ public class PomTransformer
         
         ModelDataSource dataSource = new DefaultModelDataSource();
         
-        dataSource.init( props, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+        dataSource.init( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
         
         List<ModelContainer> containers = dataSource.queryFor( ProjectUri.Build.Plugins.Plugin.xUri );
         
@@ -494,7 +501,7 @@ public class PomTransformer
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
                 ModelDataSource source = new DefaultModelDataSource();
-                source.init( tmp, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+                source.init( tmp, PomTransformer.MODEL_CONTAINER_FACTORIES );
                 List<ModelContainer> containers = source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri );
                 for ( ModelContainer container : containers )
                 {
@@ -612,7 +619,7 @@ public class PomTransformer
 
         //Rule: Build plugin config overrides reporting plugin config
         ModelDataSource source = new DefaultModelDataSource();
-        source.init( modelProperties, Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+        source.init( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
         List<ModelContainer> reportContainers = source.queryFor( ProjectUri.Reporting.Plugins.Plugin.xUri );
         for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )

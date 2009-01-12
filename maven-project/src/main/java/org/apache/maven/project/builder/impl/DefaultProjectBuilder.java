@@ -43,6 +43,7 @@ import org.apache.maven.project.builder.PomArtifactResolver;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomClassicDomainModelFactory;
 import org.apache.maven.project.builder.PomClassicTransformer;
+import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
@@ -156,8 +157,7 @@ public class DefaultProjectBuilder
         
         PomClassicTransformer transformer = new PomClassicTransformer( new PomClassicDomainModelFactory() );
         
-        ModelTransformerContext ctx = new ModelTransformerContext(
-            Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_FACTORIES );
         
         PomClassicDomainModel transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( domainModels,
                                                                                                 transformer,

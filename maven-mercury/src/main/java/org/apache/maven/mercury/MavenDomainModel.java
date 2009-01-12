@@ -112,8 +112,7 @@ public final class MavenDomainModel
         List<ArtifactBasicMetadata> metadatas = new ArrayList<ArtifactBasicMetadata>();
 
         ModelDataSource source = new DefaultModelDataSource();
-        source.init( modelProperties,
-                     Arrays.asList( new ArtifactModelContainerFactory(), new IdModelContainerFactory() ) );
+        source.init( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES  );
 
         for ( ModelContainer modelContainer : source.queryFor( ProjectUri.Dependencies.Dependency.xUri ) )
         {
@@ -127,8 +126,7 @@ public final class MavenDomainModel
         throws DataSourceException
     {
         ModelDataSource dataSource = new DefaultModelDataSource();
-        dataSource.init( modelProperties, Arrays.asList( new ArtifactModelContainerFactory(),
-                                                         new IdModelContainerFactory() ) );
+        dataSource.init( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
         return new ProfileContext( dataSource, properties ).getActiveProfiles();
     }
 
