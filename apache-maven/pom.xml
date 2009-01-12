@@ -20,7 +20,7 @@
     <groupId>org.apache.maven</groupId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-  <artifactId>maven-distribution</artifactId>
+  <artifactId>apache-maven</artifactId>
   <name>Maven Distribution</name>
   <dependencies>
     <dependency>
