@@ -35,8 +35,8 @@ END SNIPPET: ant-bootstrap -->
 
   <target name="initTaskDefs">
     <xmlproperty file="pom.xml" prefix="pom.xml" />
-    <path id="maven-ant-tasks.classpath" path="mercury-ant-tasks-1.0-alpha-2.jar"/>
-    <typedef resource="org/apache/maven/mercury/ant/antlib.xml" uri="urn:mercury-ant-tasks" classpathref="mercury-ant-tasks.classpath"/>
+    <path id="maven-ant-tasks.classpath" path="mercury-ant-tasks-1.0-alpha-1-SNAPSHOT.jar"/>
+    <typedef resource="org/apache/maven/mercury/ant/tasks/antlib.xml" uri="urn:mercury-ant-tasks" classpathref="mercury-ant-tasks.classpath"/>
   </target>
 
   <target name="isMavenHomeSet" depends="initTaskDefs">
