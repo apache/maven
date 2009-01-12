@@ -58,6 +58,7 @@ public class DefaultProfileInjector
         injectModules( profile, model );
 
         model.setRepositories( ModelUtils.mergeRepositoryLists( profile.getRepositories(), model.getRepositories() ) );
+        model.setPluginRepositories( ModelUtils.mergeRepositoryLists( profile.getPluginRepositories(), model.getPluginRepositories() ) );
 
         injectReporting( profile, model );
 
