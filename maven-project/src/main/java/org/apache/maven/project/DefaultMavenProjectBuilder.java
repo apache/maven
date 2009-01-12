@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -335,7 +336,25 @@ public class DefaultMavenProjectBuilder
         projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( project.getModel(), project.getFile(), externalProfileManager ) );
         
         project.setActiveProfiles( projectProfiles );
+        try
+        {
+            LinkedHashSet repoSet = new LinkedHashSet();
+            if ( ( model.getRepositories() != null ) && !model.getRepositories().isEmpty() )
+            {
+                repoSet.addAll( model.getRepositories() );
+            }
 
+            if ( ( model.getPluginRepositories() != null ) && !model.getPluginRepositories().isEmpty() )
+            {
+                repoSet.addAll( model.getPluginRepositories() );
+            }
+
+            project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( new ArrayList( repoSet ) ) );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
         return project;
     }
 
