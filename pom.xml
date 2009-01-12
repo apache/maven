@@ -252,7 +252,7 @@ under the License.
   </build>
   <modules>
     <module>maven-core</module>
-    <module>maven-distribution</module>
+    <module>apache-maven</module>
     <module>maven-lifecycle</module>
     <module>maven-model</module>
     <module>maven-plugin-api</module>
