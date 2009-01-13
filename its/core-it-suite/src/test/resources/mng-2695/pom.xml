@@ -72,7 +72,7 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>test</id>
+            <id>test-a</id>
             <phase>validate</phase>
             <goals>
               <goal>touch</goal>
@@ -90,7 +90,7 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>test</id>
+            <id>test-b</id>
             <phase>validate</phase>
             <goals>
               <goal>touch</goal>
