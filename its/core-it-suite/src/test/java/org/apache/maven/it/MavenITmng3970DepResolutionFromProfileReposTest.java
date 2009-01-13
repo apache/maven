@@ -77,4 +77,25 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
         verifier.assertArtifactPresent( "org.apache.maven.its.mng3970", "a", "0.1", "jar" );
     }
 
+    /**
+     * Test that dependencies can be resolved from remote repositories defined by (active) profiles in settings.xml.
+     */
+    public void testitFromSettings()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3970/test-3" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3970" );
+        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng3970", "a", "0.1", "jar" );
+    }
+
 }
