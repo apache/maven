@@ -20,46 +20,44 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Verify that dependencies with invalid POMs can still be used without failing
- * the build.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3680">MNG-3680</a>.
  * 
  * @author jdcasey
  */
 public class MavenITmng3680InvalidDependencyPOMTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3680InvalidDependencyPOMTest()
     {
         super( "(2.0.9,)" );
     }
-    
+
+    /**
+     * Verify that dependencies with invalid POMs can still be used without failing the build.
+     */
     public void testitMNG3680 ()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3680" );
-        File pluginDir = new File( testDir, "maven-mng3680-plugin" );
         
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
-        
-        verifier.executeGoal( "install" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        verifier = new Verifier( testDir.getAbsolutePath() );
-        
-        verifier.deleteArtifact( "tests", "dep-L1", "1", "jar" );
-        verifier.deleteArtifact( "tests", "dep-L1", "1", "pom" );
-        
-        verifier.deleteArtifact( "tests", "dep-L1", "1", "jar" );
-        verifier.deleteArtifact( "tests", "dep-L2", "1", "pom" );
-
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3680" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3680:direct:jar:0.1" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3680:transitive:jar:0.1" ) );
     }
+
 }

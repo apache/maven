@@ -1,45 +1,54 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>org.apache.maven.its.mng3680</groupId>
-  <artifactId>mng-3680-invalidDependencyPOM</artifactId>
+  <artifactId>test</artifactId>
   <packaging>jar</packaging>
   <version>1</version>
-  <name>mng-3680-invalidDependencyPOM</name>
+
+  <name>Maven Integration Test :: MNG-3680</name> 
+  <description>
+    Verify that dependencies with invalid POMs can still be used without failing the build.
+  </description>
   
   <repositories>
     <repository>
-      <id>dep-repo</id>
-      <url>file://${pom.basedir}/dep-repo</url>
+      <id>maven-core-it</id>
+      <url>file:///${basedir}/repo</url>
+      <releases>
+        <checksumPolicy>ignore</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>tests</groupId>
-    	<artifactId>dep-L1</artifactId>
-    	<version>1</version>
+      <!-- This has a broken POM, yet it's dependencies should contribute to this build -->
+      <groupId>org.apache.maven.its.mng3680</groupId>
+      <artifactId>direct</artifactId>
+      <version>0.1</version>
     </dependency>
   </dependencies>
   
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.its.mng3680</groupId>
-        <artifactId>maven-mng3680-plugin</artifactId>
-        <version>1</version>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>check-deps</id>
+            <id>test</id>
             <phase>validate</phase>
+            <configuration>
+              <testArtifacts>target/artifacts.txt</testArtifacts>
+            </configuration>
             <goals>
-              <goal>check</goal>
+              <goal>test</goal>
             </goals>
           </execution>
         </executions>
