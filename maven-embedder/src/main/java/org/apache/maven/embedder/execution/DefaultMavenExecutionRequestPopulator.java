@@ -343,6 +343,11 @@ public class DefaultMavenExecutionRequestPopulator
         {
             request.setLocalRepository( createLocalRepository( request, request.getSettings(), configuration ) );
         }
+
+        if ( request.getLocalRepositoryPath() == null )
+        {
+            request.setLocalRepositoryPath( new File( request.getLocalRepository().getBasedir() ).getAbsoluteFile() );
+        }
     }
     
     // ------------------------------------------------------------------------
