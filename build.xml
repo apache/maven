@@ -58,14 +58,14 @@ END SNIPPET: ant-bootstrap -->
 
   <target name="init" depends="isMavenHomeSet">
     <xmlproperty prefix="pom" file="pom.xml"/>    
-    <basename file="${maven.home}" property="maven.home.basename"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
     <!-- Initialize properties -->
     <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
+    <property name="maven.home.effective" location="${maven.home.dirname}/${maven.home.basename.expected}"/>
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
     <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
     <property name="surefire.useFile" value="true"/>    
-    <echo>maven.home = ${maven.home}</echo>
+    <echo>maven.home = ${maven.home.effective}</echo>
   </target>
 
   <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
@@ -218,11 +218,11 @@ END SNIPPET: ant-bootstrap -->
   <target name="extract-assembly" depends="init,maven-assembly" description="extracts the maven assembly into maven.home">
     <echo>Extracting assembly to ${maven.home.dirname} ...</echo>
     <!-- If we are starting from scratch make sure the directory is created -->
-    <delete dir="${maven.home}"/>
-    <mkdir dir="${maven.home}"/>
+    <delete dir="${maven.home.effective}"/>
+    <mkdir dir="${maven.home.effective}"/>
     <unzip src="${maven.assembly}" dest="${maven.home.dirname}"/>
     <chmod perm="+x">
-      <fileset dir="${maven.home}/bin">
+      <fileset dir="${maven.home.effective}/bin">
         <include name="mvn"/>
       </fileset>
     </chmod>
