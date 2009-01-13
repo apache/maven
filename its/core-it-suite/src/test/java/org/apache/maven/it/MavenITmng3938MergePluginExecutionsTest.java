@@ -66,9 +66,9 @@ public class MavenITmng3938MergePluginExecutionsTest
     private void testitMNG3938( String project )
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3938" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3938/" + project );
 
-        Verifier verifier = new Verifier( new File( new File( testDir, project ), "sub" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
