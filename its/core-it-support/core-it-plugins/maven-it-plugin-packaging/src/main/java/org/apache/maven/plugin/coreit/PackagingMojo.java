@@ -19,16 +19,15 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import org.apache.maven.archiver.MavenArchiver;
-import org.apache.maven.archiver.MavenArchiveConfiguration;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.archiver.jar.JarArchiver;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
+ * Creates an empty file to prove this goal was executed.
+ * 
  * @author <a href="brett@apache.org">Brett Porter</a>
  * @version $Id$
  * @goal package
@@ -36,12 +35,6 @@ import java.io.File;
 public class PackagingMojo
     extends AbstractMojo
 {
-    
-    /**
-     * @parameter expression="${project}"
-     * @required
-     */
-    private MavenProject project;
 
     /**
      * @parameter expression="${project.build.finalName}"
@@ -54,31 +47,29 @@ public class PackagingMojo
      * @required
      * @readonly
      */
-    private String outputDirectory;
+    private File outputDirectory;
 
     public void execute()
         throws MojoExecutionException
     {
         File jarFile = new File( outputDirectory, finalName + "-it.jar" );
 
-        MavenArchiver archiver = new MavenArchiver();
-
-        archiver.setArchiver( new JarArchiver() );
-
-        archiver.setOutputFile( jarFile );
+        getLog().info( "[MAVEN-CORE-IT-LOG] Creating artifact file: " + jarFile );
 
         try
         {
-            archiver.createArchive( project, new MavenArchiveConfiguration() );
+            jarFile.getParentFile().mkdirs();
+            jarFile.createNewFile();
         }
-        catch ( Exception e )
+        catch ( IOException e )
         {
-            // TODO: improve error handling
             throw new MojoExecutionException( "Error assembling JAR", e );
         }
-        
-        project.getArtifact().setFile( jarFile );
+
+        /*
+         * NOTE: Normal packaging plugins would set the main artifact's file path now but that's beyond the purpose of
+         * this test plugin. Hence there's no need to introduce further coupling with the Maven Artifact API.
+         */
     }
 
 }
-                    

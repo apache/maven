@@ -27,7 +27,7 @@
 
   <dependencies>
     <dependency>
-      <!-- This has a broken POM, yet it's dependencies should contribute to this build -->
+      <!-- This has a broken POM, yet its dependencies should contribute to this build -->
       <groupId>org.apache.maven.its.mng3680</groupId>
       <artifactId>direct</artifactId>
       <version>0.1</version>
