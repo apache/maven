@@ -64,7 +64,7 @@ under the License.
             <checksumPolicy>ignore</checksumPolicy>
           </releases>
           <snapshots>
-            <checksumPolicy>ignore</checksumPolicy>
+            <enabled>false</enabled>
           </snapshots>
         </pluginRepository>
       </pluginRepositories>
