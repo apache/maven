@@ -330,9 +330,11 @@ public class DefaultMavenProjectBuilder
         }
 
         List<Profile> projectProfiles = new ArrayList<Profile>();
-        
-        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( project.getModel(), project.getFile(), isReactorProject, profileActivationContext ) );
-        
+
+        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( project.getModel(),
+                                                                       isReactorProject ? projectDescriptor : null,
+                                                                       isReactorProject, profileActivationContext ) );
+
         projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( project.getModel(), project.getFile(), externalProfileManager ) );
         
         project.setActiveProfiles( projectProfiles );
