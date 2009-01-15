@@ -82,7 +82,6 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenITmng3023ReactorDependencyResolutionTest.class );
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
         // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
-        // suite.addTestSuite( MavenITmng2605BogusProfileActivationTest.class );
         // suite.addTestSuite( MavenITmng0612NewestConflictResolverTest.class );
 
         // -------------------------------------------------------------------------------------------------------------
@@ -207,6 +206,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         suite.addTestSuite( MavenITmng2739RequiredRepositoryElementsTest.class );
         suite.addTestSuite( MavenITmng2695OfflinePluginSnapshotsTest.class );
+        suite.addTestSuite( MavenITmng2605BogusProfileActivationTest.class );
         suite.addTestSuite( MavenITmng2591MergeInheritedPluginConfigTest.class );
         suite.addTestSuite( MavenITmng2562TimestampTest.class );
         suite.addTestSuite( MavenITmng2539PluginDependenciesComeFromPluginReposTest.class );

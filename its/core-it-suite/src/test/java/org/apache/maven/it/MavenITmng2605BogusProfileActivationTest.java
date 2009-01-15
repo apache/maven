@@ -37,7 +37,7 @@ public class MavenITmng2605BogusProfileActivationTest
 
     public MavenITmng2605BogusProfileActivationTest()
     {
-        super();
+        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),(3.0-alpha-1,)" );
     }
 
     /**
