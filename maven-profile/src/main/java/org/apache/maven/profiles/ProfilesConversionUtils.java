@@ -93,10 +93,6 @@ public class ProfilesConversionUtils
 
             profile.setActivation( activation );
         }
-        else
-        {
-            profile.setActivation( new AlwaysOnActivation() );
-        }
 
         profile.setProperties( profileXmlProfile.getProperties() );
 
