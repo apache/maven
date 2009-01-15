@@ -159,13 +159,12 @@ under the License.
       </build>
     </profile>
     <profile>
-      <!--
-      NOTE: Maven 3.0-alpha-1 doesn't properly handle profiles+interpolation so it requires Maven 2.x to use this
-      profile to generate coverage data for Maven 3.x:
-        mvn test -Pemma -DmavenHome=<apache-maven-3.x-home>
-      -->
       <id>emma</id>
       <properties>
+        <!--
+        NOTE: Maven 3.0-alpha-1 doesn't properly handle profiles+interpolation (MNG-3900) so we use the literal value
+        instead of this property below. Apparently, we can switch to using the property once the issue is fixed.
+        -->
         <preparedMavenHome>${project.build.directory}/distro</preparedMavenHome>
       </properties>
       <build>
@@ -176,6 +175,17 @@ under the License.
             <configuration>
               <skip>false</skip>
               <testFailureIgnore>true</testFailureIgnore>
+              <systemProperties>
+                <!-- TODO: Duplicated to workaround MNG-3900, remove entire <systemProperties> section once fixed -->
+                <property>
+                  <name>maven.version</name>
+                  <value>${maven.version}</value>
+                </property>
+                <property>
+                  <name>maven.home</name>
+                  <value>${project.build.directory}/distro</value>
+                </property>
+              </systemProperties>
             </configuration>
           </plugin>
           <plugin>
@@ -191,8 +201,8 @@ under the License.
                 </goals>
                 <configuration>
                   <tasks>
-                    <delete dir="${preparedMavenHome}"/>
-                    <copy todir="${preparedMavenHome}" overwrite="true">
+                    <delete dir="${project.build.directory}/distro"/>
+                    <copy todir="${project.build.directory}/distro" overwrite="true">
                       <fileset dir="${mavenHome}"/>
                     </copy>
                   </tasks>
@@ -219,7 +229,7 @@ under the License.
                       <version>2.0.5312</version>
                     </artifactItem>
                   </artifactItems>
-                  <outputDirectory>${preparedMavenHome}/lib</outputDirectory>
+                  <outputDirectory>${project.build.directory}/distro/lib</outputDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -231,7 +241,7 @@ under the License.
             <configuration>
               <jarSets>
                 <jarSet>
-                  <directory>${preparedMavenHome}/lib</directory>
+                  <directory>${project.build.directory}/distro/lib</directory>
                   <includes>
                     <include>maven*.jar</include>
                   </includes>
