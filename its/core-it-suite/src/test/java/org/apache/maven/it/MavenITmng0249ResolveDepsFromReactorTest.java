@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-249">MNG-249</a>.
@@ -35,24 +36,33 @@ public class MavenITmng0249ResolveDepsFromReactorTest
 {
 
     /**
-     * Test that the reactor can establish the artifact location of known projects for dependencies
+     * Test that the reactor can establish the artifact location of known projects for dependencies.
      */
-    public void testitMNG249()
+    public void testitMNG0249()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0249" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "test-component-a/target/test-component-a-0.1.jar" );
-        verifier.assertFilePresent( "test-component-b/target/test-component-b-0.1.jar" );
-        verifier.assertFilePresent( "test-component-c/target/test-component-c-0.1.war" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/test-component-a-0.1.jar" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/test-component-b-0.1.jar" );
+        verifier.setAutoclean( false );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-    }
-}
+        List ccp = verifier.loadLines( "test-component-c/target/compile.txt", "UTF-8" );
+        assertTrue( ccp.toString(), ccp.contains( "test-component-c/classes" ) );
+        assertTrue( ccp.toString(), ccp.contains( "test-component-b/classes" ) );
+        assertTrue( ccp.toString(), ccp.contains( "test-component-a/classes" ) );
 
+        List rcp = verifier.loadLines( "test-component-c/target/runtime.txt", "UTF-8" );
+        assertTrue( rcp.toString(), rcp.contains( "test-component-c/classes" ) );
+        assertTrue( rcp.toString(), rcp.contains( "test-component-b/classes" ) );
+        assertTrue( rcp.toString(), rcp.contains( "test-component-a/classes" ) );
+
+        List tcp = verifier.loadLines( "test-component-c/target/test.txt", "UTF-8" );
+        assertTrue( tcp.toString(), tcp.contains( "test-component-c/classes" ) );
+        assertTrue( tcp.toString(), tcp.contains( "test-component-b/classes" ) );
+        assertTrue( tcp.toString(), tcp.contains( "test-component-a/classes" ) );
+    }
+
+}
