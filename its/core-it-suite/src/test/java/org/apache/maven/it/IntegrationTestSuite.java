@@ -230,6 +230,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2006ChildPathAwareUrlInheritanceTest.class );
         suite.addTestSuite( MavenITmng1999DefaultReportsInheritanceTest.class );
         suite.addTestSuite( MavenITmng1995InterpolateBooleanModelElementsTest.class );
+        suite.addTestSuite( MavenITmng1992SystemPropOverridesPomPropTest.class );
         suite.addTestSuite( MavenITmng1908LegacySnapshotUpdateTest.class );
         suite.addTestSuite( MavenITmng1830ShowVersionTest.class );
         suite.addTestSuite( MavenITmng1703PluginMgmtDepInheritanceTest.class );
