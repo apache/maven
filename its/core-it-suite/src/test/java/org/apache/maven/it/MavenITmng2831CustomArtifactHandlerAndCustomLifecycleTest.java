@@ -24,11 +24,11 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest
+public class MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest()
+    public MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest()
     {
         super( "(2.0.1,2.0.5),(2.0.6,2.99.99)" ); //extension support removed from 3.0
     }
@@ -39,7 +39,7 @@ public class MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest
     public void testitMNG2831()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0115" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2831" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );

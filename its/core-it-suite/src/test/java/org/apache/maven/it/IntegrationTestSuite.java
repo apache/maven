@@ -201,6 +201,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2865MirrorWildcardTest.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRangesTest.class );
         suite.addTestSuite( MavenITmng2843PluginConfigPropertiesInjectionTest.class );
+        suite.addTestSuite( MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenITmng2790LastUpdatedMetadataTest.class );
         suite.addTestSuite( MavenITmng2749ExtensionAvailableToPluginTest.class );
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
@@ -291,7 +292,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0132PomLifecycleTest.class );
         suite.addTestSuite( MavenIT0131SiteLifecycleTest.class );
         suite.addTestSuite( MavenIT0130CleanLifecycleTest.class );
-        suite.addTestSuite( MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest.class );
         suite.addTestSuite( MavenIT0090Test.class );
         suite.addTestSuite( MavenIT0087Test.class );
