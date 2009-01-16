@@ -28,35 +28,27 @@ public class MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest() {
-        super( "(2.0.1,2.0.5),(2.0.6,2.99.99)" );//extension support removed from 3.0
+    public MavenIT0115CustomArtifactHandlerAndCustomLifecycleTest()
+    {
+        super( "(2.0.1,2.0.5),(2.0.6,2.99.99)" ); //extension support removed from 3.0
     }
 
-    public void testit0115()
+    /**
+     * Test the use of a custom lifecycle from a plugin that is defined as a build extension.
+     */
+    public void testitMNG2831()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0115" );
 
-        Verifier verifier;
-
-        // Install the parent POM
-        verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0115", "test-extension", "1.0-SNAPSHOT", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.it0115", "test-project", "1.0-SNAPSHOT", "jar" );
-
-        // Install the plugin to test for Authz info in the WagonManager
-        verifier = new Verifier( new File( testDir.getAbsolutePath(), "test-extension" ).getAbsolutePath() );
-        verifier.executeGoal( "install" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        // Build the test project that uses the plugin.
-        File testProject = new File( testDir.getAbsolutePath(), "test-project" );
-        verifier = new Verifier( testProject.getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( new File( testProject, "target/test-project.xar" ).getAbsolutePath() );
+        verifier.assertFilePresent( "target/test-1.0-it.jar" );
     }
+
 }
