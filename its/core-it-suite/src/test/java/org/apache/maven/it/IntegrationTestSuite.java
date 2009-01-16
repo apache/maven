@@ -248,6 +248,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0985NonExecutedPluginMngtGoalsTest.class );
         suite.addTestSuite( MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest.class );
         suite.addTestSuite( MavenITmng0932TestJarDeploymentTest.class );
+        suite.addTestSuite( MavenITmng0870ReactorAwarePluginDiscoveryTest.class );
         suite.addTestSuite( MavenITmng0866EvaluateDefaultValueTest.class );
         suite.addTestSuite( MavenITmng0851CustomPomFilenameTest.class );
         suite.addTestSuite( MavenITmng0848SystemPropOverridesDefaultValueTest.class );

@@ -19,40 +19,45 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-import java.io.File;
-
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-249">MNG-249</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-870">MNG-870</a>.
  * 
- * @author Brett Porter
+ * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng0249ResolveDepsFromReactorTest
+public class MavenITmng0870ReactorAwarePluginDiscoveryTest
     extends AbstractMavenIntegrationTestCase
 {
 
+    public MavenITmng0870ReactorAwarePluginDiscoveryTest()
+    {
+        super();
+    }
+
     /**
-     * Test that the reactor can establish the artifact location of known projects for dependencies
+     * Test that the reactor can resolve plugins that have just been built by a previous module and are not yet
+     * installed to the local repo.
      */
-    public void testitMNG249()
+    public void testitMNG0870()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0249" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0870" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "test-component-a/target/test-component-a-0.1.jar" );
-        verifier.assertFilePresent( "test-component-b/target/test-component-b-0.1.jar" );
-        verifier.assertFilePresent( "test-component-c/target/test-component-c-0.1.war" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/test-component-a-0.1.jar" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/test-component-b-0.1.jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "project/target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng0870" );
+        verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "project/target/touch.txt" );
     }
-}
 
+}

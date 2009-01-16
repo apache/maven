@@ -10,6 +10,5 @@
     <module>test-component-c</module>
     <module>test-component-b</module>
     <module>test-component-a</module>
-    <module>test-plugin</module>
   </modules>
 </project>

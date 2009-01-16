@@ -17,24 +17,4 @@
 			<version>0.1</version>
 		</dependency>
 	</dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.it0042</groupId>
-        <artifactId>test-plugin</artifactId>
-        <version>0.1</version>
-        <configuration>
-          <value>my-test</value>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
