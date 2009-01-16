@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-95">MNG-95</a>.
@@ -37,25 +35,92 @@ public class MavenITmng0095ReactorFailureBehaviorTest
 {
 
     /**
-     * Test fail-never reactor behavior. Forces an exception to be thrown in
-     * the first module, but checks that the second modules is built.
+     * Test fail-fast reactor behavior. Forces an exception to be thrown in
+     * the first module and checks that the second module is not built and the overall build fails, too.
      */
-    public void testitMNG95()
+    public void testitFailFast()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.plugins", "maven-it-it-plugin", "1.0", "maven-plugin" );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--fail-never" );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "subproject/target" );
+        verifier.deleteDirectory( "subproject2/target" );
+        verifier.getCliOptions().add( "--fail-fast" );
+        verifier.setLogFileName( "log-ff.txt" );
+        try
+        {
+            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.verifyErrorFreeLog();
+        }
+        catch ( VerificationException e )
+        {
+            // expected
+        }
+        verifier.resetStreams();
+
         verifier.assertFilePresent( "target/touch.txt" );
         verifier.assertFileNotPresent( "subproject/target/touch.txt" );
-        verifier.assertFilePresent( "subproject2/target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject2/target/touch.txt" );
+    }
+
+    /**
+     * Test fail-never reactor behavior. Forces an exception to be thrown in
+     * the first module, but checks that the second module is built and the overall build succeeds.
+     */
+    public void testitFailNever()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "subproject/target" );
+        verifier.deleteDirectory( "subproject2/target" );
+        verifier.getCliOptions().add( "--fail-never" );
+        verifier.setLogFileName( "log-fn.txt" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject/target/touch.txt" );
+        verifier.assertFilePresent( "subproject2/target/touch.txt" );
     }
-}
 
+    /**
+     * Test fail-at-end reactor behavior. Forces an exception to be thrown in
+     * the first module and checks that the second module is still built but the overall build finally fails.
+     */
+    public void testitFailAtEnd()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "subproject/target" );
+        verifier.deleteDirectory( "subproject2/target" );
+        verifier.getCliOptions().add( "--fail-at-end" );
+        verifier.setLogFileName( "log-fae.txt" );
+        try
+        {
+            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.verifyErrorFreeLog();
+        }
+        catch ( VerificationException e )
+        {
+            // expected
+        }
+        verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject/target/touch.txt" );
+        verifier.assertFilePresent( "subproject2/target/touch.txt" );
+    }
+
+}
