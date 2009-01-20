@@ -1,18 +1,11 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>org.apache.maven.its.it0058</groupId>
-    <artifactId>maven-it-it0058</artifactId>
+    <groupId>org.apache.maven.its.mng0773</groupId>
+    <artifactId>parent</artifactId>
     <version>1.0</version>
   </parent>
+
   <artifactId>subproject</artifactId>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <type>jar</type>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 </project>

@@ -47,6 +47,8 @@ public class MavenITmng0768OfflineModeTest
         {
             // phase 1: run build in online mode to fill local repo
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier.setAutoclean( false );
+            verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.it0069" );
             verifier.setLogFileName( "log1.txt" );
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
@@ -58,6 +60,8 @@ public class MavenITmng0768OfflineModeTest
         {
             // phase 2: run build in offline mode to check it still passes (after deleting test repo, to be sure)
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier.setAutoclean( false );
+            verifier.deleteDirectory( "target" );
             verifier.deleteDirectory( "repo" );
             List cliOptions = new ArrayList();
             cliOptions.add( "-o" );
@@ -72,6 +76,8 @@ public class MavenITmng0768OfflineModeTest
         {
             // phase 3: delete test artifact and run build in offline mode to check it fails now
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+            verifier.setAutoclean( false );
+            verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.it0069" );
             List cliOptions = new ArrayList();
             cliOptions.add( "-o" );

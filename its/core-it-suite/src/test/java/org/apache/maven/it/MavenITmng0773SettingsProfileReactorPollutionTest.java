@@ -37,22 +37,22 @@ public class MavenITmng0773SettingsProfileReactorPollutionTest
 {
 
     /**
-     * Verify that profiles from settings.xml do not pollute module lists
-     * across projects in a reactorized build.
+     * Verify that profiles from settings.xml do not pollute module lists across projects in a reactorized build.
      */
     public void testitMNG773()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0773" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings.xml" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "subproject/target/subproject-1.0.jar" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}

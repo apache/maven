@@ -42,12 +42,16 @@ public class MavenITmng0781PluginConfigVsExecConfigTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0781" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );
-        verifier.assertFilePresent( "target/exec-level.txt" );
-        verifier.assertFilePresent( "target/resources-resources.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/exec-level.txt" );
+        verifier.assertFilePresent( "target/resources-resources.txt" );
     }
 
 }

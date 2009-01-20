@@ -22,11 +22,11 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.it0069</groupId>
-  <artifactId>maven-it-it0069</artifactId>
+  <groupId>org.apache.maven.its.mng0768</groupId>
+  <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: it0069</name> 
+  <name>Maven Integration Test :: MNG-768</name> 
   <description>Test offline mode.</description>
 
   <dependencies>
@@ -45,7 +45,7 @@ under the License.
         <checksumPolicy>ignore</checksumPolicy>
       </releases>
       <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
+        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>

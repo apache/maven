@@ -23,8 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-814">MNG-814</a>.
@@ -43,16 +42,18 @@ public class MavenITmng0814ExplicitProfileActivationTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0814" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0", "jar" );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-P test-profile" );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "compile" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0067/Person.class" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.getCliOptions().add( "-P" );
+        verifier.getCliOptions().add( "test-profile" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties props = verifier.loadProperties( "target/profile.properties" );
+        assertEquals( "PASSED", props.getProperty( "project.properties.testProp" ) );
     }
-}
 
+}

@@ -36,7 +36,7 @@ public class MavenITmng0761MissingSnapshotDistRepoTest
 
     public MavenITmng0761MissingSnapshotDistRepoTest()
     {
-        super( "(2.0.2,)" );
+        super();
     }
 
     /**
@@ -47,14 +47,16 @@ public class MavenITmng0761MissingSnapshotDistRepoTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0761" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-it-it0062-SNAPSHOT", "1.0", "jar" );
-        verifier.executeGoal( "deploy" );
-        verifier.assertFilePresent( "target/classes/org/apache/maven/it0062/Person.class" );
-        verifier.assertFilePresent( "target/maven-it-it0062-1.0-SNAPSHOT.jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng0761" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/repo/org/apache/maven/its/mng0761/test/1.0-SNAPSHOT/test-1.0-SNAPSHOT.jar" );
     }
-}
 
+}
