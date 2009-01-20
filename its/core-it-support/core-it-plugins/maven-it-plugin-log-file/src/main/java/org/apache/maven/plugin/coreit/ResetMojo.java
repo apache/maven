@@ -22,7 +22,7 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * Appends a string to the log file.
+ * Clears the contents of the log file by creating a new empty log file.
  * 
  * @goal reset
  * @phase initialize
