@@ -43,12 +43,13 @@ public class MavenITmng0522PluginMgmtConfigTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0522" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0029", "1.0-SNAPSHOT", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0029-child", "1.0-SNAPSHOT", "jar" );
-        verifier.executeGoal( "install" );
-        verifier.assertFilePresent( "target/plugin-management-configuration.txt" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "child-project/target" );
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "child-project/target/plugin-mngt-config.txt" );
     }
 
 }

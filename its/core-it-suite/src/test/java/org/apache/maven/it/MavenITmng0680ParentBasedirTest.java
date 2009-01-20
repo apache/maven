@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-680">MNG-680</a>.
@@ -41,14 +42,18 @@ public class MavenITmng0680ParentBasedirTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0680" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.it0065", "plugin", "1.0", "maven-plugin" );
-        verifier.executeGoal( "install" );
-        verifier.assertFilePresent( "subproject/target/child-basedir" );
-        verifier.assertFilePresent( "parent-basedir" );
+        File subDir = new File( testDir, "subproject" );
+
+        Verifier verifier = new Verifier( subDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties props = verifier.loadProperties( "target/basedir.properties" );
+        assertEquals( subDir, new File( props.getProperty( "project.basedir" ) ) );
+        assertEquals( testDir, new File( props.getProperty( "project.parent.basedir" ) ) );
     }
-}
 
+}

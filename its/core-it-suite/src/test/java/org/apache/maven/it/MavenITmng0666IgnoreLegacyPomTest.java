@@ -23,7 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-666">MNG-666</a>.
@@ -43,16 +43,19 @@ public class MavenITmng0666IgnoreLegacyPomTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0666" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0059" );
-        Properties verifierProperties = new Properties();
-        verifierProperties.put( "failOnErrorOutput", "false" );
-        verifier.setVerifierProperties( verifierProperties );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "target/maven-it-it0059-1.0.jar" );
+        verifier.executeGoal( "validate" );
         // don't verify error free log
         verifier.resetStreams();
 
-    }
-}
+        verifier.assertArtifactPresent( "org.apache.maven.its.it0059", "test", "3.8.1", "jar" );
 
+        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0059:test:jar:3.8.1" ) );
+    }
+
+}
