@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-507">MNG-507</a>.
@@ -41,17 +42,25 @@ public class MavenITmng0507ArtifactRelocationTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0507" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.1", "jar" );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.1", "pom" );
+        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "jar" );
         verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom" );
-        verifier.executeGoal( "package" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.1", "pom" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-    }
-}
+        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.1", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.1", "pom" );
+        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom" );
+        verifier.assertArtifactNotPresent( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "jar" );
 
+        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven:maven-core-it-support:jar:1.1" ) );
+    }
+
+}

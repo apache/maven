@@ -34,6 +34,7 @@ import java.util.Properties;
 public class MavenITmng0294MergeGlobalAndUserSettingsTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng0294MergeGlobalAndUserSettingsTest()
     {
     }
@@ -45,7 +46,10 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0294" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         Properties systemProperties = new Properties();
         systemProperties.put( "org.apache.maven.user-settings", "user-settings.xml" );
         systemProperties.put( "org.apache.maven.global-settings", "global-settings.xml" );
@@ -58,9 +62,10 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
             verifier.getCliOptions().add( new File( testDir, "global-settings.xml" ).getAbsolutePath() );
         }
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.assertFilePresent( "target/test.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/test.txt" );
     }
+
 }

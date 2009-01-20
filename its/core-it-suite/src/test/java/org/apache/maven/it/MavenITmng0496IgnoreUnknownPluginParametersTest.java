@@ -44,6 +44,8 @@ public class MavenITmng0496IgnoreUnknownPluginParametersTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0496" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
         verifier.assertFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();

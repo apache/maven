@@ -43,15 +43,18 @@ public class MavenITmng0471CustomLifecycleTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0471" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         List goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-fork:fork",
             "org.apache.maven.its.plugins:maven-it-plugin-fork:fork-goal"} );
         verifier.executeGoals( goals );
-        verifier.assertFilePresent( "target/forked/touch.txt" );
-        verifier.assertFilePresent( "target/forked2/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "target/forked/touch.txt" );
+        verifier.assertFilePresent( "target/forked2/touch.txt" );
     }
-}
 
+}
