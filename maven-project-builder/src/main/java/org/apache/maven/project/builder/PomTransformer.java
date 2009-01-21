@@ -483,6 +483,19 @@ public class PomTransformer
             		tmp.add(tmp.indexOf(mc.getProperties().get(0)) + 1, new ModelProperty(ProjectUri.Dependencies.Dependency.scope, "compile"));
             	}
             }
+
+            //Remove Default Executions IDS (mng-3965)
+            List<ModelProperty> replace = new ArrayList<ModelProperty>();
+            for(ModelProperty mp : tmp)
+            {
+                if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.id)
+                        && mp.getResolvedValue() != null && mp.getResolvedValue().equals("default-execution-id")) {
+                    replace.add(mp);
+                }
+            }
+
+            tmp.removeAll(replace);
+
                 
             //Missing Version Rule
             if ( getPropertyFor( ProjectUri.version, tmp ) == null )
