@@ -30,8 +30,7 @@ public class ProfileContextTest {
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.Property.name , "foo"));
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.Property.value , "bar"));
 
-        DefaultModelDataSource dataSource = new DefaultModelDataSource();
-        dataSource.init(modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
+        DefaultModelDataSource dataSource = new DefaultModelDataSource(modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         interpolatorProperties.add(new InterpolatorProperty( "${foo}", "bar"));

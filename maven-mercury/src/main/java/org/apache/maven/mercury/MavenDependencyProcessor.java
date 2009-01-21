@@ -120,7 +120,7 @@ public final class MavenDependencyProcessor
 
         PomTransformer transformer = new PomTransformer( new MavenDomainModelFactory() );
         ModelTransformerContext ctx =
-            new ModelTransformerContext( PomTransformer.MODEL_CONTAINER_FACTORIES );
+            new ModelTransformerContext( PomTransformer.MODEL_CONTAINER_INFOS );
 
         try
         {

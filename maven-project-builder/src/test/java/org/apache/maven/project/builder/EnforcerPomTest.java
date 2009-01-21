@@ -44,13 +44,13 @@ public class EnforcerPomTest
         DomainModel childModel = new DefaultDomainModel(mp2);
         DomainModel parentModel = new DefaultDomainModel(mp);
 
-        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_FACTORIES );
+        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
 
         ModelTransformer transformer = new PomTransformer(new DefaultDomainModelFactory());
         DomainModel domainModel = ctx.transform( Arrays.asList(childModel, parentModel), transformer, transformer );
 
-        DefaultModelDataSource source = new DefaultModelDataSource();
-        source.init(domainModel.getModelProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
+        DefaultModelDataSource source = new DefaultModelDataSource( domainModel.getModelProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES);
+
         List<ModelContainer> containers = source.queryFor(ProjectUri.Dependencies.Dependency.xUri);
         assertTrue(containers.size() == 2 );
 

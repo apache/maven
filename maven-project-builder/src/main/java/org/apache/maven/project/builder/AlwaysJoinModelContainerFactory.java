@@ -7,12 +7,14 @@ import org.apache.maven.shared.model.ModelContainerAction;
 
 import java.util.*;
 
-public class ExclusionModelContainerFactory implements ModelContainerFactory
+public class AlwaysJoinModelContainerFactory
+    implements ModelContainerFactory
 {
 
     private static final Collection<String> uris = Collections.unmodifiableList( Arrays.asList(
 
-        ProjectUri.Dependencies.Dependency.Exclusions.Exclusion.xUri
+        ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.goal
+     //   ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri
 
          ) );
 
@@ -27,15 +29,15 @@ public class ExclusionModelContainerFactory implements ModelContainerFactory
         {
             throw new IllegalArgumentException( "modelProperties: null or empty" );
         }
-        return new ExclusionModelContainer( modelProperties );
+        return new Anon_ModelContainer( modelProperties );
     }
 
-    private static class ExclusionModelContainer
+    private static class Anon_ModelContainer
         implements ModelContainer
     {
 
-        public ExclusionModelContainer(List<ModelProperty> properties) {
-            this.properties = properties;
+        public Anon_ModelContainer(List<ModelProperty> properties) {
+            this.properties = new ArrayList<ModelProperty>(properties);
         }
 
         private List<ModelProperty> properties;
@@ -43,19 +45,18 @@ public class ExclusionModelContainerFactory implements ModelContainerFactory
 
         public ModelContainerAction containerAction( ModelContainer modelContainer )
         {
-            throw new UnsupportedOperationException();
+            return ModelContainerAction.JOIN;
         }
 
         public ModelContainer createNewInstance( List<ModelProperty> modelProperties )
         {
-            return new ExclusionModelContainer( modelProperties );
+            return new Anon_ModelContainer( modelProperties );
         }
 
         public List<ModelProperty> getProperties()
         {
-            return properties;
+            return new ArrayList<ModelProperty>(properties);
         }
 
     }
 }
-

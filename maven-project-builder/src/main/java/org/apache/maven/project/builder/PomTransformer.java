@@ -20,28 +20,11 @@ package org.apache.maven.project.builder;
  */
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.apache.maven.shared.model.DomainModel;
-import org.apache.maven.shared.model.DomainModelFactory;
-import org.apache.maven.shared.model.InterpolatorProperty;
-import org.apache.maven.shared.model.ModelContainer;
-import org.apache.maven.shared.model.ModelContainerAction;
-import org.apache.maven.shared.model.ModelContainerFactory;
-import org.apache.maven.shared.model.ModelDataSource;
-import org.apache.maven.shared.model.ModelEventListener;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.ModelTransformer;
-import org.apache.maven.shared.model.ModelTransformerContext;
+import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
+import org.apache.maven.project.builder.rules.ExecutionRule;
 
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
@@ -64,13 +47,40 @@ public class PomTransformer
     			new IdModelContainerFactory(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri),
     			new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri),
     			new IdModelContainerFactory(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri)));
-    
+
+    private static Collection<ModelContainerInfo> goals_infos = Arrays.asList(
+             ModelContainerInfo.Factory.createModelContainerInfo(
+                    new AlwaysJoinModelContainerFactory(), new ExecutionRule(), null)
+            );
+
+    private static Collection<ModelContainerInfo> plugin_executions = Arrays.asList(
+            ModelContainerInfo.Factory.createModelContainerInfo(
+                    new IdModelContainerFactory(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri),
+                     null, goals_infos)
+            );
+
+
+    public static final Collection<ModelContainerInfo> MODEL_CONTAINER_INFOS = Arrays.asList(
+            ModelContainerInfo.Factory.createModelContainerInfo(
+                    new ArtifactModelContainerFactory(), null, plugin_executions),
+            ModelContainerInfo.Factory.createModelContainerInfo(
+                    new IdModelContainerFactory(ProjectUri.PluginRepositories.PluginRepository.xUri), null, null),
+            ModelContainerInfo.Factory.createModelContainerInfo(
+                    new IdModelContainerFactory(ProjectUri.Repositories.Repository.xUri), null, null),
+            ModelContainerInfo.Factory.createModelContainerInfo(
+                    new IdModelContainerFactory(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri), null, null),
+            ModelContainerInfo.Factory.createModelContainerInfo(
+                    new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri), null, null)
+    );
+
     /**
      * The URIs this transformer supports
      */
     public static final Set<String> URIS = Collections.unmodifiableSet(new HashSet<String>( Arrays.asList(  ProjectUri.Build.Extensions.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.configuration,
+                                                                          ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
+                                                                          ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.Execution.Goals.xURI,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
 
@@ -117,7 +127,8 @@ public class PomTransformer
                                                                           ProjectUri.Profiles.Profile.Repositories.xUri,
 
                                                                           ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
+                                                                        //  ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
+                                                                        //  ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.Execution.Goals.xURI,
                                                                           ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
 
@@ -149,8 +160,7 @@ public class PomTransformer
         List<ModelProperty> props = new ArrayList<ModelProperty>( properties );
 
         //dependency management
-        ModelDataSource source = new DefaultModelDataSource();
-        source.init( props, PomTransformer.MODEL_CONTAINER_FACTORIES  );
+        ModelDataSource source = new DefaultModelDataSource( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
         for ( ModelContainer dependencyContainer : source.queryFor( ProjectUri.Dependencies.Dependency.xUri ) )
         {
@@ -166,7 +176,7 @@ public class PomTransformer
                 }
             }
         }
-
+        List<ModelProperty> foobar = new ArrayList<ModelProperty>();
         for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
         {
             for ( ModelContainer managementContainer : source.queryFor( ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri ) )
@@ -219,11 +229,8 @@ public class PomTransformer
 
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
                 {
-                    ModelDataSource pluginDatasource = new DefaultModelDataSource();
-                    pluginDatasource.init( pluginContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
-
-                    ModelDataSource managementDatasource = new DefaultModelDataSource();
-                    managementDatasource.init( managementContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
+                    ModelDataSource pluginDatasource = new DefaultModelDataSource(  pluginContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
+                    ModelDataSource managementDatasource = new DefaultModelDataSource( managementContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
 
                     List<ModelContainer> managementExecutionContainers = managementDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                     List<ModelProperty> managementPropertiesWithoutExecutions = new ArrayList<ModelProperty>(managementContainer.getProperties());
@@ -231,7 +238,7 @@ public class PomTransformer
                     {
                         managementPropertiesWithoutExecutions.removeAll(a.getProperties());
                     }
-
+                    //THIS JOIN REVERSES ORDER
                     source.join( pluginContainer, new ArtifactModelContainerFactory().create(managementPropertiesWithoutExecutions) );
 
                     List<ModelContainer> pluginExecutionContainers = pluginDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
@@ -257,10 +264,14 @@ public class PomTransformer
                     	
                         for(ModelContainer b : pluginExecutionContainers)
                         {
-                            if(b.containerAction(c).equals(ModelContainerAction.JOIN))
+                            if(b.containerAction(c).equals(ModelContainerAction.JOIN)) //----
                             {
+                                //MNG-3995 - property lost here
                                 source.join(b, c);
-                                joinedExecutionContainers.add(a);
+                                foobar.addAll(b.getProperties());
+                                foobar.addAll(c.getProperties());
+                                //REVERSE ORDER HERE
+                                joinedExecutionContainers.add(a);//-----
                             }
                         }
                     }
@@ -305,18 +316,14 @@ public class PomTransformer
         //Rule: Do not join plugin executions without ids
         Set<ModelProperty> removeProperties = new HashSet<ModelProperty>();
         
-        ModelDataSource dataSource = new DefaultModelDataSource();
-        
-        dataSource.init( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
-        
+        ModelDataSource dataSource = new DefaultModelDataSource( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
+
         List<ModelContainer> containers = dataSource.queryFor( ProjectUri.Build.Plugins.Plugin.xUri );
         
         for ( ModelContainer pluginContainer : containers )
         {
-            ModelDataSource executionSource = new DefaultModelDataSource();
-            
-            executionSource.init( pluginContainer.getProperties(),
-                                  Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
+            ModelDataSource executionSource = new DefaultModelDataSource( pluginContainer.getProperties(),
+                                  Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ));
             
             List<ModelContainer> executionContainers = executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
             
@@ -343,16 +350,41 @@ public class PomTransformer
         
         props.removeAll( removeProperties );
 
+        //Execution Rule - extension for this needs to be pushed into model-builder
+
+        dataSource = new DefaultModelDataSource( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
+
+        for(ModelContainer mc : dataSource.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ))
+        {
+            ModelDataSource executionSource =
+                    new DefaultModelDataSource(mc.getProperties(),
+                            Arrays.asList(new IdModelContainerFactory(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri),
+                                    new AlwaysJoinModelContainerFactory()));
+            for(ModelContainer es : executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri )) {
+                ModelContainerRule rule = new ExecutionRule();
+                //List<ModelProperty> x = rule.execute(es.getProperties());
+                List<ModelProperty> x = (!foobar.containsAll(es.getProperties())) ? rule.execute(es.getProperties()) :
+                        ModelTransformerContext.sort(rule.execute(es.getProperties()),
+                                ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
+                dataSource.replace(es, es.createNewInstance(x));
+            }
+        }
+
+        props = dataSource.getModelProperties();
+       
         for(ModelEventListener listener : eventListeners)
         {
-            ModelDataSource ds = new DefaultModelDataSource();
-            ds.init( props, listener.getModelContainerFactories() );
+            ModelDataSource ds = new DefaultModelDataSource( props, listener.getModelContainerFactories() );
             for(String uri : listener.getUris() )
             {
                 listener.fire(ds.queryFor(uri));
             }
         }
-
+//       for(ModelProperty mp : props) {
+//           if(mp.getUri().startsWith(ProjectUri.Build.Plugins.Plugin.Executions.Execution.configuration)) {
+//               System.out.println(mp);
+//           }
+//       }
         return factory.createDomainModel( props );
     }
 
@@ -415,8 +447,7 @@ public class PomTransformer
             List clearedProperties = new ArrayList<ModelProperty>();
             
             //Default Dependency Scope Rule
-            ModelDataSource s = new DefaultModelDataSource();
-            s.init( tmp, Arrays.asList( new ArtifactModelContainerFactory()) );
+            ModelDataSource s = new DefaultModelDataSource( tmp, Arrays.asList( new ArtifactModelContainerFactory()) );
             for(ModelContainer mc : s.queryFor(ProjectUri.Dependencies.Dependency.xUri))
             {
             	boolean containsScope = false;
@@ -470,8 +501,7 @@ public class PomTransformer
             if ( domainModelIndex > 0 )
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
-                ModelDataSource source = new DefaultModelDataSource();
-                source.init( tmp, Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ) );
+                ModelDataSource source = new DefaultModelDataSource( tmp, Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ));
                 List<ModelContainer> containers =
                     source.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
                 for ( ModelContainer container : containers )
@@ -500,8 +530,7 @@ public class PomTransformer
             if ( domainModelIndex > 0 )
             {
                 List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
-                ModelDataSource source = new DefaultModelDataSource();
-                source.init( tmp, PomTransformer.MODEL_CONTAINER_FACTORIES );
+                ModelDataSource source = new DefaultModelDataSource( tmp, PomTransformer.MODEL_CONTAINER_FACTORIES );
                 List<ModelContainer> containers = source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri );
                 for ( ModelContainer container : containers )
                 {
@@ -618,8 +647,7 @@ public class PomTransformer
         }
 
         //Rule: Build plugin config overrides reporting plugin config
-        ModelDataSource source = new DefaultModelDataSource();
-        source.init( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
+        ModelDataSource source = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
         List<ModelContainer> reportContainers = source.queryFor( ProjectUri.Reporting.Plugins.Plugin.xUri );
         for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
@@ -638,6 +666,7 @@ public class PomTransformer
         }
 
         modelProperties = source.getModelProperties();
+
         return modelProperties;
     }
 

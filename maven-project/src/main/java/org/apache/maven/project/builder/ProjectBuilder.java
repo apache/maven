@@ -43,10 +43,9 @@ public interface ProjectBuilder
      * Returns a maven project for the specified input stream.
      *
      * @param pom                         input stream of the model
-     * @param inheritedModels             list of models containing additional parent models in order from most to least specialized
+     * @param mixins             list of models containing additional parent models in order from most to least specialized
      * @param interpolatorProperties      properties used for interpolation of properties within the model
      * @param resolver                    artifact resolver used in resolving artifacts
-     * @param baseDirectory               the base directory of the model
      * @param projectBuilderConfiguration
      * @return a maven project for the specified input stream
      * @throws IOException if there is a problem in the construction of the maven project

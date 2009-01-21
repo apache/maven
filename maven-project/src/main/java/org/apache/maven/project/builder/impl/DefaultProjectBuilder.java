@@ -157,7 +157,7 @@ public class DefaultProjectBuilder
         
         PomClassicTransformer transformer = new PomClassicTransformer( new PomClassicDomainModelFactory() );
         
-        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_FACTORIES );
+        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
         
         PomClassicDomainModel transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( domainModels,
                                                                                                 transformer,

@@ -111,9 +111,7 @@ public final class MavenDomainModel
     {
         List<ArtifactBasicMetadata> metadatas = new ArrayList<ArtifactBasicMetadata>();
 
-        ModelDataSource source = new DefaultModelDataSource();
-        source.init( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES  );
-
+        ModelDataSource source = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
         for ( ModelContainer modelContainer : source.queryFor( ProjectUri.Dependencies.Dependency.xUri ) )
         {
             metadatas.add( transformContainerToMetadata( modelContainer ) );
@@ -125,8 +123,8 @@ public final class MavenDomainModel
     public Collection<ModelContainer> getActiveProfileContainers( List<InterpolatorProperty> properties )
         throws DataSourceException
     {
-        ModelDataSource dataSource = new DefaultModelDataSource();
-        dataSource.init( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
+        ModelDataSource dataSource = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
+
         return new ProfileContext( dataSource, properties ).getActiveProfiles();
     }
 
@@ -249,9 +247,8 @@ public final class MavenDomainModel
             metadata.setScope( "runtime" );
         }
 
-        ModelDataSource dataSource = new DefaultModelDataSource();
-        dataSource.init( container.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
-                                                                   new ExclusionModelContainerFactory() ) );
+        ModelDataSource dataSource = new DefaultModelDataSource( container.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
+                                                                   new ExclusionModelContainerFactory() ));
         List<ArtifactBasicMetadata> exclusions = new ArrayList<ArtifactBasicMetadata>();
 
         for ( ModelContainer exclusion : dataSource.queryFor( ProjectUri.Dependencies.Dependency.Exclusions.Exclusion.xUri ) )

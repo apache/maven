@@ -27,7 +27,7 @@ under the License.
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-project</artifactId>
-  <name>Maven Project Builder</name>
+  <name>Maven Project</name>
   <description>This library is used to not only read Maven project object model files, but to assemble inheritence
     and to retrieve remote models as required.</description>
   <dependencies>

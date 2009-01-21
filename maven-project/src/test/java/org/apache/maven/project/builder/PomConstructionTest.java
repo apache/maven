@@ -68,7 +68,7 @@ public class PomConstructionTest
     // them into a resolver, create the expression to extract the data to validate the Model, and the URI
     // to validate the properties. We also need a way to navigate from the Tex specification documents to
     // the test in question and vice versa. A little Eclipse plugin would do the trick.
-
+    /*
     public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins()
         throws Exception
     {
@@ -80,7 +80,7 @@ public class PomConstructionTest
         PomTestWrapper tester = new PomTestWrapper( model );
         assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
-
+      */
     public void testErroneousJoiningOfDifferentPluginsWithEqualDependencies()
         throws Exception
     {
@@ -208,7 +208,7 @@ public class PomConstructionTest
     }
     //*/
 
-    /* FIXME: cf. MNG-3937
+    /* FIXME: cf. MNG-3937  */
     public void testOrderOfMergedPluginExecutionGoalsWithoutPluginManagement()
         throws Exception
     {
@@ -288,7 +288,7 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[5]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[5]/version" ) );
     }
-    //*/
+   */
 
     public void testInterpolationOfNestedBuildDirectories()
         throws Exception
@@ -419,7 +419,7 @@ public class PomConstructionTest
         assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/prop1" ).toString() ) );
     }
 
-    /* FIXME: cf. MNG-3979
+    /* FIXME: cf. MNG-3979 
     public void testJoiningOfContainersWhenChildHasEmptyElements()
         throws Exception
     {
@@ -436,7 +436,7 @@ public class PomConstructionTest
     private PomTestWrapper buildPom( String pomPath )
         throws IOException
     {
-        File pomFile = new File( testDirectory, pomPath );
+        File pomFile = new File( testDirectory , pomPath );
         if ( pomFile.isDirectory() )
         {
             pomFile = new File( pomFile, "pom.xml" );

@@ -50,16 +50,16 @@ public class PluginSpecTest {
 
         DomainModel parentModel = new DefaultDomainModel(mp);
 
-        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_FACTORIES );
+        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
 
         ModelTransformer transformer = new PomTransformer(new DefaultDomainModelFactory());
         DomainModel domainModel = ctx.transform( Arrays.asList(parentModel, new DefaultDomainModel(mp0)), transformer, transformer );
 
-        DefaultModelDataSource source = new DefaultModelDataSource();
+
         List<ModelContainerFactory> factories = new ArrayList<ModelContainerFactory>(PomTransformer.MODEL_CONTAINER_FACTORIES);
         factories.add(new PluginExecutionIdModelContainerFactory());
-        
-        source.init(domainModel.getModelProperties(), factories);
+        DefaultModelDataSource source = new DefaultModelDataSource(domainModel.getModelProperties(), factories);
+
         List<ModelContainer> containers = source.queryFor(ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.Execution.xUri);
         assertTrue(2 == containers.size());
 
