@@ -123,7 +123,7 @@ public class PomTransformer
                                                                           ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.PluginRepositories.xUri,
                                                                           ProjectUri.Profiles.Profile.Reporting.Plugins.xUri,
-                                                                          ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.xUri,
+                                                                          //ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.xUri,
                                                                           ProjectUri.Profiles.Profile.Repositories.xUri,
 
                                                                           ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.xUri,
@@ -133,7 +133,7 @@ public class PomTransformer
                                                                           ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
 
                                                                           ProjectUri.Reporting.Plugins.xUri,
-                                                                          ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri,
+                                                                          //ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri,
 
                                                                           ProjectUri.Repositories.xUri) ));
 
