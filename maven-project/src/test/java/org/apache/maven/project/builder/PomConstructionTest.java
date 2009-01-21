@@ -106,6 +106,14 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
     //*/
+    /** MNG-3985 */
+    public void testMultipleRepositories()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "multiple-repos/sub" );
+        assertEquals( 3, ( (List<?>) pom.getValue( "repositories" ) ).size() );
+    }
+
 
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
         throws Exception
