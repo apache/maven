@@ -208,7 +208,16 @@ public class PomConstructionTest
     }
     //*/
 
-    /* FIXME: cf. MNG-3937  */
+    /* MNG-3984*/
+    public void testDifferentContainersWithSameId()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "join-different-containers-same-id" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/goals" ) ).size() );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/pluginManagement/plugins[1]/executions[1]/goals" ) ).size() );
+    }
+
+    /* FIXME: cf. MNG-3937*/
     public void testOrderOfMergedPluginExecutionGoalsWithoutPluginManagement()
         throws Exception
     {
