@@ -166,7 +166,7 @@ public class PomConstructionTest
         assertEquals( 4, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
     }
 
-    /* FIXME: cf. MNG-3943*/
+    /* MNG-3943*/
     public void testMergeOfPluginExecutionsWhenChildAndParentUseDifferentPluginVersions()
         throws Exception
     {
@@ -217,7 +217,7 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "build/pluginManagement/plugins[1]/executions[1]/goals" ) ).size() );
     }
 
-    /* FIXME: cf. MNG-3937*/
+    /* MNG-3937*/
     public void testOrderOfMergedPluginExecutionGoalsWithoutPluginManagement()
         throws Exception
     {
@@ -252,7 +252,7 @@ public class PomConstructionTest
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
 
-    /* FIXME: cf. MNG-3938 */
+    /* MNG-3938 */
     public void testOverridingOfInheritedPluginExecutionsWithPluginManagement()
         throws Exception
     {
@@ -428,7 +428,7 @@ public class PomConstructionTest
         assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/prop1" ).toString() ) );
     }
 
-    /* FIXME: cf. MNG-3979 
+    /* MNG-3979 */
     public void testJoiningOfContainersWhenChildHasEmptyElements()
         throws Exception
     {

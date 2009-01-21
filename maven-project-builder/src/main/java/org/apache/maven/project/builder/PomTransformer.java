@@ -380,12 +380,31 @@ public class PomTransformer
                 listener.fire(ds.queryFor(uri));
             }
         }
-//       for(ModelProperty mp : props) {
-//           if(mp.getUri().startsWith(ProjectUri.Build.Plugins.Plugin.Executions.Execution.configuration)) {
-//               System.out.println(mp);
-//           }
-//       }
-        return factory.createDomainModel( props );
+        
+        //Cleanup props (MNG-3979)
+        List<ModelProperty> p = new ArrayList<ModelProperty>();
+        for(ModelProperty mp : props)
+        {
+            if(mp.getResolvedValue() != null
+                    && mp.getResolvedValue().trim().equals(""))
+            {
+                int index = props.indexOf(mp) + 1;
+
+                if(index <= props.size() && mp.isParentOf(props.get(index)) && !props.get(index).getUri().contains("#property"))
+                {
+                    p.add(new ModelProperty(mp.getUri(), null));
+                }
+                else
+                {
+                    p.add(mp);
+                }
+            }
+            else
+            {
+                p.add(mp);
+            }
+        }
+        return factory.createDomainModel( p );
     }
 
     private static List<ModelProperty> transformDependencyManagement( List<ModelProperty> modelProperties )
