@@ -109,7 +109,7 @@ public final class MavenDependencyProcessor
             List<DomainModel> parentModels = getParentsOfDomainModel( domainModel, mdReader );
             
             if( parentModels == null )
-                throw new DependencyProcessorException( "cannor read parent for " + bmd.getGAV() );
+                throw new DependencyProcessorException( "cannot read parent for " + bmd.getGAV() );
             
             domainModels.addAll( parentModels );
         }
@@ -136,13 +136,18 @@ public final class MavenDependencyProcessor
     }
 
     private static List<DomainModel> getParentsOfDomainModel( MavenDomainModel domainModel, MetadataReader mdReader )
-        throws IOException, MetadataReaderException
+        throws IOException, MetadataReaderException, DependencyProcessorException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
         if ( domainModel.hasParent() )
         {
+            byte[] b = mdReader.readMetadata( domainModel.getParentMetadata() );
+
+            if ( b == null || b.length < 1 )
+                throw new DependencyProcessorException( "cannot read metadata for " + domainModel.getParentMetadata() );
+
             MavenDomainModel parentDomainModel =
-                new MavenDomainModel( mdReader.readMetadata( domainModel.getParentMetadata() ) );
+                new MavenDomainModel( b );
             domainModels.add( parentDomainModel );
             domainModels.addAll( getParentsOfDomainModel( parentDomainModel, mdReader ) );
         }
