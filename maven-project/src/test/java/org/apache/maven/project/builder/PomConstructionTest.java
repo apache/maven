@@ -114,7 +114,14 @@ public class PomConstructionTest
         assertEquals( 3, ( (List<?>) pom.getValue( "repositories" ) ).size() );
     }
 
-
+    /** MNG-3985
+    public void testMultipleExecutionIds()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "dual-execution-ids/sub" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+    }
+    //*/
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
         throws Exception
     {
