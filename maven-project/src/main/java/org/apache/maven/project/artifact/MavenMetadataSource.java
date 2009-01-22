@@ -447,6 +447,11 @@ public class MavenMetadataSource
 
             ArtifactFilter artifactFilter = dependencyFilter;
 
+            // MNG-3769: It would be nice to be able to process relocations here, 
+            // so we could have this filtering step apply to post-relocated dependencies.
+            // HOWEVER, this would require a much more invasive POM resolution process
+            // in order to look for relocations, which would make the early steps in 
+            // a Maven build way too heavy.
             if ( artifact != null && ( artifactFilter == null || artifactFilter.include( artifact ) ) )
             {
                 if ( d.getExclusions() != null && !d.getExclusions().isEmpty() )
