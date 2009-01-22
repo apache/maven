@@ -312,6 +312,17 @@ Within the project there are a number of nodes which contain id. Each of the nod
 \subsubsection{Rules}
 If an id exists in both the parent and child pom and the ids are equal, then join the nodes, otherwise inherit the node. 
 
+\subsubsection{Plugin Execution ID Rules}
+If a Plugin Model Container is joined by ID, the following rules apply:
+
+\begin{enumerate}
+\item Can not have two or more execution elements lacking an ID.
+\item If default-execution-id is explicitly defined as the execution id, it is treated as not having an id for purposes of the above rule.
+\item Project.Build.Plugins.Plugin.Executions.Execution.Goals is always joined on an execution id match. Duplicate goals are removed.
+\end{enumerate}
+
+The above rules also apply to joining with a pluginManagement node.
+
 \subsection{Plugin Configuration Inheritance}
 Plugin nodes are treated as a set. If a child pom contains the same element as a parent pom, then the parent pom element will not be inherited/joined unless the child element contains a property combine.children="append". In this case, it will treat the element as a collection.
 
