@@ -51,7 +51,7 @@ under the License.
       <version>1.0</version>
       <exclusions>
         <exclusion>
-          <groupId>org.apache.mven.its.mng3769</groupId>
+          <groupId>org.apache.maven.its.mng3769</groupId>
           <artifactId>relocated-new</artifactId>
         </exclusion>
       </exclusions>

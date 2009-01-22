@@ -137,6 +137,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3813PluginClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3796ClassImportInconsistencyTest.class );
+        suite.addTestSuite( MavenITmng3769ExclusionRelocatedTransdepsTest.class );
         suite.addTestSuite( MavenITmng3748BadSettingsXmlTest.class );
         suite.addTestSuite( MavenITmng3747PrefixedPathExpressionTest.class );
         suite.addTestSuite( MavenITmng3746POMPropertyOverrideTest.class );
