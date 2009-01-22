@@ -361,11 +361,12 @@ public class PomTransformer
                             Arrays.asList(new IdModelContainerFactory(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri),
                                     new AlwaysJoinModelContainerFactory()));
             for(ModelContainer es : executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri )) {
-                ModelContainerRule rule = new ExecutionRule();
+                ExecutionRule rule = new ExecutionRule();
                 //List<ModelProperty> x = rule.execute(es.getProperties());
                 List<ModelProperty> x = (!foobar.containsAll(es.getProperties())) ? rule.execute(es.getProperties()) :
                         ModelTransformerContext.sort(rule.execute(es.getProperties()),
                                 ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
+                
                 dataSource.replace(es, es.createNewInstance(x));
             }
         }

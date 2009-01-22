@@ -20,7 +20,11 @@ public class ExecutionRule implements ModelContainerRule {
         for(ModelProperty mp : properties) {
             if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.goal)) {
                 goalProperties.add(mp);
-            } else if(!containsProperty(mp, processedProperties)) {
+            } else if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.xURI)) {
+                if(!containsProperty(mp, processedProperties)) {
+                    processedProperties.add(mp);
+                }
+            } else {
                 processedProperties.add(mp);
             }
         }

@@ -106,6 +106,14 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
     //*/
+
+    /** MNG-3965 */
+    public void testExecutionConfigurationSubcollections()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "execution-configuration-subcollections" );
+    }
+
     /** MNG-3985 */
     public void testMultipleRepositories()
         throws Exception

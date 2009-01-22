@@ -398,7 +398,7 @@ public class ProjectUri
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
 
                             public static String configuration =
-                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/execution#collection/execution/configuration";
+                                "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/execution#collection/execution/configuration#set";
                         }
                     }
 
@@ -524,7 +524,7 @@ public class ProjectUri
                             "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/inherited";
 
                         public static String configuration =
-                            "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/configuration";
+                            "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/configuration#set";
                     }
                 }
 
@@ -788,7 +788,7 @@ public class ProjectUri
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
 
                                     public static String configuration =
-                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/configuration";
+                                        "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/configuration#set";
                                 }
                             }
 
@@ -915,7 +915,7 @@ public class ProjectUri
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/inherited";
 
                                 public static String configuration =
-                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/configuration";
+                                    "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/configuration#set";
                             }
                         }
 
