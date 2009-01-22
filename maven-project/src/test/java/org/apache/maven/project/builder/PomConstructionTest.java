@@ -122,6 +122,15 @@ public class PomConstructionTest
        // System.out.println(pom.getDomainModel().asString());
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
     }
+
+    /** MNG-3997 */
+    public void testConsecutiveEmptyElements()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "consecutive_empty_elements" );
+        pom.getDomainModel().asString();
+    }
+
     //*/
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
         throws Exception
