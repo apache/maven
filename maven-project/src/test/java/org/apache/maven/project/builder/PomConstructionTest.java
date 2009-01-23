@@ -589,6 +589,26 @@ public class PomConstructionTest
     }
     //*/
 
+    /* FIXME: cf. MNG-4000
+    public void testMultiplePluginExecutionsWithAndWithoutIdsWithoutPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-w-and-wo-id/wo-plugin-mngt" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "log-string", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
+        assertEquals( "log-string", pom.getValue( "build/plugins[1]/executions[2]/goals[1]" ) );
+    }
+    //*/
+
+    public void testMultiplePluginExecutionsWithAndWithoutIdsWithPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-w-and-wo-id/w-plugin-mngt" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "log-string", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
+        assertEquals( "log-string", pom.getValue( "build/plugins[1]/executions[2]/goals[1]" ) );
+    }
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
