@@ -470,6 +470,28 @@ public class PomConstructionTest
     }
     //*/
 
+    public void testOrderOfPluginConfigurationElementsWithoutPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-config-order/wo-plugin-mngt" );
+        assertEquals( "one", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[1]" ) );
+        assertEquals( "two", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[2]" ) );
+        assertEquals( "three", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[3]" ) );
+        assertEquals( "four", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[4]" ) );
+    }
+
+    /* FIXME: cf. MNG-3827
+    public void testOrderOfPluginConfigurationElementsWithPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-config-order/w-plugin-mngt" );
+        assertEquals( "one", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[1]" ) );
+        assertEquals( "two", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[2]" ) );
+        assertEquals( "three", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[3]" ) );
+        assertEquals( "four", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[4]" ) );
+    }
+    //*/
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );

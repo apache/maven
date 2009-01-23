@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.shared.model.ModelProperty;
@@ -39,6 +40,11 @@ public class PomTestWrapper
     private File pomFile;
 
     private JXPathContext context;
+
+    static
+    {
+        JXPathContextReferenceImpl.addNodePointerFactory( new Xpp3DomPointerFactory() );
+    }
 
     public PomTestWrapper( PomClassicDomainModel domainModel )
         throws IOException
