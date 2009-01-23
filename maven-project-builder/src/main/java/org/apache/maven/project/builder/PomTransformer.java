@@ -176,7 +176,8 @@ public class PomTransformer
                 }
             }
         }
-        List<ModelProperty> foobar = new ArrayList<ModelProperty>();
+
+        boolean joinedContainer = false;
         for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
         {
             for ( ModelContainer managementContainer : source.queryFor( ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri ) )
@@ -229,6 +230,7 @@ public class PomTransformer
 
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
                 {
+                    joinedContainer = true;
                     ModelDataSource pluginDatasource = new DefaultModelDataSource(  pluginContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
                     ModelDataSource managementDatasource = new DefaultModelDataSource( managementContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
 
@@ -268,10 +270,9 @@ public class PomTransformer
                             {
                                 //MNG-3995 - property lost here
                                 source.join(b, c);
-                                foobar.addAll(b.getProperties());
-                                foobar.addAll(c.getProperties());
                                 //REVERSE ORDER HERE
                                 joinedExecutionContainers.add(a);//-----
+                     //           Collections.reverse(joinedExecutionContainers);
                             }
                         }
                     }
@@ -363,7 +364,7 @@ public class PomTransformer
             for(ModelContainer es : executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri )) {
                 ExecutionRule rule = new ExecutionRule();
                 //List<ModelProperty> x = rule.execute(es.getProperties());
-                List<ModelProperty> x = (!foobar.containsAll(es.getProperties())) ? rule.execute(es.getProperties()) :
+                List<ModelProperty> x = (!joinedContainer) ? rule.execute(es.getProperties()) :
                         ModelTransformerContext.sort(rule.execute(es.getProperties()),
                                 ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                 

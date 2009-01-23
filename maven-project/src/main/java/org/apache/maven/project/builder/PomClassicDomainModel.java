@@ -297,6 +297,8 @@ public final class PomClassicDomainModel
             s.add(ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri);
             s.add(ProjectUri.Build.Plugins.Plugin.Executions.xUri);
             s.add(ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.xURI);
+            s.add(ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri);
+            s.add(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.configuration);
             s.add(ProjectUri.Build.Plugins.Plugin.Executions.Execution.configuration);
             modelProperties = ModelMarshaller.marshallXmlToModelProperties(
                 getInputStream(), ProjectUri.baseUri, s );

@@ -28,7 +28,23 @@ public class ExecutionRule implements ModelContainerRule {
                 processedProperties.add(mp);
             }
         }
-        
+
+        //Remove duplicate collections
+        List<ModelProperty> c = new ArrayList<ModelProperty>();
+        boolean x = false;
+        for(ModelProperty mp : processedProperties) {
+            if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.configuration)) {
+                if(x) {
+                    c.add(mp);
+                } else {
+                    x = true;
+                }
+
+            }
+        }
+
+        processedProperties.removeAll(c);
+
         if(!goalProperties.isEmpty()) {
             Collections.reverse(goalProperties);
             List<ModelProperty> uniqueGoals = new ArrayList<ModelProperty>();

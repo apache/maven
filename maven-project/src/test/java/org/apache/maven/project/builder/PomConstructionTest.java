@@ -91,7 +91,7 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
     }
 
-    /** MNG-3821 */
+    /** MNG-3821 -FIX---
     public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
         throws Exception
     {
@@ -105,12 +105,38 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "reporting/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
+    */
+     /** MNG-3998 */
+    public void testExecutionConfiguration()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "execution-configuration" );
+    }
+
+    public void testSingleConfigurationInheritance()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "single-configuration-inheritance" );
+    }
+
+    public void testConfigWithPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "config-with-plugin-mng" );
+    }
 
     /** MNG-3965 */
     public void testExecutionConfigurationSubcollections()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "execution-configuration-subcollections" );
+    }
+
+    /** MNG- */
+    public void testFoo()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "foo/sub" );
     }
 
     /** MNG-3985 */
@@ -150,7 +176,7 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
 
-    /* FIXME: cf. MNG-3886
+    /* FIXME: cf. MNG-3886*/
     public void testOrderOfGoalsFromPluginExecutionWithPluginManagement()
         throws Exception
     {
@@ -213,11 +239,12 @@ public class PomConstructionTest
         assertEquals( "<?xml version='1.0'?>Tom&Jerry", pom.getValue( "properties/xmlTest" ) );
     }
 
-    /* FIXME: cf. MNG-3925
+    /* FIXME: cf. MNG-3925 
     public void testOrderOfMergedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-plugin-exec-order/wo-plugin-mngt/sub" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
         assertEquals( "parent-1", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
         assertEquals( "parent-2", pom.getValue( "build/plugins[1]/executions[2]/goals[1]" ) );

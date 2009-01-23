@@ -109,7 +109,7 @@ public class ProjectUri
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/address";
 
                 public static String configuration =
-                    "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/configuration";
+                    "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/configuration#set";
             }
         }
     }
@@ -859,7 +859,7 @@ public class ProjectUri
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/inherited";
 
                             public static String configuration =
-                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/configuration";
+                                "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/configuration#set";
                         }
                     }
                 }
@@ -986,7 +986,7 @@ public class ProjectUri
                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/inherited";
 
                         public static String configuration =
-                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/configuration";
+                            "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/configuration#set";
                     }
                 }
             }
@@ -1188,7 +1188,7 @@ public class ProjectUri
                             "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/inherited";
 
                         public static String configuration =
-                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/configuration";
+                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/configuration#set";
 
                         public static class ReportSets
                         {
@@ -1204,13 +1204,13 @@ public class ProjectUri
                                     "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/id";
 
                                 public static String configuration =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/configuration";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/configuration#set";
 
                                 public static String inherited =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets/reportSet/inherited";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/inherited";
 
                                 public static String reports =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets/reportSet/reports";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/reports";
                             }
                         }
                     }
@@ -1571,7 +1571,7 @@ public class ProjectUri
                             "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/id";
 
                         public static String configuration =
-                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/configuration";
+                            "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/configuration#set";
 
                         public static String inherited =
                             "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/inherited";
