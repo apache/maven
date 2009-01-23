@@ -91,7 +91,7 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
     }
 
-    /* FIXME: cf. MNG-3821
+    /** MNG-3821 */
     public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
         throws Exception
     {
@@ -105,7 +105,6 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "reporting/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
-    //*/
 
     /** MNG-3965 */
     public void testExecutionConfigurationSubcollections()
@@ -127,7 +126,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "dual-execution-ids/sub" );
-       // System.out.println(pom.getDomainModel().asString());
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
     }
 
@@ -517,6 +515,25 @@ public class PomConstructionTest
         assertEquals( "four", pom.getValue( prefix + "stringParams/stringParam[4]" ) );
         assertEquals( "key1", pom.getValue( prefix + "propertiesParam/property[1]/name" ) );
         assertEquals( "key2", pom.getValue( prefix + "propertiesParam/property[2]/name" ) );
+    }
+    //*/
+
+    /* FIXME: cf. MNG-3836
+    public void testMergeOfInheritedPluginConfiguration()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-config-merging/child" );
+        String prefix = "build/plugins[1]/configuration/";
+        assertEquals( "PASSED", pom.getValue( prefix + "propertiesFile" ) );
+        assertEquals( "PASSED", pom.getValue( prefix + "parent" ) );
+        assertEquals( "PASSED-1", pom.getValue( prefix + "stringParams/stringParam[1]" ) );
+        assertEquals( "PASSED-2", pom.getValue( prefix + "stringParams/stringParam[2]" ) );
+        assertEquals( "PASSED-3", pom.getValue( prefix + "stringParams/stringParam[3]" ) );
+        assertEquals( "PASSED-4", pom.getValue( prefix + "stringParams/stringParam[4]" ) );
+        assertEquals( "PASSED-1", pom.getValue( prefix + "listParam/listParam[1]" ) );
+        assertEquals( "PASSED-2", pom.getValue( prefix + "listParam/listParam[2]" ) );
+        assertEquals( "PASSED-3", pom.getValue( prefix + "listParam/listParam[3]" ) );
+        assertEquals( "PASSED-4", pom.getValue( prefix + "listParam/listParam[4]" ) );
     }
     //*/
 
