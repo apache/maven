@@ -37,7 +37,7 @@ public class MavenITmng3271DefaultReportsSuppressionTest
 
     public MavenITmng3271DefaultReportsSuppressionTest()
     {
-        super( "(2.9999,)" );
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" );
     }
 
     /**
