@@ -117,6 +117,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3892ReleaseDeploymentTest.class );
         suite.addTestSuite( MavenITmng3887PluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng3886ExecutionGoalsOrderTest.class );
+        suite.addTestSuite( MavenITmng3885UniqueVersionFromParentProfileTest.class );
         suite.addTestSuite( MavenITmng3877BasedirAlignedModelTest.class );
         suite.addTestSuite( MavenITmng3873MultipleExecutionGoalsTest.class );
         suite.addTestSuite( MavenITmng3866PluginConfigInheritanceTest.class );
