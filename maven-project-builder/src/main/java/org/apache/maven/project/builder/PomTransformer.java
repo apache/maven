@@ -177,7 +177,7 @@ public class PomTransformer
             }
         }
 
-        boolean joinedContainer = false;
+        List<ModelProperty> joinedContainers = new ArrayList<ModelProperty>();
         for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
         {
             for ( ModelContainer managementContainer : source.queryFor( ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri ) )
@@ -230,7 +230,6 @@ public class PomTransformer
 
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
                 {
-                    joinedContainer = true;
                     ModelDataSource pluginDatasource = new DefaultModelDataSource(  pluginContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
                     ModelDataSource managementDatasource = new DefaultModelDataSource( managementContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );
 
@@ -241,7 +240,7 @@ public class PomTransformer
                         managementPropertiesWithoutExecutions.removeAll(a.getProperties());
                     }
                     //THIS JOIN REVERSES ORDER
-                    source.join( pluginContainer, new ArtifactModelContainerFactory().create(managementPropertiesWithoutExecutions) );
+                    source.joinWithOriginalOrder( pluginContainer, new ArtifactModelContainerFactory().create(managementPropertiesWithoutExecutions) );
 
                     List<ModelContainer> pluginExecutionContainers = pluginDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                     List<ModelContainer> joinedExecutionContainers = new ArrayList<ModelContainer>();
@@ -266,13 +265,19 @@ public class PomTransformer
                     	
                         for(ModelContainer b : pluginExecutionContainers)
                         {
-                            if(b.containerAction(c).equals(ModelContainerAction.JOIN)) //----
+                            if(b.containerAction(c).equals(ModelContainerAction.JOIN))
                             {
                                 //MNG-3995 - property lost here
-                                source.join(b, c);
+                                joinedContainers.addAll(source.join(b, c).getProperties());
+              // ExecutionRule rule = new ExecutionRule();
+               // List<ModelProperty> x = rule.execute(d.getProperties());
+               // List<ModelProperty> x = (!joinedContainer) ? rule.execute(es.getProperties()) :
+               //         ModelTransformerContext.sort(rule.execute(es.getProperties()),
+               //                 ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
+
+             //   source.replace(d, d.createNewInstance(x));
                                 //REVERSE ORDER HERE
-                                joinedExecutionContainers.add(a);//-----
-                     //           Collections.reverse(joinedExecutionContainers);
+                                joinedExecutionContainers.add(a);
                             }
                         }
                     }
@@ -363,17 +368,17 @@ public class PomTransformer
                                     new AlwaysJoinModelContainerFactory()));
             for(ModelContainer es : executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri )) {
                 ExecutionRule rule = new ExecutionRule();
-                List<ModelProperty> x = rule.execute(es.getProperties());
-               // List<ModelProperty> x = (!joinedContainer) ? rule.execute(es.getProperties()) :
-               //         ModelTransformerContext.sort(rule.execute(es.getProperties()),
-               //                 ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
+               // List<ModelProperty> x = rule.execute(es.getProperties());
+                List<ModelProperty> x = !aContainsAnyOfB(es.getProperties(), joinedContainers) ? rule.execute(es.getProperties()) :
+                        ModelTransformerContext.sort(rule.execute(es.getProperties()),
+                                ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                 
                 dataSource.replace(es, es.createNewInstance(x));
             }
         }
 
-        props = joinedContainer ? ModelTransformerContext.sort(dataSource.getModelProperties(), ProjectUri.baseUri)
-                : dataSource.getModelProperties();
+        props =// false ? ModelTransformerContext.sort(dataSource.getModelProperties(), ProjectUri.baseUri)
+                dataSource.getModelProperties();
        
         for(ModelEventListener listener : eventListeners)
         {
@@ -409,6 +414,20 @@ public class PomTransformer
             }
         }
         return factory.createDomainModel( p );
+    }
+
+    private static boolean aContainsAnyOfB(List<ModelProperty> a, List<ModelProperty> b) {
+        for(ModelProperty mpA : a )
+        {
+            for(ModelProperty mpB : b)
+            {
+                if(mpA.equals(mpB))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static List<ModelProperty> transformDependencyManagement( List<ModelProperty> modelProperties )

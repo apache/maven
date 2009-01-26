@@ -81,6 +81,14 @@ public class PomConstructionTest
         assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
+    public void testPluginOrder()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-order" );
+        assertEquals( "plexus-component-metadata", pom.getValue( "build/plugins[1]/artifactId" ) );
+        assertEquals( "maven-surefire-plugin", pom.getValue( "build/plugins[2]/artifactId" ) );
+    }
+
     public void testErroneousJoiningOfDifferentPluginsWithEqualDependencies()
         throws Exception
     {
