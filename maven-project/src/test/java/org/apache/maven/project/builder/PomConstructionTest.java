@@ -91,7 +91,7 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
     }
 
-    /** MNG-3821 FIX THIS
+    /** MNG-3821 */
     public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
         throws Exception
     {
@@ -105,7 +105,7 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "reporting/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
-      */
+
      /** MNG-3998 */
     public void testExecutionConfiguration()
         throws Exception
@@ -145,6 +145,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "foo/sub" );
+        System.out.println(pom.getDomainModel().asString());
     }
 
     /** MNG-3985 */

@@ -59,7 +59,7 @@ public class PomTransformer
                      null, goals_infos)
             );
 
-
+    //Don't add subcontainers here, breaks MNG-3821
     public static final Collection<ModelContainerInfo> MODEL_CONTAINER_INFOS = Arrays.asList(
             ModelContainerInfo.Factory.createModelContainerInfo(
                     new ArtifactModelContainerFactory(), null, plugin_executions),
@@ -67,8 +67,8 @@ public class PomTransformer
                     new IdModelContainerFactory(ProjectUri.PluginRepositories.PluginRepository.xUri), null, null),
             ModelContainerInfo.Factory.createModelContainerInfo(
                     new IdModelContainerFactory(ProjectUri.Repositories.Repository.xUri), null, null),
-            ModelContainerInfo.Factory.createModelContainerInfo(
-                    new IdModelContainerFactory(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri), null, null),
+           // ModelContainerInfo.Factory.createModelContainerInfo(
+           //         new IdModelContainerFactory(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri), null, null),
             ModelContainerInfo.Factory.createModelContainerInfo(
                     new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri), null, null)
     );
