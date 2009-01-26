@@ -628,6 +628,28 @@ public class PomConstructionTest
         assertEquals( "log-string", pom.getValue( "build/plugins[1]/executions[2]/goals[1]" ) );
     }
 
+    public void testDependencyOrderWithoutPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "dependency-order/wo-plugin-mngt" );
+        assertEquals( 4, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+        assertEquals( "a", pom.getValue( "dependencies[1]/artifactId" ) );
+        assertEquals( "c", pom.getValue( "dependencies[2]/artifactId" ) );
+        assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
+        assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
+    }
+
+    public void testDependencyOrderWithPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "dependency-order/w-plugin-mngt" );
+        assertEquals( 4, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+        assertEquals( "a", pom.getValue( "dependencies[1]/artifactId" ) );
+        assertEquals( "c", pom.getValue( "dependencies[2]/artifactId" ) );
+        assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
+        assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
+    }
+
     private PomArtifactResolver artifactResolver( String basedir )
     {
         return new FileBasedPomArtifactResolver( new File( BASE_POM_DIR, basedir ) );
