@@ -68,7 +68,7 @@ public class PomConstructionTest
     // them into a resolver, create the expression to extract the data to validate the Model, and the URI
     // to validate the properties. We also need a way to navigate from the Tex specification documents to
     // the test in question and vice versa. A little Eclipse plugin would do the trick.
-    /*
+
     public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins()
         throws Exception
     {
@@ -80,7 +80,7 @@ public class PomConstructionTest
         PomTestWrapper tester = new PomTestWrapper( model );
         assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
-      */
+
     public void testErroneousJoiningOfDifferentPluginsWithEqualDependencies()
         throws Exception
     {
@@ -91,7 +91,7 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
     }
 
-    /** MNG-3821 -FIX---
+    /** MNG-3821 FIX THIS
     public void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds()
         throws Exception
     {
@@ -105,24 +105,31 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-b", pom.getValue( "reporting/plugins[2]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
     }
-    */
+      */
      /** MNG-3998 */
     public void testExecutionConfiguration()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "execution-configuration" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration" ) ).size() );
     }
 
     public void testSingleConfigurationInheritance()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "single-configuration-inheritance" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules" ) ).size() );
+        assertEquals("2.0.6", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/requireMavenVersion[1]/version" ) );
+        assertEquals("[2.0.6,)", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[2]/requireMavenVersion[1]/version" ) );
     }
 
     public void testConfigWithPluginManagement()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "config-with-plugin-mng" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "src/main/mdo/security.xml", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/model" ) );
+        assertEquals( "1.0.8", pom.getValue( "build/plugins[1]/executions[2]/configuration[1]/version" ) );
     }
 
     /** MNG-3965 */
@@ -130,6 +137,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "execution-configuration-subcollections" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/bannedDependencies" ) ).size() );
     }
 
     /** MNG- */

@@ -352,7 +352,6 @@ public class PomTransformer
         props.removeAll( removeProperties );
 
         //Execution Rule - extension for this needs to be pushed into model-builder
-
         dataSource = new DefaultModelDataSource( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
         for(ModelContainer mc : dataSource.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ))
