@@ -111,7 +111,9 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "execution-configuration" );
-        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration" ) ).size() );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "src/main/mdo/nexus.xml", ( pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/model" ) ));
+        assertEquals( "src/main/mdo/security.xml", ( pom.getValue( "build/plugins[1]/executions[2]/configuration[1]/model" ) ));
     }
 
     public void testSingleConfigurationInheritance()
@@ -128,8 +130,8 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "config-with-plugin-mng" );
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
-        assertEquals( "src/main/mdo/security.xml", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/model" ) );
-        assertEquals( "1.0.8", pom.getValue( "build/plugins[1]/executions[2]/configuration[1]/version" ) );
+        assertEquals( "src/main/mdo/security.xml", pom.getValue( "build/plugins[1]/executions[2]/configuration[1]/model" ) );
+        assertEquals( "1.0.8", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/version" ) );
     }
 
     /** MNG-3965 */
@@ -145,7 +147,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "foo/sub" );
-        System.out.println(pom.getDomainModel().asString());
+        //System.out.println(pom.getDomainModel().asString());
     }
 
     /** MNG-3985 */
@@ -211,7 +213,7 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
     }
 
-    /* FIXME: cf. MNG-3887
+    /* FIXME: cf. MNG-3887 */
     public void testOrderOfPluginExecutionsWithPluginManagement()
         throws Exception
     {
@@ -248,7 +250,7 @@ public class PomConstructionTest
         assertEquals( "<?xml version='1.0'?>Tom&Jerry", pom.getValue( "properties/xmlTest" ) );
     }
 
-    /* FIXME: cf. MNG-3925 
+    /* FIXME: cf. MNG-3925
     public void testOrderOfMergedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -315,7 +317,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "plugin-exec-merging/wo-plugin-mngt/sub" );
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
-        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default']/phase" ) );
+        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default-execution-id']/phase" ) );
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
 
@@ -514,7 +516,7 @@ public class PomConstructionTest
         assertEquals( "four", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[4]" ) );
     }
 
-    /* FIXME: cf. MNG-3827
+    /* FIXME: cf. MNG-3827*/
     public void testOrderOfPluginConfigurationElementsWithPluginManagement()
         throws Exception
     {
@@ -539,7 +541,7 @@ public class PomConstructionTest
         assertEquals( "key2", pom.getValue( prefix + "propertiesParam/property[2]/name" ) );
     }
 
-    /* FIXME: cf. MNG-3864
+    /* FIXME: cf. MNG-3864*/
     public void testOrderOfPluginExecutionConfigurationElementsWithPluginManagement()
         throws Exception
     {
@@ -598,7 +600,7 @@ public class PomConstructionTest
     }
     //*/
 
-    /* FIXME: cf. MNG-4000
+    /* FIXME: cf. MNG-4000 */
     public void testMultiplePluginExecutionsWithAndWithoutIdsWithoutPluginManagement()
         throws Exception
     {

@@ -333,19 +333,20 @@ public class PomTransformer
                 continue;
             }
 
-            boolean hasAtLeastOneWithoutId = true;
+            boolean hasAtLeastOneWithoutId = false;
             
             for ( ModelContainer executionContainer : executionContainers )
             {
-                if ( hasAtLeastOneWithoutId )
-                {
-                    hasAtLeastOneWithoutId = hasExecutionId( executionContainer );
-                }
+
                 
-                if ( !hasAtLeastOneWithoutId && !hasExecutionId( executionContainer ) && executionContainers.indexOf( executionContainer ) > 0 )
+                if ( hasAtLeastOneWithoutId && !hasExecutionId( executionContainer ) && executionContainers.indexOf( executionContainer ) > 0 )
                 {
                     removeProperties.addAll( executionContainer.getProperties() );
                 }
+                if ( !hasAtLeastOneWithoutId )
+                {
+                    hasAtLeastOneWithoutId = !hasExecutionId( executionContainer );
+                }                
             }
         }
         
@@ -362,16 +363,17 @@ public class PomTransformer
                                     new AlwaysJoinModelContainerFactory()));
             for(ModelContainer es : executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri )) {
                 ExecutionRule rule = new ExecutionRule();
-                //List<ModelProperty> x = rule.execute(es.getProperties());
-                List<ModelProperty> x = (!joinedContainer) ? rule.execute(es.getProperties()) :
-                        ModelTransformerContext.sort(rule.execute(es.getProperties()),
-                                ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
+                List<ModelProperty> x = rule.execute(es.getProperties());
+               // List<ModelProperty> x = (!joinedContainer) ? rule.execute(es.getProperties()) :
+               //         ModelTransformerContext.sort(rule.execute(es.getProperties()),
+               //                 ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                 
                 dataSource.replace(es, es.createNewInstance(x));
             }
         }
 
-        props = dataSource.getModelProperties();
+        props = joinedContainer ? ModelTransformerContext.sort(dataSource.getModelProperties(), ProjectUri.baseUri)
+                : dataSource.getModelProperties();
        
         for(ModelEventListener listener : eventListeners)
         {
