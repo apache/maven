@@ -159,6 +159,11 @@
       <groupId>classworlds</groupId>
       <artifactId>classworlds</artifactId>
     </dependency>
+    
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-sec-dispatcher</artifactId>
+      </dependency>
   </dependencies>
 
   <build>

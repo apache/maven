@@ -20,8 +20,20 @@ package org.apache.maven;
  */
 
 
-import org.apache.maven.artifact.manager.WagonManager;
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.TimeZone;
+
 import org.apache.maven.artifact.manager.DefaultWagonManager;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -65,18 +77,8 @@ import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.TimeZone;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -659,6 +661,19 @@ public class DefaultMaven
         try
         {
             Proxy proxy = settings.getActiveProxy();
+            
+            SecDispatcher sd = null;
+            
+            try
+            {
+                sd = (SecDispatcher) container.lookup( SecDispatcher.ROLE );
+            }
+            catch (Exception e)
+            {
+                getLogger().warn( "security features are disabled. Cannot find plexus component "+SecDispatcher.ROLE );
+                
+                line();
+            }
 
             if ( proxy != null )
             {
@@ -666,17 +681,58 @@ public class DefaultMaven
                 {
                     throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
                 }
+                
+                String pass = proxy.getPassword();
+                
+                if( sd != null )
+                    try
+                    {
+                        pass = sd.decrypt( pass, null, null, container );
+                    }
+                    catch ( SecDispatcherException e )
+                    {
+                        throw new SettingsConfigurationException( e.getMessage() );
+                    }
 
-                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
-                                       proxy.getPassword(), proxy.getNonProxyHosts() );
+                wagonManager.addProxy(   proxy.getProtocol()
+                                       , proxy.getHost()
+                                       , proxy.getPort()
+                                       , proxy.getUsername()
+                                       , pass
+                                       , proxy.getNonProxyHosts()
+                                       );
             }
-
+            
             for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
             {
                 Server server = (Server) i.next();
+                
+                String passWord = server.getPassword();
 
-                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(),
-                                                    server.getPrivateKey(), server.getPassphrase() );
+                if( sd != null )
+                    try
+                    {
+                        passWord = sd.decrypt( passWord, null, null, container );
+                    }
+                    catch ( SecDispatcherException e )
+                    {
+                        throw new SettingsConfigurationException( e.getMessage() );
+                    }
+                
+                String passPhrase = server.getPassphrase();
+
+                if( sd != null )
+                    try
+                    {
+                        passPhrase = sd.decrypt( passPhrase, null, null, container );
+                    }
+                    catch ( SecDispatcherException e )
+                    {
+                        throw new SettingsConfigurationException( e.getMessage() );
+                    }
+
+                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), passWord,
+                                                    server.getPrivateKey(), passPhrase );
 
                 // Remove once Wagon is upgraded to 1.0-beta-5
                 if ( server.getPassword() != null )

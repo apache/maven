@@ -397,6 +397,11 @@ under the License.
         <version>1.5.6</version>
       </dependency>
       <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-sec-dispatcher</artifactId>
+        <version>1.0-alpha-1</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
         <version>${wagonVersion}</version>
