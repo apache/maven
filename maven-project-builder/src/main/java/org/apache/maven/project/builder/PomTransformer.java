@@ -19,6 +19,7 @@ package org.apache.maven.project.builder;
  * under the License.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -136,6 +137,23 @@ public class PomTransformer
                                                                           //ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri,
 
                                                                           ProjectUri.Repositories.xUri) ));
+
+    /**
+     * The URIs that denote file/directory paths and need their file separators being normalized.
+     */
+    private static final Set<String> PATH_URIS =
+        Collections.unmodifiableSet( new HashSet<String>(
+                                                          Arrays.asList(
+                                                                         ProjectUri.Build.directory,
+                                                                         ProjectUri.Build.outputDirectory,
+                                                                         ProjectUri.Build.testOutputDirectory,
+                                                                         ProjectUri.Build.sourceDirectory,
+                                                                         ProjectUri.Build.testSourceDirectory,
+                                                                         ProjectUri.Build.scriptSourceDirectory,
+                                                                         ProjectUri.Build.Resources.Resource.directory,
+                                                                         ProjectUri.Build.TestResources.TestResource.directory,
+                                                                         ProjectUri.Build.filters + "/filter",
+                                                                         ProjectUri.Reporting.outputDirectory ) ) );
 
     /**
      * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
@@ -408,11 +426,17 @@ public class PomTransformer
                     p.add(mp);
                 }
             }
+            else if ( mp.getResolvedValue() != null && PATH_URIS.contains( mp.getUri() ) )
+            {
+                // normalize file separator
+                p.add( new ModelProperty( mp.getUri(), new File( mp.getResolvedValue() ).getPath() ) );
+            }
             else
             {
                 p.add(mp);
             }
         }
+
         return factory.createDomainModel( p );
     }
 
