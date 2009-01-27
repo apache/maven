@@ -399,7 +399,7 @@ under the License.
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
-        <version>1.0-alpha-1</version>
+        <version>1.0-alpha-2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
