@@ -342,7 +342,12 @@ public class ProjectUri
 
         public static String finalName = "http://apache.org/maven/project/build/finalName";
 
-        public static String filters = "http://apache.org/maven/project/build/filters";
+        public static class Filters
+        {
+            public static final String xUri = "http://apache.org/maven/project/build/filters#set";
+
+            public static final String filter = xUri + "/filter";
+        }
 
         public static class PluginManagement
         {

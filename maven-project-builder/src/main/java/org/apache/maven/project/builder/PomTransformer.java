@@ -95,6 +95,8 @@ public class PomTransformer
                                                                           ProjectUri.Build.Resources.Resource.excludes,
                                                                           ProjectUri.Build.TestResources.xUri,
 
+                                                                          ProjectUri.Build.Filters.xUri,
+
                                                                           ProjectUri.CiManagement.Notifiers.xUri,
 
                                                                           ProjectUri.Contributors.xUri,
@@ -152,7 +154,7 @@ public class PomTransformer
                                                                          ProjectUri.Build.scriptSourceDirectory,
                                                                          ProjectUri.Build.Resources.Resource.directory,
                                                                          ProjectUri.Build.TestResources.TestResource.directory,
-                                                                         ProjectUri.Build.filters + "/filter",
+                                                                         ProjectUri.Build.Filters.filter,
                                                                          ProjectUri.Reporting.outputDirectory ) ) );
 
     /**
