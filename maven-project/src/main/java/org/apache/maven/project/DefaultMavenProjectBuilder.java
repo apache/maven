@@ -23,9 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -309,6 +307,17 @@ public class DefaultMavenProjectBuilder
             profileActivationContext = new DefaultProfileActivationContext( config.getExecutionProperties(), false );
         }
 
+        List<Profile> projectProfiles = new ArrayList<Profile>();
+
+        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( model,
+                                                                       isReactorProject ? projectDescriptor : null,
+                                                                       isReactorProject, profileActivationContext ) );
+
+        projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( model,
+                                                                               isReactorProject ? projectDescriptor
+                                                                                               : null,
+                                                                               externalProfileManager ) );
+
         MavenProject project;
         
         try
@@ -328,35 +337,9 @@ public class DefaultMavenProjectBuilder
         {
             throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
         }
-
-        List<Profile> projectProfiles = new ArrayList<Profile>();
-
-        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( project.getModel(),
-                                                                       isReactorProject ? projectDescriptor : null,
-                                                                       isReactorProject, profileActivationContext ) );
-
-        projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( project.getModel(), project.getFile(), externalProfileManager ) );
         
         project.setActiveProfiles( projectProfiles );
-        try
-        {
-            LinkedHashSet repoSet = new LinkedHashSet();
-            if ( ( model.getRepositories() != null ) && !model.getRepositories().isEmpty() )
-            {
-                repoSet.addAll( model.getRepositories() );
-            }
 
-            if ( ( model.getPluginRepositories() != null ) && !model.getPluginRepositories().isEmpty() )
-            {
-                repoSet.addAll( model.getPluginRepositories() );
-            }
-
-            project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( new ArrayList( repoSet ) ) );
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
         return project;
     }
 
