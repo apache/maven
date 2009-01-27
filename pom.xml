@@ -399,7 +399,7 @@ under the License.
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
-        <version>1.0-alpha-2</version>
+        <version>1.0-alpha-3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
@@ -566,4 +566,14 @@ under the License.
       </reporting>
     </profile>
   </profiles>
+  
+  <repositories>
+    <repository>
+        <id>snapshots.temp</id>
+        <url>http://repository.sonatype.org/content/repositories/snapshots</url>
+        <snapshots><enabled>true</enabled></snapshots>
+        <releases><enabled>false</enabled></releases>
+    </repository>
+  </repositories>
+  
 </project>
