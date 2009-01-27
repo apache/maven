@@ -26,6 +26,7 @@ import java.util.*;
 import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.apache.maven.project.builder.rules.ExecutionRule;
+import org.apache.maven.project.builder.rules.DependencyRule;
 
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
@@ -60,6 +61,12 @@ public class PomTransformer
                      null, goals_infos)
             );
 
+    private static Collection<ModelContainerInfo> dependency_exclusions = Arrays.asList(
+            ModelContainerInfo.Factory.createModelContainerInfo(
+                    new IdModelContainerFactory(ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.Exclusion.xUri),
+                     new DependencyRule(), null)
+            );
+
     //Don't add subcontainers here, breaks MNG-3821
     public static final Collection<ModelContainerInfo> MODEL_CONTAINER_INFOS = Arrays.asList(
             ModelContainerInfo.Factory.createModelContainerInfo(
@@ -68,8 +75,8 @@ public class PomTransformer
                     new IdModelContainerFactory(ProjectUri.PluginRepositories.PluginRepository.xUri), null, null),
             ModelContainerInfo.Factory.createModelContainerInfo(
                     new IdModelContainerFactory(ProjectUri.Repositories.Repository.xUri), null, null),
-           // ModelContainerInfo.Factory.createModelContainerInfo(
-           //         new IdModelContainerFactory(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.xUri), null, null),
+            ModelContainerInfo.Factory.createModelContainerInfo(
+                    new ArtifactModelContainerFactory(), null, dependency_exclusions),
             ModelContainerInfo.Factory.createModelContainerInfo(
                     new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri), null, null)
     );
@@ -102,10 +109,10 @@ public class PomTransformer
                                                                           ProjectUri.Contributors.xUri,
 
                                                                           ProjectUri.Dependencies.xUri,
-                                                                          ProjectUri.Dependencies.Dependency.Exclusions.xUri,
+                                                                      //    ProjectUri.Dependencies.Dependency.Exclusions.xUri,
 
                                                                           ProjectUri.DependencyManagement.Dependencies.xUri,
-                                                                          ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
+                                                                       //   ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
 
                                                                           ProjectUri.Developers.xUri,
                                                                           ProjectUri.Developers.Developer.roles,
@@ -121,9 +128,9 @@ public class PomTransformer
                                                                           ProjectUri.Profiles.Profile.Build.Resources.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.TestResources.xUri,
                                                                           ProjectUri.Profiles.Profile.Dependencies.xUri,
-                                                                          ProjectUri.Profiles.Profile.Dependencies.Dependency.Exclusions.xUri,
+                                                                         // ProjectUri.Profiles.Profile.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.xUri,
-                                                                          ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
+                                                                        //  ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.PluginRepositories.xUri,
                                                                           ProjectUri.Profiles.Profile.Reporting.Plugins.xUri,
                                                                           //ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.xUri,
@@ -133,7 +140,7 @@ public class PomTransformer
                                                                         //  ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
                                                                         //  ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.Execution.Goals.xURI,
                                                                           ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
-                                                                          ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
+                                                                       //   ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
 
                                                                           ProjectUri.Reporting.Plugins.xUri,
                                                                           //ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri,
@@ -187,8 +194,25 @@ public class PomTransformer
             for ( ModelContainer managementContainer : source.queryFor(
                 ProjectUri.DependencyManagement.Dependencies.Dependency.xUri ) )
             {
+                //Join Duplicate Exclusions Rule (MNG-4010)
+                ModelDataSource exclusionSource = new DefaultModelDataSource(managementContainer.getProperties(),
+                        Collections.unmodifiableList(Arrays.asList(new ArtifactModelContainerFactory(ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.Exclusion.xUri))));
+                List<ModelContainer> exclusionContainers =
+                        exclusionSource.queryFor(ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.Exclusion.xUri);
+
+                for(ModelContainer mc : exclusionContainers)
+                {
+                    for(ModelContainer mc1 : exclusionContainers)
+                    {
+                        if(!mc.equals(mc1)  && mc.containerAction(mc1).equals(ModelContainerAction.JOIN))
+                        {
+                            exclusionSource.joinWithOriginalOrder(mc, mc1);       
+                        }
+                    }
+                }
+                
                 managementContainer = new ArtifactModelContainerFactory().create(
-                    transformDependencyManagement( managementContainer.getProperties() ) );
+                    transformDependencyManagement( exclusionSource.getModelProperties() ) );
                 ModelContainerAction action = dependencyContainer.containerAction( managementContainer );
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
                 {
@@ -259,7 +283,7 @@ public class PomTransformer
                     {
                         managementPropertiesWithoutExecutions.removeAll(a.getProperties());
                     }
-                    //THIS JOIN REVERSES ORDER
+
                     source.joinWithOriginalOrder( pluginContainer, new ArtifactModelContainerFactory().create(managementPropertiesWithoutExecutions) );
 
                     List<ModelContainer> pluginExecutionContainers = pluginDatasource.queryFor(ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
@@ -289,14 +313,6 @@ public class PomTransformer
                             {
                                 //MNG-3995 - property lost here
                                 joinedContainers.addAll(source.join(b, c).getProperties());
-              // ExecutionRule rule = new ExecutionRule();
-               // List<ModelProperty> x = rule.execute(d.getProperties());
-               // List<ModelProperty> x = (!joinedContainer) ? rule.execute(es.getProperties()) :
-               //         ModelTransformerContext.sort(rule.execute(es.getProperties()),
-               //                 ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
-
-             //   source.replace(d, d.createNewInstance(x));
-                                //REVERSE ORDER HERE
                                 joinedExecutionContainers.add(a);
                             }
                         }

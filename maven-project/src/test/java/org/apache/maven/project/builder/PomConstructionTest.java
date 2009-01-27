@@ -81,6 +81,34 @@ public class PomConstructionTest
         assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
+    /*MNG-
+    public void testDependencyScope()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "dependency-scope/sub" );
+        System.out.println(pom.getDomainModel().asString());
+
+    }
+    */
+    /*MNG- 4010*/
+    public void testDuplicateExclusionsDependency()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "duplicate-exclusions-dependency/sub" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies[1]/exclusions" ) ).size() );
+        System.out.println(pom.getDomainModel().asString());
+
+    }
+
+    /*MNG-4005 - not implemented
+    public void testDependenciesDifferentVersions()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "dependencies-different-versions" );
+
+    }
+    */
+
     public void testPluginOrder()
         throws Exception
     {
@@ -150,13 +178,14 @@ public class PomConstructionTest
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/bannedDependencies" ) ).size() );
     }
 
-    /** MNG- */
+    /** MNG-
     public void testFoo()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "foo/sub" );
         //System.out.println(pom.getDomainModel().asString());
     }
+    */
 
     /** MNG-3985 */
     public void testMultipleRepositories()

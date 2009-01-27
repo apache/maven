@@ -35,20 +35,27 @@ public final class ArtifactModelContainerFactory
 {
 
     private static final Collection<String> uris = Collections.unmodifiableList( Arrays.asList(
-        ProjectUri.DependencyManagement.Dependencies.Dependency.xUri, ProjectUri.Dependencies.Dependency.xUri,
+        ProjectUri.DependencyManagement.Dependencies.Dependency.xUri,
+        ProjectUri.Dependencies.Dependency.xUri,
         ProjectUri.Reporting.Plugins.Plugin.xUri,
         ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri,
-        //ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.xUri,
-
-        ProjectUri.Build.Plugins.Plugin.xUri, 
-        //ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.xUri,
-       // ProjectUri.Build.Plugins.Plugin.Dependencies.Dependency.Exclusions.Exclusion.xUri,
+        ProjectUri.Build.Plugins.Plugin.xUri,
         ProjectUri.Build.Extensions.Extension.xUri    
          ) );
 
+    private final Collection<String> u;
+
     public Collection<String> getUris()
     {
-        return uris;
+        return u;
+    }
+
+    public ArtifactModelContainerFactory() {
+        u = uris;
+    }
+
+    public ArtifactModelContainerFactory(String uri) {
+        u = Collections.unmodifiableList( Arrays.asList(uri) );
     }
 
     public ModelContainer create( List<ModelProperty> modelProperties )
