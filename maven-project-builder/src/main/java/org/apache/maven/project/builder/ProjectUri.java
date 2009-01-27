@@ -24,6 +24,12 @@ package org.apache.maven.project.builder;
  */
 public class ProjectUri
 {
+
+    /*
+     * NOTE: The strings defined here are deliberately non-final to prevent the compiler from inlining them when
+     * downstream code compiles against them.
+     */
+
     public static String baseUri = "http://apache.org/maven";
 
     public static String xUri = "http://apache.org/maven/project";
@@ -344,9 +350,9 @@ public class ProjectUri
 
         public static class Filters
         {
-            public static final String xUri = "http://apache.org/maven/project/build/filters#set";
+            public static String xUri = "http://apache.org/maven/project/build/filters#set";
 
-            public static final String filter = xUri + "/filter";
+            public static String filter = xUri + "/filter";
         }
 
         public static class PluginManagement
