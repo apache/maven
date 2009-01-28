@@ -206,11 +206,11 @@ public class PomTransformer
                     {
                         if(!mc.equals(mc1)  && mc.containerAction(mc1).equals(ModelContainerAction.JOIN))
                         {
-                            exclusionSource.joinWithOriginalOrder(mc, mc1);       
+                            exclusionSource.joinWithOriginalOrder(mc1, mc);       
                         }
                     }
                 }
-                
+
                 managementContainer = new ArtifactModelContainerFactory().create(
                     transformDependencyManagement( exclusionSource.getModelProperties() ) );
                 ModelContainerAction action = dependencyContainer.containerAction( managementContainer );

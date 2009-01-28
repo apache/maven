@@ -96,7 +96,6 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "duplicate-exclusions-dependency/sub" );
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies[1]/exclusions" ) ).size() );
-        System.out.println(pom.getDomainModel().asString());
 
     }
 
