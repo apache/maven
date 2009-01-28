@@ -114,7 +114,7 @@ public class MavenProject
 
     private List collectedProjects = Collections.EMPTY_LIST;
 
-    private List attachedArtifacts;
+    private List<Artifact> attachedArtifacts;
 
     private MavenProject executionProject;
 
@@ -1437,17 +1437,20 @@ public class MavenProject
 
         if ( attachedArtifacts.contains( artifact ) )
         {
-            throw new DuplicateArtifactAttachmentException( this, artifact );
+             //should add logger to this class:
+             System.out.println("[Warning] Duplicate artifact: " + artifact.toString());
+             return;
+            //throw new DuplicateArtifactAttachmentException( this, artifact );
         }
 
         getAttachedArtifacts().add( artifact );
     }
 
-    public List getAttachedArtifacts()
+    public List<Artifact> getAttachedArtifacts()
     {
         if ( attachedArtifacts == null )
         {
-            attachedArtifacts = new ArrayList();
+            attachedArtifacts = new ArrayList<Artifact>();
         }
         return attachedArtifacts;
     }
