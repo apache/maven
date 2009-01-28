@@ -32,7 +32,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
 {
     public MavenITmng0553SettingsAuthzEncryptionTest()
     {
-        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,2.1.99)" ); // 2.0.10+, excluding 2.1.0-M1
+        super( "(2.1.0-M1,2.99)" ); // 2.1.0-M2+
+        //super( "(2.0.9,2.1.0-M1),(2.1.0-M1,2.1.99)" ); // 2.0.10+, excluding 2.1.0-M1
     }
 
     /**
