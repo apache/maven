@@ -38,7 +38,7 @@ public class MavenITmng3704LifecycleExecutorWrapperTest
 {
     public MavenITmng3704LifecycleExecutorWrapperTest()
     {
-        super( "(2.0.9,2.99.99)" ); // only test in 2.0.9+
+        super( "[2.0.9,3.0-alpha-1)" ); // 2.0.9+, lifecycle switching not supported in the same way in 3.0
     }
 
     public void testitMNG3704 ()

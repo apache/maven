@@ -35,7 +35,6 @@ public class MavenITmng3694ReactorProjectsDynamismTest
 {
     public MavenITmng3694ReactorProjectsDynamismTest()
     {
-        super( "[,2.99.99)" );
     }
 
     public void testitMNG3694 ()
