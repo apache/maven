@@ -50,7 +50,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
-        cliOptions.add( "-Dmaven.sec.path=sec.xml" );
+        verifier.getSystemProperties().setProperty( "maven.sec.path", "settings-security.xml" );
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
