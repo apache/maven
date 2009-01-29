@@ -27,6 +27,11 @@ import java.io.File;
 public class MavenITmng2668UsePluginDependenciesForSortingTest
     extends AbstractMavenIntegrationTestCase
 {
+    public MavenITmng2668UsePluginDependenciesForSortingTest()
+    {
+        // TODO: estimated fix by 3.0-alpha-3
+        super( "(2.1.0-M1,3.0-alpha-1),(3.0-alpha-3,)" ); // 2.1.0-M2+
+    }
 
     public void testmng2668()
         throws Exception
