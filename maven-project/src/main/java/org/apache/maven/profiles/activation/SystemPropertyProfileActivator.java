@@ -44,6 +44,7 @@ public class SystemPropertyProfileActivator
     }
 
     public boolean isActive( Profile profile )
+        throws ProfileActivationException
     {
         Activation activation = profile.getActivation();
 
@@ -53,6 +54,12 @@ public class SystemPropertyProfileActivator
         {
             String name = property.getName();
             boolean reverseName = false;
+            
+            if ( name == null )
+            {
+                throw new ProfileActivationException( "The property name is required to activate the profile '"
+                    + profile.getId() + "'" );
+            }
             
             if ( name.startsWith("!") )
             {

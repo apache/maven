@@ -27,6 +27,6 @@ public interface ProfileActivator
 
     boolean canDetermineActivation( Profile profile );
 
-    boolean isActive( Profile profile );
-
+    boolean isActive( Profile profile )
+        throws ProfileActivationException;
 }
