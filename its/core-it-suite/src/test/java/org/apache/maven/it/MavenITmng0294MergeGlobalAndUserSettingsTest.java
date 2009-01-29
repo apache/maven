@@ -50,16 +50,18 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        Properties systemProperties = new Properties();
-        systemProperties.put( "org.apache.maven.user-settings", "user-settings.xml" );
-        systemProperties.put( "org.apache.maven.global-settings", "global-settings.xml" );
-        verifier.setSystemProperties( systemProperties );
-        if ( matchesVersionRange( "(2.99,)" ) )
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( new File( testDir, "user-settings.xml" ).getAbsolutePath() );
+        if ( matchesVersionRange( "[3.0-alpha-1,)" ) )
         {
-            verifier.getCliOptions().add( "--settings" );
-            verifier.getCliOptions().add( new File( testDir, "user-settings.xml" ).getAbsolutePath() );
             verifier.getCliOptions().add( "--global-settings" );
             verifier.getCliOptions().add( new File( testDir, "global-settings.xml" ).getAbsolutePath() );
+        }
+        else
+        {
+            Properties systemProperties = new Properties();
+            systemProperties.put( "org.apache.maven.global-settings", "global-settings.xml" );
+            verifier.setSystemProperties( systemProperties );
         }
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.verifyErrorFreeLog();
