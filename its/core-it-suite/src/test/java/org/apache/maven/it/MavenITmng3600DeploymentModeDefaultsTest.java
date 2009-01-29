@@ -32,7 +32,8 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 {
     public MavenITmng3600DeploymentModeDefaultsTest()
     {
-        super( "(2.1.0-M1,)" );
+        // TODO: implement for 3.0
+        super( "(2.1.0-M1,3.0-alpha-1),(3.0-alpha-3,)" );
     }
 
     public void testitMNG3600NoSettings()

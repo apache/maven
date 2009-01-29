@@ -46,7 +46,8 @@ public class MavenITmng3652UserAgentHeaderTest
 
     public MavenITmng3652UserAgentHeaderTest()
     {
-        super( "[2.1.0-M1,2.99.99)" );
+        // TODO: re-instate feature in 3.0
+        super( "[2.1.0-M1,3.0-alpha-1),(3.0-alpha-3,)" ); // 2.1.0-M1+
     }
 
     public void setUp()

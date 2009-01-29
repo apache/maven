@@ -29,7 +29,7 @@ public class MavenITmng2668UsePluginDependenciesForSortingTest
 {
     public MavenITmng2668UsePluginDependenciesForSortingTest()
     {
-        // TODO: estimated fix by 3.0-alpha-3
+        // TODO: estimated fix by 3.0-alpha-4
         super( "(2.1.0-M1,3.0-alpha-1),(3.0-alpha-3,)" ); // 2.1.0-M2+
     }
 

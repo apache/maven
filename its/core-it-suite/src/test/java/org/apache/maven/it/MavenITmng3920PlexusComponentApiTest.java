@@ -33,7 +33,8 @@ public class MavenITmng3920PlexusComponentApiTest
 {
     public MavenITmng3920PlexusComponentApiTest()
     {
-        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,)" ); // only test in 2.0.11+, and not in 2.1.0-M1
+        // TODO: implement for 3.0
+        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),(3.0-alpha-3,)" ); // 2.0.11+, 2.1.0-M2+
     }
 
     public void testitMNG3920()
