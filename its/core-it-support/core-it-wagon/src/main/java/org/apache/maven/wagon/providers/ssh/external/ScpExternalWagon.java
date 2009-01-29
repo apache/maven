@@ -34,6 +34,7 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringInputStream;
 
 /**
@@ -124,6 +125,31 @@ public class ScpExternalWagon
     public void fillOutputData( OutputData outputData )
         throws TransferFailedException
     {
+        String content = "";
+        if ( getRepository().getPermissions() != null )
+        {
+            String dirPerms = getRepository().getPermissions().getDirectoryMode();
+
+            if ( dirPerms != null )
+            {
+                content += "directory.mode = " + dirPerms + "\n";
+            }
+
+            String filePerms = getRepository().getPermissions().getFileMode();
+            if ( filePerms != null )
+            {
+                content += "file.mode = " + filePerms + "\n";
+            }
+        }
+        try
+        {
+            FileUtils.fileWrite( "target/wagon.properties", content );
+        }
+        catch ( IOException e )
+        {
+            throw new TransferFailedException( e.getMessage(), e );
+        }
+
         outputData.setOutputStream( new ByteArrayOutputStream() );
     }
 
