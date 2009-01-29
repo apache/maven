@@ -112,6 +112,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3927PluginDefaultExecutionConfigTest.class );
         suite.addTestSuite( MavenITmng3925MergedPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng3924XmlMarkupInterpolationTest.class );
+        suite.addTestSuite( MavenITmng3920PlexusComponentApiTest.class );
         suite.addTestSuite( MavenITmng3916PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng3906MergedPluginClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3904NestedBuildDirInterpolationTest.class );
@@ -141,9 +142,11 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3821EqualPluginExecIdsTest.class );
         suite.addTestSuite( MavenITmng3819PluginDepPlexusUtilsTest.class );
         suite.addTestSuite( MavenITmng3813PluginClassPathOrderingTest.class );
+        suite.addTestSuite( MavenITmng3810BadProfileActivationTest.class );
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3796ClassImportInconsistencyTest.class );
         suite.addTestSuite( MavenITmng3769ExclusionRelocatedTransdepsTest.class );
+        suite.addTestSuite( MavenITmng3760BaseUriPropertyTest.class );
         suite.addTestSuite( MavenITmng3748BadSettingsXmlTest.class );
         suite.addTestSuite( MavenITmng3747PrefixedPathExpressionTest.class );
         suite.addTestSuite( MavenITmng3746POMPropertyOverrideTest.class );
@@ -165,6 +168,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3667ResolveDepsWithBadPomVersionTest.class );
         suite.addTestSuite( MavenITmng3652UserAgentHeaderTest.class );
         suite.addTestSuite( MavenITmng3642DynamicResourcesTest.class );
+        suite.addTestSuite( MavenITmng3600DeploymentModeDefaultsTest.class );
         suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAVTest.class );
         suite.addTestSuite( MavenITmng3586SystemScopePluginDependencyTest.class );
         suite.addTestSuite( MavenITmng3581PluginUsesWagonDependencyTest.class );
@@ -214,6 +218,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         suite.addTestSuite( MavenITmng2739RequiredRepositoryElementsTest.class );
         suite.addTestSuite( MavenITmng2695OfflinePluginSnapshotsTest.class );
+        suite.addTestSuite( MavenITmng2668UsePluginDependenciesForSortingTest.class );
         suite.addTestSuite( MavenITmng2605BogusProfileActivationTest.class );
         suite.addTestSuite( MavenITmng2591MergeInheritedPluginConfigTest.class );
         suite.addTestSuite( MavenITmng2562TimestampTest.class );
