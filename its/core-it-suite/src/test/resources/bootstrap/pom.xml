@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: Boostrap</name> 
+  <name>Maven Integration Test :: Boostrap</name>
   <description>
     This project pulls down all the snapshot plugins required for the IT suite. Due to MNG-2974, snapshot versions of
     plugins cannot be downloaded by Maven from non-default repositories configured in the POM if the plugin is invoked
@@ -92,7 +92,13 @@ under the License.
   </properties>
 
   <dependencies>
-    <!-- IT plugins in alphabetical order -->
+    <!-- IT plugins/artifacts in alphabetical order -->
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-wagon</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-all</artifactId>
