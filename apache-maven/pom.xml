@@ -73,6 +73,11 @@
       <groupId>easymock</groupId>
       <artifactId>easymock</artifactId>
     </dependency>
+    <!--Mercury MP3-->
+    <dependency>
+      <groupId>org.sonatype.mercury</groupId>
+      <artifactId>mercury-mp3-cli</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
