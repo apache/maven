@@ -235,16 +235,27 @@ public abstract class AbstractStringBasedModelInterpolator
                 {
                     return projectDir.getAbsolutePath();
                 }
-
                 return null;
             }
         },
         PROJECT_PREFIXES, true );
+        ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false ){
+            public Object getValue( String expression )
+            {
+                if ( projectDir != null && "baseUri".equals( expression ) )
+                {
+                    return projectDir.getAbsoluteFile().toURI().toString();
+                }
+                return null;
+            }
+        },
+        PROJECT_PREFIXES, false );
         
-        List valueSources = new ArrayList( 8 );
+        List valueSources = new ArrayList( 9 );
         
         // NOTE: Order counts here!
         valueSources.add( basedirValueSource );
+        valueSources.add( baseUriValueSource );
         valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), timestampFormat ) );
         valueSources.add( modelValueSource1 );
         valueSources.add( new MapBasedValueSource( config.getUserProperties() ) );

@@ -59,7 +59,9 @@ public abstract class AbstractModelInterpolatorTest
     {
         super.setUp();
 
-        context = Collections.singletonMap( "basedir", "myBasedir" );
+        context = new HashMap();
+        context.put( "basedir", "myBasedir" );
+        context.put( "project.baseUri", "myBaseUri" );
     }
     
     public void testDefaultBuildTimestampFormatShouldParseTimeIn24HourFormat()
@@ -258,6 +260,26 @@ public abstract class AbstractModelInterpolatorTest
         Model out = interpolator.interpolate( model, context );
         
         assertEquals( "file://localhost/myBasedir/temp-repo", ( (Repository) out.getRepositories().get( 0 ) ).getUrl() );
+    }
+
+    public void testBaseUri()
+        throws Exception
+    {
+        Model model = new Model();
+        model.setVersion( "3.8.1" );
+        model.setArtifactId( "foo" );
+
+        Repository repository = new Repository();
+
+        repository.setUrl( "${project.baseUri}/temp-repo" );
+
+        model.addRepository( repository );
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        Model out = interpolator.interpolate( model, context );
+
+        assertEquals( "myBaseUri/temp-repo", ( (Repository) out.getRepositories().get( 0 ) ).getUrl() );
     }
 
     public void testEnvars()
