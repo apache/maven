@@ -1,0 +1,10 @@
+<settings>
+  <servers>
+    <server>
+      <id>id</id>
+      <filePermissions>600</filePermissions>
+      <directoryPermissions>700</directoryPermissions>
+    </server>
+  </servers>
+</settings>
+
