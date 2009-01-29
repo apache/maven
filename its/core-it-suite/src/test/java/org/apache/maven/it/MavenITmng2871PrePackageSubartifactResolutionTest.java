@@ -37,7 +37,7 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest
 
     public MavenITmng2871PrePackageSubartifactResolutionTest()
     {
-        super( "(2.999,)" );
+        super( "[3.0-alpha-1,)" );
     }
 
     /**

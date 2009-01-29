@@ -40,7 +40,7 @@ public class MavenITmng3530DynamicPOMInterpolationTest
 
     public MavenITmng3530DynamicPOMInterpolationTest()
     {   //Dynamic properties for forked lifecycles not supported in 3.0
-        super( "[2.1.0-M1,2.999)" );
+        super( "[2.1.0-M1,3.0-alpha-1)" );
     }
 
     public void testitMNG3530_BuildPath()

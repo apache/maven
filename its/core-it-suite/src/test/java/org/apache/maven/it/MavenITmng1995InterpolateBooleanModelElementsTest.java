@@ -37,7 +37,7 @@ public class MavenITmng1995InterpolateBooleanModelElementsTest
 
     public MavenITmng1995InterpolateBooleanModelElementsTest()
     {
-        super( "(2.999.0,)" );
+        super( "[3.0-alpha-1,)" );
     }
 
     /**

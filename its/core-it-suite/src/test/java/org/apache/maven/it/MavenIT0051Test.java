@@ -29,7 +29,7 @@ public class MavenIT0051Test
 {
     public MavenIT0051Test()                                                                                                                          
     {                                                                                                                                                 
-        super( "(2.0.2,2.99.99)" );
+        super( "(2.0.2,3.0-alpha-1)" ); // no longer supported in 3.0+
     }    
 
     /**

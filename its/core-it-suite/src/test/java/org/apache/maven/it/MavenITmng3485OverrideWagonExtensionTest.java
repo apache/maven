@@ -31,7 +31,7 @@ public class MavenITmng3485OverrideWagonExtensionTest
 {
     public MavenITmng3485OverrideWagonExtensionTest()
     {
-        super( "(2.0.8,2.99.99)" ); 
+        super( "(2.0.8,3.0-alpha-1)" );  // extensions not supported in 3.0+
     }
 
     public void testitMNG3485 ()

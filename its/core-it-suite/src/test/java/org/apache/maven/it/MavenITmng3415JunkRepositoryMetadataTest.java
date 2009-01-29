@@ -276,7 +276,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         dir.mkdirs();
 
         // < 3.0 (including snapshots)
-        if ( matchesVersionRange( "(2.0.8,2.999)" ) )
+        if ( matchesVersionRange( "(2.0.8,3.0-alpha-1)" ) )
         {
             return new File( dir, "maven-metadata-testing-repo.xml" );
         }

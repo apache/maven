@@ -37,7 +37,7 @@ public class MavenITmng1323AntrunDependenciesTest
 
     public MavenITmng1323AntrunDependenciesTest()
     {
-        super( "(2.999,)" );
+        super( "[3.0-alpha-1,)" );
     }
 
     /**

@@ -31,7 +31,7 @@ public class MavenITmng3221InfiniteForkingTest
 {
     public MavenITmng3221InfiniteForkingTest()
     {
-        super( "(2.0.8,2.99.99)" );
+        super( "(2.0.8,3.0-alpha-1)" ); // irrelevant in 3.0+
     }
 
     public void testitMNG3221a()

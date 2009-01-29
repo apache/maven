@@ -31,7 +31,7 @@ public class MavenITmng2196ParentResolutionTest
 
     public MavenITmng2196ParentResolutionTest()
     {
-        super( "(,2.0.2)(2.0.2,)" );
+        super( "(,2.0.2),(2.0.2,)" );
     }
 
     /**
@@ -46,7 +46,7 @@ public class MavenITmng2196ParentResolutionTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
         
-        if ( matchesVersionRange( "(, 2.99.99)" ) )
+        if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
         {
             verifier.executeGoal( "package" );
             verifier.verifyErrorFreeLog();
