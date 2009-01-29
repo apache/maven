@@ -145,6 +145,23 @@ public class ProjectSorter
                     {
                         addEdgeWithParentCheck( projectMap, pluginId, project, id );
                     }
+
+                    if ( !pluginId.equals( id ) ) {
+                        for ( Iterator k = plugin.getDependencies().iterator(); k.hasNext(); )
+                        {
+                          Dependency dependency = (Dependency) k.next();
+
+                          String dependencyId = ArtifactUtils
+                              .versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
+
+                          if ( dag.getVertex( dependencyId ) != null )
+                          {
+                              project.addProjectReference( (MavenProject) projectMap.get( dependencyId ) );
+
+                              dag.addEdge( id, dependencyId );
+                          }
+                       }
+                    }
                 }
             }
 

@@ -25,6 +25,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.util.ArrayList;
@@ -275,6 +276,49 @@ public class ProjectSorterTest
             // expected
             assertTrue( true );
         }
+    }
+
+    public void testPluginDependenciesInfluenceSorting()
+        throws Exception {
+      List projects = new ArrayList();
+
+      MavenProject parentProject = createProject( "groupId", "parent", "1.0" );
+
+      MavenProject project1 = createProject( "groupId", "artifactId1", "1.0" );
+      project1.setParent(parentProject);
+      projects.add( project1 );
+
+      MavenProject project2 = createProject( "groupId", "artifactId2", "1.0" );
+      project2.setParent(parentProject);
+      projects.add( project2 );
+
+      MavenProject pluginProject = createProject( "groupId", "pluginArtifact", "1.0" );
+      pluginProject.setParent(parentProject);
+      projects.add( pluginProject );
+
+      Plugin plugin = new Plugin();
+      plugin.setGroupId(pluginProject.getGroupId());
+      plugin.setArtifactId(pluginProject.getArtifactId());
+      plugin.setVersion(pluginProject.getVersion());
+
+      plugin.addDependency( createDependency( project2 ) );
+
+      Model model = project1.getModel();
+      Build build = model.getBuild();
+
+      if ( build == null )
+      {
+          build = new Build();
+          model.setBuild( build );
+      }
+
+      build.addPlugin( plugin );
+
+      projects = new ProjectSorter( projects ).getSortedProjects();
+
+      assertEquals( project1, projects.get( 2 ) );
+      assertTrue( projects.contains( project2 ) );
+      assertTrue( projects.contains( pluginProject ) );
     }
 
     private Dependency createDependency( MavenProject project )
