@@ -87,6 +87,10 @@ public class MavenArtifactFilterManager
         artifacts.add( "plexus-interactivity-api" );
         artifacts.add( "maven-toolchain" );
         artifacts.add( "wagon-provider-api" );
+
+        // drop the component-api - even though we don't use it directly it is included in out container-default
+        artifacts.add( "plexus-component-api" );
+        
         return artifacts;
     }
 }
