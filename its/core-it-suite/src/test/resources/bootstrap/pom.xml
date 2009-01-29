@@ -185,6 +185,12 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-component-api</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-project-interpolation</artifactId>
       <version>${itPluginVersion}</version>
       <scope>runtime</scope>
