@@ -19,11 +19,14 @@ package org.apache.maven.wagon.providers.ssh.external;
  * under the License.
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Properties;
 
 import org.apache.maven.wagon.AbstractWagon;
 import org.apache.maven.wagon.ConnectionException;
@@ -34,8 +37,6 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringInputStream;
 
 /**
  * NOTE: Plexus will only pick this correctly if the Class package and name are the same as that in core. This is
@@ -119,31 +120,47 @@ public class ScpExternalWagon
     public void fillInputData( InputData inputData )
         throws TransferFailedException, ResourceDoesNotExistException
     {
-        inputData.setInputStream( new StringInputStream( "<metadata />" ) );
+        try
+        {
+            inputData.setInputStream( new ByteArrayInputStream( "<metadata />".getBytes( "UTF-8" ) ) );
+        }
+        catch ( IOException e )
+        {
+            throw new TransferFailedException( "Broken JVM", e );
+        }
     }
 
     public void fillOutputData( OutputData outputData )
         throws TransferFailedException
     {
-        String content = "";
+        Properties props = new Properties();
         if ( getRepository().getPermissions() != null )
         {
             String dirPerms = getRepository().getPermissions().getDirectoryMode();
 
             if ( dirPerms != null )
             {
-                content += "directory.mode = " + dirPerms + "\n";
+                props.setProperty( "directory.mode", dirPerms );
             }
 
             String filePerms = getRepository().getPermissions().getFileMode();
             if ( filePerms != null )
             {
-                content += "file.mode = " + filePerms + "\n";
+                props.setProperty( "file.mode", filePerms );
             }
         }
+
         try
         {
-            FileUtils.fileWrite( "target/wagon.properties", content );
+            OutputStream os = new FileOutputStream( "target/wagon.properties" );
+            try
+            {
+                props.store( os, "MAVEN-CORE-IT-WAGON" );
+            }
+            finally
+            {
+                os.close();
+            }
         }
         catch ( IOException e )
         {
