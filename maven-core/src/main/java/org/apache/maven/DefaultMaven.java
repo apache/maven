@@ -750,14 +750,6 @@ public class DefaultMaven
                 }
             }
 
-            RepositoryPermissions defaultPermissions = new RepositoryPermissions();
-
-            defaultPermissions.setDirectoryMode( "775" );
-
-            defaultPermissions.setFileMode( "664" );
-
-            wagonManager.setDefaultRepositoryPermissions( defaultPermissions );
-
             for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
             {
                 Mirror mirror = (Mirror) i.next();
