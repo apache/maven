@@ -47,6 +47,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         List cliOptions = new ArrayList();
         verifier.setCliOptions( cliOptions );
+        verifier.setLogFileName( "log-no-settings.txt" );
         verifier.executeGoal( "deploy" );
 
         verifier.assertFilePresent( "target/wagon.properties" );
@@ -72,6 +73,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         cliOptions.add( "--settings" );
         cliOptions.add( "settings-server-defaults.xml" );
         verifier.setCliOptions( cliOptions );
+        verifier.setLogFileName( "log-server-defaults.txt" );
         verifier.executeGoal( "deploy" );
 
         verifier.assertFilePresent( "target/wagon.properties" );
@@ -97,6 +99,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         cliOptions.add( "--settings" );
         cliOptions.add( "settings-modes-set.xml" );
         verifier.setCliOptions( cliOptions );
+        verifier.setLogFileName( "log-modes-set.txt" );
         verifier.executeGoal( "deploy" );
 
         verifier.assertFilePresent( "target/wagon.properties" );
