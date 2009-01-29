@@ -56,6 +56,7 @@ under the License.
     <wagonVersion>1.0-beta-4</wagonVersion>
     <modelBuilderVersion>1.3</modelBuilderVersion>
     <mercuryVersion>1.0.0-alpha-2</mercuryVersion>
+    <mercuryMp3Version>1.0-alpha-1-SNAPSHOT</mercuryMp3Version>
     <woodstoxVersion>3.2.6</woodstoxVersion>
     <modelloVersion>1.0-alpha-22</modelloVersion>
   </properties>  
@@ -411,6 +412,11 @@ under the License.
         <artifactId>mercury-external</artifactId>
         <version>${mercuryVersion}</version>
       </dependency>
+    <dependency>
+      <groupId>org.sonatype.mercury</groupId>
+      <artifactId>mercury-mp3-cli</artifactId>
+        <version>${mercuryMp3Version}</version>
+    </dependency>
       
       <!--  Mercury test dependencies -->
       <dependency>
