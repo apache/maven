@@ -1,0 +1,10 @@
+<?xml version="1.0"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.mng2668</groupId>
+    <version>1.0-SNAPSHOT</version>
+    <artifactId>test-project</artifactId>
+  </parent>
+  <artifactId>tools</artifactId>
+</project>
+
