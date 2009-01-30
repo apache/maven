@@ -102,6 +102,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3970DepResolutionFromProfileReposTest.class );
         suite.addTestSuite( MavenITmng3955EffectiveSettingsTest.class );
         suite.addTestSuite( MavenITmng3953AuthenticatedDeploymentTest.class );
+        suite.addTestSuite( MavenITmng3951AbsolutePathsTest.class );
         suite.addTestSuite( MavenITmng3948ParentResolutionFromProfileReposTest.class );
         suite.addTestSuite( MavenITmng3947PluginDefaultExecutionConfigTest.class );
         suite.addTestSuite( MavenITmng3944BasedirInterpolationTest.class );
