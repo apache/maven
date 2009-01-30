@@ -41,5 +41,15 @@ under the License.
         <version>2.1-SNAPSHOT</version>
       </extension>
     </extensions>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!-- Only here to lock down the plugin version -->
+          <groupId>org.apache.maven.its.plugins</groupId>
+          <artifactId>maven-it-plugin-packaging</artifactId>
+          <version>2.1-SNAPSHOT</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>
