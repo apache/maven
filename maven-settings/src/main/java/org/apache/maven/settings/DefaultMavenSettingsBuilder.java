@@ -231,6 +231,13 @@ public class DefaultMavenSettingsBuilder
             localRepository = new File( mavenUserConfigurationDirectory, "repository" ).getAbsolutePath();
         }
 
+        // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
+        File file = new File( localRepository );
+        if ( !file.isAbsolute() && file.getPath().startsWith( File.separator ) )
+        {
+            localRepository = file.getAbsolutePath();
+        }
+
         userSettings.setLocalRepository( localRepository );
     }
 

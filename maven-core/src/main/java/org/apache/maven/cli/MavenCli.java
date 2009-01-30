@@ -156,6 +156,14 @@ public class MavenCli
 
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
 
+        // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
+        // Windows paths.
+        String mavenHome = System.getProperty( "maven.home" );
+        if ( mavenHome != null )
+        {
+            System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
+        }
+
         // ----------------------------------------------------------------------
         // Now that we have everything that we need we will fire up plexus and
         // bring the maven component to life for use.
