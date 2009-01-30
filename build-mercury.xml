@@ -29,13 +29,13 @@ This facilitates having a set of builds converge on the same repository for inte
 
 END SNIPPET: ant-bootstrap -->
 
-<project default="all" basedir="." xmlns:artifact="urn:mercury-ant-tasks">
+<project default="all" basedir="." xmlns:mercury="urn:mercury-ant-tasks">
   
   <property name="it.workdir.version" value="3.0.x"/>
 
   <target name="initTaskDefs">
     <xmlproperty file="pom.xml" prefix="pom.xml" />
-    <path id="maven-ant-tasks.classpath" path="mercury-ant-tasks-1.0-alpha-1-SNAPSHOT.jar"/>
+    <path id="mercury-ant-tasks.classpath" path="mercury-ant-tasks-1.0.0-alpha-4-SNAPSHOT.jar"/>
     <typedef resource="org/apache/maven/mercury/ant/tasks/antlib.xml" uri="urn:mercury-ant-tasks" classpathref="mercury-ant-tasks.classpath"/>
   </target>
 
@@ -78,9 +78,11 @@ END SNIPPET: ant-bootstrap -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
+    
     <mercury:resolve-dependencies source="maven:pom.xml" id="pom">
       <mercury:local-repository location="${maven.repo.local}"/>
     </mercury:resolve-dependencies>
+    
     <delete file="${basedir}/dependencies.xml"/>
     
     <!-- Pull the dependencies for Modello -->
@@ -93,7 +95,7 @@ END SNIPPET: ant-bootstrap -->
     <mercury:resolve-dependencies id="pmdg">
        <mercury:local-repository path="${maven.repo.local}"/>       
        <mercury:dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
-    </artifact:dependencies>              
+    </mercury:resolve-dependencies>              
   </target>
 
   <target name="process-classes" depends="pull" description="generates plexus component metadata.">
