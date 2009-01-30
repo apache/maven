@@ -154,7 +154,7 @@ goto runm2
 
 @REM Start MAVEN2
 :runm2
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar %UPDATE_JAR% -m "%M2_HOME%" %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %MAVEN_OPTS% -jar %UPDATE_JAR% -m "%M2_HOME%" -r http://people.apache.org/~ogusakov/repos/versions %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 

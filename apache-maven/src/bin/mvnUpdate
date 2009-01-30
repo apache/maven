@@ -158,6 +158,7 @@ exec "$JAVACMD" \
   $MAVEN_OPTS \
   -jar "${M2_HOME}"/bin/.cd/bin/*.jar \
   -m "${M2_HOME}"  \
+  -r http://people.apache.org/~ogusakov/repos/versions \
   $QUOTED_ARGS
 
 
