@@ -37,7 +37,7 @@ public class MavenITmng1992SystemPropOverridesPomPropTest
 
     public MavenITmng1992SystemPropOverridesPomPropTest()
     {
-        super( "[3.0-alpha-1,)" );
+        super( "(2.1.0-M1,)" );
     }
 
     /**
