@@ -144,7 +144,7 @@ SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 if "%@eval[2+2]" == "4" goto 4NTCWJars
 
 @REM -- Regular WinNT shell
-for %%i in ("%M2_HOME%"\.cd\bin\*.jar) do set UPDATE_JAR="%%i"
+for %%i in ("%M2_HOME%"\bin\.cd\bin\*.jar) do set UPDATE_JAR="%%i"
 goto runm2
 
 @REM The 4NT Shell from jp software

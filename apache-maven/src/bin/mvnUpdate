@@ -156,7 +156,7 @@ fi
 
 exec "$JAVACMD" \
   $MAVEN_OPTS \
-  -jar "${M2_HOME}"/.cd/bin/*.jar \
+  -jar "${M2_HOME}"/bin/.cd/bin/*.jar \
   -m "${M2_HOME}"  \
   $QUOTED_ARGS
 
