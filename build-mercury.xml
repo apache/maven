@@ -87,14 +87,14 @@ END SNIPPET: ant-bootstrap -->
     
     <!-- Pull the dependencies for Modello -->
     <mercury:resolve-dependencies id="modello">
-       <mercury:local-repository location="${maven.repo.local}"/>
-       <mercury:dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
+      <mercury:local-repository location="${maven.repo.local}"/>
+      <mercury:dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
     </mercury:resolve-dependencies>
     
     <!-- Pull the dependencies for the MetadataGenerator CLI -->
     <mercury:resolve-dependencies id="pmdg">
-       <mercury:local-repository path="${maven.repo.local}"/>       
-       <mercury:dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
+      <mercury:local-repository path="${maven.repo.local}"/>       
+      <mercury:dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
     </mercury:resolve-dependencies>              
   </target>
 
