@@ -31,6 +31,8 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
@@ -63,12 +65,21 @@ public abstract class AbstractMavenIntegrationTestCase
 
     private VersionRange versionRange;
 
+    private String matchPattern;
+
     protected AbstractMavenIntegrationTestCase()
     {
     }
 
     protected AbstractMavenIntegrationTestCase( String versionRangeStr )
     {
+        this( versionRangeStr, "(.*?)-(RC[0-9]+|SNAPSHOT|RC[0-9]+-SNAPSHOT)" );
+    }
+
+    protected AbstractMavenIntegrationTestCase( String versionRangeStr, String matchPattern )
+    {
+        this.matchPattern = matchPattern;
+
         try
         {
             versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
@@ -81,7 +92,7 @@ public abstract class AbstractMavenIntegrationTestCase
         ArtifactVersion version = getMavenVersion();
         if ( version != null )
         {
-            skip = !versionRange.containsVersion( removeSnapshot( version ) );
+            skip = !versionRange.containsVersion( removePattern( version ) );
         }
         else
         {
@@ -129,7 +140,7 @@ public abstract class AbstractMavenIntegrationTestCase
         ArtifactVersion version = getMavenVersion();
         if ( version != null )
         {
-            return versionRange.containsVersion( removeSnapshot( version ) );
+            return versionRange.containsVersion( removePattern( version ) );
         }
         else
         {
@@ -226,12 +237,15 @@ public abstract class AbstractMavenIntegrationTestCase
         return localRepo;
     }
 
-    private static ArtifactVersion removeSnapshot( ArtifactVersion version )
+    protected ArtifactVersion removePattern( ArtifactVersion version )
     {
         String v = version.toString();
-        if ( v.endsWith( "-SNAPSHOT" ) )
+
+        Matcher m = Pattern.compile( matchPattern ).matcher( v );
+
+        if ( m.matches() )
         {
-            return new DefaultArtifactVersion( v.substring( 0, v.length() - 9 ) );
+            return new DefaultArtifactVersion( m.group( 1 ) );
         }
         return version;
     }
