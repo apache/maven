@@ -68,11 +68,6 @@
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
     </dependency>
-    <!--Wagon-->
-    <dependency>
-      <groupId>easymock</groupId>
-      <artifactId>easymock</artifactId>
-    </dependency>
     <!--Mercury MP3-->
     <dependency>
       <groupId>org.sonatype.mercury</groupId>
@@ -95,117 +90,7 @@
     </plugins>
   </build>
   <profiles>
-    <profile>
-      <!--
-        | | This profile is specifically for creating an embedder that
-        can be used for IntelliJ integration. We need to | remove the
-        JDOM JAR because IntelliJ include its own version, and the JTidy
-        JAR includes org.xml.* classes | which causes a loader
-        constraint issues while loading the embedder. |
-      -->
-      <id>idea</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>shade-maven-plugin</artifactId>
-            <groupId>org.codehaus.mojo</groupId>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-                <configuration>
-                  <!--
-                    The IDEA folks don't want to put SNAPSHOT libs in
-                    their projects even though they are
-                  -->
-                  <finalName>maven-embedder-idea-2.1</finalName>
-                  <createDependencyReducedPom>false</createDependencyReducedPom>
-                  <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-                  <transformers>
-                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer" />
-                  </transformers>
-                  <artifactSet>
-                    <excludes>
-                      <exclude>org.codehaus.plexus:plexus-component-api</exclude>
-                      <exclude>classworlds:classworlds</exclude>
-                      <exclude>junit:junit</exclude>
-                      <exclude>jmock:jmock</exclude>
-                      <exclude>xml-apis:xml-apis</exclude>
-                      <!--
-                        So this is required for the IDEA embedder which
-                        already has its own copy of JDOM
-                      -->
-                      <exclude>jdom:jdom</exclude>
-                      <exclude>jtidy:jtidy</exclude>
-                    </excludes>
-                  </artifactSet>
-                  <relocations>
-                    <relocation>
-                      <pattern>org.codehaus.plexus.util</pattern>
-                      <excludes>
-                        <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
-                        <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
-                      </excludes>
-                    </relocation>
-                  </relocations>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <!--
-        | | This profile is specifically for creating an embedder that
-        can be used for netbeans integration |
-      -->
-      <id>netbeans</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>shade-maven-plugin</artifactId>
-            <groupId>org.codehaus.mojo</groupId>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-                <configuration>
-                  <createDependencyReducedPom>false</createDependencyReducedPom>
-                  <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-                  <transformers>
-                    <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer" />
-                  </transformers>
-                  <artifactSet>
-                    <excludes>
-                      <exclude>org.codehaus.plexus:plexus-component-api</exclude>
-                      <exclude>classworlds:classworlds</exclude>
-                      <exclude>junit:junit</exclude>
-                      <exclude>jmock:jmock</exclude>
-                      <exclude>xml-apis:xml-apis</exclude>
-                    </excludes>
-                  </artifactSet>
-                  <relocations>
-                    <relocation>
-                      <pattern>org.codehaus.plexus.util</pattern>
-                      <excludes>
-                        <exclude>org.codehaus.plexus.util.xml.Xpp3Dom</exclude>
-                        <exclude>org.codehaus.plexus.util.xml.pull.*</exclude>
-                      </excludes>
-                    </relocation>
-                  </relocations>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
+     <profile>
       <id>standard</id>
       <activation>
         <activeByDefault>true</activeByDefault>

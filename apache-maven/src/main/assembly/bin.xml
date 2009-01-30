@@ -47,6 +47,17 @@ under the License.
              since we're not using the jdom modello stuff here.
         -->
         <exclude>jdom:jdom</exclude>
+        <!-- Stuff which will be culled or optional as we move toward 3.0 -->
+        <exclude>org.apache.maven:apache-maven</exclude>
+        <exclude>bouncycastle:bcprov-jdk15</exclude>
+        <exclude>bouncycastle:bcpg-jdk15</exclude>
+        <exclude>log4j:log4j</exclude>
+        <exclude>org.sonatype.mercury:mercury-mp3-cli</exclude>
+        <exclude>commons-logging:commons-logging-api</exclude>
+        <exclude>org.slf4j:slf4j-api</exclude>
+        <exclude>org.slf4j:slf4j-jdk14</exclude>
+        <exclude>org.apache.maven.mercury:mercury-crypto-api</exclude>
+        <exclude>org.apache.maven.mercury:mercury-crypto-basic</exclude>        
       </excludes>
     </dependencySet>
     <dependencySet>
