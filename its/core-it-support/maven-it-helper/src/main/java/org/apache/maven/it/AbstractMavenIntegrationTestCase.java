@@ -81,7 +81,7 @@ public abstract class AbstractMavenIntegrationTestCase
         ArtifactVersion version = getMavenVersion();
         if ( version != null )
         {
-            skip = !versionRange.containsVersion( version );
+            skip = !versionRange.containsVersion( removeSnapshot( version ) );
         }
         else
         {
@@ -129,7 +129,7 @@ public abstract class AbstractMavenIntegrationTestCase
         ArtifactVersion version = getMavenVersion();
         if ( version != null )
         {
-            return versionRange.containsVersion( version );
+            return versionRange.containsVersion( removeSnapshot( version ) );
         }
         else
         {
@@ -224,5 +224,15 @@ public abstract class AbstractMavenIntegrationTestCase
         System.setProperty( "maven.repo.local", localRepo.getAbsolutePath() );
 
         return localRepo;
+    }
+
+    private static ArtifactVersion removeSnapshot( ArtifactVersion version )
+    {
+        String v = version.toString();
+        if ( v.endsWith( "-SNAPSHOT" ) )
+        {
+            return new DefaultArtifactVersion( v.substring( 0, v.length() - 9 ) );
+        }
+        return version;
     }
 }
