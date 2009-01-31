@@ -56,7 +56,7 @@ under the License.
     <wagonVersion>1.0-beta-4</wagonVersion>
     <modelBuilderVersion>1.3</modelBuilderVersion>
     <mercuryVersion>1.0.0-alpha-2</mercuryVersion>
-    <mercuryMp3Version>1.0-alpha-1-SNAPSHOT</mercuryMp3Version>
+    <mercuryMp3Version>1.0-alpha-1</mercuryMp3Version>
     <woodstoxVersion>3.2.6</woodstoxVersion>
     <modelloVersion>1.0-alpha-22</modelloVersion>
   </properties>  
