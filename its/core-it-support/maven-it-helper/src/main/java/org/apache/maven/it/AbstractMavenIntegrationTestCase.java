@@ -67,13 +67,16 @@ public abstract class AbstractMavenIntegrationTestCase
 
     private String matchPattern;
 
+    private static final String DEFAULT_MATCH_PATTERN = "(.*?)-(RC[0-9]+|SNAPSHOT|RC[0-9]+-SNAPSHOT)";
+
     protected AbstractMavenIntegrationTestCase()
     {
+        this.matchPattern = DEFAULT_MATCH_PATTERN;
     }
 
     protected AbstractMavenIntegrationTestCase( String versionRangeStr )
     {
-        this( versionRangeStr, "(.*?)-(RC[0-9]+|SNAPSHOT|RC[0-9]+-SNAPSHOT)" );
+        this( versionRangeStr, DEFAULT_MATCH_PATTERN );
     }
 
     protected AbstractMavenIntegrationTestCase( String versionRangeStr, String matchPattern )
@@ -237,7 +240,7 @@ public abstract class AbstractMavenIntegrationTestCase
         return localRepo;
     }
 
-    protected ArtifactVersion removePattern( ArtifactVersion version )
+    ArtifactVersion removePattern( ArtifactVersion version )
     {
         String v = version.toString();
 

@@ -19,34 +19,47 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.it.util.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 import junit.framework.TestCase;
+
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 public class MavenIntegrationTestCaseTest
     extends TestCase
 {
-    public void testRemovePattern()
+
+    public void testRemovePatternForTestWithVersionRange()
     {
-        AbstractMavenIntegrationTestCase test = new AbstractMavenIntegrationTestCase( "[2.0,)" ) {};
-        assertEquals( "2.1.0-M1", test.removePattern( new DefaultArtifactVersion( "2.1.0-M1" ) ).toString() );
-        assertEquals( "2.1.0-M1", test.removePattern( new DefaultArtifactVersion( "2.1.0-M1-SNAPSHOT" ) ).toString() );
-        assertEquals( "2.1.0-M1", test.removePattern( new DefaultArtifactVersion( "2.1.0-M1-RC1" ) ).toString() );
-        assertEquals( "2.1.0-M1", test.removePattern( new DefaultArtifactVersion( "2.1.0-M1-RC1-SNAPSHOT" ) ).toString() );
-        assertEquals( "2.0.10", test.removePattern( new DefaultArtifactVersion( "2.0.10" ) ).toString() );
-        assertEquals( "2.0.10", test.removePattern( new DefaultArtifactVersion( "2.0.10-SNAPSHOT" ) ).toString() );
-        assertEquals( "2.0.10", test.removePattern( new DefaultArtifactVersion( "2.0.10-RC1" ) ).toString() );
-        assertEquals( "2.0.10", test.removePattern( new DefaultArtifactVersion( "2.0.10-RC1-SNAPSHOT" ) ).toString() );
+        AbstractMavenIntegrationTestCase test = new AbstractMavenIntegrationTestCase( "[2.0,)" )
+        {
+            // test case with version range
+        };
+        testRemovePattern( test );
     }
+
+    public void testRemovePatternForTestWithoutVersionRange()
+    {
+        AbstractMavenIntegrationTestCase test = new AbstractMavenIntegrationTestCase()
+        {
+            // test case without version range
+        };
+        testRemovePattern( test );
+    }
+
+    private static void testRemovePattern( AbstractMavenIntegrationTestCase test )
+    {
+        assertVersionEquals( "2.1.0-M1", "2.1.0-M1", test );
+        assertVersionEquals( "2.1.0-M1", "2.1.0-M1-SNAPSHOT", test );
+        assertVersionEquals( "2.1.0-M1", "2.1.0-M1-RC1", test );
+        assertVersionEquals( "2.1.0-M1", "2.1.0-M1-RC1-SNAPSHOT", test );
+        assertVersionEquals( "2.0.10", "2.0.10", test );
+        assertVersionEquals( "2.0.10", "2.0.10-SNAPSHOT", test );
+        assertVersionEquals( "2.0.10", "2.0.10-RC1", test );
+        assertVersionEquals( "2.0.10", "2.0.10-RC1-SNAPSHOT", test );
+    }
+
+    private static void assertVersionEquals( String expected, String version, AbstractMavenIntegrationTestCase test )
+    {
+        assertEquals( expected, test.removePattern( new DefaultArtifactVersion( version ) ).toString() );
+    }
+
 }
