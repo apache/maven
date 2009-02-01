@@ -102,6 +102,17 @@ public class DefaultMavenSettingsBuilder
 
         userSettings = interpolate( userSettings, request );
 
+        // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
+        String localRepository = userSettings.getLocalRepository();
+        if ( localRepository != null && localRepository.length() > 0 )
+        {
+            File file = new File( localRepository );
+            if ( !file.isAbsolute() && file.getPath().startsWith( File.separator ) )
+            {
+                userSettings.setLocalRepository( file.getAbsolutePath() );
+            }
+        }
+
         return userSettings;
     }
 

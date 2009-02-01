@@ -116,7 +116,15 @@ public class MavenCli
         {
             CLIReportingUtils.showVersion();
         }
-        
+
+        // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
+        // Windows paths.
+        String mavenHome = System.getProperty( "maven.home" );
+        if ( mavenHome != null )
+        {
+            System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
+        }
+
         MavenExecutionRequest request = CLIRequestUtils.buildRequest( commandLine, debug, quiet, showErrors );
 
         Configuration configuration = buildEmbedderConfiguration( request, commandLine, classWorld );

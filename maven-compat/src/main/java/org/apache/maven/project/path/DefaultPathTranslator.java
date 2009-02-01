@@ -35,8 +35,6 @@ public class DefaultPathTranslator
 {
     private static final String[] BASEDIR_EXPRESSIONS = {"${basedir}", "${pom.basedir}", "${project.basedir}"};
 
-    private String FILE_SEPARATOR = "/";
-
     public void alignToBaseDirectory( Model model, File basedir )
     {
         Build build = model.getBuild();
@@ -83,10 +81,27 @@ public class DefaultPathTranslator
 
     public String alignToBaseDirectory( String path, File basedir )
     {
+        if ( path == null )
+        {
+            return null;
+        }
+
         String s = stripBasedirToken( path );
 
-        if ( requiresBaseDirectoryAlignment( s ) )
+        File file = new File( s );
+        if ( file.isAbsolute() )
         {
+            // path was already absolute, just normalize file separator and we're done
+            s = file.getPath();
+        }
+        else if ( file.getPath().startsWith( File.separator ) )
+        {
+            // drive-relative Windows path, don't align with project directory but with drive root
+            s = file.getAbsolutePath();
+        }
+        else
+        {
+            // an ordinary relative path, align with project directory
             s = new File( new File( basedir, s ).toURI().normalize() ).getAbsolutePath();
         }
 
@@ -145,25 +160,6 @@ public class DefaultPathTranslator
             }
         }
         return path;
-    }
-
-    private boolean requiresBaseDirectoryAlignment( String s )
-    {
-        if ( s != null )
-        {
-            File f = new File( s );
-
-            if ( s.startsWith( FILE_SEPARATOR ) || f.isAbsolute() )
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void unalignFromBaseDirectory( Model model, File basedir )
