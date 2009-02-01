@@ -43,16 +43,16 @@ public class MavenITmng0823MojoContextPassingTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0823" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-context-passing", "1.0",
-                                 "maven-plugin" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         List goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-context-passing:throw",
             "org.apache.maven.its.plugins:maven-it-plugin-context-passing:catch"} );
         verifier.executeGoals( goals );
         verifier.assertFilePresent( "target/thrown-value" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}

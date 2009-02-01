@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,6 +34,7 @@ import java.util.List;
 public class MavenITmng1412DependenciesOrderTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng1412DependenciesOrderTest()
     {
         super( "(2.0.8,)" ); // 2.0.9+
@@ -43,20 +43,51 @@ public class MavenITmng1412DependenciesOrderTest
     public void testitMNG1412()
         throws Exception
     {
-        // The testdir is computed from the location of this file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1412" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-X" );
-
-        verifier.setCliOptions( cliOptions );
-
-        verifier.executeGoal( "test" );
-
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng1412" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-
         verifier.resetStreams();
+
+        List compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
+        assertArtifactOrder( compileArtifacts );
+
+        List compileClassPath = verifier.loadLines( "target/compile-classpath.txt", "UTF-8" );
+        assertClassPathOrder( compileClassPath.subList( 1, compileClassPath.size() ) );
+
+        List runtimeArtifacts = verifier.loadLines( "target/runtime-artifacts.txt", "UTF-8" );
+        assertArtifactOrder( runtimeArtifacts );
+
+        List runtimeClassPath = verifier.loadLines( "target/runtime-classpath.txt", "UTF-8" );
+        assertClassPathOrder( runtimeClassPath.subList( 1, runtimeClassPath.size() ) );
+
+        List testArtifacts = verifier.loadLines( "target/test-artifacts.txt", "UTF-8" );
+        assertArtifactOrder( testArtifacts );
+
+        List testClassPath = verifier.loadLines( "target/test-classpath.txt", "UTF-8" );
+        assertClassPathOrder( testClassPath.subList( 2, testClassPath.size() ) );
     }
+
+    private void assertArtifactOrder( List artifacts )
+    {
+        assertEquals( 4, artifacts.size() );
+        assertEquals( "org.apache.maven.its.mng1412:a:jar:0.1", artifacts.get( 0 ) );
+        assertEquals( "org.apache.maven.its.mng1412:c:jar:0.1", artifacts.get( 1 ) );
+        assertEquals( "org.apache.maven.its.mng1412:b:jar:0.1", artifacts.get( 2 ) );
+        assertEquals( "org.apache.maven.its.mng1412:d:jar:0.1", artifacts.get( 3 ) );
+    }
+
+    private void assertClassPathOrder( List classpath )
+    {
+        assertEquals( 4, classpath.size() );
+        assertEquals( "a-0.1.jar", classpath.get( 0 ) );
+        assertEquals( "c-0.1.jar", classpath.get( 1 ) );
+        assertEquals( "b-0.1.jar", classpath.get( 2 ) );
+        assertEquals( "d-0.1.jar", classpath.get( 3 ) );
+    }
+
 }

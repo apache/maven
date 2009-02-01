@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Collection;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-505">MNG-505</a>.
@@ -35,21 +36,27 @@ public class MavenITmng0505VersionRangeTest
 {
 
     /**
-     * Test version range junit [3.7,) resolves to 3.8.1
+     * Test version range support.
      */
     public void testitMNG505()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0505" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.4", "jar" );
-        verifier.deleteArtifact( "junit", "junit", "3.8", "jar" );
-        verifier.executeGoal( "package" );
-        verifier.assertArtifactPresent( "junit", "junit", "3.8", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.4", "jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng0505" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Collection artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        assertEquals( 4, artifacts.size() );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:a:jar:1.1" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:b:jar:1.0" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:c:jar:3.8" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:d:jar:2.1.1" ) );
     }
-}
 
+}

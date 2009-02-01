@@ -55,8 +55,7 @@ public class MavenITmng1323AntrunDependenciesTest
         verifier.deleteDirectory( "a/target" );
         verifier.deleteDirectory( "b/target" );
         verifier.deleteDirectory( "c/target" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng1323", "dep-a", "0.1", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng1323", "dep-b", "0.1", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng1323" );
         verifier.executeGoal( "validate" ); 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

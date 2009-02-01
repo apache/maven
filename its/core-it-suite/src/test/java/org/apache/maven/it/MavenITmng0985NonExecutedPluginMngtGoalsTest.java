@@ -44,6 +44,8 @@ public class MavenITmng0985NonExecutedPluginMngtGoalsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0985" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.assertFileNotPresent( "target/unexpected.txt" );
         verifier.verifyErrorFreeLog();

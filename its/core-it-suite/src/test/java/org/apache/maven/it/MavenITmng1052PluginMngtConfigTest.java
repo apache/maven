@@ -44,6 +44,8 @@ public class MavenITmng1052PluginMngtConfigTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1052" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );
         verifier.assertFilePresent( "target/plugin-management.txt" );
         verifier.assertFileNotPresent( "target/resources-resources.txt" );

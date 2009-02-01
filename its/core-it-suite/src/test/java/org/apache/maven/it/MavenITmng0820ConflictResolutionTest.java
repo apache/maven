@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Collection;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-820">MNG-820</a>.
@@ -41,31 +42,21 @@ public class MavenITmng0820ConflictResolutionTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0820" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.assertFilePresent( "test-component-a/target/test-component-a-0.1.jar" );
-        verifier.assertFilePresent( "test-component-b/target/test-component-b-0.1.jar" );
-        verifier.assertFilePresent( "test-component-c/target/test-component-c-0.1.war" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/test-component-a-0.1.jar" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/test-component-b-0.1.jar" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/maven-core-it-support-1.4.jar" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1.war!/WEB-INF/lib/commons-io-1.0.jar" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1/WEB-INF/lib/test-component-a-0.1.jar" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1/WEB-INF/lib/test-component-b-0.1.jar" );
-        verifier.assertFilePresent(
-            "test-component-c/target/test-component-c-0.1/WEB-INF/lib/maven-core-it-support-1.4.jar" );
-        verifier.assertFilePresent( "test-component-c/target/test-component-c-0.1/WEB-INF/lib/commons-io-1.0.jar" );
-        verifier.assertFileNotPresent(
-            "test-component-c/target/test-component-c-0.1/WEB-INF/lib/commons-lang-1.0.jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng0820" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Collection artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        assertEquals( 3, artifacts.size() );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0820:d:jar:2.0" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0820:c:jar:1.4" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0820:a:jar:1.0" ) );
+        assertFalse( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:b:jar:1.0" ) );
     }
-}
 
+}
