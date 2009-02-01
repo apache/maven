@@ -25,6 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1415">MNG-1415</a>.
@@ -42,14 +43,19 @@ public class MavenITmng1415QuotedSystemPropertiesTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1415" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dtest.property=\"Test Property\"" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "test" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Properties props = verifier.loadProperties( "target/cli.properties" );
+        assertEquals( "Test Property", props.getProperty( "stringParam" ) );
     }
-}
 
+}

@@ -39,14 +39,16 @@ public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2052" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings.xml" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}

@@ -23,6 +23,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2054">MNG-2054</a>.
@@ -46,9 +48,15 @@ public class MavenITmng2054PluginExecutionInheritanceTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2054" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "project/project-level2/project-level3/project-jar/target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        List executions = verifier.loadLines( "project/project-level2/project-level3/project-jar/target/exec.log", "UTF-8" );
+        List expected = Arrays.asList( new String[] { "once" } );
+        assertEquals( expected, executions );
     }
 
 }

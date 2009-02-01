@@ -52,9 +52,10 @@ public class MavenITmng1830ShowVersionTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1830" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         List cliOptions = Collections.singletonList( "-X" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "clean" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

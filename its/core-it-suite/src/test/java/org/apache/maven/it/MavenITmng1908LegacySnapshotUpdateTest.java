@@ -41,12 +41,15 @@ public class MavenITmng1908LegacySnapshotUpdateTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1908" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
-        verifier.executeGoal( "compile" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng1908" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-    }
-}
 
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng1908", "artifact", "1.0-SNAPSHOT", "jar" );
+    }
+
+}
