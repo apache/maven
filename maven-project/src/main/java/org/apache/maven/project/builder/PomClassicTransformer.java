@@ -44,6 +44,10 @@ public final class PomClassicTransformer
                                            DomainModel domainModel)
             throws IOException
     {
+        if(! ( domainModel instanceof PomClassicDomainModel ) )
+        {
+            return;    
+        }
         Interpolator.interpolateModelProperties( modelProperties, interpolatorProperties, (PomClassicDomainModel) domainModel);
     }
 }

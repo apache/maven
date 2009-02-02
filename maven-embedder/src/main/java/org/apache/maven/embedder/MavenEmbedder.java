@@ -58,18 +58,16 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.plugin.InvalidPluginException;
-import org.apache.maven.plugin.MavenPluginCollector;
-import org.apache.maven.plugin.MavenPluginDiscoverer;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.*;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.builder.ProjectBuilder;
+import org.apache.maven.project.builder.Mixer;
+import org.apache.maven.plugin.PluginRepository;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.settings.Settings;
@@ -92,6 +90,7 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -147,6 +146,10 @@ public class MavenEmbedder
     private MavenExecutionRequestPopulator populator;
 
     private BuildPlanner buildPlanner;
+
+    private PluginRepository pluginRepository;
+
+    private Mixer mixer;
     
     // ----------------------------------------------------------------------
     // Configuration
@@ -244,6 +247,15 @@ public class MavenEmbedder
         throws IOException
     {
         modelWriter.write( writer, model );
+    }
+
+    public PlexusConfiguration getPluginConfiguration(String pluginId, String mojoId, Model model) throws Exception
+    {        
+        try {
+            return mixer.mixPluginAndReturnConfig(pluginRepository.findPluginById(pluginId, mojoId), model);
+        } catch (PlexusConfigurationException e) {
+            throw new IOException(e.getMessage());
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -655,6 +667,10 @@ public class MavenEmbedder
             buildPlanner = container.lookup( BuildPlanner.class );
 
             artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
+
+            pluginRepository = container.lookup( PluginRepository.class );
+
+            mixer = (Mixer) container.lookup( ProjectBuilder.class );
 
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.

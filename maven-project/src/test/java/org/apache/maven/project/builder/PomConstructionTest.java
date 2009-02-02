@@ -21,22 +21,35 @@ package org.apache.maven.project.builder;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.MavenTools;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomConstructionTest
     extends PlexusTestCase
 {
 
-    private static String BASE_POM_DIR = "src/test/resources-project-builder";
+    private static String BASE_DIR = "src/test";
+
+    private static String BASE_POM_DIR = BASE_DIR + "/resources-project-builder";
+
+    private static String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
 
     private ProjectBuilder projectBuilder;
+
+    private Mixer mixer;
 
     private MavenTools mavenTools;
 
@@ -44,11 +57,15 @@ public class PomConstructionTest
 
     private File testDirectory;
 
+    private File testMixinDirectory;
+
     protected void setUp()
         throws Exception
     {
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
+        testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         projectBuilder = lookup( ProjectBuilder.class );
+        mixer = (Mixer) projectBuilder;
         mavenTools = lookup( MavenTools.class );
         pomArtifactResolver = new PomArtifactResolver()
         {
@@ -60,6 +77,18 @@ public class PomConstructionTest
             }
 
         };
+    }
+
+    public void testPluginMergeSimple()
+        throws Exception
+    {
+        Model model = buildPom( "plugin-merge-simple" ).getDomainModel().getModel();
+        Model plugin = buildMixin("plugins/simple");
+
+        model = mixer.mixPlugin((Plugin) plugin.getBuild().getPlugins().get(0), model);
+
+        PomTestWrapper pom = new PomTestWrapper( model );
+        assertEquals( "FAILED", pom.getValue( "build/plugins[1]/configuration[1]/propertiesFile" ) );
     }
 
     // Some better conventions for the test poms needs to be created and each of these tests
@@ -731,11 +760,24 @@ public class PomConstructionTest
         return new PomTestWrapper( pomFile, projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
     }
 
+    private Model buildMixin( String mixinPath )
+        throws IOException, XmlPullParserException
+    {
+        File mixinFile = new File( testMixinDirectory , mixinPath );
+        if ( mixinFile.isDirectory() )
+        {
+            mixinFile = new File( mixinFile, "mixin.xml" );
+        }
+        FileInputStream pluginStream = new FileInputStream( mixinFile );
+        MavenXpp3Reader reader = new MavenXpp3Reader();
+        return reader.read(pluginStream, false);
+    }
+
     protected void assertModelEquals( PomTestWrapper pom, Object expected, String expression )
     {
         assertEquals( expected, pom.getValue( expression ) );        
     }
-    
+
     // Need to get this to walk around a directory and automatically build up the artifact set. If we
     // follow some standard conventions this can be simple.
     class FileBasedPomArtifactResolver

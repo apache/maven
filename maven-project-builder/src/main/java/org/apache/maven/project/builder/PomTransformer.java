@@ -162,8 +162,7 @@ public class PomTransformer
                                                                          ProjectUri.Build.Resources.Resource.directory,
                                                                          ProjectUri.Build.TestResources.TestResource.directory,
                                                                          ProjectUri.Build.Filters.filter,
-                                                                         ProjectUri.Reporting.outputDirectory ) ) );
-
+                                                                         ProjectUri.Reporting.outputDirectory ) ) );   
     /**
      * @see ModelTransformer#transformToDomainModel(java.util.List, java.util.List)
      */
