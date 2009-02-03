@@ -264,18 +264,20 @@ public final class CLIReportingUtils
         handleGenericException( e, showStackTraces, writer );
 
         MavenProject project = e.getProject();
-
-        writer.write( NEWLINE );
-        writer.write( "While building project with id: " );
-        writer.write( project.getId() );
-        writer.write( NEWLINE );
-        if ( project.getFile() != null )
+        if(project != null)
         {
-            writer.write( "Project File: " );
-            writer.write( project.getFile().getAbsolutePath() );
+            writer.write( NEWLINE );
+            writer.write( "While building project with id: " );
+            writer.write( project.getId() );
+            writer.write( NEWLINE );
+            if ( project.getFile() != null )
+            {
+                writer.write( "Project File: " );
+                writer.write( project.getFile().getAbsolutePath() );
+            }
+            writer.write( NEWLINE );
         }
-        writer.write( NEWLINE );
-
+        
         return true;
     }
 

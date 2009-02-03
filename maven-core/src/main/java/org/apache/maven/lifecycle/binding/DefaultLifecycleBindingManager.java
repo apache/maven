@@ -248,6 +248,12 @@ public class DefaultLifecycleBindingManager
                                         }
 
                                         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
+                                        if(mojoDescriptor == null)
+                                        {
+                                            throw new LifecycleSpecificationException( "Mojo Descriptor for goal is invalid: Plugin = "
+                                                    + plugin.getKey() + ", Plugin Descriptor = "
+                                                    + pluginDescriptor.getPluginLookupKey() +", Goal = " + goal);
+                                        }
                                         phase = mojoDescriptor.getPhase();
 
                                         logger.debug( "Phase from plugin descriptor: " + mojoDescriptor.getFullGoalName() + " is: " + phase );

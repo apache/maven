@@ -33,6 +33,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
+import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -56,6 +57,7 @@ public class MavenEmbedderTest
     protected String basedir;
 
     protected MavenEmbedder maven;
+
 
     protected void setUp()
         throws Exception
@@ -132,6 +134,30 @@ public class MavenEmbedderTest
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
 
         assertTrue( jar.exists() );
+    }
+
+    /*MNG-3919*/
+    public void testWithInvalidGoal()
+        throws Exception
+    {
+        File testDirectory = new File( basedir, "src/test/projects/invalid-goal" );
+
+        File targetDirectory = new File( basedir, "target/projects/invalid-goal" );
+
+        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( targetDirectory )
+            .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"validate"} ) );
+
+        MavenExecutionResult result = maven.execute( request );
+        List exceptions = result.getExceptions();
+        assertEquals("Incorrect number of exceptions", 1, exceptions.size());
+
+        Iterator it = exceptions.iterator();
+        if( (it.next() instanceof NullPointerException))
+        {
+            fail("Null Pointer on Exception");
+        }
     }
 
     public void testExecutionUsingAPomFile()
