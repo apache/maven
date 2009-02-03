@@ -350,7 +350,7 @@ public class ProjectUri
 
         public static class Filters
         {
-            public static String xUri = "http://apache.org/maven/project/build/filters#set";
+            public static String xUri = "http://apache.org/maven/project/build/filters#collection";
 
             public static String filter = xUri + "/filter";
         }

@@ -559,7 +559,6 @@ public class PomTransformer
             }
 
             tmp.removeAll(replace);
-
                 
             //Missing Version Rule
             if ( getPropertyFor( ProjectUri.version, tmp ) == null )
@@ -741,6 +740,27 @@ public class PomTransformer
             modelProperties.addAll( tmp );
             modelProperties.removeAll( clearedProperties );
         }
+
+        //Rules processed on collapsed pom
+
+        //Rule: Remove duplicate filters
+        List<ModelProperty> removedProperties = new ArrayList<ModelProperty>();
+        List<String> filters = new ArrayList<String>();
+        for(ModelProperty mp : modelProperties)
+        {
+            if(mp.getUri().equals(ProjectUri.Build.Filters.filter))
+            {
+                if(filters.contains(mp.getResolvedValue()))
+                {
+                    removedProperties.add(mp);
+                }
+                else
+                {
+                    filters.add(mp.getResolvedValue());   
+                }
+            }
+        }
+        modelProperties.removeAll(removedProperties);
 
         //Rule: Build plugin config overrides reporting plugin config
         ModelDataSource source = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );

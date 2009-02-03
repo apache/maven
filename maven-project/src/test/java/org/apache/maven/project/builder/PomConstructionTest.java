@@ -136,6 +136,15 @@ public class PomConstructionTest
 
     }
 
+    /*MNG- 4008*/
+    public void testMultipleFilters()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "multiple-filters" );
+        assertEquals( 4, ( (List<?>) pom.getValue( "build/filters" ) ).size() );
+
+    }
+
     /*MNG-4005 - not implemented
     public void testDependenciesDifferentVersions()
         throws Exception
@@ -748,11 +757,12 @@ public class PomConstructionTest
         assertPathWithNormalizedFileSeparators( pom.getValue( "reporting/outputDirectory" ) );
     }
 
-    /* FIXME: cf. MNG-4008
+    /* MNG-4008 */
     public void testMergedFilterOrder()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-filter-order/sub" );
+
         System.out.println(pom.getValue( "build/filters" ));
         assertEquals( 7, ( (List<?>) pom.getValue( "build/filters" ) ).size() );
         assertTrue( pom.getValue( "build/filters[1]" ).toString().endsWith( "child-a.properties" ) );
@@ -763,7 +773,7 @@ public class PomConstructionTest
         assertTrue( pom.getValue( "build/filters[6]" ).toString().endsWith( "parent-b.properties" ) );
         assertTrue( pom.getValue( "build/filters[7]" ).toString().endsWith( "parent-d.properties" ) );
     }
-    //*/
+
 
     private void assertPathWithNormalizedFileSeparators( Object value )
     {
