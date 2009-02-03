@@ -41,6 +41,11 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
     </dependency>
+      
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>model-builder</artifactId>
+    </dependency>
 
     <!-- test dependencies  -->
     <dependency>

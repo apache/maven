@@ -23,12 +23,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.apache.maven.MavenTools;
+import org.apache.maven.mercury.PomProcessor;
+import org.apache.maven.mercury.PomProcessorException;
+import org.apache.maven.mercury.MavenDomainModel;
+import org.apache.maven.mercury.MavenDomainModelFactory;
+import org.apache.maven.mercury.builder.api.MetadataReader;
+import org.apache.maven.mercury.builder.api.MetadataReaderException;
+import org.apache.maven.mercury.builder.api.DependencyProcessorException;
+import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -61,7 +66,7 @@ import org.apache.commons.jxpath.JXPathContext;
  */
 @Component(role = ProjectBuilder.class)
 public class DefaultProjectBuilder
-    implements ProjectBuilder, Mixer, LogEnabled
+    implements ProjectBuilder, Mixer, PomProcessor, LogEnabled
 {
     @Requirement
     private ArtifactFactory artifactFactory;
@@ -73,6 +78,84 @@ public class DefaultProjectBuilder
     List<ModelEventListener> listeners;
 
     private Logger logger;
+
+    public List<ModelProperty> getRawPom(ArtifactBasicMetadata bmd, MetadataReader mdReader, Map system, Map user)
+            throws MetadataReaderException, PomProcessorException {
+        if ( bmd == null )
+        {
+            throw new IllegalArgumentException( "bmd: null" );
+        }
+
+        if ( mdReader == null )
+        {
+            throw new IllegalArgumentException( "mdReader: null" );
+        }
+
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        interpolatorProperties.add( new InterpolatorProperty( "${mavenVersion}", "3.0-SNAPSHOT",
+                                                              PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
+
+        if ( system != null )
+        {
+            interpolatorProperties.addAll(
+                InterpolatorProperty.toInterpolatorProperties( system, PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
+        }
+        if ( user != null )
+        {
+            interpolatorProperties.addAll(
+                InterpolatorProperty.toInterpolatorProperties( user, PomInterpolatorTag.USER_PROPERTIES.name() ) );
+        }
+
+       List<DomainModel> domainModels = new ArrayList<DomainModel>();
+        try
+        {
+            // MavenDomainModel superPom =
+            //     new MavenDomainModel(MavenDependencyProcessor.class.getResourceAsStream( "pom-4.0.0.xml" ));
+            // domainModels.add(superPom);
+
+            byte[] superBytes = mdReader.readMetadata( bmd );
+
+            if ( superBytes == null || superBytes.length < 1 )
+                throw new PomProcessorException( "cannot read metadata for " + bmd.getGAV() );
+
+            MavenDomainModel domainModel = new MavenDomainModel( superBytes );
+            domainModels.add( domainModel );
+
+            Collection<ModelContainer> activeProfiles = domainModel.getActiveProfileContainers( interpolatorProperties );
+
+            for ( ModelContainer mc : activeProfiles )
+            {
+                domainModels.add( new MavenDomainModel( transformProfiles( mc.getProperties() ) ) );
+            }
+
+            List<DomainModel> parentModels = getParentsOfDomainModel( domainModel, mdReader );
+
+            if( parentModels == null )
+                throw new PomProcessorException( "cannot read parent for " + bmd.getGAV() );
+
+            domainModels.addAll( parentModels );
+        }
+        catch ( IOException e )
+        {
+            throw new MetadataReaderException( "Failed to create domain model. Message = " + e.getMessage() );
+        }
+
+        PomTransformer transformer = new PomTransformer( new MavenDomainModelFactory() );
+        ModelTransformerContext ctx =
+            new ModelTransformerContext( PomTransformer.MODEL_CONTAINER_INFOS );
+
+        try
+        {
+            MavenDomainModel model =
+                ( (MavenDomainModel) ctx.transform( domainModels, transformer, transformer, null,
+                                                    interpolatorProperties, null ) );
+            return model.getModelProperties();
+        }
+        catch ( IOException e )
+        {
+            throw new MetadataReaderException( "Unable to transform model" );
+        }
+    }
 
     public PomClassicDomainModel buildModel( File pom, 
                                              Collection<InterpolatorProperty> interpolatorProperties,
@@ -475,5 +558,40 @@ public class DefaultProjectBuilder
             }
         }
         return "";
+    }
+
+    private static List<DomainModel> getParentsOfDomainModel( MavenDomainModel domainModel, MetadataReader mdReader )
+        throws IOException, MetadataReaderException, PomProcessorException
+    {
+        List<DomainModel> domainModels = new ArrayList<DomainModel>();
+        if ( domainModel.hasParent() )
+        {
+            byte[] b = mdReader.readMetadata( domainModel.getParentMetadata() );
+
+            if ( b == null || b.length < 1 )
+                throw new PomProcessorException( "cannot read metadata for " + domainModel.getParentMetadata() );
+
+            MavenDomainModel parentDomainModel =
+                new MavenDomainModel( b );
+            domainModels.add( parentDomainModel );
+            domainModels.addAll( getParentsOfDomainModel( parentDomainModel, mdReader ) );
+        }
+        return domainModels;
+    }
+
+    private static List<ModelProperty> transformProfiles( List<ModelProperty> modelProperties )
+    {
+        List<ModelProperty> properties = new ArrayList<ModelProperty>();
+        for ( ModelProperty mp : modelProperties )
+        {
+            if ( mp.getUri().startsWith( ProjectUri.Profiles.Profile.xUri )
+                && !mp.getUri().equals( ProjectUri.Profiles.Profile.id )
+                && !mp.getUri().startsWith( ProjectUri.Profiles.Profile.Activation.xUri ) )
+            {
+                properties.add( new ModelProperty( mp.getUri().replace( ProjectUri.Profiles.Profile.xUri,
+                                                                        ProjectUri.xUri ), mp.getResolvedValue() ) );
+            }
+        }
+        return properties;
     }
 }

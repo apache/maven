@@ -251,6 +251,11 @@ under the License.
       <!--start-->
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-mercury</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-lifecycle</artifactId>
         <version>${project.version}</version>
       </dependency>
