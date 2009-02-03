@@ -22,6 +22,7 @@ package org.apache.maven.project.builder.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +38,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.builder.*;
+import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.codehaus.plexus.component.annotations.Component;
@@ -46,9 +49,12 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.apache.maven.shared.model.ModelMarshaller;
+import org.apache.commons.jxpath.JXPathContext;
 
 /**
  * Default implementation of the project builder.
@@ -62,7 +68,7 @@ public class DefaultProjectBuilder
     
     @Requirement
     private MavenTools mavenTools;
-       
+
     @Requirement
     List<ModelEventListener> listeners;
 
@@ -170,7 +176,8 @@ public class DefaultProjectBuilder
                                             List<Model> mixins,
                                             Collection<InterpolatorProperty> interpolatorProperties,
                                             PomArtifactResolver resolver, 
-                                            ProjectBuilderConfiguration projectBuilderConfiguration )
+                                            ProjectBuilderConfiguration projectBuilderConfiguration,
+                                            MavenProjectBuilder mavenProjectBuilder)
         throws IOException
     {
         PomClassicDomainModel domainModel = buildModel( pom, 
@@ -183,7 +190,7 @@ public class DefaultProjectBuilder
             MavenProject mavenProject = new MavenProject( domainModel.getModel(), 
                                                           artifactFactory, 
                                                           mavenTools, 
-                                                          null, 
+                                                          mavenProjectBuilder, 
                                                           projectBuilderConfiguration );
             
             mavenProject.setParentFile( domainModel.getParentFile() );
@@ -385,13 +392,36 @@ public class DefaultProjectBuilder
                                                                                                 null,
                                                                                                 listeners ) );
         return transformedDomainModel.getModel();
-      //  List<ModelProperty> pluginProperties = ModelMarshaller.marshallXmlToModelProperties(
-      //          (new PluginMixin(plugin)).getInputStream(), ProjectUri.Build.Plugins.xUri, null);
         
     }
 
     public PlexusConfiguration mixPluginAndReturnConfig(Plugin plugin, Model model) throws IOException
     {
+        List<ModelProperty> mps = mixPluginAndReturnConfigAsProperties(plugin, model);
+        return !mps.isEmpty() ?
+            new XmlPlexusConfiguration(ModelMarshaller.unmarshalModelPropertiesToXml(mps, ProjectUri.Build.Plugins.Plugin.xUri)) : null;
+    }
+
+   public Object mixPluginAndReturnConfigAsDom(Plugin plugin, Model model) throws IOException, XmlPullParserException
+   {
+       List<ModelProperty> mps = mixPluginAndReturnConfigAsProperties(plugin, model);
+       return  !mps.isEmpty() ? Xpp3DomBuilder.build(
+               new StringReader(ModelMarshaller.unmarshalModelPropertiesToXml(mps, ProjectUri.Build.Plugins.Plugin.xUri) ) ) : null;
+   }
+
+   public Object mixPluginAndReturnConfigAsDom(Plugin plugin, Model model, String xpathExpression) throws IOException,
+           XmlPullParserException
+   {
+       Object dom = mixPluginAndReturnConfigAsDom(plugin, model);
+       if(dom == null)
+       {
+           return null;
+       }
+       return JXPathContext.newContext( dom ).getValue(xpathExpression);
+   }
+
+   private List<ModelProperty> mixPluginAndReturnConfigAsProperties(Plugin plugin, Model model) throws IOException
+   {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
         domainModels.add( new PluginMixin(plugin) );
         domainModels.add( new PomClassicDomainModel(model) );
@@ -420,12 +450,12 @@ public class DefaultProjectBuilder
                         config.add(mp);
                     }
                 }
-                return new XmlPlexusConfiguration(ModelMarshaller.unmarshalModelPropertiesToXml(config, ProjectUri.Build.Plugins.Plugin.xUri));
+                return config;
 
             }
         }
-        return null;       
-    }
+        return new ArrayList<ModelProperty>();
+   }
 
     private static boolean matchesIdOfPlugin(ModelContainer mc, Plugin plugin)
     {   

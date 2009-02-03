@@ -31,7 +31,12 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.project.harness.PomTestWrapper;
+import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -49,6 +54,8 @@ public class PomConstructionTest
 
     private ProjectBuilder projectBuilder;
 
+    private MavenProjectBuilder mavenProjectBuilder;
+
     private Mixer mixer;
 
     private MavenTools mavenTools;
@@ -64,6 +71,7 @@ public class PomConstructionTest
     {
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
+        mavenProjectBuilder = lookup( MavenProjectBuilder.class );
         projectBuilder = lookup( ProjectBuilder.class );
         mixer = (Mixer) projectBuilder;
         mavenTools = lookup( MavenTools.class );
@@ -136,6 +144,24 @@ public class PomConstructionTest
 
     }
     */
+
+    /* MNG-3567*/
+    public void testParentInterpolation()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPomFromMavenProject( "parent-interpolation/sub" );
+        pom = new PomTestWrapper(pom.getMavenProject().getParent());
+        assertEquals( "1.3.0-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
+    }
+
+
+    /* MNG-3567*/
+    public void testPluginManagementInherited()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "pluginmanagement-inherited/sub" );
+        assertEquals( "1.0-alpha-21", pom.getValue( "build/plugins[1]/version" ) );
+    }
 
     public void testPluginOrder()
         throws Exception
@@ -758,6 +784,20 @@ public class PomConstructionTest
             pomFile = new File( pomFile, "pom.xml" );
         }
         return new PomTestWrapper( pomFile, projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
+    }
+
+    private PomTestWrapper buildPomFromMavenProject( String pomPath )
+        throws IOException
+    {
+        File pomFile = new File( testDirectory , pomPath );
+        if ( pomFile.isDirectory() )
+        {
+            pomFile = new File( pomFile, "pom.xml" );
+        }
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+        config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
+        return new PomTestWrapper( pomFile, projectBuilder.buildFromLocalPath( pomFile, null, null, pomArtifactResolver,
+                config, mavenProjectBuilder ) );
     }
 
     private Model buildMixin( String mixinPath )

@@ -91,6 +91,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -250,13 +251,31 @@ public class MavenEmbedder
     }
 
     public PlexusConfiguration getPluginConfiguration(String pluginId, String mojoId, Model model) throws Exception
-    {        
+    {
         try {
             return mixer.mixPluginAndReturnConfig(pluginRepository.findPluginById(pluginId, mojoId), model);
         } catch (PlexusConfigurationException e) {
             throw new IOException(e.getMessage());
         }
     }
+
+    public Object getPluginConfigurationAsDom(String pluginId, String mojoId, Model model) throws Exception
+    {
+        try {
+            return mixer.mixPluginAndReturnConfigAsDom(pluginRepository.findPluginById(pluginId, mojoId), model);
+        } catch (PlexusConfigurationException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    public Object getPluginConfigurationAsDom(String pluginId, String mojoId, Model model, String xpathExpression) throws Exception
+    {
+        try {
+            return mixer.mixPluginAndReturnConfigAsDom(pluginRepository.findPluginById(pluginId, mojoId), model, xpathExpression);
+        } catch (PlexusConfigurationException e) {
+            throw new IOException(e.getMessage());
+        }
+    }    
 
     // ----------------------------------------------------------------------
     // Settings

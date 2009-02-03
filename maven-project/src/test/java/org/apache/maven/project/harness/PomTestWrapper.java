@@ -30,6 +30,7 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.ModelProperty;
 
 public class PomTestWrapper
@@ -40,6 +41,8 @@ public class PomTestWrapper
     private File pomFile;
 
     private JXPathContext context;
+
+    private MavenProject mavenProject;
 
     static
     {
@@ -64,6 +67,29 @@ public class PomTestWrapper
         context = JXPathContext.newContext( domainModel.getModel() );
     }
 
+    public PomTestWrapper( File pomFile, MavenProject mavenProject )
+        throws IOException
+    {
+        if ( mavenProject == null )
+        {
+            throw new IllegalArgumentException( "mavenProject: null" );
+        }
+        this.mavenProject = mavenProject;
+        this.pomFile = pomFile;
+        context = JXPathContext.newContext( mavenProject.getModel() );
+    }
+
+    public PomTestWrapper( MavenProject mavenProject )
+        throws IOException
+    {
+        if ( mavenProject == null )
+        {
+            throw new IllegalArgumentException( "mavenProject: null" );
+        }
+        this.mavenProject = mavenProject;
+        context = JXPathContext.newContext( mavenProject.getModel() );
+    }
+
     public PomTestWrapper( File file )
         throws IOException
     {
@@ -86,6 +112,11 @@ public class PomTestWrapper
 
         this.domainModel = new PomClassicDomainModel( model );
         context = JXPathContext.newContext( domainModel.getModel() );
+    }
+
+    public MavenProject getMavenProject()
+    {
+        return mavenProject;
     }
 
     public PomClassicDomainModel getDomainModel()

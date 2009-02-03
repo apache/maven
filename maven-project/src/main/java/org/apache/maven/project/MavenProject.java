@@ -194,12 +194,41 @@ public class MavenProject
 
     public MavenProject( Model model )
     {
+        if(model == null)
+        {
+            throw new IllegalArgumentException("model: null");
+        }
         setModel( model );
     }
 
+    /**
+     * Constructor
+     *
+     * @param model - may not be null
+     * @param artifactFactory - may not be null
+     * @param mavenTools - may not be null
+     * @param mavenProjectBuilder
+     * @param projectBuilderConfiguration
+     * @throws InvalidRepositoryException
+     */
     public MavenProject( Model model, ArtifactFactory artifactFactory, MavenTools mavenTools, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
+        if(model == null)
+        {
+            throw new IllegalArgumentException("model: null");
+        }
+
+        if(artifactFactory == null)
+        {
+            throw new IllegalArgumentException("artifactFactory: null");
+        }
+
+        if(mavenTools == null)
+        {
+            throw new IllegalArgumentException("mavenTools: null");
+        }
+
         setModel( model );
         this.mavenProjectBuilder = mavenProjectBuilder;
         this.projectBuilderConfiguration = projectBuilderConfiguration;
@@ -330,7 +359,17 @@ public class MavenProject
     public MavenProject getParent()
     {
         if ( parent == null )
-        {
+        {   /*
+            if(mavenProjectBuilder == null)
+            {
+                throw new IllegalArgumentException("mavenProjectBuilder: null");
+            }
+
+            if(projectBuilderConfiguration == null)
+            {
+                throw new IllegalArgumentException("projectBuilderConfiguration: null");
+            }
+            */
             if ( parentFile != null )
             {
                 try

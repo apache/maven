@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.shared.model.InterpolatorProperty;
 
 /**
@@ -54,7 +55,8 @@ public interface ProjectBuilder
                                      List<Model> mixins, 
                                      Collection<InterpolatorProperty> interpolatorProperties,
                                      PomArtifactResolver resolver, 
-                                     ProjectBuilderConfiguration projectBuilderConfiguration )
+                                     ProjectBuilderConfiguration projectBuilderConfiguration,
+                                     MavenProjectBuilder mavenProjectBuilder)
         throws IOException;
 
     Model getSuperModel();
