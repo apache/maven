@@ -19,6 +19,9 @@ package org.apache.maven.profiles.activation;
  * under the License.
  */
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.util.StringUtils;
@@ -29,30 +32,62 @@ public class JdkPrefixProfileActivator
     private static final String JDK_VERSION = System.getProperty( "java.version" );
 
     public boolean isActive( Profile profile )
+        throws ProfileActivationException
     {
         Activation activation = profile.getActivation();
 
         String jdk = activation.getJdk();
-        
+
+        // null case is covered by canDetermineActivation(), so we can do a straight startsWith() here.
+        if ( jdk.startsWith( "[" ) || jdk.startsWith( "(" ) )
+        {
+            try
+            {
+                if ( matchJdkVersionRange( jdk ) )
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new ProfileActivationException( "Invalid JDK version in profile '" + profile.getId() + "': "
+                    + e.getMessage() );
+            }
+        }
+
         boolean reverse = false;
-        
+
         if ( jdk.startsWith( "!" ) )
         {
             reverse = true;
             jdk = jdk.substring( 1 );
         }
 
-        // null case is covered by canDetermineActivation(), so we can do a straight startsWith() here.
-        boolean result = getJdkVersion().startsWith( jdk );
-        
-        if ( reverse )
+        if ( getJdkVersion().startsWith( jdk ) )
         {
-            return !result;
+            return !reverse;
         }
         else
         {
-            return result;
+            return reverse;
         }
+    }
+
+    private boolean matchJdkVersionRange( String jdk )
+        throws InvalidVersionSpecificationException
+    {
+        VersionRange jdkVersionRange = VersionRange.createFromVersionSpec( convertJdkToMavenVersion( jdk ) );
+        DefaultArtifactVersion jdkVersion = new DefaultArtifactVersion( convertJdkToMavenVersion( getJdkVersion() ) );
+        return jdkVersionRange.containsVersion( jdkVersion );
+    }
+
+    private String convertJdkToMavenVersion( String jdk )
+    {
+        return jdk.replaceAll( "_", "-" );
     }
 
     protected String getJdkVersion()

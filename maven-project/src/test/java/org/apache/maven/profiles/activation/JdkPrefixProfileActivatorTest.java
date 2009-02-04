@@ -55,6 +55,7 @@ public class JdkPrefixProfileActivatorTest
     }
 
     public void testActivationWithMatchingJdkVersion()
+        throws ProfileActivationException
     {
         JdkPrefixProfileActivator activator = createActivator( "1.5.0_15" );
 
@@ -63,7 +64,8 @@ public class JdkPrefixProfileActivatorTest
         assertTrue( activator.isActive( profile ) );
     }
 
-    public void testActivationWithoutMatchingJdkVersion()
+    public void testActivationWithDifferentJdkVersion()
+        throws ProfileActivationException
     {
         JdkPrefixProfileActivator activator = createActivator( "1.5.0_15" );
 
@@ -73,6 +75,7 @@ public class JdkPrefixProfileActivatorTest
     }
 
     public void testActivationWithMatchingNegatedJdkVersion()
+        throws ProfileActivationException
     {
         JdkPrefixProfileActivator activator = createActivator( "1.5.0_15" );
 
@@ -81,13 +84,51 @@ public class JdkPrefixProfileActivatorTest
         assertTrue( activator.isActive( profile ) );
     }
 
-    public void testActivationWithoutMatchingNegatedJdkVersion()
+    public void testActivationWithDifferentNegatedJdkVersion()
+        throws ProfileActivationException
     {
         JdkPrefixProfileActivator activator = createActivator( "1.5.0_15" );
 
         Profile profile = createProfile( "!1.5" );
 
         assertFalse( activator.isActive( profile ) );
+    }
+
+    public void testActivationWithMatchingRangeJdkVersion()
+        throws ProfileActivationException
+    {
+        JdkPrefixProfileActivator activator = createActivator( "1.5.0_15" );
+
+        Profile profile = createProfile( "[1.4,1.6)" );
+
+        assertTrue( activator.isActive( profile ) );
+    }
+
+    public void testActivationWithDifferentRangeJdkVersion()
+        throws ProfileActivationException
+    {
+        JdkPrefixProfileActivator activator = createActivator( "1.5.0_15" );
+
+        Profile profile = createProfile( "[1.4,1.5]" );
+
+        assertFalse( activator.isActive( profile ) );
+    }
+
+    public void testActivationWithBadRangeJdkVersion()
+        throws ProfileActivationException
+    {
+        JdkPrefixProfileActivator activator = createActivator( "1.5.0_15" );
+
+        Profile profile = createProfile( "[1.4," );
+        try
+        {
+            activator.isActive( profile );
+            fail( "Should have raised an exception for invalid format" );
+        }
+        catch ( ProfileActivationException e )
+        {
+            assertTrue( true );
+        }
     }
 
     private static JdkPrefixProfileActivator createActivator()
