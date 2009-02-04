@@ -43,7 +43,7 @@ public class JdkPrefixProfileActivator
         }
 
         // null case is covered by canDetermineActivation(), so we can do a straight startsWith() here.
-        boolean result = JDK_VERSION.startsWith( jdk );
+        boolean result = getJdkVersion().startsWith( jdk );
         
         if ( reverse )
         {
@@ -53,6 +53,11 @@ public class JdkPrefixProfileActivator
         {
             return result;
         }
+    }
+
+    protected String getJdkVersion()
+    {
+        return JDK_VERSION;
     }
 
     protected boolean canDetectActivation( Profile profile )
