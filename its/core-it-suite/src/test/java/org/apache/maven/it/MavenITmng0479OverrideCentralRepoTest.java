@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -60,7 +59,9 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.setCliOptions( Collections.singletonList( "-s settings.xml" ) );
+        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

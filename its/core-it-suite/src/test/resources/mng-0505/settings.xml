@@ -20,29 +20,15 @@ under the License.
 -->
 
 <settings>
-  <profiles>
-    <profile>
-      <!--
-      Make sure we also override the repo definition in case a repo manager is setup.
-      -->
-      <id>it0043</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <name>it0043</name>
-          <url>@baseurl@/target/maven-core-it0043-repo</url>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>central</id>
-          <name>it0043</name>
-          <url>@baseurl@/target/maven-core-it0043-repo</url>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
+  <!--
+  Make sure the test queries only the test repo.
+  -->
+  <mirrors>
+    <mirror>
+      <id>mng-0505</id>
+      <name>mng-0505</name>
+      <url>@baseurl@/target/null</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
 </settings>

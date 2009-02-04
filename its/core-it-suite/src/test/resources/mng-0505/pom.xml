@@ -33,7 +33,7 @@ under the License.
 
   <repositories>
     <repository>
-      <id>central</id>
+      <id>maven-core-it</id>
       <url>file:///${basedir}/repo</url>
       <releases>
         <checksumPolicy>ignore</checksumPolicy>
