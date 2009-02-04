@@ -86,6 +86,13 @@ public class PomConstructionTest
 
         };
     }
+    /*MNG-3803*/
+    public void testPluginConfigProperties()
+       throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-config-properties" );
+        assertEquals( "my.property", pom.getValue( "build/plugins[1]/configuration[1]/systemProperties[1]/property[1]/name" ) );
+    }
 
     public void testPluginMergeSimple()
         throws Exception
