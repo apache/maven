@@ -35,7 +35,27 @@ public class ProfileContextTest {
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         interpolatorProperties.add(new InterpolatorProperty( "${foo}", "bar"));
 
-        ProfileContext ctx = new ProfileContext(dataSource, interpolatorProperties);
+        ProfileContext ctx = new ProfileContext(dataSource, null, interpolatorProperties);
+
+        Collection<ModelContainer> profiles = ctx.getActiveProfiles();
+
+        assertTrue(profiles.size() == 1);
+
+    }
+
+    @org.junit.Test
+    public void getActiveProfilesById() throws DataSourceException {
+        List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
+        modelProperties.add(new ModelProperty(ProjectUri.xUri, null));
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.xUri, null));
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.xUri, null));
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.id , "test"));
+
+        DefaultModelDataSource dataSource = new DefaultModelDataSource(modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
+
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+
+        ProfileContext ctx = new ProfileContext(dataSource, Arrays.asList("test"), interpolatorProperties);
 
         Collection<ModelContainer> profiles = ctx.getActiveProfiles();
 

@@ -460,7 +460,7 @@ public class DefaultMavenProjectBuilder
     private static void setBuildOutputDirectoryOnParent( MavenProject project )
     {
         MavenProject parent = project.getParent();
-        if ( parent != null )
+        if ( parent != null && parent.getFile() != null && parent.getModel().getBuild() != null)
         {
             parent.getModel().getBuild().setDirectory( parent.getFile().getAbsolutePath() );
             setBuildOutputDirectoryOnParent( parent );

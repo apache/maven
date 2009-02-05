@@ -125,7 +125,7 @@ public final class MavenDomainModel
     {
         ModelDataSource dataSource = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
-        return new ProfileContext( dataSource, properties ).getActiveProfiles();
+        return new ProfileContext( dataSource, null, properties ).getActiveProfiles();
     }
 
     public ArtifactBasicMetadata getParentMetadata()

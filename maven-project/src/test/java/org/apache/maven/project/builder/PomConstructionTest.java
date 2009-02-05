@@ -25,8 +25,13 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 import org.apache.maven.MavenTools;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
+import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -160,6 +165,13 @@ public class PomConstructionTest
 
     }
     */
+      /*MNG-3803*/
+    public void testDependenciesWithDifferentVersions()
+       throws Exception
+    {
+        PomTestWrapper pom = buildPom( "dependencies-with-different-versions" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+    }
 
     /* MNG-3567*/
     public void testParentInterpolation()
@@ -813,6 +825,9 @@ public class PomConstructionTest
         }
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
         config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
+        ProfileActivationContext pCtx = new DefaultProfileActivationContext(null, true);
+        pCtx.setExplicitlyActiveProfileIds(Arrays.asList("release"));
+        config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
         return new PomTestWrapper( pomFile, projectBuilder.buildFromLocalPath( pomFile, null, null, pomArtifactResolver,
                 config, mavenProjectBuilder ) );
     }

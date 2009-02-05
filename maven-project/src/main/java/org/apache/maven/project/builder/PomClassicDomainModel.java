@@ -77,6 +77,10 @@ public final class PomClassicDomainModel
     
     private int lineageCount;
 
+    public PomClassicDomainModel( List<ModelProperty> modelProperties)
+    {
+        this.modelProperties = modelProperties;
+    }
     /**
      * Constructor
      *
