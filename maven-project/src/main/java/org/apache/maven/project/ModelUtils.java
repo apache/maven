@@ -21,7 +21,6 @@ package org.apache.maven.project;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -230,7 +229,10 @@ public final class ModelUtils
                 int idx = normalized.indexOf( currentPlugin );
                 Plugin firstPlugin = (Plugin) normalized.get( idx );
 
-                mergePluginDefinitions( firstPlugin, currentPlugin, false );
+                // MNG-3719: merge currentPlugin with firstPlugin as parent,
+                // then use updated currentPlugin as new parent
+                mergePluginDefinitions( currentPlugin, firstPlugin, false );
+                normalized.set(idx, currentPlugin);
             }
             else
             {
