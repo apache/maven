@@ -98,6 +98,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3998PluginExecutionConfigTest.class );
         suite.addTestSuite( MavenITmng3983PluginResolutionFromProfileReposTest.class );
         suite.addTestSuite( MavenITmng3979ElementJoinTest.class );
+        suite.addTestSuite( MavenITmng3719PomExecutionOrderingTest.class );
         suite.addTestSuite( MavenITmng3974MirrorOrderingTest.class );
         suite.addTestSuite( MavenITmng3970DepResolutionFromProfileReposTest.class );
         suite.addTestSuite( MavenITmng3955EffectiveSettingsTest.class );
@@ -145,6 +146,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3819PluginDepPlexusUtilsTest.class );
         suite.addTestSuite( MavenITmng3813PluginClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3810BadProfileActivationTest.class );
+        suite.addTestSuite( MavenITmng3808ReportInheritenceOrderingTest.class );
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3796ClassImportInconsistencyTest.class );
         suite.addTestSuite( MavenITmng3769ExclusionRelocatedTransdepsTest.class );
@@ -194,6 +196,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3331ModulePathNormalizationTest.class );
         suite.addTestSuite( MavenITmng3314OfflineSnapshotsTest.class );
+        suite.addTestSuite( MavenITmng3288SystemScopeDirTest.class );
         suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
         suite.addTestSuite( MavenITmng3271DefaultReportsSuppressionTest.class );
         suite.addTestSuite( MavenITmng3221InfiniteForkingTest.class );
