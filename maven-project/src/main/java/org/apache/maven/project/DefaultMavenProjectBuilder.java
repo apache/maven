@@ -1260,7 +1260,7 @@ public class DefaultMavenProjectBuilder
 
             if ( parentProject != null )
             {
-                model = ModelUtils.cloneModel( parentProject.getModel() );
+                model = ModelUtils.cloneModel( parentProject.getOriginalModel() );
 
                 parentDescriptor = parentProject.getFile();
             }
