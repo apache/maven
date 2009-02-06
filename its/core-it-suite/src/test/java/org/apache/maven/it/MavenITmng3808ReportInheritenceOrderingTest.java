@@ -31,7 +31,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3808">MNG-3808</a>.
  * 
  * @author Brett Porter
- * @version $Id: MavenITmng4016PrefixedPropertyInterpolationTest.java 739321 2009-01-30 16:09:55Z bentmann $
+ * @version $Id$
  */
 public class MavenITmng3808ReportInheritenceOrderingTest
     extends AbstractMavenIntegrationTestCase
@@ -45,7 +45,7 @@ public class MavenITmng3808ReportInheritenceOrderingTest
     /**
      * Test that 3 executions are run in the correct order.
      */
-    public void testitMNG3719()
+    public void testitMNG3808()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3808" );

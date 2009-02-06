@@ -98,7 +98,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3998PluginExecutionConfigTest.class );
         suite.addTestSuite( MavenITmng3983PluginResolutionFromProfileReposTest.class );
         suite.addTestSuite( MavenITmng3979ElementJoinTest.class );
-        suite.addTestSuite( MavenITmng3719PomExecutionOrderingTest.class );
         suite.addTestSuite( MavenITmng3974MirrorOrderingTest.class );
         suite.addTestSuite( MavenITmng3970DepResolutionFromProfileReposTest.class );
         suite.addTestSuite( MavenITmng3955EffectiveSettingsTest.class );
@@ -159,6 +158,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3729MultiForkAggregatorsTest.class );
         suite.addTestSuite( MavenITmng3724ExecutionProjectSyncTest.class );
         suite.addTestSuite( MavenITmng3723ConcreteParentProjectTest.class );
+        suite.addTestSuite( MavenITmng3719PomExecutionOrderingTest.class );
         suite.addTestSuite( MavenITmng3716AggregatorForkingTest.class );
         suite.addTestSuite( MavenITmng3710PollutedClonedPluginsTest.class );
         suite.addTestSuite( MavenITmng3704LifecycleExecutorWrapperTest.class );
