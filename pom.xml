@@ -406,11 +406,11 @@ under the License.
           </exclusion>
         </exclusions>
       </dependency>
-    <dependency>
-    	<groupId>commons-jxpath</groupId>
-    	<artifactId>commons-jxpath</artifactId>
+      <dependency>
+        <groupId>commons-jxpath</groupId>
+        <artifactId>commons-jxpath</artifactId>
         <version>${jxpathVersion}</version>
-    </dependency>
+      </dependency>
 
       <!--  Mercury -->
       <dependency>
@@ -423,11 +423,11 @@ under the License.
         <artifactId>mercury-external</artifactId>
         <version>${mercuryVersion}</version>
       </dependency>
-    <dependency>
-      <groupId>org.sonatype.mercury</groupId>
-      <artifactId>mercury-mp3-cli</artifactId>
+      <dependency>
+        <groupId>org.sonatype.mercury</groupId>
+        <artifactId>mercury-mp3-cli</artifactId>
         <version>${mercuryMp3Version}</version>
-    </dependency>
+      </dependency>
       
       <!--  Mercury test dependencies -->
       <dependency>
