@@ -73,6 +73,14 @@
       <groupId>org.sonatype.mercury</groupId>
       <artifactId>mercury-mp3-cli</artifactId>
     </dependency>
+    <dependency>
+      <!--
+      FIXME: org.sonatype.mercury:mercury-mp3:1.0-alpha-1:pom depends on a snapshot version of mercury-event.
+      -->
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-event</artifactId>
+      <version>${mercuryVersion}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
