@@ -462,16 +462,16 @@ public final class ModelUtils
      *
      *   X -> Y -> A -> B -> C -> D -> E -> F
      */
-    public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
+    public static void mergePluginLists( PluginContainer child, PluginContainer parent,
                                          boolean handleAsInheritance )
     {
-        if ( ( childContainer == null ) || ( parentContainer == null ) )
+        if ( ( child == null ) || ( parent == null ) )
         {
             // nothing to do.
             return;
         }
 
-        List parentPlugins = parentContainer.getPlugins();
+        List parentPlugins = parent.getPlugins();
 
         if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
@@ -496,7 +496,7 @@ public final class ModelUtils
 
             List assembledPlugins = new ArrayList();
 
-            Map childPlugins = childContainer.getPluginsAsMap();
+            Map childPlugins = child.getPluginsAsMap();
 
             for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
             {
@@ -536,12 +536,12 @@ public final class ModelUtils
                 // very important to use the parentPlugins List, rather than parentContainer.getPlugins()
                 // since this list is a local one, and may have been modified during processing.
                 List results = ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins,
-                                                                        childContainer.getPlugins() );
+                                                                        child.getPlugins() );
 
 
-                childContainer.setPlugins( results );
+                child.setPlugins( results );
 
-                childContainer.flushPluginMap();
+                child.flushPluginMap();
             }
         }
     }
@@ -603,6 +603,14 @@ public final class ModelUtils
         return results;
     }
 
+    /**
+     * Merge the list of reporting plugins from parent pom and child pom
+     * TODO it's pretty much a copy of {@link #mergePluginLists(PluginContainer, PluginContainer, boolean)}
+     * 
+     * @param child
+     * @param parent
+     * @param handleAsInheritance
+     */
     public static void mergeReportPluginLists( Reporting child, Reporting parent, boolean handleAsInheritance )
     {
         if ( ( child == null ) || ( parent == null ) )
@@ -615,7 +623,26 @@ public final class ModelUtils
 
         if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
-            Map assembledPlugins = new TreeMap();
+            parentPlugins = new ArrayList( parentPlugins );
+
+            // If we're processing this merge as an inheritance, we have to build up a list of
+            // plugins that were considered for inheritance.
+            if ( handleAsInheritance )
+            {
+                for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+                {
+                    ReportPlugin plugin = (ReportPlugin) it.next();
+
+                    String inherited = plugin.getInherited();
+
+                    if ( ( inherited != null ) && !Boolean.valueOf( inherited ).booleanValue() )
+                    {
+                        it.remove();
+                    }
+                }
+            }
+
+            List assembledPlugins = new ArrayList();
 
             Map childPlugins = child.getReportPluginsAsMap();
 
@@ -625,43 +652,44 @@ public final class ModelUtils
 
                 String parentInherited = parentPlugin.getInherited();
 
+                // only merge plugin definition from the parent if at least one
+                // of these is true:
+                // 1. we're not processing the plugins in an inheritance-based merge
+                // 2. the parent's <inherited/> flag is not set
+                // 3. the parent's <inherited/> flag is set to true
                 if ( !handleAsInheritance || ( parentInherited == null ) ||
                     Boolean.valueOf( parentInherited ).booleanValue() )
                 {
-
-                    ReportPlugin assembledPlugin = parentPlugin;
-
                     ReportPlugin childPlugin = (ReportPlugin) childPlugins.get( parentPlugin.getKey() );
 
-                    if ( childPlugin != null )
+                    if ( ( childPlugin != null ) && !assembledPlugins.contains( childPlugin ) )
                     {
-                        assembledPlugin = childPlugin;
+                        ReportPlugin assembledPlugin = childPlugin;
 
                         mergeReportPluginDefinitions( childPlugin, parentPlugin, handleAsInheritance );
+
+                        // fix for MNG-2221 (assembly cache was not being populated for later reference):
+                        assembledPlugins.add( assembledPlugin );
                     }
 
+                    // if we're processing this as an inheritance-based merge, and
+                    // the parent's <inherited/> flag is not set, then we need to
+                    // clear the inherited flag in the merge result.
                     if ( handleAsInheritance && ( parentInherited == null ) )
                     {
-                        assembledPlugin.unsetInheritanceApplied();
+                        parentPlugin.unsetInheritanceApplied();
                     }
-
-                    assembledPlugins.put( assembledPlugin.getKey(), assembledPlugin );
                 }
+
+                // very important to use the parentPlugins List, rather than parentContainer.getPlugins()
+                // since this list is a local one, and may have been modified during processing.
+                List results = ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins,
+                                                                        child.getPlugins() );
+
+                child.setPlugins( results );
+
+                child.flushReportPluginMap();
             }
-
-            for ( Iterator it = childPlugins.values().iterator(); it.hasNext(); )
-            {
-                ReportPlugin childPlugin = (ReportPlugin) it.next();
-
-                if ( !assembledPlugins.containsKey( childPlugin.getKey() ) )
-                {
-                    assembledPlugins.put( childPlugin.getKey(), childPlugin );
-                }
-            }
-
-            child.setPlugins( new ArrayList( assembledPlugins.values() ) );
-
-            child.flushReportPluginMap();
         }
     }
 

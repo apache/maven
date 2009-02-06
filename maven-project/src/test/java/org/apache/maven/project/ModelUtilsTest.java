@@ -24,6 +24,8 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.Reporting;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.Collections;
@@ -136,18 +138,71 @@ public class ModelUtilsTest
         Xpp3Dom result3Config = (Xpp3Dom) result3.getConfiguration();
 
         assertNotNull( result3Config );
+        assertNotNull( result3Config.getChild( "key" ) );
+        assertNotNull( result3Config.getChild( "key2" ) );
 
         assertEquals( "value", result3Config.getChild( "key" ).getValue() );
         assertEquals( "value2", result3Config.getChild( "key2" ).getValue() );
     }
 
-    private Plugin createPlugin( String groupId, String artifactId, String version, Map configuration )
+    /**
+     * Test that this is the resulting ordering of reports after merging:
+     *
+     * Given:
+     *
+     *   parent: X -> A -> B -> D -> E
+     *   child: Y -> A -> C -> D -> F
+     *
+     * Result:
+     *
+     *   X -> Y -> A -> B -> C -> D -> E -> F
+     */
+    public void testShouldPreserveChildOrderingOfReportsAfterParentMerge()
     {
-        Plugin plugin = new Plugin();
-        plugin.setGroupId( groupId );
-        plugin.setArtifactId( artifactId );
-        plugin.setVersion( version );
+        Reporting parent = new Reporting();
 
+        parent.addPlugin( createReportPlugin( "group", "artifact", "1.0", Collections.EMPTY_MAP ) );
+        parent.addPlugin( createReportPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key", "value" ) ) );
+
+        Reporting child = new Reporting();
+
+        child.addPlugin( createReportPlugin( "group3", "artifact3", "1.0", Collections.EMPTY_MAP ) );
+        child.addPlugin( createReportPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key2", "value2" ) ) );
+
+        ModelUtils.mergeReportPluginLists( child, parent, true );
+
+        List results = child.getPlugins();
+
+        assertEquals( 3, results.size() );
+
+        ReportPlugin result1 = (ReportPlugin) results.get( 0 );
+
+        assertEquals( "group", result1.getGroupId() );
+        assertEquals( "artifact", result1.getArtifactId() );
+
+        ReportPlugin result2 = (ReportPlugin) results.get( 1 );
+
+        assertEquals( "group3", result2.getGroupId() );
+        assertEquals( "artifact3", result2.getArtifactId() );
+
+        ReportPlugin result3 = (ReportPlugin) results.get( 2 );
+
+        assertEquals( "group2", result3.getGroupId() );
+        assertEquals( "artifact2", result3.getArtifactId() );
+
+        Xpp3Dom result3Config = (Xpp3Dom) result3.getConfiguration();
+
+        assertNotNull( result3Config );
+        // Carlos: Current behavior is not to merge the ocnfiguration, although dont know why 
+        assertNull( result3Config.getChild( "key" ) );
+        assertNotNull( result3Config.getChild( "key2" ) );
+
+        //assertEquals( "value", result3Config.getChild( "key" ).getValue() );
+        assertEquals( "value2", result3Config.getChild( "key2" ).getValue() );
+    }
+
+    private Xpp3Dom createConfiguration( Map configuration )
+    {
         Xpp3Dom config = new Xpp3Dom( "configuration" );
 
         if( configuration != null )
@@ -163,8 +218,26 @@ public class ModelUtilsTest
             }
         }
 
-        plugin.setConfiguration( config );
+        return config;
+    }
 
+    private Plugin createPlugin( String groupId, String artifactId, String version, Map configuration )
+    {
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( groupId );
+        plugin.setArtifactId( artifactId );
+        plugin.setVersion( version );
+        plugin.setConfiguration( createConfiguration( configuration ) );
+        return plugin;
+    }
+
+    private ReportPlugin createReportPlugin( String groupId, String artifactId, String version, Map configuration )
+    {
+        ReportPlugin plugin = new ReportPlugin();
+        plugin.setGroupId( groupId );
+        plugin.setArtifactId( artifactId );
+        plugin.setVersion( version );
+        plugin.setConfiguration( createConfiguration( configuration ) );
         return plugin;
     }
 

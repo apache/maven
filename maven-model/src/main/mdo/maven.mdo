@@ -3224,6 +3224,37 @@
     {
         return inheritanceApplied;
     }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object other )
+    {
+        if ( other instanceof ReportPlugin )
+        {
+            ReportPlugin otherPlugin = (ReportPlugin) other;
+
+            return getKey().equals( otherPlugin.getKey() );
+        }
+
+        return false;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        return getKey().hashCode();
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "ReportPlugin [" + getKey() + "]";
+    }
             ]]>
           </code>
         </codeSegment>
