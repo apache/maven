@@ -91,6 +91,15 @@ public class PomConstructionTest
 
         };
     }
+
+    /*MNG-3995*/
+    public void testExecutionConfigurationJoin()
+       throws Exception
+    {
+        PomTestWrapper pom = buildPom( "execution-configuration-join" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/fileset[1]" ) ).size() );
+    }
+
     /*MNG-3803*/
     public void testPluginConfigProperties()
        throws Exception
