@@ -80,13 +80,13 @@ TODO:
   </target>
 
   <target name="init" depends="isMavenHomeSet,initLocalRepo">
-    <xmlproperty prefix="pom" file="pom.xml"/>    
+    <xmlproperty prefix="pom" file="pom.xml"/>
     <basename file="${maven.home}" property="maven.home.basename"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
     <!-- Initialize properties -->
     <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
-    <property name="surefire.useFile" value="true"/>    
+    <property name="surefire.useFile" value="true"/>
     <echo>maven.home = ${maven.home}</echo>
     <echo>maven.assembly = ${maven.assembly}</echo>
   </target>
@@ -95,20 +95,20 @@ TODO:
     <delete dir="bootstrap"/>
   </target>
 
-  <target name="pull" depends="init, read-poms" unless="skip.pull">    
-    <property name="verbose" value="false"/>    
+  <target name="pull" depends="init, read-poms" unless="skip.pull">
+    <property name="verbose" value="false"/>
     <!-- Pull the dependencies that Maven needs to build -->
     <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}" useScope="compile">
        <localRepository path="${maven.repo.local}"/>
-       <pom refid="pom"/>                                                                                                                                       
-    </artifact:dependencies>      
+       <pom refid="pom"/>
+    </artifact:dependencies>
     
     <!-- Pull the dependencies for Modello -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
        <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-20"/>
        <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-20"/>
-    </artifact:dependencies>          
+    </artifact:dependencies>
   </target>
 
   <target name="generate-sources" depends="pull" description="generates Java sources from Modello mdo model files">
@@ -185,6 +185,7 @@ TODO:
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <jvmarg value="-Xmx256M"/>
       <classpath refid="maven.classpath"/>
+      <arg value="-e"/>
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
@@ -193,7 +194,7 @@ TODO:
     </java>
   </target>
 
-  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">              
+  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">
     <echo>
     The new Maven distribution was created as part of the MAVEN-COMPILE step, above. 
     This goal just validates the presence of that distribution.
@@ -236,6 +237,7 @@ TODO:
       <env key="M2_HOME" value="${maven.home}"/>
       <arg value="/c"/>
       <arg value="${maven.home}\bin\mvn.bat"/>
+      <arg value="-e"/>
       <arg value="-B"/>
       <arg value="process-resources"/>
     </exec>
@@ -243,17 +245,18 @@ TODO:
       <env key="M2_HOME" value="${maven.home}"/>
       <arg value="/c"/>
       <arg value="${maven.home}\bin\mvn.bat"/>
+      <arg value="-e"/>
       <arg value="-B"/>
       <arg value="package"/>
     </exec>
     
     <echo>Running integration tests</echo>
-    <!-- Hard-coding to /tmp/ to avoid long path names that will make windows scream. -->
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="cmd">
       <env key="M2_HOME" value="${maven.home}"/>
       <arg value="/c"/>
       <arg value="${maven.home}\bin\mvn.bat"/>
       <arg value="-Prun-its"/>
+      <arg value="-e"/>
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
@@ -264,21 +267,22 @@ TODO:
     <echo>Retrieving integration tests</echo>
     <exec failonerror="true" dir="${basedir}/${itPom.artifactId}" executable="${maven.home}/bin/mvn">
       <env key="M2_HOME" value="${maven.home}"/>
+      <arg value="-e"/>
       <arg value="-B"/>
       <arg value="process-resources"/>
     </exec>
     <exec failonerror="true" dir="${basedir}/${itPom.artifactId}/target/classes" executable="${maven.home}/bin/mvn">
       <env key="M2_HOME" value="${maven.home}"/>
+      <arg value="-e"/>
       <arg value="-B"/>
       <arg value="package"/>
     </exec>
     
     <echo>Running integration tests</echo>
-    <echo>maven.home is: ${maven.home}</echo>
-    <!-- Using java.io.tmpdir to avoid long path names that will make windows scream. -->
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="${maven.home}/bin/mvn">
       <env key="M2_HOME" value="${maven.home}"/>
       <arg value="-Prun-its"/>
+      <arg value="-e"/>
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
