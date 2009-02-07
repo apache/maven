@@ -1787,36 +1787,12 @@ public class MavenProject
     
     private void addArtifactPath(Artifact a, List list) throws DependencyResolutionRequiredException
     {
-        String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
-        MavenProject project = (MavenProject) projectReferences.get( refId );
-        
-        boolean projectDirFound = false;
-        if ( project != null )
+        File file = a.getFile();
+        if ( file == null )
         {
-            if (a.getType().equals("test-jar"))
-            {
-                File testOutputDir = new File( project.getBuild().getTestOutputDirectory() );
-                if ( testOutputDir.exists() )
-                {
-                    list.add( testOutputDir.getAbsolutePath() );
-                    projectDirFound = true;
-                }
-            }
-            else
-            {
-                list.add( project.getBuild().getOutputDirectory() );
-                projectDirFound = true;
-            }
+            throw new DependencyResolutionRequiredException( a );
         }
-        if ( ! projectDirFound )
-        {
-            File file = a.getFile();
-            if ( file == null )
-            {
-                throw new DependencyResolutionRequiredException( a );
-            }
-            list.add( file.getPath() );
-        }
+        list.add( file.getPath() );
     }
     
     /**
