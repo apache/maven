@@ -33,22 +33,22 @@ under the License.
   </description>
 
 <!-- Below are the dependency trees for the artifacts of this test with Maven 2.0.9:
-[INFO] ------------------------------------------------------------------------
+[INFO] ========================================================================
 [INFO] [dependency:tree]
 [INFO] org.apache.maven.its.mng3890:b:jar:0.1
 [INFO] \- org.apache.maven.its.mng3890:a:jar:0.1:compile
-[INFO] ------------------------------------------------------------------------
+[INFO] ========================================================================
 [INFO] [dependency:tree]
 [INFO] org.apache.maven.its.mng3890:c:jar:0.1
 [INFO] +- org.apache.maven.its.mng3890:a:jar:0.1:provided (scope not updated to compile)
 [INFO] \- org.apache.maven.its.mng3890:b:jar:0.1:compile
-[INFO] ------------------------------------------------------------------------
+[INFO] ========================================================================
 [INFO] [dependency:tree]
 [INFO] org.apache.maven.its.mng3890:test:jar:1.0
 [INFO] \- org.apache.maven.its.mng3890:c:jar:0.1:compile
 [INFO]    \- org.apache.maven.its.mng3890:b:jar:0.1:compile
 [INFO]       \- org.apache.maven.its.mng3890:a:jar:0.1:compile  << ERROR: Should be excluded because declared as provided by c
-[INFO] ------------------------------------------------------------------------
+[INFO] ========================================================================
 -->
 
   <repositories>
