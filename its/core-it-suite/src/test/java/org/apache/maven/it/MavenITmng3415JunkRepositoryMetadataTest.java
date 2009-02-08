@@ -103,7 +103,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         List cliOptions = new ArrayList();
         cliOptions.add( "-X" );
         cliOptions.add( "-s" );
-        cliOptions.add( settings.getPath() );
+        cliOptions.add( settings.getName() );
 
         verifier.setCliOptions( cliOptions );
         verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
@@ -176,7 +176,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         List cliOptions = new ArrayList();
         cliOptions.add( "-X" );
         cliOptions.add( "-s" );
-        cliOptions.add( settings.getPath() );
+        cliOptions.add( settings.getName() );
 
         verifier.setCliOptions( cliOptions );
 

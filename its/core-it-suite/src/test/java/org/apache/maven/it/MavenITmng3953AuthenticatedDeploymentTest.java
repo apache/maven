@@ -152,7 +152,7 @@ public class MavenITmng3953AuthenticatedDeploymentTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.getCliOptions().add( "-DdeploymentPort=" + port );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

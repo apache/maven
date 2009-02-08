@@ -52,7 +52,7 @@ public class MavenITmng3955EffectiveSettingsTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.getCliOptions().add( "--offline" );
         verifier.getCliOptions().add( "--batch-mode" );
         verifier.executeGoal( "validate" );

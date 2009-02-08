@@ -68,7 +68,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         // used to inject the remote repository
         cliOptions.add( "-s" );
-        cliOptions.add( settings.getAbsolutePath() );
+        cliOptions.add( settings.getName() );
 
         verifier.setCliOptions( cliOptions );
 
@@ -167,7 +167,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         // used to inject the remote repository
         cliOptions.add( "-s" );
-        cliOptions.add( settings.getAbsolutePath() );
+        cliOptions.add( settings.getName() );
 
         verifier.setCliOptions( cliOptions );
 
@@ -269,7 +269,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         // used to inject the remote repository
         cliOptions.add( "-s" );
-        cliOptions.add( settings.getAbsolutePath() );
+        cliOptions.add( settings.getName() );
 
         verifier.setCliOptions( cliOptions );
 

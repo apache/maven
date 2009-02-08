@@ -51,11 +51,11 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( new File( testDir, "user-settings.xml" ).getAbsolutePath() );
+        verifier.getCliOptions().add( "user-settings.xml" );
         if ( matchesVersionRange( "[3.0-alpha-1,)" ) )
         {
             verifier.getCliOptions().add( "--global-settings" );
-            verifier.getCliOptions().add( new File( testDir, "global-settings.xml" ).getAbsolutePath() );
+            verifier.getCliOptions().add( "global-settings.xml" );
         }
         else
         {

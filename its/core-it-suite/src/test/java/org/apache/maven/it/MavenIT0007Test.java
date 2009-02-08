@@ -42,7 +42,7 @@ public class MavenIT0007Test
         verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.deleteArtifacts( "org.apache.maven.its.it0007" );
         verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
