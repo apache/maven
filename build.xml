@@ -43,7 +43,7 @@ TODO:
   </target>
   
   <target name="initLocalRepo">
-    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
+    <property name="maven.repo.local" location="${user.home}/.m2/repository"/>
     <echo>Using the local repository at: ${maven.repo.local}</echo>
   </target>
 
@@ -298,7 +298,7 @@ TODO:
   <target name="with-its" depends="all,run-its"/>
   
   <target name="set-temp-maven-home" depends="read-poms">
-    <property name="maven.home" value="${java.io.tmpdir}${file.separator}apache-maven-${pom.version}"/>
+    <property name="maven.home" location="${java.io.tmpdir}/apache-maven-${pom.version}"/>
     <echo>Using temporary maven install directory: ${maven.home}</echo>
   </target>
   
