@@ -240,6 +240,7 @@ TODO:
       <arg value="-e"/>
       <arg value="-B"/>
       <arg value="process-resources"/>
+      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
     <exec failonerror="true" dir="${basedir}/${itPom.artifactId}/target/classes" executable="cmd">
       <env key="M2_HOME" value="${maven.home}"/>
@@ -248,6 +249,7 @@ TODO:
       <arg value="-e"/>
       <arg value="-B"/>
       <arg value="package"/>
+      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
     
     <echo>Running integration tests</echo>
@@ -260,6 +262,7 @@ TODO:
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
+      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
   </target>
 
@@ -270,12 +273,14 @@ TODO:
       <arg value="-e"/>
       <arg value="-B"/>
       <arg value="process-resources"/>
+      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
     <exec failonerror="true" dir="${basedir}/${itPom.artifactId}/target/classes" executable="${maven.home}/bin/mvn">
       <env key="M2_HOME" value="${maven.home}"/>
       <arg value="-e"/>
       <arg value="-B"/>
       <arg value="package"/>
+      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
     
     <echo>Running integration tests</echo>
@@ -286,6 +291,7 @@ TODO:
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
+      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
   </target>
 
