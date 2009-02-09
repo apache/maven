@@ -29,7 +29,6 @@ package org.apache.maven.plugin.logging;
  * rather than formatting first by calling <code>toString()</code>.
  *
  * @author jdcasey
- * @version $Id$
  */
 public interface Log
 {

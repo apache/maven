@@ -28,7 +28,6 @@ import java.util.Map;
  * The plugin manager would pull the context out of the plugin container context, and populate it into the Mojo.
  *
  * @author jdcasey
- * @version $Id$
  */
 public interface ContextEnabled
 {

@@ -21,7 +21,6 @@ package org.apache.maven.plugin.descriptor;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class Parameter
 {

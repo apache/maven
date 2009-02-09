@@ -25,7 +25,6 @@ package org.apache.maven.plugin;
  * Throwing this exception causes a "BUILD ERROR" message to be displayed.
  *
  * @author Brett Porter
- * @version $Id$
  */
 public class MojoExecutionException
     extends AbstractMojoExecutionException

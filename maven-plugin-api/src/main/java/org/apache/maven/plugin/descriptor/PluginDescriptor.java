@@ -42,7 +42,6 @@ import java.util.Set;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class PluginDescriptor
     extends ComponentSetDescriptor

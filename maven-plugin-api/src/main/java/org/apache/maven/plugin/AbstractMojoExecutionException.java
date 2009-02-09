@@ -23,7 +23,6 @@ package org.apache.maven.plugin;
  * Base exception.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public abstract class AbstractMojoExecutionException
     extends Exception

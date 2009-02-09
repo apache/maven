@@ -32,7 +32,6 @@ import org.apache.maven.plugin.logging.Log;
  * allow the Mojo to communicate to the outside world through standard Maven channels.
  *
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface Mojo
 {

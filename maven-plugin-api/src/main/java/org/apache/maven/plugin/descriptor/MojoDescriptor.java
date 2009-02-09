@@ -38,7 +38,6 @@ import java.util.Map;
  *
  * @todo is there a need for the delegation of MavenMojoDescriptor to this?
  * Why not just extend ComponentDescriptor here?
- * @version $Id$
  */
 public class MojoDescriptor
     extends ComponentDescriptor

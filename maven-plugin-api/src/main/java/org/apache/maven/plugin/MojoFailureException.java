@@ -25,7 +25,6 @@ package org.apache.maven.plugin;
  * Throwing this exception causes a "BUILD FAILURE" message to be displayed.
  *
  * @author Brett Porter
- * @version $Id$
  */
 public class MojoFailureException
     extends AbstractMojoExecutionException

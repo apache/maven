@@ -26,7 +26,6 @@ import java.io.StringWriter;
  * Logger with "standard" output and error output stream.
  *
  * @author jdcasey
- * @version $Id$
  */
 public class SystemStreamLog
     implements Log
