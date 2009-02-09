@@ -56,7 +56,11 @@ public class MavenITmng3951AbsolutePathsTest
          * filesystem but will make the path drive-relative on Windows so we can check how Maven handles it.
          */
         String repoDir = new File( verifier.localRepo ).getAbsolutePath();
-        verifier.setLocalRepo( repoDir.substring( repoDir.indexOf( File.separator ) ) );
+        if ( getRoot( new File( repoDir ) ).equals( getRoot( testDir ) ) )
+        {
+            // NOTE: We can only test the local repo if it resides on the same drive as the test
+            verifier.setLocalRepo( repoDir.substring( repoDir.indexOf( File.separator ) ) );
+        }
 
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
