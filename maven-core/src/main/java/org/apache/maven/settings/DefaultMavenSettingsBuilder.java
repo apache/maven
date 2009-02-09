@@ -44,7 +44,6 @@ import java.util.List;
 
 /**
  * @author jdcasey
- * @version $Id$
  */
 @Component(role = MavenSettingsBuilder.class)
 public class DefaultMavenSettingsBuilder

@@ -23,7 +23,6 @@ package org.apache.maven.settings;
  * If there was an error in the settings file.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class SettingsConfigurationException
     extends Exception

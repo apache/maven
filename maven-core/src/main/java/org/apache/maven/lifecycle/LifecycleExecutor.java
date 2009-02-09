@@ -37,7 +37,6 @@ import org.apache.maven.project.MavenProject;
  *
  * @author Jason van Zyl
  * @author jdcasey
- * @version $Id$
  */
 public interface LifecycleExecutor
 {

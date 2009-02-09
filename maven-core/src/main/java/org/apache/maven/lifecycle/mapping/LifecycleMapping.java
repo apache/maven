@@ -24,7 +24,6 @@ import java.util.Map;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public interface LifecycleMapping
 {

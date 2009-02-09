@@ -28,7 +28,6 @@ import java.util.List;
  * Manage plugin prefix to artifact ID mapping associations.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public interface PluginMappingManager
 {

@@ -28,7 +28,6 @@ import org.codehaus.plexus.logging.Logger;
  * Log at debug level the mojo configuration.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class DebugConfigurationListener
     implements ConfigurationListener

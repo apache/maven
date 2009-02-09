@@ -29,7 +29,6 @@ import java.util.List;
  * Describes a single mojo invocation.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class MojoExecution
 {

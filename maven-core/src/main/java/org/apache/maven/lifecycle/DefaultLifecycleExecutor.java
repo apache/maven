@@ -71,7 +71,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author jdcasey
- * @version $Id$
  * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without
  * much of the event handling)
  */

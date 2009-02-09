@@ -32,7 +32,6 @@ import java.util.Map;
  * Several convenience methods to handle settings
  *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id$
  */
 public final class SettingsUtils
 {
