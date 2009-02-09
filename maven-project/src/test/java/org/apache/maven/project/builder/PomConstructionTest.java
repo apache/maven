@@ -22,10 +22,7 @@ package org.apache.maven.project.builder;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
+import java.util.*;
 
 import org.apache.maven.MavenTools;
 import org.apache.maven.profiles.DefaultProfileManager;
@@ -186,7 +183,7 @@ public class PomConstructionTest
     public void testParentInterpolation()
         throws Exception
     {
-        PomTestWrapper pom = buildPomFromMavenProject( "parent-interpolation/sub" );
+        PomTestWrapper pom = buildPomFromMavenProject( "parent-interpolation/sub", null );
         pom = new PomTestWrapper(pom.getMavenProject().getParent());
         assertEquals( "1.3.0-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
     }
@@ -199,6 +196,27 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "pluginmanagement-inherited/sub" );
         assertEquals( "1.0-alpha-21", pom.getValue( "build/plugins[1]/version" ) );
     }
+
+     /* MNG-2174*/
+    public void testPluginManagementDependencies()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPomFromMavenProject( "plugin-management-dependencies/sub", "test" );
+        assertEquals( "1.0-alpha-21", pom.getValue( "build/plugins[1]/version" ) );
+        assertEquals( "1.0", pom.getValue( "build/plugins[1]/dependencies[1]/version" ) );
+    }
+
+
+    /* MNG-3877*/
+    public void testReportingInterpolation()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPomFromMavenProject( "reporting-interpolation", null );
+        pom = new PomTestWrapper(pom.getMavenProject());
+        assertEquals( System.getProperty("user.dir")
+                + "/src/test/resources-project-builder/reporting-interpolation/target/site",
+                pom.getValue( "reporting/outputDirectory" ) );
+    }    
 
     public void testPluginOrder()
         throws Exception
@@ -824,7 +842,7 @@ public class PomConstructionTest
         return new PomTestWrapper( pomFile, projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
     }
 
-    private PomTestWrapper buildPomFromMavenProject( String pomPath )
+    private PomTestWrapper buildPomFromMavenProject( String pomPath, String profileId )
         throws IOException
     {
         File pomFile = new File( testDirectory , pomPath );
@@ -835,7 +853,11 @@ public class PomConstructionTest
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
         config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
         ProfileActivationContext pCtx = new DefaultProfileActivationContext(null, true);
-        pCtx.setExplicitlyActiveProfileIds(Arrays.asList("release"));
+        if(profileId != null)
+        {
+            pCtx.setExplicitlyActiveProfileIds(Arrays.asList(profileId));
+        }
+
         config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
         return new PomTestWrapper( pomFile, projectBuilder.buildFromLocalPath( pomFile, null, null, pomArtifactResolver,
                 config, mavenProjectBuilder ) );

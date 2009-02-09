@@ -213,14 +213,29 @@ public class DefaultProjectBuilder
 
         PomClassicDomainModel domainModel = new PomClassicDomainModel( pom );
         domainModel.setProjectDirectory( pom.getParentFile() );
+        List<DomainModel> domainModels = new ArrayList<DomainModel>();
+        domainModels.add( domainModel );
 
         ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(domainModel.getModelProperties(),
                 PomTransformer.MODEL_CONTAINER_FACTORIES), activeProfileIds, properties);
-        Collection<ModelContainer> profileContainers = profileContext.getActiveProfiles();
-        //get mixin
 
-        List<DomainModel> domainModels = new ArrayList<DomainModel>();
-        domainModels.add( domainModel );
+        Collection<ModelContainer> profileContainers = profileContext.getActiveProfiles();
+
+        for(ModelContainer mc : profileContainers)
+        {
+            List<ModelProperty> transformed = new ArrayList<ModelProperty>();
+            transformed.add(new ModelProperty(ProjectUri.xUri, null));
+            for(ModelProperty mp : mc.getProperties())
+            {
+                if(mp.getUri().startsWith(ProjectUri.Profiles.Profile.xUri) && !mp.getUri().equals(ProjectUri.Profiles.Profile.id)
+                        && !mp.getUri().startsWith(ProjectUri.Profiles.Profile.Activation.xUri) )
+                {
+                    transformed.add(new ModelProperty(mp.getUri().replace(ProjectUri.Profiles.Profile.xUri, ProjectUri.xUri),
+                            mp.getResolvedValue()));
+                }
+            }
+            domainModels.add(new PomClassicDomainModel(transformed));
+        }
 
         File parentFile = null;
         int lineageCount = 0;

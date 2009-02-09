@@ -121,6 +121,15 @@ public class PomTestWrapper
 
     public PomClassicDomainModel getDomainModel()
     {
+        if(domainModel == null && mavenProject != null)
+        {
+            try {
+                return new PomClassicDomainModel(mavenProject.getModel());
+            } catch (IOException e) {
+
+            }
+        }
+
         return this.domainModel;
     }
 
