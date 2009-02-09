@@ -1,0 +1,40 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+	<groupId>org.apache.maven.its.mng3023</groupId>
+	<artifactId>parent</artifactId>
+	<version>1</version>
+  </parent>
+  
+  <artifactId>consumer</artifactId>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng3023</groupId>
+      <artifactId>dependency</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>compile-classpath</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <compileClassPath>${project.build.directory}/compile.classpath</compileClassPath>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

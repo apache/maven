@@ -1,7 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0122 :: Dependency</name>
-  <groupId>org.apache.maven.its.it0122</groupId>
-  <artifactId>maven-it-it0122-dependency</artifactId>
-  <version>1.0</version>
-</project>

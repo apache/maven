@@ -1,0 +1,10 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+	<groupId>org.apache.maven.its.mng3023</groupId>
+	<artifactId>parent</artifactId>
+	<version>1</version>
+  </parent>
+  
+  <artifactId>dependency</artifactId>
+</project>
