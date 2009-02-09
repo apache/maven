@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0028</name> 
+  <name>Maven Integration Test :: it0028</name>
   <description>
     Test that unused configuration parameters from the POM don't cause the
     mojo to fail...they will show up as warnings in the -X output instead.
@@ -37,9 +37,10 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-file</artifactId>
+        <artifactId>maven-it-plugin-log-file</artifactId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
+          <logFile>target/file.txt</logFile>
           <unused>something</unused>
         </configuration>
       </plugin>

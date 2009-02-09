@@ -57,7 +57,7 @@ public class MavenITmng3808ReportInheritenceOrderingTest
 
         verifier.assertFilePresent( "target/model.properties" );
         Properties props = verifier.loadProperties( "target/model.properties" );
-        assertEquals( "maven-it-plugin-file", props.getProperty( "project.reporting.plugins.0.artifactId" ) );
+        assertEquals( "maven-it-plugin-log-file", props.getProperty( "project.reporting.plugins.0.artifactId" ) );
         assertEquals( "maven-it-plugin-expression", props.getProperty( "project.reporting.plugins.1.artifactId" ) );
         assertEquals( "maven-it-plugin-configuration", props.getProperty( "project.reporting.plugins.2.artifactId" ) );
     }

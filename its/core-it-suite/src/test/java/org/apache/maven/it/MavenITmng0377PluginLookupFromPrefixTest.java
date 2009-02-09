@@ -53,12 +53,13 @@ public class MavenITmng0377PluginLookupFromPrefixTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         List cliOptions = new ArrayList();
-        cliOptions.add( "--settings settings.xml" );
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings.xml" );
         verifier.setCliOptions( cliOptions );
         Properties systemProperties = new Properties();
-        systemProperties.put( "maven.pathname", "target/file.txt" );
+        systemProperties.put( "log.logFile", "target/file.txt" );
         verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "itfile:file" );
+        verifier.executeGoal( "itlog-file:reset" );
         verifier.assertFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

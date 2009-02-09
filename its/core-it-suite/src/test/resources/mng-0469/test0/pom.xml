@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-469</name> 
+  <name>Maven Integration Test :: MNG-469</name>
   <description>
     Test that reporting configuration applies to build plugins, too.
   </description>
@@ -36,11 +36,12 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-file</artifactId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
+          <propertiesFile>target/config.properties</propertiesFile>
           <!-- should override default value when plugin is invoked during build lifecycle -->
-          <pathname>target/reporting.txt</pathname>
+          <defaultParam>not-the-default-value</defaultParam>
         </configuration>
       </plugin>
     </plugins>

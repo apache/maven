@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-469">MNG-469</a>.
@@ -50,10 +51,12 @@ public class MavenITmng0469ReportConfigTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
-        verifier.assertFilePresent( "target/reporting.txt" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        assertEquals( "not-the-default-value", props.getProperty( "defaultParam" ) );
     }
 
     /**
@@ -67,8 +70,9 @@ public class MavenITmng0469ReportConfigTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-file:2.1-SNAPSHOT:file" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );
         verifier.assertFilePresent( "target/build.txt" );
+        verifier.assertFileNotPresent( "target/reporting.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
