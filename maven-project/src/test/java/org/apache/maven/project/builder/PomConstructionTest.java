@@ -213,10 +213,11 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPomFromMavenProject( "reporting-interpolation", null );
         pom = new PomTestWrapper(pom.getMavenProject());
-        assertEquals( System.getProperty("user.dir")
-                + "/src/test/resources-project-builder/reporting-interpolation/target/site",
+        assertEquals( createPath(Arrays.asList(System.getProperty("user.dir"),
+                "src", "test", "resources-project-builder", "reporting-interpolation", "target", "site")),
                 pom.getValue( "reporting/outputDirectory" ) );
-    }    
+    }
+
 
     public void testPluginOrder()
         throws Exception
@@ -396,7 +397,7 @@ public class PomConstructionTest
         assertEquals( "<?xml version='1.0'?>Tom&Jerry", pom.getValue( "properties/xmlTest" ) );
     }
 
-    /* FIXME: cf. MNG-3925
+    /* FIXME: cf. MNG-3925 
     public void testOrderOfMergedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -917,5 +918,15 @@ public class PomConstructionTest
             String id = artifact.getArtifactId() + "-" + artifact.getVersion();
             artifact.setFile( artifacts.get( id  ) );
         }
+    }
+
+    private static String createPath(List<String> elements)
+    {
+        StringBuffer buffer = new StringBuffer();
+        for(String s : elements)
+        {
+            buffer.append(s).append(File.separator);
+        }
+        return buffer.toString().substring(0, buffer.toString().length() - 1);
     }
 }
