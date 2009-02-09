@@ -26,7 +26,6 @@ import java.io.IOException;
 
 /**
  * @author jdcasey
- * @version $Id$
  */
 public interface MavenProfilesBuilder
 {
