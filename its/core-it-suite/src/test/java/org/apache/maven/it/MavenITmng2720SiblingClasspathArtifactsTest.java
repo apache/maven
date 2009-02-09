@@ -19,14 +19,12 @@
 
 package org.apache.maven.it;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.it.AbstractMavenIntegrationTestCase;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2720">MNG-2720</a>.
@@ -54,18 +52,34 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2720" );
-        File pluginDir = new File( testDir, "plugin" );
-        File projectDir = new File( testDir, "project-hierarchy" );
 
-        // First, install the plugin used for the test.
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        
+        verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        // Now, build the project hierarchy that uses the plugin to verify sibling dependencies.
-        verifier = new Verifier( projectDir.getAbsolutePath() );
-        verifier.executeGoal( "package" );
-        verifier.verifyErrorFreeLog();
+        List compileClassPath = verifier.loadLines( "child2/target/compile.classpath", "UTF-8" );
+        assertTrue( find( "child1-1.jar", compileClassPath ) );
+        
+        compileClassPath = verifier.loadLines( "child3/target/compile.classpath", "UTF-8" );
+        assertFalse( find( "child1-1.jar", compileClassPath ) );
+        assertTrue( find( "child1-1-tests.jar", compileClassPath ) );
+        
+    }
+
+    private boolean find( String pathSubstr, List classPath )
+    {
+        for ( Iterator it = classPath.iterator(); it.hasNext(); )
+        {
+            String path = (String) it.next();
+            
+            if ( path.indexOf( pathSubstr ) > -1 )
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

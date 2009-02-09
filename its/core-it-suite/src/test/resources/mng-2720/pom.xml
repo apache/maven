@@ -5,7 +5,7 @@
   <artifactId>project-hierarchy</artifactId>
   <packaging>pom</packaging>
   <version>1</version>
-  <name>MNG-2720 Project Hierarchy 1</name>
+  <name>MNG-2720 Project Hierarchy</name>
   
   <modules>
     <module>child1</module>
@@ -16,16 +16,19 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.its.mng2720</groupId>
-        <artifactId>maven-mng2720-plugin</artifactId>
-        <version>1</version>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>test</id>
+            <id>compile-classpath</id>
             <phase>package</phase>
             <goals>
-              <goal>test</goal>
+              <goal>compile</goal>
             </goals>
+            <configuration>
+              <compileClassPath>${project.build.directory}/compile.classpath</compileClassPath>
+            </configuration>
           </execution>
         </executions>
       </plugin>
