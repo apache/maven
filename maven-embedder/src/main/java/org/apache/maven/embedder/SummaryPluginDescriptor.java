@@ -19,7 +19,6 @@ package org.apache.maven.embedder;/*
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class SummaryPluginDescriptor
 {

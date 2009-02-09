@@ -19,9 +19,10 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import org.codehaus.plexus.logging.Logger;/**
+import org.codehaus.plexus.logging.Logger;
+
+/**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class PlexusLoggerAdapter
     implements Logger

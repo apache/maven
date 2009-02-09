@@ -72,8 +72,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * - Artifact transfer mechanism configuration
  * - Eventing/Logging configuration
  * - Profile manager configuration
- *
- * @version $Id$
  */
 @Component(role = MavenExecutionRequestPopulator.class)
 public class DefaultMavenExecutionRequestPopulator

@@ -40,7 +40,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
  *
  * @author Jason van Zyl
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 public class MavenEmbedderLoggerManager
     extends AbstractLoggerManager

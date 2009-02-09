@@ -38,7 +38,6 @@ import java.io.File;
 
 /**
  * @author jason van zyl
- * @version $Id$
  * @noinspection UseOfSystemOutOrSystemErr,ACCESS_STATIC_VIA_INSTANCE
  */
 public class MavenCli
