@@ -24,6 +24,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -39,10 +40,10 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
     /**
      * Test that the encrypted auth infos given in the settings.xml are decrypted.
      */
-    public void testit0553()
+    public void testitBasic()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0553" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0553/test-1" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -60,5 +61,42 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         assertEquals( "testuser", props.getProperty( "test.username" ) );
         assertEquals( "testtest", props.getProperty( "test.password" ) );
     }
+
+    /**
+     * Test that the encrypted auth infos given in the settings.xml are decrypted when the master password resides
+     * in an external file.
+     */
+    /* FIXME: Outstanding bugs in plexus-sec-dispatcher prevent this from passing
+    public void testitRelocation()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0553/test-2" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+
+        // NOTE: The upper-case scheme name is essential part of the test
+        String secUrl = "FILE://" + new File( testDir, "relocated-settings-security.xml" ).toURI().getRawPath();
+        Properties filterProps = new Properties();
+        filterProps.setProperty( "@relocation@", secUrl );
+        // NOTE: The tilde ~ in the file name is essential part of the test
+        verifier.filterFile( "security-template.xml", "settings~security.xml", "UTF-8", filterProps );
+
+        List cliOptions = new ArrayList();
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings.xml" );
+        verifier.getSystemProperties().setProperty( "maven.sec.path", "settings~security.xml" );
+        verifier.setCliOptions( cliOptions );
+        // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
+        verifier.executeGoal( "validate", Collections.singletonMap( "MAVEN_OPTS", "-Duser.language=tr" ) );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/auth.properties" );
+        assertEquals( "testuser", props.getProperty( "test.username" ) );
+        assertEquals( "testtest", props.getProperty( "test.password" ) );
+    }
+    //*/
 
 }
