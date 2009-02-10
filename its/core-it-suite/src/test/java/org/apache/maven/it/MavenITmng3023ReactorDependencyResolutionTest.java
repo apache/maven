@@ -36,6 +36,12 @@ import java.util.List;
 public class MavenITmng3023ReactorDependencyResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
+
+    public MavenITmng3023ReactorDependencyResolutionTest()
+    {
+        super( "(2.1.0-M1,)" );
+    }
+
     /**
      * Test that reactor projects are included in dependency resolution.
      * 
