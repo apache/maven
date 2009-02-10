@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1741,7 +1741,7 @@ public class MavenProject
             return;
         }
         
-        Set updated = new HashSet( depArtifacts.size() );
+        Set updated = new LinkedHashSet( depArtifacts.size() );
         int updatedCount = 0;
         
         for ( Iterator it = depArtifacts.iterator(); it.hasNext(); )
