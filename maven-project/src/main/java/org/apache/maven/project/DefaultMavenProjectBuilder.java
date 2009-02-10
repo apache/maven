@@ -1014,7 +1014,7 @@ public class DefaultMavenProjectBuilder
         Model originalModel = project.getOriginalModel();
 
         // We will return a different project object using the new model (hence the need to return a project, not just modify the parameter)
-        project = new MavenProject( model );
+        project = new MavenProject( model, getLogger() );
 
         project.setOriginalModel( originalModel );
         
@@ -1217,7 +1217,7 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        MavenProject project = new MavenProject( model );
+        MavenProject project = new MavenProject( model, getLogger() );
 
         project.setActiveProfiles( activeProfiles );
         project.setOriginalModel( originalModel );

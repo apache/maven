@@ -1434,6 +1434,10 @@ public class DefaultPluginManager
         {
             project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
         }
+        else
+        {
+            project.resolveActiveArtifacts();
+        }
 
         Set resolvedArtifacts;
         try

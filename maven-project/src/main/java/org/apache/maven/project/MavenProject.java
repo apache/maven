@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -151,6 +153,8 @@ public class MavenProject
 
     private File basedir;
     
+    private Logger logger;
+    
     public MavenProject()
     {
         Model model = new Model();
@@ -165,6 +169,12 @@ public class MavenProject
     public MavenProject( Model model )
     {
         this.setModel( model );
+    }
+
+    public MavenProject( Model model, Logger logger )
+    {
+        this.setModel( model );
+        this.setLogger( logger );
     }
 
     /**
@@ -1722,6 +1732,36 @@ public class MavenProject
     {
         return snapshotArtifactRepository;
     }
+    
+    public void resolveActiveArtifacts()
+    {
+        Set depArtifacts = getDependencyArtifacts();
+        if ( depArtifacts == null )
+        {
+            return;
+        }
+        
+        Set updated = new HashSet( depArtifacts.size() );
+        int updatedCount = 0;
+        
+        for ( Iterator it = depArtifacts.iterator(); it.hasNext(); )
+        {
+            Artifact depArtifact = (Artifact) it.next();
+            Artifact replaced = replaceWithActiveArtifact( depArtifact );
+            
+            if ( depArtifact != replaced )
+            {
+                updatedCount++;
+            }
+            
+            updated.add( replaced );
+        }
+        
+        if ( updatedCount > 0 )
+        {
+            setDependencyArtifacts( updated );
+        }
+    }
 
     public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )
     {
@@ -1743,48 +1783,76 @@ public class MavenProject
                     }
                     else
                     {
-/* TODO...
-                        logger.warn( "Artifact found in the reactor has not been built when it's use was " +
-                            "attempted - resolving from the repository instead" );
-*/
+                        logMissingSiblingProjectArtifact( pluginArtifact );
                     }
                 }
 
                 Iterator itr = ref.getAttachedArtifacts().iterator();
-                while(itr.hasNext()) {
+                while ( itr.hasNext() )
+                {
                     Artifact attached = (Artifact) itr.next();
-                    if( attached.getDependencyConflictId().equals(pluginArtifact.getDependencyConflictId()) ) {
-                        /* TODO: if I use the original, I get an exception below:
-                            java.lang.UnsupportedOperationException: Cannot change the download information for an attached artifact. It is derived from the main artifact.
-                            at org.apache.maven.project.artifact.AttachedArtifact.setDownloadUrl(AttachedArtifact.java:89)
-                            at org.apache.maven.project.artifact.MavenMetadataSource.retrieve(MavenMetadataSource.java:205)
-                            at org.apache.maven.artifact.resolver.DefaultArtifactCollector.recurse(DefaultArtifactCollector.java:275)
-                            at org.apache.maven.artifact.resolver.DefaultArtifactCollector.collect(DefaultArtifactCollector.java:67)
-                            at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:223)
-                            at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:211)
-                            at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:182)
-                            at org.apache.maven.plugin.DefaultPluginManager.resolveTransitiveDependencies(DefaultPluginManager.java:1117)
-                            at org.apache.maven.plugin.DefaultPluginManager.executeMojo(DefaultPluginManager.java:366)
-                            at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoals(DefaultLifecycleExecutor.java:534)
-                            at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalWithLifecycle(DefaultLifecycleExecutor.java:475)
-                            at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoal(DefaultLifecycleExecutor.java:454)
-                            at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalAndHandleFailures(DefaultLifecycleExecutor.java:306)
-                            at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeTaskSegments(DefaultLifecycleExecutor.java:273)
-                            at org.apache.maven.lifecycle.DefaultLifecycleExecutor.execute(DefaultLifecycleExecutor.java:140)
-                            at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:322)
-                            at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:115)
-                            at org.apache.maven.cli.MavenCli.main(MavenCli.java:256)
-                        */
-                        Artifact resultArtifact=ArtifactUtils.copyArtifact(attached);
-                        resultArtifact.setScope(pluginArtifact.getScope());
-                        return resultArtifact;
+                    if ( attached.getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
+                    {
+                        if ( attached.getFile() != null && attached.getFile().exists() )
+                        {
+                            /* TODO: if I use the original, I get an exception below:
+                                java.lang.UnsupportedOperationException: Cannot change the download information for an attached artifact. It is derived from the main artifact.
+                                at org.apache.maven.project.artifact.AttachedArtifact.setDownloadUrl(AttachedArtifact.java:89)
+                                at org.apache.maven.project.artifact.MavenMetadataSource.retrieve(MavenMetadataSource.java:205)
+                                at org.apache.maven.artifact.resolver.DefaultArtifactCollector.recurse(DefaultArtifactCollector.java:275)
+                                at org.apache.maven.artifact.resolver.DefaultArtifactCollector.collect(DefaultArtifactCollector.java:67)
+                                at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:223)
+                                at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:211)
+                                at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:182)
+                                at org.apache.maven.plugin.DefaultPluginManager.resolveTransitiveDependencies(DefaultPluginManager.java:1117)
+                                at org.apache.maven.plugin.DefaultPluginManager.executeMojo(DefaultPluginManager.java:366)
+                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoals(DefaultLifecycleExecutor.java:534)
+                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalWithLifecycle(DefaultLifecycleExecutor.java:475)
+                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoal(DefaultLifecycleExecutor.java:454)
+                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalAndHandleFailures(DefaultLifecycleExecutor.java:306)
+                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeTaskSegments(DefaultLifecycleExecutor.java:273)
+                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.execute(DefaultLifecycleExecutor.java:140)
+                                at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:322)
+                                at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:115)
+                                at org.apache.maven.cli.MavenCli.main(MavenCli.java:256)
+                            */
+                            
+                            Artifact resultArtifact = ArtifactUtils.copyArtifact( attached );
+                            resultArtifact.setScope( pluginArtifact.getScope() );
+                            
+                            return resultArtifact;
+                        }
                     }
+                    else
+                    {
+                        logMissingSiblingProjectArtifact( pluginArtifact );
+                    }
+                    
+                    break;
                 }
             }
         }
         return pluginArtifact;
     }
     
+    private void logMissingSiblingProjectArtifact( Artifact artifact )
+    {
+        if ( logger == null )
+        {
+            return;
+        }
+        
+        StringBuffer message = new StringBuffer();
+        message.append( "A dependency of the current project (or of one the plugins used in its build)was found in the reactor, " );
+        message.append( "\nbut had not been built at the time it was requested. It will be resolved from the repository instead." );
+        message.append( "\n\nCurrent Project: " ).append( getName() );
+        message.append( "\nRequested Dependency: " ).append( artifact.getId() );
+        message.append( "\n\nNOTE: You may need to run this build to the 'compile' lifecycle phase, or farther, in order to build the dependency artifact." );
+        message.append( "\n" );
+        
+        logger.warn( message.toString() );
+    }
+
     private void addArtifactPath(Artifact a, List list) throws DependencyResolutionRequiredException
     {
         File file = a.getFile();
@@ -2019,6 +2087,11 @@ public class MavenProject
     public void preserveBasedir()
     {
         this.preservedBasedir = getBasedir();
+    }
+
+    public void setLogger( Logger logger )
+    {
+        this.logger = logger;
     }
 
 }
