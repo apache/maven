@@ -189,6 +189,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3461MirrorMatchingTest.class );
         suite.addTestSuite( MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
+        suite.addTestSuite( MavenITmng3422ActiveComponentCollectionTest.class );
         suite.addTestSuite( MavenITmng3415JunkRepositoryMetadataTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRangesTest.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
