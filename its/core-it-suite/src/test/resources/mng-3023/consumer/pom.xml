@@ -1,9 +1,9 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-	<groupId>org.apache.maven.its.mng3023</groupId>
-	<artifactId>parent</artifactId>
-	<version>1</version>
+  <groupId>org.apache.maven.its.mng3023</groupId>
+  <artifactId>parent</artifactId>
+  <version>1</version>
   </parent>
   
   <artifactId>consumer</artifactId>
@@ -31,6 +31,7 @@
             </goals>
             <configuration>
               <compileClassPath>${project.build.directory}/compile.classpath</compileClassPath>
+              <significantPathLevels>1</significantPathLevels>
             </configuration>
           </execution>
         </executions>

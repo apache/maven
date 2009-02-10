@@ -56,8 +56,9 @@ public class MavenITmng3023ReactorDependencyResolutionTest
 
         // First pass. Make sure the dependency cannot be resolved.
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setLogFileName( "log-a.txt" );
         
-        verifier.deleteArtifact( "org.apache.maven.its.mng3023", "dependency", "1", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
         
         try
         {
@@ -77,7 +78,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
     /**
      * Test that reactor projects are included in dependency resolution.
      * 
-     * I this pass, the dependency artifact should have the file $(basedir)/dependency/target/classes
+     * I this pass, the dependency artifact should have the file $(basedir)/dependency/dependency-classes
      * (a directory) associated with it, since the 'compile' phase has run. This location should be
      * present in the compile classpath output from the maven-it-plugin-dependency-resolution:compile
      * mojo execution.
@@ -88,16 +89,17 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setLogFileName( "log-b.txt" );
         
-        verifier.deleteArtifact( "org.apache.maven.its.mng3023", "dependency", "1", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
         
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         List compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
-        assertTrue( find( "dependency/target/classes", compileClassPath ) );
-        assertFalse( find( "dependency-1.jar", compileClassPath ) );
+        assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
+        assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
     }
 
     /**
@@ -119,37 +121,25 @@ public class MavenITmng3023ReactorDependencyResolutionTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         
-        verifier.deleteArtifact( "org.apache.maven.its.mng3023", "dependency", "1", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
         
+        verifier.setLogFileName( "log-c-1.txt" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         List compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
-        assertTrue( find( "dependency-1.jar", compileClassPath ) );
-        assertFalse( find( "dependency/target/classes", compileClassPath ) );
+        assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
+        assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
         
+        verifier.setLogFileName( "log-c-2.txt" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
         compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
-        assertTrue( find( "dependency-1.jar", compileClassPath ) );
-        assertFalse( find( "dependency/target/classes", compileClassPath ) );
+        assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
+        assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
     }
 
-    private boolean find( String pathSubstr, List classPath )
-    {
-        for ( Iterator it = classPath.iterator(); it.hasNext(); )
-        {
-            String path = (String) it.next();
-
-            if ( path.indexOf( pathSubstr ) > -1 )
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
