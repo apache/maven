@@ -45,6 +45,7 @@ under the License.
   </repositories>
 
   <dependencies>
+    <!-- model dependencies first, in the order given -->
     <dependency>
       <groupId>org.apache.maven.its.mng1412</groupId>
       <artifactId>a</artifactId>
@@ -60,12 +61,30 @@ under the License.
       <artifactId>b</artifactId>
       <version>0.1</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.its.mng1412</groupId>
-      <artifactId>d</artifactId>
-      <version>0.1</version>
-    </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>mng-1412</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <!-- profile dependencies last, in the order given -->
+      <dependencies>
+        <dependency>
+          <!-- deliberately respecifying this dep to check merging behavior -->
+          <groupId>org.apache.maven.its.mng1412</groupId>
+          <artifactId>a</artifactId>
+          <version>0.1</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.maven.its.mng1412</groupId>
+          <artifactId>d</artifactId>
+          <version>0.1</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
