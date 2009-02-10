@@ -19,11 +19,6 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.codehaus.classworlds.ClassWorld;
-import org.codehaus.plexus.util.StringOutputStream;
-
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -46,7 +41,7 @@ public class MavenCliTest
         Properties execProperties = new Properties();
         Properties userProperties = new Properties();
 
-        MavenCli.populateProperties( ( new MavenCli.CLIManager() ).parse( new String[] {
+        MavenCli.populateProperties( ( new CLIManager() ).parse( new String[] {
             "-Dtest.property.2=2.1",
             "-Dtest.property.3=3.0" } ), execProperties, userProperties );
 
