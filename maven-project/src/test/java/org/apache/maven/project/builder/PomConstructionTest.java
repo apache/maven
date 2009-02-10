@@ -28,7 +28,6 @@ import org.apache.maven.MavenTools;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
-import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -40,8 +39,6 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomConstructionTest
@@ -513,7 +510,7 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[5]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[5]/version" ) );
     }
-   */
+   //*/
 
     public void testInterpolationOfNestedBuildDirectories()
         throws Exception
@@ -821,6 +818,18 @@ public class PomConstructionTest
         assertTrue( pom.getValue( "build/filters[7]" ).toString().endsWith( "parent-d.properties" ) );
     }
 
+    /** MNG-4027
+    public void testProjectInjectedDependencies()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "profile-injected-dependencies" );
+        assertEquals( 4, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+        assertEquals( "a", pom.getValue( "dependencies[1]/artifactId" ) );
+        assertEquals( "c", pom.getValue( "dependencies[2]/artifactId" ) );
+        assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
+        assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
+    }
+    //*/
 
     private void assertPathWithNormalizedFileSeparators( Object value )
     {
