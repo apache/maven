@@ -35,6 +35,7 @@ under the License.
   <name>Maven Integration Tests :: Plugins</name>
 
   <modules>
+    <module>maven-it-plugin-active-collection</module>
     <module>maven-it-plugin-artifact</module>
     <module>maven-it-plugin-class-loader</module>
     <module>maven-it-plugin-configuration</module>
