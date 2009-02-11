@@ -253,7 +253,7 @@ public class MavenEmbedder
     public PlexusConfiguration getPluginConfiguration(String pluginId, String mojoId, Model model) throws Exception
     {
         try {
-            return mixer.mixPluginAndReturnConfig(pluginRepository.findPluginById(pluginId, mojoId), model);
+            return mixer.mixPluginAndReturnConfig(pluginRepository.findPluginById(pluginId, mojoId), null, model, null);
         } catch (PlexusConfigurationException e) {
             throw new IOException(e.getMessage());
         }

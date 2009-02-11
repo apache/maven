@@ -58,6 +58,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -542,9 +543,9 @@ public class DefaultProjectBuilder
     public Model mixPlugin(Plugin plugin, Model model) throws IOException
     {
         //TODO - interpolation
-        List<DomainModel> domainModels = new ArrayList<DomainModel>();
-        domainModels.add( new PluginMixin(plugin) );
+        List<DomainModel> domainModels = new ArrayList<DomainModel>();       
         domainModels.add( new PomClassicDomainModel(model) );
+        domainModels.add( new PluginMixin(plugin) );
 
         PomClassicTransformer transformer = new PomClassicTransformer( new PomClassicDomainModelFactory() );
 
@@ -560,16 +561,19 @@ public class DefaultProjectBuilder
         
     }
 
-    public PlexusConfiguration mixPluginAndReturnConfig(Plugin plugin, Model model) throws IOException
+    public PlexusConfiguration mixPluginAndReturnConfig(Plugin plugin, Xpp3Dom dom, Model model, List<InterpolatorProperty> props)
+            throws IOException,  XmlPullParserException
     {
-        List<ModelProperty> mps = mixPluginAndReturnConfigAsProperties(plugin, model);
-        return !mps.isEmpty() ?
-            new XmlPlexusConfiguration(ModelMarshaller.unmarshalModelPropertiesToXml(mps, ProjectUri.Build.Plugins.Plugin.xUri)) : null;
-    }
+        List<ModelProperty> mps = mixPluginAndReturnConfigAsProperties(plugin, dom, model, null);
 
+        return !mps.isEmpty() ?
+            new XmlPlexusConfiguration(Xpp3DomBuilder.build(
+                    new StringReader(ModelMarshaller.unmarshalModelPropertiesToXml(mps, ProjectUri.Build.Plugins.Plugin.xUri))) ) : null;
+    }
+   
    public Object mixPluginAndReturnConfigAsDom(Plugin plugin, Model model) throws IOException, XmlPullParserException
    {
-       List<ModelProperty> mps = mixPluginAndReturnConfigAsProperties(plugin, model);
+       List<ModelProperty> mps = mixPluginAndReturnConfigAsProperties(plugin, null, model, null);
        return  !mps.isEmpty() ? Xpp3DomBuilder.build(
                new StringReader(ModelMarshaller.unmarshalModelPropertiesToXml(mps, ProjectUri.Build.Plugins.Plugin.xUri) ) ) : null;
    }
@@ -585,11 +589,22 @@ public class DefaultProjectBuilder
        return JXPathContext.newContext( dom ).getValue(xpathExpression);
    }
 
-   private List<ModelProperty> mixPluginAndReturnConfigAsProperties(Plugin plugin, Model model) throws IOException
+   private List<ModelProperty> mixPluginAndReturnConfigAsProperties(Plugin plugin, Xpp3Dom dom, Model model,
+                                                                    List<InterpolatorProperty> props) throws IOException
    {
-        List<DomainModel> domainModels = new ArrayList<DomainModel>();
-        domainModels.add( new PluginMixin(plugin) );
-        domainModels.add( new PomClassicDomainModel(model) );
+       List<DomainModel> domainModels = new ArrayList<DomainModel>();
+       domainModels.add(new PomClassicDomainModel(model));
+       domainModels.add(new PluginMixin(plugin));
+
+       if (dom != null)
+       {
+           Plugin p = new Plugin();
+           p.setGroupId(plugin.getGroupId());
+           p.setArtifactId(plugin.getArtifactId());
+           p.setVersion(p.getVersion());
+           p.setConfiguration(dom);
+           domainModels.add(new PluginMixin(p));
+       }
 
         PomClassicTransformer transformer = new PomClassicTransformer( new PomClassicDomainModelFactory() );
 
@@ -599,7 +614,7 @@ public class DefaultProjectBuilder
                                                                                                 transformer,
                                                                                                 transformer,
                                                                                                 Collections.EMPTY_LIST,
-                                                                                                null,
+                                                                                                props,
                                                                                                 listeners ) );
         ModelDataSource source =
                 new DefaultModelDataSource(transformedDomainModel.getModelProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES);
@@ -625,8 +640,9 @@ public class DefaultProjectBuilder
     private static boolean matchesIdOfPlugin(ModelContainer mc, Plugin plugin)
     {   
         List<ModelProperty> props = mc.getProperties();
-        return getValueByUri(ProjectUri.Build.Plugins.Plugin.groupId, props).equals(plugin.getGroupId())
-                && getValueByUri(ProjectUri.Build.Plugins.Plugin.artifactId, props).equals(plugin.getArtifactId())
+
+        return //getValueByUri(ProjectUri.Build.Plugins.Plugin.groupId, props).equals(plugin.getGroupId())
+                getValueByUri(ProjectUri.Build.Plugins.Plugin.artifactId, props).equals(plugin.getArtifactId())
                 && getValueByUri(ProjectUri.Build.Plugins.Plugin.version, props).equals(plugin.getVersion());
     }
 

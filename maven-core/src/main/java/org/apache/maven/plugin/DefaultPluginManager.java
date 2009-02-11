@@ -73,6 +73,8 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.builder.Interpolator;
 import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.ProjectBuilder;
+import org.apache.maven.project.builder.Mixer;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
@@ -152,6 +154,12 @@ public class DefaultPluginManager
 
     @Requirement
     private PluginManagerSupport pluginManagerSupport;
+
+    @Requirement
+    private PluginRepository pluginRepository;
+
+    @Requirement
+    private ProjectBuilder projectBuilder;
 
     public DefaultPluginManager()
     {
@@ -549,54 +557,13 @@ public class DefaultPluginManager
             downloadDependencies( project, session, artifactResolver );
         }
 
-        String goalName = mojoDescriptor.getFullGoalName();
-
-        Mojo mojo = null;
-
-        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-
-        Xpp3Dom dom = mojoExecution.getConfiguration();
-        
-        if ( dom != null )
-        {
-            try
-            {  
-                List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-                
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getExecutionProperties(),
-                        PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
-                
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(),
-                        PomInterpolatorTag.USER_PROPERTIES.name()));
-                
-                String interpolatedDom  = Interpolator.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
-                
-                dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new PluginManagerException(
-                                                  mojoDescriptor,
-                                                  project,
-                                                  "Failed to calculate concrete state for configuration of: "
-                                                                  + mojoDescriptor.getHumanReadableKey(),
-                                                  e );
-            }
-            catch ( IOException e )
-            {
-                throw new PluginManagerException(
-                                                  mojoDescriptor,
-                                                  project,
-                                                  "Failed to calculate concrete state for configuration of: "
-                                                                  + mojoDescriptor.getHumanReadableKey(),
-                                                  e );
-            }
-        }
+        //
 
         // Event monitoring.
         String event = MavenEvents.MOJO_EXECUTION;
         EventDispatcher dispatcher = session.getEventDispatcher();
 
+        String goalName = mojoDescriptor.getFullGoalName();
         String goalExecId = goalName;
         if ( mojoExecution.getExecutionId() != null )
         {
@@ -604,14 +571,17 @@ public class DefaultPluginManager
         }
 
         // by this time, the pluginDescriptor has had the correct realm setup from getConfiguredMojo(..)
-        ClassRealm pluginRealm = null;
+        ClassRealm pluginRealm;
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
         List realmActions = new ArrayList();
+        
+        Mojo mojo = null;
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
         try
         {
-            mojo = getConfiguredMojo( session, dom, project, false, mojoExecution, realmActions );
+            mojo = getConfiguredMojo( session, project, false, mojoExecution, realmActions );
 
             dispatcher.dispatchStart( event, goalExecId );
 
@@ -742,7 +712,7 @@ public class DefaultPluginManager
                                   MavenSession session )
         throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException,
         ArtifactResolutionException
-    {
+    {   /*
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         PluginDescriptor descriptor = mojoDescriptor.getPluginDescriptor();
         Xpp3Dom dom = project.getReportConfiguration( descriptor.getGroupId(),
@@ -752,8 +722,8 @@ public class DefaultPluginManager
         {
             dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
         }
-
-        return (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution, new ArrayList() );
+        */
+        return (MavenReport) getConfiguredMojo( session, project, true, mojoExecution, new ArrayList() );
     }
 
     public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin,
@@ -785,7 +755,6 @@ public class DefaultPluginManager
     }
 
     private Mojo getConfiguredMojo( MavenSession session,
-                                    Xpp3Dom dom,
                                     MavenProject project,
                                     boolean report,
                                     MojoExecution mojoExecution,
@@ -870,28 +839,6 @@ public class DefaultPluginManager
         }
 
         mojo.setLog( new DefaultLog( getLogger() ) );
- 
-        XmlPlexusConfiguration pomConfiguration;
-
-        if ( dom == null )
-        {
-            pomConfiguration = new XmlPlexusConfiguration( "configuration" );
-        }
-        else
-        {
-            pomConfiguration = new XmlPlexusConfiguration( dom );
-        }
-
-        // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to
-        // override in the POM.
-        validatePomConfiguration( mojoDescriptor, pomConfiguration );
-
-        PlexusConfiguration mergedConfiguration = mergeMojoConfiguration( pomConfiguration,
-                                                                          mojoDescriptor );
-
-        // TODO: plexus changes to make this more like the component descriptor so this can be used instead
-        //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
-        //                                                                          mojoDescriptor.getConfiguration() );
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(
                                                                                           session,
@@ -900,16 +847,38 @@ public class DefaultPluginManager
                                                                                           getLogger(),
                                                                                           session.getExecutionProperties() );
 
-        PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration(
-                                                                                   mergedConfiguration,
-                                                                                   mojoDescriptor );
+           List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
 
-        checkDeprecatedParameters( mojoDescriptor, pomConfiguration );
+           interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(session.getProjectBuilderConfiguration().getExecutionProperties(),
+                   PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
 
-        checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
+           interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(session.getProjectBuilderConfiguration().getUserProperties(),
+                   PomInterpolatorTag.USER_PROPERTIES.name()));
 
-        populatePluginFields( mojo, mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
+            Plugin plugin = null;
+            try {
+                plugin = pluginRepository.findPluginById(pluginDescriptor.getId(), mojoDescriptor.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
+
+            PlexusConfiguration mojoConfiguration = null;
+            try {
+                mojoConfiguration = ((Mixer) projectBuilder).mixPluginAndReturnConfig(plugin, mojoExecution.getConfiguration(), project.getModel(),
+                        interpolatorProperties);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if(mojoConfiguration == null)
+            {
+                mojoConfiguration = new XmlPlexusConfiguration( "configuration" );
+            }
+
+        checkRequiredParameters( mojoDescriptor, mojoConfiguration, expressionEvaluator );
+
+        populatePluginFields( mojo, mojoDescriptor, mojoConfiguration, expressionEvaluator );
+        
         return mojo;
 
         } finally {
@@ -917,63 +886,6 @@ public class DefaultPluginManager
         }
     }
 
-    private void checkDeprecatedParameters( MojoDescriptor mojoDescriptor,
-                                            PlexusConfiguration extractedMojoConfiguration )
-    {
-        if ( ( extractedMojoConfiguration == null ) || ( extractedMojoConfiguration.getChildCount() < 1 ) )
-        {
-            return;
-        }
-
-        List parameters = mojoDescriptor.getParameters();
-        if ( ( parameters != null ) && !parameters.isEmpty() )
-        {
-            for ( Iterator it = parameters.iterator(); it.hasNext(); )
-            {
-                Parameter param = (Parameter) it.next();
-
-                if ( param.getDeprecated() != null )
-                {
-                    boolean warnOfDeprecation = false;
-                    PlexusConfiguration child = extractedMojoConfiguration.getChild( param.getName() );
-                    try
-                    {
-                        if ( ( child != null ) && ( child.getValue() != null ) )
-                        {
-                            warnOfDeprecation = true;
-                        }
-                        else if ( param.getAlias() != null)
-                        {
-                            child = extractedMojoConfiguration.getChild( param.getAlias() );
-                            if ( ( child != null ) && ( child.getValue() != null ) )
-                            {
-                                warnOfDeprecation = true;
-                            }
-                        }
-                    }
-                    catch ( PlexusConfigurationException e )
-                    {
-                        // forget it, this is just for deprecation checking, after all...
-                    }
-
-                    if ( warnOfDeprecation )
-                    {
-                        StringBuffer buffer = new StringBuffer();
-                        buffer.append( "In mojo: " ).append( mojoDescriptor.getGoal() ).append( ", parameter: " ).append( param.getName() );
-
-                        if ( param.getAlias() != null )
-                        {
-                            buffer.append( " (alias: " ).append( param.getAlias() ).append( ")" );
-                        }
-
-                        buffer.append( " is deprecated:" ).append( "\n\n" ).append( param.getDeprecated() ).append( "\n" );
-
-                        getLogger().warn( buffer.toString() );
-                    }
-                }
-            }
-        }
-    }
 
     private void setDescriptorClassAndArtifactInfo( PluginDescriptor pluginDescriptor,
                                                     MavenProject project,
@@ -1016,40 +928,6 @@ public class DefaultPluginManager
         pluginDescriptor.setArtifacts( realmManager.getPluginArtifacts( plugin ) );
     }
 
-    private PlexusConfiguration extractMojoConfiguration( PlexusConfiguration mergedConfiguration,
-                                                          MojoDescriptor mojoDescriptor )
-    {
-        Map parameterMap = mojoDescriptor.getParameterMap();
-
-        PlexusConfiguration[] mergedChildren = mergedConfiguration.getChildren();
-
-        XmlPlexusConfiguration extractedConfiguration = new XmlPlexusConfiguration( "configuration" );
-
-        for ( int i = 0; i < mergedChildren.length; i++ )
-        {
-            PlexusConfiguration child = mergedChildren[i];
-
-            if ( parameterMap.containsKey( child.getName() ) )
-            {
-                extractedConfiguration.addChild( copyConfiguration( child ) );
-            }
-            else
-            {
-                // TODO: I defy anyone to find these messages in the '-X' output! Do we need a new log level?
-                // ideally, this would be elevated above the true debug output, but below the default INFO level...
-                // [BP] (2004-07-18): need to understand the context more but would prefer this could be either WARN or
-                // removed - shouldn't need DEBUG to diagnose a problem most of the time.
-                getLogger().debug(
-                                   "*** WARNING: Configuration \'" + child.getName()
-                                                   + "\' is not used in goal \'"
-                                                   + mojoDescriptor.getFullGoalName()
-                                                   + "; this may indicate a typo... ***" );
-            }
-        }
-
-        return extractedConfiguration;
-    }
-
     private void checkRequiredParameters( MojoDescriptor goal,
                                           PlexusConfiguration configuration,
                                           ExpressionEvaluator expressionEvaluator )
@@ -1074,7 +952,6 @@ public class DefaultPluginManager
             {
                 // the key for the configuration map we're building.
                 String key = parameter.getName();
-
                 Object fieldValue = null;
                 String expression = null;
                 PlexusConfiguration value = configuration.getChild( key, false );
@@ -1128,192 +1005,6 @@ public class DefaultPluginManager
         }
     }
 
-    private void validatePomConfiguration( MojoDescriptor goal,
-                                           PlexusConfiguration pomConfiguration )
-        throws PluginConfigurationException
-    {
-        List parameters = goal.getParameters();
-
-        if ( parameters == null )
-        {
-            return;
-        }
-
-        for ( int i = 0; i < parameters.size(); i++ )
-        {
-            Parameter parameter = (Parameter) parameters.get( i );
-
-            // the key for the configuration map we're building.
-            String key = parameter.getName();
-
-            PlexusConfiguration value = pomConfiguration.getChild( key, false );
-
-            if ( ( value == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
-            {
-                key = parameter.getAlias();
-                value = pomConfiguration.getChild( key, false );
-            }
-
-            if ( value != null )
-            {
-                // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM
-                if ( !parameter.isEditable() )
-                {
-                    StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " );
-                    errorMessage.append( key );
-                    errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
-
-                    throw new PluginConfigurationException( goal.getPluginDescriptor(),
-                                                            errorMessage.toString() );
-                }
-
-                String deprecated = parameter.getDeprecated();
-                if ( StringUtils.isNotEmpty( deprecated ) )
-                {
-                    getLogger().warn( "DEPRECATED [" + parameter.getName() + "]: " + deprecated );
-                }
-            }
-        }
-    }
-
-    private PlexusConfiguration mergeMojoConfiguration( XmlPlexusConfiguration fromPom,
-                                                        MojoDescriptor mojoDescriptor )
-    {
-        XmlPlexusConfiguration result = new XmlPlexusConfiguration( fromPom.getName() );
-        result.setValue( fromPom.getValue( null ) );
-
-        if ( mojoDescriptor.getParameters() != null )
-        {
-            PlexusConfiguration fromMojo = mojoDescriptor.getMojoConfiguration();
-
-            for ( Iterator it = mojoDescriptor.getParameters().iterator(); it.hasNext(); )
-            {
-                Parameter parameter = (Parameter) it.next();
-
-                String paramName = parameter.getName();
-                String alias = parameter.getAlias();
-                String implementation = parameter.getImplementation();
-
-                PlexusConfiguration pomConfig = fromPom.getChild( paramName );
-                PlexusConfiguration aliased = null;
-
-                if ( alias != null )
-                {
-                    aliased = fromPom.getChild( alias );
-                }
-
-                PlexusConfiguration mojoConfig = fromMojo.getChild( paramName, false );
-
-                // first we'll merge configurations from the aliased and real params.
-                // TODO: Is this the right thing to do?
-                if ( aliased != null )
-                {
-                    if ( pomConfig == null )
-                    {
-                        pomConfig = new XmlPlexusConfiguration( paramName );
-                    }
-
-                    pomConfig = buildTopDownMergedConfiguration( pomConfig, aliased );
-                }
-
-                PlexusConfiguration toAdd = null;
-
-                if ( pomConfig != null )
-                {
-                    pomConfig = buildTopDownMergedConfiguration( pomConfig, mojoConfig );
-
-                    if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) )
-                         || ( pomConfig.getChildCount() > 0 ) )
-                    {
-                        toAdd = pomConfig;
-                    }
-                }
-
-                if ( ( toAdd == null ) && ( mojoConfig != null ) )
-                {
-                    toAdd = copyConfiguration( mojoConfig );
-                }
-
-                if ( toAdd != null )
-                {
-                    if ( ( implementation != null )
-                         && ( toAdd.getAttribute( "implementation", null ) == null ) )
-                    {
-
-                        XmlPlexusConfiguration implementationConf = new XmlPlexusConfiguration(
-                                                                                                paramName );
-
-                        implementationConf.setAttribute( "implementation",
-                                                         parameter.getImplementation() );
-
-                        toAdd = buildTopDownMergedConfiguration( toAdd, implementationConf );
-                    }
-
-                    result.addChild( toAdd );
-                }
-            }
-        }
-        return result;
-    }
-
-    private XmlPlexusConfiguration buildTopDownMergedConfiguration( PlexusConfiguration dominant,
-                                                                    PlexusConfiguration recessive )
-    {
-        XmlPlexusConfiguration result = new XmlPlexusConfiguration( dominant.getName() );
-
-        String value = dominant.getValue( null );
-
-        if ( StringUtils.isEmpty( value ) && ( recessive != null ) )
-        {
-            value = recessive.getValue( null );
-        }
-
-        if ( StringUtils.isNotEmpty( value ) )
-        {
-            result.setValue( value );
-        }
-
-        String[] attributeNames = dominant.getAttributeNames();
-
-        for ( int i = 0; i < attributeNames.length; i++ )
-        {
-            String attributeValue = dominant.getAttribute( attributeNames[i], null );
-
-            result.setAttribute( attributeNames[i], attributeValue );
-        }
-
-        if ( recessive != null )
-        {
-            attributeNames = recessive.getAttributeNames();
-
-            for ( int i = 0; i < attributeNames.length; i++ )
-            {
-                String attributeValue = recessive.getAttribute( attributeNames[i], null );
-                // TODO: recessive seems to be dominant here?
-                result.setAttribute( attributeNames[i], attributeValue );
-            }
-        }
-
-        PlexusConfiguration[] children = dominant.getChildren();
-
-        for ( int i = 0; i < children.length; i++ )
-        {
-            PlexusConfiguration childDom = children[i];
-            PlexusConfiguration childRec = recessive == null ? null
-                            : recessive.getChild( childDom.getName(), false );
-
-            if ( childRec != null )
-            {
-                result.addChild( buildTopDownMergedConfiguration( childDom, childRec ) );
-            }
-            else
-            { // FIXME: copy, or use reference?
-                result.addChild( copyConfiguration( childDom ) );
-            }
-        }
-
-        return result;
-    }
 
     public static PlexusConfiguration copyConfiguration( PlexusConfiguration src )
     {
