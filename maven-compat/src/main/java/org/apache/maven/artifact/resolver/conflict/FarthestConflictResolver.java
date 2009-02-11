@@ -20,6 +20,7 @@ package org.apache.maven.artifact.resolver.conflict;
  */
 
 import org.apache.maven.artifact.resolver.ResolutionNode;
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Resolves conflicting artifacts by always selecting the <em>farthest</em> declaration. Farthest is defined as the
@@ -28,8 +29,8 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
  * @since 3.0
- * @plexus.component role-hint="farthest"
  */
+@Component(role=ConflictResolver.class, hint="farthest")
 public class FarthestConflictResolver
     implements ConflictResolver
 {

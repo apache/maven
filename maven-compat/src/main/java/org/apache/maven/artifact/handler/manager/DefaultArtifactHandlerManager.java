@@ -21,6 +21,8 @@ package org.apache.maven.artifact.handler.manager;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,12 +30,12 @@ import java.util.Set;
 /**
  * @author Jason van Zyl
  * @version $Id$
- * @plexus.component
  */
+@Component(role=ArtifactHandlerManager.class) 
 public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
-    /** @plexus.requirement role="org.apache.maven.artifact.handler.ArtifactHandler" */
+    @Requirement(role=ArtifactHandler.class)    
     private Map<String,ArtifactHandler> artifactHandlers;
 
     public ArtifactHandler getArtifactHandler( String type )

@@ -31,6 +31,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -52,16 +54,15 @@ import java.util.Set;
  * @todo This needs to collect all errors and not die on the first error. If there are problems retrieving the metadata
  *       then we need all the information so that we can tell users about what we attempted to do.
  * @todo there 8 places where we can can range exceptions which is bad, again the result of not using a graph.
- * @plexus.component
  */
+@Component(role=ArtifactCollector.class)
 public class DefaultArtifactCollector
     implements ArtifactCollector, LogEnabled
 {
     /**
      * The conflict resolver to use when none is specified.
-     *
-     * @plexus.requirement role-hint="nearest"
      */
+	@Requirement(hint="nearest")
     private ConflictResolver defaultConflictResolver;
 
     private Logger logger;

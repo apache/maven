@@ -25,6 +25,8 @@ import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
 import org.apache.maven.artifact.resolver.metadata.MetadataResolutionException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,19 +35,17 @@ import java.util.TreeSet;
 /**
  * Default conflict resolver.Implements closer newer first policy by default, but could be configured via plexus
  * 
- * @plexus.component
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  * @version $Id$
  */
-
+@Component(role=GraphConflictResolver.class)
 public class DefaultGraphConflictResolver
     implements GraphConflictResolver
 {
     /**
      * artifact, closer to the entry point, is selected
-     * 
-     * @plexus.requirement role="org.apache.maven.artifact.resolver.conflict.GraphConflictResolutionPolicy"
      */
+    @Requirement(role=GraphConflictResolutionPolicy.class)     
     protected GraphConflictResolutionPolicy policy;
 
     // -------------------------------------------------------------------------------------

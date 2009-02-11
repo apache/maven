@@ -25,6 +25,8 @@ import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import java.util.Iterator;
 import java.util.List;
@@ -32,15 +34,12 @@ import java.util.Map;
 
 /**
  * @author Jason van Zyl
- * @plexus.component
  */
+@Component(role=ArtifactTransformationManager.class)
 public class DefaultArtifactTransformationManager
     implements ArtifactTransformationManager
 {
-    /** @plexus.requirement
-     *    role="org.apache.maven.artifact.transform.ArtifactTransformation"
-     *    role-hints="release,latest,snapshot"
-     */
+    @Requirement(role=ArtifactTransformation.class, hints={"release", "latest", "snapshot"})
     private List<ArtifactTransformation> artifactTransformations;
 
     public void transformForResolve( Artifact artifact,

@@ -23,6 +23,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -38,7 +39,7 @@ import java.nio.channels.FileLock;
 import java.util.Date;
 import java.util.Properties;
 
-/** @plexus.component */
+@Component(role=UpdateCheckManager.class)
 public class DefaultUpdateCheckManager
     extends AbstractLogEnabled
     implements UpdateCheckManager

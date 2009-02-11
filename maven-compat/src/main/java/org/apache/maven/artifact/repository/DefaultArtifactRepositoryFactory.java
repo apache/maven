@@ -22,6 +22,8 @@ package org.apache.maven.artifact.repository;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -30,8 +32,8 @@ import java.util.Map;
 
 /**
  * @author jdcasey
- * @plexus.component
  */
+@Component(role=ArtifactRepositoryFactory.class)
 public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
@@ -43,7 +45,7 @@ public class DefaultArtifactRepositoryFactory
     // FIXME: This is a non-ThreadLocal cache!!
     private final Map<String,ArtifactRepository> artifactRepositories = new HashMap<String,ArtifactRepository>();
 
-    /** @plexus.requirement role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" */
+    @Requirement(role=ArtifactRepositoryLayout.class)
     private Map<String,ArtifactRepositoryLayout> repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout( String layoutId )

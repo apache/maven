@@ -35,6 +35,8 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
@@ -43,16 +45,16 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * @author Jason van Zyl
- * @plexus.component
  */
+@Component(role=RepositoryMetadataManager.class)
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled
     implements RepositoryMetadataManager
 {
-    /** @plexus.requirement */
+    @Requirement
     private WagonManager wagonManager;
 
-    /** @plexus.requirement */
+    @Requirement
     private UpdateCheckManager updateCheckManager;
 
     protected DefaultRepositoryMetadataManager( WagonManager wagonManager, UpdateCheckManager updateCheckManager, Logger logger )

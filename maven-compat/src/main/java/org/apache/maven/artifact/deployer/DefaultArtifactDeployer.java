@@ -28,27 +28,29 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymen
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.TransferFailedException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
-/** @plexus.component */
+@Component (role=ArtifactDeployer.class)
 public class DefaultArtifactDeployer
     extends AbstractLogEnabled
     implements ArtifactDeployer
 {
-    /** @plexus.requirement */
+    @Requirement
     private WagonManager wagonManager;
 
-    /** @plexus.requirement */
+    @Requirement
     private ArtifactTransformationManager transformationManager;
 
-    /** @plexus.requirement */
+    @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    /** @plexus.requirement */
+    @Requirement
     private ArtifactMetadataSource metadataSource;
 
-    /** @plexus.requirement role-hint="default" */
+    @Requirement(hint="default")
     private ArtifactRepositoryLayout defaultLayout;
 
     /**

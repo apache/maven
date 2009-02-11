@@ -29,7 +29,9 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.util.List;
 
@@ -44,10 +46,10 @@ public abstract class AbstractVersionTransformation
     extends AbstractLogEnabled
     implements ArtifactTransformation
 {
-    /** @plexus.requirement */
+    @Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;
 
-    /** @plexus.requirement */
+    @Requirement
     protected WagonManager wagonManager;
 
     protected String resolveVersion( Artifact artifact,

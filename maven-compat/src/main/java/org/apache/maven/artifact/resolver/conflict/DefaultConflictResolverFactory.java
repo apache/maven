@@ -21,6 +21,8 @@ package org.apache.maven.artifact.resolver.conflict;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -31,10 +33,10 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
- * @plexus.component
  * @todo you don't need the container in here with the active maps (jvz).
  * @since 3.0
  */
+@Component(role=ConflictResolverFactory.class) 
 public class DefaultConflictResolverFactory
     implements ConflictResolverFactory,
     Contextualizable
@@ -43,9 +45,8 @@ public class DefaultConflictResolverFactory
 
     /**
      * The plexus container used to obtain instances from.
-     *
-     * @plexus.requirement
      */
+	@Requirement
     private PlexusContainer container;
 
     // ConflictResolverFactory methods ----------------------------------------

@@ -4,14 +4,15 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * The code in this class is taken from DefaultRepositorylayout, located at:
  * http://svn.apache.org/viewvc/maven/components/trunk/maven-artifact/src/main/java/org/apache/maven/artifact/repository/layout/DefaultRepositoryLayout.java
  *
  * @version $Id$
- * @plexus.component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" role-hint="flat" 
  */
+@Component(role=ArtifactRepositoryLayout.class, hint="flat")                                                                         
 public class FlatRepositoryLayout
     implements ArtifactRepositoryLayout
 {

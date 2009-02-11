@@ -13,6 +13,8 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.conflict.GraphConflictResolver;
 import org.apache.maven.artifact.transform.ClasspathTransformation;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 
@@ -21,28 +23,27 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * 
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
- * @plexus.component
- *
  */
+@Component(role=MetadataResolver.class)
 public class DefaultMetadataResolver
     extends AbstractLogEnabled
     implements MetadataResolver
 {
     //------------------------------------------------------------------------
 
-    /** @plexus.requirement */
+    @Requirement
     ArtifactResolver artifactResolver;
 
-    /** @plexus.requirement */
+    @Requirement
     ArtifactFactory artifactFactory;
 
-    /** @plexus.requirement */
+    @Requirement
     MetadataSource metadataSource;
 
-    /** @plexus.requirement */
+    @Requirement
     GraphConflictResolver conflictResolver;
 
-    /** @plexus.requirement */
+    @Requirement
     ClasspathTransformation classpathTransformation;
 
     //------------------------------------------------------------------------

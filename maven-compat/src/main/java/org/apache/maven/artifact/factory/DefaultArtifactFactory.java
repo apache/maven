@@ -24,12 +24,14 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-/** @plexus.component */
+@Component(role=ArtifactFactory.class)
 public class DefaultArtifactFactory
     implements ArtifactFactory
 {
-    /** @plexus.requirement */
+    @Requirement
     private ArtifactHandlerManager artifactHandlerManager;
 
     public DefaultArtifactFactory()

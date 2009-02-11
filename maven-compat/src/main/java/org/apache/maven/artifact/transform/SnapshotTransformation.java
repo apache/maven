@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.text.DateFormat;
@@ -41,8 +42,8 @@ import java.util.TimeZone;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
  * @version $Id$
- * @plexus.component role="org.apache.maven.artifact.transform.ArtifactTransformation" role-hint="snapshot"
  */
+@Component(role=ArtifactTransformation.class, hint="snapshot") 
 public class SnapshotTransformation
     extends AbstractVersionTransformation
 {

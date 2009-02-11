@@ -12,20 +12,22 @@ import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * default implementation of the metadata classpath transformer
  * 
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
- * @plexus.component
- *
  */
+@Component(role=ClasspathTransformation.class)
 public class DefaultClasspathTransformation
 implements ClasspathTransformation
 {
-    /** @plexus.requirement */
+    @Requirement
     GraphConflictResolver conflictResolver;
+
     //----------------------------------------------------------------------------------------------------
 	public ClasspathContainer transform(
 						  MetadataGraph dirtyGraph

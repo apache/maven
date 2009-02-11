@@ -1,5 +1,7 @@
 package org.apache.maven.artifact.resolver.conflict;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,9 +28,9 @@ package org.apache.maven.artifact.resolver.conflict;
  * @version $Id$
  * @see NearestConflictResolver
  * @deprecated As of 3.0, use a specific implementation instead, e.g. {@link NearestConflictResolver}
- * @plexus.component
  */
 @Deprecated
+@Component(role=ConflictResolver.class)
 public class DefaultConflictResolver
     extends NearestConflictResolver
 {

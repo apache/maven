@@ -25,6 +25,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataInstallationException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -33,16 +35,16 @@ import java.io.IOException;
 
 /**
  * @author Jason van Zyl
- * @plexus.component
  */
+@Component(role=ArtifactInstaller.class)
 public class DefaultArtifactInstaller
     extends AbstractLogEnabled
     implements ArtifactInstaller
 {
-    /** @plexus.requirement */
+    @Requirement
     private ArtifactTransformationManager transformationManager;
 
-    /** @plexus.requirement */
+    @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */

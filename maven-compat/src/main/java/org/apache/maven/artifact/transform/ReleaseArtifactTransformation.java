@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.codehaus.plexus.component.annotations.Component;
 
 import java.util.List;
 
@@ -35,8 +36,8 @@ import java.util.List;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
- * @plexus.component role="org.apache.maven.artifact.transform.ArtifactTransformation" role-hint="release"
  */
+@Component(role=ArtifactTransformation.class, hint="release") 
 public class ReleaseArtifactTransformation
     extends AbstractVersionTransformation
 {

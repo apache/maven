@@ -23,11 +23,12 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author jdcasey
- * @plexus.component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" role-hint="legacy"
  */
+@Component(role=ArtifactRepositoryLayout.class, hint="legacy")
 public class LegacyRepositoryLayout
     implements ArtifactRepositoryLayout
 {

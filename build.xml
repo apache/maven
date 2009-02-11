@@ -144,6 +144,7 @@ END SNIPPET: ant-bootstrap -->
           <arg file="bootstrap/target/generated-sources"/>
           <arg value="@{version}"/>
           <arg value="false"/>
+          <arg value="false"/>
         </java>
       </sequential>
     </macrodef>

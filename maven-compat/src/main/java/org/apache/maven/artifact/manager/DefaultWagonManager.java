@@ -53,6 +53,8 @@ import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -67,7 +69,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-/** @plexus.component */
+@Component(role=WagonManager.class)
 public class DefaultWagonManager
     extends AbstractLogEnabled
     implements WagonManager, Contextualizable
@@ -111,16 +113,16 @@ public class DefaultWagonManager
 
     // Components
 
-    /** @plexus.requirement */
+    @Requirement
     private ArtifactRepositoryFactory repositoryFactory;
 
-    /** @plexus.requirement role="org.apache.maven.wagon.Wagon" */
+    @Requirement(role=Wagon.class)
     private Map wagons;
 
     /** encapsulates access to Server credentials */
     private CredentialsDataSource credentialsDataSource;
 
-    /** @plexus.requirement */
+    @Requirement
     private UpdateCheckManager updateCheckManager;
 
     private String httpUserAgent = "Apache-Maven/3.0-alpha-1";
