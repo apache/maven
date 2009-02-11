@@ -66,7 +66,6 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
      * Test that the encrypted auth infos given in the settings.xml are decrypted when the master password resides
      * in an external file.
      */
-    // FIXME: Outstanding bugs in plexus-sec-dispatcher prevent this from passing 
     public void testitRelocation()
         throws Exception
     {
@@ -97,6 +96,5 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         assertEquals( "testuser", props.getProperty( "test.username" ) );
         assertEquals( "testtest", props.getProperty( "test.password" ) );
     }
-    //
 
 }
