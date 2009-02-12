@@ -134,21 +134,25 @@ public class DefaultMavenSettingsBuilder
     {
         List<Server> servers = settings.getServers();
         
-        if( servers != null && !servers.isEmpty() )
+        if ( servers != null && !servers.isEmpty() )
+        {
             try
             {
-                for( Server server : servers )
+                for ( Server server : servers )
                 {
-                    if( server.getPassword() != null )
+                    if ( server.getPassword() != null )
+                    {
                         server.setPassword( securityDispatcher.decrypt( server.getPassword() ) );
+                    }
                 }
             }
-            catch( Exception e )
+            catch ( Exception e )
             {
-                // 2009-02-12 Oleg: get do this because 2 levels up Exception is 
+                // 2009-02-12 Oleg: get do this because 2 levels up Exception is
                 // caught, not exception type does not matter
                 throw new IOException( e.getMessage() );
             }
+        }
     }
 
     private Settings interpolate( Settings settings, MavenExecutionRequest request )
