@@ -41,7 +41,7 @@ under the License.
   <repositories>
     <repository>
       <id>maven-core-it</id>
-      <url>file:///M:/maven/core-it/core-it-suite/src/test/resources/mng-3217/repo</url>
+      <url>@baseurl@/repo</url>
       <releases>
         <checksumPolicy>ignore</checksumPolicy>
       </releases>
@@ -53,7 +53,7 @@ under the License.
   <pluginRepositories>
     <pluginRepository>
       <id>maven-core-it</id>
-      <url>file:///M:/maven/core-it/core-it-suite/src/test/resources/mng-3217/repo</url>
+      <url>@baseurl@/repo</url>
       <releases>
         <checksumPolicy>ignore</checksumPolicy>
       </releases>
