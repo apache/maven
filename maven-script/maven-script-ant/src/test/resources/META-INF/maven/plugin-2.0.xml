@@ -1,0 +1,43 @@
+<plugin>
+  <description>Test Plugin</description>
+  <groupId>org.myplugin</groupId>
+  <artifactId>my-plugin</artifactId>
+  <version>1</version>
+  <goalPrefix>myplugin</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <mojos>
+    <mojo>
+      <goal>test</goal>
+      <description>Build a JAR from the current project.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>false</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>test.build.xml:test</implementation>
+      <language>ant</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+		<parameter>
+			<name>basedir</name>
+			<required>true</required>
+			<editable>false</editable>
+			<type>java.io.File</type>
+		</parameter>
+		<parameter>
+			<name>messageLevel</name>
+			<required>true</required>
+			<editable>false</editable>
+			<type>java.lang.String</type>
+		</parameter>
+      </parameters>
+      <configuration>
+        <basedir implementation="java.io.File">${basedir}</basedir>
+        <messageLevel implementation="java.lang.String">${messageLevel}</messageLevel>
+      </configuration>
+    </mojo>
+  </mojos>
+</plugin>

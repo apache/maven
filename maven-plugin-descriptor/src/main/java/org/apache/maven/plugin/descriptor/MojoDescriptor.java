@@ -203,6 +203,8 @@ public class MojoDescriptor
         }
 
         parameters.add( parameter );
+        
+        parameterMap = null;
     }
 
     /**

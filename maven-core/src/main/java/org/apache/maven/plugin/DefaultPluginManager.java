@@ -80,14 +80,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.Xpp3DomWriter;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -338,6 +332,7 @@ public class DefaultPluginManager
         // later when the plugin is first invoked. Retrieving this artifact will in turn allow us to
         // transitively resolve its dependencies, and add them to the plugin container...
         addedPlugin.setArtifacts( Collections.singletonList( pluginArtifact ) );
+        addedPlugin.setPluginArtifact( pluginArtifact );
 
         try
         {

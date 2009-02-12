@@ -1,0 +1,69 @@
+<plugin>
+  <description>Test Plugin</description>
+  <groupId>org.myplugin</groupId>
+  <artifactId>my-plugin</artifactId>
+  <version>1</version>
+  <goalPrefix>myplugin</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <mojos>
+    <mojo>
+      <goal>test</goal>
+      <description>Build a JAR from the current project.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>false</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>test.build.xml:test</implementation>
+      <language>ant</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+		<parameter>
+			<name>basedir</name>
+			<required>true</required>
+			<editable>false</editable>
+			<type>java.io.File</type>
+		</parameter>
+		<parameter>
+			<name>messageLevel</name>
+			<required>true</required>
+			<editable>false</editable>
+			<type>java.lang.String</type>
+		</parameter>
+		<parameter>
+			<name>project</name>
+			<required>true</required>
+			<editable>false</editable>
+			<type>org.apache.maven.project.MavenProject</type>
+		</parameter>
+		<parameter>
+			<name>session</name>
+			<required>true</required>
+			<editable>false</editable>
+			<type>org.apache.maven.execution.MavenSession</type>
+		</parameter>
+		<parameter>
+			<name>mojoExecution</name>
+			<required>true</required>
+			<editable>false</editable>
+			<type>org.apache.maven.plugin.MojoExecution</type>
+		</parameter>
+      </parameters>
+      <configuration>
+        <project implementation="org.apache.maven.project.MavenProject">${project}</project>
+        <session implementation="org.apache.maven.execution.MavenSession">${session}</session>
+        <mojoExecution implementation="org.apache.maven.plugin.MojoExecution">${mojoExecution}</mojoExecution>
+        <basedir implementation="java.io.File">${basedir}</basedir>
+        <messageLevel implementation="java.lang.String">${messageLevel}</messageLevel>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.project.path.PathTranslator</role>
+        </requirement>
+      </requirements>
+    </mojo>
+  </mojos>
+</plugin>

@@ -1,0 +1,15 @@
+<project>
+  <target name="init-cp" unless="cp-exists">
+  	<path id="maven.plugin.classpath" location="path-is-missing"/>
+  </target>
+  	
+  <target name="test">
+  	<condition property="cp-exists">
+  		<isreference refid="maven.plugin.classpath"/>
+  	</condition>
+    <antcall target="init-cp" inheritall="true"/>
+  	
+  	<property name="cp" refId="maven.plugin.classpath"/>
+    <echo>plugin classpath is: ${cp}</echo>
+  </target>
+</project>

@@ -19,6 +19,7 @@ package org.apache.maven.plugin.descriptor;
  * under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
@@ -57,6 +58,8 @@ public class PluginDescriptor
     private String source;
 
     private boolean inheritedByDefault = true;
+    
+    private Artifact pluginArtifact;
 
     private List artifacts;
 
@@ -364,5 +367,15 @@ public class PluginDescriptor
     public String getDescription()
     {
         return description;
+    }
+
+    public Artifact getPluginArtifact()
+    {
+        return pluginArtifact;
+    }
+
+    public void setPluginArtifact( Artifact pluginArtifact )
+    {
+        this.pluginArtifact = pluginArtifact;
     }
 }
