@@ -136,6 +136,22 @@ use a configuration source to pull in the lifecycle information.
         </defaultReports>
         <!-- END SNIPPET: default-reports -->
       </configuration>
-    </component>    
+    </component>  
+
+    <component>
+      <role>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher</role>
+      <role-hint>maven</role-hint>
+      <implementation>org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher</implementation>
+      <description>Maven Security dispatcher</description>
+      <requirements>
+        <requirement>
+          <role>org.sonatype.plexus.components.cipher.PlexusCipher</role>
+          <field-name>_cipher</field-name>
+        </requirement>
+      </requirements>
+      <configuration>
+        <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
+      </configuration>
+    </component>          
   </components>
 </component-set>
