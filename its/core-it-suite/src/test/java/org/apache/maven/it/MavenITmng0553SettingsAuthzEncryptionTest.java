@@ -51,7 +51,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
-        verifier.getSystemProperties().setProperty( "maven.sec.path", "settings-security.xml" );
+        verifier.getSystemProperties().setProperty( "settings.security", "settings-security.xml" );
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -85,7 +85,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
-        verifier.getSystemProperties().setProperty( "maven.sec.path", "settings~security.xml" );
+        verifier.getSystemProperties().setProperty( "settings.security", "settings~security.xml" );
         verifier.setCliOptions( cliOptions );
         // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
         verifier.executeGoal( "validate", Collections.singletonMap( "MAVEN_OPTS", "-Duser.language=tr" ) );
