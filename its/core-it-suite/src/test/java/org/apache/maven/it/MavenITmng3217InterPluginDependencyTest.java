@@ -23,50 +23,43 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4026">MNG-4026</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3217">MNG-3217</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng4026ReactorDependenciesOrderTest
+public class MavenITmng3217InterPluginDependencyTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4026ReactorDependenciesOrderTest()
+    public MavenITmng3217InterPluginDependencyTest()
     {
-        // This feature depends on MNG-1412
-        super( "(2.0.8,)" );
+        super( "[3.0-alpha-1,)" );
     }
 
     /**
-     * Verify that the project class path is properly ordered during a reactor build, i.e. when dependencies are
-     * resolved as active project artifacts from the reactor.
+     * Verify that the dependency of plugin A on some plugin B does not influence the build of another module in the
+     * reactor that uses a different version of plugin B for normal build tasks.
      */
-    public void testitMNG4026()
+    public void testitMNG3217()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4026" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3217" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "consumer/target" );
+        verifier.deleteDirectory( "sub-1/target" );
+        verifier.deleteDirectory( "sub-2/target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3217" );
+        verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath1 = verifier.loadLines( "consumer/target/classpath-1.txt", "UTF-8" );
-        assertEquals( 5, classpath1.size() );
-        assertEquals( "consumer/classes", classpath1.get( 0 ) );
-        assertEquals( "dep-1/pom.xml", classpath1.get( 1 ) );
-        assertEquals( "dep-3/pom.xml", classpath1.get( 2 ) );
-        assertEquals( "dep-2/pom.xml", classpath1.get( 3 ) );
-        assertEquals( "dep-4/pom.xml", classpath1.get( 4 ) );
-
-        List classpath2 = verifier.loadLines( "consumer/target/classpath-2.txt", "UTF-8" );
-        assertEquals( classpath1, classpath2 );
+        verifier.assertFilePresent( "sub-1/target/touch-1.txt" );
+        verifier.assertFilePresent( "sub-2/target/touch-2.txt" );
     }
 
 }

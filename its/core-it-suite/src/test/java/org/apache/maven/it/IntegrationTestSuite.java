@@ -207,6 +207,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3268MultipleDashPCommandLineTest.class );
         suite.addTestSuite( MavenITmng3259DepsDroppedInMultiModuleBuildTest.class );
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
+        suite.addTestSuite( MavenITmng3217InterPluginDependencyTest.class );
         suite.addTestSuite( MavenITmng3106ProfileMultipleActivatorsTest.class );
         suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPomTest.class );
         suite.addTestSuite( MavenITmng3052DepRepoAggregationTest.class );
