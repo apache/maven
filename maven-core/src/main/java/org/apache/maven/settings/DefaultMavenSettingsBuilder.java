@@ -34,6 +34,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,9 @@ public class DefaultMavenSettingsBuilder
 {
     @Requirement
     private SettingsValidator validator;
+
+    @Requirement( hint = "maven" )
+    private SecDispatcher securityDispatcher;
 
     /** @since 2.1 */
     public Settings buildSettings( MavenExecutionRequest request )
@@ -100,6 +104,8 @@ public class DefaultMavenSettingsBuilder
             TrackableBase.GLOBAL_LEVEL );
 
         userSettings = interpolate( userSettings, request );
+        
+        decrypt( userSettings );
 
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
         String localRepository = userSettings.getLocalRepository();
@@ -113,6 +119,36 @@ public class DefaultMavenSettingsBuilder
         }
 
         return userSettings;
+    }
+    
+
+    /**
+     * decrypt settings passwords and passphrases
+     * 
+     * @param settings settings to process
+     * @throws IOException 
+     */
+    @SuppressWarnings("unchecked")
+    private void decrypt( Settings settings )
+    throws IOException
+    {
+        List<Server> servers = settings.getServers();
+        
+        if( servers != null && !servers.isEmpty() )
+            try
+            {
+                for( Server server : servers )
+                {
+                    if( server.getPassword() != null )
+                        server.setPassword( securityDispatcher.decrypt( server.getPassword() ) );
+                }
+            }
+            catch( Exception e )
+            {
+                // 2009-02-12 Oleg: get do this because 2 levels up Exception is 
+                // caught, not exception type does not matter
+                throw new IOException( e.getMessage() );
+            }
     }
 
     private Settings interpolate( Settings settings, MavenExecutionRequest request )
