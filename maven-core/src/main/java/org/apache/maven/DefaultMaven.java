@@ -712,7 +712,7 @@ public class DefaultMaven
                 if( sd != null )
                     try
                     {
-                        passWord = sd.decrypt( passWord, null, null, container );
+                        passWord = sd.decrypt( passWord, null, null);
                     }
                     catch ( SecDispatcherException e )
                     {
@@ -724,7 +724,7 @@ public class DefaultMaven
                 if( sd != null )
                     try
                     {
-                        passPhrase = sd.decrypt( passPhrase, null, null, container );
+                        passPhrase = sd.decrypt( passPhrase, null, null );
                     }
                     catch ( SecDispatcherException e )
                     {
