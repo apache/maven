@@ -687,7 +687,7 @@ public class DefaultMaven
                 if( sd != null )
                     try
                     {
-                        pass = sd.decrypt( pass, null, null, container );
+                        pass = sd.decrypt( pass, null, null );
                     }
                     catch ( SecDispatcherException e )
                     {
