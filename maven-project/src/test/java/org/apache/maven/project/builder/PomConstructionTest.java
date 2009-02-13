@@ -819,7 +819,7 @@ public class PomConstructionTest
     }
 
     /** MNG-4027
-    public void testProjectInjectedDependencies()
+    public void testProfileInjectedDependencies()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "profile-injected-dependencies" );
@@ -828,6 +828,21 @@ public class PomConstructionTest
         assertEquals( "c", pom.getValue( "dependencies[2]/artifactId" ) );
         assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
         assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
+    }
+    //*/
+
+    /** MNG-4034
+    public void testManagedProfileDependency()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "managed-profile-dependency/sub" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+        assertEquals( "org.apache.maven.its", pom.getValue( "dependencies[1]/groupId" ) );
+        assertEquals( "maven-core-it-support", pom.getValue( "dependencies[1]/artifactId" ) );
+        assertEquals( "1.3", pom.getValue( "dependencies[1]/version" ) );
+        assertEquals( "runtime", pom.getValue( "dependencies[1]/scope" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies[1]/exclusions" ) ).size() );
+        assertEquals( "commons-lang", pom.getValue( "dependencies[1]/exclusions[1]/groupId" ) );
     }
     //*/
 
