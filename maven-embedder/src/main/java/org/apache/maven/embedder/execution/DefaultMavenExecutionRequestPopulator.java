@@ -60,6 +60,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 /**
  * Things that we deal with in this populator to ensure that we have a valid {@MavenExecutionRequest}
@@ -89,7 +91,12 @@ public class DefaultMavenExecutionRequestPopulator
 
     @Requirement
     private MavenTools mavenTools;
-    
+
+    // 2009-02-12 Oleg: this component is defined in maven-core components.xml
+    // because it already has another declared (not generated) component
+    @Requirement( hint = "maven" )
+    private SecDispatcher securityDispatcher;
+
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request,
                                                    Configuration configuration )
         throws MavenEmbedderException
@@ -454,8 +461,12 @@ public class DefaultMavenExecutionRequestPopulator
             for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
             {
                 Server server = (Server) i.next();
+                
+                String pass = securityDispatcher.decrypt( server.getPassword() );
+                
+                String phrase = securityDispatcher.decrypt( server.getPassphrase() );
 
-                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), server.getPassword(), server.getPrivateKey(), server.getPassphrase() );
+                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
 
                 wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
 
@@ -480,9 +491,46 @@ public class DefaultMavenExecutionRequestPopulator
                 wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
             }
         }
+        catch ( SecDispatcherException e )
+        {
+            throw new SettingsConfigurationException( e.getMessage() );
+        }
         finally
         {
             container.release( wagonManager );
+        }
+    }
+
+    /**
+     * decrypt settings passwords and passphrases
+     * 
+     * @param settings settings to process
+     * @throws IOException 
+     */
+    @SuppressWarnings("unchecked")
+    private void decrypt( Settings settings )
+    throws IOException
+    {
+        List<Server> servers = settings.getServers();
+        
+        if ( servers != null && !servers.isEmpty() )
+        {
+            try
+            {
+                for ( Server server : servers )
+                {
+                    if ( server.getPassword() != null )
+                    {
+                        server.setPassword( securityDispatcher.decrypt( server.getPassword() ) );
+                    }
+                }
+            }
+            catch ( Exception e )
+            {
+                // 2009-02-12 Oleg: get do this because 2 levels up Exception is
+                // caught, not exception type does not matter
+                throw new IOException( e.getMessage() );
+            }
         }
     }
 

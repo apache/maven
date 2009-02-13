@@ -136,7 +136,7 @@ use a configuration source to pull in the lifecycle information.
         </defaultReports>
         <!-- END SNIPPET: default-reports -->
       </configuration>
-    </component>  
+    </component> 
 
     <component>
       <role>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher</role>
@@ -153,5 +153,6 @@ use a configuration source to pull in the lifecycle information.
         <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
       </configuration>
     </component>          
+     
   </components>
 </component-set>
