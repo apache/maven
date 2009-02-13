@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-522</name> 
+  <name>Maven Integration Test :: MNG-522</name>
   <description>Test for pluginManagement injection of plugin configuration.</description>
 
   <modules>
@@ -38,11 +38,21 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
+          <!-- this checks handling of a plugin which is implicitly bound to the lifecycle -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>0.1-stub-SNAPSHOT</version>
+          <configuration>
+            <pathname>target/plugin-mngt-config-1.txt</pathname>
+          </configuration>
+        </plugin>
+        <plugin>
+          <!-- this checks handling of a plugin which is explicitly bound to the lifecycle -->
           <groupId>org.apache.maven.its.plugins</groupId>
           <artifactId>maven-it-plugin-log-file</artifactId>
           <version>2.1-SNAPSHOT</version>
           <configuration>
-            <logFile>target/plugin-mngt-config.txt</logFile>
+            <logFile>target/plugin-mngt-config-2.txt</logFile>
           </configuration>
         </plugin>
       </plugins>

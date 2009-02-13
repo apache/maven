@@ -42,14 +42,15 @@ public class MavenITmng0522PluginMgmtConfigTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0522" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = new Verifier( new File( testDir, "child-project" ).getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "child-project/target" );
-        verifier.executeGoal( "initialize" );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "process-resources" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "child-project/target/plugin-mngt-config.txt" );
+        verifier.assertFilePresent( "target/plugin-mngt-config-1.txt" );
+        verifier.assertFilePresent( "target/plugin-mngt-config-2.txt" );
     }
 
 }
