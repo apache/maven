@@ -34,6 +34,10 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-sec-dispatcher</artifactId>
+    </dependency>
     <!-- CLI -->
     <dependency>
       <groupId>commons-cli</groupId>
