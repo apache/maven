@@ -79,7 +79,6 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
         // suite.addTestSuite( MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest.class );
         // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
-        // suite.addTestSuite( MavenITmng3023ReactorDependencyResolutionTest.class );
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
         // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
         // suite.addTestSuite( MavenITmng0612NewestConflictResolverTest.class );
@@ -299,6 +298,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0479OverrideCentralRepoTest.class );
         suite.addTestSuite( MavenITmng0471CustomLifecycleTest.class );
         suite.addTestSuite( MavenITmng0469ReportConfigTest.class );
+        suite.addTestSuite( MavenITmng0449PluginVersionResolutionTest.class );
         suite.addTestSuite( MavenITmng0377PluginLookupFromPrefixTest.class );
         suite.addTestSuite( MavenITmng0294MergeGlobalAndUserSettingsTest.class );
         suite.addTestSuite( MavenITmng0282NonReactorExecWhenProjectIndependentTest.class );
