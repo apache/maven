@@ -89,6 +89,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4034ManagedProfileDependencyTest.class );
         suite.addTestSuite( MavenITmng4026ReactorDependenciesOrderTest.class );
         suite.addTestSuite( MavenITmng4023ParentProfileOneTimeInjectionTest.class );
         suite.addTestSuite( MavenITmng4016PrefixedPropertyInterpolationTest.class );
