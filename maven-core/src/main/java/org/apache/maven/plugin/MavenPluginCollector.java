@@ -29,18 +29,14 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MavenPluginCollector
     implements ComponentDiscoveryListener, LogEnabled
 {
     private Set pluginsInProcess = new HashSet();
 
-    private Map pluginDescriptors = new HashMap();
+    private Map<String, PluginDescriptor> pluginDescriptors = new HashMap();
 
     private Map pluginIdsByPrefix = new HashMap();
 
@@ -75,8 +71,12 @@ public class MavenPluginCollector
 
     public PluginDescriptor getPluginDescriptor( Plugin plugin )
     {
-        String key = constructPluginKey( plugin );
-        return (PluginDescriptor) pluginDescriptors.get( key );
+        return pluginDescriptors.get( constructPluginKey( plugin ) );
+    }
+
+    public Collection<PluginDescriptor> getPluginDescriptors()
+    {
+        return pluginDescriptors.values();    
     }
 
     private String constructPluginKey( Plugin plugin )
@@ -97,7 +97,7 @@ public class MavenPluginCollector
         return pluginDescriptors.containsKey( key );
     }
 
-    public Set getPluginDescriptorsForPrefix( String prefix )
+    public Set<PluginDescriptor> getPluginDescriptorsForPrefix( String prefix )
     {
         Set result = new HashSet();
         for ( Iterator it = pluginDescriptors.values().iterator(); it.hasNext(); )

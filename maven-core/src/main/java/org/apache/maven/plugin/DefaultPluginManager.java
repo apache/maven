@@ -847,13 +847,13 @@ public class DefaultPluginManager
                                                                                           getLogger(),
                                                                                           session.getExecutionProperties() );
 
-           List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+            List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
 
-           interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(session.getProjectBuilderConfiguration().getExecutionProperties(),
-                   PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
+            interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(session.getProjectBuilderConfiguration().getExecutionProperties(),
+                    PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
 
-           interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(session.getProjectBuilderConfiguration().getUserProperties(),
-                   PomInterpolatorTag.USER_PROPERTIES.name()));
+            interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(session.getProjectBuilderConfiguration().getUserProperties(),
+                    PomInterpolatorTag.USER_PROPERTIES.name()));
 
             Plugin plugin = null;
             try {
@@ -878,7 +878,7 @@ public class DefaultPluginManager
         checkRequiredParameters( mojoDescriptor, mojoConfiguration, expressionEvaluator );
 
         populatePluginFields( mojo, mojoDescriptor, mojoConfiguration, expressionEvaluator );
-        
+            
         return mojo;
 
         } finally {
@@ -1005,29 +1005,6 @@ public class DefaultPluginManager
         }
     }
 
-
-    public static PlexusConfiguration copyConfiguration( PlexusConfiguration src )
-    {
-        // TODO: shouldn't be necessary
-        XmlPlexusConfiguration dom = new XmlPlexusConfiguration( src.getName() );
-        dom.setValue( src.getValue( null ) );
-
-        String[] attributeNames = src.getAttributeNames();
-        for ( int i = 0; i < attributeNames.length; i++ )
-        {
-            String attributeName = attributeNames[i];
-            dom.setAttribute( attributeName, src.getAttribute( attributeName, null ) );
-        }
-
-        PlexusConfiguration[] children = src.getChildren();
-        for ( int i = 0; i < children.length; i++ )
-        {
-            dom.addChild( copyConfiguration( children[i] ) );
-        }
-
-        return dom;
-    }
-
     // ----------------------------------------------------------------------
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
@@ -1063,7 +1040,7 @@ public class DefaultPluginManager
             getLogger().debug( "Configuring mojo '" + mojoDescriptor.getId() + "' with "
                                + ( configuratorId == null ? "basic" : configuratorId )
                                + " configurator -->" );
-            
+
             // This needs to be able to use methods
             configurator.configureComponent( plugin, configuration, expressionEvaluator, realm, listener );
 

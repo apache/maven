@@ -24,10 +24,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
@@ -90,8 +87,6 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -170,6 +165,8 @@ public class MavenEmbedder
 
     private Configuration configuration;
 
+    private PluginContext pluginContext;
+
     // ----------------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------------
@@ -183,6 +180,21 @@ public class MavenEmbedder
     public MavenExecutionRequest getDefaultRequest()
     {
         return request;
+    }
+
+    public Collection<MojoExecution> getMojoExecutionsForGoal(String goal) throws Exception
+    {
+        return pluginContext.getMojoExecutionsForGoal( goal );
+    }
+
+    public Object getMojoParameterFor(MojoExecution mojoExecution, String xPath) throws Exception
+    {
+        return pluginContext.getMojoParameterFor( mojoExecution, xPath);
+    }
+
+    public void executeMojo(MojoExecution mojoExecution, MavenSession mavenSession ) throws Exception
+    {
+        pluginContext.executeMojo( mojoExecution, mavenSession );
     }
 
     // ----------------------------------------------------------------------
@@ -250,32 +262,6 @@ public class MavenEmbedder
         modelWriter.write( writer, model );
     }
 
-    public PlexusConfiguration getPluginConfiguration(String pluginId, String mojoId, Model model) throws Exception
-    {
-        try {
-            return mixer.mixPluginAndReturnConfig(pluginRepository.findPluginById(pluginId, mojoId), null, model, null);
-        } catch (PlexusConfigurationException e) {
-            throw new IOException(e.getMessage());
-        }
-    }
-
-    public Object getPluginConfigurationAsDom(String pluginId, String mojoId, Model model) throws Exception
-    {
-        try {
-            return mixer.mixPluginAndReturnConfigAsDom(pluginRepository.findPluginById(pluginId, mojoId), model);
-        } catch (PlexusConfigurationException e) {
-            throw new IOException(e.getMessage());
-        }
-    }
-
-    public Object getPluginConfigurationAsDom(String pluginId, String mojoId, Model model, String xpathExpression) throws Exception
-    {
-        try {
-            return mixer.mixPluginAndReturnConfigAsDom(pluginRepository.findPluginById(pluginId, mojoId), model, xpathExpression);
-        } catch (PlexusConfigurationException e) {
-            throw new IOException(e.getMessage());
-        }
-    }    
 
     // ----------------------------------------------------------------------
     // Settings
