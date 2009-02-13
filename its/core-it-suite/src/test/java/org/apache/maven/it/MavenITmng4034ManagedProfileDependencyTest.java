@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,8 +58,11 @@ public class MavenITmng4034ManagedProfileDependencyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
-        assertEquals( Collections.singletonList( "org.apache.maven.its:maven-core-it-support:jar:1.0" ), artifacts );
+        List artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        assertEquals( Arrays.asList( new String[0] ), artifacts );
+
+        artifacts = verifier.loadLines( "target/runtime.txt", "UTF-8" );
+        assertEquals( Collections.singletonList( "org.apache.maven.its:maven-core-it-support:jar:1.3" ), artifacts );
     }
 
 }

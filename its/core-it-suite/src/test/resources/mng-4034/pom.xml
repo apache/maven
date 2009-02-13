@@ -29,8 +29,7 @@ under the License.
 
   <name>Maven Integration Test :: MNG-4034</name> 
   <description>
-    Verify that dependencies defined in profiles get their version injected from the dependency management of the
-    parent.
+    Verify that dependencies defined in profiles are subject to the dependency management of the parent.
   </description>
 
   <modules>
@@ -42,7 +41,14 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.its</groupId>
         <artifactId>maven-core-it-support</artifactId>
-        <version>1.0</version>
+        <version>1.3</version>
+        <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
