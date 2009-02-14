@@ -54,8 +54,7 @@ public class MavenPluginCollector
         {
             PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
             
-            // TODO: see comment in getPluginDescriptor
-            String key = Plugin.constructKey( pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId() );
+            String key = PluginUtils.constructVersionedKey( pluginDescriptor );
             
             if ( !pluginsInProcess.contains( key ) )
             {
@@ -75,16 +74,14 @@ public class MavenPluginCollector
 
     public PluginDescriptor getPluginDescriptor( Plugin plugin )
     {
-        // TODO: include version, but can't do this in the plugin manager as it is not resolved to the right version
-        // at that point. Instead, move the duplication check to the artifact container, or store it locally based on
-        // the unresolved version?
-        return (PluginDescriptor) pluginDescriptors.get( plugin.getKey() );
+        String key = PluginUtils.constructVersionedKey( plugin );
+        return (PluginDescriptor) pluginDescriptors.get( key );
     }
 
     public boolean isPluginInstalled( Plugin plugin )
     {
-        // TODO: see comment in getPluginDescriptor
-        return pluginDescriptors.containsKey( plugin.getKey() );
+        String key = PluginUtils.constructVersionedKey( plugin );
+        return pluginDescriptors.containsKey( key );
     }
 
     public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
@@ -94,14 +91,15 @@ public class MavenPluginCollector
 
     public void flushPluginDescriptor( Plugin plugin )
     {
-        pluginsInProcess.remove( plugin.getKey() );
-        pluginDescriptors.remove( plugin.getKey() );
+        String key = PluginUtils.constructVersionedKey( plugin );
+        pluginsInProcess.remove( key );
+        pluginDescriptors.remove( key );
         
         for ( Iterator it = pluginIdsByPrefix.entrySet().iterator(); it.hasNext(); )
         {
             Map.Entry entry = (Map.Entry) it.next();
             
-            if ( plugin.getKey().equals( entry.getValue() ) )
+            if ( key.equals( PluginUtils.constructVersionedKey( (PluginDescriptor) entry.getValue() ) ) )
             {
                 it.remove();
             }

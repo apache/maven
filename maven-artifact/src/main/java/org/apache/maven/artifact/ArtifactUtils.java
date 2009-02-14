@@ -20,7 +20,6 @@ package org.apache.maven.artifact;
  */
 
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 public final class ArtifactUtils
 {
@@ -41,6 +41,19 @@ public final class ArtifactUtils
         return version != null &&
             ( version.toUpperCase().endsWith( Artifact.SNAPSHOT_VERSION ) || Artifact.VERSION_FILE_PATTERN.matcher( version )
                 .matches() );
+    }
+
+    public static String toSnapshotVersion( String version )
+    {
+        Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
+        if ( m.matches() )
+        {
+            return m.group( 1 ) + '-' + Artifact.SNAPSHOT_VERSION;
+        }
+        else
+        {
+            return version;
+        }
     }
 
     public static String versionlessKey( Artifact artifact )

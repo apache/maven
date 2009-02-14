@@ -202,7 +202,9 @@ public class DefaultPluginManager
 
             artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
-            PlexusContainer pluginContainer = container.getChildContainer( plugin.getKey() );
+            String pluginKey = PluginUtils.constructVersionedKey( plugin );
+
+            PlexusContainer pluginContainer = container.getChildContainer( pluginKey );
 
             File pluginFile = pluginArtifact.getFile();
 
@@ -213,7 +215,7 @@ public class DefaultPluginManager
             else if ( pluginFile.lastModified() > pluginContainer.getCreationDate().getTime() )
             {
                 getLogger().info(
-                    "Reloading plugin container for: " + plugin.getKey() + ". The plugin artifact has changed." );
+                    "Reloading plugin container for: " + pluginKey + ". The plugin artifact has changed." );
 
                 pluginContainer.dispose();
 
@@ -292,7 +294,7 @@ public class DefaultPluginManager
 
         try
         {
-            child = container.createChildContainer( plugin.getKey(),
+            child = container.createChildContainer( PluginUtils.constructVersionedKey( plugin ).intern(),
                                                     Collections.singletonList( pluginArtifact.getFile() ),
                                                     Collections.EMPTY_MAP,
                                                     Collections.singletonList( pluginCollector ) );
@@ -580,7 +582,7 @@ public class DefaultPluginManager
     private PlexusContainer getPluginContainer( PluginDescriptor pluginDescriptor )
         throws PluginManagerException
     {
-        String pluginKey = pluginDescriptor.getPluginLookupKey();
+        String pluginKey = PluginUtils.constructVersionedKey( pluginDescriptor );
 
         PlexusContainer pluginContainer = container.getChildContainer( pluginKey );
 
