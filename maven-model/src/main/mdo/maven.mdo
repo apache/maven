@@ -743,7 +743,7 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-    java.util.Map pluginMap;
+    java.util.Map<String, Plugin> pluginMap;
 
     /**
      * Reset the <code>pluginsMap</code> field to <code>null</code>
@@ -757,14 +757,14 @@
      * @return a Map of plugins field with <code>Plugins#getKey()</code> as key
      * @see org.apache.maven.model.Plugin#getKey()
      */
-    public synchronized java.util.Map getPluginsAsMap()
+    public synchronized java.util.Map<String, Plugin> getPluginsAsMap()
     {
         if ( pluginMap == null )
         {
-            pluginMap = new java.util.LinkedHashMap();
+            pluginMap = new java.util.LinkedHashMap<String, Plugin>();
             if ( plugins != null )
             {
-                for ( java.util.Iterator it = plugins.iterator(); it.hasNext(); )
+                for ( java.util.Iterator<Plugin> it = plugins.iterator(); it.hasNext(); )
                 {
                     Plugin plugin = (Plugin) it.next();
                     pluginMap.put( plugin.getKey(), plugin );
@@ -2621,7 +2621,7 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-    private java.util.Map executionMap = null;
+    private java.util.Map<String, PluginExecution> executionMap = null;
 
     /**
      * Reset the <code>executionMap</code> field to <code>null</code>
@@ -2635,14 +2635,14 @@
      * @return a Map of executions field with <code>PluginExecution#getId()</code> as key
      * @see org.apache.maven.model.PluginExecution#getId()
      */
-    public java.util.Map getExecutionsAsMap()
+    public java.util.Map<String, PluginExecution> getExecutionsAsMap()
     {
         if ( executionMap == null )
         {
-            executionMap = new java.util.LinkedHashMap();
+            executionMap = new java.util.LinkedHashMap<String, PluginExecution>();
             if ( getExecutions() != null )
             {
-                for ( java.util.Iterator i = getExecutions().iterator(); i.hasNext(); )
+                for ( java.util.Iterator<PluginExecution> i = getExecutions().iterator(); i.hasNext(); )
                 {
                     PluginExecution exec = (PluginExecution) i.next();
 
@@ -2832,7 +2832,7 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-    java.util.Map reportPluginMap;
+    java.util.Map<String, ReportPlugin> reportPluginMap;
 
     /**
      * Reset the <code>reportPluginMap</code> field to <code>null</code>
@@ -2846,14 +2846,14 @@
      * @return a Map of plugins field with <code>ReportPlugin#getKey()</code> as key
      * @see org.apache.maven.model.ReportPlugin#getKey()
      */
-    public synchronized java.util.Map getReportPluginsAsMap()
+    public synchronized java.util.Map<String, ReportPlugin> getReportPluginsAsMap()
     {
         if ( reportPluginMap == null )
         {
-            reportPluginMap = new java.util.LinkedHashMap();
+            reportPluginMap = new java.util.LinkedHashMap<String, ReportPlugin>();
             if ( getPlugins() != null )
             {
-                for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext(); )
+                for ( java.util.Iterator<ReportPlugin> it = getPlugins().iterator(); it.hasNext(); )
                 {
                     ReportPlugin reportPlugin = (ReportPlugin) it.next();
                     reportPluginMap.put( reportPlugin.getKey(), reportPlugin );
@@ -3179,7 +3179,7 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-    private java.util.Map reportSetMap = null;
+    private java.util.Map<String, ReportSet> reportSetMap = null;
 
     /**
      * Reset the <code>reportSetMap</code> field to <code>null</code>
@@ -3193,14 +3193,14 @@
      * @return a Map of reportSets field with <code>ReportSet#getId()</code> as key
      * @see org.apache.maven.model.ReportSet#getId()
      */
-    public java.util.Map getReportSetsAsMap()
+    public java.util.Map<String, ReportSet> getReportSetsAsMap()
     {
         if ( reportSetMap == null )
         {
-            reportSetMap = new java.util.LinkedHashMap();
+            reportSetMap = new java.util.LinkedHashMap<String, ReportSet>();
             if ( getReportSets() != null )
             {
-                for ( java.util.Iterator i = getReportSets().iterator(); i.hasNext(); )
+                for ( java.util.Iterator<ReportSet> i = getReportSets().iterator(); i.hasNext(); )
                 {
                     ReportSet reportSet = (ReportSet) i.next();
                     reportSetMap.put( reportSet.getId(), reportSet );

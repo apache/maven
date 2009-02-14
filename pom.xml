@@ -185,6 +185,9 @@ under the License.
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
           <version>${modelloVersion}</version>
+          <configuration>
+            <useJava5>true</useJava5>
+          </configuration>
           <executions>
             <execution>
               <id>site-docs</id>
@@ -413,8 +416,8 @@ under the License.
         </exclusions>
       </dependency>
     <dependency>
-    	<groupId>commons-jxpath</groupId>
-    	<artifactId>commons-jxpath</artifactId>
+      <groupId>commons-jxpath</groupId>
+      <artifactId>commons-jxpath</artifactId>
         <version>${jxpathVersion}</version>
     </dependency>
 

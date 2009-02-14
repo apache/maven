@@ -64,9 +64,11 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Prerequisites;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -104,7 +106,7 @@ public class MavenProject
 
     private File file;
 
-    private Set artifacts;
+    private Set<Artifact> artifacts;
 
     private Artifact parentArtifact;
 
@@ -112,54 +114,54 @@ public class MavenProject
 
     private List<ArtifactRepository> remoteArtifactRepositories;
 
-    private List collectedProjects = Collections.EMPTY_LIST;
+    private List<MavenProject> collectedProjects = Collections.emptyList();
 
     private List<Artifact> attachedArtifacts;
 
     private MavenProject executionProject;
 
-    private List compileSourceRoots = new ArrayList();
+    private List<String> compileSourceRoots = new ArrayList<String>();
 
-    private List testCompileSourceRoots = new ArrayList();
+    private List<String> testCompileSourceRoots = new ArrayList<String>();
 
-    private List scriptSourceRoots = new ArrayList();
+    private List<String> scriptSourceRoots = new ArrayList<String>();
 
-    private List pluginArtifactRepositories;
+    private List<ArtifactRepository> pluginArtifactRepositories;
 
     private ArtifactRepository releaseArtifactRepository;
 
     private ArtifactRepository snapshotArtifactRepository;
 
-    private List activeProfiles = new ArrayList();
+    private List<Profile> activeProfiles = new ArrayList<Profile>();
 
-    private Set dependencyArtifacts;
+    private Set<Artifact> dependencyArtifacts;
 
     private Artifact artifact;
 
     // calculated.
-    private Map artifactMap;
+    private Map<String, Artifact> artifactMap;
 
     private Model originalModel;
 
-    private Map pluginArtifactMap;
+    private Map<String, Artifact> pluginArtifactMap;
 
-    private Set reportArtifacts;
+    private Set<Artifact> reportArtifacts;
 
-    private Map reportArtifactMap;
+    private Map<String, Artifact> reportArtifactMap;
 
-    private Set extensionArtifacts;
+    private Set<Artifact> extensionArtifacts;
 
-    private Map extensionArtifactMap;
+    private Map<String, Artifact> extensionArtifactMap;
 
-    private Map managedVersionMap;
+    private Map<String, Artifact> managedVersionMap;
 
-    private Map projectReferences = new HashMap();
+    private Map<String, MavenProject> projectReferences = new HashMap<String, MavenProject>();
 
     private boolean executionRoot;
 
-    private Map moduleAdjustments;
+    private Map<String, String> moduleAdjustments;
 
-    private Stack previousExecutionProjects = new Stack();
+    private Stack<MavenProject> previousExecutionProjects = new Stack<MavenProject>();
 
     //!! Components that need to be taken out of here
     private ArtifactFactory artifactFactory;
@@ -250,7 +252,7 @@ public class MavenProject
 
         try
         {
-            LinkedHashSet repoSet = new LinkedHashSet();
+            Set<Repository> repoSet = new LinkedHashSet<Repository>();
             if ( ( model.getRepositories() != null ) && !model.getRepositories().isEmpty() )
             {
                 repoSet.addAll( model.getRepositories() );
@@ -261,7 +263,7 @@ public class MavenProject
                 repoSet.addAll( model.getPluginRepositories() );
             }
 
-            setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( new ArrayList( repoSet ) ) );
+            setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( new ArrayList<Repository>( repoSet ) ) );
         }
         catch ( Exception e )
         {
@@ -298,12 +300,12 @@ public class MavenProject
 
         if ( moduleAdjustments == null )
         {
-            moduleAdjustments = new HashMap();
+            moduleAdjustments = new HashMap<String, String>();
 
-            List modules = getModules();
+            List<String> modules = getModules();
             if ( modules != null )
             {
-                for ( Iterator it = modules.iterator(); it.hasNext(); )
+                for ( Iterator<String> it = modules.iterator(); it.hasNext(); )
                 {
                     String modulePath = (String) it.next();
                     String moduleName = modulePath;
@@ -403,7 +405,7 @@ public class MavenProject
         this.parent = parent;
     }
 
-    public void setRemoteArtifactRepositories( List remoteArtifactRepositories )
+    public void setRemoteArtifactRepositories( List<ArtifactRepository> remoteArtifactRepositories )
     {
         this.remoteArtifactRepositories = remoteArtifactRepositories;
     }
@@ -441,12 +443,12 @@ public class MavenProject
         }
     }
 
-    public void setDependencies( List dependencies )
+    public void setDependencies( List<Dependency> dependencies )
     {
         getModel().setDependencies( dependencies );
     }
 
-    public List getDependencies()
+    public List<Dependency> getDependencies()
     {
         return getModel().getDependencies();
     }
@@ -505,29 +507,29 @@ public class MavenProject
         }
     }
 
-    public List getCompileSourceRoots()
+    public List<String> getCompileSourceRoots()
     {
         return compileSourceRoots;
     }
 
-    public List getScriptSourceRoots()
+    public List<String> getScriptSourceRoots()
     {
         return scriptSourceRoots;
     }
 
-    public List getTestCompileSourceRoots()
+    public List<String> getTestCompileSourceRoots()
     {
         return testCompileSourceRoots;
     }
 
-    public List getCompileClasspathElements()
+    public List<String> getCompileClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List list = new ArrayList( getArtifacts().size() );
+        List<String> list = new ArrayList<String>( getArtifacts().size() + 1 );
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -544,11 +546,11 @@ public class MavenProject
         return list;
     }
 
-    public List getCompileArtifacts()
+    public List<Artifact> getCompileArtifacts()
     {
-        List list = new ArrayList( getArtifacts().size() );
+        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -566,18 +568,18 @@ public class MavenProject
         return list;
     }
 
-    public List getCompileDependencies()
+    public List<Dependency> getCompileDependencies()
     {
-        Set artifacts = getArtifacts();
+        Set<Artifact> artifacts = getArtifacts();
 
         if ( ( artifacts == null ) || artifacts.isEmpty() )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
-        List list = new ArrayList( artifacts.size() );
+        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -600,16 +602,16 @@ public class MavenProject
         return list;
     }
 
-    public List getTestClasspathElements()
+    public List<String> getTestClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List list = new ArrayList( getArtifacts().size() + 2 );
+        List<String> list = new ArrayList<String>( getArtifacts().size() + 2 );
 
         list.add( getBuild().getTestOutputDirectory() );
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -626,11 +628,11 @@ public class MavenProject
         return list;
     }
 
-    public List getTestArtifacts()
+    public List<Artifact> getTestArtifacts()
     {
-        List list = new ArrayList( getArtifacts().size() );
+        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -643,18 +645,18 @@ public class MavenProject
         return list;
     }
 
-    public List getTestDependencies()
+    public List<Dependency> getTestDependencies()
     {
-        Set artifacts = getArtifacts();
+        Set<Artifact> artifacts = getArtifacts();
 
         if ( ( artifacts == null ) || artifacts.isEmpty() )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
-        List list = new ArrayList( artifacts.size() );
+        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -672,14 +674,14 @@ public class MavenProject
         return list;
     }
 
-    public List getRuntimeClasspathElements()
+    public List<String> getRuntimeClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List list = new ArrayList( getArtifacts().size() + 1 );
+        List<String> list = new ArrayList<String>( getArtifacts().size() + 1 );
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -700,11 +702,11 @@ public class MavenProject
         return list;
     }
 
-    public List getRuntimeArtifacts()
+    public List<Artifact> getRuntimeArtifacts()
     {
-        List list = new ArrayList( getArtifacts().size() );
+        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -721,18 +723,18 @@ public class MavenProject
         return list;
     }
 
-    public List getRuntimeDependencies()
+    public List<Dependency> getRuntimeDependencies()
     {
-        Set artifacts = getArtifacts();
+        Set<Artifact> artifacts = getArtifacts();
 
         if ( ( artifacts == null ) || artifacts.isEmpty() )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
-        List list = new ArrayList( artifacts.size() );
+        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
 
-        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = artifacts.iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -754,14 +756,14 @@ public class MavenProject
         return list;
     }
 
-    public List getSystemClasspathElements()
+    public List<String> getSystemClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List list = new ArrayList( getArtifacts().size() );
+        List<String> list = new ArrayList<String>( getArtifacts().size() );
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -777,11 +779,11 @@ public class MavenProject
         return list;
     }
 
-    public List getSystemArtifacts()
+    public List<Artifact> getSystemArtifacts()
     {
-        List list = new ArrayList( getArtifacts().size() );
+        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -798,18 +800,18 @@ public class MavenProject
         return list;
     }
 
-    public List getSystemDependencies()
+    public List<Dependency> getSystemDependencies()
     {
-        Set artifacts = getArtifacts();
+        Set<Artifact> artifacts = getArtifacts();
 
         if ( ( artifacts == null ) || artifacts.isEmpty() )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
-        List list = new ArrayList( artifacts.size() );
+        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
 
-        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -1007,12 +1009,12 @@ public class MavenProject
         return getModel().getScm();
     }
 
-    public void setMailingLists( List mailingLists )
+    public void setMailingLists( List<MailingList> mailingLists )
     {
         getModel().setMailingLists( mailingLists );
     }
 
-    public List getMailingLists()
+    public List<MailingList> getMailingLists()
     {
         return getModel().getMailingLists();
     }
@@ -1022,12 +1024,12 @@ public class MavenProject
         getModel().addMailingList( mailingList );
     }
 
-    public void setDevelopers( List developers )
+    public void setDevelopers( List<Developer> developers )
     {
         getModel().setDevelopers( developers );
     }
 
-    public List getDevelopers()
+    public List<Developer> getDevelopers()
     {
         return getModel().getDevelopers();
     }
@@ -1037,12 +1039,12 @@ public class MavenProject
         getModel().addDeveloper( developer );
     }
 
-    public void setContributors( List contributors )
+    public void setContributors( List<Contributor> contributors )
     {
         getModel().setContributors( contributors );
     }
 
-    public List getContributors()
+    public List<Contributor> getContributors()
     {
         return getModel().getContributors();
     }
@@ -1062,12 +1064,12 @@ public class MavenProject
         return getModelBuild();
     }
 
-    public List getResources()
+    public List<Resource> getResources()
     {
         return getBuild().getResources();
     }
 
-    public List getTestResources()
+    public List<Resource> getTestResources()
     {
         return getBuild().getTestResources();
     }
@@ -1092,12 +1094,12 @@ public class MavenProject
         return getModel().getReporting();
     }
 
-    public void setLicenses( List licenses )
+    public void setLicenses( List<License> licenses )
     {
         getModel().setLicenses( licenses );
     }
 
-    public List getLicenses()
+    public List<License> getLicenses()
     {
         return getModel().getLicenses();
     }
@@ -1107,7 +1109,7 @@ public class MavenProject
         getModel().addLicense( license );
     }
 
-    public void setArtifacts( Set artifacts )
+    public void setArtifacts( Set<Artifact> artifacts )
     {
         this.artifacts = artifacts;
 
@@ -1123,12 +1125,12 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
-    public Set getArtifacts()
+    public Set<Artifact> getArtifacts()
     {
-        return artifacts == null ? Collections.EMPTY_SET : artifacts;
+        return artifacts == null ? Collections.<Artifact> emptySet() : artifacts;
     }
 
-    public Map getArtifactMap()
+    public Map<String, Artifact> getArtifactMap()
     {
         if ( artifactMap == null )
         {
@@ -1137,17 +1139,17 @@ public class MavenProject
         return artifactMap;
     }
 
-    public Set getPluginArtifacts()
+    public Set<Artifact> getPluginArtifacts()
     {
         if ( pluginArtifacts != null )
         {
             return pluginArtifacts;
         }
-        pluginArtifacts = new HashSet();
+        pluginArtifacts = new HashSet<Artifact>();
         if ( artifactFactory != null )
         {
-            List plugins = getBuildPlugins();
-            for ( Iterator i = plugins.iterator(); i.hasNext(); )
+            List<Plugin> plugins = getBuildPlugins();
+            for ( Iterator<Plugin> i = plugins.iterator(); i.hasNext(); )
             {
                 Plugin p = (Plugin) i.next();
 
@@ -1182,31 +1184,31 @@ public class MavenProject
         return pluginArtifacts;
     }
 
-    public Map getPluginArtifactMap()
+    public Map<String, Artifact> getPluginArtifactMap()
     {
         pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getPluginArtifacts() );
         return pluginArtifactMap;
     }
 
-    public void setReportArtifacts( Set reportArtifacts )
+    public void setReportArtifacts( Set<Artifact> reportArtifacts )
     {
         this.reportArtifacts = reportArtifacts;
 
         reportArtifactMap = null;
     }
 
-    public Set getReportArtifacts()
+    public Set<Artifact> getReportArtifacts()
     {
         if( reportArtifacts != null )
         {
             return reportArtifacts;
         }
 
-        reportArtifacts = new HashSet();
-        List reports = getReportPlugins();
+        reportArtifacts = new HashSet<Artifact>();
+        List<ReportPlugin> reports = getReportPlugins();
         if ( reports != null )
         {
-            for ( Iterator i = reports.iterator(); i.hasNext(); )
+            for ( Iterator<ReportPlugin> i = reports.iterator(); i.hasNext(); )
             {
                 ReportPlugin p = (ReportPlugin) i.next();
 
@@ -1241,7 +1243,7 @@ public class MavenProject
         return reportArtifacts;
     }
 
-    public Map getReportArtifactMap()
+    public Map<String, Artifact> getReportArtifactMap()
     {
         if ( reportArtifactMap == null )
         {
@@ -1251,24 +1253,24 @@ public class MavenProject
         return reportArtifactMap;
     }
 
-    public void setExtensionArtifacts( Set extensionArtifacts )
+    public void setExtensionArtifacts( Set<Artifact> extensionArtifacts )
     {
         this.extensionArtifacts = extensionArtifacts;
 
         extensionArtifactMap = null;
     }
 
-    public Set getExtensionArtifacts()
+    public Set<Artifact> getExtensionArtifacts()
     {
         if( extensionArtifacts != null )
         {
             return extensionArtifacts;
         }
-        extensionArtifacts = new HashSet();
-        List extensions = getBuildExtensions();
+        extensionArtifacts = new HashSet<Artifact>();
+        List<Extension> extensions = getBuildExtensions();
         if ( extensions != null )
         {
-            for ( Iterator i = extensions.iterator(); i.hasNext(); )
+            for ( Iterator<Extension> i = extensions.iterator(); i.hasNext(); )
             {
                 Extension ext = (Extension) i.next();
 
@@ -1304,7 +1306,7 @@ public class MavenProject
         return extensionArtifacts;
     }
 
-    public Map getExtensionArtifactMap()
+    public Map<String, Artifact> getExtensionArtifactMap()
     {
         if ( extensionArtifactMap == null )
         {
@@ -1329,7 +1331,7 @@ public class MavenProject
         return parentArtifact;
     }
 
-    public List getRepositories()
+    public List<Repository> getRepositories()
     {
         return getModel().getRepositories();
     }
@@ -1338,26 +1340,26 @@ public class MavenProject
     // Plugins
     // ----------------------------------------------------------------------
 
-    public List getReportPlugins()
+    public List<ReportPlugin> getReportPlugins()
     {
         if ( getModel().getReporting() == null )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return getModel().getReporting().getPlugins();
 
     }
 
-    public List getBuildPlugins()
+    public List<Plugin> getBuildPlugins()
     {
         if ( getModel().getBuild() == null )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return getModel().getBuild().getPlugins();
     }
 
-    public List getModules()
+    public List<String> getModules()
     {
         return getModel().getModules();
     }
@@ -1409,7 +1411,7 @@ public class MavenProject
 
         if ( pm != null )
         {
-            Map pmByKey = pm.getPluginsAsMap();
+            Map<String, Plugin> pmByKey = pm.getPluginsAsMap();
 
             String pluginKey = plugin.getKey();
 
@@ -1422,17 +1424,17 @@ public class MavenProject
         }
     }
 
-    public List getCollectedProjects()
+    public List<MavenProject> getCollectedProjects()
     {
         return collectedProjects;
     }
 
-    public void setCollectedProjects( List collectedProjects )
+    public void setCollectedProjects( List<MavenProject> collectedProjects )
     {
         this.collectedProjects = collectedProjects;
     }
 
-    public void setPluginArtifactRepositories( List pluginArtifactRepositories )
+    public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
         this.pluginArtifactRepositories = pluginArtifactRepositories;
     }
@@ -1441,7 +1443,7 @@ public class MavenProject
      * @return a list of ArtifactRepository objects constructed
      *         from the Repository objects returned by getPluginRepositories.
      */
-    public List getPluginArtifactRepositories()
+    public List<ArtifactRepository> getPluginArtifactRepositories()
     {
         return getRemoteArtifactRepositories();
     }
@@ -1453,18 +1455,18 @@ public class MavenProject
             : getReleaseArtifactRepository();
     }
 
-    public List getPluginRepositories()
+    public List<Repository> getPluginRepositories()
     {
 //        return model.getPluginRepositories();
         return getModel().getRepositories();
     }
 
-    public void setActiveProfiles( List activeProfiles )
+    public void setActiveProfiles( List<Profile> activeProfiles )
     {
         this.activeProfiles.addAll( activeProfiles );
     }
 
-    public List getActiveProfiles()
+    public List<Profile> getActiveProfiles()
     {
         return activeProfiles;
     }
@@ -1472,7 +1474,7 @@ public class MavenProject
     public void addAttachedArtifact( Artifact artifact )
         throws DuplicateArtifactAttachmentException
     {
-        List attachedArtifacts = getAttachedArtifacts();
+        List<Artifact> attachedArtifacts = getAttachedArtifacts();
 
         if ( attachedArtifacts.contains( artifact ) )
         {
@@ -1507,7 +1509,7 @@ public class MavenProject
 
         if ( getReportPlugins() != null )
         {
-            for ( Iterator iterator = getReportPlugins().iterator(); iterator.hasNext(); )
+            for ( Iterator<ReportPlugin> iterator = getReportPlugins().iterator(); iterator.hasNext(); )
             {
                 ReportPlugin plugin = (ReportPlugin) iterator.next();
 
@@ -1563,12 +1565,12 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getArtifacts() to get all transitive dependencies
      */
-    public Set getDependencyArtifacts()
+    public Set<Artifact> getDependencyArtifacts()
     {
         return dependencyArtifacts;
     }
 
-    public void setDependencyArtifacts( Set dependencyArtifacts )
+    public void setDependencyArtifacts( Set<Artifact> dependencyArtifacts )
     {
         this.dependencyArtifacts = dependencyArtifacts;
     }
@@ -1593,29 +1595,29 @@ public class MavenProject
         return originalModel;
     }
 
-    public void setManagedVersionMap( Map map )
+    public void setManagedVersionMap( Map<String, Artifact> map )
     {
         managedVersionMap = map;
     }
 
-    public Map getManagedVersionMap()
+    public Map<String, Artifact> getManagedVersionMap()
     {
         if ( managedVersionMap != null )
         {
             return managedVersionMap;
         }
 
-        Map map = null;
+        Map<String, Artifact> map = null;
         if ( artifactFactory != null )
         {
 
-            List deps;
+            List<Dependency> deps;
             DependencyManagement dependencyManagement = getDependencyManagement();
             if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null ) &&
                 ( deps.size() > 0 ) )
             {
                 map = new ManagedVersionMap( map );
-                for ( Iterator i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
+                for ( Iterator<Dependency> i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
                 {
                     Dependency d = (Dependency) i.next();
 
@@ -1639,9 +1641,9 @@ public class MavenProject
 
                         if ( ( null != d.getExclusions() ) && !d.getExclusions().isEmpty() )
                         {
-                            List exclusions = new ArrayList();
+                            List<String> exclusions = new ArrayList<String>();
 
-                            for ( Iterator j = d.getExclusions().iterator(); j.hasNext(); )
+                            for ( Iterator<Exclusion> j = d.getExclusions().iterator(); j.hasNext(); )
                             {
                                 Exclusion e = (Exclusion) j.next();
 
@@ -1661,13 +1663,13 @@ public class MavenProject
                     }
                     catch ( InvalidVersionSpecificationException e )
                     {
-                        map = Collections.EMPTY_MAP;
+                        map = Collections.emptyMap();
                     }
                 }
             }
             else if ( map == null )
             {
-                map = Collections.EMPTY_MAP;
+                map = Collections.emptyMap();
             }
         }
         managedVersionMap = map;
@@ -1699,12 +1701,12 @@ public class MavenProject
         return getId().hashCode();
     }
 
-    public List getBuildExtensions()
+    public List<Extension> getBuildExtensions()
     {
         Build build = getBuild();
         if ( ( build == null ) || ( build.getExtensions() == null ) )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         else
         {
@@ -1716,7 +1718,7 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} >
      * @todo the lazy initialisation of this makes me uneasy.
      */
-    public Set createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
+    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
                                 ArtifactFilter dependencyFilter )
         throws InvalidDependencyVersionException
     {
@@ -1743,12 +1745,12 @@ public class MavenProject
         return getModel().getProperties();
     }
 
-    public List getFilters()
+    public List<String> getFilters()
     {
         return getBuild().getFilters();
     }
 
-    public Map getProjectReferences()
+    public Map<String, MavenProject> getProjectReferences()
     {
         return projectReferences;
     }
@@ -1796,7 +1798,7 @@ public class MavenProject
                     }
                 }
 
-                Iterator itr = ref.getAttachedArtifacts().iterator();
+                Iterator<Artifact> itr = ref.getAttachedArtifacts().iterator();
                 while ( itr.hasNext() )
                 {
                     Artifact attached = (Artifact) itr.next();
@@ -1904,22 +1906,22 @@ public class MavenProject
         this.model = model;
     }
 
-    protected void setAttachedArtifacts( List attachedArtifacts )
+    protected void setAttachedArtifacts( List<Artifact> attachedArtifacts )
     {
         this.attachedArtifacts = attachedArtifacts;
     }
 
-    protected void setCompileSourceRoots( List compileSourceRoots )
+    protected void setCompileSourceRoots( List<String> compileSourceRoots )
     {
         this.compileSourceRoots = compileSourceRoots;
     }
 
-    protected void setTestCompileSourceRoots( List testCompileSourceRoots )
+    protected void setTestCompileSourceRoots( List<String> testCompileSourceRoots )
     {
         this.testCompileSourceRoots = testCompileSourceRoots;
     }
 
-    protected void setScriptSourceRoots( List scriptSourceRoots )
+    protected void setScriptSourceRoots( List<String> scriptSourceRoots )
     {
         this.scriptSourceRoots = scriptSourceRoots;
     }
@@ -1994,23 +1996,23 @@ public class MavenProject
         if ( project.getAttachedArtifacts() != null )
         {
             // clone properties modifyable by plugins in a forked lifecycle
-            setAttachedArtifacts( new ArrayList( project.getAttachedArtifacts() ) );
+            setAttachedArtifacts( new ArrayList<Artifact>( project.getAttachedArtifacts() ) );
         }
 
         if ( project.getCompileSourceRoots() != null )
         {
             // clone source roots
-            setCompileSourceRoots( ( new ArrayList( project.getCompileSourceRoots() ) ) );
+            setCompileSourceRoots( ( new ArrayList<String>( project.getCompileSourceRoots() ) ) );
         }
 
         if ( project.getTestCompileSourceRoots() != null )
         {
-            setTestCompileSourceRoots( ( new ArrayList( project.getTestCompileSourceRoots() ) ) );
+            setTestCompileSourceRoots( ( new ArrayList<String>( project.getTestCompileSourceRoots() ) ) );
         }
 
         if ( project.getScriptSourceRoots() != null )
         {
-            setScriptSourceRoots( ( new ArrayList( project.getScriptSourceRoots() ) ) );
+            setScriptSourceRoots( ( new ArrayList<String>( project.getScriptSourceRoots() ) ) );
         }
 
         setModel(  project.getModel() );
@@ -2043,7 +2045,7 @@ public class MavenProject
         }
     }
 
-    private void addArtifactPath( Artifact a, List list )
+    private void addArtifactPath( Artifact a, List<String> list )
         throws DependencyResolutionRequiredException
     {
         String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
