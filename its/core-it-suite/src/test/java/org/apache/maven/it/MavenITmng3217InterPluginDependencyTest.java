@@ -36,7 +36,7 @@ public class MavenITmng3217InterPluginDependencyTest
 
     public MavenITmng3217InterPluginDependencyTest()
     {
-        super( "[3.0-alpha-1,)" );
+        super( "[2.1.0-M2,)" );
     }
 
     /**

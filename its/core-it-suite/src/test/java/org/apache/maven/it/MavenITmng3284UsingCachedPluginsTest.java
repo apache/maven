@@ -33,7 +33,7 @@ public class MavenITmng3284UsingCachedPluginsTest
 
     public MavenITmng3284UsingCachedPluginsTest()
     {
-        super( "[3.0-alpha-1,)" ); 
+        super( "[2.1.0-M2,)" ); 
     }
 
     /**
@@ -53,8 +53,7 @@ public class MavenITmng3284UsingCachedPluginsTest
          */
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3284", "maven-it-plugin-version", "0.1", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3284", "maven-it-plugin-version", "0.2", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3284" );
         verifier.executeGoal( "validate" ); 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
