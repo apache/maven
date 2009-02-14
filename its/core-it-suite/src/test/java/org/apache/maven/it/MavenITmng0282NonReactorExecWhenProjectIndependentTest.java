@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng0282NonReactorExecWhenProjectIndependentTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0282NonReactorExecWhenProjectIndependentTest()
+    public MavenITmng0282NonReactorExecWhenProjectIndependentTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

@@ -36,7 +36,7 @@ import java.io.File;
 public class MavenITmng3498ForkToOtherMojoTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng3498ForkToOtherMojoTest()
+    public MavenITmng3498ForkToOtherMojoTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

@@ -28,7 +28,7 @@ import java.util.List;
 public class MavenIT0063Test
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenIT0063Test()
+    public MavenIT0063Test()
     {
         super( ALL_MAVEN_VERSIONS );
     }

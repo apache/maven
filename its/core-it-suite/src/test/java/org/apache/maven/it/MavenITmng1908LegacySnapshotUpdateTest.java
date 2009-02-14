@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng1908LegacySnapshotUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng1908LegacySnapshotUpdateTest()
+    public MavenITmng1908LegacySnapshotUpdateTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

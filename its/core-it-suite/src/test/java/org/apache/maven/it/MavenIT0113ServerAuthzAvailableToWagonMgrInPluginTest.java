@@ -30,7 +30,7 @@ import java.util.Properties;
 public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest()
+    public MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

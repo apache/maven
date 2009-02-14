@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng0674PluginParameterAliasTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0674PluginParameterAliasTest()
+    public MavenITmng0674PluginParameterAliasTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

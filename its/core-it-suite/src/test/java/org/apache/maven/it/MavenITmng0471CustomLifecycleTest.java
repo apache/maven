@@ -35,7 +35,7 @@ import java.util.List;
 public class MavenITmng0471CustomLifecycleTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0471CustomLifecycleTest()
+    public MavenITmng0471CustomLifecycleTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

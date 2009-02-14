@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng0612NewestConflictResolverTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0612NewestConflictResolverTest()
+    public MavenITmng0612NewestConflictResolverTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng1052PluginMngtConfigTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng1052PluginMngtConfigTest()
+    public MavenITmng1052PluginMngtConfigTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

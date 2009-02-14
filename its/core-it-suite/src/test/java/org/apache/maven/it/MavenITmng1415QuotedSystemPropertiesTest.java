@@ -35,7 +35,7 @@ import java.util.Properties;
 public class MavenITmng1415QuotedSystemPropertiesTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng1415QuotedSystemPropertiesTest()
+    public MavenITmng1415QuotedSystemPropertiesTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

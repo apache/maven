@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenIT0039Test
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenIT0039Test()
+    public MavenIT0039Test()
     {
         super( ALL_MAVEN_VERSIONS );
     }

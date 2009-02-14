@@ -34,7 +34,7 @@ import java.util.Collection;
 public class MavenITmng1233WarDepWithProvidedScopeTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng1233WarDepWithProvidedScopeTest()
+    public MavenITmng1233WarDepWithProvidedScopeTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

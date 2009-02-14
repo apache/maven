@@ -34,7 +34,7 @@ import java.util.Map;
 public class MavenIT0109ReleaseUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenIT0109ReleaseUpdateTest()
+    public MavenIT0109ReleaseUpdateTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

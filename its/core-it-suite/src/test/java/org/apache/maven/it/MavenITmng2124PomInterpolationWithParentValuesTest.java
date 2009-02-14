@@ -28,7 +28,7 @@ import java.util.Properties;
 public class MavenITmng2124PomInterpolationWithParentValuesTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng2124PomInterpolationWithParentValuesTest()
+    public MavenITmng2124PomInterpolationWithParentValuesTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

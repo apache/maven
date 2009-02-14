@@ -33,7 +33,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3679PluginExecIdInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng3679PluginExecIdInterpolationTest()
+    public MavenITmng3679PluginExecIdInterpolationTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

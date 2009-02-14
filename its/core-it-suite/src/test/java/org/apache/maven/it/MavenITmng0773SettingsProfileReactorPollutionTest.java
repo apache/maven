@@ -35,7 +35,7 @@ import java.util.List;
 public class MavenITmng0773SettingsProfileReactorPollutionTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0773SettingsProfileReactorPollutionTest()
+    public MavenITmng0773SettingsProfileReactorPollutionTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

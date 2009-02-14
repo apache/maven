@@ -34,7 +34,7 @@ import java.util.Collection;
 public class MavenITmng0820ConflictResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0820ConflictResolutionTest()
+    public MavenITmng0820ConflictResolutionTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

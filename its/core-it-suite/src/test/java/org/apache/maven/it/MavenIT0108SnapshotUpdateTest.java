@@ -37,7 +37,7 @@ import java.util.Locale;
 public class MavenIT0108SnapshotUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenIT0108SnapshotUpdateTest()
+    public MavenIT0108SnapshotUpdateTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

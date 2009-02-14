@@ -32,7 +32,7 @@ import java.io.File;
 public class MavenITBootstrapTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITBootstrapTest()
+    public MavenITBootstrapTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

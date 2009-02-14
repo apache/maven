@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng0095ReactorFailureBehaviorTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0095ReactorFailureBehaviorTest()
+    public MavenITmng0095ReactorFailureBehaviorTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

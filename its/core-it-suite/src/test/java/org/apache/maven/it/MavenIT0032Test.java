@@ -27,7 +27,7 @@ import java.io.File;
 public class MavenIT0032Test
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenIT0032Test()
+    public MavenIT0032Test()
     {
         super( ALL_MAVEN_VERSIONS );
     }

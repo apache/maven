@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng0985NonExecutedPluginMngtGoalsTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0985NonExecutedPluginMngtGoalsTest()
+    public MavenITmng0985NonExecutedPluginMngtGoalsTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

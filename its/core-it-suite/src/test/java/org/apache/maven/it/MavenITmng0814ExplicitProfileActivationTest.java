@@ -34,7 +34,7 @@ import java.util.Properties;
 public class MavenITmng0814ExplicitProfileActivationTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0814ExplicitProfileActivationTest()
+    public MavenITmng0814ExplicitProfileActivationTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

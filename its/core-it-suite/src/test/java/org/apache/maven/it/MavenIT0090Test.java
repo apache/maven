@@ -30,7 +30,7 @@ import java.util.Properties;
 public class MavenIT0090Test
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenIT0090Test()
+    public MavenIT0090Test()
     {
         super( ALL_MAVEN_VERSIONS );
     }

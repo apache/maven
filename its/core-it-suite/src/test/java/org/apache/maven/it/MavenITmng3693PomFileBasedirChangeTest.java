@@ -36,7 +36,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3693PomFileBasedirChangeTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng3693PomFileBasedirChangeTest()
+    public MavenITmng3693PomFileBasedirChangeTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

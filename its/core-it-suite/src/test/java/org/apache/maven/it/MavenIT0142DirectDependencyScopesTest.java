@@ -38,7 +38,7 @@ public class MavenIT0142DirectDependencyScopesTest
      * NOTE: Class path ordering is another issue (MNG-1412), so we merely check set containment here.
      */
 
-    protected MavenIT0142DirectDependencyScopesTest()
+    public MavenIT0142DirectDependencyScopesTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

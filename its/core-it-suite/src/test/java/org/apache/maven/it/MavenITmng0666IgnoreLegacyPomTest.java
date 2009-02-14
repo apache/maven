@@ -34,7 +34,7 @@ import java.util.List;
 public class MavenITmng0666IgnoreLegacyPomTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0666IgnoreLegacyPomTest()
+    public MavenITmng0666IgnoreLegacyPomTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

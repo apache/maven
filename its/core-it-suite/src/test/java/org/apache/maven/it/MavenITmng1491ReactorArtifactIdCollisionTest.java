@@ -28,7 +28,7 @@ import java.io.File;
 public class MavenITmng1491ReactorArtifactIdCollisionTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng1491ReactorArtifactIdCollisionTest()
+    public MavenITmng1491ReactorArtifactIdCollisionTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

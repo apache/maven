@@ -40,7 +40,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3331ModulePathNormalizationTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng3331ModulePathNormalizationTest()
+    public MavenITmng3331ModulePathNormalizationTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

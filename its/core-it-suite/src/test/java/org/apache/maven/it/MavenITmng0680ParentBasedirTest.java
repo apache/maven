@@ -34,7 +34,7 @@ import java.util.Properties;
 public class MavenITmng0680ParentBasedirTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0680ParentBasedirTest()
+    public MavenITmng0680ParentBasedirTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

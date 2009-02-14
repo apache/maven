@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng0836PluginParentResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0836PluginParentResolutionTest()
+    public MavenITmng0836PluginParentResolutionTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

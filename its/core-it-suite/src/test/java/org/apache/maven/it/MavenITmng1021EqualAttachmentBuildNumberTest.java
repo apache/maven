@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng1021EqualAttachmentBuildNumberTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng1021EqualAttachmentBuildNumberTest()
+    public MavenITmng1021EqualAttachmentBuildNumberTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

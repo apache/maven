@@ -31,7 +31,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3288SystemScopeDirTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng3288SystemScopeDirTest()
+    public MavenITmng3288SystemScopeDirTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

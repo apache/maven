@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng1088ReactorDepResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng1088ReactorDepResolutionTest()
+    public MavenITmng1088ReactorDepResolutionTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

@@ -34,7 +34,7 @@ import java.util.List;
 public class MavenITmng0249ResolveDepsFromReactorTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0249ResolveDepsFromReactorTest()
+    public MavenITmng0249ResolveDepsFromReactorTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

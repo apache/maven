@@ -29,7 +29,7 @@ import java.util.List;
 public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng2052InterpolateWithSettingsProfilePropertiesTest()
+    public MavenITmng2052InterpolateWithSettingsProfilePropertiesTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

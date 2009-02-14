@@ -28,7 +28,7 @@ public class MavenIT0008Test
     extends AbstractMavenIntegrationTestCase
 {
 
-    protected MavenIT0008Test()
+    public MavenIT0008Test()
     {
         super( ALL_MAVEN_VERSIONS );
     }

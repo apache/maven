@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng2994SnapshotRangeRepositoryTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng2994SnapshotRangeRepositoryTest()
+    public MavenITmng2994SnapshotRangeRepositoryTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

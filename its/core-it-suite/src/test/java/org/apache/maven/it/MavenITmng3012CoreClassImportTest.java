@@ -34,7 +34,7 @@ import java.util.Properties;
 public class MavenITmng3012CoreClassImportTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng3012CoreClassImportTest()
+    public MavenITmng3012CoreClassImportTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

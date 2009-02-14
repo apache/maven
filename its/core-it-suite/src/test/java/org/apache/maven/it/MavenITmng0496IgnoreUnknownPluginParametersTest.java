@@ -33,7 +33,7 @@ import java.io.File;
 public class MavenITmng0496IgnoreUnknownPluginParametersTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0496IgnoreUnknownPluginParametersTest()
+    public MavenITmng0496IgnoreUnknownPluginParametersTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

@@ -34,7 +34,7 @@ import java.util.Properties;
 public class MavenITmng2878DefaultReportXmlImportTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng2878DefaultReportXmlImportTest()
+    public MavenITmng2878DefaultReportXmlImportTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

@@ -35,7 +35,7 @@ import java.util.Collections;
 public class MavenITmng0818WarDepsNotTransitiveTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng0818WarDepsNotTransitiveTest()
+    public MavenITmng0818WarDepsNotTransitiveTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

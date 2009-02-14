@@ -38,7 +38,7 @@ import java.util.List;
 public class MavenITmng3482DependencyPomInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
-    protected MavenITmng3482DependencyPomInterpolationTest()
+    public MavenITmng3482DependencyPomInterpolationTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
