@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.apache.maven.Maven;
 import org.apache.maven.MavenTools;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -190,6 +191,7 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
     private void processSettings( MavenExecutionRequest request, Configuration configuration )
+        throws MavenEmbedderException
     {
         ProfileManager profileManager = request.getProfileManager();
 
@@ -217,37 +219,15 @@ public class DefaultMavenExecutionRequestPopulator
                 {
                     Repository r = (Repository) j.next();
 
-                    ArtifactRepositoryPolicy releases = new ArtifactRepositoryPolicy();
-
-                    if ( r.getReleases() != null )
+                    ArtifactRepository ar;
+                    try
                     {
-                        releases.setChecksumPolicy( r.getReleases().getChecksumPolicy() );
-
-                        releases.setUpdatePolicy( r.getReleases().getUpdatePolicy() );
+                        ar = mavenTools.buildArtifactRepository( r );
                     }
-                    else
+                    catch ( InvalidRepositoryException e )
                     {
-                        releases.setChecksumPolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY );
-
-                        releases.setUpdatePolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                        throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
                     }
-
-                    ArtifactRepositoryPolicy snapshots = new ArtifactRepositoryPolicy();
-
-                    if ( r.getSnapshots() != null )
-                    {
-                        snapshots.setChecksumPolicy( r.getSnapshots().getChecksumPolicy() );
-
-                        snapshots.setUpdatePolicy( r.getSnapshots().getUpdatePolicy() );
-                    }
-                    else
-                    {
-                        snapshots.setChecksumPolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY );
-
-                        snapshots.setUpdatePolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
-                    }
-
-                    ArtifactRepository ar = mavenTools.createRepository( r.getId(), r.getUrl(), snapshots, releases );
 
                     request.addRemoteRepository( ar );
                 }
