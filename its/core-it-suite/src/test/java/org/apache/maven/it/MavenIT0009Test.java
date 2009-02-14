@@ -28,6 +28,11 @@ public class MavenIT0009Test
     extends AbstractMavenIntegrationTestCase
 {
 
+    protected MavenIT0009Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+
     /**
      * Test plugin configuration and goal configuration that overrides what the
      * mojo has specified.

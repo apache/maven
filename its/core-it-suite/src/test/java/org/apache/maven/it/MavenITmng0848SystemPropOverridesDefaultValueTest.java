@@ -37,6 +37,7 @@ public class MavenITmng0848SystemPropOverridesDefaultValueTest
 
     public MavenITmng0848SystemPropOverridesDefaultValueTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

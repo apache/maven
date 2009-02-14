@@ -35,6 +35,10 @@ import java.util.List;
 public class MavenITmng0557UserSettingsCliOptionTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0557UserSettingsCliOptionTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test --settings CLI option

@@ -37,6 +37,7 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
 
     public MavenITmng0294MergeGlobalAndUserSettingsTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

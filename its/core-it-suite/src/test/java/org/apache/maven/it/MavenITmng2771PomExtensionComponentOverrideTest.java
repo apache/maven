@@ -33,6 +33,11 @@ import java.io.File;
 public class MavenITmng2771PomExtensionComponentOverrideTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng2771PomExtensionComponentOverrideTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+
     /**
      * Test that ensures the POM extensions can override default component implementations.
      */

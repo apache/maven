@@ -39,7 +39,7 @@ public class MavenITmng3998PluginExecutionConfigTest
 
     public MavenITmng3998PluginExecutionConfigTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

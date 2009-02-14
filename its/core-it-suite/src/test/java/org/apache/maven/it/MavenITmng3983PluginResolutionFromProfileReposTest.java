@@ -36,7 +36,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
 
     public MavenITmng3983PluginResolutionFromProfileReposTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

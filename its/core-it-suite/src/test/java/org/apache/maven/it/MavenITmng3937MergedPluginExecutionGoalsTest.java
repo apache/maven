@@ -38,6 +38,7 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest
 
     public MavenITmng3937MergedPluginExecutionGoalsTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

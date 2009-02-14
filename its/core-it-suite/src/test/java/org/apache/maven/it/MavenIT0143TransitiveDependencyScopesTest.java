@@ -41,6 +41,7 @@ public class MavenIT0143TransitiveDependencyScopesTest
 
     public MavenIT0143TransitiveDependencyScopesTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

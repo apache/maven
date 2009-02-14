@@ -37,6 +37,7 @@ public class MavenITmng3900ProfilePropertiesInterpolationTest
 
     public MavenITmng3900ProfilePropertiesInterpolationTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

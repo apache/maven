@@ -36,7 +36,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
 
     public MavenITmng3379ParallelArtifactDownloadsTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

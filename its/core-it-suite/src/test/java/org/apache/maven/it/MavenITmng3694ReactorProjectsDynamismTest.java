@@ -35,6 +35,7 @@ public class MavenITmng3694ReactorProjectsDynamismTest
 {
     public MavenITmng3694ReactorProjectsDynamismTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     public void testitMNG3694 ()

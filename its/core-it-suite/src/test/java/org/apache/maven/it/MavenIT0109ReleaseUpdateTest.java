@@ -34,6 +34,11 @@ import java.util.Map;
 public class MavenIT0109ReleaseUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0109ReleaseUpdateTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+
     private static final String GROUPID = "org.apache.maven.it";
 
     private static final String ARTIFACTID = "maven-it-release-update";

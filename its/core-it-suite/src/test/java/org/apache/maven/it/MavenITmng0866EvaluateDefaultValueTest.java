@@ -38,6 +38,7 @@ public class MavenITmng0866EvaluateDefaultValueTest
 
     public MavenITmng0866EvaluateDefaultValueTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

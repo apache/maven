@@ -35,6 +35,10 @@ import java.util.List;
 public class MavenITmng0823MojoContextPassingTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0823MojoContextPassingTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Tests context passing between mojos in the same plugin.

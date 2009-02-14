@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng0985NonExecutedPluginMngtGoalsTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0985NonExecutedPluginMngtGoalsTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that plugins in pluginManagement aren't included in the build

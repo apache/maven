@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenIT0025Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0025Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test multiple goal executions with different execution-level configs.

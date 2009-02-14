@@ -37,6 +37,7 @@ public class MavenITmng3944BasedirInterpolationTest
 
     public MavenITmng3944BasedirInterpolationTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

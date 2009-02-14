@@ -25,10 +25,11 @@ import org.apache.maven.it.Verifier;
 import java.io.PrintStream;
 
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class IntegrationTestSuite
-    extends AbstractMavenIntegrationTestCase
+    extends TestCase
 {
     private static PrintStream out = System.out;
 

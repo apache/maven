@@ -34,6 +34,10 @@ import java.util.Collection;
 public class MavenITmng0505VersionRangeTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0505VersionRangeTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test version range support.

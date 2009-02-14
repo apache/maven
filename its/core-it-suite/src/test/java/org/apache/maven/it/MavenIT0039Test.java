@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenIT0039Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0039Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test reactor for projects that have release-pom.xml in addition to

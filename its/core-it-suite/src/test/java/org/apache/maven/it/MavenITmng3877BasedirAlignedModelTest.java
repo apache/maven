@@ -37,6 +37,7 @@ public class MavenITmng3877BasedirAlignedModelTest
 
     public MavenITmng3877BasedirAlignedModelTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

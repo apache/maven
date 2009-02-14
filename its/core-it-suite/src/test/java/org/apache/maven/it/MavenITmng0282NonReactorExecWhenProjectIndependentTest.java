@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng0282NonReactorExecWhenProjectIndependentTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0282NonReactorExecWhenProjectIndependentTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test non-reactor behavior when plugin declares "@requiresProject false"

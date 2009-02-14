@@ -37,7 +37,7 @@ public class MavenITmng4008MergedFilterOrderTest
 
     public MavenITmng4008MergedFilterOrderTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

@@ -34,6 +34,10 @@ import java.util.Properties;
 public class MavenITmng0786ProfileAwareReactorTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0786ProfileAwareReactorTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verify that direct invocation of a mojo from the command line still

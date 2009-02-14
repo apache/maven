@@ -37,6 +37,7 @@ public class MavenITmng3866PluginConfigInheritanceTest
 
     public MavenITmng3866PluginConfigInheritanceTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

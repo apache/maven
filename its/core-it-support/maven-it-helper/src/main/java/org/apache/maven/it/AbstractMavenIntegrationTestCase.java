@@ -69,10 +69,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
     private static final String DEFAULT_MATCH_PATTERN = "(.*?)-(RC[0-9]+|SNAPSHOT|RC[0-9]+-SNAPSHOT)";
 
-    protected AbstractMavenIntegrationTestCase()
-    {
-        this.matchPattern = DEFAULT_MATCH_PATTERN;
-    }
+    protected static final String ALL_MAVEN_VERSIONS = "[2.0,)";
 
     protected AbstractMavenIntegrationTestCase( String versionRangeStr )
     {

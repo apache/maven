@@ -37,7 +37,7 @@ public class MavenITmng4009InheritProfileEffectsTest
 
     public MavenITmng4009InheritProfileEffectsTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

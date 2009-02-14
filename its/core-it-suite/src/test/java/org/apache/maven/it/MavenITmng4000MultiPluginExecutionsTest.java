@@ -38,7 +38,7 @@ public class MavenITmng4000MultiPluginExecutionsTest
 
     public MavenITmng4000MultiPluginExecutionsTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

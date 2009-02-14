@@ -37,6 +37,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
 
     public MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

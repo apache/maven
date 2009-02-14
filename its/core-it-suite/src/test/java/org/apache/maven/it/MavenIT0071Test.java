@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenIT0071Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0071Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verifies that dotted property references work within plugin

@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng0781PluginConfigVsExecConfigTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0781PluginConfigVsExecConfigTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that plugin-level configuration instances are not nullified by

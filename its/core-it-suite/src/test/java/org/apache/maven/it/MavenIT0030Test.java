@@ -27,6 +27,10 @@ import java.io.File;
 public class MavenIT0030Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0030Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test for injection of dependencyManagement through parents of

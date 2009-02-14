@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng1088ReactorDepResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng1088ReactorDepResolutionTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that the reactor can establish the artifact location of known projects for dependencies

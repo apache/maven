@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng0522PluginMgmtConfigTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0522PluginMgmtConfigTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test for pluginManagement injection of plugin configuration.

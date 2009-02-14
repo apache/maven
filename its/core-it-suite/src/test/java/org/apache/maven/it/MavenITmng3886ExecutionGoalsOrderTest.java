@@ -38,6 +38,7 @@ public class MavenITmng3886ExecutionGoalsOrderTest
 
     public MavenITmng3886ExecutionGoalsOrderTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

@@ -34,6 +34,10 @@ import java.util.Properties;
 public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test component injection from project-level plugin dependencies.

@@ -36,7 +36,7 @@ public class MavenITmng3979ElementJoinTest
 
     public MavenITmng3979ElementJoinTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

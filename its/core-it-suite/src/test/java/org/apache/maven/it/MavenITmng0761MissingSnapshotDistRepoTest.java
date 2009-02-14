@@ -36,7 +36,7 @@ public class MavenITmng0761MissingSnapshotDistRepoTest
 
     public MavenITmng0761MissingSnapshotDistRepoTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

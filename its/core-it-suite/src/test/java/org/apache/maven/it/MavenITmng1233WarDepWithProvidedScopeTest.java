@@ -34,6 +34,10 @@ import java.util.Collection;
 public class MavenITmng1233WarDepWithProvidedScopeTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng1233WarDepWithProvidedScopeTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verify that overriding a transitive compile time dependency as provided in a WAR ensures it is not included.

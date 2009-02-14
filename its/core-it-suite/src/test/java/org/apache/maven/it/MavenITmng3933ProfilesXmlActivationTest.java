@@ -39,6 +39,7 @@ public class MavenITmng3933ProfilesXmlActivationTest
 
     public MavenITmng3933ProfilesXmlActivationTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

@@ -35,6 +35,10 @@ import java.util.Properties;
 public class MavenITmng1415QuotedSystemPropertiesTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng1415QuotedSystemPropertiesTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that quoted system properties are processed correctly. [MNG-1415]

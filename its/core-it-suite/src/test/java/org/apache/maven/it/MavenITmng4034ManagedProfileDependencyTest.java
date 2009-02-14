@@ -39,7 +39,7 @@ public class MavenITmng4034ManagedProfileDependencyTest
 
     public MavenITmng4034ManagedProfileDependencyTest()
     {
-        super( "[2.0,)" );
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

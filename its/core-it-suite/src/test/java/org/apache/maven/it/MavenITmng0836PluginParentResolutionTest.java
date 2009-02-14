@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng0836PluginParentResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0836PluginParentResolutionTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that parent POMs referenced by a plugin POM can be resolved from ordinary repos, i.e. non-plugin repos.

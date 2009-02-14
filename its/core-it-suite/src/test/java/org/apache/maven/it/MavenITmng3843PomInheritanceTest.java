@@ -40,6 +40,7 @@ public class MavenITmng3843PomInheritanceTest
 
     public MavenITmng3843PomInheritanceTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

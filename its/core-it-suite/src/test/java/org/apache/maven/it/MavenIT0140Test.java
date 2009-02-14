@@ -33,6 +33,10 @@ import java.util.Properties;
 public class MavenIT0140Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0140Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that expressions of the form ${pom.*} resolve correctly to POM values.

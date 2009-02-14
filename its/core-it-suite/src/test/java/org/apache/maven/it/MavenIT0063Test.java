@@ -28,6 +28,10 @@ import java.util.List;
 public class MavenIT0063Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0063Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test the use of a system scoped dependency to a (fake) tools.jar.

@@ -30,6 +30,10 @@ import java.util.Properties;
 public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that the auth infos given in the settings.xml are pushed into the wagon manager and are available

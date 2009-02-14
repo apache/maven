@@ -27,6 +27,10 @@ import java.io.File;
 public class MavenIT0018Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0018Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Ensure that managed dependencies for dependency POMs are calculated

@@ -28,6 +28,10 @@ import java.util.List;
 public class MavenIT0010Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0010Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Since the artifact resolution does not use the project builder, we must

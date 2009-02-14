@@ -34,6 +34,10 @@ import java.util.List;
 public class MavenITmng0666IgnoreLegacyPomTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0666IgnoreLegacyPomTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verify that maven-1 POMs will be ignored but not stop the resolution

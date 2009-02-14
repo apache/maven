@@ -37,6 +37,7 @@ public class MavenITmng3839PomParsingCoalesceTextTest
 
     public MavenITmng3839PomParsingCoalesceTextTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

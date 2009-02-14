@@ -34,6 +34,10 @@ import java.util.List;
 public class MavenITmng3890TransitiveDependencyScopeUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng3890TransitiveDependencyScopeUpdateTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that transitive dependencies whose scope has been updated from "compile" to "provided" by a consumer

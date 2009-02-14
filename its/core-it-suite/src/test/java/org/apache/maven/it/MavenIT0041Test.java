@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenIT0041Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0041Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test the use of a new type from a plugin

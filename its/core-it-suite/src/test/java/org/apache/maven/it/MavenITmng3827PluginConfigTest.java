@@ -37,6 +37,7 @@ public class MavenITmng3827PluginConfigTest
 
     public MavenITmng3827PluginConfigTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

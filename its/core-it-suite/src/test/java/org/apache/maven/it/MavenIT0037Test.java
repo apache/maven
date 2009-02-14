@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenIT0037Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0037Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test building with alternate pom file using '-f'

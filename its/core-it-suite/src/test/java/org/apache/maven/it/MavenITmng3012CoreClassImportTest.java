@@ -34,6 +34,10 @@ import java.util.Properties;
 public class MavenITmng3012CoreClassImportTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng3012CoreClassImportTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verify that classes shared with the Maven core realm are imported into the plugin realm such that instances of

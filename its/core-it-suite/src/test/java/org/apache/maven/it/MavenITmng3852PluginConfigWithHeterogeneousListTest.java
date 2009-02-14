@@ -37,6 +37,7 @@ public class MavenITmng3852PluginConfigWithHeterogeneousListTest
 
     public MavenITmng3852PluginConfigWithHeterogeneousListTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

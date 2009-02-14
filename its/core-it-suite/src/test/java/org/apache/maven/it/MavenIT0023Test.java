@@ -27,6 +27,11 @@ import java.io.File;
 public class MavenIT0023Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0023Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+
     /**
      * Test profile inclusion from settings.xml (this one is activated by an id
      * in the activeProfiles section).

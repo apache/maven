@@ -36,6 +36,7 @@ public class MavenITmng3821EqualPluginExecIdsTest
 
     public MavenITmng3821EqualPluginExecIdsTest() 
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

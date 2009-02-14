@@ -37,6 +37,7 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest
 
     public MavenITmng3846PomInheritanceUrlAdjustmentTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

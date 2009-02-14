@@ -34,6 +34,10 @@ import java.util.Properties;
 public class MavenITmng0479OverrideCentralRepoTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0479OverrideCentralRepoTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test for repository inheritance - ensure using the same id overrides the defaults

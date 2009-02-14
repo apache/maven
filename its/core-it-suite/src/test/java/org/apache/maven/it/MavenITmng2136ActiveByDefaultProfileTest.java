@@ -28,6 +28,10 @@ import java.util.Properties;
 public class MavenITmng2136ActiveByDefaultProfileTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng2136ActiveByDefaultProfileTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that &lt;activeByDefault/&gt; calculations for profile activation only

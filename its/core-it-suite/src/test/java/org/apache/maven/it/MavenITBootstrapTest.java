@@ -32,6 +32,10 @@ import java.io.File;
 public class MavenITBootstrapTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITBootstrapTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Bootstraps the integration tests by downloading required artifacts.

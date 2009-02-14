@@ -37,6 +37,7 @@ public class MavenITmng3845LimitedPomInheritanceTest
 
     public MavenITmng3845LimitedPomInheritanceTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

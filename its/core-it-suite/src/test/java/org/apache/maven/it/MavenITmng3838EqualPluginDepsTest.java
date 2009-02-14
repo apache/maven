@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng3838EqualPluginDepsTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng3838EqualPluginDepsTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verify that using the same dependency for different plugins doesn't blow up the project builder.

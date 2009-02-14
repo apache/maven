@@ -36,7 +36,7 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest
 
     public MavenITmng0870ReactorAwarePluginDiscoveryTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

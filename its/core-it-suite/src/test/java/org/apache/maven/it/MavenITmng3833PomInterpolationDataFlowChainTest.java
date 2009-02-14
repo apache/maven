@@ -37,6 +37,7 @@ public class MavenITmng3833PomInterpolationDataFlowChainTest
 
     public MavenITmng3833PomInterpolationDataFlowChainTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

@@ -37,7 +37,7 @@ public class MavenITmng4007PlatformFileSeparatorTest
 
     public MavenITmng4007PlatformFileSeparatorTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

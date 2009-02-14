@@ -34,6 +34,10 @@ import java.util.Properties;
 public class MavenIT0072Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0072Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verifies that property references with dotted notation work within

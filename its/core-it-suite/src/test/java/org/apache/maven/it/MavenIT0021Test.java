@@ -27,6 +27,10 @@ import java.io.File;
 public class MavenIT0021Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0021Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test pom-level profile inclusion (this one is activated by system

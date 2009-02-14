@@ -38,6 +38,7 @@ public class MavenIT0144LifecycleExecutionOrderTest
 
     public MavenIT0144LifecycleExecutionOrderTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

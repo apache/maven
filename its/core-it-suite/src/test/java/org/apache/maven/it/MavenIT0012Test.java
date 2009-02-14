@@ -27,6 +27,10 @@ import java.io.File;
 public class MavenIT0012Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0012Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test simple POM interpolation

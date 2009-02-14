@@ -35,6 +35,10 @@ import java.util.Collections;
 public class MavenITmng0818WarDepsNotTransitiveTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0818WarDepsNotTransitiveTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that depending on a WAR doesn't also get its dependencies transitively.

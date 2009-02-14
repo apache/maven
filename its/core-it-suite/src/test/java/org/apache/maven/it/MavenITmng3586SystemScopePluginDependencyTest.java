@@ -37,6 +37,7 @@ public class MavenITmng3586SystemScopePluginDependencyTest
 
     public MavenITmng3586SystemScopePluginDependencyTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

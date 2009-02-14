@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng0731LegacyRepoLayoutTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0731LegacyRepoLayoutTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verify that deployment of artifacts to a legacy-layout repository

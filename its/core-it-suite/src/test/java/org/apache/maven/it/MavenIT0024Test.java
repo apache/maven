@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenIT0024Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0024Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test usage of &lt;executions/&gt; inside a plugin rather than &lt;goals/&gt;

@@ -35,6 +35,10 @@ import java.util.List;
 public class MavenITmng0768OfflineModeTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0768OfflineModeTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test offline mode.

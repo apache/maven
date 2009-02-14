@@ -36,7 +36,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
 
     public MavenITmng3970DepResolutionFromProfileReposTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

@@ -27,6 +27,10 @@ import java.io.File;
 public class MavenIT0032Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0032Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Tests that a specified Maven version requirement that is lower doesn't cause any problems

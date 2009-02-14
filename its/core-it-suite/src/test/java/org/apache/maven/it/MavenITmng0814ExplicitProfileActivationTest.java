@@ -34,6 +34,10 @@ import java.util.Properties;
 public class MavenITmng0814ExplicitProfileActivationTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0814ExplicitProfileActivationTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test activation of a profile from the command line.

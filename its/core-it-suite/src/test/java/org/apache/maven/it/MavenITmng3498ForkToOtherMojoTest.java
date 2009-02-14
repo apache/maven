@@ -36,10 +36,10 @@ import java.io.File;
 public class MavenITmng3498ForkToOtherMojoTest
     extends AbstractMavenIntegrationTestCase
 {
-//    public MavenITmng3498ForkToOtherMojoTest()
-//    {
-//        super( "(2.0.8,)" ); // only test in 2.0.9+
-//    }
+    protected MavenITmng3498ForkToOtherMojoTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     public void testitMNG3498 ()
         throws Exception

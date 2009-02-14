@@ -33,20 +33,7 @@ public class MavenIntegrationTestCaseTest
         {
             // test case with version range
         };
-        testRemovePattern( test );
-    }
 
-    public void testRemovePatternForTestWithoutVersionRange()
-    {
-        AbstractMavenIntegrationTestCase test = new AbstractMavenIntegrationTestCase()
-        {
-            // test case without version range
-        };
-        testRemovePattern( test );
-    }
-
-    private static void testRemovePattern( AbstractMavenIntegrationTestCase test )
-    {
         assertVersionEquals( "2.1.0-M1", "2.1.0-M1", test );
         assertVersionEquals( "2.1.0-M1", "2.1.0-M1-SNAPSHOT", test );
         assertVersionEquals( "2.1.0-M1", "2.1.0-M1-RC1", test );

@@ -38,6 +38,7 @@ public class MavenITmng3892ReleaseDeploymentTest
 
     public MavenITmng3892ReleaseDeploymentTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

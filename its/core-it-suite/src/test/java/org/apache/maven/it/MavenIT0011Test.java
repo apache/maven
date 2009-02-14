@@ -28,6 +28,10 @@ import java.util.List;
 public class MavenIT0011Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0011Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test specification of dependency versions via &lt;dependencyManagement/&gt;.

@@ -37,6 +37,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest
 
     public MavenITmng3873MultipleExecutionGoalsTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

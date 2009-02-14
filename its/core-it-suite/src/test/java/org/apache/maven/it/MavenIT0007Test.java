@@ -28,6 +28,11 @@ public class MavenIT0007Test
     extends AbstractMavenIntegrationTestCase
 {
 
+    protected MavenIT0007Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+
     /**
      * We specify a parent in the POM and make sure that it is downloaded as
      * part of the process.

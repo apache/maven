@@ -28,6 +28,10 @@ import java.util.Collection;
 public class MavenIT0085Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0085Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verify that system-scoped dependencies get resolved with system scope

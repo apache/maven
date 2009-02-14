@@ -31,6 +31,10 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3288SystemScopeDirTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng3288SystemScopeDirTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test the use of a system scoped dependency to a directory instead of a JAR which should fail early.

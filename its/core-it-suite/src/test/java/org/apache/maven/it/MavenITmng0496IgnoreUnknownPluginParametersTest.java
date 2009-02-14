@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng0496IgnoreUnknownPluginParametersTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0496IgnoreUnknownPluginParametersTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that unused configuration parameters from the POM don't cause the

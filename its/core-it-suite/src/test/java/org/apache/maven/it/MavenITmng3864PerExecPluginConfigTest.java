@@ -37,6 +37,7 @@ public class MavenITmng3864PerExecPluginConfigTest
 
     public MavenITmng3864PerExecPluginConfigTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

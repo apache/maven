@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng1052PluginMngtConfigTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng1052PluginMngtConfigTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that configuration for a lifecycle-bound plugin is injected from

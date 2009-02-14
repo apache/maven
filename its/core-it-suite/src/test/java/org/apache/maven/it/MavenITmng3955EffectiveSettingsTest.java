@@ -37,7 +37,7 @@ public class MavenITmng3955EffectiveSettingsTest
 
     public MavenITmng3955EffectiveSettingsTest()
     {
-        super();
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

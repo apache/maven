@@ -38,6 +38,7 @@ public class MavenITmng0377PluginLookupFromPrefixTest
 {
     public MavenITmng0377PluginLookupFromPrefixTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

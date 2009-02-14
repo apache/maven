@@ -38,6 +38,7 @@ public class MavenITmng3887PluginExecutionOrderTest
 
     public MavenITmng3887PluginExecutionOrderTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

@@ -34,6 +34,10 @@ import java.util.List;
 public class MavenITmng0507ArtifactRelocationTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0507ArtifactRelocationTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test artifact relocation.

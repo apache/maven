@@ -34,6 +34,10 @@ import java.util.List;
 public class MavenITmng0249ResolveDepsFromReactorTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng0249ResolveDepsFromReactorTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that the reactor can establish the artifact location of known projects for dependencies.

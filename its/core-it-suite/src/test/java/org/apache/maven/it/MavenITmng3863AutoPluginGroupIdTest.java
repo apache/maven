@@ -37,6 +37,7 @@ public class MavenITmng3863AutoPluginGroupIdTest
 
     public MavenITmng3863AutoPluginGroupIdTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**

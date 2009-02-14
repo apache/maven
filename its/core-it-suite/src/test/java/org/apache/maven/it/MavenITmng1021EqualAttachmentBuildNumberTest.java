@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng1021EqualAttachmentBuildNumberTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng1021EqualAttachmentBuildNumberTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that source attachments have the same build number and timestamp as the main

@@ -34,6 +34,10 @@ import java.util.Properties;
 public class MavenITmng2878DefaultReportXmlImportTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng2878DefaultReportXmlImportTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Verify that a plugin can load default-report.xml from the core.

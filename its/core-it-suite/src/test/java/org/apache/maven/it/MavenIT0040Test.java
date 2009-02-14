@@ -34,6 +34,11 @@ public class MavenIT0040Test
     extends AbstractMavenIntegrationTestCase
 {
 
+    protected MavenIT0040Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+
     /**
      * Test the use of a packaging from a plugin
      */

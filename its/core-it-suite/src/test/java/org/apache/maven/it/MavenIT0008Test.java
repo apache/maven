@@ -28,6 +28,11 @@ public class MavenIT0008Test
     extends AbstractMavenIntegrationTestCase
 {
 
+    protected MavenIT0008Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+
     /**
      * Simple goal decoration where a plugin binds to a phase and the plugin must
      * be downloaded from a remote repository before it can be executed. This

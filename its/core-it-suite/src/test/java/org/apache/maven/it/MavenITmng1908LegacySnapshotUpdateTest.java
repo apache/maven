@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenITmng1908LegacySnapshotUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng1908LegacySnapshotUpdateTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
     
     /**
      * Test that legacy repositories with legacy snapshots download correctly.

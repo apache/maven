@@ -35,6 +35,11 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3038TransitiveDepManVersionTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng3038TransitiveDepManVersionTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+    
     public void testitMNG3038()
         throws Exception
     {

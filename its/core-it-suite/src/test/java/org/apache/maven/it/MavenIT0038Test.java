@@ -33,6 +33,10 @@ import java.io.File;
 public class MavenIT0038Test
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenIT0038Test()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test building project from outside the project directory using '-f'

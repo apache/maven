@@ -27,6 +27,10 @@ import java.io.File;
 public class MavenITmng2130ParentLookupFromReactorCacheTest
     extends AbstractMavenIntegrationTestCase
 {
+    protected MavenITmng2130ParentLookupFromReactorCacheTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
 
     /**
      * Test that parent-POMs cached during a build are available as parents

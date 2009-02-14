@@ -38,6 +38,7 @@ public class MavenITmng3853ProfileInjectedDistReposTest
 
     public MavenITmng3853ProfileInjectedDistReposTest()
     {
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**
