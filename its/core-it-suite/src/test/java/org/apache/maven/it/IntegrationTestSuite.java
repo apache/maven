@@ -90,6 +90,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4036ParentResolutionFromSettingsRepoTest.class );
         suite.addTestSuite( MavenITmng4034ManagedProfileDependencyTest.class );
         suite.addTestSuite( MavenITmng4026ReactorDependenciesOrderTest.class );
         suite.addTestSuite( MavenITmng4023ParentProfileOneTimeInjectionTest.class );
@@ -352,7 +353,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0010Test.class );
         suite.addTestSuite( MavenIT0009Test.class );
         suite.addTestSuite( MavenIT0008Test.class );
-        suite.addTestSuite( MavenIT0007Test.class );
 
         /*
          * Add tests in reverse alpha order above.
