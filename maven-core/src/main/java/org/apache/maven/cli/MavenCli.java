@@ -309,6 +309,12 @@ public class MavenCli
             userSettingsPath = commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS );
         }
 
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
+        {
+            String globalSettingsPath = commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS );
+            System.setProperty( MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION, globalSettingsPath );
+        }
+
         Settings settings = null;
 
         MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) embedder.lookup( MavenSettingsBuilder.ROLE );

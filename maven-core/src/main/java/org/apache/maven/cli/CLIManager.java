@@ -58,6 +58,8 @@ public class CLIManager
 
     public static final char ALTERNATE_USER_SETTINGS = 's';
 
+    public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
+
     public static final String FAIL_FAST = "ff";
 
     public static final String FAIL_AT_END = "fae";
@@ -158,6 +160,11 @@ public class CLIManager
                                         .withDescription( "Alternate path for the user settings file" )
                                         .hasArg()
                                         .create( ALTERNATE_USER_SETTINGS ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "global-settings" )
+                                        .withDescription( "Alternate path for the global settings file" )
+                                        .hasArg()
+                                        .create( ALTERNATE_GLOBAL_SETTINGS ) );
 
         options.addOption( OptionBuilder.withLongOpt( "fail-fast" )
                                         .withDescription( "Stop at first failure in reactorized builds" )
