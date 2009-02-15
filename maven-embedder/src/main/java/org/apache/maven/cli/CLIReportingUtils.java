@@ -49,12 +49,20 @@ public final class CLIReportingUtils
 
     static void showVersion()
     {
-        ApplicationInformation ai = DefaultRuntimeInformation.getVersion( MavenCli.class.getClassLoader(), "org.apache.maven", "maven-core" );
+        ApplicationInformation ai =
+            DefaultRuntimeInformation.getVersion( MavenCli.class.getClassLoader(), "org.apache.maven", "maven-core" );
 
         System.out.println( "Maven version: " + ai.getVersion() + " built on " + ai.getBuiltOn() );
+
         System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
-        System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: " + System.getProperty( "file.encoding", "<unknown encoding>" ) );
-        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION + "\" arch: \"" + Os.OS_ARCH + "\" family: \"" + Os.OS_FAMILY + "\"" );
+
+        System.out.println( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) );
+
+        System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
+            + System.getProperty( "file.encoding", "<unknown encoding>" ) );
+
+        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION + "\" arch: \"" + Os.OS_ARCH
+            + "\" family: \"" + Os.OS_FAMILY + "\"" );
     }
 
     /**
