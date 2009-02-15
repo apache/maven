@@ -613,6 +613,8 @@ public class MavenCli
 
         System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
 
+        System.out.println( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) );
+
         System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
                             + System.getProperty( "file.encoding", "<unknown encoding>" ) );
 
