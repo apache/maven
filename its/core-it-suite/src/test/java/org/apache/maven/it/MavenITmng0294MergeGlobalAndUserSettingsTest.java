@@ -53,7 +53,7 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "user-settings.xml" );
-        if ( matchesVersionRange( "[3.0-alpha-1,)" ) )
+        if ( matchesVersionRange( "[2.1.0-M2,)" ) )
         {
             verifier.getCliOptions().add( "--global-settings" );
             verifier.getCliOptions().add( "global-settings.xml" );
