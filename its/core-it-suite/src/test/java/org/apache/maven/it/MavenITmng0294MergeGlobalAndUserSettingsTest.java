@@ -55,6 +55,7 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         verifier.getCliOptions().add( "user-settings.xml" );
         if ( matchesVersionRange( "[2.1.0-M2,)" ) )
         {
+            // dedicated CLI option only available since MNG-3914
             verifier.getCliOptions().add( "--global-settings" );
             verifier.getCliOptions().add( "global-settings.xml" );
         }
