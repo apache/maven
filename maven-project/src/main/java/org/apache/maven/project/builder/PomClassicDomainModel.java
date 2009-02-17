@@ -307,6 +307,7 @@ public final class PomClassicDomainModel
             s.add(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.configuration);
             s.add(ProjectUri.Build.Plugins.Plugin.Executions.Execution.configuration);
             //TODO: More profile info
+            s.add(ProjectUri.Profiles.Profile.modules);
             s.add(ProjectUri.Profiles.Profile.Dependencies.xUri);
             s.add(ProjectUri.Profiles.Profile.Dependencies.Dependency.Exclusions.xUri);
             s.add(ProjectUri.Profiles.Profile.Build.Plugins.Plugin.configuration);

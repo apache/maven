@@ -1002,7 +1002,7 @@ public class ProjectUri
                 }
             }
 
-            public static String modules = "http://apache.org/maven/project/profiles#collection/profile/modules";
+            public static String modules = "http://apache.org/maven/project/profiles#collection/profile/modules#collection";
 
             public static class Repositories
             {

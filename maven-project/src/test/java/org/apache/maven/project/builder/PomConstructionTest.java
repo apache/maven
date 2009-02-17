@@ -846,6 +846,15 @@ public class PomConstructionTest
     }
     //*/
 
+
+    /** MNG-4040 */
+    public void testProfileModuleInheritance()
+        throws Exception
+    {
+        PomTestWrapper pom = this.buildPomFromMavenProject( "profile-module-inheritance/sub", "dist" );
+        assertEquals(0, ( (List<?>) pom.getValue( "modules" ) ).size());
+
+    }
     private void assertPathWithNormalizedFileSeparators( Object value )
     {
         assertEquals( new File( value.toString() ).getPath(), value.toString() );
