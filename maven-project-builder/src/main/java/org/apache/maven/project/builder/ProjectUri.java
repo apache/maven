@@ -1160,7 +1160,7 @@ public class ProjectUri
                     }
 
                     public static String optional =
-                        "http://apache.org/maven/project/profiles#collection/profile/dependencies/dependency/optional";
+                        "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/optional";
                 }
             }
 
@@ -1179,49 +1179,49 @@ public class ProjectUri
                 public static class Plugins
                 {
                     public static String xUri =
-                        "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins";
+                        "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection";
 
                     public static class Plugin
                     {
                         public static String xUri =
-                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin";
+                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin";
 
                         public static String groupId =
-                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/groupId";
+                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/groupId";
 
                         public static String artifactId =
-                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/artifactId";
+                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/artifactId";
 
                         public static String version =
-                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/version";
+                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/version";
 
                         public static String inherited =
-                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/inherited";
+                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/inherited";
 
                         public static String configuration =
-                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/configuration#set";
+                            "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/configuration#set";
 
                         public static class ReportSets
                         {
                             public static String xUri =
-                                "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection";
+                                "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection";
 
                             public static class ReportSet
                             {
                                 public static String xUri =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet";
 
                                 public static String id =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/id";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet/id";
 
                                 public static String configuration =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/configuration#set";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet/configuration#set";
 
                                 public static String inherited =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/inherited";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet/inherited";
 
                                 public static String reports =
-                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins/plugin/reportSets#collection/reportSet/reports";
+                                    "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet/reports";
                             }
                         }
                     }
@@ -1375,7 +1375,7 @@ public class ProjectUri
                     "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/status";
             }
 
-            public static String properties = "http://apache.org/maven/project/profiles#collection/profile/properties";
+            public static String properties = "http://apache.org/maven/project/profiles#collection/profile/properties#collection";
         }
     }
 
