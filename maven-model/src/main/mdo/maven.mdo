@@ -43,7 +43,10 @@
   |   definition of these types
   |
 -->
-<model xsd.namespace="http://maven.apache.org/POM/4.0.0" xsd.target-namespace="http://maven.apache.org/POM/4.0.0">
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/POM/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/maven-${version}.xsd">
   <id>maven</id>
   <name>Maven</name>
   <description>
@@ -103,7 +106,7 @@
         <!-- Parent Model                                                           -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>extend</name>
           <version>3.0.0</version>
           <description>
@@ -117,7 +120,7 @@
           </description>
           <type>String</type>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>parent</name>
           <version>4.0.0</version>
           <description>The location of the parent project, if one exists. Values from the parent
@@ -132,7 +135,7 @@
         <!-- groupId/artifactId/Version/Packaging                                   -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>groupId</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -212,7 +215,7 @@
         <!-- Elements which describe a project                                      -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>name</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -312,7 +315,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>mailingLists</name>
           <version>3.0.0+</version>
           <description>Contains information about a project's mailing lists.</description>
@@ -321,7 +324,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>developers</name>
           <version>3.0.0+</version>
           <description>Describes the committers of a project.</description>
@@ -344,13 +347,13 @@
         <!-- Issue Tracking                                                         -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>issueTrackingUrl</name>
           <version>3.0.0</version>
           <description>The URL of the project's issue tracking system.</description>
           <type>String</type>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>issueManagement</name>
           <version>4.0.0</version>
           <description>The project's issue management system information.</description>
@@ -363,7 +366,7 @@
         <!-- SCM                                                                    -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>branches</name>
           <version>3.0.0</version>
           <description>
@@ -493,7 +496,7 @@
         <!-- Build prerequisites                                                    -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>prerequisites</name>
           <version>4.0.0</version>
           <description>Describes the prerequisites in the build environment for this project.</description>
@@ -506,7 +509,7 @@
         <!-- Build                                                                  -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>build</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -520,7 +523,7 @@
         <!-- Profiles                                                               -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>profiles</name>
           <version>4.0.0</version>
           <description>A listing of project-local build profiles which will modify the build process
@@ -603,7 +606,7 @@
             <type>DistributionManagement</type>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>modules</name>
           <version>4.0.0</version>
           <description>The modules (sometimes called subprojects) to build as a part of this
@@ -613,7 +616,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>repositories</name>
           <version>4.0.0</version>
           <description>The lists of the remote repositories for discovering dependencies and
@@ -633,7 +636,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>dependencies</name>
           <version>3.0.0+</version>
           <description>
@@ -652,7 +655,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>reports</name>
           <version>4.0.0</version>
           <description>
@@ -677,7 +680,7 @@
             <type>Reporting</type>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>dependencyManagement</name>
           <version>4.0.0</version>
           <required>false</required>
@@ -690,7 +693,7 @@
             <type>DependencyManagement</type>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>properties</name>
           <version>4.0.0</version>
           <description>

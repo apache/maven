@@ -9,9 +9,9 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License.  You may obtain a copy of the License at
-  
+
   http://www.apache.org/licenses/LICENSE-2.0
-  
+
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,10 +20,13 @@
   under the License.
 -->
 
-<!-- 
-    *** NOTE: If you add a new lifecycle or phase, be sure to update the codeSegments! *** 
+<!--
+    *** NOTE: If you add a new lifecycle or phase, be sure to update the codeSegments! ***
 -->
-<model>
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/MAVEN_LIFECYCLE/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/maven-lifecycle-${version}.xsd">
   <id>build-lifecycle</id>
   <name>LifecycleBindings</name>
   <description>Model for lifecycle specifications starting in Maven 2.1</description>
@@ -81,22 +84,22 @@
     public java.util.List getBindingList()
     {
         java.util.List lifecycles = new java.util.ArrayList();
-        
+
         if ( getCleanBinding() != null )
         {
             lifecycles.add( getCleanBinding() );
         }
-        
+
         if ( getBuildBinding() != null )
         {
             lifecycles.add( getBuildBinding() );
         }
-        
+
         if ( getSiteBinding() != null )
         {
             lifecycles.add( getSiteBinding() );
         }
-        
+
         return java.util.Collections.unmodifiableList( lifecycles );
     }
           ]]></code>
@@ -115,17 +118,17 @@
     {
         throw new UnsupportedOperationException( "Unsupported in base-class." );
     }
-          
+
     public java.util.LinkedHashMap getOrderedPhaseMapping()
     {
         throw new UnsupportedOperationException( "Unsupported in base-class." );
     }
-    
+
     public java.util.List getPhasesInOrder()
     {
         throw new UnsupportedOperationException( "Unsupported in base-class." );
     }
-    
+
     public java.util.List getPhaseNamesInOrder()
     {
         throw new UnsupportedOperationException( "Unsupported in base-class." );
@@ -172,22 +175,22 @@
     {
         return "clean";
     }
-          
+
     public java.util.LinkedHashMap getOrderedPhaseMapping()
     {
         java.util.LinkedHashMap phases = new java.util.LinkedHashMap();
         phases.put( "pre-clean", getPreClean() );
         phases.put( "clean", getClean() );
         phases.put( "post-clean", getPostClean() );
-        
+
         return phases;
     }
-    
+
     public java.util.List getPhasesInOrder()
     {
         return new java.util.ArrayList( getOrderedPhaseMapping().values() );
     }
-    
+
     public java.util.List getPhaseNamesInOrder()
     {
         return new java.util.ArrayList( getOrderedPhaseMapping().keySet() );
@@ -394,7 +397,7 @@
     {
         return "build";
     }
-          
+
     public java.util.LinkedHashMap getOrderedPhaseMapping()
     {
         java.util.LinkedHashMap phases = new java.util.LinkedHashMap();
@@ -421,15 +424,15 @@
         phases.put( "verify", getVerify() );
         phases.put( "install", getInstall() );
         phases.put( "deploy", getDeploy() );
-        
+
         return phases;
     }
-    
+
     public java.util.List getPhasesInOrder()
     {
         return new java.util.ArrayList( getOrderedPhaseMapping().values() );
     }
-    
+
     public java.util.List getPhaseNamesInOrder()
     {
         return new java.util.ArrayList( getOrderedPhaseMapping().keySet() );
@@ -484,7 +487,7 @@
     {
         return "site";
     }
-    
+
     public java.util.LinkedHashMap getOrderedPhaseMapping()
     {
         java.util.LinkedHashMap map = new java.util.LinkedHashMap();
@@ -492,15 +495,15 @@
         map.put( "site", getSite() );
         map.put( "post-site", getPostSite() );
         map.put( "site-deploy", getSiteDeploy() );
-        
+
         return map;
     }
-    
+
     public java.util.List getPhasesInOrder()
     {
         return new java.util.ArrayList( getOrderedPhaseMapping().values() );
     }
-    
+
     public java.util.List getPhaseNamesInOrder()
     {
         return new java.util.ArrayList( getOrderedPhaseMapping().keySet() );
@@ -530,7 +533,7 @@
           <code><![CDATA[
     private String name;
     private LifecycleBinding lifecycleBinding;
-    
+
     /**
      * Get the name of this phase.
      */
@@ -538,7 +541,7 @@
     {
         return name;
     }
-    
+
     /**
      * Get the LifecycleBinding instance to which this Phase belongs.
      */
@@ -546,7 +549,7 @@
     {
         return lifecycleBinding;
     }
-    
+
     /**
      * Set the name of this phase, and the Lifecycle instance to which is belongs.
      */
@@ -554,7 +557,7 @@
     {
         this.name = phaseName;
         this.lifecycleBinding = lifecycleBinding;
-        
+
         java.util.List bindings = getBindings();
         if ( bindings != null )
         {
@@ -632,21 +635,21 @@
           <code><![CDATA[
     /** origin marker for mojos referenced directly by the user or embedded-mode consumer. */
     public static final String DIRECT_INVOCATION_ORIGIN = "Direct invocation";
-    
+
     /** origin marker for single (non-lifecycle) mojos referenced by a forked-execution annotation in another mojo. */
     public static final String FORKED_DIRECT_REFERENCE_ORIGIN = "Direct forking reference";
-    
+
     /** origin marker for mojos bound to the lifecycle through POM configuration (not packaging defaults). */
     public static final String POM_ORIGIN = "POM";
-    
+
     /** origin marker for mojos bound to the lifecycle by a standard (or default) lifecycle mapping. */
     public static final String LIFECYCLE_MAPPING_ORIGIN = "Lifecycle mapping";
-    
+
     /** origin marker for mojos injected into the lifecycle by Maven, to manage lifecycle state. */
     public static final String INTERNAL_ORIGIN = "Maven internal state-management";
-    
+
     private String origin;
-    
+
     /**
      * Return the origin marker set for this MojoBinding, or null. This will give a general idea of where this
      * binding came from.
@@ -655,16 +658,16 @@
     {
         return origin;
     }
-    
+
     public void setOrigin( String origin )
     {
         this.origin = origin;
     }
-    
+
     private String originDescription;
-    
+
     /**
-     * Return specific information about where exactly this binding came from, if it's available. 
+     * Return specific information about where exactly this binding came from, if it's available.
      * This might be used to record the specific forking mojo or the lifecycle
      * overlay name that included this mojo, for instance.
      */
@@ -672,14 +675,14 @@
     {
         return originDescription;
     }
-    
+
     public void setOriginDescription( String originDescription )
     {
         this.originDescription = originDescription;
     }
-          
+
     private Phase phase;
-    
+
     /**
      * Get the Phase instance to which this MojoBinding is bound. NOTE: In
      * some cases, the phase name may not be known, or may not exist (as in the
@@ -689,7 +692,7 @@
     {
         return phase;
     }
-    
+
     /**
      * Set the Phase instance to which this MojoBinding is bound.
      */

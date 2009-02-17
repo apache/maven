@@ -19,8 +19,10 @@
   under the License.
 
 -->
-<model xsd.namespace="http://maven.apache.org/TOOLCHAINS/1.0.0"
-       xsd.target-namespace="http://maven.apache.org/TOOLCHAINS/1.0.0">
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/TOOLCHAINS/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/toolchains-${version}.xsd">
     <id>maven-toolchains</id>
     <name>MavenToolchains</name>
     <description><![CDATA[
@@ -41,11 +43,11 @@
             ]]></description>
             <version>1.0.0+</version>
             <fields>
-                <field xml.listStyle="flat">
+                <field>
                     <name>toolchains</name>
                     <version>1.0.0+</version>
                     <description><![CDATA[The toolchain definition.]]></description>
-                    <association>
+                    <association xml.itemsStyle="flat">
                         <type>ToolchainModel</type>
                         <multiplicity>*</multiplicity>
                     </association>

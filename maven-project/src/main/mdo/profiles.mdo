@@ -17,8 +17,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model xsd.namespace="http://maven.apache.org/PROFILES/1.0.0" 
-       xsd.target-namespace="http://maven.apache.org/PROFILES/1.0.0">
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/PROFILES/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/profiles-${version}.xsd">
   <id>profiles</id>
   <name>Profiles</name>
   <description><![CDATA[
@@ -41,7 +43,7 @@ under the License.
           <name>profiles</name>
           <version>1.0.0</version>
           <description><![CDATA[
-            Configuration of build profiles for adjusting the build 
+            Configuration of build profiles for adjusting the build
             according to environmental parameters
           ]]></description>
           <association>
@@ -67,7 +69,7 @@ under the License.
       <name>Profile</name>
       <version>1.0.0</version>
       <description><![CDATA[
-        Modifications to the build process which is keyed on some 
+        Modifications to the build process which is keyed on some
         sort of environmental parameter.
       ]]></description>
       <fields>
@@ -316,7 +318,7 @@ under the License.
       <name>ActivationProperty</name>
       <version>1.0.0</version>
       <description><![CDATA[
-        This is the property specification used to activate a profile. If the value field is empty, 
+        This is the property specification used to activate a profile. If the value field is empty,
         then the existence of the named property will activate the profile, otherwise it does a case-sensitive
         match against the property value as well.
       ]]></description>
@@ -341,7 +343,7 @@ under the License.
       <version>1.0.0</version>
       <description><![CDATA[
         This is the file specification used to activate a profile. The missing value will be a the location
-        of a file that needs to exist, and if it doesn't the profile must run.  On the other hand exists will test 
+        of a file that needs to exist, and if it doesn't the profile must run.  On the other hand exists will test
         for the existence of the file and if it is there will run the profile.
       ]]></description>
       <fields>

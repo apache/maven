@@ -61,7 +61,7 @@ under the License.
     <woodstoxVersion>3.2.6</woodstoxVersion>
     <modelloVersion>1.0.1-SNAPSHOT</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-  </properties>  
+  </properties>
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
@@ -442,8 +442,8 @@ under the License.
         <artifactId>plexus-sec-dispatcher</artifactId>
         <version>${securityDispatcherVersion}</version>
       </dependency>
-      
-      
+
+
       <!--  Mercury test dependencies -->
       <dependency>
         <groupId>org.apache.maven.mercury</groupId>

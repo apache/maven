@@ -19,18 +19,18 @@ under the License.
 
 <!-- START SNIPPET: ant-bootstrap
 
-By default the bootstrap will use ~/.m2/repository as the integration repository but you can define the integration 
+By default the bootstrap will use ~/.m2/repository as the integration repository but you can define the integration
 repository by specifying a property on the command line:
 
 ant -Dmaven.repo.local=/my/integration/repository
 
-Those familiar with Maven will note this is the same way the local repository can be set from the command-line. 
+Those familiar with Maven will note this is the same way the local repository can be set from the command-line.
 This facilitates having a set of builds converge on the same repository for integration purposes.
 
 END SNIPPET: ant-bootstrap -->
 
 <project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
-  
+
   <property name="it.workdir.version" value="3.0.x"/>
 
   <target name="initTaskDefs">
@@ -57,14 +57,14 @@ END SNIPPET: ant-bootstrap -->
   </target>
 
   <target name="init" depends="isMavenHomeSet">
-    <xmlproperty prefix="pom" file="pom.xml"/>    
+    <xmlproperty prefix="pom" file="pom.xml"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
     <!-- Initialize properties -->
     <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
     <property name="maven.home.effective" location="${maven.home.dirname}/${maven.home.basename.expected}"/>
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
     <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
-    <property name="surefire.useFile" value="true"/>    
+    <property name="surefire.useFile" value="true"/>
     <echo>maven.home = ${maven.home.effective}</echo>
   </target>
 
@@ -72,45 +72,45 @@ END SNIPPET: ant-bootstrap -->
     <delete dir="bootstrap"/>
   </target>
 
-  <target name="pull" depends="init" unless="skip.pull">    
-    <property name="verbose" value="false"/>    
+  <target name="pull" depends="init" unless="skip.pull">
+    <property name="verbose" value="false"/>
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
-    <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>                                                                                                     
+    <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>
     <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}" useScope="compile">
        <localRepository path="${maven.repo.local}"/>
-       <pom refid="pom"/>                                                                                                                                       
-    </artifact:dependencies>      
+       <pom refid="pom"/>
+    </artifact:dependencies>
     <delete file="${basedir}/dependencies.xml"/>
-    
+
     <!-- Pull the dependencies for Modello -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
        <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
     </artifact:dependencies>
-    
+
     <!-- Pull the dependencies for the MetadataGenerator CLI -->
     <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
-       <localRepository path="${maven.repo.local}"/>       
+       <localRepository path="${maven.repo.local}"/>
        <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
-    </artifact:dependencies>          
-    
+    </artifact:dependencies>
+
   </target>
 
   <target name="process-classes" depends="pull" description="generates plexus component metadata.">
     <mkdir dir="${basedir}/bootstrap/target"/>
     <mkdir dir="${basedir}/bootstrap/target/classes"/>
-  	
+
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes"/>
-      <path refid="sources"/>    	
+      <path refid="sources"/>
       <path refid="pom.pathid"/>
       <path refid="pmdg.pathid"/>
     </path>
 
-    <echo>Using plexus version ${pom.properties.plexusVersion}</echo> 
+    <echo>Using plexus version ${pom.properties.plexusVersion}</echo>
     <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
       <classpath refid="maven.classpath"/>
       <!-- We need to generate component descriptors from the maven-artifact sources which use javadoc annotations. -->
@@ -126,8 +126,8 @@ END SNIPPET: ant-bootstrap -->
       <arg value="--output"/>
       <arg value="${basedir}/bootstrap/target/classes/META-INF/plexus/components.xml"/>
     </java>
-  </target>	
-	
+  </target>
+
   <target name="generate-sources" depends="pull" description="generates Java sources from Modello mdo model files">
     <mkdir dir="bootstrap/target"/>
     <mkdir dir="bootstrap/target/generated-sources"/>
@@ -139,12 +139,13 @@ END SNIPPET: ant-bootstrap -->
       <sequential>
         <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true">
           <classpath refid="modello.pathid"/>
-          <arg file="@{file}"/>
-          <arg value="@{mode}"/>
-          <arg file="bootstrap/target/generated-sources"/>
-          <arg value="@{version}"/>
-          <arg value="false"/>
-          <arg value="false"/>
+          <arg file="@{file}"/> <!-- model file -->
+          <arg value="@{mode}"/> <!-- output type -->
+          <arg file="bootstrap/target/generated-sources"/> <!-- output directory -->
+          <arg value="@{version}"/> <!-- model version -->
+          <arg value="false"/> <!-- package with version -->
+          <arg value="true"/> <!-- use Java 5 -->
+          <arg value="UTF-8"/> <!-- encoding -->
         </java>
       </sequential>
     </macrodef>
@@ -194,7 +195,7 @@ END SNIPPET: ant-bootstrap -->
   <target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <classpath refid="maven.classpath"/>
-      <arg value="-e"/>      
+      <arg value="-e"/>
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
@@ -203,9 +204,9 @@ END SNIPPET: ant-bootstrap -->
     </java>
   </target>
 
-  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">              
+  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">
     <echo>
-    The new Maven distribution was created as part of the MAVEN-COMPILE step, above. 
+    The new Maven distribution was created as part of the MAVEN-COMPILE step, above.
     This goal just validates the presence of that distribution.
     </echo>
     <condition property="build.failed">
@@ -228,7 +229,7 @@ END SNIPPET: ant-bootstrap -->
       </fileset>
     </chmod>
   </target>
-  
+
   <target name="all" depends="clean-bootstrap,init,extract-assembly"/>
-  
+
 </project>

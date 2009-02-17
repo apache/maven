@@ -19,8 +19,10 @@
   under the License.
 -->
 
-<model xsd.namespace="http://maven.apache.org/SETTINGS/1.0.0" 
-       xsd.target-namespace="http://maven.apache.org/SETTINGS/1.0.0">
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/SETTINGS/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/settings-${version}.xsd">
   <id>settings</id>
   <name>Settings</name>
   <description>
@@ -393,9 +395,9 @@
 
         return profileMap;
     }
-    
+
     //[MNG-3954] :: this is required for the release plugin
-    
+
     private RuntimeInfo runtimeInfo;
 
     public void setRuntimeInfo( RuntimeInfo runtimeInfo )
@@ -411,7 +413,7 @@
         }
         return runtimeInfo;
     }
-    
+
             ]]>
           </code>
         </codeSegment>
