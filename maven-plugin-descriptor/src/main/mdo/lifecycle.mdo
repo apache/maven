@@ -17,7 +17,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model>
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/LIFECYCLE/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/lifecycle-${version}.xsd">
   <id>lifecycle-mappings</id>
   <name>LifecycleMappings</name>
   <description><![CDATA[
@@ -35,10 +38,10 @@ under the License.
       <version>1.0.0</version>
       <description>Root element of the lifecycle.xml file.</description>
       <fields>
-        <field xml.listStyle="flat">
+        <field>
           <name>lifecycles</name>
           <version>1.0.0</version>
-          <association>
+          <association xml.itemsStyle="flat">
             <type>Lifecycle</type>
             <multiplicity>*</multiplicity>
           </association>

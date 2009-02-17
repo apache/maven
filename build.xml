@@ -19,7 +19,7 @@ under the License.
 
 <!--
 
-By default the bootstrap will use ~/.m2/repository as the integration repository but you can define the integration repository by 
+By default the bootstrap will use ~/.m2/repository as the integration repository but you can define the integration repository by
 specifying a property on the command line:
 
 ant -Dmaven.repo.local=/my/integration/repository
@@ -34,14 +34,14 @@ TODO:
 -->
 
 <project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
-  
+
   <target name="initTaskDefs" unless="taskdefs.inited">
     <xmlproperty file="pom.xml" prefix="pom.xml" />
     <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.0.8.jar"/>
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
     <property name="taskdefs.inited" value="true"/>
   </target>
-  
+
   <target name="initLocalRepo">
     <property name="maven.repo.local" location="${user.home}/.m2/repository"/>
     <echo>Using the local repository at: ${maven.repo.local}</echo>
@@ -64,7 +64,7 @@ TODO:
     </fail>
     <echo>Using Maven home at: ${maven.home}</echo>
   </target>
-  
+
   <target name="read-poms" depends="initTaskDefs,initLocalRepo" unless="pom.version">
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
@@ -73,7 +73,7 @@ TODO:
       <localRepository path="${maven.repo.local}"/>
     </artifact:pom>
     <delete file="${basedir}/dependencies.xml"/>
-    
+
     <artifact:pom file="${basedir}/maven-integration-tests/pom.xml" id="itPom">
       <localRepository path="${maven.repo.local}"/>
     </artifact:pom>
@@ -102,12 +102,12 @@ TODO:
        <localRepository path="${maven.repo.local}"/>
        <pom refid="pom"/>
     </artifact:dependencies>
-    
+
     <!-- Pull the dependencies for Modello -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
        <localRepository path="${maven.repo.local}"/>
-       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0-alpha-20"/>
-       <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0-alpha-20"/>
+       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0"/>
+       <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0"/>
     </artifact:dependencies>
   </target>
 
@@ -122,11 +122,13 @@ TODO:
       <sequential>
         <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true">
           <classpath refid="modello.pathid"/>
-          <arg file="@{file}"/>
-          <arg value="@{mode}"/>
-          <arg file="bootstrap/target/generated-sources"/>
-          <arg value="@{version}"/>
-          <arg value="false"/>
+          <arg file="@{file}"/> <!-- model file -->
+          <arg value="@{mode}"/> <!-- output type -->
+          <arg file="bootstrap/target/generated-sources"/> <!-- output directory -->
+          <arg value="@{version}"/> <!-- model version -->
+          <arg value="false"/> <!-- package with version -->
+          <arg value="false"/> <!-- use Java 5 -->
+          <arg value="UTF-8"/> <!-- encoding -->
         </java>
       </sequential>
     </macrodef>
@@ -196,7 +198,7 @@ TODO:
 
   <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">
     <echo>
-    The new Maven distribution was created as part of the MAVEN-COMPILE step, above. 
+    The new Maven distribution was created as part of the MAVEN-COMPILE step, above.
     This goal just validates the presence of that distribution.
     </echo>
     <condition property="build.failed">
@@ -219,7 +221,7 @@ TODO:
       </fileset>
     </chmod>
   </target>
-  
+
   <target name="its-setup">
     <condition property="its.win32">
       <os family="windows"/>
@@ -230,7 +232,7 @@ TODO:
       </not>
     </condition>
   </target>
-  
+
   <target name="its-win32" if="its.win32">
     <echo>Retrieving integration tests</echo>
     <exec failonerror="true" dir="${basedir}/${itPom.artifactId}" executable="cmd">
@@ -251,7 +253,7 @@ TODO:
       <arg value="package"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
-    
+
     <echo>Running integration tests</echo>
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="cmd">
       <env key="M2_HOME" value="${maven.home}"/>
@@ -282,7 +284,7 @@ TODO:
       <arg value="package"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
-    
+
     <echo>Running integration tests</echo>
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="${maven.home}/bin/mvn">
       <env key="M2_HOME" value="${maven.home}"/>
@@ -298,14 +300,14 @@ TODO:
   <target name="run-its" depends="init,its-setup,its-win32,its-unix">
     <echo>Integration-test results should be displayed above.</echo>
   </target>
-  
+
   <target name="all" depends="clean-bootstrap,init,extract-assembly"/>
 
   <target name="with-its" depends="all,run-its"/>
-  
+
   <target name="set-temp-maven-home" depends="read-poms">
     <property name="maven.home" location="${java.io.tmpdir}/apache-maven-${pom.version}"/>
     <echo>Using temporary maven install directory: ${maven.home}</echo>
   </target>
-  
+
 </project>

@@ -17,7 +17,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model>
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/PLUGINS/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/plugins-${version}.xsd">
   <id>plugin-map</id>
   <name>PluginMapping</name>
   <description>Mappings for searching for a plugin within a particular groupId.</description>

@@ -181,7 +181,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>1.0-alpha-22</version>
+          <version>1.0</version>
           <executions>
             <execution>
               <id>site-docs</id>
@@ -567,7 +567,7 @@ under the License.
     </profile>
   </profiles>
 
-  <!-- FIXME: Remove when snapshot dependencies have been released -->  
+  <!-- FIXME: Remove when snapshot dependencies have been released -->
   <repositories>
     <repository>
         <id>snapshots.temp</id>
@@ -586,5 +586,5 @@ under the License.
       </releases>
     </repository>
   </repositories>
-  
+
 </project>

@@ -19,7 +19,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model>
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/PLUGIN_REGISTRY/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/plugin-registry-${version}.xsd">
   <id>plugin-registry</id>
   <name>PluginRegistry</name>
   <description><![CDATA[
@@ -44,10 +47,10 @@ under the License.
           <code><![CDATA[
     public static final String USER_LEVEL = "user-level";
     public static final String GLOBAL_LEVEL = "global-level";
-    
+
     private String sourceLevel = USER_LEVEL;
     private boolean sourceLevelSet = false;
-    
+
     public void setSourceLevel( String sourceLevel )
     {
         if ( sourceLevelSet )
@@ -64,7 +67,7 @@ under the License.
             this.sourceLevelSet = true;
         }
     }
-    
+
     public String getSourceLevel()
     {
         return sourceLevel;
@@ -119,36 +122,36 @@ under the License.
           <version>1.0.0</version>
           <code><![CDATA[
     private java.util.Map pluginsByKey;
-    
+
     public java.util.Map getPluginsByKey()
     {
         if ( pluginsByKey == null )
         {
             pluginsByKey = new java.util.HashMap();
-            
+
             for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext(); )
             {
                 Plugin plugin = (Plugin) it.next();
-            
+
                 pluginsByKey.put( plugin.getKey(), plugin );
             }
         }
-        
+
         return pluginsByKey;
     }
-    
+
     public void flushPluginsByKey()
     {
         this.pluginsByKey = null;
     }
-    
+
     private RuntimeInfo runtimeInfo;
-    
+
     public void setRuntimeInfo( RuntimeInfo runtimeInfo )
     {
         this.runtimeInfo = runtimeInfo;
     }
-    
+
     public RuntimeInfo getRuntimeInfo()
     {
         return runtimeInfo;
@@ -202,7 +205,7 @@ under the License.
           <version>1.0.0</version>
           <code><![CDATA[
     public static final String LAST_CHECKED_DATE_FORMAT = "yyyy-MM-dd.HH:mm:ss Z";
-    
+
     public String getKey()
     {
         return getGroupId() + ":" + getArtifactId();

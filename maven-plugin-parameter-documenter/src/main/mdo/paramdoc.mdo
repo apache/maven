@@ -19,7 +19,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model>
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/PARAMDOC/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/paramdoc-${version}.xsd">
   <id>paramdoc</id>
   <name>Paramdoc</name>
   <description><![CDATA[Documentation on parameter expressions supported by Maven for use in plugins.]]></description>
@@ -50,29 +53,29 @@ under the License.
         <codeSegment>
           <version>1.0.0</version>
           <code><![CDATA[    private java.util.Map expressionsBySyntax;
-    
+
     public java.util.Map getExpressionsBySyntax()
     {
         if ( expressionsBySyntax == null )
         {
             expressionsBySyntax = new java.util.HashMap();
-       
+
             java.util.List expressions = getExpressions();
-       
+
             if ( expressions != null && !expressions.isEmpty() )
             {
                 for ( java.util.Iterator it = expressions.iterator(); it.hasNext(); )
                 {
                     Expression expr = (Expression) it.next();
-       
+
                     expressionsBySyntax.put( expr.getSyntax(), expr );
                 }
             }
         }
-        
+
         return expressionsBySyntax;
     }
-    
+
     public void flushExpressionsBySyntax()
     {
         expressionsBySyntax = null;
@@ -146,6 +149,6 @@ under the License.
           <defaultValue>true</defaultValue>
         </field>
       </fields>
-		</class>
+    </class>
   </classes>
 </model>
