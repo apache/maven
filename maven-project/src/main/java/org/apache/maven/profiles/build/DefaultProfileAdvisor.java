@@ -229,12 +229,15 @@ public class DefaultProfileAdvisor
 
                 if ( root != null )
                 {
-                    List active = root.getActiveProfiles();
+                    List<String> active = root.getActiveProfiles();
 
                     if ( ( active != null ) && !active.isEmpty() )
                     {
                         ProfileActivationContext ctx = profileManager.getProfileActivationContext();
-                        ctx.setExplicitlyActiveProfileIds( root.getActiveProfiles() );
+                        for ( String profileId : active )
+                        {
+                            ctx.setActive( profileId );
+                        }
                     }
 
                     for ( Iterator it = root.getProfiles().iterator(); it.hasNext(); )
