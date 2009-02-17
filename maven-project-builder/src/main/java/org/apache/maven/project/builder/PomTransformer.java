@@ -530,24 +530,27 @@ public class PomTransformer
             List clearedProperties = new ArrayList<ModelProperty>();
             
             //Default Dependency Scope Rule
-            ModelDataSource s = new DefaultModelDataSource( tmp, Arrays.asList( new ArtifactModelContainerFactory()) );
-            for(ModelContainer mc : s.queryFor(ProjectUri.Dependencies.Dependency.xUri))
+            if(domainModelIndex == 0)
             {
-            	boolean containsScope = false;
-            	for(ModelProperty mp :mc.getProperties()) 
-            	{
-            		if(mp.getUri().equals(ProjectUri.Dependencies.Dependency.scope)) {
-            			containsScope = true;
-            			break;
-            		}
-            	}    
+                ModelDataSource s = new DefaultModelDataSource( tmp, Arrays.asList( new ArtifactModelContainerFactory()) );
+                for(ModelContainer mc : s.queryFor(ProjectUri.Dependencies.Dependency.xUri))
+                {
+                    boolean containsScope = false;
+                    for(ModelProperty mp :mc.getProperties())
+                    {
+                        if(mp.getUri().equals(ProjectUri.Dependencies.Dependency.scope)) {
+                            containsScope = true;
+                            break;
+                        }
+                    }
 
-            	if(!containsScope)
-            	{
-            		tmp.add(tmp.indexOf(mc.getProperties().get(0)) + 1, new ModelProperty(ProjectUri.Dependencies.Dependency.scope, "compile"));
-            	}
+                    if(!containsScope)
+                    {
+                        tmp.add(tmp.indexOf(mc.getProperties().get(0)) + 1, new ModelProperty(ProjectUri.Dependencies.Dependency.scope, "compile"));
+                    }
+                }
             }
-
+           
             //Remove Default Executions IDS (mng-3965)
             List<ModelProperty> replace = new ArrayList<ModelProperty>();
             for(ModelProperty mp : tmp)

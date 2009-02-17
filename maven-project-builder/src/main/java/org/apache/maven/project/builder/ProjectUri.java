@@ -1113,7 +1113,7 @@ public class ProjectUri
 
             public static class Dependencies
             {
-                public static String xUri = "http://apache.org/maven/project/profiles#collection/profile/dependencies";
+                public static String xUri = "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection";
 
                 public static class Dependency
                 {

@@ -306,7 +306,11 @@ public final class PomClassicDomainModel
             s.add(ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri);
             s.add(ProjectUri.Reporting.Plugins.Plugin.ReportSets.ReportSet.configuration);
             s.add(ProjectUri.Build.Plugins.Plugin.Executions.Execution.configuration);
-            s.add(ProjectUri.Profiles.Profile.Build.Plugins.Plugin.configuration);//TODO: More profile info
+            //TODO: More profile info
+            s.add(ProjectUri.Profiles.Profile.Dependencies.xUri);
+            s.add(ProjectUri.Profiles.Profile.Dependencies.Dependency.Exclusions.xUri);
+            s.add(ProjectUri.Profiles.Profile.Build.Plugins.Plugin.configuration);
+            
             modelProperties = ModelMarshaller.marshallXmlToModelProperties(
                 getInputStream(), ProjectUri.baseUri, s );
         }

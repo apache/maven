@@ -217,6 +217,7 @@ public class DefaultProjectBuilder
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
         domainModels.add( domainModel );
 
+        //Process Profile on most specialized child model
         ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(domainModel.getModelProperties(),
                 PomTransformer.MODEL_CONTAINER_FACTORIES), activeProfileIds, properties);
 
@@ -225,7 +226,7 @@ public class DefaultProjectBuilder
         for(ModelContainer mc : profileContainers)
         {
             List<ModelProperty> transformed = new ArrayList<ModelProperty>();
-            transformed.add(new ModelProperty(ProjectUri.xUri, null));
+            //transformed.add(new ModelProperty(ProjectUri.xUri, null));
             for(ModelProperty mp : mc.getProperties())
             {
                 if(mp.getUri().startsWith(ProjectUri.Profiles.Profile.xUri) && !mp.getUri().equals(ProjectUri.Profiles.Profile.id)
@@ -380,7 +381,8 @@ public class DefaultProjectBuilder
 
         domainModels.add( parentDomainModel );
 
-         ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(parentDomainModel.getModelProperties(),
+        //Process Profiles
+        ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(parentDomainModel.getModelProperties(),
                 PomTransformer.MODEL_CONTAINER_FACTORIES), activeProfileIds, properties);
         Collection<ModelContainer> profileContainers = profileContext.getActiveProfiles();
 
@@ -445,7 +447,9 @@ public class DefaultProjectBuilder
 
         PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( parentFile );
         parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
-         ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(parentDomainModel.getModelProperties(),
+
+        //Process Profiles
+        ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(parentDomainModel.getModelProperties(),
                 PomTransformer.MODEL_CONTAINER_FACTORIES), activeProfileIds, properties);
         Collection<ModelContainer> profileContainers = profileContext.getActiveProfiles();
 
