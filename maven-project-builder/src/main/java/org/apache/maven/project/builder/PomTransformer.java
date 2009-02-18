@@ -433,7 +433,7 @@ public class PomTransformer
             {
                 int index = props.indexOf(mp) + 1;
 
-                if(index <= props.size() && mp.isParentOf(props.get(index)) && mp.getDepth() != props.get(index).getDepth()
+                if(index < props.size() && mp.isParentOf(props.get(index)) && mp.getDepth() != props.get(index).getDepth()
                         && !props.get(index).getUri().contains("#property"))
                 {
                     p.add(new ModelProperty(mp.getUri(), null));
