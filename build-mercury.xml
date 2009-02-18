@@ -35,7 +35,7 @@ END SNIPPET: ant-bootstrap -->
 
   <target name="initTaskDefs">
     <xmlproperty file="pom.xml" prefix="pom.xml" />
-    <path id="mercury-ant-tasks.classpath" path="mercury-ant-tasks-1.0.0-alpha-4-SNAPSHOT.jar"/>
+    <path id="mercury-ant-tasks.classpath" path="mercury-ant-tasks-1.0-alpha-6-SNAPSHOT.jar"/>
     <typedef resource="org/apache/maven/mercury/ant/tasks/antlib.xml" uri="urn:mercury-ant-tasks" classpathref="mercury-ant-tasks.classpath"/>
   </target>
 
@@ -78,24 +78,29 @@ END SNIPPET: ant-bootstrap -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
+
+  	<delete file="${basedir}/dependencies.xml"/>
     
-    <mercury:resolve-dependencies source="maven:pom.xml" id="pom">
-      <mercury:local-repository location="${maven.repo.local}"/>
+    <mercury:local-repository location="${maven.repo.local}"/>
+    
+    <mercury:resolve-dependencies>
+      <mercury:dependency id="org.apache.maven:maven:3.0-SNAPSHOT::pom" source="maven:${basedir}/pom.xml"/>
     </mercury:resolve-dependencies>
     
-    <delete file="${basedir}/dependencies.xml"/>
-    
-    <!-- Pull the dependencies for Modello -->
-    <mercury:resolve-dependencies id="modello">
-      <mercury:local-repository location="${maven.repo.local}"/>
+    <mercury:resolve-dependencies>
+      <mercury:dependency id="org.codehaus.plexus:plexus-component-metadata:${pom.properties.plexusVersion}"/>
+    </mercury:resolve-dependencies>
+  	
+    <!-- Pull the dependencies for Modello 
       <mercury:dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
     </mercury:resolve-dependencies>
+    -->
     
-    <!-- Pull the dependencies for the MetadataGenerator CLI -->
+    <!-- Pull the dependencies for the MetadataGenerator CLI
     <mercury:resolve-dependencies id="pmdg">
-      <mercury:local-repository path="${maven.repo.local}"/>       
       <mercury:dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
-    </mercury:resolve-dependencies>              
+    </mercury:resolve-dependencies>
+    -->
   </target>
 
   <target name="process-classes" depends="pull" description="generates plexus component metadata.">
@@ -104,9 +109,8 @@ END SNIPPET: ant-bootstrap -->
   	
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes"/>
-      <path refid="sources"/>    	
-      <path refid="pom.pathid"/>
-      <path refid="pmdg.pathid"/>
+      <path refid="sources"/>     
+      <path refid="mercury.classpath"/>     
     </path>
 
     <echo>Using plexus version ${pom.properties.plexusVersion}</echo> 
@@ -136,8 +140,7 @@ END SNIPPET: ant-bootstrap -->
       <attribute name="mode"/>
       <attribute name="version"/>
       <sequential>
-        <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true">
-          <classpath refid="modello.pathid"/>
+        <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true" classpathref="mercury.classpath">
           <arg file="@{file}"/>
           <arg value="@{mode}"/>
           <arg file="bootstrap/target/generated-sources"/>
