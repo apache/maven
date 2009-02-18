@@ -34,7 +34,7 @@ END SNIPPET: ant-bootstrap -->
   <property name="it.workdir.version" value="3.0.x"/>
 
   <target name="initTaskDefs">
-    <xmlproperty file="pom.xml" prefix="pom.xml" />
+    <xmlproperty file="pom.xml" prefix="pom" keepRoot="false"/>
     <path id="mercury-ant-tasks.classpath" path="mercury-ant-tasks-1.0-alpha-6-SNAPSHOT.jar"/>
     <typedef resource="org/apache/maven/mercury/ant/tasks/antlib.xml" uri="urn:mercury-ant-tasks" classpathref="mercury-ant-tasks.classpath"/>
   </target>
@@ -63,7 +63,13 @@ END SNIPPET: ant-bootstrap -->
     <!-- Initialize properties -->
     <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
     <property name="maven.assembly" location="maven-distribution/target/${maven.home.basename.expected}-bin.zip"/>
-    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
+
+  	<property name="maven.repo.local"   value="${user.home}/.m2/repository"/>
+<!--
+    <property name="maven.repo.central" value="http://repository.sonatype.org/content/groups/public"/>
+    <mercury:remote-repository location="${maven.repo.central}"/>
+-->
+  	
     <property name="surefire.useFile" value="true"/>    
     <echo>maven.home = ${maven.home}</echo>
   </target>
@@ -81,16 +87,39 @@ END SNIPPET: ant-bootstrap -->
 
   	<delete file="${basedir}/dependencies.xml"/>
     
+    
     <mercury:local-repository location="${maven.repo.local}"/>
-    
-    <mercury:resolve-dependencies>
-      <mercury:dependency id="org.apache.maven:maven:3.0-SNAPSHOT::pom" source="maven:${basedir}/pom.xml"/>
-    </mercury:resolve-dependencies>
-    
     <mercury:resolve-dependencies>
       <mercury:dependency id="org.codehaus.plexus:plexus-component-metadata:${pom.properties.plexusVersion}"/>
+      <mercury:dependency id="org.apache.maven:maven:3.0-SNAPSHOT::pom" source="maven:pom.xml"/>
+      <mercury:dependency id="org.codehaus.modello:modello-maven-plugin:${pom.properties.modelloVersion}"/>
     </mercury:resolve-dependencies>
-  	
+    
+<!-- those are for debugging and example (named paths) only. Remove as needed -->
+<!--
+    <mercury:resolve-dependencies pathid="plexus.classpath">
+      <mercury:dependency id="org.codehaus.plexus:plexus-component-metadata:${pom.properties.plexusVersion}"/>
+    </mercury:resolve-dependencies>
+    
+    <mercury:resolve-dependencies pathid="modello.classpath">
+      <mercury:dependency id="org.codehaus.modello:modello-maven-plugin:${pom.properties.modelloVersion}"/>
+    </mercury:resolve-dependencies>
+-->
+    <echo>========================================================================</echo>
+    <property name="mcc" refid="mercury.classpath.compile"/>
+    <echo>mercury.classpath.compile=${mcc}</echo>
+    <echo>========================================================================</echo>
+    <property name="mct" refid="mercury.classpath.test"/>
+    <echo>mercury.classpath.test=${mct}</echo>
+    <echo>========================================================================</echo>
+<!--
+    <property name="cp.plexus" refid="plexus.classpath"/>
+    <echo>cp.plexus=${cp.plexus}</echo>
+    <echo>========================================================================</echo>
+    <property name="cp.modello" refid="modello.classpath"/>
+    <echo>cp.modello=${cp.modello}</echo>
+    <echo>========================================================================</echo>
+-->  	
     <!-- Pull the dependencies for Modello 
       <mercury:dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
     </mercury:resolve-dependencies>

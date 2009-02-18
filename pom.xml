@@ -55,9 +55,9 @@ under the License.
     <plexusUtilsVersion>1.5.8</plexusUtilsVersion>
     <wagonVersion>1.0-beta-4</wagonVersion>
     <modelBuilderVersion>1.3</modelBuilderVersion>
-    <mercuryVersion>1.0.0-alpha-4</mercuryVersion>
+    <mercuryVersion>1.0-alpha-5</mercuryVersion>
     <mercuryMp3Version>1.0-alpha-1</mercuryMp3Version>
-    <securityDispatcherVersion>1.0-alpha-4-SNAPSHOT</securityDispatcherVersion>
+    <securityDispatcherVersion>1.0</securityDispatcherVersion>
     <woodstoxVersion>3.2.6</woodstoxVersion>
     <modelloVersion>1.0.1-SNAPSHOT</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
