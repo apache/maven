@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3057</groupId>
+  <artifactId>mng-3057</artifactId>
+  <version>${testVersion}</version>
+  
+  <packaging>pom</packaging>
+  
+  <name>Integration Test Project for MNG-3057</name>
+  <description>
+    This project verifies that MNG-3057 is fixed. It is controlled by a JUnit test called org.apache.maven.integrationtests.MNG3057Test
+  </description>
+  
+  <url>http://jira.codehaus.org/browse/MNG-3057</url>
+  
+  <modules>
+    <module>level2</module>
+  </modules>
+</project>
