@@ -14,37 +14,64 @@ public class ProfileContext {
 
     private Collection<String> activeProfileIds;
 
-    List<ActiveProfileMatcher> matchers  = Collections.unmodifiableList( Arrays.asList(new ByDefaultMatcher(),
+    private Collection<String> inactiveProfileIds;
+
+    private ActiveProfileMatcher defaultMatcher = new ByDefaultMatcher();
+
+    private List<ActiveProfileMatcher> matchers  = Collections.unmodifiableList( Arrays.asList(
             new FileMatcher(), new JdkMatcher(), new OperatingSystemMatcher(), new PropertyMatcher()
          ) );
 
-    public ProfileContext(ModelDataSource modelDataSource, Collection<String> activeProfileIds,
-                          List<InterpolatorProperty> properties) {
+    public ProfileContext( ModelDataSource modelDataSource, Collection<String> activeProfileIds,
+                           Collection<String> inactiveProfileIds, List<InterpolatorProperty> properties )
+    {
         this.modelDataSource = modelDataSource;
-        this.properties = new ArrayList<InterpolatorProperty>(properties);
-        this.activeProfileIds = (activeProfileIds != null) ? activeProfileIds : new ArrayList<String>();
+        this.properties = new ArrayList<InterpolatorProperty>( properties );
+        this.activeProfileIds = ( activeProfileIds != null ) ? activeProfileIds : new ArrayList<String>();
+        this.inactiveProfileIds = ( inactiveProfileIds != null ) ? inactiveProfileIds : new ArrayList<String>();
     }
 
-    public Collection<ModelContainer> getActiveProfiles() throws DataSourceException {
+    public Collection<ModelContainer> getActiveProfiles()
+        throws DataSourceException
+    {
         List<ModelContainer> matchedContainers = new ArrayList<ModelContainer>();
+        List<ModelContainer> defaultContainers = new ArrayList<ModelContainer>();
 
-        List<ModelContainer> modelContainers  = modelDataSource.queryFor(ProjectUri.Profiles.Profile.xUri);
-        for(ModelContainer mc : modelContainers) {
-            for(ActiveProfileMatcher matcher : matchers) {
-                if(matcher.isMatch(mc, properties)) {
-                    matchedContainers.add(mc);
-                    continue;
-                }
-            }
+        List<ModelContainer> modelContainers = modelDataSource.queryFor( ProjectUri.Profiles.Profile.xUri );
+        for ( ModelContainer mc : modelContainers )
+        {
+            String profileId = getProfileId( mc.getProperties() );
 
-            String profileId = getProfileId(mc.getProperties());
-            if(profileId != null && activeProfileIds.contains(profileId))
+            if ( !inactiveProfileIds.contains( profileId ) )
             {
-                matchedContainers.add(mc);
+                if ( activeProfileIds.contains( profileId ) )
+                {
+                    matchedContainers.add( mc );
+                }
+                else if ( defaultMatcher.isMatch( mc, properties ) )
+                {
+                    defaultContainers.add( mc );
+                }
+                else
+                {
+                    for ( ActiveProfileMatcher matcher : matchers )
+                    {
+                        if ( matcher.isMatch( mc, properties ) )
+                        {
+                            matchedContainers.add( mc );
+                            break;
+                        }
+                    }
+                }
             }
         }
 
-        return matchedContainers;       
+        if ( matchedContainers.isEmpty() )
+        {
+            matchedContainers = defaultContainers;
+        }
+
+        return matchedContainers;
     }
 
     private String getProfileId(List<ModelProperty> modelProperties)

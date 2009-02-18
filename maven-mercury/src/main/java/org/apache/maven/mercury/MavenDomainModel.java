@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
 import org.apache.maven.project.builder.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.ExclusionModelContainerFactory;
-import org.apache.maven.project.builder.IdModelContainerFactory;
 import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
@@ -125,7 +124,7 @@ public final class MavenDomainModel
     {
         ModelDataSource dataSource = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
-        return new ProfileContext( dataSource, null, properties ).getActiveProfiles();
+        return new ProfileContext( dataSource, null, null, properties ).getActiveProfiles();
     }
 
     public ArtifactBasicMetadata getParentMetadata()

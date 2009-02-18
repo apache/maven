@@ -181,6 +181,7 @@ public class DefaultProfileManager
         return getActiveProfiles( null );
     }
 
+    // TODO: Portions of this logic are duplicated in o.a.m.p.b.p.ProfileContext, something is wrong here
     public List getActiveProfiles( Model model )
         throws ProfileActivationException
     {
