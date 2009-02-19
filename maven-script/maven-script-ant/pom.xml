@@ -46,20 +46,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-ant-factory</artifactId>
-      <version>1.0-alpha-2.1-SNAPSHOT</version>
-      <!-- We need to exclude this artifact's dependency on Ant, -->
-      <!-- because it has a different groupId that the version of Ant -->
-      <!-- we want to use now. -->
-      <exclusions>
-        <exclusion>
-          <groupId>ant</groupId>
-          <artifactId>ant</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>ant</groupId>
-          <artifactId>ant-launcher</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>1.0-alpha-2.1</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
