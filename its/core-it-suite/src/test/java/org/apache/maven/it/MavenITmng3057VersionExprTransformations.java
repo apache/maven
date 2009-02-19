@@ -80,7 +80,7 @@ public class MavenITmng3057VersionExprTransformations
         verifier.deleteArtifact( "org.apache.maven.its.mng3057", "level3", "1", "jar" );
 
         Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty( "deployTo", remoteRepo );
+        properties.setProperty( "@deployTo@", remoteRepo );
 
         verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", properties );
 
