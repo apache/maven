@@ -63,7 +63,6 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.usability.SystemWarnings;
 import org.apache.maven.usability.diagnostics.ErrorDiagnostics;
-import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -733,13 +732,6 @@ public class DefaultMaven
 
                 wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), passWord,
                                                     server.getPrivateKey(), passPhrase );
-
-                // Remove once Wagon is upgraded to 1.0-beta-5
-                if ( server.getPassword() != null )
-                {
-                    // setting this globally is not ideal, but not harmful
-                    com.jcraft.jsch.JSch.setConfig( "PreferredAuthentications", "gssapi-with-mic,publickey,password,keyboard-interactive" );
-                }
 
                 wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
                                                 server.getDirectoryPermissions() );
