@@ -123,7 +123,7 @@ public class MavenITmng3057VersionExprTransformations
         verifier.setCliOptions( cliOptions );
         
         verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:eval" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
