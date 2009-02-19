@@ -55,9 +55,36 @@ public class DefaultArtifactInstaller
     public void install( File source, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
+        
+        // If we're installing the POM, we need to transform it first. The source file supplied for 
+        // installation here may be the POM, but that POM may not be set as the file of the supplied
+        // artifact. Since the transformation only has access to the artifact and not the supplied
+        // source file, we have to use the Artifact.setFile(..) and Artifact.getFile(..) methods
+        // to shunt the POM file into the transformation process.
+        // Here, we also set a flag indicating that the POM has been shunted through the Artifact,
+        // and to expect the transformed version to be available in the Artifact afterwards...
+        boolean useArtifactFile = false;
+        if ( "pom".equals( artifact.getType() ) )
+        {
+            if ( artifact.getFile() == null )
+            {
+                artifact.setFile( source );
+            }
+            
+            useArtifactFile = true;
+        }
+        
         try
         {
             transformationManager.transformForInstall( artifact, localRepository );
+            
+            // If we used the Artifact shunt to transform a POM source file, we need to install
+            // the transformed version, not the supplied version. Therefore, we need to replace
+            // the supplied source POM with the one from Artifact.getFile(..).
+            if ( useArtifactFile )
+            {
+                source = artifact.getFile();
+            }
 
             String localPath = localRepository.pathOf( artifact );
 
@@ -71,6 +98,13 @@ public class DefaultArtifactInstaller
             getLogger().info( "Installing " + source.getPath() + " to " + destination );
 
             FileUtils.copyFile( source, destination );
+            
+            // Now, we'll set the artifact's file to the one installed in the local repository,
+            // to help avoid duplicate copy operations in the deployment step.
+            if ( useArtifactFile )
+            {
+                artifact.setFile( destination );
+            }
 
             // must be after the artifact is installed
             for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )

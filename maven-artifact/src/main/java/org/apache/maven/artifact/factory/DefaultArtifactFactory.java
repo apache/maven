@@ -158,4 +158,9 @@ public class DefaultArtifactFactory
         return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
                                     optional );
     }
+
+    protected ArtifactHandlerManager getArtifactHandlerManager()
+    {
+        return artifactHandlerManager;
+    }
 }

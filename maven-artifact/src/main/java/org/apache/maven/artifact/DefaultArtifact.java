@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -264,6 +265,25 @@ public class DefaultArtifact
         }
     }
 
+    public ArtifactMetadata getMetadata( Class metadataClass )
+    {
+        Collection metadata = getMetadataList();
+        
+        if ( metadata != null )
+        {
+            for ( Iterator it = metadata.iterator(); it.hasNext(); )
+            {
+                ArtifactMetadata m = (ArtifactMetadata) it.next();
+                if ( metadataClass.isAssignableFrom( m.getClass() ) )
+                {
+                    return m;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
     public Collection getMetadataList()
     {
         return metadataMap == null ? Collections.EMPTY_LIST : metadataMap.values();

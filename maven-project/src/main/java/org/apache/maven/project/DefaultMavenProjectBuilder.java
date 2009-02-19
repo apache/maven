@@ -78,7 +78,9 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.ProfilesConversionUtils;
 import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.project.artifact.ArtifactWithProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.artifact.ProjectArtifactFactory;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.injection.ProfileInjector;
@@ -151,7 +153,7 @@ public class DefaultMavenProjectBuilder
 
     protected ArtifactMetadataSource artifactMetadataSource;
 
-    private ArtifactFactory artifactFactory;
+    private ProjectArtifactFactory artifactFactory;
 
     private ModelInheritanceAssembler modelInheritanceAssembler;
 
@@ -1021,10 +1023,10 @@ public class DefaultMavenProjectBuilder
         project.setActiveProfiles( activeProfiles );
 
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
-        Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
-                                                                        project.getVersion(), project.getPackaging() );
-
+        Artifact projectArtifact = artifactFactory.create( project );
+        
         project.setArtifact( projectArtifact );
+        project.setProjectBuilderConfiguration( config );
 
         project.setPluginArtifactRepositories( ProjectUtils.buildArtifactRepositories( model.getPluginRepositories(),
                                                                                        artifactRepositoryFactory,

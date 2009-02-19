@@ -174,11 +174,6 @@ under the License.
       <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
       <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
     </component>
-
-    <component>
-      <role>org.apache.maven.artifact.repository.ArtifactRepositoryFactory</role>
-      <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
-    </component>
   </components>
 
 </component-set>

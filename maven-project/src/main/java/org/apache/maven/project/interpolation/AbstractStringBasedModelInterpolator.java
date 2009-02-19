@@ -378,9 +378,19 @@ public abstract class AbstractStringBasedModelInterpolator
         return result;
     }
     
+    protected RecursionInterceptor getRecursionInterceptor()
+    {
+        return recursionInterceptor;
+    }
+
+    protected void setRecursionInterceptor( RecursionInterceptor recursionInterceptor )
+    {
+        this.recursionInterceptor = recursionInterceptor;
+    }
+
     protected abstract Interpolator createInterpolator();
 
-    public final void initialize()
+    public void initialize()
         throws InitializationException
     {
         interpolator = createInterpolator();

@@ -38,7 +38,11 @@ import org.codehaus.plexus.util.FileUtils;
 public class ProjectArtifactMetadata
     extends AbstractArtifactMetadata
 {
-    private final File file;
+    private File originalFile;
+    
+    private File transformedFile;
+    
+    private boolean versionExpressionsResolved = false;
 
     public ProjectArtifactMetadata( Artifact artifact )
     {
@@ -49,7 +53,7 @@ public class ProjectArtifactMetadata
                                     File file )
     {
         super( artifact );
-        this.file = file;
+        this.originalFile = file;
     }
 
     public String getRemoteFilename()
@@ -71,6 +75,12 @@ public class ProjectArtifactMetadata
                                         ArtifactRepository remoteRepository )
         throws RepositoryMetadataStoreException
     {
+        File f = transformedFile == null ? originalFile : transformedFile;
+        if ( f == null )
+        {
+            return;
+        }
+        
         File destination = new File( localRepository.getBasedir(),
                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
@@ -83,7 +93,7 @@ public class ProjectArtifactMetadata
 
         try
         {
-            FileUtils.copyFile( file, destination );
+            FileUtils.copyFile( f, destination );
         }
         catch ( IOException e )
         {
@@ -114,9 +124,29 @@ public class ProjectArtifactMetadata
     public void merge( ArtifactMetadata metadata )
     {
         ProjectArtifactMetadata m = (ProjectArtifactMetadata) metadata;
-        if ( !m.file.equals( file ) )
+        if ( !m.originalFile.equals( originalFile ) )
         {
             throw new IllegalStateException( "Cannot add two different pieces of metadata for: " + getKey() );
         }
+    }
+
+    public boolean isVersionExpressionsResolved()
+    {
+        return versionExpressionsResolved;
+    }
+
+    public void setVersionExpressionsResolved( boolean versionExpressionsResolved )
+    {
+        this.versionExpressionsResolved = versionExpressionsResolved;
+    }
+    
+    public void setFile( File file )
+    {
+        this.transformedFile = file;
+    }
+
+    public File getFile()
+    {
+        return transformedFile == null ? originalFile : transformedFile;
     }
 }

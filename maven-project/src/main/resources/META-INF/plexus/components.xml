@@ -19,6 +19,16 @@ under the License.
 
 <component-set>
   <components>
+    <component>
+      <role>org.apache.maven.project.artifact.ProjectArtifactFactory</role>
+      <role-hint>maven-project</role-hint>
+      <implementation>org.apache.maven.project.artifact.ProjectArtifactFactory</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
+      </requirements>
+    </component>
 <!--
      |
      |
@@ -30,6 +40,21 @@ under the License.
       <requirements>
         <requirement>
           <role>org.apache.maven.artifact.handler.manager.ArtifactHandlerManager</role>
+        </requirement>
+      </requirements>
+    </component>
+<!--
+     |
+     |
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
+      <role-hint>version-expression</role-hint>
+      <implementation>org.apache.maven.project.artifact.VersionExpressionTransformation</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
       </requirements>
     </component>
@@ -96,7 +121,8 @@ under the License.
           <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+          <role>org.apache.maven.project.artifact.ProjectArtifactFactory</role>
+	      <role-hint>maven-project</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>

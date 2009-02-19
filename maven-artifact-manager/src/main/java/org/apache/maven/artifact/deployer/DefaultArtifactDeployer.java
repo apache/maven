@@ -66,10 +66,39 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( "System is offline. Cannot deploy artifact: " + artifact + "." );
         }
 
+        // If we're installing the POM, we need to transform it first. The source file supplied for 
+        // installation here may be the POM, but that POM may not be set as the file of the supplied
+        // artifact. Since the transformation only has access to the artifact and not the supplied
+        // source file, we have to use the Artifact.setFile(..) and Artifact.getFile(..) methods
+        // to shunt the POM file into the transformation process.
+        // Here, we also set a flag indicating that the POM has been shunted through the Artifact,
+        // and to expect the transformed version to be available in the Artifact afterwards...
+        boolean useArtifactFile = false;
+        if ( "pom".equals( artifact.getType() ) )
+        {
+            if ( artifact.getFile() == null )
+            {
+                artifact.setFile( source );
+            }
+            
+            useArtifactFile = true;
+        }
+        
         try
         {
             transformationManager.transformForDeployment( artifact, deploymentRepository, localRepository );
 
+            // If we used the Artifact shunt to transform a POM source file, we need to install
+            // the transformed version, not the supplied version. Therefore, we need to replace
+            // the supplied source POM with the one from Artifact.getFile(..).
+            if ( useArtifactFile )
+            {
+                source = artifact.getFile();
+            }
+
+            // FIXME: Why oh why are we re-installing the artifact in the local repository? Isn't this
+            // the responsibility of the ArtifactInstaller??
+            
             // Copy the original file to the new one if it was transformed
             File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
             if ( !artifactFile.equals( source ) )

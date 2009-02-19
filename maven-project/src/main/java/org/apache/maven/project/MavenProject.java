@@ -155,6 +155,8 @@ public class MavenProject
     
     private Logger logger;
     
+    private ProjectBuilderConfiguration projectBuilderConfiguration;
+    
     public MavenProject()
     {
         Model model = new Model();
@@ -2092,6 +2094,23 @@ public class MavenProject
     public void setLogger( Logger logger )
     {
         this.logger = logger;
+    }
+
+    /**
+     * Retrieve the {@link ProjectBuilderConfiguration} instance used to construct this MavenProject instance.
+     */
+    public ProjectBuilderConfiguration getProjectBuilderConfiguration()
+    {
+        return projectBuilderConfiguration;
+    }
+
+    /**
+     * Set the {@link ProjectBuilderConfiguration} instance used to construct this MavenProject instance.
+     * @param projectBuilderConfiguration
+     */
+    public void setProjectBuilderConfiguration( ProjectBuilderConfiguration projectBuilderConfiguration )
+    {
+        this.projectBuilderConfiguration = projectBuilderConfiguration;
     }
 
 }

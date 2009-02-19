@@ -104,6 +104,8 @@ public interface Artifact
     String getDependencyConflictId();
 
     void addMetadata( ArtifactMetadata metadata );
+    
+    ArtifactMetadata getMetadata( Class metadataClass );
 
     Collection getMetadataList();
 

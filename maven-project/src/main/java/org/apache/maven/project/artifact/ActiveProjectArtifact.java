@@ -399,4 +399,9 @@ public class ActiveProjectArtifact
 
         return true;
     }
+
+    public ArtifactMetadata getMetadata( Class metadataClass )
+    {
+        return artifact.getMetadata( metadataClass );
+    }
 }

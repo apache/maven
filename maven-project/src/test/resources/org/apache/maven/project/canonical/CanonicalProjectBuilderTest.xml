@@ -84,7 +84,8 @@ under the License.
           <role>org.apache.maven.project.path.PathTranslator</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+          <role>org.apache.maven.project.artifact.ProjectArtifactFactory</role>
+          <role-hint>maven-project</role-hint>
         </requirement>
         <requirement>
           <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
