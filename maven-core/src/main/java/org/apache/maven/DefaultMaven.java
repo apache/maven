@@ -683,7 +683,8 @@ public class DefaultMaven
                 
                 String pass = proxy.getPassword();
                 
-                if( sd != null )
+                if ( sd != null )
+                {
                     try
                     {
                         pass = sd.decrypt( pass );
@@ -692,14 +693,10 @@ public class DefaultMaven
                     {
                         throw new SettingsConfigurationException( e.getMessage() );
                     }
+                }
 
-                wagonManager.addProxy(   proxy.getProtocol()
-                                       , proxy.getHost()
-                                       , proxy.getPort()
-                                       , proxy.getUsername()
-                                       , pass
-                                       , proxy.getNonProxyHosts()
-                                       );
+                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+                                       pass, proxy.getNonProxyHosts() );
             }
             
             for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
@@ -708,7 +705,8 @@ public class DefaultMaven
                 
                 String passWord = server.getPassword();
 
-                if( sd != null )
+                if ( sd != null )
+                {
                     try
                     {
                         passWord = sd.decrypt( passWord );
@@ -717,10 +715,12 @@ public class DefaultMaven
                     {
                         throw new SettingsConfigurationException( e.getMessage() );
                     }
+                }
                 
                 String passPhrase = server.getPassphrase();
 
-                if( sd != null )
+                if ( sd != null )
+                {
                     try
                     {
                         passPhrase = sd.decrypt( passPhrase );
@@ -729,6 +729,7 @@ public class DefaultMaven
                     {
                         throw new SettingsConfigurationException( e.getMessage() );
                     }
+                }
 
                 wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), passWord,
                                                     server.getPrivateKey(), passPhrase );
