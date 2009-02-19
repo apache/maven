@@ -70,7 +70,6 @@ public class MavenITmng3057VersionExprTransformations
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3057" );
         
-        File localRepo = new File( testDir, "target/local" );
         String remoteRepo = new File( testDir, "target/deployment" ).toURL().toExternalForm();
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
@@ -86,16 +85,15 @@ public class MavenITmng3057VersionExprTransformations
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-DtestVersion=1" );
-        cliOptions.add( "-Dmaven.repo.local=" + localRepo.getAbsolutePath() );
 
         verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "deploy" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        assertVersionExpressions( new File( localRepo, "org/apache/maven/its/mng3057/mng-3057/1/mng-3057-1.pom" ) ); 
-        assertVersionExpressions( new File( localRepo, "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ) ); 
-        assertVersionExpressions( new File( localRepo, "org/apache/maven/its/mng3057/level3/1/level3-1.pom" ) ); 
+        assertVersionExpressions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "mng-3057", "1", "pom" ) ) ); 
+        assertVersionExpressions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level2", "1", "pom" ) ) ); 
+        assertVersionExpressions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level3", "1", "pom" ) ) ); 
         
         assertVersionExpressions( new File( remoteRepo, "org/apache/maven/its/mng3057/mng-3057/1/mng-3057-1.pom" ) ); 
         assertVersionExpressions( new File( remoteRepo, "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ) ); 
