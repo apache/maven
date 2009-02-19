@@ -15,7 +15,7 @@
   <distributionManagement>
     <repository>
       <id>test-repo</id>
-      <url>${deployTo}</url>
+      <url>@deployTo@</url>
     </repository>
   </distributionManagement>
   
