@@ -19,18 +19,18 @@ under the License.
 
 <!-- START SNIPPET: ant-bootstrap
 
-By default the bootstrap will use ~/.m2/repository as the integration repository but you can define the integration
+By default the bootstrap will use ~/.m2/repository as the integration repository but you can define the integration 
 repository by specifying a property on the command line:
 
 ant -Dmaven.repo.local=/my/integration/repository
 
-Those familiar with Maven will note this is the same way the local repository can be set from the command-line.
+Those familiar with Maven will note this is the same way the local repository can be set from the command-line. 
 This facilitates having a set of builds converge on the same repository for integration purposes.
 
 END SNIPPET: ant-bootstrap -->
 
 <project default="all" basedir="." xmlns:mercury="urn:mercury-ant-tasks">
-
+  
   <property name="it.workdir.version" value="3.0.x"/>
 
   <target name="initTaskDefs">
@@ -57,7 +57,7 @@ END SNIPPET: ant-bootstrap -->
   </target>
 
   <target name="init" depends="isMavenHomeSet">
-    <xmlproperty prefix="pom" file="pom.xml"/>
+    <xmlproperty prefix="pom" file="pom.xml"/>    
     <basename file="${maven.home}" property="maven.home.basename"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
     <!-- Initialize properties -->
@@ -69,8 +69,8 @@ END SNIPPET: ant-bootstrap -->
     <property name="maven.repo.central" value="http://repository.sonatype.org/content/groups/public"/>
     <mercury:remote-repository location="${maven.repo.central}"/>
 -->
-
-    <property name="surefire.useFile" value="true"/>
+  	
+    <property name="surefire.useFile" value="true"/>    
     <echo>maven.home = ${maven.home}</echo>
   </target>
 
@@ -78,53 +78,50 @@ END SNIPPET: ant-bootstrap -->
     <delete dir="bootstrap"/>
   </target>
 
-  <target name="pull" depends="init" unless="skip.pull">
-    <property name="verbose" value="false"/>
+  <target name="pull" depends="init" unless="skip.pull">    
+    <property name="verbose" value="false"/>    
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
 
-  	<delete file="${basedir}/dependencies.xml"/>
-
-
     <mercury:local-repository location="${maven.repo.local}"/>
+
+  	<!-- classpaths with default names: mercury.classpath, mercury.classpath.test, mercury.classpath.runtime -->
     <mercury:resolve-dependencies>
+      <mercury:dependency source="maven:${basedir}/dependencies.xml"/>
       <mercury:dependency id="org.codehaus.plexus:plexus-component-metadata:${pom.properties.plexusVersion}"/>
-      <mercury:dependency id="org.apache.maven:maven:3.0-SNAPSHOT::pom" source="maven:pom.xml"/>
-      <mercury:dependency id="org.codehaus.modello:modello-maven-plugin:${pom.properties.modelloVersion}"/>
     </mercury:resolve-dependencies>
-
-<!-- those are for debugging and example (named paths) only. Remove as needed -->
 <!--
-    <mercury:resolve-dependencies pathid="plexus.classpath">
-      <mercury:dependency id="org.codehaus.plexus:plexus-component-metadata:${pom.properties.plexusVersion}"/>
-    </mercury:resolve-dependencies>
-
-    <mercury:resolve-dependencies pathid="modello.classpath">
+  	<delete file="${basedir}/dependencies.xml"/>
+-->    
+    <!-- only one named classpath: modello.classpath -->
+    <mercury:resolve-dependencies pathid="modello.classpath" scope="runtime">
       <mercury:dependency id="org.codehaus.modello:modello-maven-plugin:${pom.properties.modelloVersion}"/>
     </mercury:resolve-dependencies>
--->
+<!--
     <echo>========================================================================</echo>
     <property name="mcc" refid="mercury.classpath.compile"/>
     <echo>mercury.classpath.compile=${mcc}</echo>
     <echo>========================================================================</echo>
-    <property name="mct" refid="mercury.classpath.test"/>
-    <echo>mercury.classpath.test=${mct}</echo>
+    <property name="mcr" refid="mercury.classpath.runtime"/>
+    <echo>mercury.classpath.runtime=${mcr}</echo>
     <echo>========================================================================</echo>
-<!--
+
     <property name="cp.plexus" refid="plexus.classpath"/>
     <echo>cp.plexus=${cp.plexus}</echo>
     <echo>========================================================================</echo>
+    
     <property name="cp.modello" refid="modello.classpath"/>
     <echo>cp.modello=${cp.modello}</echo>
     <echo>========================================================================</echo>
 -->
-    <!-- Pull the dependencies for Modello
+
+    <!-- Pull the dependencies for Modello 
       <mercury:dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
     </mercury:resolve-dependencies>
     -->
-
+    
     <!-- Pull the dependencies for the MetadataGenerator CLI
     <mercury:resolve-dependencies id="pmdg">
       <mercury:dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
@@ -135,14 +132,14 @@ END SNIPPET: ant-bootstrap -->
   <target name="process-classes" depends="pull" description="generates plexus component metadata.">
     <mkdir dir="${basedir}/bootstrap/target"/>
     <mkdir dir="${basedir}/bootstrap/target/classes"/>
-
+  	
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes"/>
-      <path refid="sources"/>
-      <path refid="mercury.classpath"/>
+      <path refid="sources"/>     
+      <path refid="mercury.classpath.runtime"/>     
     </path>
 
-    <echo>Using plexus version ${pom.properties.plexusVersion}</echo>
+    <echo>Using plexus version ${pom.properties.plexusVersion}</echo> 
     <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
       <classpath refid="maven.classpath"/>
       <!-- We need to generate component descriptors from the maven-artifact sources which use javadoc annotations. -->
@@ -158,8 +155,8 @@ END SNIPPET: ant-bootstrap -->
       <arg value="--output"/>
       <arg value="${basedir}/bootstrap/target/classes/META-INF/plexus/components.xml"/>
     </java>
-  </target>
-
+  </target>	
+	
   <target name="generate-sources" depends="pull" description="generates Java sources from Modello mdo model files">
     <mkdir dir="bootstrap/target"/>
     <mkdir dir="bootstrap/target/generated-sources"/>
@@ -169,7 +166,7 @@ END SNIPPET: ant-bootstrap -->
       <attribute name="mode"/>
       <attribute name="version"/>
       <sequential>
-        <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true" classpathref="mercury.classpath">
+        <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true" classpathref="modello.classpath">
           <arg file="@{file}"/> <!-- model file -->
           <arg value="@{mode}"/> <!-- output type -->
           <arg file="bootstrap/target/generated-sources"/> <!-- output directory -->
@@ -202,6 +199,7 @@ END SNIPPET: ant-bootstrap -->
   </target>
 
   <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
+  	
     <path id="sources">
       <dirset dir=".">
         <include name="bootstrap/target/generated-sources"/>
@@ -209,10 +207,15 @@ END SNIPPET: ant-bootstrap -->
       </dirset>
     </path>
 
+
+    <echo>========================================================================</echo>
+    <property name="mc" refid="mercury.classpath"/>
+    <echo>mercury.classpath=${mc}</echo>
+    <echo>========================================================================</echo>
     <mkdir dir="bootstrap/target/classes"/>
     <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.5" target="1.5" debug="true">
       <src refid="sources"/>
-      <classpath refid="pom.pathid"/>
+      <classpath refid="mercury.classpath"/>
     </javac>
 
     <path id="maven.classpath">
@@ -226,7 +229,7 @@ END SNIPPET: ant-bootstrap -->
   <target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <classpath refid="maven.classpath"/>
-      <arg value="-e"/>
+      <arg value="-e"/>      
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
@@ -235,9 +238,9 @@ END SNIPPET: ant-bootstrap -->
     </java>
   </target>
 
-  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">
+  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">              
     <echo>
-    The new Maven distribution was created as part of the MAVEN-COMPILE step, above.
+    The new Maven distribution was created as part of the MAVEN-COMPILE step, above. 
     This goal just validates the presence of that distribution.
     </echo>
     <condition property="build.failed">
@@ -260,7 +263,7 @@ END SNIPPET: ant-bootstrap -->
       </fileset>
     </chmod>
   </target>
-
+  
   <target name="all" depends="clean-bootstrap,init,extract-assembly"/>
-
+  
 </project>
