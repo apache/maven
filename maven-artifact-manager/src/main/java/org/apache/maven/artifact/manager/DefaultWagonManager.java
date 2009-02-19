@@ -333,12 +333,12 @@ public class DefaultWagonManager
                 // This one we will eat when looking through remote repositories
                 // because we want to cycle through them all before squawking.
 
-                getLogger().debug( "Unable to find resource '" + artifact.getId() + "' in repository " +
+                getLogger().info( "Unable to find resource '" + artifact.getId() + "' in repository " +
                     repository.getId() + " (" + repository.getUrl() + ")" );
             }
             catch ( TransferFailedException e )
             {
-                getLogger().debug( "Unable to get resource '" + artifact.getId() + "' from repository " +
+                getLogger().warn( "Unable to get resource '" + artifact.getId() + "' from repository " +
                     repository.getId() + " (" + repository.getUrl() + "): " + e.getMessage() );
             }
         }
