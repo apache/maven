@@ -19,12 +19,10 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.ResourceExtractor;
-
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
+
+import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3023">MNG-3023</a>
