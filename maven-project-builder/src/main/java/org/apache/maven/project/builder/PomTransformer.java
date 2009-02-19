@@ -799,7 +799,7 @@ public class PomTransformer
                                                    DomainModel domainModel )
         throws IOException
     {
-        IPomClassicDomainModel dm = (IPomClassicDomainModel) domainModel;
+        PomClassicDomainModel dm = (PomClassicDomainModel) domainModel;
 
         if ( !containsProjectVersion( interpolatorProperties ) )
         {

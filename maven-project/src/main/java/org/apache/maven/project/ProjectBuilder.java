@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.project;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -25,17 +25,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.project.builder.PomClassicDomainModel;
 
 /**
  * Provides services for building maven projects from models.
  */
 public interface ProjectBuilder
 {
-    public IPomClassicDomainModel buildModel( File pom,
+    public PomClassicDomainModel buildModel( File pom,
                                              Collection<InterpolatorProperty> interpolatorProperties,
                                              PomArtifactResolver resolver )
         throws IOException;

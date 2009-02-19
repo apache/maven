@@ -21,6 +21,7 @@ package org.apache.maven.plugin;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,20 +66,19 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.project.DuplicateArtifactAttachmentException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.*;
+import org.apache.maven.project.builder.*;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
-import org.apache.maven.project.builder.Interpolator;
-import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.project.builder.ProjectBuilder;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.shared.model.ModelProperty;
+import org.apache.maven.shared.model.ModelMarshaller;
+import org.apache.maven.shared.model.ModelTransformerContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -575,7 +575,7 @@ public class DefaultPluginManager
                 interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(),
                         PomInterpolatorTag.USER_PROPERTIES.name()));
                 String interpolatedDom  =
-                        Interpolator.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
+                        interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
                 dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
             }
             catch ( XmlPullParserException e )
@@ -1684,5 +1684,29 @@ public class DefaultPluginManager
                 realmWithTransientParent.setParentRealm( null );
             }
         }
+    }
+
+    private static String interpolateXmlString( String xml, List<InterpolatorProperty> interpolatorProperties )
+        throws IOException
+    {
+        List<ModelProperty> modelProperties = ModelMarshaller.marshallXmlToModelProperties( new ByteArrayInputStream( xml.getBytes() ), ProjectUri.baseUri, PomTransformer.URIS );
+
+        Map<String, String> aliases = new HashMap<String, String>();
+        aliases.put( "project.", "pom." );
+
+        List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>( interpolatorProperties );
+        ips.addAll( ModelTransformerContext.createInterpolatorProperties( modelProperties, ProjectUri.baseUri, aliases, PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false ) );
+
+        for ( ModelProperty mp : modelProperties )
+        {
+            if ( mp.getUri().startsWith( ProjectUri.properties ) && mp.getValue() != null )
+            {
+                String uri = mp.getUri();
+                ips.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1, uri.length() ) + "}", mp.getValue() ) );
+            }
+        }
+
+        ModelTransformerContext.interpolateModelProperties( modelProperties, ips );
+        return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
     }
 }

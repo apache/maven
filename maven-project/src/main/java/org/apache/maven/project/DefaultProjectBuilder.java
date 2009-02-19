@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder.impl;
+package org.apache.maven.project;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,9 +19,7 @@ package org.apache.maven.project.builder.impl;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.*;
 
 import org.apache.maven.MavenTools;
@@ -36,11 +34,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.project.*;
 import org.apache.maven.project.builder.*;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
@@ -52,6 +48,8 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Default implementation of the project builder.
@@ -233,10 +231,10 @@ public class DefaultProjectBuilder
 
         File parentFile = null;
         int lineageCount = 0;
-        if ( domainModel.getModel().getParent() != null )
+        if ( domainModel.getParentId() != null )
         {
             List<DomainModel> mavenParents;
-            if ( isParentLocal( domainModel.getModel().getParent(), pom.getParentFile() ) )
+            if ( isParentLocal( domainModel.getRelativePathOfParent(), pom.getParentFile() ) )
             {
                 mavenParents =
                     getDomainModelParentsFromLocalPath( domainModel, resolver, pom.getParentFile(), properties,
@@ -262,7 +260,7 @@ public class DefaultProjectBuilder
 
         for ( Model model : mixins )
         {
-            domainModels.add( new PomClassicDomainModel( model ) );
+            domainModels.add( convertToDomainModel( model ) );
         }
         
         PomTransformer transformer = new PomTransformer( new PomClassicDomainModelFactory() );
@@ -280,6 +278,30 @@ public class DefaultProjectBuilder
         transformedDomainModel.setParentFile( parentFile );
         
         return transformedDomainModel;
+    }
+
+    private PomClassicDomainModel convertToDomainModel(Model model) throws IOException
+    {
+                if ( model == null )
+        {
+            throw new IllegalArgumentException( "model: null" );
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer out = null;
+        MavenXpp3Writer writer = new MavenXpp3Writer();
+        try
+        {
+            out = WriterFactory.newXmlWriter( baos );
+            writer.write( out, model );
+        }
+        finally
+        {
+            if ( out != null )
+            {
+                out.close();
+            }
+        }
+        return new PomClassicDomainModel(new ByteArrayInputStream(baos.toByteArray()));
     }
     
     public MavenProject buildFromLocalPath( File pom, 
@@ -309,7 +331,7 @@ public class DefaultProjectBuilder
         
         try
         {
-            MavenProject mavenProject = new MavenProject( domainModel.getModel(), 
+            MavenProject mavenProject = new MavenProject( convertFromInputStreamToModel(domainModel.getInputStream()),
                                                           artifactFactory, 
                                                           mavenTools, 
                                                           mavenProjectBuilder, 
@@ -325,18 +347,32 @@ public class DefaultProjectBuilder
         }
     }
 
+    private static Model convertFromInputStreamToModel(InputStream inputStream) throws IOException
+    {
+
+        try
+        {
+            return new MavenXpp3Reader().read( ReaderFactory.newXmlReader( inputStream ) );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new IOException( e.getMessage() );
+        }
+
+    }
+
     /**
      * Returns true if the relative path of the specified parent references a pom, otherwise returns false.
      *
-     * @param parent           the parent model info
+     * @param relativePath         the parent model info
      * @param projectDirectory the project directory of the child pom
      * @return true if the relative path of the specified parent references a pom, otherwise returns fals
      */
-    private boolean isParentLocal( Parent parent, File projectDirectory )
+    private boolean isParentLocal( String relativePath, File projectDirectory )
     {
         try
         {
-            File f = new File( projectDirectory, parent.getRelativePath() ).getCanonicalFile();
+            File f = new File( projectDirectory, relativePath ).getCanonicalFile();
             
             if ( f.isDirectory() )
             {
@@ -360,23 +396,24 @@ public class DefaultProjectBuilder
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
 
-        Parent parent = domainModel.getModel().getParent();
+        String parentId = domainModel.getParentId();
 
-        if ( parent == null )
+        if ( parentId == null )
         {
             return domainModels;
         }
 
-        Artifact artifactParent = artifactFactory.createParentArtifact( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+        Artifact artifactParent = artifactFactory.createParentArtifact( domainModel.getParentGroupId(),
+                domainModel.getParentArtifactId(), domainModel.getParentVersion() );
         
         artifactResolver.resolve( artifactParent );
 
         PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( artifactParent.getFile() );
 
-        if ( !parentDomainModel.matchesParent( domainModel.getModel().getParent() ) )
+        if ( !parentDomainModel.matchesParentOf( domainModel ) )
         {
             logger.debug( "Parent pom ids do not match: Parent File = " + artifactParent.getFile().getAbsolutePath() +
-                ": Child ID = " + domainModel.getModel().getId() );
+                ": Child ID = " + domainModel.getId() );
             return domainModels;
         }
 
@@ -428,16 +465,16 @@ public class DefaultProjectBuilder
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
 
-        Parent parent = domainModel.getModel().getParent();
+        String parentId = domainModel.getParentId();
 
-        if ( parent == null )
+        if ( parentId == null )
         {
             return domainModels;
         }
 
-        Model model = domainModel.getModel();
+       // Model model = domainModel.getModel();
 
-        File parentFile = new File( projectDirectory, model.getParent().getRelativePath() ).getCanonicalFile();
+        File parentFile = new File( projectDirectory, domainModel.getRelativePathOfParent() ).getCanonicalFile();
         if ( parentFile.isDirectory() )
         {
             parentFile = new File( parentFile.getAbsolutePath(), "pom.xml" );
@@ -472,11 +509,11 @@ public class DefaultProjectBuilder
             domainModels.add(new PomClassicDomainModel(transformed));
         }
 
-        if ( !parentDomainModel.matchesParent( domainModel.getModel().getParent() ) )
+        if ( !parentDomainModel.matchesParentOf( domainModel ) )
         {
-            logger.debug( "Parent pom ids do not match: Parent File = " + parentFile.getAbsolutePath() + ", Parent ID = "
+            logger.info( "Parent pom ids do not match: Parent File = " + parentFile.getAbsolutePath() + ", Parent ID = "
                     + parentDomainModel.getId() + ", Child ID = " + domainModel.getId() + ", Expected Parent ID = "
-                    + domainModel.getModel().getParent().getId() );
+                    + domainModel.getParentId() );
             
             List<DomainModel> parentDomainModels =
                 getDomainModelParentsFromRepository( domainModel, artifactResolver, properties, activeProfileIds,
@@ -485,7 +522,7 @@ public class DefaultProjectBuilder
             if(parentDomainModels.size() == 0)
             {
                 throw new IOException("Unable to find parent pom on local path or repo: "
-                        + domainModel.getModel().getParent().getId());
+                        + domainModel.getParentId());
             }
             
             domainModels.addAll( parentDomainModels );
@@ -493,9 +530,9 @@ public class DefaultProjectBuilder
         }
 
         domainModels.add( parentDomainModel );
-        if ( parentDomainModel.getModel().getParent() != null )
+        if ( domainModel.getParentId() != null )
         {
-            if ( isParentLocal( parentDomainModel.getModel().getParent(), parentFile.getParentFile() ) )
+            if ( isParentLocal(parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
             {
                 domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, artifactResolver,
                                                                          parentFile.getParentFile(), properties,

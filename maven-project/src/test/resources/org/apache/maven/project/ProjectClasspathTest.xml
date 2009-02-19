@@ -57,9 +57,9 @@ under the License.
       </requirements>
     </component>
     <component>
-        <role>org.apache.maven.project.builder.ProjectBuilder</role>
+        <role>org.apache.maven.project.ProjectBuilder</role>
         <role-hint>default</role-hint>
-        <implementation>org.apache.maven.project.builder.impl.DefaultProjectBuilder</implementation>
+        <implementation>org.apache.maven.project.DefaultProjectBuilder</implementation>
         <requirements>
             <requirement>
                 <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
@@ -75,7 +75,7 @@ under the License.
       <implementation>org.apache.maven.project.TestProjectBuilder</implementation>
       <requirements>
         <requirement>
-             <role>org.apache.maven.project.builder.ProjectBuilder</role>
+             <role>org.apache.maven.project.ProjectBuilder</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.profiles.build.ProfileAdvisor</role>

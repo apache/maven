@@ -29,15 +29,12 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.project.harness.PomTestWrapper;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.project.DefaultProjectBuilderConfiguration;
+import org.apache.maven.project.*;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -83,6 +80,17 @@ public class PomConstructionTest
         };
     }
 
+    /**
+     * Will throw exception if doesn't find parent(s) in build
+     *
+     * @throws Exception
+     */
+    public void testParentInheritance()
+        throws Exception
+    {
+        buildPom( "parent-inheritance/sub" );
+    }
+
     /*MNG-3995*/
     public void testExecutionConfigurationJoin()
        throws Exception
@@ -112,7 +120,7 @@ public class PomConstructionTest
     {
         File pom = new File( testDirectory, "micromailer/micromailer-1.0.3.pom" );
         PomArtifactResolver resolver = artifactResolver( "micromailer" );
-        IPomClassicDomainModel model = projectBuilder.buildModel( pom, null, resolver );
+        PomClassicDomainModel model = projectBuilder.buildModel( pom, null, resolver );
         // This should be 2
         //assertEquals( 2, model.getLineageCount() );
         PomTestWrapper tester = new PomTestWrapper( (PomClassicDomainModel) model );

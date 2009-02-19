@@ -19,8 +19,7 @@ package org.apache.maven.project.harness;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +28,13 @@ import java.util.Map;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.builder.PomClassicDomainModel;
-import org.apache.maven.project.builder.IPomClassicDomainModel;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.ModelProperty;
+import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomTestWrapper
 {
@@ -65,7 +67,11 @@ public class PomTestWrapper
         }
         this.domainModel = domainModel;
         this.pomFile = pomFile;
-        context = JXPathContext.newContext( domainModel.getModel() );
+        try {
+            context = JXPathContext.newContext( new MavenXpp3Reader().read(domainModel.getInputStream()));
+        } catch (XmlPullParserException e) {
+            throw new IOException(e.getMessage());
+        }
     }
 
     public PomTestWrapper( File pomFile, MavenProject mavenProject )
@@ -100,19 +106,11 @@ public class PomTestWrapper
         }
 
         this.domainModel = new PomClassicDomainModel( file );
-        context = JXPathContext.newContext( domainModel.getModel() );
-    }
-
-    public PomTestWrapper( Model model )
-        throws IOException
-    {
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model: null" );
+        try {
+            context = JXPathContext.newContext( new MavenXpp3Reader().read(domainModel.getInputStream()));
+        } catch (XmlPullParserException e) {
+            throw new IOException(e.getMessage());
         }
-
-        this.domainModel = new PomClassicDomainModel( model );
-        context = JXPathContext.newContext( domainModel.getModel() );
     }
 
     public MavenProject getMavenProject()
@@ -125,13 +123,37 @@ public class PomTestWrapper
         if(domainModel == null && mavenProject != null)
         {
             try {
-                return new PomClassicDomainModel(mavenProject.getModel());
+                return convertToDomainModel(mavenProject.getModel());
             } catch (IOException e) {
 
             }
         }
 
         return this.domainModel;
+    }
+
+    private PomClassicDomainModel convertToDomainModel(Model model) throws IOException
+    {
+                if ( model == null )
+        {
+            throw new IllegalArgumentException( "model: null" );
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer out = null;
+        MavenXpp3Writer writer = new MavenXpp3Writer();
+        try
+        {
+            out = WriterFactory.newXmlWriter( baos );
+            writer.write( out, model );
+        }
+        finally
+        {
+            if ( out != null )
+            {
+                out.close();
+            }
+        }
+        return new PomClassicDomainModel(new ByteArrayInputStream(baos.toByteArray()));
     }
 
     public File getBasedir()

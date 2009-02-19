@@ -19,25 +19,17 @@ package org.apache.maven.project.builder;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.shared.model.InputStreamDomainModel;
 import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelMarshaller;
+import org.apache.maven.shared.model.InputStreamDomainModel;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -46,8 +38,7 @@ import java.util.HashSet;
 /**
  * Provides a wrapper for the maven model.
  */
-public final class PomClassicDomainModel
-    implements IPomClassicDomainModel
+public class PomClassicDomainModel implements InputStreamDomainModel
 {
 
     /**
@@ -59,11 +50,6 @@ public final class PomClassicDomainModel
      * History of joins and deletes of model properties
      */
     private String eventHistory;
-
-    /**
-     * Maven model
-     */
-    private Model model;
 
     private String id;
 
@@ -77,44 +63,18 @@ public final class PomClassicDomainModel
     
     private int lineageCount;
 
-    public PomClassicDomainModel( List<ModelProperty> modelProperties)
+    private String parentGroupId = null, parentArtifactId = null, parentVersion = null, parentId = null, parentRelativePath;
+
+    public PomClassicDomainModel( List<ModelProperty> modelProperties )
     {
         this.modelProperties = modelProperties;
+
         try {
             inputBytes = IOUtil.toByteArray( ModelMarshaller.unmarshalModelPropertiesToXml(modelProperties, ProjectUri.baseUri));
         } catch (IOException e) {
 
         }
-    }
-    /**
-     * Constructor
-     *
-     * @param model maven model
-     * @throws IOException if there is a problem constructing the model
-     */
-    public PomClassicDomainModel( Model model )
-        throws IOException
-    {
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model: null" );
-        }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer out = null;
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        try
-        {
-            out = WriterFactory.newXmlWriter( baos );
-            writer.write( out, model );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                out.close();
-            }
-        }
-        inputBytes = baos.toByteArray();
+        initializeProperties( modelProperties );
     }
 
     /**
@@ -131,6 +91,76 @@ public final class PomClassicDomainModel
             throw new IllegalArgumentException( "inputStream: null" );
         }
         this.inputBytes = IOUtil.toByteArray( inputStream );
+        modelProperties = getModelProperties();
+        initializeProperties( modelProperties );
+    }
+
+    private void initializeProperties(List<ModelProperty> modelProperties)
+    {
+        String groupId = null, artifactId = null, version = null;
+        for(ModelProperty mp : modelProperties)
+        {
+            if(mp.getUri().equals(ProjectUri.groupId))
+            {
+                groupId = mp.getResolvedValue();
+            }
+            else if(mp.getUri().equals(ProjectUri.artifactId))
+            {
+                artifactId = mp.getResolvedValue();
+            }
+            else if(mp.getUri().equals(ProjectUri.version))
+            {
+                version = mp.getResolvedValue();
+            }
+            else if(mp.getUri().equals(ProjectUri.Parent.artifactId))
+            {
+                parentArtifactId = mp.getResolvedValue();
+            }
+            else if(mp.getUri().equals(ProjectUri.Parent.groupId))
+            {
+                parentGroupId = mp.getResolvedValue();
+            }
+            else if(mp.getUri().equals(ProjectUri.Parent.version))
+            {
+                parentVersion = mp.getResolvedValue();
+            }
+            else if(mp.getUri().equals(ProjectUri.Parent.relativePath))
+            {
+                parentRelativePath = mp.getResolvedValue();
+            }
+
+
+
+            if(groupId != null && artifactId != null && version != null && parentGroupId != null &&
+                    parentArtifactId != null && parentVersion != null & parentRelativePath != null)
+            {
+                break;
+            }
+        }
+            if( groupId == null && parentGroupId != null)
+            {
+                groupId = parentGroupId;
+            }
+            if( artifactId == null && parentArtifactId != null)
+            {
+                artifactId = parentArtifactId;
+            }
+            if( version == null && parentVersion != null )
+            {
+                version = parentVersion;
+            }
+
+        if(parentGroupId != null && parentArtifactId != null && parentVersion != null)
+        {
+            parentId = parentGroupId + ":" + parentArtifactId + ":" + parentVersion;
+        }
+        
+        if(parentRelativePath == null)
+        {
+            parentRelativePath = ".." + File.separator + "pom.xml";
+        }
+
+        id = groupId + ":" + artifactId + ":" + version;
     }
 
     public PomClassicDomainModel( File file )
@@ -149,7 +179,19 @@ public final class PomClassicDomainModel
     {
         this.parentFile = parentFile;
     }
-    
+
+    public String getParentGroupId() {
+        return parentGroupId;
+    }
+
+    public String getParentArtifactId() {
+        return parentArtifactId;
+    }
+
+    public String getParentVersion() {
+        return parentVersion;
+    }
+
     /**
      * This should only be set for projects that are in the build. Setting for poms in the repo may cause unstable behavior.
      * 
@@ -170,72 +212,30 @@ public final class PomClassicDomainModel
         return projectDirectory != null;
     }
 
-    /**
-     * Returns true if groupId.equals(a.groupId) && artifactId.equals(a.artifactId) && version.equals(a.version),
-     * otherwise returns false.
-     *
-     * @param a model to compare
-     * @return true if groupId.equals(a.groupId) && artifactId.equals(a.artifactId) && version.equals(a.version),
-     *         otherwise returns false.
-     */
-    public boolean matchesModel( Model a )
+    public String getParentId() throws IOException
     {
-        if ( a == null )
-        {
-            throw new IllegalArgumentException( "a: null" );
-        }
-        if ( model == null )
-        {
-            try
-            {
-                model = getModel();
-            }
-            catch ( IOException e )
-            {
-                return false;
-            }
-        }
-        return a.getId().equals( this.getId() );
+        return parentId;
     }
 
-    public String getId()
+    public String getRelativePathOfParent()
     {
-        if ( id == null )
-        {
-            if ( model == null )
-            {
-                try
-                {
-                    model = getModel();
-                }
-                catch ( IOException e )
-                {
-                    return "";
-                }
-            }
-            String groupId = ( model.getGroupId() == null && model.getParent() != null )
-                ? model.getParent().getGroupId()
-                : model.getGroupId();
-            String artifactId = ( model.getArtifactId() == null && model.getParent() != null )
-                ? model.getParent().getArtifactId()
-                : model.getArtifactId();
-            String version = ( model.getVersion() == null && model.getParent() != null )
-                ? model.getParent().getVersion()
-                : model.getVersion();
+        return parentRelativePath;
+    }
 
-            id = groupId + ":" + artifactId + ":" + version;
-        }
+    public String getId() throws IOException
+    {
         return id;
     }
 
 
-    public boolean matchesParent( Parent parent )
+    public boolean matchesParentOf( PomClassicDomainModel domainModel ) throws IOException
     {
-        if ( parent == null )
+        if ( domainModel == null )
         {
-            throw new IllegalArgumentException( "parent: null" );
+            throw new IllegalArgumentException( "domainModel: null" );
         }
-        return getId().equals( parent.getGroupId() + ":" + parent.getArtifactId() + ":" + parent.getVersion() );
+
+        return getId().equals(domainModel.getParentId());
     }
 
     /**
@@ -253,29 +253,6 @@ public final class PomClassicDomainModel
         {
             // should not occur: everything is in-memory
             return "";
-        }
-    }
-
-    /**
-     * Returns maven model
-     *
-     * @return maven model
-     */
-    public Model getModel()
-        throws IOException
-    {
-        if ( model != null )
-        {
-            return model;
-        }
-        try
-        {
-            model = new MavenXpp3Reader().read( ReaderFactory.newXmlReader( new ByteArrayInputStream( inputBytes ) ) );
-            return model;
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new IOException( e.getMessage() );
         }
     }
 
@@ -370,7 +347,11 @@ public final class PomClassicDomainModel
      */
     public boolean equals( Object o )
     {
-        return o instanceof PomClassicDomainModel && getId().equals( ( (PomClassicDomainModel) o ).getId() );
+        try {
+            return o instanceof PomClassicDomainModel && getId().equals( ( (PomClassicDomainModel) o ).getId() );
+        } catch (IOException e) {
+            return false;
+        }
     }
 
 }

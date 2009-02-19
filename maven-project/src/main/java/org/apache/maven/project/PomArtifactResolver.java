@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.project;
 
 import java.io.IOException;
 
