@@ -23,9 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -70,23 +73,26 @@ public class MavenITmng3057VersionExprTransformations
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3057" );
         
-        String remoteRepo = new File( testDir, "target/deployment" ).toURL().toExternalForm();
+        URI remoteRepo = new File( testDir, "target/deployment" ).toURI();
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3057", "mng-3057", "1", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3057", "level2", "1", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3057", "level3", "1", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3057", "level3", "1", "jar" );
-
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3057" );
+        
         Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty( "@deployTo@", remoteRepo );
+        properties.setProperty( "@deployTo@", remoteRepo.toURL().toExternalForm() );
 
         verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", properties );
 
         List cliOptions = new ArrayList();
+        cliOptions.add( "-V" );
         cliOptions.add( "-DtestVersion=1" );
 
         verifier.setCliOptions( cliOptions );
+        
+//        Map envars = new HashMap();
+//        envars.put( "MAVEN_OPTS", "-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=5005 -Djava.compiler=NONE" );
+//        verifier.executeGoal( "deploy", envars );
+        
         verifier.executeGoal( "deploy" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -95,9 +101,9 @@ public class MavenITmng3057VersionExprTransformations
         assertVersionExpressions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level2", "1", "pom" ) ) ); 
         assertVersionExpressions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level3", "1", "pom" ) ) ); 
         
-        assertVersionExpressions( new File( remoteRepo, "org/apache/maven/its/mng3057/mng-3057/1/mng-3057-1.pom" ) ); 
-        assertVersionExpressions( new File( remoteRepo, "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ) ); 
-        assertVersionExpressions( new File( remoteRepo, "org/apache/maven/its/mng3057/level3/1/level3-1.pom" ) ); 
+        assertVersionExpressions( new File( remoteRepo.getPath(), "org/apache/maven/its/mng3057/mng-3057/1/mng-3057-1.pom" ) ); 
+        assertVersionExpressions( new File( remoteRepo.getPath(), "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ) ); 
+        assertVersionExpressions( new File( remoteRepo.getPath(), "org/apache/maven/its/mng3057/level3/1/level3-1.pom" ) ); 
     }
 
     private void assertVersionExpressions( File pomFile )
@@ -106,13 +112,17 @@ public class MavenITmng3057VersionExprTransformations
         Verifier verifier = new Verifier( pomFile.getParentFile().getAbsolutePath() );
         
         List cliOptions = new ArrayList();
-        cliOptions.add( "-f" );
+        cliOptions.add( "-V" );
+        cliOptions.add( "-N" );
         cliOptions.add( "-Dexpression.outputFile=expressions.properties" );
         cliOptions.add( "-Dexpression.expressions=" + StringUtils.join( VERIFICATION_EXPRESSIONS.iterator(), "," ) );
+        cliOptions.add( "-f" );
         cliOptions.add( pomFile.getName() );
+        
         
         verifier.setCliOptions( cliOptions );
         
+        verifier.setAutoclean( false );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
