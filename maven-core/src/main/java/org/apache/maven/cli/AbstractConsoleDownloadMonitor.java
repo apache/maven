@@ -23,6 +23,7 @@ import org.apache.maven.wagon.WagonConstants;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 
 /**
  * Abstract console download progress meter.
@@ -35,6 +36,16 @@ public abstract class AbstractConsoleDownloadMonitor
     extends AbstractLogEnabled
     implements TransferListener
 {
+    private Logger logger;
+
+    public AbstractConsoleDownloadMonitor()
+    {
+    }
+
+    public AbstractConsoleDownloadMonitor( Logger logger )
+    {
+        this.logger = logger;
+    }
 
     public void transferInitiated( TransferEvent transferEvent )
     {
@@ -76,6 +87,11 @@ public abstract class AbstractConsoleDownloadMonitor
     public void transferError( TransferEvent transferEvent )
     {
         // these errors should already be handled elsewhere by Maven since they all result in an exception from Wagon
+        if ( logger != null )
+        {
+            Exception exception = transferEvent.getException();
+            logger.debug( exception.getMessage(), exception );
+        }
     }
 
     /**
@@ -83,8 +99,10 @@ public abstract class AbstractConsoleDownloadMonitor
      */
     public void debug( String message )
     {
-        // TODO: can't use getLogger() because this isn't currently instantiated as a component
-//        getLogger().debug( message );
+        if ( logger != null )
+        {
+            logger.debug( message );
+        }
     }
 
 }

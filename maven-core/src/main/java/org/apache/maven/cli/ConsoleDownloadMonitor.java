@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 
 import org.apache.maven.wagon.WagonConstants;
 import org.apache.maven.wagon.events.TransferEvent;
+import org.codehaus.plexus.logging.Logger;
 
 /**
  * Console download progress meter.
@@ -33,13 +34,21 @@ public class ConsoleDownloadMonitor
 {
     private long complete;
 
+    public ConsoleDownloadMonitor( Logger logger )
+    {
+        super( logger );
+    }
+
+    public ConsoleDownloadMonitor()
+    {
+    }
+
     public void transferInitiated( TransferEvent transferEvent )
     {
         String message = transferEvent.getRequestType() == TransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
 
         String url = transferEvent.getWagon().getRepository().getUrl();
 
-        // TODO: can't use getLogger() because this isn't currently instantiated as a component
         System.out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
 
         complete = 0;
@@ -54,7 +63,6 @@ public class ConsoleDownloadMonitor
     {
         long total = transferEvent.getResource().getContentLength();
         complete += length;
-        // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
         if ( total >= 1024 )
         {
             System.out.print(
