@@ -15,15 +15,6 @@ public class PomClassicDomainModelFactory implements DomainModelFactory
 {
     public DomainModel createDomainModel(List<ModelProperty> modelProperties) throws IOException
     {
-        String xml = null;
-        try
-        {
-            xml = ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-            return new PomClassicDomainModel( new MavenXpp3Reader().read( new StringReader( xml ) ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new IOException( e + ":\r\n" + xml );
-        }
+        return new PomClassicDomainModel(modelProperties);
     }
 }

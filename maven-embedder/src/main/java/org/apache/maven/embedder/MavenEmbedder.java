@@ -63,7 +63,6 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.builder.ProjectBuilder;
-import org.apache.maven.project.builder.Mixer;
 import org.apache.maven.plugin.PluginRepository;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.reactor.MissingModuleException;
@@ -144,8 +143,6 @@ public class MavenEmbedder
     private BuildPlanner buildPlanner;
 
     private PluginRepository pluginRepository;
-
-    private Mixer mixer;
     
     // ----------------------------------------------------------------------
     // Configuration
@@ -674,8 +671,6 @@ public class MavenEmbedder
             artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
 
             pluginRepository = container.lookup( PluginRepository.class );
-
-            mixer = (Mixer) container.lookup( ProjectBuilder.class );
 
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.

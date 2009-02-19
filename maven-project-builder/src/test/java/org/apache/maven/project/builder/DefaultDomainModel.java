@@ -5,8 +5,10 @@ import org.apache.maven.shared.model.ModelProperty;
 
 import java.util.List;
 import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
 
-public class DefaultDomainModel implements DomainModel {
+public class DefaultDomainModel implements IPomClassicDomainModel {
 
     private List<ModelProperty> modelProperties;
 
@@ -24,5 +26,17 @@ public class DefaultDomainModel implements DomainModel {
 
     public void setEventHistory(String s) {
 
+    }
+
+    public boolean isPomInBuild() {
+        return false;
+    }
+
+    public File getProjectDirectory() {
+        return null;
+    }
+
+    public InputStream getInputStream() {
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.project.builder.factories;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -23,6 +23,7 @@ import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelContainerAction;
 import org.apache.maven.shared.model.ModelContainerFactory;
 import org.apache.maven.shared.model.ModelProperty;
+import org.apache.maven.project.builder.ProjectUri;
 
 import java.util.ArrayList;
 import java.util.Arrays;

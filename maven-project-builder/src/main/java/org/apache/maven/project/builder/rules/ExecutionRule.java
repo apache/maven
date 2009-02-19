@@ -1,14 +1,11 @@
 package org.apache.maven.project.builder.rules;
 
 import org.apache.maven.shared.model.*;
-import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.apache.maven.project.builder.ProjectUri;
-import org.apache.maven.project.builder.AlwaysJoinModelContainerFactory;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Arrays;
 
 public class ExecutionRule implements ModelContainerRule {
 

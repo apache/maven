@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.project.builder.ArtifactModelContainerFactory;
+import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.shared.model.DataSourceException;
 import org.apache.maven.shared.model.ModelContainer;

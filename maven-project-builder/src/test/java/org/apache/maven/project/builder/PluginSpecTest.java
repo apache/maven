@@ -3,6 +3,7 @@ package org.apache.maven.project.builder;
 import static org.junit.Assert.*;
 import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
+import org.apache.maven.project.builder.factories.PluginExecutionIdModelContainerFactory;
 
 import java.util.List;
 import java.util.ArrayList;

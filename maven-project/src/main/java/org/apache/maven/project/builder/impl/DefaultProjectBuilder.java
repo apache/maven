@@ -22,7 +22,6 @@ package org.apache.maven.project.builder.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.*;
 
 import org.apache.maven.MavenTools;
@@ -38,7 +37,6 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
@@ -54,20 +52,13 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.apache.maven.shared.model.ModelMarshaller;
-import org.apache.commons.jxpath.JXPathContext;
 
 /**
  * Default implementation of the project builder.
  */
 @Component(role = ProjectBuilder.class)
 public class DefaultProjectBuilder
-    implements ProjectBuilder, Mixer, PomProcessor, LogEnabled
+    implements ProjectBuilder, PomProcessor, LogEnabled
 {
     @Requirement
     private ArtifactFactory artifactFactory;
@@ -166,7 +157,7 @@ public class DefaultProjectBuilder
         return buildModel( pom, null, interpolatorProperties, null, null, resolver );
     }    
     
-    private PomClassicDomainModel buildModel( File pom,
+    private PomClassicDomainModel buildModel(File pom,
                                              List<Model> mixins,
                                              Collection<InterpolatorProperty> interpolatorProperties,
                                              Collection<String> activeProfileIds, Collection<String> inactiveProfileIds,
@@ -274,7 +265,7 @@ public class DefaultProjectBuilder
             domainModels.add( new PomClassicDomainModel( model ) );
         }
         
-        PomClassicTransformer transformer = new PomClassicTransformer( new PomClassicDomainModelFactory() );
+        PomTransformer transformer = new PomTransformer( new PomClassicDomainModelFactory() );
         
         ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
         
@@ -559,124 +550,6 @@ public class DefaultProjectBuilder
         }
         
         return superModel;        
-    }
-
-    public Model mixPlugin(Plugin plugin, Model model) throws IOException
-    {
-        //TODO - interpolation
-        List<DomainModel> domainModels = new ArrayList<DomainModel>();       
-        domainModels.add( new PomClassicDomainModel(model) );
-        domainModels.add( new PluginMixin(plugin) );
-
-        PomClassicTransformer transformer = new PomClassicTransformer( new PomClassicDomainModelFactory() );
-
-        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
-
-        PomClassicDomainModel transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( domainModels,
-                                                                                                transformer,
-                                                                                                transformer,
-                                                                                                Collections.EMPTY_LIST,
-                                                                                                null,
-                                                                                                listeners ) );
-        return transformedDomainModel.getModel();
-        
-    }
-
-    public PlexusConfiguration mixPluginAndReturnConfig(Plugin plugin, Xpp3Dom dom, Model model, List<InterpolatorProperty> props)
-            throws IOException,  XmlPullParserException
-    {
-        List<ModelProperty> mps = mixPluginAndReturnConfigAsProperties(plugin, dom, model, null);
-
-        return !mps.isEmpty() ?
-            new XmlPlexusConfiguration(Xpp3DomBuilder.build(
-                    new StringReader(ModelMarshaller.unmarshalModelPropertiesToXml(mps, ProjectUri.Build.Plugins.Plugin.xUri))) ) : null;
-    }
-   
-   public Object mixPluginAndReturnConfigAsDom(Plugin plugin, Model model) throws IOException, XmlPullParserException
-   {
-       List<ModelProperty> mps = mixPluginAndReturnConfigAsProperties(plugin, null, model, null);
-       return  !mps.isEmpty() ? Xpp3DomBuilder.build(
-               new StringReader(ModelMarshaller.unmarshalModelPropertiesToXml(mps, ProjectUri.Build.Plugins.Plugin.xUri) ) ) : null;
-   }
-
-   public Object mixPluginAndReturnConfigAsDom(Plugin plugin, Model model, String xpathExpression) throws IOException,
-           XmlPullParserException
-   {
-       Object dom = mixPluginAndReturnConfigAsDom(plugin, model);
-       if(dom == null)
-       {
-           return null;
-       }
-       return JXPathContext.newContext( dom ).getValue(xpathExpression);
-   }
-
-   private List<ModelProperty> mixPluginAndReturnConfigAsProperties(Plugin plugin, Xpp3Dom dom, Model model,
-                                                                    List<InterpolatorProperty> props) throws IOException
-   {
-       List<DomainModel> domainModels = new ArrayList<DomainModel>();
-       domainModels.add(new PomClassicDomainModel(model));
-       domainModels.add(new PluginMixin(plugin));
-
-       if (dom != null)
-       {
-           Plugin p = new Plugin();
-           p.setGroupId(plugin.getGroupId());
-           p.setArtifactId(plugin.getArtifactId());
-           p.setVersion(p.getVersion());
-           p.setConfiguration(dom);
-           domainModels.add(new PluginMixin(p));
-       }
-
-        PomClassicTransformer transformer = new PomClassicTransformer( new PomClassicDomainModelFactory() );
-
-        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
-
-        PomClassicDomainModel transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( domainModels,
-                                                                                                transformer,
-                                                                                                transformer,
-                                                                                                Collections.EMPTY_LIST,
-                                                                                                props,
-                                                                                                listeners ) );
-        ModelDataSource source =
-                new DefaultModelDataSource(transformedDomainModel.getModelProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES);
-        for(ModelContainer pluginContainer : source.queryFor(ProjectUri.Build.Plugins.Plugin.xUri))
-        {
-            if(matchesIdOfPlugin(pluginContainer, plugin))
-            {
-                List<ModelProperty> config = new ArrayList<ModelProperty>();
-                for(ModelProperty mp : pluginContainer.getProperties())
-                {
-                    if(mp.getUri().startsWith(ProjectUri.Build.Plugins.Plugin.configuration))
-                    {
-                        config.add(mp);
-                    }
-                }
-                return config;
-
-            }
-        }
-        return new ArrayList<ModelProperty>();
-   }
-
-    private static boolean matchesIdOfPlugin(ModelContainer mc, Plugin plugin)
-    {   
-        List<ModelProperty> props = mc.getProperties();
-
-        return //getValueByUri(ProjectUri.Build.Plugins.Plugin.groupId, props).equals(plugin.getGroupId())
-                getValueByUri(ProjectUri.Build.Plugins.Plugin.artifactId, props).equals(plugin.getArtifactId())
-                && getValueByUri(ProjectUri.Build.Plugins.Plugin.version, props).equals(plugin.getVersion());
-    }
-
-    private static String getValueByUri(String uri, List<ModelProperty> modelProperties)
-    {
-        for(ModelProperty mp : modelProperties)
-        {
-            if(mp.getUri().equals(uri))
-            {
-                return mp.getResolvedValue();
-            }
-        }
-        return "";
     }
 
     private static List<DomainModel> getParentsOfDomainModel( MavenDomainModel domainModel, MetadataReader mdReader )

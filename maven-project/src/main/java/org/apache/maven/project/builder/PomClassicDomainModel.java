@@ -47,7 +47,7 @@ import java.util.HashSet;
  * Provides a wrapper for the maven model.
  */
 public final class PomClassicDomainModel
-    implements InputStreamDomainModel
+    implements IPomClassicDomainModel
 {
 
     /**
@@ -80,6 +80,11 @@ public final class PomClassicDomainModel
     public PomClassicDomainModel( List<ModelProperty> modelProperties)
     {
         this.modelProperties = modelProperties;
+        try {
+            inputBytes = IOUtil.toByteArray( ModelMarshaller.unmarshalModelPropertiesToXml(modelProperties, ProjectUri.baseUri));
+        } catch (IOException e) {
+
+        }
     }
     /**
      * Constructor
@@ -265,7 +270,8 @@ public final class PomClassicDomainModel
         }
         try
         {
-            return new MavenXpp3Reader().read( ReaderFactory.newXmlReader( new ByteArrayInputStream( inputBytes ) ) );
+            model = new MavenXpp3Reader().read( ReaderFactory.newXmlReader( new ByteArrayInputStream( inputBytes ) ) );
+            return model;
         }
         catch ( XmlPullParserException e )
         {

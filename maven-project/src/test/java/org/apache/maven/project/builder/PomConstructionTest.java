@@ -55,8 +55,6 @@ public class PomConstructionTest
 
     private MavenProjectBuilder mavenProjectBuilder;
 
-    private Mixer mixer;
-
     private MavenTools mavenTools;
 
     private PomArtifactResolver pomArtifactResolver;
@@ -72,7 +70,6 @@ public class PomConstructionTest
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = lookup( MavenProjectBuilder.class );
         projectBuilder = lookup( ProjectBuilder.class );
-        mixer = (Mixer) projectBuilder;
         mavenTools = lookup( MavenTools.class );
         pomArtifactResolver = new PomArtifactResolver()
         {
@@ -102,17 +99,6 @@ public class PomConstructionTest
         assertEquals( "my.property", pom.getValue( "build/plugins[1]/configuration[1]/systemProperties[1]/property[1]/name" ) );
     }
 
-    public void testPluginMergeSimple()
-        throws Exception
-    {
-        Model model = buildPom( "plugin-merge-simple" ).getDomainModel().getModel();
-        Model plugin = buildMixin("plugins/simple");
-
-        model = mixer.mixPlugin((Plugin) plugin.getBuild().getPlugins().get(0), model);
-
-        PomTestWrapper pom = new PomTestWrapper( model );
-        assertEquals( "FAILED", pom.getValue( "build/plugins[1]/configuration[1]/propertiesFile" ) );
-    }
 
     // Some better conventions for the test poms needs to be created and each of these tests
     // that represent a verification of a specification item needs to be a couple lines at most.
@@ -126,10 +112,10 @@ public class PomConstructionTest
     {
         File pom = new File( testDirectory, "micromailer/micromailer-1.0.3.pom" );
         PomArtifactResolver resolver = artifactResolver( "micromailer" );
-        PomClassicDomainModel model = projectBuilder.buildModel( pom, null, resolver );
+        IPomClassicDomainModel model = projectBuilder.buildModel( pom, null, resolver );
         // This should be 2
         //assertEquals( 2, model.getLineageCount() );
-        PomTestWrapper tester = new PomTestWrapper( model );
+        PomTestWrapper tester = new PomTestWrapper( (PomClassicDomainModel) model );
         assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
@@ -873,7 +859,7 @@ public class PomConstructionTest
         {
             pomFile = new File( pomFile, "pom.xml" );
         }
-        return new PomTestWrapper( pomFile, projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
+        return new PomTestWrapper( pomFile, (PomClassicDomainModel) projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
     }
 
     private PomTestWrapper buildPomFromMavenProject( String pomPath, String profileId )

@@ -35,10 +35,10 @@ import org.apache.maven.shared.model.InterpolatorProperty;
  */
 public interface ProjectBuilder
 {
-    public PomClassicDomainModel buildModel( File pom, 
+    public IPomClassicDomainModel buildModel( File pom,
                                              Collection<InterpolatorProperty> interpolatorProperties,
-                                             PomArtifactResolver resolver ) 
-        throws IOException;       
+                                             PomArtifactResolver resolver )
+        throws IOException;
 
     /**
      * Returns a maven project for the specified input stream.

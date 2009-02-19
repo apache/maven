@@ -30,6 +30,7 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.project.builder.IPomClassicDomainModel;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.ModelProperty;
 

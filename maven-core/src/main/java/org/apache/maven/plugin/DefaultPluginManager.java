@@ -74,7 +74,6 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.builder.Interpolator;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProjectBuilder;
-import org.apache.maven.project.builder.Mixer;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;

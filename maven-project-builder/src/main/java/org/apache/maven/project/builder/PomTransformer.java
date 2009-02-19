@@ -25,8 +25,11 @@ import java.util.*;
 
 import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
-import org.apache.maven.project.builder.rules.ExecutionRule;
-import org.apache.maven.project.builder.rules.DependencyRule;
+import org.apache.maven.project.builder.rules.*;
+import org.apache.maven.project.builder.factories.PluginExecutionIdModelContainerFactory;
+import org.apache.maven.project.builder.factories.AlwaysJoinModelContainerFactory;
+import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
+import org.apache.maven.project.builder.factories.IdModelContainerFactory;
 
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
@@ -193,7 +196,7 @@ public class PomTransformer
             for ( ModelContainer managementContainer : source.queryFor(
                 ProjectUri.DependencyManagement.Dependencies.Dependency.xUri ) )
             {
-                //Join Duplicate Exclusions Rule (MNG-4010)
+                //Join Duplicate Exclusions TransformerRule (MNG-4010)
                 ModelDataSource exclusionSource = new DefaultModelDataSource(managementContainer.getProperties(),
                         Collections.unmodifiableList(Arrays.asList(new ArtifactModelContainerFactory(ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.Exclusion.xUri))));
                 List<ModelContainer> exclusionContainers =
@@ -354,7 +357,7 @@ public class PomTransformer
 
         props = source.getModelProperties();
 
-        //Rule: Do not join plugin executions without ids
+        //TransformerRule: Do not join plugin executions without ids
         Set<ModelProperty> removeProperties = new HashSet<ModelProperty>();
         
         ModelDataSource dataSource = new DefaultModelDataSource( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
@@ -392,7 +395,7 @@ public class PomTransformer
         
         props.removeAll( removeProperties );
 
-        //Execution Rule - extension for this needs to be pushed into model-builder
+        //Execution TransformerRule - extension for this needs to be pushed into model-builder
         dataSource = new DefaultModelDataSource( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
         for(ModelContainer mc : dataSource.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ))
@@ -484,6 +487,12 @@ public class PomTransformer
         }
         return transformedProperties;
     }
+
+    List<TransformerRule> transformerRules = Arrays.asList(new MissingVersionTransformerRule(),
+            new DefaultDependencyScopeTransformerRule());
+
+    List<TransformerRemovalRule> transformerRemovalRules = Arrays.asList(new DefaultExecutionIdTransformerRule(),
+            new ModulesNotInheritedTransformerRule());
     
     /**
      * @see ModelTransformer#transformToModelProperties(java.util.List)
@@ -528,63 +537,19 @@ public class PomTransformer
             List<ModelProperty> tmp = domainModel.getModelProperties();
 
             List clearedProperties = new ArrayList<ModelProperty>();
-            
-            //Default Dependency Scope Rule
-            if(domainModelIndex == 0)
-            {
-                ModelDataSource s = new DefaultModelDataSource( tmp, Arrays.asList( new ArtifactModelContainerFactory()) );
-                for(ModelContainer mc : s.queryFor(ProjectUri.Dependencies.Dependency.xUri))
-                {
-                    boolean containsScope = false;
-                    for(ModelProperty mp :mc.getProperties())
-                    {
-                        if(mp.getUri().equals(ProjectUri.Dependencies.Dependency.scope)) {
-                            containsScope = true;
-                            break;
-                        }
-                    }
 
-                    if(!containsScope)
-                    {
-                        tmp.add(tmp.indexOf(mc.getProperties().get(0)) + 1, new ModelProperty(ProjectUri.Dependencies.Dependency.scope, "compile"));
-                    }
-                }
-            }
-           
-            //Remove Default Executions IDS (mng-3965)
-            List<ModelProperty> replace = new ArrayList<ModelProperty>();
-            for(ModelProperty mp : tmp)
+            for(TransformerRule rule : transformerRules)
             {
-                if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.id)
-                        && mp.getResolvedValue() != null && mp.getResolvedValue().equals("default-execution-id")) {
-                    replace.add(mp);
-                }
+                rule.execute(tmp, domainModelIndex);
             }
 
-            tmp.removeAll(replace);
-                
-            //Missing Version Rule
-            if ( getPropertyFor( ProjectUri.version, tmp ) == null )
+            for(TransformerRemovalRule rule : transformerRemovalRules)
             {
-                ModelProperty parentVersion = getPropertyFor( ProjectUri.Parent.version, tmp );
-                if ( parentVersion != null )
-                {
-                    tmp.add( new ModelProperty( ProjectUri.version, parentVersion.getResolvedValue() ) );
-                }
+                tmp.removeAll(rule.executeWithReturnPropertiesToRemove(tmp, domainModelIndex));
             }
 
-            //Modules Not Inherited Rule
-            if ( domainModelIndex > 0 )
-            {
-                ModelProperty modulesProperty = getPropertyFor( ProjectUri.Modules.xUri, tmp );
-                if ( modulesProperty != null )
-                {
-                    tmp.remove( modulesProperty );
-                    tmp.removeAll( getPropertiesFor( ProjectUri.Modules.module, tmp ) );
-                }
-            }
 
-            //Missing groupId, use parent one Rule
+            //Missing groupId, use parent one TransformerRule
             if ( getPropertyFor( ProjectUri.groupId, tmp ) == null )
             {
                 ModelProperty parentGroupId = getPropertyFor( ProjectUri.Parent.groupId, tmp );
@@ -624,6 +589,7 @@ public class PomTransformer
                 }
                 tmp.removeAll( removeProperties );
             }
+            
             //Not inherited plugin rule
             if ( domainModelIndex > 0 )
             {
@@ -653,23 +619,23 @@ public class PomTransformer
                 tmp.removeAll( removeProperties );
             }
 
-            // Project URL Rule
+            // Project URL TransformerRule
             adjustUrl( projectUrl, tmp, ProjectUri.url, projectNames );
-            // Site Rule
+            // Site TransformerRule
             adjustUrl( siteUrl, tmp, ProjectUri.DistributionManagement.Site.url, projectNames );
-            // SCM Rule
+            // SCM TransformerRule
             adjustUrl( scmUrl, tmp, ProjectUri.Scm.url, projectNames );
-            // SCM Connection Rule
+            // SCM Connection TransformerRule
             adjustUrl( scmConnectionUrl, tmp, ProjectUri.Scm.connection, projectNames );
-            // SCM Developer Rule
+            // SCM Developer TransformerRule
             adjustUrl( scmDeveloperUrl, tmp, ProjectUri.Scm.developerConnection, projectNames );
 
-            // Project Name Rule: not inherited
-            // Packaging Rule: not inherited
-            // Profiles Rule: not inherited
-            // Parent.relativePath Rule: not inherited
-            // Prerequisites Rule: not inherited
-            // DistributionManagent.Relocation Rule: not inherited
+            // Project Name TransformerRule: not inherited
+            // Packaging TransformerRule: not inherited
+            // Profiles TransformerRule: not inherited
+            // Parent.relativePath TransformerRule: not inherited
+            // Prerequisites TransformerRule: not inherited
+            // DistributionManagent.Relocation TransformerRule: not inherited
             if ( domainModelIndex > 0 )
             {
                 for ( ModelProperty mp : tmp )
@@ -686,19 +652,19 @@ public class PomTransformer
                 }
             }
 
-            // Remove Plugin Repository Inheritance Rule
-            // License Rule: only inherited if not specified in child
-            // Organization Rule: only inherited if not specified in child
-            // Developers Rule: only inherited if not specified in child
-            // Contributors Rule: only inherited if not specified in child
-            // Mailing Lists Rule: only inherited if not specified in child
-            // Build Resources Rule: only inherited if not specified in child
-            // Build Test Resources Rule: only inherited if not specified in child
-            // CI Management Rule: only inherited if not specified in child
-            // Issue Management Rule: only inherited if not specified in child
-            // Distribution Management Repository Rule: only inherited if not specified in child
-            // Distribution Management Snapshot Repository Rule: only inherited if not specified in child
-            // Distribution Management Site Rule: only inherited if not specified in child
+            // Remove Plugin Repository Inheritance TransformerRule
+            // License TransformerRule: only inherited if not specified in child
+            // Organization TransformerRule: only inherited if not specified in child
+            // Developers TransformerRule: only inherited if not specified in child
+            // Contributors TransformerRule: only inherited if not specified in child
+            // Mailing Lists TransformerRule: only inherited if not specified in child
+            // Build Resources TransformerRule: only inherited if not specified in child
+            // Build Test Resources TransformerRule: only inherited if not specified in child
+            // CI Management TransformerRule: only inherited if not specified in child
+            // Issue Management TransformerRule: only inherited if not specified in child
+            // Distribution Management Repository TransformerRule: only inherited if not specified in child
+            // Distribution Management Snapshot Repository TransformerRule: only inherited if not specified in child
+            // Distribution Management Site TransformerRule: only inherited if not specified in child
             for ( ModelProperty mp : tmp )
             {
                 String uri = mp.getUri();
@@ -746,7 +712,7 @@ public class PomTransformer
 
         //Rules processed on collapsed pom
 
-        //Rule: Remove duplicate filters
+        //TransformerRule: Remove duplicate filters
         List<ModelProperty> removedProperties = new ArrayList<ModelProperty>();
         List<String> filters = new ArrayList<String>();
         for(ModelProperty mp : modelProperties)
@@ -765,7 +731,7 @@ public class PomTransformer
         }
         modelProperties.removeAll(removedProperties);
 
-        //Rule: Build plugin config overrides reporting plugin config
+        //TransformerRule: Build plugin config overrides reporting plugin config
         ModelDataSource source = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
         List<ModelContainer> reportContainers = source.queryFor( ProjectUri.Reporting.Plugins.Plugin.xUri );
@@ -797,61 +763,96 @@ public class PomTransformer
      * @param domainModel
      * @throws IOException
      */
-    public void interpolateModelProperties(List<ModelProperty> modelProperties,
-                                           List<InterpolatorProperty> interpolatorProperties,
-                                           DomainModel domainModel)
-            throws IOException
+     private static final Map<String, String> aliases = new HashMap<String, String>();
+
+    private static void addProjectAlias( String element, boolean leaf )
     {
+        String suffix = leaf ? "\\}" : "\\.";
+        aliases.put( "\\$\\{project\\." + element + suffix, "\\$\\{" + element + suffix );
+    }
 
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.put( "project.", "pom.");
-        aliases.put( "\\$\\{project.build.", "\\$\\{build.");
+    static
+    {
+        aliases.put( "\\$\\{project\\.", "\\$\\{pom\\." );
+        addProjectAlias( "modelVersion", true );
+        addProjectAlias( "groupId", true );
+        addProjectAlias( "artifactId", true );
+        addProjectAlias( "version", true );
+        addProjectAlias( "packaging", true );
+        addProjectAlias( "name", true );
+        addProjectAlias( "description", true );
+        addProjectAlias( "inceptionYear", true );
+        addProjectAlias( "url", true );
+        addProjectAlias( "parent", false );
+        addProjectAlias( "prerequisites", false );
+        addProjectAlias( "organization", false );
+        addProjectAlias( "build", false );
+        addProjectAlias( "reporting", false );
+        addProjectAlias( "scm", false );
+        addProjectAlias( "distributionManagement", false );
+        addProjectAlias( "issueManagement", false );
+        addProjectAlias( "ciManagement", false );
+    }
 
-        if(!containsProjectVersion(interpolatorProperties))
+    public void interpolateModelProperties( List<ModelProperty> modelProperties,
+                                                   List<InterpolatorProperty> interpolatorProperties,
+                                                   DomainModel domainModel )
+        throws IOException
+    {
+        IPomClassicDomainModel dm = (IPomClassicDomainModel) domainModel;
+
+        if ( !containsProjectVersion( interpolatorProperties ) )
         {
-            aliases.put("\\$\\{project.version\\}", "\\$\\{version\\}");
+            aliases.put( "\\$\\{project.version\\}", "\\$\\{version\\}" );
         }
 
         List<ModelProperty> firstPassModelProperties = new ArrayList<ModelProperty>();
         List<ModelProperty> secondPassModelProperties = new ArrayList<ModelProperty>();
 
-        ModelProperty buildProperty = new ModelProperty(ProjectUri.Build.xUri, null);
-        for(ModelProperty mp : modelProperties)
+        ModelProperty buildProperty = new ModelProperty( ProjectUri.Build.xUri, null );
+        for ( ModelProperty mp : modelProperties )
         {
-            if( mp.getValue() != null && !mp.getUri().contains( "#property" ) && !mp.getUri().contains( "#collection" ))
+            if ( mp.getValue() != null && !mp.getUri().contains( "#property" ) && !mp.getUri().contains( "#collection" ) )
             {
-                if( !buildProperty.isParentOf( mp ) || mp.getUri().equals(ProjectUri.Build.finalName ) )
+                if ( ( !buildProperty.isParentOf( mp ) && !mp.getUri().equals( ProjectUri.Reporting.outputDirectory ) || mp.getUri().equals( ProjectUri.Build.finalName ) ) )
                 {
-                    firstPassModelProperties.add(mp);
+                    firstPassModelProperties.add( mp );
                 }
                 else
                 {
-                    secondPassModelProperties.add(mp);
+                    secondPassModelProperties.add( mp );
                 }
             }
         }
 
-
         List<InterpolatorProperty> standardInterpolatorProperties = new ArrayList<InterpolatorProperty>();
-
-        for(ModelProperty mp : modelProperties)
+        if ( dm.isPomInBuild() )
         {
-            if(mp.getUri().startsWith(ProjectUri.properties) && mp.getValue() != null )
+            String basedir = dm.getProjectDirectory().getAbsolutePath();
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${project.basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+
+        }
+
+        for ( ModelProperty mp : modelProperties )
+        {
+            if ( mp.getUri().startsWith( ProjectUri.properties ) && mp.getValue() != null )
             {
                 String uri = mp.getUri();
-                standardInterpolatorProperties.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1,
-                        uri.length() ) + "}", mp.getValue(), PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+                standardInterpolatorProperties.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1, uri.length() ) + "}", mp.getValue(),
+                                                                              PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
             }
         }
 
         //FIRST PASS - Withhold using build directories as interpolator properties
-        List<InterpolatorProperty> ips1 = new ArrayList<InterpolatorProperty>(interpolatorProperties);
-        ips1.addAll(standardInterpolatorProperties);
-        ips1.addAll(ModelTransformerContext.createInterpolatorProperties(firstPassModelProperties, ProjectUri.baseUri, aliases,
-                        PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false));
-        Collections.sort(ips1, new Comparator<InterpolatorProperty>()
+        List<InterpolatorProperty> ips1 = new ArrayList<InterpolatorProperty>( interpolatorProperties );
+        ips1.addAll( standardInterpolatorProperties );
+        ips1.addAll( ModelTransformerContext.createInterpolatorProperties( firstPassModelProperties, ProjectUri.baseUri, aliases, PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false ) );
+        Collections.sort( ips1, new Comparator<InterpolatorProperty>()
         {
-            public int compare(InterpolatorProperty o, InterpolatorProperty o1) {
+            public int compare( InterpolatorProperty o, InterpolatorProperty o1 )
+            {
                 if(o.getTag() == null || o1.getTag() == null)
                 {
                     return 0;
@@ -861,8 +862,52 @@ public class PomTransformer
         });
 
         ModelTransformerContext.interpolateModelProperties( modelProperties, ips1 );
-    }
 
+        //SECOND PASS - Set absolute paths on build directories
+        if ( dm.isPomInBuild() )
+        {
+            String basedir = dm.getProjectDirectory().getAbsolutePath();
+            Map<ModelProperty, ModelProperty> buildDirectories = new HashMap<ModelProperty, ModelProperty>();
+            for ( ModelProperty mp : secondPassModelProperties )
+            {
+                if ( mp.getUri().startsWith( ProjectUri.Build.xUri ) || mp.getUri().equals( ProjectUri.Reporting.outputDirectory ) )
+                {
+                    File file = new File(mp.getResolvedValue());
+                    if( !file.isAbsolute() && !mp.getResolvedValue().startsWith("${project.build.")
+                            && !mp.getResolvedValue().equals("${project.basedir}"))
+                    {
+                        buildDirectories.put( mp, new ModelProperty( mp.getUri(), new File( basedir, file.getPath() ).getAbsolutePath() ) );
+                    }
+                }
+            }
+
+            for ( Map.Entry<ModelProperty, ModelProperty> e : buildDirectories.entrySet() )
+            {
+                secondPassModelProperties.remove( e.getKey() );
+                secondPassModelProperties.add( e.getValue() );
+            }
+        }
+
+        //THIRD PASS - Use build directories as interpolator properties
+        List<InterpolatorProperty> ips2 = new ArrayList<InterpolatorProperty>( interpolatorProperties );
+        ips2.addAll( standardInterpolatorProperties );
+        ips2.addAll( ModelTransformerContext.createInterpolatorProperties( secondPassModelProperties, ProjectUri.baseUri, aliases, PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false ) );
+        ips2.addAll( interpolatorProperties );
+        Collections.sort( ips2, new Comparator<InterpolatorProperty>()
+        {
+            public int compare( InterpolatorProperty o, InterpolatorProperty o1 )
+            {
+                if(o.getTag() == null || o1.getTag() == null)
+                {
+                    return 0;
+                }
+
+                return PomInterpolatorTag.valueOf( o.getTag() ).compareTo( PomInterpolatorTag.valueOf( o1.getTag() ) );
+            }
+        } );
+
+        ModelTransformerContext.interpolateModelProperties( modelProperties, ips2 );
+    }
     /**
      * Override this method for different preprocessing of model properties.
      *
@@ -960,7 +1005,7 @@ public class PomTransformer
      * @param properties the model properties list to search
      * @return all model properties containing the specified uri from the specified properties list
      */
-    private static List<ModelProperty> getPropertiesFor( String uri, List<ModelProperty> properties )
+    public static List<ModelProperty> getPropertiesFor( String uri, List<ModelProperty> properties )
     {
         List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
         for ( ModelProperty mp : properties )
@@ -981,7 +1026,7 @@ public class PomTransformer
      * @param properties the model properties list to search
      * @return the first model property containing the specified uri from the specified properties list.
      */
-    private static ModelProperty getPropertyFor( String uri, List<ModelProperty> properties )
+    public static ModelProperty getPropertyFor( String uri, List<ModelProperty> properties )
     {
         for ( ModelProperty mp : properties )
         {

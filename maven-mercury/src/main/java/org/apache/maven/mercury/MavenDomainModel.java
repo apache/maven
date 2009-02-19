@@ -28,8 +28,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
-import org.apache.maven.project.builder.ArtifactModelContainerFactory;
-import org.apache.maven.project.builder.ExclusionModelContainerFactory;
+import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
+import org.apache.maven.project.builder.factories.ExclusionModelContainerFactory;
 import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
