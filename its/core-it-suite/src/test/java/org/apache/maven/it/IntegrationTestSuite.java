@@ -169,6 +169,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3710PollutedClonedPluginsTest.class );
         suite.addTestSuite( MavenITmng3704LifecycleExecutorWrapperTest.class );
         suite.addTestSuite( MavenITmng3703ExecutionProjectWithRelativePathsTest.class );
+        suite.addTestSuite( MavenITmng3701ImplicitProfileIdTest.class );
         suite.addTestSuite( MavenITmng3694ReactorProjectsDynamismTest.class );
         suite.addTestSuite( MavenITmng3693PomFileBasedirChangeTest.class );
         suite.addTestSuite( MavenITmng3684BuildPluginParameterTest.class );
