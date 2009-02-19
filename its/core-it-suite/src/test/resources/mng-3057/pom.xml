@@ -12,6 +12,13 @@
     This project verifies that MNG-3057 is fixed. It is controlled by a JUnit test called org.apache.maven.integrationtests.MNG3057Test
   </description>
   
+  <distributionManagement>
+    <repository>
+      <id>test-repo</id>
+      <url>${deployTo}</url>
+    </repository>
+  </distributionManagement>
+  
   <url>http://jira.codehaus.org/browse/MNG-3057</url>
   
   <modules>
