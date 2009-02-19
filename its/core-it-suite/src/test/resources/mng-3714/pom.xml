@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: MNG-3714</name> 
+  <groupId>org.apache.maven.its.mng3714</groupId>
+  <artifactId>maven-it-mng3714</artifactId>
+  <description>Test --toolchains CLI option</description>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-toolchain</artifactId>
+        <version>2.1-SNAPSHOT</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
