@@ -63,7 +63,7 @@ public final class MavenDomainModel
 
     /**
      * Constructor
-     * 
+     *
      * @throws IOException if there is a problem constructing the model
      */
     public MavenDomainModel( byte[] bytes )
@@ -74,7 +74,7 @@ public final class MavenDomainModel
 
     /**
      * Constructor
-     * 
+     *
      * @throws IOException if there is a problem constructing the model
      */
     public MavenDomainModel( InputStream inputStream )
@@ -85,7 +85,7 @@ public final class MavenDomainModel
 
     /**
      * Constructor
-     * 
+     *
      * @throws IOException if there is a problem constructing the model
      */
     public MavenDomainModel( List<ModelProperty> modelProperties )
@@ -247,7 +247,7 @@ public final class MavenDomainModel
         }
 
         ModelDataSource dataSource = new DefaultModelDataSource( container.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
-                                                                   new ExclusionModelContainerFactory() ));
+                                                                   new ExclusionModelContainerFactory() ) );
         List<ArtifactBasicMetadata> exclusions = new ArrayList<ArtifactBasicMetadata>();
 
         for ( ModelContainer exclusion : dataSource.queryFor( ProjectUri.Dependencies.Dependency.Exclusions.Exclusion.xUri ) )

@@ -1,6 +1,7 @@
 package org.apache.maven.mercury;
 
-public class PomProcessorException extends Exception
+public class PomProcessorException
+    extends Exception
 {
     static final long serialVersionUID = 980457843528974352L;
 

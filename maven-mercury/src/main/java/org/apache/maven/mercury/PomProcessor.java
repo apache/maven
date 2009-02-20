@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface PomProcessor
 {
-    List<ModelProperty> getRawPom(ArtifactBasicMetadata bmd, MetadataReader mdReader, Map env, Map sysProps)
+    List<ModelProperty> getRawPom(ArtifactBasicMetadata bmd, MetadataReader mdReader, Map<String, String>  env,
+                                  Map<String, String>  sysProps)
             throws MetadataReaderException, PomProcessorException;
 }
