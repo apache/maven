@@ -86,7 +86,7 @@ public abstract class AbstractConsoleDownloadMonitor
             String l = contentLength >= 1024 ? ( contentLength / 1024 ) + "K" : contentLength + "b";
             String name = transferEvent.getResource().getName();
             name = name.substring( name.lastIndexOf( '/' ) + 1, name.length() );
-            out.println( l + " " + type + "  (" + name + ")" );
+            out.println( l + " " + type + "  (" + name + ")                                        " );
         }
     }
 
