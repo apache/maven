@@ -52,9 +52,8 @@ under the License.
       <artifactId>wagon-provider-api</artifactId>
     </dependency>
     <dependency>
-        <groupId>backport-util-concurrent</groupId>
-        <artifactId>backport-util-concurrent</artifactId>
-        <version>3.1</version>
+      <groupId>backport-util-concurrent</groupId>
+      <artifactId>backport-util-concurrent</artifactId>
     </dependency>
     <dependency>
       <groupId>easymock</groupId>
