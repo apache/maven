@@ -25,14 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.it.util.StringUtils;
@@ -65,7 +62,8 @@ public class MavenITmng3057VersionExprTransformations
     public MavenITmng3057VersionExprTransformations()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.1.0-M1,2.99.99)" ); // only test in 2.0.9+
+        // TODO: port to 3.x
+        super( "[2.1.0,)" ); // only test in 2.1.0+
     }
 
     public void testitMNG3057 ()
