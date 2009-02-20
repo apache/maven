@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -463,4 +462,9 @@ public class DefaultArtifactResolver
         }
     }
 
+    public synchronized void configureNumberOfThreads( int threads )
+    {
+        resolveArtifactPool.setCorePoolSize( threads );
+        resolveArtifactPool.setMaximumPoolSize( threads );
+    }
 }

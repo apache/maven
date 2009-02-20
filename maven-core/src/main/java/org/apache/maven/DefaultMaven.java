@@ -36,6 +36,8 @@ import org.apache.maven.artifact.manager.DefaultWagonManager;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.BuildFailure;
@@ -269,7 +271,7 @@ public class DefaultMaven
 
         try
         {
-            resolveParameters( request.getSettings() );
+            resolveParameters( request.getSettings(), request.getExecutionProperties() );
         }
         catch ( ComponentLookupException e )
         {
@@ -609,7 +611,7 @@ public class DefaultMaven
      * @todo [JC] we should at least provide a mapping of protocol-to-proxy for
      * the wagons, shouldn't we?
      */
-    private void resolveParameters( Settings settings )
+    private void resolveParameters( Settings settings, Properties executionProperties )
         throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
     {
         // TODO: remove when components.xml can be used to configure this instead
@@ -753,6 +755,40 @@ public class DefaultMaven
         finally
         {
             container.release( wagonManager );
+        }
+        
+        // Would be better in settings.xml, but it is not extensible yet
+        String numThreads = System.getProperty( "maven.artifact.threads" );
+        if ( numThreads != null )
+        {
+            int threads = 0;
+            try
+            {
+                threads = Integer.valueOf( numThreads ).intValue();
+
+                if ( threads < 1 )
+                {
+                    getLogger().warn( "Invalid number of threads '" + threads + "' will be ignored" );
+                }
+            }
+            catch ( NumberFormatException e )
+            {
+                getLogger().warn( "Invalid number of threads '" + numThreads + "' will be ignored: " + e.getMessage() );
+            }
+            
+            if ( threads > 0 )
+            {
+                DefaultArtifactResolver artifactResolver = (DefaultArtifactResolver) container.lookup( ArtifactResolver.ROLE );
+                try
+                {
+                    artifactResolver.configureNumberOfThreads( threads );
+                    getLogger().debug( "Resolution thread pool size set to: " + threads );
+                }
+                finally
+                {
+                    container.release( artifactResolver );
+                }
+            }
         }
     }
 
