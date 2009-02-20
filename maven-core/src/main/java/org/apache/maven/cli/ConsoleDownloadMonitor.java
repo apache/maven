@@ -19,23 +19,25 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.maven.wagon.WagonConstants;
-import org.apache.maven.wagon.resource.Resource;
 import org.apache.maven.wagon.events.TransferEvent;
+import org.apache.maven.wagon.resource.Resource;
 import org.codehaus.plexus.logging.Logger;
 
-import java.util.*;
-
 /**
- * Console download progress meter.  Properly handles multiple downloads simultaneously.
- *
+ * Console download progress meter. Properly handles multiple downloads simultaneously.
+ * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
 public class ConsoleDownloadMonitor
     extends AbstractConsoleDownloadMonitor
 {
-    private Map/*<Resource,Integer>*/ downloads;
+    private Map/* <Resource,Integer> */downloads;
 
     public ConsoleDownloadMonitor( Logger logger )
     {
@@ -67,35 +69,37 @@ public class ConsoleDownloadMonitor
     public synchronized void transferProgress( TransferEvent transferEvent, byte[] buffer, int length )
     {
         Resource resource = transferEvent.getResource();
-        if (!downloads.containsKey(resource))
+        if ( !downloads.containsKey( resource ) )
         {
-            downloads.put(resource, new Long(length));
-        } else
+            downloads.put( resource, new Long( length ) );
+        }
+        else
         {
-            Long complete = (Long) downloads.get(resource);
-            complete = new Long(complete.longValue() + length);
-            downloads.put(resource, complete);
+            Long complete = (Long) downloads.get( resource );
+            complete = new Long( complete.longValue() + length );
+            downloads.put( resource, complete );
         }
 
-        for (Iterator i = downloads.entrySet().iterator(); i.hasNext(); )
+        for ( Iterator i = downloads.entrySet().iterator(); i.hasNext(); )
         {
             Map.Entry entry = (Map.Entry) i.next();
-            Long complete = (Long)entry.getValue();
-            String status = getDownloadStatusForResource(complete.longValue(), ((Resource)entry.getKey()).getContentLength());
-            out.print(status);
-            if (i.hasNext())
+            Long complete = (Long) entry.getValue();
+            String status =
+                getDownloadStatusForResource( complete.longValue(), ( (Resource) entry.getKey() ).getContentLength() );
+            out.print( status );
+            if ( i.hasNext() )
             {
-                out.print(" ");
+                out.print( " " );
             }
         }
-        out.print("\r");
+        out.print( "\r" );
     }
 
-    String getDownloadStatusForResource(long progress, long total)
+    String getDownloadStatusForResource( long progress, long total )
     {
         if ( total >= 1024 )
         {
-            return (progress / 1024 ) + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K");
+            return ( progress / 1024 ) + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K" );
         }
         else
         {
@@ -105,8 +109,7 @@ public class ConsoleDownloadMonitor
 
     public synchronized void transferCompleted( TransferEvent transferEvent )
     {
-        super.transferCompleted(transferEvent);
-        downloads.remove(transferEvent.getResource());
+        super.transferCompleted( transferEvent );
+        downloads.remove( transferEvent.getResource() );
     }
 }
-

@@ -106,11 +106,11 @@ public abstract class AbstractConsoleDownloadMonitorTest
             getWagon().connect( repository );
         }
 
-        public TransferEventMock(Resource resource, int length)
+        public TransferEventMock( Resource resource, int length )
             throws ConnectionException, AuthenticationException
         {
             super( new FileWagon(), resource, TransferEvent.TRANSFER_INITIATED, TransferEvent.REQUEST_GET );
-            getResource().setContentLength(length);
+            getResource().setContentLength( length );
             Repository repository = new Repository();
             getWagon().connect( repository );
         }

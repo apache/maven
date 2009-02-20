@@ -19,6 +19,17 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -37,15 +48,10 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.HashMap;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class DefaultArtifactResolver
     extends AbstractLogEnabled
@@ -67,7 +73,7 @@ public class DefaultArtifactResolver
     public DefaultArtifactResolver()
     {
         super();
-        resolveArtifactPool = new ThreadPoolExecutor(3, 5, 3, TimeUnit.SECONDS, new LinkedBlockingQueue());
+        resolveArtifactPool = new ThreadPoolExecutor( 3, 5, 3, TimeUnit.SECONDS, new LinkedBlockingQueue() );
     }
 
     // ----------------------------------------------------------------------
@@ -303,40 +309,51 @@ public class DefaultArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactResolutionResult artifactResolutionResult;
-        artifactResolutionResult = artifactCollector.collect( artifacts, originatingArtifact, managedVersions,
-                                                              localRepository, remoteRepositories, source, filter,
-                                                              listeners );
+        artifactResolutionResult =
+            artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository,
+                                       remoteRepositories, source, filter, listeners );
 
-        List resolvedArtifacts = Collections.synchronizedList(new ArrayList());
-        List missingArtifacts = Collections.synchronizedList(new ArrayList());
-        CountDownLatch latch = new CountDownLatch(artifactResolutionResult.getArtifactResolutionNodes().size());
+        List resolvedArtifacts = Collections.synchronizedList( new ArrayList() );
+        List missingArtifacts = Collections.synchronizedList( new ArrayList() );
+        CountDownLatch latch = new CountDownLatch( artifactResolutionResult.getArtifactResolutionNodes().size() );
         Map nodesByGroupId = new HashMap();
         for ( Iterator i = artifactResolutionResult.getArtifactResolutionNodes().iterator(); i.hasNext(); )
         {
             ResolutionNode node = (ResolutionNode) i.next();
-            List nodes = (List) nodesByGroupId.get(node.getArtifact().getGroupId());
-            if (nodes == null)
+            List nodes = (List) nodesByGroupId.get( node.getArtifact().getGroupId() );
+            if ( nodes == null )
             {
                 nodes = new ArrayList();
-                nodesByGroupId.put(node.getArtifact().getGroupId(), nodes);
+                nodesByGroupId.put( node.getArtifact().getGroupId(), nodes );
             }
-            nodes.add(node);
+            nodes.add( node );
         }
 
-        try {
-            for (Iterator i = nodesByGroupId.values().iterator(); i.hasNext(); )
+        try
+        {
+            for ( Iterator i = nodesByGroupId.values().iterator(); i.hasNext(); )
             {
                 List nodes = (List) i.next();
-                resolveArtifactPool.execute(new ResolveArtifactTask(resolveArtifactPool, latch, nodes, localRepository, resolvedArtifacts, missingArtifacts));
+                resolveArtifactPool.execute( new ResolveArtifactTask( resolveArtifactPool, latch, nodes,
+                                                                      localRepository, resolvedArtifacts,
+                                                                      missingArtifacts ) );
             }
             latch.await();
-        } catch (InterruptedException e) {
-            throw new ArtifactResolutionException("Resolution interrupted", null, e);
-        } catch (RuntimeException ex) {
-            if (ex.getCause() instanceof ArtifactResolutionException)
+        }
+        catch ( InterruptedException e )
+        {
+            throw new ArtifactResolutionException( "Resolution interrupted", null, e );
+        }
+        catch ( RuntimeException ex )
+        {
+            if ( ex.getCause() instanceof ArtifactResolutionException )
+            {
                 throw (ArtifactResolutionException) ex.getCause();
+            }
             else
+            {
                 throw ex;
+            }
         } 
 
         if ( missingArtifacts.size() > 0 )
@@ -377,43 +394,60 @@ public class DefaultArtifactResolver
                                     remoteRepositories, source, null, listeners );
     }
 
-    private class ResolveArtifactTask implements Runnable {
+    private class ResolveArtifactTask
+        implements Runnable
+    {
         private List nodes;
+
         private ArtifactRepository localRepository;
+
         private List resolvedArtifacts;
+
         private List missingArtifacts;
+
         private CountDownLatch latch;
+
         private ThreadPoolExecutor pool;
 
-        public ResolveArtifactTask(ThreadPoolExecutor pool, CountDownLatch latch, List nodes, ArtifactRepository localRepository, List resolvedArtifacts, List missingArtifacts) {
+        public ResolveArtifactTask( ThreadPoolExecutor pool, CountDownLatch latch, List nodes,
+                                    ArtifactRepository localRepository, List resolvedArtifacts, List missingArtifacts )
+        {
             this.nodes = nodes;
             this.localRepository = localRepository;
-            this.resolvedArtifacts =  resolvedArtifacts;
+            this.resolvedArtifacts = resolvedArtifacts;
             this.missingArtifacts = missingArtifacts;
             this.latch = latch;
             this.pool = pool;
         }
 
-        public void run() {
-            //getLogger().info("Size of nodes: "+nodes.size()+" on thread: "+Thread.currentThread().getId());
+        public void run()
+        {
             Iterator i = nodes.iterator();
             ResolutionNode node = (ResolutionNode) i.next();
             i.remove();
-            try {
-                resolveArtifact(node);
-                if (i.hasNext())
-                    pool.execute(new ResolveArtifactTask(pool, latch, nodes, localRepository, resolvedArtifacts, missingArtifacts));
-            } catch (ArtifactResolutionException e) {
-                throw new RuntimeException(e);
+            try
+            {
+                resolveArtifact( node );
+                if ( i.hasNext() )
+                {
+                    pool.execute( new ResolveArtifactTask( pool, latch, nodes, localRepository, resolvedArtifacts,
+                                                           missingArtifacts ) );
+                }
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new RuntimeException( e );
             }
             latch.countDown();
         }
 
-        private void resolveArtifact(ResolutionNode node) throws ArtifactResolutionException {
+        private void resolveArtifact( ResolutionNode node )
+            throws ArtifactResolutionException
+        {
             try
-                {
-                    resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
-                    resolvedArtifacts.add( node.getArtifact() );
+            {
+                resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
+                resolvedArtifacts.add( node.getArtifact() );
             }
             catch ( ArtifactNotFoundException anfe )
             {
