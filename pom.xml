@@ -59,7 +59,7 @@ under the License.
     <mercuryMp3Version>1.0-alpha-1</mercuryMp3Version>
     <securityDispatcherVersion>1.0</securityDispatcherVersion>
     <woodstoxVersion>3.2.6</woodstoxVersion>
-    <modelloVersion>1.0.1-SNAPSHOT</modelloVersion>
+    <modelloVersion>1.0</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
   </properties>
   <issueManagement>
