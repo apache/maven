@@ -20,15 +20,11 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.it.util.StringUtils;
@@ -49,21 +45,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class MavenITmng3057VersionExprTransformations
     extends AbstractMavenIntegrationTestCase
 {
-    
-    private static final List VERIFICATION_EXPRESSIONS;
-    
-    static
-    {
-        List exprs = new ArrayList();
-        
-        exprs.add( "project.parent.version" );
-        exprs.add( "project.version" );
-        
-        VERIFICATION_EXPRESSIONS = exprs;
-    }
-    
+
     public MavenITmng3057VersionExprTransformations()
-        throws InvalidVersionSpecificationException
     {
         // TODO: port to 3.x
         super( "[2.1.0,)" ); // only test in 2.1.0+
