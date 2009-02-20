@@ -39,14 +39,13 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.HashMap;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 public class DefaultArtifactResolver
     extends AbstractLogEnabled
@@ -63,6 +62,13 @@ public class DefaultArtifactResolver
     protected ArtifactFactory artifactFactory;
 
     private ArtifactCollector artifactCollector;
+    private final ThreadPoolExecutor resolveArtifactPool;
+
+    public DefaultArtifactResolver()
+    {
+        super();
+        resolveArtifactPool = new ThreadPoolExecutor(3, 5, 3, TimeUnit.SECONDS, new LinkedBlockingQueue());
+    }
 
     // ----------------------------------------------------------------------
     // Implementation
@@ -301,23 +307,37 @@ public class DefaultArtifactResolver
                                                               localRepository, remoteRepositories, source, filter,
                                                               listeners );
 
-        List resolvedArtifacts = new ArrayList();
-        List missingArtifacts = new ArrayList();
+        List resolvedArtifacts = Collections.synchronizedList(new ArrayList());
+        List missingArtifacts = Collections.synchronizedList(new ArrayList());
+        CountDownLatch latch = new CountDownLatch(artifactResolutionResult.getArtifactResolutionNodes().size());
+        Map nodesByGroupId = new HashMap();
         for ( Iterator i = artifactResolutionResult.getArtifactResolutionNodes().iterator(); i.hasNext(); )
         {
             ResolutionNode node = (ResolutionNode) i.next();
-            try
+            List nodes = (List) nodesByGroupId.get(node.getArtifact().getGroupId());
+            if (nodes == null)
             {
-                resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
-                resolvedArtifacts.add( node.getArtifact() );
+                nodes = new ArrayList();
+                nodesByGroupId.put(node.getArtifact().getGroupId(), nodes);
             }
-            catch ( ArtifactNotFoundException anfe )
-            {
-                getLogger().debug( anfe.getMessage(), anfe );
-
-                missingArtifacts.add( node.getArtifact() );
-            }
+            nodes.add(node);
         }
+
+        try {
+            for (Iterator i = nodesByGroupId.values().iterator(); i.hasNext(); )
+            {
+                List nodes = (List) i.next();
+                resolveArtifactPool.execute(new ResolveArtifactTask(resolveArtifactPool, latch, nodes, localRepository, resolvedArtifacts, missingArtifacts));
+            }
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new ArtifactResolutionException("Resolution interrupted", null, e);
+        } catch (RuntimeException ex) {
+            if (ex.getCause() instanceof ArtifactResolutionException)
+                throw (ArtifactResolutionException) ex.getCause();
+            else
+                throw ex;
+        } 
 
         if ( missingArtifacts.size() > 0 )
         {
@@ -355,6 +375,53 @@ public class DefaultArtifactResolver
     {
         return resolveTransitively( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository,
                                     remoteRepositories, source, null, listeners );
+    }
+
+    private class ResolveArtifactTask implements Runnable {
+        private List nodes;
+        private ArtifactRepository localRepository;
+        private List resolvedArtifacts;
+        private List missingArtifacts;
+        private CountDownLatch latch;
+        private ThreadPoolExecutor pool;
+
+        public ResolveArtifactTask(ThreadPoolExecutor pool, CountDownLatch latch, List nodes, ArtifactRepository localRepository, List resolvedArtifacts, List missingArtifacts) {
+            this.nodes = nodes;
+            this.localRepository = localRepository;
+            this.resolvedArtifacts =  resolvedArtifacts;
+            this.missingArtifacts = missingArtifacts;
+            this.latch = latch;
+            this.pool = pool;
+        }
+
+        public void run() {
+            //getLogger().info("Size of nodes: "+nodes.size()+" on thread: "+Thread.currentThread().getId());
+            Iterator i = nodes.iterator();
+            ResolutionNode node = (ResolutionNode) i.next();
+            i.remove();
+            try {
+                resolveArtifact(node);
+                if (i.hasNext())
+                    pool.execute(new ResolveArtifactTask(pool, latch, nodes, localRepository, resolvedArtifacts, missingArtifacts));
+            } catch (ArtifactResolutionException e) {
+                throw new RuntimeException(e);
+            }
+            latch.countDown();
+        }
+
+        private void resolveArtifact(ResolutionNode node) throws ArtifactResolutionException {
+            try
+                {
+                    resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
+                    resolvedArtifacts.add( node.getArtifact() );
+            }
+            catch ( ArtifactNotFoundException anfe )
+            {
+                getLogger().debug( anfe.getMessage(), anfe );
+
+                missingArtifacts.add( node.getArtifact() );
+            }
+        }
     }
 
 }

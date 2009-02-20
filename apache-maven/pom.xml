@@ -89,6 +89,13 @@
                 <relocation>
                   <pattern>org.apache.commons.logging</pattern>
                 </relocation>
+
+                <!-- For maven-artifact-manager -->
+                <relocation>
+                  <pattern>edu.emory.mathcs.backport</pattern>
+                </relocation>
+
+                <!-- For jsch wagon -->
                 <relocation>
                   <pattern>org.apache.commons.codec</pattern>
                 </relocation>

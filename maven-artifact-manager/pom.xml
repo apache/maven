@@ -52,6 +52,11 @@ under the License.
       <artifactId>wagon-provider-api</artifactId>
     </dependency>
     <dependency>
+        <groupId>backport-util-concurrent</groupId>
+        <artifactId>backport-util-concurrent</artifactId>
+        <version>3.1</version>
+    </dependency>
+    <dependency>
       <groupId>easymock</groupId>
       <artifactId>easymock</artifactId>
       <version>1.2_Java1.3</version>

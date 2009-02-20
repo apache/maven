@@ -46,6 +46,6 @@ public class BatchModeDownloadMonitor
 
         String url = transferEvent.getWagon().getRepository().getUrl();
 
-        System.out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
+        out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
     }
 }
