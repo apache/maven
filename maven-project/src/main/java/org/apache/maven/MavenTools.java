@@ -26,6 +26,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
@@ -68,8 +70,12 @@ public interface MavenTools
     // PomArtifactResolver
     
     void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws IOException;    
+        throws ArtifactResolutionException, ArtifactNotFoundException;    
     
+    Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type);
+
+    Artifact createArtifactWithClassifier(String groupId, String artifactId, String version, String type, String classifier);
+
     // WagonManager
     
     ArtifactRepository getMirrorRepository( ArtifactRepository repository );

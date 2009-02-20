@@ -31,14 +31,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.Maven;
+import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.errors.CoreReporterManager;
@@ -140,12 +137,8 @@ public class MavenEmbedder
 
     private MavenXpp3Writer modelWriter;
 
-    private ArtifactFactory artifactFactory;
-
-    private ArtifactResolver artifactResolver;
-
-    private ArtifactHandlerManager artifactHandlerManager;
-
+    private MavenTools repositoryTools;
+    
     private Maven maven;
 
     private MavenExecutionRequestPopulator populator;
@@ -474,7 +467,7 @@ public class MavenEmbedder
                                     String scope,
                                     String type )
     {
-        return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
+        return repositoryTools.createArtifact( groupId, artifactId, version, scope, type );
     }
 
     public Artifact createArtifactWithClassifier( String groupId,
@@ -483,7 +476,7 @@ public class MavenEmbedder
                                                   String type,
                                                   String classifier )
     {
-        return artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
+        return repositoryTools.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
     }
 
     public void resolve( Artifact artifact,
@@ -491,12 +484,7 @@ public class MavenEmbedder
                          ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        artifactResolver.resolve( artifact, remoteRepositories, localRepository );
-    }
-
-    public ArtifactHandler getArtifactHandler( Artifact artifact )
-    {
-        return artifactHandlerManager.getArtifactHandler( artifact.getType() );
+        repositoryTools.resolve( artifact, localRepository, remoteRepositories );
     }
 
     // ----------------------------------------------------------------------
@@ -665,22 +653,14 @@ public class MavenEmbedder
 
             mavenProjectBuilder = container.lookup( MavenProjectBuilder.class );
 
-            // ----------------------------------------------------------------------
-            // Artifact related components
-            // ----------------------------------------------------------------------
-
-            artifactFactory = container.lookup( ArtifactFactory.class );
-
-            artifactResolver = container.lookup( ArtifactResolver.class );
-
             populator = container.lookup( MavenExecutionRequestPopulator.class );
 
             buildPlanner = container.lookup( BuildPlanner.class );
 
-            artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
-
             pluginRepository = container.lookup( PluginRepository.class );
 
+            repositoryTools = container.lookup( MavenTools.class );
+            
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.
             request = new DefaultMavenExecutionRequest();

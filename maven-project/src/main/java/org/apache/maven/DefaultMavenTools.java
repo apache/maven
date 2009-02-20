@@ -86,6 +86,18 @@ public class DefaultMavenTools
     
     private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();
     
+    // Artifact Creation
+    
+    public Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type)
+    {
+    	return artifactFactory.createArtifact(groupId, artifactId, version, scope, type);
+    }
+
+    public Artifact createArtifactWithClassifier(String groupId, String artifactId, String version, String type, String classifier)
+    {
+    	return artifactFactory.createArtifactWithClassifier(groupId, artifactId, version, type, classifier);
+    }
+    
     // ----------------------------------------------------------------------------
     // Code snagged from ProjectUtils: this will have to be moved somewhere else
     // but just trying to collect it all in one place right now.
@@ -391,23 +403,11 @@ public class DefaultMavenTools
      * @throws IOException if there is a problem resolving the artifact
      */
     public void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws IOException
+        throws ArtifactResolutionException, ArtifactNotFoundException
     {
         File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
         artifact.setFile( artifactFile );
-
-        try
-        {
-            artifactResolver.resolve( artifact, remoteRepositories, localRepository );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new IOException( e.getMessage() );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new IOException( e.getMessage() );
-        }
+        artifactResolver.resolve( artifact, remoteRepositories, localRepository );
     }    
     
     // ------------------------------------------------------------------------
