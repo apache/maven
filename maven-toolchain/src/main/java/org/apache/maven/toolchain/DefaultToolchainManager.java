@@ -22,16 +22,14 @@ package org.apache.maven.toolchain;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -45,6 +43,7 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  *
@@ -152,14 +151,14 @@ public class DefaultToolchainManager extends AbstractLogEnabled
     }
 
     private MavenProject getCurrentProject(MavenSession session) {
-        //use reflection since MavenSession.getCurrentProject() is not part of 3.0.8
+        //use reflection since MavenSession.getCurrentProject() is not part of 2.0.8
         try 
         {
             Method meth = session.getClass().getMethod("getCurrentProject", new Class[0]);
             return (MavenProject) meth.invoke(session, null);
         } catch (Exception ex) 
         {
-            //just ignore, we're running in pre- 3.0.9
+            //just ignore, we're running in pre- 2.0.9
         }
         return null;
     }
@@ -218,16 +217,7 @@ public class DefaultToolchainManager extends AbstractLogEnabled
             }
             finally
             {
-                if (in != null) 
-                {
-                    try 
-                    {
-                        in.close();
-                    } 
-                    catch (IOException ex) 
-                    { }
-                }
-//                IOUtil.close( in );
+                IOUtil.close( in );
             }
         }
         else
