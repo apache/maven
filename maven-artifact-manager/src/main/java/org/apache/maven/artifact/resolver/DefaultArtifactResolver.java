@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -61,6 +62,8 @@ public class DefaultArtifactResolver
     // Components
     // ----------------------------------------------------------------------
 
+    private static final int DEFAULT_POOL_SIZE = 5;
+
     private WagonManager wagonManager;
 
     private ArtifactTransformationManager transformationManager;
@@ -73,7 +76,9 @@ public class DefaultArtifactResolver
     public DefaultArtifactResolver()
     {
         super();
-        resolveArtifactPool = new ThreadPoolExecutor( 3, 5, 3, TimeUnit.SECONDS, new LinkedBlockingQueue() );
+        resolveArtifactPool = 
+            new ThreadPoolExecutor( DEFAULT_POOL_SIZE, DEFAULT_POOL_SIZE, 3, TimeUnit.SECONDS,
+                                    new LinkedBlockingQueue() );
     }
 
     // ----------------------------------------------------------------------
