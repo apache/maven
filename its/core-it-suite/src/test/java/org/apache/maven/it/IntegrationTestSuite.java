@@ -83,6 +83,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
         // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
         // suite.addTestSuite( MavenITmng0612NewestConflictResolverTest.class );
+        // suite.addTestSuite( MavenITmng3714ToolchainsCliOptionTest.class );
 
         // -------------------------------------------------------------------------------------------------------------
         // Tests that don't run stable and need to be fixed
