@@ -62,7 +62,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
         List cliOptions = new ArrayList();
         cliOptions.add( "--toolchains toolchains.xml" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-toolchain:toolchain" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
