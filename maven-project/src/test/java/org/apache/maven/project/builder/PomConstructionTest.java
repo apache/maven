@@ -900,7 +900,7 @@ public class PomConstructionTest
         }
 
         config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
-        return new PomTestWrapper( pomFile, projectBuilder.buildFromLocalPath( pomFile, null, null, pomArtifactResolver,
+        return new PomTestWrapper( pomFile, projectBuilder.buildFromLocalPath( pomFile, null, pomArtifactResolver,
                 config, mavenProjectBuilder ) );
     }
 

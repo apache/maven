@@ -42,19 +42,17 @@ public interface ProjectBuilder
      * Returns a maven project for the specified input stream.
      *
      * @param pom                         input stream of the model
-     * @param mixins             list of models containing additional parent models in order from most to least specialized
      * @param interpolatorProperties      properties used for interpolation of properties within the model
      * @param resolver                    artifact resolver used in resolving artifacts
      * @param projectBuilderConfiguration
      * @return a maven project for the specified input stream
      * @throws IOException if there is a problem in the construction of the maven project
      */
-    MavenProject buildFromLocalPath( File pom, 
-                                     List<Model> mixins, 
-                                     Collection<InterpolatorProperty> interpolatorProperties,
-                                     PomArtifactResolver resolver, 
-                                     ProjectBuilderConfiguration projectBuilderConfiguration,
-                                     MavenProjectBuilder mavenProjectBuilder)
+    MavenProject buildFromLocalPath(File pom,
+                                    Collection<InterpolatorProperty> interpolatorProperties,
+                                    PomArtifactResolver resolver,
+                                    ProjectBuilderConfiguration projectBuilderConfiguration,
+                                    MavenProjectBuilder mavenProjectBuilder)
         throws IOException;
 
     Model getSuperModel();

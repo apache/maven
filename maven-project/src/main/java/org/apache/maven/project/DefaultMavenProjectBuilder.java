@@ -39,7 +39,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
@@ -56,7 +55,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.WriterFactory;
 
 
 /**
@@ -281,11 +279,6 @@ public class DefaultMavenProjectBuilder
         this.logger = logger;
     }
 
-    private Logger getLogger()
-    {
-        return logger;
-    }
-
     private MavenProject buildWithProfiles( Model model, ProjectBuilderConfiguration config, File projectDescriptor,
                                         File parentDescriptor, boolean isReactorProject )
         throws ProjectBuildingException
@@ -351,30 +344,6 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private MavenProject superProject;
-    
-    private MavenProject getSuperProject( ProjectBuilderConfiguration config, File projectDescriptor )
-    {
-        if ( superProject != null )
-        {
-            return superProject;
-        }
-        
-        Model model = projectBuilder.getSuperModel();
-
-        try
-        {
-            superProject = new MavenProject( model, artifactFactory, mavenTools, this, config );
-        }
-        catch ( InvalidRepositoryException e )
-        {
-            // Not going to happen as this exception is thrown when checking distributionManagement and the super pom
-            // doesn't have a distributionManagement section.
-        }
-
-        return superProject;
-    }    
-
     private MavenProject readModelFromLocalPath( String projectId, File projectDescriptor, PomArtifactResolver resolver, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
@@ -402,9 +371,8 @@ public class DefaultMavenProjectBuilder
         
         try
         {
-            mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor, 
-                                                              null, 
-                                                              interpolatorProperties, 
+            mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor,
+                    interpolatorProperties,
                                                               resolver,
                                                               config,
                                                               this);

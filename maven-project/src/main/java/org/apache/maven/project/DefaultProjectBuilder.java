@@ -36,7 +36,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.project.*;
 import org.apache.maven.project.builder.*;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
@@ -147,19 +146,18 @@ public class DefaultProjectBuilder
         }
     }
 
-    public PomClassicDomainModel buildModel( File pom, 
+    public PomClassicDomainModel buildModel( File pom,
                                              Collection<InterpolatorProperty> interpolatorProperties,
                                              PomArtifactResolver resolver )
         throws IOException    
     {
-        return buildModel( pom, null, interpolatorProperties, null, null, resolver );
+        return buildModel( pom, interpolatorProperties, null, null, resolver );
     }    
     
     private PomClassicDomainModel buildModel(File pom,
-                                             List<Model> mixins,
                                              Collection<InterpolatorProperty> interpolatorProperties,
                                              Collection<String> activeProfileIds, Collection<String> inactiveProfileIds,
-                                             PomArtifactResolver resolver ) 
+                                             PomArtifactResolver resolver)
         throws IOException    
     {
         if ( pom == null )
@@ -170,17 +168,6 @@ public class DefaultProjectBuilder
         if ( resolver == null )
         {
             throw new IllegalArgumentException( "resolver: null" );
-        }
-
-        if ( mixins == null )
-        {
-            mixins = new ArrayList<Model>();
-            mixins.add( getSuperModel() );            
-        }
-        else
-        {
-            mixins = new ArrayList<Model>( mixins );
-            Collections.reverse( mixins );
         }
 
         if(activeProfileIds == null)
@@ -258,11 +245,8 @@ public class DefaultProjectBuilder
             domainModels.addAll( mavenParents );
         }
 
-        for ( Model model : mixins )
-        {
-            domainModels.add( convertToDomainModel( model ) );
-        }
-        
+        domainModels.add( convertToDomainModel( getSuperModel() ) );
+
         PomTransformer transformer = new PomTransformer( new PomClassicDomainModelFactory() );
         
         ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
@@ -282,7 +266,7 @@ public class DefaultProjectBuilder
 
     private PomClassicDomainModel convertToDomainModel(Model model) throws IOException
     {
-                if ( model == null )
+        if ( model == null )
         {
             throw new IllegalArgumentException( "model: null" );
         }
@@ -304,12 +288,11 @@ public class DefaultProjectBuilder
         return new PomClassicDomainModel(new ByteArrayInputStream(baos.toByteArray()));
     }
     
-    public MavenProject buildFromLocalPath( File pom, 
-                                            List<Model> mixins,
-                                            Collection<InterpolatorProperty> interpolatorProperties,
-                                            PomArtifactResolver resolver, 
-                                            ProjectBuilderConfiguration projectBuilderConfiguration,
-                                            MavenProjectBuilder mavenProjectBuilder)
+    public MavenProject buildFromLocalPath(File pom,
+                                           Collection<InterpolatorProperty> interpolatorProperties,
+                                           PomArtifactResolver resolver,
+                                           ProjectBuilderConfiguration projectBuilderConfiguration,
+                                           MavenProjectBuilder mavenProjectBuilder)
         throws IOException
     {
 
@@ -323,9 +306,8 @@ public class DefaultProjectBuilder
                            projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext() != null ) ? 
                            projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds() : new ArrayList<String>();
 
-        PomClassicDomainModel domainModel = buildModel( pom, 
-                                                        mixins, 
-                                                        interpolatorProperties,
+        PomClassicDomainModel domainModel = buildModel( pom,
+                interpolatorProperties,
                                                         activeProfileIds, inactiveProfileIds,
                                                         resolver ); 
         
@@ -472,8 +454,6 @@ public class DefaultProjectBuilder
             return domainModels;
         }
 
-       // Model model = domainModel.getModel();
-
         File parentFile = new File( projectDirectory, domainModel.getRelativePathOfParent() ).getCanonicalFile();
         if ( parentFile.isDirectory() )
         {
@@ -552,6 +532,18 @@ public class DefaultProjectBuilder
     public void enableLogging( Logger logger )
     {
         this.logger = logger;
+    }
+
+    private DomainModel superDomainModel;
+
+    private DomainModel getSuperDomainModel()
+        throws IOException
+    {
+        if( superDomainModel == null )
+        {
+            superDomainModel = convertToDomainModel( getSuperModel() );
+        }
+        return superDomainModel;
     }
 
     // Super Model Handling

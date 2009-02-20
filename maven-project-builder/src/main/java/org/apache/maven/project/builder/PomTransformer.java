@@ -94,7 +94,6 @@ public class PomTransformer
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.Execution.Goals.xURI,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
-
                                                                           ProjectUri.Build.Plugins.xUri,
                                                                           ProjectUri.Build.Plugins.Plugin.configuration,
                                                                           ProjectUri.Reporting.Plugins.xUri,
@@ -104,26 +103,17 @@ public class PomTransformer
                                                                           ProjectUri.Build.Resources.Resource.includes,
                                                                           ProjectUri.Build.Resources.Resource.excludes,
                                                                           ProjectUri.Build.TestResources.xUri,
-
                                                                           ProjectUri.Build.Filters.xUri,
-
                                                                           ProjectUri.CiManagement.Notifiers.xUri,
-
                                                                           ProjectUri.Contributors.xUri,
-
                                                                           ProjectUri.Dependencies.xUri,
-                                                                      //    ProjectUri.Dependencies.Dependency.Exclusions.xUri,
-
                                                                           ProjectUri.DependencyManagement.Dependencies.xUri,
-                                                                       //   ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
-
                                                                           ProjectUri.Developers.xUri,
                                                                           ProjectUri.Developers.Developer.roles,
                                                                           ProjectUri.Licenses.xUri,
                                                                           ProjectUri.MailingLists.xUri,
                                                                           ProjectUri.Modules.xUri,
                                                                           ProjectUri.PluginRepositories.xUri,
-
                                                                           ProjectUri.Profiles.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.Plugins.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Dependencies.xUri,
@@ -131,23 +121,13 @@ public class PomTransformer
                                                                           ProjectUri.Profiles.Profile.Build.Resources.xUri,
                                                                           ProjectUri.Profiles.Profile.Build.TestResources.xUri,
                                                                           ProjectUri.Profiles.Profile.Dependencies.xUri,
-                                                                         // ProjectUri.Profiles.Profile.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.xUri,
-                                                                        //  ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Profiles.Profile.PluginRepositories.xUri,
                                                                           ProjectUri.Profiles.Profile.Reporting.Plugins.xUri,
-                                                                          //ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.xUri,
                                                                           ProjectUri.Profiles.Profile.Repositories.xUri,
-
                                                                           ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.xUri,
-                                                                        //  ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
-                                                                        //  ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Executions.Execution.Goals.xURI,
                                                                           ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
-                                                                       //   ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
-
                                                                           ProjectUri.Reporting.Plugins.xUri,
-                                                                          //ProjectUri.Reporting.Plugins.Plugin.ReportSets.xUri,
-
                                                                           ProjectUri.Repositories.xUri) ));
 
     /**
