@@ -91,8 +91,6 @@ public class ArtifactUpdatePolicyTest
     protected void tearDown()
         throws Exception
     {
-        wagonManager.setDownloadMonitor( null );
-        wagonManager.setOnline( true );
         super.tearDown();
     }
 
@@ -138,17 +136,6 @@ public class ArtifactUpdatePolicyTest
         a.addMetadata( snapshotMetadata );
 
         return a;
-    }
-
-    public void testForceLocalDoesNotExist()
-        throws Exception
-    {
-        Artifact a = createRemoteArtifact( "o", "0.0.1-SNAPSHOT" );
-
-        artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
-
-        assertTransfers( new String[] { "get " + PATH, "getTransfer " + PATH, "get " + PATH + ".sha1",
-            "get " + PATH + ".md5" } );
     }
 
     public void testForceButNoNewUpdates()
@@ -324,18 +311,6 @@ public class ArtifactUpdatePolicyTest
 
         assertTrue( j.isResolved() );
         assertTrue( j.getFile().canRead() );
-    }
-
-    public void testResolveExistingLocalArtifactInOfflineMode()
-        throws Exception
-    {
-        Artifact a = createLocalArtifact( "a", "1.0.0" );
-
-        wagonManager.setOnline( false );
-
-        artifactResolver.resolve( a, remoteRepositories(), localRepository() );
-
-        assertTrue( a.isResolved() );
     }
 
     public void testMultipleRemoteRepositories()

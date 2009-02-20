@@ -112,65 +112,6 @@ public interface WagonManager
                                                       File file, String checksumPolicyWarn )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void setOnline( boolean online );
-
-    boolean isOnline();
-
-    void addProxy( String protocol,
-                   String host,
-                   int port,
-                   String username,
-                   String password,
-                   String nonProxyHosts );
-
-    void registerCredentialsDataSource( CredentialsDataSource cds );
-
-    public void addAuthenticationCredentials( String repositoryId,
-                                              String username,
-                                              String password,
-                                              String privateKey,
-                                              String passphrase )
-        throws CredentialsDataSourceException;
-
-    void addAuthenticationInfo( String repositoryId,
-                                String username,
-                                String password,
-                                String privateKey,
-                                String passphrase );
-
-    void addMirror( String id,
-                    String mirrorOf,
-                    String url );
-
-    void setDownloadMonitor( TransferListener downloadMonitor );
-
-    void addPermissionInfo( String repositoryId,
-                            String filePermissions,
-                            String directoryPermissions );
-
-    ProxyInfo getProxy( String protocol );
-
-    AuthenticationInfo getAuthenticationInfo( String id )
-        throws CredentialsDataSourceException;
-
-    /**
-     * Set the configuration for a repository
-     *
-     * @param repositoryId  id of the repository to set the configuration to
-     * @param configuration dom tree of the xml with the configuration for the {@link Wagon}
-     */
-    void addConfiguration( String repositoryId,
-                           Xpp3Dom configuration );
-
-    void setInteractive( boolean interactive );
-
-    @Deprecated
-    void registerWagons( Collection wagons,
-                         PlexusContainer extensionContainer );
-
-    void findAndRegisterWagons( PlexusContainer container );
-
-    void setDefaultRepositoryPermissions( RepositoryPermissions permissions );
-
-    ArtifactRepository getMirrorRepository( ArtifactRepository repository );
+    // All the tests fail that are specifically look for the contents of the listener fail without this.
+    void setDownloadMonitor( TransferListener listener );    
 }

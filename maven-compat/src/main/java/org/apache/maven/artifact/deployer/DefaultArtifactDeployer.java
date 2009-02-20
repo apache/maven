@@ -69,12 +69,6 @@ public class DefaultArtifactDeployer
     public void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository, ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        if ( !wagonManager.isOnline() )
-        {
-            // deployment shouldn't silently fail when offline
-            throw new ArtifactDeploymentException( "System is offline. Cannot deploy artifact: " + artifact + "." );
-        }
-
         try
         {
             transformationManager.transformForDeployment( artifact, deploymentRepository, localRepository );

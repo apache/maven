@@ -19,18 +19,18 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.project.ProjectBuildingException;
-
-import java.io.IOException;
-import java.util.List;
+import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * @author Jason van Zyl
@@ -48,7 +48,7 @@ public interface MavenTools
     
     ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException;   
-
+ 
     ArtifactRepository createRepository( String url, String repositoryId );
     
     ArtifactRepository createRepository( String url, String repositoryId, ArtifactRepositoryPolicy snapshotsPolicy, ArtifactRepositoryPolicy releasesPolicy );
@@ -69,4 +69,30 @@ public interface MavenTools
     
     void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws IOException;    
+    
+    // WagonManager
+    
+    ArtifactRepository getMirrorRepository( ArtifactRepository repository );
+    
+    ArtifactRepository getMirror( ArtifactRepository originalRepository );
+
+    boolean matchPattern( ArtifactRepository originalRepository, String pattern );
+
+    boolean isExternalRepo( ArtifactRepository originalRepository );
+    
+    void addMirror( String id, String mirrorOf, String url );  
+    
+    void setOnline( boolean online );
+    
+    boolean isOnline();
+
+    void setInteractive( boolean interactive );   
+    
+    void setDownloadMonitor( TransferListener downloadMonitor );
+    
+    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
+    
+    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );
+    
+    void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions );  
 }

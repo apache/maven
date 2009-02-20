@@ -1,23 +1,27 @@
 package org.apache.maven.artifact.resolver;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -29,8 +33,8 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -38,16 +42,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Jason van Zyl
@@ -77,15 +71,13 @@ public class DefaultArtifactResolver
     // Implementation
     // ----------------------------------------------------------------------
 
-    public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                         ArtifactRepository localRepository )
+    public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         resolve( artifact, remoteRepositories, localRepository, false );
     }
 
-    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                               ArtifactRepository localRepository )
+    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         resolve( artifact, remoteRepositories, localRepository, true );
@@ -100,6 +92,7 @@ public class DefaultArtifactResolver
             return;
         }
 
+        File destination;
         if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
         {
             File systemFile = artifact.getFile();
@@ -139,23 +132,17 @@ public class DefaultArtifactResolver
 
             boolean localCopy = isLocalCopy( artifact );
 
-            File destination = artifact.getFile();
-
+            destination = artifact.getFile();
+                             
             boolean resolved = false;
-            if ( !wagonManager.isOnline() )
-            {
-                if ( !destination.exists() )
-                {
-                    throw new ArtifactNotFoundException( "System is offline.", artifact );
-                }
-            }
+
             // There are three conditions in which we'll go after the artifact here:
             // 1. the force flag is set.
             // 2. the artifact's file doesn't exist (this would be true for release or snapshot artifacts)
             // 3. the artifact is a snapshot and is not a locally installed snapshot
 
             // TODO: Should it matter whether it's a locally installed snapshot??
-            else if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) )
+            if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) )
             {
                 try
                 {
@@ -173,18 +160,16 @@ public class DefaultArtifactResolver
                     {
                         throw new ArtifactResolutionException(
                                                                "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
-                                                               artifact, getMirroredRepositories( remoteRepositories ) );
+                                                               artifact, remoteRepositories );
                     }
                 }
                 catch ( ResourceDoesNotExistException e )
                 {
-                    throw new ArtifactNotFoundException( e.getMessage(), artifact,
-                                                         getMirroredRepositories( remoteRepositories ), e );
+                    throw new ArtifactNotFoundException( e.getMessage(), artifact, remoteRepositories, e );
                 }
                 catch ( TransferFailedException e )
                 {
-                    throw new ArtifactResolutionException( e.getMessage(), artifact,
-                                                           getMirroredRepositories( remoteRepositories ), e );
+                    throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                 }
 
                 resolved = true;
@@ -216,7 +201,7 @@ public class DefaultArtifactResolver
                     catch ( IOException e )
                     {
                         throw new ArtifactResolutionException( "Unable to copy resolved artifact for local use: "
-                            + e.getMessage(), artifact, getMirroredRepositories( remoteRepositories ), e );
+                            + e.getMessage(), artifact, remoteRepositories, e );
                     }
                 }
 
@@ -229,7 +214,6 @@ public class DefaultArtifactResolver
 
     private boolean isLocalCopy( Artifact artifact )
     {
-
         boolean localCopy = false;
 
         for ( ArtifactMetadata m : artifact.getMetadataList() )
@@ -261,51 +245,37 @@ public class DefaultArtifactResolver
         return localCopy;
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories,
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository,
-                                    remoteRepositories, source, filter );
+        return resolveTransitively( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository, remoteRepositories, source, filter );
 
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactMetadataSource source )
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
-                                    remoteRepositories, source, null );
+        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, null );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactMetadataSource source, ArtifactFilter filter )
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
-                                    remoteRepositories, source, filter, null );
+        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, filter, null );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactRepository localRepository,
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository,
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return resolveTransitively( artifacts, originatingArtifact, localRepository, remoteRepositories, source, null );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source,
-                                                         List<ResolutionListener> listeners )
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source, List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return resolveTransitively( artifacts, originatingArtifact,
@@ -313,22 +283,15 @@ public class DefaultArtifactResolver
         Collections.EMPTY_MAP, localRepository, remoteRepositories, source, null, listeners );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactMetadataSource source, ArtifactFilter filter,
-                                                         List<ResolutionListener> listeners )
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter, List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
-                                    remoteRepositories, source, filter, listeners, null );
+        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners, null );
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactMetadataSource source, ArtifactFilter filter,
-                                                         List<ResolutionListener> listeners,
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter, List<ResolutionListener> listeners,
                                                          List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
@@ -346,9 +309,7 @@ public class DefaultArtifactResolver
 
         ArtifactResolutionResult result;
 
-        result =
-            artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository,
-                                       remoteRepositories, source, filter, listeners, conflictResolvers );
+        result = artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners, conflictResolvers );
 
         // We have collected all the problems so let's mimic the way the old code worked and just blow up right here.
         // That's right lets just let it rip right here and send a big incomprehensible blob of text at unsuspecting
@@ -399,24 +360,10 @@ public class DefaultArtifactResolver
 
         if ( missingArtifacts.size() > 0 )
         {
-            throw new MultipleArtifactsNotFoundException( originatingArtifact, resolvedArtifacts, missingArtifacts,
-                                                          getMirroredRepositories( remoteRepositories ) );
+            throw new MultipleArtifactsNotFoundException( originatingArtifact, resolvedArtifacts, missingArtifacts, remoteRepositories );
         }
 
         return result;
-    }
-
-    private List<ArtifactRepository> getMirroredRepositories( List<ArtifactRepository> remoteRepositories )
-    {
-        Map<String, ArtifactRepository> repos = new HashMap<String, ArtifactRepository>();
-
-        for ( ArtifactRepository repository : remoteRepositories )
-        {
-            ArtifactRepository repo = wagonManager.getMirrorRepository( repository );
-            repos.put( repo.getId(), repo );
-        }
-
-        return new ArrayList<ArtifactRepository>( repos.values() );
     }
 
     // ------------------------------------------------------------------------
@@ -444,9 +391,9 @@ public class DefaultArtifactResolver
         // This is an attempt to get the metadata for the artifacts we are ultimately trying to resolve.
         // We still
 
-        ArtifactResolutionResult result =
-            artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository,
-                                       remoteRepositories, source, filter, listeners );
+        ArtifactResolutionResult result = artifactCollector.collect( artifacts, originatingArtifact, 
+                                                                     managedVersions, localRepository, 
+                                                                     remoteRepositories, source, filter, listeners );
 
         // Let's grab all the repositories that were gleaned. This we should know up front. I'm not sure
         // what the metadata source is doing. Repositories in POMs are deadly.

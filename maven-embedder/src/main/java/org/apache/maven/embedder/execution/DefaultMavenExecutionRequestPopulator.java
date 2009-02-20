@@ -60,7 +60,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLifecycleExce
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
@@ -83,9 +82,6 @@ public class DefaultMavenExecutionRequestPopulator
 {
     @Requirement
     private PlexusContainer container;
-
-    @Requirement
-    private WagonManager wagonManager;
 
     @Requirement
     private MavenSettingsBuilder settingsBuilder;
@@ -392,22 +388,18 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.isOffline() )
         {
-            wagonManager.setOnline( false );
+            mavenTools.setOnline( false );
         }
         else if ( ( request.getSettings() != null ) && request.getSettings().isOffline() )
         {
-            wagonManager.setOnline( false );
+            mavenTools.setOnline( false );
         }
         else
         {
-            wagonManager.findAndRegisterWagons( container );
+            mavenTools.setDownloadMonitor( request.getTransferListener() );
 
-            wagonManager.setInteractive( request.isInteractiveMode() );
-
-            wagonManager.setDownloadMonitor( request.getTransferListener() );
-
-            wagonManager.setOnline( true );
-        }
+            mavenTools.setOnline( true );
+        } 
 
         try
         {
@@ -435,7 +427,7 @@ public class DefaultMavenExecutionRequestPopulator
                     throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
                 }
 
-                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
+                mavenTools.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
             }
 
             for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
@@ -446,29 +438,18 @@ public class DefaultMavenExecutionRequestPopulator
                 
                 String phrase = securityDispatcher.decrypt( server.getPassphrase() );
 
-                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
+                mavenTools.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
 
-                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
-
-                if ( server.getConfiguration() != null )
-                {
-                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
-                }
+                mavenTools.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
             }
 
             RepositoryPermissions defaultPermissions = new RepositoryPermissions();
             
-            defaultPermissions.setDirectoryMode( "775" );
-
-            defaultPermissions.setFileMode( "664" );
-
-            wagonManager.setDefaultRepositoryPermissions( defaultPermissions );
-
             for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
             {
                 Mirror mirror = (Mirror) i.next();
 
-                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+                mavenTools.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
             }
         }
         catch ( SecDispatcherException e )
@@ -489,7 +470,7 @@ public class DefaultMavenExecutionRequestPopulator
      */
     @SuppressWarnings("unchecked")
     private void decrypt( Settings settings )
-    throws IOException
+    	throws IOException
     {
         List<Server> servers = settings.getServers();
         

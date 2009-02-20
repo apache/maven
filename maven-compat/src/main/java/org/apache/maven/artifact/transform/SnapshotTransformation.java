@@ -158,13 +158,6 @@ public class SnapshotTransformation
     {
         RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact );
 
-        if ( !wagonManager.isOnline() )
-        {
-            // build number is a required feature for metadata consistency
-            throw new RepositoryMetadataResolutionException(
-                "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
-        }
-
         getLogger().info( "Retrieving previous build number from " + remoteRepository.getId() );
         repositoryMetadataManager.resolveAlways( metadata, localRepository, remoteRepository );
 

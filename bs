@@ -5,9 +5,6 @@
 #       and maven-3 requires a specific default implementation
 #
 export CLASSPATH=./mercury-ant-tasks-1.0-alpha-6-SNAPSHOT.jar
-export ANT_OPTS='-Dmercury.log.threshold=debug -Djavax.xml.stream.XMLInputFactory=com.ctc.wstx.stax.WstxInputFactory -Dmercury.repo.central=http://repository.sonatype.org/content/groups/public '
+export ANT_OPTS='-Dmercury.log.threshold=warn -Djavax.xml.stream.XMLInputFactory=com.ctc.wstx.stax.WstxInputFactory -Dmaven.repo.central=http://repository.sonatype.org/content/groups/public '
 #export ANT_OPTS=$ANT_OPTS' -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000'
-
-echo ANT_OPTS=$ANT_OPTS
-
-ant -f build-mercury.xml $*
+ant -f build-mercury.xml
