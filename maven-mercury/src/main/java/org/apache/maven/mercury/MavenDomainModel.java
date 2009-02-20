@@ -32,6 +32,7 @@ import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.factories.ExclusionModelContainerFactory;
 import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectUri;
+import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.profile.ProfileContext;
 import org.apache.maven.shared.model.DataSourceException;
 import org.apache.maven.shared.model.DomainModel;
@@ -46,7 +47,7 @@ import org.apache.maven.shared.model.impl.DefaultModelDataSource;
  * Provides a wrapper for the maven model.
  */
 public final class MavenDomainModel
-    implements DomainModel
+    extends PomClassicDomainModel
 {
 
     /**
@@ -91,11 +92,7 @@ public final class MavenDomainModel
     public MavenDomainModel( List<ModelProperty> modelProperties )
         throws IOException
     {
-        if ( modelProperties == null )
-        {
-            throw new IllegalArgumentException( "modelProperties: null" );
-        }
-
+        super(modelProperties);
         this.modelProperties = new ArrayList<ModelProperty>( modelProperties );
     }
 
