@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +32,10 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.it.util.StringUtils;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3057">MNG-3057</a>.
@@ -71,19 +74,20 @@ public class MavenITmng3057VersionExprTransformations
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3057" );
         
-        URI remoteRepo = new File( testDir, "target/deployment" ).toURI();
+        File remoteRepo = new File( testDir, "target/deployment" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3057" );
         
         Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty( "@deployTo@", remoteRepo.toURL().toExternalForm() );
+        properties.setProperty( "@deployTo@", remoteRepo.toURI().toURL().toExternalForm() );
 
-        verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", properties );
+        verifier.filterFile( "pom.xml", "pom-filtered.xml", "UTF-8", properties );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-V" );
         cliOptions.add( "-DtestVersion=1" );
+        cliOptions.add( "-f pom-filtered.xml" );
 
         verifier.setCliOptions( cliOptions );
         
@@ -94,59 +98,30 @@ public class MavenITmng3057VersionExprTransformations
         verifier.executeGoal( "deploy" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        assertVersions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "mng-3057", "1", "pom" ) ), "1", null );
+        assertVersions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level2", "1", "pom" ) ), "1", "1" );
+        assertVersions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level3", "1", "pom" ) ), "1", "1" );
         
-        assertVersionExpressions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "mng-3057", "1", "pom" ) ) ); 
-        assertVersionExpressions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level2", "1", "pom" ) ) ); 
-        assertVersionExpressions( new File( verifier.getArtifactPath( "org.apache.maven.its.mng3057", "level3", "1", "pom" ) ) ); 
-        
-        assertVersionExpressions( new File( remoteRepo.getPath(), "org/apache/maven/its/mng3057/mng-3057/1/mng-3057-1.pom" ) ); 
-        assertVersionExpressions( new File( remoteRepo.getPath(), "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ) ); 
-        assertVersionExpressions( new File( remoteRepo.getPath(), "org/apache/maven/its/mng3057/level3/1/level3-1.pom" ) ); 
+        assertVersions( new File( remoteRepo, "org/apache/maven/its/mng3057/mng-3057/1/mng-3057-1.pom" ), "1", null );
+        assertVersions( new File( remoteRepo, "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ), "1", "1" );
+        assertVersions( new File( remoteRepo, "org/apache/maven/its/mng3057/level2/1/level2-1.pom" ), "1", "1" );
     }
 
-    private void assertVersionExpressions( File pomFile )
-        throws VerificationException, IOException
+    private void assertVersions( File file, String version, String parentVersion )
+        throws XmlPullParserException, IOException
     {
-        Verifier verifier = new Verifier( pomFile.getParentFile().getAbsolutePath() );
-        
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-V" );
-        cliOptions.add( "-N" );
-        cliOptions.add( "-Dexpression.outputFile=expressions.properties" );
-        cliOptions.add( "-Dexpression.expressions=" + StringUtils.join( VERIFICATION_EXPRESSIONS.iterator(), "," ) );
-        cliOptions.add( "-f" );
-        cliOptions.add( pomFile.getName() );
-        
-        
-        verifier.setCliOptions( cliOptions );
-        
-        verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-        
-        File propsFile = new File( pomFile.getParentFile(), "expressions.properties" );
-        InputStream is = null;
-        Properties props = new Properties();
-        try
+        Xpp3Dom dom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( file ) );        
+        assertEquals( version, dom.getChild( "version" ).getValue() );
+        Xpp3Dom parent = dom.getChild( "parent" );
+        if ( parentVersion != null )
         {
-            is = new FileInputStream( propsFile );
-            props.load( is );
+            assertNotNull( parent );
+            assertEquals( parentVersion, parent.getChild( "version" ).getValue() );
         }
-        finally
+        else
         {
-            IOUtil.close( is );
+            assertNull( parent );
         }
-        
-        for ( Iterator it = VERIFICATION_EXPRESSIONS.iterator(); it.hasNext(); )
-        {
-            String expr = (String ) it.next();
-            String value = props.getProperty( expr );
-            if ( value != null )
-            {
-                assertEquals( "POM expression not interpolated: '" + expr + "'\nin: '" + pomFile + "'.", "1", value );
-            }
-        }
-    }
-    
+    }    
 }
