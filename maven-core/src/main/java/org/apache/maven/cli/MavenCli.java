@@ -227,9 +227,12 @@ public class MavenCli
                 String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
                 
                 dispatcher = (DefaultSecDispatcher) embedder.lookup( SecDispatcher.ROLE );
-                String file =
-                    System.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION,
-                                        dispatcher.getConfigurationFile() );
+                String configurationFile = dispatcher.getConfigurationFile();
+                if ( configurationFile.startsWith( "~" ) )
+                {
+                    configurationFile = System.getProperty( "user.home" ) + configurationFile.substring( 1 );
+                }
+                String file = System.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, configurationFile );
                 embedder.release( dispatcher );
                 
                 String master = null;
