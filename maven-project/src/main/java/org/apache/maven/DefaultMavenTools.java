@@ -36,6 +36,9 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -44,6 +47,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
@@ -82,6 +86,9 @@ public class DefaultMavenTools
     private WagonManager wagonManager;
     
     @Requirement
+    private ArtifactMetadataSource artifactMetadataSource;
+    
+    @Requirement
     private Logger logger;
     
     private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();
@@ -96,6 +103,25 @@ public class DefaultMavenTools
     public Artifact createArtifactWithClassifier(String groupId, String artifactId, String version, String type, String classifier)
     {
     	return artifactFactory.createArtifactWithClassifier(groupId, artifactId, version, type, classifier);
+    }
+    
+    public Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId )
+    {
+    	return artifactFactory.createProjectArtifact(groupId, artifactId, metaVersionId );    	
+    }
+    
+    public List<ArtifactVersion> retrieveAvailableVersions(Artifact artifact,
+			ArtifactRepository localRepository,
+			List<ArtifactRepository> remoteRepositories)
+			throws ArtifactMetadataRetrievalException 
+	{
+        return artifactMetadataSource.retrieveAvailableVersions(artifact, localRepository, remoteRepositories);
+	}
+    
+    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        return artifactMetadataSource.retrieve(artifact, localRepository, remoteRepositories);
     }
     
     // ----------------------------------------------------------------------------

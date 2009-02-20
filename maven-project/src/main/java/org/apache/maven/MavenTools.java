@@ -24,15 +24,20 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.wagon.events.TransferListener;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author Jason van Zyl
@@ -76,6 +81,14 @@ public interface MavenTools
 
     Artifact createArtifactWithClassifier(String groupId, String artifactId, String version, String type, String classifier);
 
+    Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId );
+
+    List<ArtifactVersion> retrieveAvailableVersions(Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
+	    throws ArtifactMetadataRetrievalException;
+    
+    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException;
+    
     // WagonManager
     
     ArtifactRepository getMirrorRepository( ArtifactRepository repository );

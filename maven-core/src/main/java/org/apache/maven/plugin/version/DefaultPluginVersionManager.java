@@ -19,11 +19,13 @@ package org.apache.maven.plugin.version;
  * under the License.
  */
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -43,20 +45,14 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.util.Iterator;
-import java.util.List;
-
 @Component(role = PluginVersionManager.class)
 public class DefaultPluginVersionManager
     extends AbstractLogEnabled
     implements PluginVersionManager
 {
     @Requirement
-    private ArtifactFactory artifactFactory;
-
-    @Requirement
-    private ArtifactMetadataSource artifactMetadataSource;
-
+    private MavenTools repositoryTools;
+	
     @Requirement
     private MavenProjectBuilder mavenProjectBuilder;
 
@@ -188,7 +184,7 @@ public class DefaultPluginVersionManager
     {
         getLogger().info( "Attempting to resolve a version for plugin: " + groupId + ":" + artifactId + " using meta-version: " + metaVersionId  );
 
-        Artifact artifact = artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
+        Artifact artifact = repositoryTools.createProjectArtifact( groupId, artifactId, metaVersionId );
 
         String key = artifact.getDependencyConflictId();
 
@@ -198,7 +194,7 @@ public class DefaultPluginVersionManager
         try
         {
             ResolutionGroup resolutionGroup =
-                artifactMetadataSource.retrieve( artifact, localRepository, project.getRemoteArtifactRepositories() );
+                repositoryTools.retrieve( artifact, localRepository, project.getRemoteArtifactRepositories() );
 
             // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
             // artifact.
@@ -222,7 +218,7 @@ public class DefaultPluginVersionManager
                 MavenProject pluginProject;
                 try
                 {
-                    artifact = artifactFactory.createProjectArtifact( groupId, artifactId, artifactVersion );
+                    artifact = repositoryTools.createProjectArtifact( groupId, artifactId, artifactVersion );
 
                     pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project.getRemoteArtifactRepositories(), localRepository );
                 }
@@ -283,7 +279,7 @@ public class DefaultPluginVersionManager
                         getLogger().debug( "Trying " + vr );
                         try
                         {
-                            List versions = artifactMetadataSource.retrieveAvailableVersions( artifact, localRepository,
+                            List versions = repositoryTools.retrieveAvailableVersions( artifact, localRepository,
                                                                                               project.getRemoteArtifactRepositories() );
                             ArtifactVersion v = vr.matchVersion( versions );
                             artifactVersion = v != null ? v.toString() : null;
