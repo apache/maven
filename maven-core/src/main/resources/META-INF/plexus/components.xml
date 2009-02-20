@@ -616,7 +616,7 @@ under the License.
         </requirement>
       </requirements>
       <configuration>
-        <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
+        <_configuration-file>${user.home}/.m2/settings-security.xml</_configuration-file>
       </configuration>
     </component>    
   </components>

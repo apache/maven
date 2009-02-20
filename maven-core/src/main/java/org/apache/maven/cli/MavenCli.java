@@ -19,6 +19,18 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Map.Entry;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
@@ -54,18 +66,11 @@ import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Map.Entry;
+import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
+import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
+import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -135,7 +140,7 @@ public class MavenCli
             cliManager.displayHelp();
             return 0;
         }
-
+        
         if ( commandLine.hasOption( CLIManager.VERSION ) )
         {
             showVersion();
@@ -203,6 +208,60 @@ public class MavenCli
             return 1;
         }
 
+        DefaultSecDispatcher dispatcher;
+        try
+        {
+            if ( commandLine.hasOption( CLIManager.ENCRYPT_MASTER_PASSWORD ) )
+            {
+                String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_MASTER_PASSWORD );
+
+                DefaultPlexusCipher cipher = new DefaultPlexusCipher();
+
+                System.out.println( cipher.encryptAndDecorate( passwd,
+                                                               DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
+                
+                return 0;
+            }
+            else if ( commandLine.hasOption( CLIManager.ENCRYPT_PASSWORD ) )
+            {
+                String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
+                
+                dispatcher = (DefaultSecDispatcher) embedder.lookup( SecDispatcher.ROLE );
+                String file =
+                    System.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION,
+                                        dispatcher.getConfigurationFile() );
+                embedder.release( dispatcher );
+                
+                String master = null;
+                
+                SettingsSecurity sec = SecUtil.read( file, true );
+                if ( sec != null )
+                {
+                    master = sec.getMaster();
+                }
+
+                if ( master == null )
+                {
+                    System.err.println( "Master password is not set in the setting security file" );
+                    
+                    return 1;
+                }
+                
+                DefaultPlexusCipher cipher = new DefaultPlexusCipher();
+                String masterPasswd =
+                    cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
+                System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
+                
+                return 0;
+            }
+        }
+        catch ( Exception e )
+        {
+            showFatalError( "Error encrypting password: " + e.getMessage(), e, showErrors );
+            
+            return 1;
+        }
+            
         Maven maven = null;
 
         MavenExecutionRequest request = null;

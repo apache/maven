@@ -74,6 +74,10 @@ public class CLIManager
     
     public static final String ALSO_MAKE_DEPENDENTS = "amd";
 
+    public static final String ENCRYPT_MASTER_PASSWORD = "emp";
+
+    public static final String ENCRYPT_PASSWORD = "ep";
+
     public CLIManager()
     {
         options = new Options();
@@ -97,6 +101,15 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "version" )
                                         .withDescription( "Display version information" )
                                         .create( VERSION ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "enc-master-passwd" )
+                           .hasArg()
+                           .withDescription( "Encrypt master security password" )
+                           .create( ENCRYPT_MASTER_PASSWORD ) );
+        options.addOption( OptionBuilder.withLongOpt( "enc-passwd" )
+                           .hasArg()
+                           .withDescription( "Encrypt server password" )
+                           .create( ENCRYPT_PASSWORD ) );
 
         options.addOption( OptionBuilder.withLongOpt( "quiet" )
                                         .withDescription( "Quiet output - only show errors" )
