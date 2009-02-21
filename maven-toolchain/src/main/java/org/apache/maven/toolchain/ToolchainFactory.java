@@ -27,9 +27,6 @@ import org.apache.maven.toolchain.model.ToolchainModel;
  */
 public interface ToolchainFactory
 {
-
-    String ROLE = ToolchainFactory.class.getName();
-
     /**
      * Create instance of toolchain.
      **/

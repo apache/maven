@@ -40,6 +40,8 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -50,25 +52,16 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  *
  * @author mkleint
  */
+@Component(role=ToolchainManager.class)
 public class DefaultToolchainManager extends AbstractLogEnabled
     implements ToolchainManager,
-               ToolchainManagerPrivate,
-               Contextualizable
+               ToolchainManagerPrivate
 {
-
-    /**
-     * @component
-     */
+	@Requirement
     private PlexusContainer container;
 
     public DefaultToolchainManager( )
     {
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get(PlexusConstants.PLEXUS_KEY);
     }
 
     public ToolchainPrivate[] getToolchainsForType( String type )

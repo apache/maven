@@ -22,6 +22,7 @@ package org.apache.maven.toolchain.java;
 import java.io.File;
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
@@ -29,11 +30,11 @@ import org.codehaus.plexus.util.Os;
 /**
  * @author Milos Kleint
  */
+@Component(role=JavaToolChain.class)
 public class DefaultJavaToolChain
     extends DefaultToolchain
     implements JavaToolChain
 {
-
     private String javaHome;
 
     public static final String KEY_JAVAHOME = "jdkHome"; //NOI18N
@@ -68,7 +69,6 @@ public class DefaultJavaToolChain
         }
         return null;
     }
-
 
     private static File findTool( String toolName, File installFolder )
     {

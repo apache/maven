@@ -28,14 +28,9 @@ import org.apache.maven.execution.MavenSession;
  */
 public interface ToolchainManager
 {
-
-    String ROLE = ToolchainManager.class.getName();
-
-
     /**
      * to be used from plugins capable of working with toolchains.
      */
     Toolchain getToolchainFromBuildContext( String type,
                                             MavenSession context );
-
 }

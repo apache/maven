@@ -25,6 +25,7 @@ import org.apache.maven.toolchain.RequirementMatcherFactory;
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.model.ToolchainModel;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
@@ -34,10 +35,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  *
  * @author mkleint
  */
+@Component(role=ToolchainFactory.class)
 public class DefaultJavaToolchainFactory
     implements ToolchainFactory, LogEnabled
 {
-
     private Logger logger;
 
     public DefaultJavaToolchainFactory( )

@@ -29,8 +29,6 @@ import org.apache.maven.execution.MavenSession;
  */
 public interface ToolchainManagerPrivate
 {
-    String ROLE = ToolchainManagerPrivate.class.getName();
-
     /**
      * Retrieves the toolchains of given type from the user settings.
      */
