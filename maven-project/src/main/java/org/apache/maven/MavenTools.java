@@ -21,21 +21,30 @@ package org.apache.maven;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ResolutionListener;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -81,6 +90,8 @@ public interface MavenTools
 
     Artifact createArtifactWithClassifier(String groupId, String artifactId, String version, String type, String classifier);
 
+    Artifact createBuildArtifact(String groupId, String artifactId, String version, String packaging );
+
     Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId );
 
     List<ArtifactVersion> retrieveAvailableVersions(Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
@@ -88,6 +99,18 @@ public interface MavenTools
     
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
+    
+    public ArtifactResolutionResult resolveTransitively(
+			Set<Artifact> artifacts, Artifact originatingArtifact,
+			Map managedVersions, ArtifactRepository localRepository,
+			List<ArtifactRepository> remoteRepositories,
+			ArtifactFilter filter )
+			throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    Set<Artifact> createArtifacts(
+			List<Dependency> dependencies, String inheritedScope,
+			ArtifactFilter dependencyFilter, MavenProject project)
+			throws InvalidDependencyVersionException;
     
     // WagonManager
     

@@ -66,7 +66,7 @@ public class DefaultArtifactResolver
 
     @Requirement
     private ArtifactCollector artifactCollector;
-
+    
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------

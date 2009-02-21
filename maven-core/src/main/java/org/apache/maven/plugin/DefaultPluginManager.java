@@ -19,9 +19,9 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,16 +34,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.ArtifactFilterManager;
+import org.apache.maven.MavenTools;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
@@ -66,18 +65,22 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.version.PluginVersionManager;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.project.*;
-import org.apache.maven.project.builder.*;
+import org.apache.maven.project.DuplicateArtifactAttachmentException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.PomTransformer;
+import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.shared.model.InterpolatorProperty;
-import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelMarshaller;
+import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelTransformerContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -134,13 +137,7 @@ public class DefaultPluginManager
     protected PluginVersionManager pluginVersionManager;
 
     @Requirement
-    protected ArtifactFactory artifactFactory;
-
-    @Requirement
-    protected ArtifactResolver artifactResolver;
-
-    @Requirement
-    protected ArtifactMetadataSource artifactMetadataSource;
+    protected MavenTools repositoryTools;
 
     @Requirement
     protected RuntimeInformation runtimeInformation;
@@ -395,8 +392,7 @@ public class DefaultPluginManager
         
         try
         {
-            projectPluginDependencies = MavenMetadataSource.createArtifacts(
-                                                                             artifactFactory,
+            projectPluginDependencies = repositoryTools.createArtifacts(
                                                                              plugin.getDependencies(),
                                                                              null,
                                                                              coreArtifactFilterManager.getCoreArtifactFilter(),
@@ -412,7 +408,7 @@ public class DefaultPluginManager
 
         try
         {
-            resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
+            resolutionGroup = repositoryTools.retrieve( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
@@ -454,15 +450,14 @@ public class DefaultPluginManager
 
         repositories.addAll( project.getRemoteArtifactRepositories() );
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively(
+        ArtifactResolutionResult result = repositoryTools.resolveTransitively(
                                                                                 dependencies,
                                                                                 pluginArtifact,
                                                                                 pluginManagedDependencies,
                                                                                 localRepository,
                                                                                 repositories.isEmpty()
-                                                                                                ? Collections.EMPTY_LIST
-                                                                                                : new ArrayList( repositories ),
-                                                                                artifactMetadataSource,
+                                                                                ? Collections.EMPTY_LIST
+                                                                                : new ArrayList( repositories ),
                                                                                 filter );
 
         Set<Artifact> resolved = new LinkedHashSet<Artifact>();
@@ -546,14 +541,13 @@ public class DefaultPluginManager
                 MavenProject p = (MavenProject) i.next();
 
                 resolveTransitiveDependencies( session,
-                                               artifactResolver,
+                                               repositoryTools,
                                                mojoDescriptor.isDependencyResolutionRequired(),
-                                               artifactFactory,
                                                p,
                                                mojoDescriptor.isAggregator() );
             }
 
-            downloadDependencies( project, session, artifactResolver );
+            downloadDependencies( project, session, repositoryTools );
         }
 
         String goalName = mojoDescriptor.getFullGoalName();
@@ -1477,9 +1471,8 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     protected void resolveTransitiveDependencies( MavenSession context,
-                                                ArtifactResolver artifactResolver,
+                                                MavenTools repositoryTools,
                                                 String scope,
-                                                ArtifactFactory artifactFactory,
                                                 MavenProject project,
                                                 boolean isAggregator )
         throws ArtifactResolutionException, ArtifactNotFoundException,
@@ -1488,7 +1481,7 @@ public class DefaultPluginManager
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
-        Artifact artifact = artifactFactory.createBuildArtifact( project.getGroupId(),
+        Artifact artifact = repositoryTools.createBuildArtifact( project.getGroupId(),
                                                                  project.getArtifactId(),
                                                                  project.getVersion(),
                                                                  project.getPackaging() );
@@ -1499,19 +1492,18 @@ public class DefaultPluginManager
         if ( project.getDependencyArtifacts() == null )
         {
             // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
-            project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+            project.setDependencyArtifacts( repositoryTools.createArtifacts( project.getDependencies(), null, filter, project ) );
         }
 
         Set resolvedArtifacts;
         try
         {
-            ArtifactResolutionResult result = artifactResolver.resolveTransitively(
+            ArtifactResolutionResult result = repositoryTools.resolveTransitively(
                                                                                    project.getDependencyArtifacts(),
                                                                                    artifact,
                                                                                    project.getManagedVersionMap(),
                                                                                    context.getLocalRepository(),
                                                                                    project.getRemoteArtifactRepositories(),
-                                                                                   artifactMetadataSource,
                                                                                    filter );
 
             resolvedArtifacts = result.getArtifacts();
@@ -1590,7 +1582,7 @@ public class DefaultPluginManager
 
     private void downloadDependencies( MavenProject project,
                                        MavenSession context,
-                                       ArtifactResolver artifactResolver )
+                                       MavenTools repositoryTools )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = context.getLocalRepository();
@@ -1600,7 +1592,7 @@ public class DefaultPluginManager
         {
             Artifact artifact = (Artifact) it.next();
 
-            artifactResolver.resolve( artifact, remoteArtifactRepositories, localRepository );
+            repositoryTools.resolve( artifact, localRepository, remoteArtifactRepositories );
         }
     }
 

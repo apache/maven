@@ -46,13 +46,19 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
@@ -87,7 +93,7 @@ public class DefaultMavenTools
     
     @Requirement
     private ArtifactMetadataSource artifactMetadataSource;
-    
+        
     @Requirement
     private Logger logger;
     
@@ -103,6 +109,11 @@ public class DefaultMavenTools
     public Artifact createArtifactWithClassifier(String groupId, String artifactId, String version, String type, String classifier)
     {
     	return artifactFactory.createArtifactWithClassifier(groupId, artifactId, version, type, classifier);
+    }
+    
+    public Artifact createBuildArtifact(String groupId, String artifactId, String version, String packaging )
+    {
+    	return artifactFactory.createBuildArtifact(groupId, artifactId, version, packaging );    	
     }
     
     public Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId )
@@ -123,6 +134,26 @@ public class DefaultMavenTools
     {
         return artifactMetadataSource.retrieve(artifact, localRepository, remoteRepositories);
     }
+    
+    public ArtifactResolutionResult resolveTransitively(
+			Set<Artifact> artifacts, Artifact originatingArtifact,
+			Map managedVersions, ArtifactRepository localRepository,
+			List<ArtifactRepository> remoteRepositories,
+			ArtifactFilter filter )
+			throws ArtifactResolutionException, ArtifactNotFoundException 
+    {
+    	return artifactResolver.resolveTransitively(artifacts, originatingArtifact, remoteRepositories, localRepository, artifactMetadataSource );    	
+	}
+
+    public Set<Artifact> createArtifacts(
+			List<Dependency> dependencies, String inheritedScope,
+			ArtifactFilter dependencyFilter, MavenProject project) 
+        throws InvalidDependencyVersionException
+
+	{
+		return MavenMetadataSource.createArtifacts(artifactFactory,
+				dependencies, inheritedScope, dependencyFilter, project);
+	}
     
     // ----------------------------------------------------------------------------
     // Code snagged from ProjectUtils: this will have to be moved somewhere else
