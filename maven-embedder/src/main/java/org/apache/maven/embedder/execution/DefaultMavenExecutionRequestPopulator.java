@@ -28,7 +28,6 @@ import java.util.Properties;
 import org.apache.maven.Maven;
 import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.embedder.Configuration;
@@ -414,10 +413,6 @@ public class DefaultMavenExecutionRequestPopulator
     private void resolveParameters( Settings settings )
         throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
     {
-        WagonManager wagonManager = container.lookup( WagonManager.class );
-
-        try
-        {
             Proxy proxy = settings.getActiveProxy();
 
             if ( proxy != null )
@@ -434,10 +429,18 @@ public class DefaultMavenExecutionRequestPopulator
             {
                 Server server = (Server) i.next();
                 
-                String pass = securityDispatcher.decrypt( server.getPassword() );
+                String pass;
+                String phrase;
+				try 
+				{
+					pass = securityDispatcher.decrypt( server.getPassword() );					
+					phrase = securityDispatcher.decrypt( server.getPassphrase() );					
+				} 
+				catch (SecDispatcherException e) 
+				{
+					throw new SettingsConfigurationException( "Error decrypting server password/passphrase.", e );
+				}
                 
-                String phrase = securityDispatcher.decrypt( server.getPassphrase() );
-
                 mavenTools.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
 
                 mavenTools.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
@@ -451,15 +454,6 @@ public class DefaultMavenExecutionRequestPopulator
 
                 mavenTools.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
             }
-        }
-        catch ( SecDispatcherException e )
-        {
-            throw new SettingsConfigurationException( e.getMessage() );
-        }
-        finally
-        {
-            container.release( wagonManager );
-        }
     }
 
     /**
