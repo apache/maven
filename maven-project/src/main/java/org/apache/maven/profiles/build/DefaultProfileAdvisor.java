@@ -19,7 +19,7 @@ package org.apache.maven.profiles.build;
  * under the License.
  */
 
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -60,7 +60,7 @@ public class DefaultProfileAdvisor
     public static final String ROLE_HINT = "default";
 
     @Requirement
-    private MavenTools mavenTools;
+    private RepositorySystem mavenTools;
 
     @Requirement
     private MavenProfilesBuilder profilesBuilder;

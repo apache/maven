@@ -72,9 +72,9 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author Jason van Zyl
  */
-@Component(role = MavenTools.class)
-public class DefaultMavenTools
-    implements MavenTools, LogEnabled
+@Component(role = RepositorySystem.class)
+public class LegacyRepositorySystem
+    implements RepositorySystem, LogEnabled
 {
     @Requirement
     private ArtifactFactory artifactFactory;

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -74,7 +74,7 @@ public class DefaultMavenProjectBuilder
     private ProfileAdvisor profileAdvisor;
 
     @Requirement
-    private MavenTools mavenTools;
+    private RepositorySystem mavenTools;
 
     @Requirement
     private ProjectBuilder projectBuilder;

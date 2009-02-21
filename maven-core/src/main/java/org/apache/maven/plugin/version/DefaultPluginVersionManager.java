@@ -22,7 +22,7 @@ package org.apache.maven.plugin.version;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -51,7 +51,7 @@ public class DefaultPluginVersionManager
     implements PluginVersionManager
 {
     @Requirement
-    private MavenTools repositoryTools;
+    private RepositorySystem repositoryTools;
 	
     @Requirement
     private MavenProjectBuilder mavenProjectBuilder;

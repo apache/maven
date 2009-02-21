@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.Maven;
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -87,7 +87,7 @@ public class DefaultMavenExecutionRequestPopulator
     private MavenSettingsBuilder settingsBuilder;
 
     @Requirement
-    private MavenTools mavenTools;
+    private RepositorySystem mavenTools;
 
     // 2009-02-12 Oleg: this component is defined in maven-core components.xml
     // because it already has another declared (not generated) component

@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.ArtifactFilterManager;
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -137,7 +137,7 @@ public class DefaultPluginManager
     protected PluginVersionManager pluginVersionManager;
 
     @Requirement
-    protected MavenTools repositoryTools;
+    protected RepositorySystem repositoryTools;
 
     @Requirement
     protected RuntimeInformation runtimeInformation;
@@ -1471,7 +1471,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     protected void resolveTransitiveDependencies( MavenSession context,
-                                                MavenTools repositoryTools,
+                                                RepositorySystem repositoryTools,
                                                 String scope,
                                                 MavenProject project,
                                                 boolean isAggregator )
@@ -1582,7 +1582,7 @@ public class DefaultPluginManager
 
     private void downloadDependencies( MavenProject project,
                                        MavenSession context,
-                                       MavenTools repositoryTools )
+                                       RepositorySystem repositoryTools )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = context.getLocalRepository();

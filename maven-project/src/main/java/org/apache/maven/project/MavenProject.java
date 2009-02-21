@@ -34,7 +34,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -213,7 +213,7 @@ public class MavenProject
      * @param projectBuilderConfiguration
      * @throws InvalidRepositoryException
      */
-    public MavenProject( Model model, ArtifactFactory artifactFactory, MavenTools mavenTools, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
+    public MavenProject( Model model, ArtifactFactory artifactFactory, RepositorySystem mavenTools, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
         if(model == null)

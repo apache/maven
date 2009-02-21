@@ -51,7 +51,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 /**
  * @author Jason van Zyl
  */
-public interface MavenTools
+public interface RepositorySystem
 {
     List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories )
         throws InvalidRepositoryException;

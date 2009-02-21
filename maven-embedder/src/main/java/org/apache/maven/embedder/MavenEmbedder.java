@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.Maven;
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
@@ -137,7 +137,7 @@ public class MavenEmbedder
 
     private MavenXpp3Writer modelWriter;
 
-    private MavenTools repositoryTools;
+    private RepositorySystem repositoryTools;
     
     private Maven maven;
 
@@ -659,7 +659,7 @@ public class MavenEmbedder
 
             pluginRepository = container.lookup( PluginRepository.class );
 
-            repositoryTools = container.lookup( MavenTools.class );
+            repositoryTools = container.lookup( RepositorySystem.class );
             
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.

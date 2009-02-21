@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.*;
 
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -52,7 +52,7 @@ public class PomConstructionTest
 
     private MavenProjectBuilder mavenProjectBuilder;
 
-    private MavenTools mavenTools;
+    private RepositorySystem mavenTools;
 
     private PomArtifactResolver pomArtifactResolver;
 
@@ -67,7 +67,7 @@ public class PomConstructionTest
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = lookup( MavenProjectBuilder.class );
         projectBuilder = lookup( ProjectBuilder.class );
-        mavenTools = lookup( MavenTools.class );
+        mavenTools = lookup( RepositorySystem.class );
         pomArtifactResolver = new PomArtifactResolver()
         {
 

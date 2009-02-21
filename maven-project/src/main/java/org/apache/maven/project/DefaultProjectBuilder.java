@@ -22,7 +22,7 @@ package org.apache.maven.project;
 import java.io.*;
 import java.util.*;
 
-import org.apache.maven.MavenTools;
+import org.apache.maven.RepositorySystem;
 import org.apache.maven.mercury.PomProcessor;
 import org.apache.maven.mercury.PomProcessorException;
 import org.apache.maven.mercury.MavenDomainModel;
@@ -61,7 +61,7 @@ public class DefaultProjectBuilder
     private ArtifactFactory artifactFactory;
     
     @Requirement
-    private MavenTools mavenTools;
+    private RepositorySystem mavenTools;
 
     @Requirement
     List<ModelEventListener> listeners;
