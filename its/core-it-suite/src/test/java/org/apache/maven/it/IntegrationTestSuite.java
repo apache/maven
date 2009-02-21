@@ -74,8 +74,10 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // Tests that currently don't pass for any Maven version, i.e. the corresponding issue hasn't been resolved yet
         // -------------------------------------------------------------------------------------------------------------
+        // suite.addTestSuite( MavenITmng4048VersionRangeReactorResolutionTest.class );
         // suite.addTestSuite( MavenITmng3890TransitiveDependencyScopeUpdateTest.class );
         // suite.addTestSuite( MavenITmng3814BogusProjectCycleTest.class );
+        // suite.addTestSuite( MavenITmng3714ToolchainsCliOptionTest.class );
         // suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
         // suite.addTestSuite( MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest.class );
@@ -83,7 +85,6 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
         // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
         // suite.addTestSuite( MavenITmng0612NewestConflictResolverTest.class );
-        // suite.addTestSuite( MavenITmng3714ToolchainsCliOptionTest.class );
 
         // -------------------------------------------------------------------------------------------------------------
         // Tests that don't run stable and need to be fixed
