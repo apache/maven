@@ -92,7 +92,7 @@ public class VersionExpressionTransformation
         boolean pomArtifact = false;
         if ( "pom".equals( artifact.getType() ) )
         {
-            System.out.println( "On Deploy: Using artifact file for POM: " + artifact );
+            getLogger().debug( "On Deploy: Using artifact file for POM: " + artifact );
             pomFile = artifact.getFile();
             pomArtifact = true;
         }
@@ -151,7 +151,7 @@ public class VersionExpressionTransformation
         boolean pomArtifact = false;
         if ( "pom".equals( artifact.getType() ) )
         {
-            System.out.println( "On Install: Using artifact file for POM: " + artifact );
+            getLogger().debug( "On Install: Using artifact file for POM: " + artifact );
             pomFile = artifact.getFile();
             pomArtifact = true;
         }
