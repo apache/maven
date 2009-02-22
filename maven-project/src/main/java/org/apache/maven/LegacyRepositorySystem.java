@@ -142,8 +142,9 @@ public class LegacyRepositorySystem
 			ArtifactFilter filter )
 			throws ArtifactResolutionException, ArtifactNotFoundException 
     {
-    	return artifactResolver.resolveTransitively(artifacts, originatingArtifact, remoteRepositories, localRepository, artifactMetadataSource );    	
-	}
+        return artifactResolver.resolveTransitively( artifacts, originatingArtifact, localRepository,
+                                                     remoteRepositories, artifactMetadataSource, filter );
+    }
 
     public Set<Artifact> createArtifacts(
 			List<Dependency> dependencies, String inheritedScope,
@@ -463,6 +464,7 @@ public class LegacyRepositorySystem
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+        // FIXME: Not sure whether this is just intermediate code but the call belows wrecks havoc on system dependencies
         artifact.setFile( artifactFile );
         artifactResolver.resolve( artifact, remoteRepositories, localRepository );
     }    
