@@ -42,11 +42,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author jdcasey
  * 
  */
-public class MavenITmng3057VersionExprTransformations
+public class MavenITmng3057VersionExprTransformationsTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng3057VersionExprTransformations()
+    public MavenITmng3057VersionExprTransformationsTest()
     {
         // TODO: port to 3.x
         super( "[2.1.0,)" ); // only test in 2.1.0+
