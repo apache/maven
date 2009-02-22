@@ -28,6 +28,10 @@ import org.apache.maven.execution.MavenSession;
  */
 public interface ToolchainManager
 {
+
+    // NOTE: Some plugins like Surefire access this field directly!
+    String ROLE = ToolchainManager.class.getName();
+
     /**
      * to be used from plugins capable of working with toolchains.
      */
