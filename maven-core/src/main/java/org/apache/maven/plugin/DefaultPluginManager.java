@@ -1478,8 +1478,6 @@ public class DefaultPluginManager
         throws ArtifactResolutionException, ArtifactNotFoundException,
         InvalidDependencyVersionException
     {
-        ArtifactFilter filter = new ScopeArtifactFilter( scope );
-
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
         Artifact artifact = repositoryTools.createBuildArtifact( project.getGroupId(),
                                                                  project.getArtifactId(),
@@ -1492,8 +1490,10 @@ public class DefaultPluginManager
         if ( project.getDependencyArtifacts() == null )
         {
             // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
-            project.setDependencyArtifacts( repositoryTools.createArtifacts( project.getDependencies(), null, filter, project ) );
+            project.setDependencyArtifacts( repositoryTools.createArtifacts( project.getDependencies(), null, null, project ) );
         }
+
+        ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         Set resolvedArtifacts;
         try
