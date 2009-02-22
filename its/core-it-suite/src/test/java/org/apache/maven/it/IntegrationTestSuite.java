@@ -281,6 +281,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1021EqualAttachmentBuildNumberTest.class );
         suite.addTestSuite( MavenITmng0985NonExecutedPluginMngtGoalsTest.class );
         suite.addTestSuite( MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest.class );
+        suite.addTestSuite( MavenITmng0947OptionalDependencyTest.class );
         suite.addTestSuite( MavenITmng0870ReactorAwarePluginDiscoveryTest.class );
         suite.addTestSuite( MavenITmng0866EvaluateDefaultValueTest.class );
         suite.addTestSuite( MavenITmng0848SystemPropOverridesDefaultValueTest.class );
