@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.ArtifactFilterManager;
-import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -78,6 +77,7 @@ import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.reporting.MavenReport;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelMarshaller;
 import org.apache.maven.shared.model.ModelProperty;
@@ -137,7 +137,7 @@ public class DefaultPluginManager
     protected PluginVersionManager pluginVersionManager;
 
     @Requirement
-    protected RepositorySystem repositoryTools;
+    protected MavenRepositorySystem repositoryTools;
 
     @Requirement
     protected RuntimeInformation runtimeInformation;
@@ -1471,7 +1471,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     protected void resolveTransitiveDependencies( MavenSession context,
-                                                RepositorySystem repositoryTools,
+                                                MavenRepositorySystem repositoryTools,
                                                 String scope,
                                                 MavenProject project,
                                                 boolean isAggregator )
@@ -1582,7 +1582,7 @@ public class DefaultPluginManager
 
     private void downloadDependencies( MavenProject project,
                                        MavenSession context,
-                                       RepositorySystem repositoryTools )
+                                       MavenRepositorySystem repositoryTools )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = context.getLocalRepository();

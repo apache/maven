@@ -19,63 +19,60 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.model.*;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.PlexusConstants;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.*;
-
+@Component(role=ArtifactResolver.class, hint="test")
 public class TestArtifactResolver
     extends DefaultArtifactResolver
-    implements Contextualizable
 {
-    public static final String ROLE = TestArtifactResolver.class.getName();
-
-    private ArtifactRepositoryFactory repositoryFactory;
-
+    @Requirement
     private PlexusContainer container;
 
+    @Requirement
+    private MavenRepositorySystem repositorySystem;
+    
     static class Source
         implements ArtifactMetadataSource
     {
-        private ArtifactFactory artifactFactory;
-
-        private final ArtifactRepositoryFactory repositoryFactory;
-
         private final PlexusContainer container;
 
-        public Source( ArtifactFactory artifactFactory, ArtifactRepositoryFactory repositoryFactory,
-                       PlexusContainer container )
+        private MavenRepositorySystem repositorySystem;
+        
+        public Source( MavenRepositorySystem repositorySystem, PlexusContainer container )
         {
-            this.artifactFactory = artifactFactory;
-            this.repositoryFactory = repositoryFactory;
+            this.repositorySystem = repositorySystem;
             this.container = container;
         }
 
@@ -129,7 +126,7 @@ public class TestArtifactResolver
             try
             {
                 artifactRepositories =
-                    ProjectUtils.buildArtifactRepositories( model.getRepositories(), repositoryFactory, container );
+                    repositorySystem.buildArtifactRepositories( model.getRepositories() );
             }
             catch ( InvalidRepositoryException e )
             {
@@ -174,10 +171,14 @@ public class TestArtifactResolver
                 }
 
                 VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
-                Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                              versionRange, d.getType(),
-                                                                              d.getClassifier(), scope,
-                                                                              inheritedScope );
+                
+                Artifact artifact = repositorySystem.createDependencyArtifact( d.getGroupId(), 
+                                                                               d.getArtifactId(),
+                                                                               versionRange, 
+                                                                               d.getType(),
+                                                                               d.getClassifier(), 
+                                                                               scope,
+                                                                               inheritedScope );
                 if ( artifact != null )
                 {
                     projectArtifacts.add( artifact );
@@ -198,7 +199,7 @@ public class TestArtifactResolver
 
     public Source source()
     {
-        return new Source( artifactFactory, repositoryFactory, container );
+        return new Source( repositorySystem, container );
     }
 
     /**
@@ -218,7 +219,7 @@ public class TestArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return super.resolveTransitively( artifacts, originatingArtifact, localRepository, remoteRepositories,
-                                          new Source( artifactFactory, repositoryFactory, container ), filter );
+                                          new Source( repositorySystem, container ), filter );
     }
 
     @Override
@@ -228,117 +229,6 @@ public class TestArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return super.resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository,
-                                          new Source( artifactFactory, repositoryFactory, container ) );
+                                          new Source( repositorySystem, container ) );
     }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    public static final class ProjectUtils
-    {
-        private ProjectUtils()
-        {
-        }
-
-        public static List buildArtifactRepositories( List repositories,
-                                                      ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                      PlexusContainer container )
-            throws InvalidRepositoryException
-        {
-
-            List repos = new ArrayList();
-
-            for ( Iterator i = repositories.iterator(); i.hasNext(); )
-            {
-                Repository mavenRepo = (Repository) i.next();
-
-                ArtifactRepository artifactRepo =
-                    buildArtifactRepository( mavenRepo, artifactRepositoryFactory, container );
-
-                if ( !repos.contains( artifactRepo ) )
-                {
-                    repos.add( artifactRepo );
-                }
-            }
-            return repos;
-        }
-
-        public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
-                                                                            ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                                            PlexusContainer container )
-            throws InvalidRepositoryException
-        {
-            if ( repo != null )
-            {
-                String id = repo.getId();
-                String url = repo.getUrl();
-
-                return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(),
-                                                                                     repo.isUniqueVersion() );
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public static ArtifactRepository buildArtifactRepository( Repository repo,
-                                                                  ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                                  PlexusContainer container )
-            throws InvalidRepositoryException
-        {
-            if ( repo != null )
-            {
-                String id = repo.getId();
-                String url = repo.getUrl();
-
-                if ( id == null || id.trim().length() < 1 )
-                {
-                    throw new MissingRepositoryElementException( "Repository ID must not be empty (URL is: " + url + ")." );
-                }
-
-                if ( url == null || url.trim().length() < 1 )
-                {
-                    throw new MissingRepositoryElementException( "Repository URL must not be empty (ID is: " + id + ").", id );
-                }
-
-                ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
-                ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
-
-                return artifactRepositoryFactory.createArtifactRepository( id, url, repo.getLayout(), snapshots, releases );
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy )
-        {
-            boolean enabled = true;
-            String updatePolicy = null;
-            String checksumPolicy = null;
-
-            if ( policy != null )
-            {
-                enabled = policy.isEnabled();
-                if ( policy.getUpdatePolicy() != null )
-                {
-                    updatePolicy = policy.getUpdatePolicy();
-                }
-                if ( policy.getChecksumPolicy() != null )
-                {
-                    checksumPolicy = policy.getChecksumPolicy();
-                }
-            }
-
-            return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
-        }
-
-    }
-
-
 }

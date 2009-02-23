@@ -22,7 +22,6 @@ package org.apache.maven.plugin.version;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -40,6 +39,7 @@ import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -51,7 +51,7 @@ public class DefaultPluginVersionManager
     implements PluginVersionManager
 {
     @Requirement
-    private RepositorySystem repositoryTools;
+    private MavenRepositorySystem repositoryTools;
 	
     @Requirement
     private MavenProjectBuilder mavenProjectBuilder;

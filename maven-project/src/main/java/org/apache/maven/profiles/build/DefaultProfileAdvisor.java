@@ -19,7 +19,6 @@ package org.apache.maven.profiles.build;
  * under the License.
  */
 
-import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -35,6 +34,7 @@ import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.injection.ProfileInjector;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -57,10 +57,8 @@ import java.util.List;
 public class DefaultProfileAdvisor
     implements ProfileAdvisor, LogEnabled, Contextualizable
 {
-    public static final String ROLE_HINT = "default";
-
     @Requirement
-    private RepositorySystem mavenTools;
+    private MavenRepositorySystem mavenTools;
 
     @Requirement
     private MavenProfilesBuilder profilesBuilder;

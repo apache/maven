@@ -29,8 +29,6 @@ import java.io.IOException;
  */
 public interface MavenProfilesBuilder
 {
-    String ROLE = MavenProfilesBuilder.class.getName();
-
     ProfilesRoot buildProfiles( File basedir )
         throws IOException, XmlPullParserException;
 }

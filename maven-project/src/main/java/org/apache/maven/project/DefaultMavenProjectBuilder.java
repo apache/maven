@@ -19,23 +19,20 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -46,9 +43,10 @@ import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.builder.*;
+import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -74,22 +72,13 @@ public class DefaultMavenProjectBuilder
     private ProfileAdvisor profileAdvisor;
 
     @Requirement
-    private RepositorySystem mavenTools;
+    private MavenRepositorySystem repositorySystem;
 
     @Requirement
     private ProjectBuilder projectBuilder;
     
     private Logger logger;
     
-    @Requirement
-    protected ArtifactResolver artifactResolver;
-
-    @Requirement
-    protected ArtifactMetadataSource artifactMetadataSource;
-
-    @Requirement
-    private ArtifactFactory artifactFactory;    
-
     //DO NOT USE, it is here only for backward compatibility reasons. The existing
     // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
 
@@ -127,7 +116,7 @@ public class DefaultMavenProjectBuilder
         }
         
        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( );
-       artifactRepositories.addAll( mavenTools.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
+       artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
        if(config.getRemoteRepositories() != null) 
        {
     	   artifactRepositories.addAll(config.getRemoteRepositories());
@@ -136,7 +125,7 @@ public class DefaultMavenProjectBuilder
         MavenProject project = readModelFromLocalPath( "unknown", 
                                                        projectDescriptor, 
                                                        new DefaultPomArtifactResolver( config.getLocalRepository(), 
-                                                                                       artifactRepositories, artifactResolver ), config );
+                                                                                       artifactRepositories, repositorySystem ), config );
 
         project.setFile( projectDescriptor );
         
@@ -189,14 +178,14 @@ public class DefaultMavenProjectBuilder
             return project;
         }        
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
-        artifactRepositories.addAll( mavenTools.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
+        artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
         
         File f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-        mavenTools.findModelFromRepository( artifact, artifactRepositories, localRepository );
+        repositorySystem.findModelFromRepository( artifact, artifactRepositories, localRepository );
 
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 
-        project = readModelFromLocalPath( "unknown", artifact.getFile(), new DefaultPomArtifactResolver( config.getLocalRepository(), artifactRepositories, artifactResolver ), config );
+        project = readModelFromLocalPath( "unknown", artifact.getFile(), new DefaultPomArtifactResolver( config.getLocalRepository(), artifactRepositories, repositorySystem ), config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
         artifact.setFile( f );
         project.setVersion( artifact.getVersion() );
@@ -221,7 +210,7 @@ public class DefaultMavenProjectBuilder
         
         try
         {
-            project = new MavenProject( superModel, artifactFactory, mavenTools, this, config );
+            project = new MavenProject( superModel, repositorySystem, this, config );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -230,8 +219,8 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project.setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
-            project.setPluginArtifactRepositories( mavenTools.buildArtifactRepositories( superModel.getRepositories() ) );
+            project.setRemoteArtifactRepositories( repositorySystem.buildArtifactRepositories( superModel.getRepositories() ) );
+            project.setPluginArtifactRepositories( repositorySystem.buildArtifactRepositories( superModel.getRepositories() ) );
         }
         catch ( InvalidRepositoryException e )
         {
@@ -250,7 +239,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+            project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
         }
         catch ( InvalidDependencyVersionException e )
         {
@@ -265,9 +254,9 @@ public class DefaultMavenProjectBuilder
             .setLocalRepository( config.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() )
-            .setMetadataSource( artifactMetadataSource );
+            .setMetadataSource( repositorySystem );
 
-        ArtifactResolutionResult result = artifactResolver.resolve( request );
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         project.setArtifacts( result.getArtifacts() );
 
@@ -323,12 +312,11 @@ public class DefaultMavenProjectBuilder
         
         try
         {
-            project = new MavenProject( model, artifactFactory, mavenTools, this, config );
+            project = new MavenProject( model, repositorySystem, this, config );
             
             validateModel( model, projectDescriptor );
 
-            Artifact projectArtifact = artifactFactory.createBuildArtifact( project.getGroupId(), project.getArtifactId(),
-                                                                            project.getVersion(), project.getPackaging() );
+            Artifact projectArtifact = repositorySystem.createBuildArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), project.getPackaging() );
             project.setArtifact( projectArtifact );
             
             project.setParentFile( parentDescriptor );
@@ -371,11 +359,7 @@ public class DefaultMavenProjectBuilder
         
         try
         {
-            mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor,
-                    interpolatorProperties,
-                                                              resolver,
-                                                              config,
-                                                              this);
+            mavenProject = projectBuilder.buildFromLocalPath( projectDescriptor, interpolatorProperties, resolver, config, this );
         }
         catch ( IOException e )
         {

@@ -34,7 +34,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -75,6 +74,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -163,12 +163,11 @@ public class MavenProject
 
     private Stack<MavenProject> previousExecutionProjects = new Stack<MavenProject>();
 
-    //!! Components that need to be taken out of here
-    private ArtifactFactory artifactFactory;
-
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ProjectBuilderConfiguration projectBuilderConfiguration;
+    
+    private MavenRepositorySystem repositorySystem;
     //
 
     private File parentFile;
@@ -213,17 +212,12 @@ public class MavenProject
      * @param projectBuilderConfiguration
      * @throws InvalidRepositoryException
      */
-    public MavenProject( Model model, ArtifactFactory artifactFactory, RepositorySystem mavenTools, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
+    public MavenProject( Model model, MavenRepositorySystem mavenTools, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
         if(model == null)
         {
             throw new IllegalArgumentException("model: null");
-        }
-
-        if(artifactFactory == null)
-        {
-            throw new IllegalArgumentException("artifactFactory: null");
         }
 
         if(mavenTools == null)
@@ -234,7 +228,7 @@ public class MavenProject
         setModel( model );
         this.mavenProjectBuilder = mavenProjectBuilder;
         this.projectBuilderConfiguration = projectBuilderConfiguration;
-        this.artifactFactory = artifactFactory;
+        this.repositorySystem = mavenTools;
         originalModel = model;
         DistributionManagement dm = model.getDistributionManagement();
 
@@ -1146,7 +1140,7 @@ public class MavenProject
             return pluginArtifacts;
         }
         pluginArtifacts = new HashSet<Artifact>();
-        if ( artifactFactory != null )
+        if ( repositorySystem != null )
         {
             List<Plugin> plugins = getBuildPlugins();
             for ( Iterator<Plugin> i = plugins.iterator(); i.hasNext(); )
@@ -1166,8 +1160,8 @@ public class MavenProject
                 Artifact artifact;
                 try
                 {
-                    artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
-                                                                     VersionRange.createFromVersionSpec( version ) );
+                    artifact = repositorySystem.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
+                                                                VersionRange.createFromVersionSpec( version ) );
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
@@ -1225,7 +1219,7 @@ public class MavenProject
                 Artifact artifact = null;
                 try
                 {
-                    artifact = artifactFactory.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
+                    artifact = repositorySystem.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
                                                                      VersionRange.createFromVersionSpec( version ) );
                 }
                 catch ( InvalidVersionSpecificationException e )
@@ -1288,8 +1282,7 @@ public class MavenProject
                 try
                 {
                     VersionRange versionRange = VersionRange.createFromVersionSpec( version );
-                    artifact =
-                        artifactFactory.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(), versionRange );
+                    artifact = repositorySystem.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(), versionRange );
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
@@ -1326,7 +1319,7 @@ public class MavenProject
         if ( parentArtifact == null && model.getParent() != null )
         {
             Parent p = model.getParent();
-            parentArtifact = artifactFactory.createParentArtifact( p.getGroupId(), p.getArtifactId(), p.getVersion() );
+            parentArtifact = repositorySystem.createParentArtifact( p.getGroupId(), p.getArtifactId(), p.getVersion() );
         }
         return parentArtifact;
     }
@@ -1608,7 +1601,7 @@ public class MavenProject
         }
 
         Map<String, Artifact> map = null;
-        if ( artifactFactory != null )
+        if ( repositorySystem != null )
         {
 
             List<Dependency> deps;
@@ -1625,7 +1618,7 @@ public class MavenProject
                     {
                         VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
 
-                        Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
+                        Artifact artifact = repositorySystem.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                                       versionRange, d.getType(),
                                                                                       d.getClassifier(), d.getScope(),
                                                                                       d.isOptional() );

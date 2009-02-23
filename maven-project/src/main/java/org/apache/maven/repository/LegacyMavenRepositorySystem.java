@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.repository;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -46,10 +46,12 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Model;
@@ -72,9 +74,9 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author Jason van Zyl
  */
-@Component(role = RepositorySystem.class)
-public class LegacyRepositorySystem
-    implements RepositorySystem, LogEnabled
+@Component(role = MavenRepositorySystem.class)
+public class LegacyMavenRepositorySystem
+    implements MavenRepositorySystem, LogEnabled
 {
     @Requirement
     private ArtifactFactory artifactFactory;
@@ -120,6 +122,39 @@ public class LegacyRepositorySystem
     {
     	return artifactFactory.createProjectArtifact(groupId, artifactId, metaVersionId );    	
     }
+
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, boolean optional )
+    {
+        return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope );        
+    }
+
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, String inheritedScope )
+    {
+        return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );        
+    }
+    
+    public Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange )
+    {
+        return artifactFactory.createExtensionArtifact( groupId, artifactId, versionRange );
+    }
+
+    public Artifact createParentArtifact( String groupId, String artifactId, String version )
+    {
+        return artifactFactory.createParentArtifact( groupId, artifactId, version );
+    }
+    
+    public Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange )
+    {
+        return artifactFactory.createPluginArtifact( groupId, artifactId, versionRange );
+    }
+    
+    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
+        throws InvalidDependencyVersionException
+    {
+        return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, project );
+    }
+    
+    //
     
     public List<ArtifactVersion> retrieveAvailableVersions(Artifact artifact,
 			ArtifactRepository localRepository,
@@ -142,18 +177,7 @@ public class LegacyRepositorySystem
 			ArtifactFilter filter )
 			throws ArtifactResolutionException, ArtifactNotFoundException 
     {
-        return artifactResolver.resolveTransitively( artifacts, originatingArtifact, localRepository,
-                                                     remoteRepositories, artifactMetadataSource, filter );
-    }
-
-    public Set<Artifact> createArtifacts(
-			List<Dependency> dependencies, String inheritedScope,
-			ArtifactFilter dependencyFilter, MavenProject project) 
-        throws InvalidDependencyVersionException
-
-	{
-		return MavenMetadataSource.createArtifacts(artifactFactory,
-				dependencies, inheritedScope, dependencyFilter, project);
+    	return artifactResolver.resolveTransitively(artifacts, originatingArtifact, remoteRepositories, localRepository, artifactMetadataSource );    	
 	}
     
     // ----------------------------------------------------------------------------
@@ -464,7 +488,6 @@ public class LegacyRepositorySystem
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-        // FIXME: Not sure whether this is just intermediate code but the call belows wrecks havoc on system dependencies
         artifact.setFile( artifactFile );
         artifactResolver.resolve( artifact, remoteRepositories, localRepository );
     }    
@@ -695,6 +718,26 @@ public class LegacyRepositorySystem
         {
             serverPermissionsMap.put( repositoryId, permissions );
         }
+    }
+
+    public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
+    {
+        return artifactResolver.resolve( request );
+    }
+
+    // These two methods are here so that the ArtifactMetadataSource is implemented so that I can pass this into an ArtifactResolutionRequest.
+    // Intermediate measure before separating the RepositorySystem out into its own module.
+    
+    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+        throws ArtifactMetadataRetrievalException
+    {
+        return artifactMetadataSource.retrieveAvailableVersionsFromDeploymentRepository( artifact, localRepository, remoteRepository );
+    }
+
+    public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        return artifactMetadataSource.retrieveRelocatedArtifact( artifact, localRepository, remoteRepositories );
     }    
     
     // Test for this stuff

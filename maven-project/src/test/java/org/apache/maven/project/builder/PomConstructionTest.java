@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.*;
 
-import org.apache.maven.RepositorySystem;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -35,6 +34,7 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.project.*;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -52,7 +52,7 @@ public class PomConstructionTest
 
     private MavenProjectBuilder mavenProjectBuilder;
 
-    private RepositorySystem mavenTools;
+    private MavenRepositorySystem mavenTools;
 
     private PomArtifactResolver pomArtifactResolver;
 
@@ -67,7 +67,7 @@ public class PomConstructionTest
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = lookup( MavenProjectBuilder.class );
         projectBuilder = lookup( ProjectBuilder.class );
-        mavenTools = lookup( RepositorySystem.class );
+        mavenTools = lookup( MavenRepositorySystem.class );
         pomArtifactResolver = new PomArtifactResolver()
         {
 

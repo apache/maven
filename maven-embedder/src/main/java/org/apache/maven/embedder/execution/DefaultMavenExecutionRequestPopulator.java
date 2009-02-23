@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.Maven;
-import org.apache.maven.RepositorySystem;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -44,6 +43,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.realm.DefaultMavenRealmManager;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -86,7 +86,7 @@ public class DefaultMavenExecutionRequestPopulator
     private MavenSettingsBuilder settingsBuilder;
 
     @Requirement
-    private RepositorySystem mavenTools;
+    private MavenRepositorySystem mavenTools;
 
     // 2009-02-12 Oleg: this component is defined in maven-core components.xml
     // because it already has another declared (not generated) component

@@ -19,19 +19,14 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-public class TestProjectBuilder extends DefaultMavenProjectBuilder
+@Component(role=MavenProjectBuilder.class,hint="test")
+public class TestProjectBuilder 
+    extends DefaultMavenProjectBuilder
 {
-
-    public void setArtifactResolver( ArtifactResolver resolver )
-    {
-        artifactResolver = resolver;
-    }
-    
-    public void setArtifactMetadataSource( ArtifactMetadataSource metadataSource )
-    {
-        artifactMetadataSource = metadataSource;
-    }
+    @Requirement(hint="test")
+    private ArtifactResolver artifactResolver;    
 }

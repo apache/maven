@@ -22,7 +22,6 @@ package org.apache.maven.project;
 import java.io.*;
 import java.util.*;
 
-import org.apache.maven.RepositorySystem;
 import org.apache.maven.mercury.PomProcessor;
 import org.apache.maven.mercury.PomProcessorException;
 import org.apache.maven.mercury.MavenDomainModel;
@@ -37,8 +36,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.builder.*;
-import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.codehaus.plexus.component.annotations.Component;
@@ -58,10 +57,7 @@ public class DefaultProjectBuilder
     implements ProjectBuilder, PomProcessor, LogEnabled
 {
     @Requirement
-    private ArtifactFactory artifactFactory;
-    
-    @Requirement
-    private RepositorySystem mavenTools;
+    private MavenRepositorySystem repositorySystem;
 
     @Requirement
     List<ModelEventListener> listeners;
@@ -314,8 +310,7 @@ public class DefaultProjectBuilder
         try
         {
             MavenProject mavenProject = new MavenProject( convertFromInputStreamToModel(domainModel.getInputStream()),
-                                                          artifactFactory, 
-                                                          mavenTools, 
+                                                          repositorySystem, 
                                                           mavenProjectBuilder, 
                                                           projectBuilderConfiguration );
             
@@ -385,7 +380,7 @@ public class DefaultProjectBuilder
             return domainModels;
         }
 
-        Artifact artifactParent = artifactFactory.createParentArtifact( domainModel.getParentGroupId(),
+        Artifact artifactParent = repositorySystem.createParentArtifact( domainModel.getParentGroupId(),
                 domainModel.getParentArtifactId(), domainModel.getParentVersion() );
         
         artifactResolver.resolve( artifactParent );

@@ -24,26 +24,15 @@ import java.util.Iterator;
 
 import org.apache.maven.artifact.Artifact;
 
-/**
- * @todo relocate to maven-artifact in entirety
- */
 public class ProjectClasspathTest
     extends AbstractMavenProjectTestCase
 {
     private String dir = "projects/scope/";
-
+    
     public void testProjectClasspath()
         throws Exception
     {
         File f = getFileForClasspathResource( dir + "project-with-scoped-dependencies.xml" );
-
-//        assertEquals( TestArtifactResolver.class, getContainer().lookup( ArtifactResolver.ROLE ).getClass() );
-        TestProjectBuilder builder = (TestProjectBuilder) getContainer().lookup( MavenProjectBuilder.class, "test" );
-        
-        TestArtifactResolver testArtifactResolver = getContainer().lookup( TestArtifactResolver.class );
-        
-        builder.setArtifactResolver( testArtifactResolver );
-        builder.setArtifactMetadataSource( testArtifactResolver.source() );
         
         MavenProject project = getProjectWithDependencies( f );
 
@@ -63,6 +52,8 @@ public class ProjectClasspathTest
         artifact = getArtifact( project, "maven-test-test", "scope-test" );
         assertNull( "Check no test dependencies are transitive", artifact );
         artifact = getArtifact( project, "maven-test-test", "scope-compile" );
+        System.out.println( "a = " + artifact );
+        System.out.println( "b = " + artifact.getScope() );
         assertEquals( "Check scope", "test", artifact.getScope() );
         artifact = getArtifact( project, "maven-test-test", "scope-default" );
         assertEquals( "Check scope", "test", artifact.getScope() );

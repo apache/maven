@@ -25,6 +25,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.project.PomArtifactResolver;
+import org.apache.maven.repository.MavenRepositorySystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class DefaultPomArtifactResolver
     /**
      * Artifact resolver used to resolve artifacts
      */
-    private ArtifactResolver resolver;
+    private MavenRepositorySystem repositorySystem;
 
     /**
      * Constructor
@@ -58,11 +59,11 @@ public class DefaultPomArtifactResolver
      * @param remoteRepositories remote repositories used in resolving artifacts
      * @param resolver           artifact resolver used to resolve artifacts
      */
-    public DefaultPomArtifactResolver( ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, ArtifactResolver resolver )
+    public DefaultPomArtifactResolver( ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, MavenRepositorySystem resolver )
     {
         this.localRepository = localRepository;
         this.remoteRepositories = remoteRepositories;
-        this.resolver = resolver;
+        this.repositorySystem = resolver;
     }
 
     /**
@@ -79,7 +80,7 @@ public class DefaultPomArtifactResolver
 
         try
         {
-            resolver.resolve( artifact, remoteRepositories, localRepository );
+            repositorySystem.resolve( artifact, localRepository, remoteRepositories );
         }
         catch ( ArtifactResolutionException e )
         {
