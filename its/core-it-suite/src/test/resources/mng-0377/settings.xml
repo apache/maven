@@ -17,7 +17,7 @@
         <repository>
           <id>apache.snapshots</id>
           <name>Apache Snapshot Repository</name>
-          <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+          <url>http://repository.apache.org/snapshots</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -30,7 +30,7 @@
         <pluginRepository>
           <id>apache.snapshots</id>
           <name>Apache Snapshot Repository</name>
-          <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+          <url>http://repository.apache.org/snapshots</url>
           <releases>
             <enabled>true</enabled>
           </releases>

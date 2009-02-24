@@ -37,7 +37,7 @@ under the License.
   <pluginRepositories>
       <pluginRepository>
           <id>apache.snapshots</id>
-          <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+          <url>http://repository.apache.org/snapshots</url>
           <snapshots>
               <enabled>true</enabled>
           </snapshots>
