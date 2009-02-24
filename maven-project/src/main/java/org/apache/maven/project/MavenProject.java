@@ -2031,35 +2031,38 @@ public class MavenProject
     private void addArtifactPath( Artifact a, List<String> list )
         throws DependencyResolutionRequiredException
     {
-        String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
-        MavenProject project = (MavenProject) projectReferences.get( refId );
-
-        boolean projectDirFound = false;
-        if ( project != null )
+        File file = a.getFile();
+        if ( file != null )
         {
-            if ( a.getType().equals( "test-jar" ) )
+            list.add( file.getPath() );
+        }
+        else
+        {
+            String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
+            MavenProject project = (MavenProject) projectReferences.get( refId );
+
+            boolean projectDirFound = false;
+            if ( project != null )
             {
-                File testOutputDir = new File( project.getBuild().getTestOutputDirectory() );
-                if ( testOutputDir.exists() )
+                if ( "test-jar".equals( a.getType() ) )
                 {
-                    list.add( testOutputDir.getAbsolutePath() );
+                    File testOutputDir = new File( project.getBuild().getTestOutputDirectory() );
+                    if ( testOutputDir.exists() )
+                    {
+                        list.add( testOutputDir.getAbsolutePath() );
+                        projectDirFound = true;
+                    }
+                }
+                else
+                {
+                    list.add( project.getBuild().getOutputDirectory() );
                     projectDirFound = true;
                 }
             }
-            else
-            {
-                list.add( project.getBuild().getOutputDirectory() );
-                projectDirFound = true;
-            }
-        }
-        if ( !projectDirFound )
-        {
-            File file = a.getFile();
-            if ( file == null )
+            if ( !projectDirFound )
             {
                 throw new DependencyResolutionRequiredException( a );
             }
-            list.add( file.getPath() );
         }
     }
 
