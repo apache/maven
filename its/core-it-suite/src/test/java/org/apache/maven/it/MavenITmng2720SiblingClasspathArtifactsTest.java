@@ -45,7 +45,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
     public MavenITmng2720SiblingClasspathArtifactsTest()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.0.99,2.99.99)" );
+        super( "[2.1.0,)" );
     }
 
     public void testIT ()
