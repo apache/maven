@@ -41,15 +41,13 @@ import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.interpolation.ValueSource;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -215,7 +213,7 @@ public class VersionExpressionTransformation
         Model model;
         try
         {
-            reader = new FileReader( pomFile );
+            reader = ReaderFactory.newXmlReader( pomFile );
             model = new MavenXpp3Reader().read( reader );
         }
         finally
@@ -276,14 +274,11 @@ public class VersionExpressionTransformation
             String pomContents;
             try
             {
-                FileReader reader = null;
+                Reader reader = null;
                 try
                 {
-                    reader = new FileReader( pomFile );
-                    StringWriter writer = new StringWriter();
-                    IOUtil.copy( reader, writer );
-                    
-                    pomContents = writer.toString();
+                    reader = ReaderFactory.newXmlReader( pomFile );
+                    pomContents = IOUtil.toString( reader );
                 }
                 catch ( IOException e )
                 {
@@ -368,9 +363,9 @@ public class VersionExpressionTransformation
             {
                 outputFile.getParentFile().mkdirs();
                 
-                writer = new FileWriter( outputFile );
+                writer = WriterFactory.newXmlWriter( outputFile );
                 
-                IOUtil.copy( new StringReader( pomContents ), writer );
+                IOUtil.copy( pomContents, writer );
             }
             catch ( IOException e )
             {
