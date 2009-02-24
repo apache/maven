@@ -487,8 +487,10 @@ public class LegacyMavenRepositorySystem
     public void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
+        /* FIXME: Not sure what this was meant to do here but right now it screws up several ITs
         File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
         artifact.setFile( artifactFile );
+        //*/
         artifactResolver.resolve( artifact, remoteRepositories, localRepository );
     }    
     
