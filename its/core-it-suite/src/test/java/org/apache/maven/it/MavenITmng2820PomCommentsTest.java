@@ -37,7 +37,7 @@ public class MavenITmng2820PomCommentsTest
     public MavenITmng2820PomCommentsTest()
     {
         // FIXME: Get this passing again for 2.1.0
-        super( "[2.0.5,2.1.0),(2.1.0,)" );
+        super( "[2.0.5,)" );
     }
 
     /**
