@@ -24,4 +24,25 @@
   <modules>
     <module>level2</module>
   </modules>
+  
+  <!-- This section is technically INCORRECT, but should have no effect on the result
+       of the build. It is described in MCOMPILER-94, and could interact with the 
+       handling of POMs for install and deploy, when packaging == pom. Adding here
+       to force the issue and make sure the POM transformation still happens correctly.
+  -->
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>mcompiler-94</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
