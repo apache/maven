@@ -68,7 +68,6 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     public PomClassicDomainModel( List<ModelProperty> modelProperties )
     {
         this.modelProperties = modelProperties;
-
         try {
             inputBytes = IOUtil.toByteArray( ModelMarshaller.unmarshalModelPropertiesToXml(modelProperties, ProjectUri.baseUri));
         } catch (IOException e) {
@@ -129,8 +128,6 @@ public class PomClassicDomainModel implements InputStreamDomainModel
                 parentRelativePath = mp.getResolvedValue();
             }
 
-
-
             if(groupId != null && artifactId != null && version != null && parentGroupId != null &&
                     parentArtifactId != null && parentVersion != null & parentRelativePath != null)
             {
@@ -154,7 +151,7 @@ public class PomClassicDomainModel implements InputStreamDomainModel
         {
             parentId = parentGroupId + ":" + parentArtifactId + ":" + parentVersion;
         }
-        
+
         if(parentRelativePath == null)
         {
             parentRelativePath = ".." + File.separator + "pom.xml";
@@ -337,6 +334,17 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     public void setLineageCount( int lineageCount )
     {
         this.lineageCount = lineageCount;
+    }
+
+    public PomClassicDomainModel createCopy()
+    {
+        List<ModelProperty> props = new ArrayList<ModelProperty>();
+        for(ModelProperty mp : modelProperties)
+        {
+            props.add(mp.createCopyOfOriginal());
+        }
+
+        return new PomClassicDomainModel(props);
     }
 
     /**

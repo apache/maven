@@ -355,17 +355,7 @@ public class MavenProject
     public MavenProject getParent()
     {
         if ( parent == null )
-        {   /*
-            if(mavenProjectBuilder == null)
-            {
-                throw new IllegalArgumentException("mavenProjectBuilder: null");
-            }
-
-            if(projectBuilderConfiguration == null)
-            {
-                throw new IllegalArgumentException("projectBuilderConfiguration: null");
-            }
-            */
+        {
             if ( parentFile != null )
             {
                 try
@@ -1266,7 +1256,7 @@ public class MavenProject
         {
             for ( Iterator<Extension> i = extensions.iterator(); i.hasNext(); )
             {
-                Extension ext = (Extension) i.next();
+                Extension ext = i.next();
 
                 String version;
                 if ( StringUtils.isEmpty( ext.getVersion() ) )
@@ -1410,7 +1400,7 @@ public class MavenProject
 
             if ( ( pmByKey != null ) && pmByKey.containsKey( pluginKey ) )
             {
-                Plugin pmPlugin = (Plugin) pmByKey.get( pluginKey );
+                Plugin pmPlugin = pmByKey.get( pluginKey );
 
                 ModelUtils.mergePluginDefinitions( plugin, pmPlugin, false );
             }
@@ -1504,7 +1494,7 @@ public class MavenProject
         {
             for ( Iterator<ReportPlugin> iterator = getReportPlugins().iterator(); iterator.hasNext(); )
             {
-                ReportPlugin plugin = (ReportPlugin) iterator.next();
+                ReportPlugin plugin = iterator.next();
 
                 if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
                 {
@@ -1512,7 +1502,7 @@ public class MavenProject
 
                     if ( reportSetId != null )
                     {
-                        ReportSet reportSet = (ReportSet) plugin.getReportSetsAsMap().get( reportSetId );
+                        ReportSet reportSet = plugin.getReportSetsAsMap().get( reportSetId );
                         if ( reportSet != null )
                         {
                             Xpp3Dom executionConfiguration = (Xpp3Dom) reportSet.getConfiguration();
@@ -1612,7 +1602,7 @@ public class MavenProject
                 map = new ManagedVersionMap( map );
                 for ( Iterator<Dependency> i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
                 {
-                    Dependency d = (Dependency) i.next();
+                    Dependency d = i.next();
 
                     try
                     {
@@ -1638,7 +1628,7 @@ public class MavenProject
 
                             for ( Iterator<Exclusion> j = d.getExclusions().iterator(); j.hasNext(); )
                             {
-                                Exclusion e = (Exclusion) j.next();
+                                Exclusion e = j.next();
 
                                 exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
                             }
@@ -1660,7 +1650,7 @@ public class MavenProject
                     }
                 }
             }
-            else if ( map == null )
+            else
             {
                 map = Collections.emptyMap();
             }
@@ -1769,7 +1759,7 @@ public class MavenProject
         {
             String refId = getProjectReferenceId( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(),
                                                   pluginArtifact.getVersion() );
-            MavenProject ref = (MavenProject) getProjectReferences().get( refId );
+            MavenProject ref = getProjectReferences().get( refId );
             if ( ( ref != null ) && ( ref.getArtifact() != null ) )
             {
                 // TODO: if not matching, we should get the correct artifact from that project (attached)

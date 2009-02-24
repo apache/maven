@@ -13,7 +13,6 @@ import java.util.ArrayList;
  */
 public class DefaultExecutionIdTransformerRule implements TransformerRemovalRule
 {
-
     public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, int domainIndex)
             throws DataSourceException
     {

@@ -69,10 +69,6 @@ under the License.
       <artifactId>maven-project-builder</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-mercury</artifactId>
-    </dependency>
-    <dependency>
     	<groupId>commons-jxpath</groupId>
     	<artifactId>commons-jxpath</artifactId>
     </dependency>

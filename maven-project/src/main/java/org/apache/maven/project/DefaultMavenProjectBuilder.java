@@ -160,7 +160,7 @@ public class DefaultMavenProjectBuilder
             return projects.put( key, project );
         }
     }
-    
+
     //!! This is used by the RR plugin
     public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository, boolean allowStubs )
         throws ProjectBuildingException
@@ -172,7 +172,7 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         MavenProject project = hm.get( artifact.getId() );
-        
+
         if ( project != null )
         {            
             return project;

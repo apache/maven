@@ -168,59 +168,32 @@ public class PomTransformer
 
         List<ModelProperty> props = new ArrayList<ModelProperty>( properties );
 
-        //dependency management
+
         ModelDataSource source = new DefaultModelDataSource( props, PomTransformer.MODEL_CONTAINER_FACTORIES );
 
-        for ( ModelContainer dependencyContainer : source.queryFor( ProjectUri.Dependencies.Dependency.xUri ) )
-        {
-            for ( ModelContainer managementContainer : source.queryFor(
-                ProjectUri.DependencyManagement.Dependencies.Dependency.xUri ) )
-            {
-                //Join Duplicate Exclusions TransformerRule (MNG-4010)
-                ModelDataSource exclusionSource = new DefaultModelDataSource(managementContainer.getProperties(),
-                        Collections.unmodifiableList(Arrays.asList(new ArtifactModelContainerFactory(ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.Exclusion.xUri))));
-                List<ModelContainer> exclusionContainers =
-                        exclusionSource.queryFor(ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.Exclusion.xUri);
+        //Dependency Management
+        new DependencyManagementDataSourceRule().execute( source );
 
-                for(ModelContainer mc : exclusionContainers)
-                {
-                    for(ModelContainer mc1 : exclusionContainers)
-                    {
-                        if(!mc.equals(mc1)  && mc.containerAction(mc1).equals(ModelContainerAction.JOIN))
-                        {
-                            exclusionSource.joinWithOriginalOrder(mc1, mc);       
-                        }
-                    }
-                }
-
-                managementContainer = new ArtifactModelContainerFactory().create(
-                    transformDependencyManagement( exclusionSource.getModelProperties() ) );
-                ModelContainerAction action = dependencyContainer.containerAction( managementContainer );
-                if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
-                {
-                    source.join( dependencyContainer, managementContainer );
-                }
-            }
-        }
-
+        //Plugin Management
         List<ModelProperty> joinedContainers = new ArrayList<ModelProperty>();
         for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
         {
             for ( ModelContainer managementContainer : source.queryFor( ProjectUri.Build.PluginManagement.Plugins.Plugin.xUri ) )
             {
+                //Transform from plugin management to plugins
                 List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
                 for ( ModelProperty mp : managementContainer.getProperties() )
                 {
                     if ( mp.getUri().startsWith( ProjectUri.Build.PluginManagement.xUri ) )
                     {
-                        transformedProperties.add( new ModelProperty( mp.getUri().replace( ProjectUri.Build.PluginManagement.xUri, ProjectUri.Build.xUri ), mp.getResolvedValue() ) );
+                        transformedProperties.add( new ModelProperty( mp.getUri().replace( ProjectUri.Build.PluginManagement.xUri,
+                                ProjectUri.Build.xUri ), mp.getResolvedValue() ) );
                     }
                 }
                 
                 managementContainer = new ArtifactModelContainerFactory().create( transformedProperties );
 
                 //Remove duplicate executions tags
-
                 boolean hasExecutionsTag = false;
                 for ( ModelProperty mp : pluginContainer.getProperties() )
                 {
@@ -454,25 +427,15 @@ public class PomTransformer
         return false;
     }
 
-    private static List<ModelProperty> transformDependencyManagement( List<ModelProperty> modelProperties )
-    {
-        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.DependencyManagement.xUri ) )
-            {
-                transformedProperties.add( new ModelProperty(
-                    mp.getUri().replace( ProjectUri.DependencyManagement.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
-            }
-        }
-        return transformedProperties;
-    }
+
 
     List<TransformerRule> transformerRules = Arrays.asList(new MissingVersionTransformerRule(),
-            new DefaultDependencyScopeTransformerRule());
+            new DefaultDependencyScopeTransformerRule(), new MissingGroupIdTransformerRule());
 
     List<TransformerRemovalRule> transformerRemovalRules = Arrays.asList(new DefaultExecutionIdTransformerRule(),
-            new ModulesNotInheritedTransformerRule());
+            new ModulesNotInheritedTransformerRule(), new NotInheritedPluginExecutionTransformerRule(),
+            new NotInheritedPluginTransformerRule(), new RelativePathNotInheritedTransformerRule(),
+            new PackagingNotInheritedTransformerRule(), new NameNotInheritedTransformerRule());
     
     /**
      * @see ModelTransformer#transformToModelProperties(java.util.List)
@@ -528,77 +491,6 @@ public class PomTransformer
                 tmp.removeAll(rule.executeWithReturnPropertiesToRemove(tmp, domainModelIndex));
             }
 
-
-            //Missing groupId, use parent one TransformerRule
-            if ( getPropertyFor( ProjectUri.groupId, tmp ) == null )
-            {
-                ModelProperty parentGroupId = getPropertyFor( ProjectUri.Parent.groupId, tmp );
-                if ( parentGroupId != null )
-                {
-                    tmp.add( new ModelProperty( ProjectUri.groupId, parentGroupId.getResolvedValue() ) );
-                }
-
-            }
-
-            //Not inherited plugin execution rule
-            if ( domainModelIndex > 0 )
-            {
-                List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
-                ModelDataSource source = new DefaultModelDataSource( tmp, Arrays.asList( new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ));
-                List<ModelContainer> containers =
-                    source.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri );
-                for ( ModelContainer container : containers )
-                {
-                    for ( ModelProperty mp : container.getProperties() )
-                    {
-                        if ( mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.Executions.Execution.inherited ) &&
-                            mp.getResolvedValue() != null && mp.getResolvedValue().equals( "false" ) )
-                        {
-                            removeProperties.addAll( container.getProperties() );
-                            for ( int j = tmp.indexOf( mp ); j >= 0; j-- )
-                            {
-                                if ( tmp.get( j ).getUri().equals( ProjectUri.Build.Plugins.Plugin.Executions.xUri ) )
-                                {
-                                    removeProperties.add( tmp.get( j ) );
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                tmp.removeAll( removeProperties );
-            }
-            
-            //Not inherited plugin rule
-            if ( domainModelIndex > 0 )
-            {
-                List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
-                ModelDataSource source = new DefaultModelDataSource( tmp, PomTransformer.MODEL_CONTAINER_FACTORIES );
-                List<ModelContainer> containers = source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri );
-                for ( ModelContainer container : containers )
-                {
-                    for ( ModelProperty mp : container.getProperties() )
-                    {
-                        if ( mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.inherited ) && mp.getResolvedValue() != null &&
-                            mp.getResolvedValue().equals( "false" ) )
-                        {
-                            removeProperties.addAll( container.getProperties() );
-                            for ( int j = tmp.indexOf( mp ); j >= 0; j-- )
-                            {
-                                if ( tmp.get( j ).getUri().equals( ProjectUri.Build.Plugins.Plugin.xUri ) )
-                                {
-                                    removeProperties.add( tmp.get( j ) );
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                tmp.removeAll( removeProperties );
-            }
-
             // Project URL TransformerRule
             adjustUrl( projectUrl, tmp, ProjectUri.url, projectNames );
             // Site TransformerRule
@@ -610,10 +502,7 @@ public class PomTransformer
             // SCM Developer TransformerRule
             adjustUrl( scmDeveloperUrl, tmp, ProjectUri.Scm.developerConnection, projectNames );
 
-            // Project Name TransformerRule: not inherited
-            // Packaging TransformerRule: not inherited
             // Profiles TransformerRule: not inherited
-            // Parent.relativePath TransformerRule: not inherited
             // Prerequisites TransformerRule: not inherited
             // DistributionManagent.Relocation TransformerRule: not inherited
             if ( domainModelIndex > 0 )
@@ -621,9 +510,7 @@ public class PomTransformer
                 for ( ModelProperty mp : tmp )
                 {
                     String uri = mp.getUri();
-                    if ( uri.equals( ProjectUri.name ) || uri.equals( ProjectUri.packaging )
-                        || uri.startsWith( ProjectUri.Profiles.xUri )
-                        || uri.startsWith( ProjectUri.Parent.relativePath )
+                    if ( uri.startsWith( ProjectUri.Profiles.xUri )
                         || uri.startsWith( ProjectUri.Prerequisites.xUri )
                         || uri.startsWith( ProjectUri.DistributionManagement.Relocation.xUri ) )
                     {
@@ -693,46 +580,10 @@ public class PomTransformer
         //Rules processed on collapsed pom
 
         //TransformerRule: Remove duplicate filters
-        List<ModelProperty> removedProperties = new ArrayList<ModelProperty>();
-        List<String> filters = new ArrayList<String>();
-        for(ModelProperty mp : modelProperties)
-        {
-            if(mp.getUri().equals(ProjectUri.Build.Filters.filter))
-            {
-                if(filters.contains(mp.getResolvedValue()))
-                {
-                    removedProperties.add(mp);
-                }
-                else
-                {
-                    filters.add(mp.getResolvedValue());   
-                }
-            }
-        }
-        modelProperties.removeAll(removedProperties);
+        modelProperties.removeAll(new DuplicateFiltersTransformerRule().executeWithReturnPropertiesToRemove( modelProperties , 0));
 
         //TransformerRule: Build plugin config overrides reporting plugin config
-        ModelDataSource source = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
-
-        List<ModelContainer> reportContainers = source.queryFor( ProjectUri.Reporting.Plugins.Plugin.xUri );
-        for ( ModelContainer pluginContainer : source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri ) )
-        {
-            ModelContainer transformedReportContainer = new ArtifactModelContainerFactory().create(
-                    transformPlugin( pluginContainer.getProperties() ) );
-
-            for(ModelContainer reportContainer : reportContainers) {
-                ModelContainerAction action = transformedReportContainer.containerAction( reportContainer );
-                if ( action.equals( ModelContainerAction.JOIN ) )
-                {
-                    source.join( transformedReportContainer, reportContainer );
-                    break;
-                }
-            }
-        }
-
-        modelProperties = source.getModelProperties();
-
-        return modelProperties;
+        return new OverideConfigTransformerRule().execute( modelProperties );
     }
 
     /**
@@ -1018,26 +869,6 @@ public class PomTransformer
         return null;
     }
 
-    private static List<ModelProperty> transformPlugin( List<ModelProperty> modelProperties )
-    {
-        List<ModelProperty> transformedProperties = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.Build.Plugins.xUri ) )
-            {   if(mp.getUri().startsWith(ProjectUri.Build.Plugins.Plugin.configuration)
-                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.groupId)
-                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.artifactId)
-                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.version)
-                    || mp.getUri().equals( ProjectUri.Build.Plugins.Plugin.xUri ) )
-                {
-                transformedProperties.add( new ModelProperty(
-                    mp.getUri().replace( ProjectUri.Build.Plugins.xUri, ProjectUri.Reporting.Plugins.xUri ),
-                    mp.getResolvedValue() ) );
-                }
 
-            }
-        }
-        return transformedProperties;
-    }
 }
 
