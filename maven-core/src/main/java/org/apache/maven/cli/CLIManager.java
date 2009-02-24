@@ -102,11 +102,11 @@ public class CLIManager
                                         .withDescription( "Display version information" )
                                         .create( VERSION ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "enc-master-passwd" )
+        options.addOption( OptionBuilder.withLongOpt( "encrypt-master-passwd" )
                            .hasArg()
                            .withDescription( "Encrypt master security password" )
                            .create( ENCRYPT_MASTER_PASSWORD ) );
-        options.addOption( OptionBuilder.withLongOpt( "enc-passwd" )
+        options.addOption( OptionBuilder.withLongOpt( "encrypt-passwd" )
                            .hasArg()
                            .withDescription( "Encrypt server password" )
                            .create( ENCRYPT_PASSWORD ) );
