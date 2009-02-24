@@ -571,25 +571,4 @@ under the License.
       </reporting>
     </profile>
   </profiles>
-
-  <!-- FIXME: Remove when snapshot dependencies have been released -->
-  <repositories>
-    <repository>
-        <id>snapshots.temp</id>
-        <url>http://repository.sonatype.org/content/repositories/snapshots</url>
-        <snapshots><enabled>true</enabled></snapshots>
-        <releases><enabled>false</enabled></releases>
-    </repository>
-    <repository>
-      <id>codehaus.snapshots</id>
-      <url>http://snapshots.repository.codehaus.org/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
-
 </project>
