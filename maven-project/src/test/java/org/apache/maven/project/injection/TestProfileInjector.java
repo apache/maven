@@ -22,7 +22,9 @@ package org.apache.maven.project.injection;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.injection.ProfileInjector;
+import org.codehaus.plexus.component.annotations.Component;
 
+@Component(role=ProfileInjector.class,hint="test")
 public class TestProfileInjector
     implements ProfileInjector
 {
