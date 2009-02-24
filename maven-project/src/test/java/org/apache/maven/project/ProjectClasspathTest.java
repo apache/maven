@@ -47,13 +47,12 @@ public class ProjectClasspathTest
         checkArtifactIdScope( project, "default", "compile" );
 
         // check all transitive deps of a test dependency are test, except test and provided which is skipped
-        /*
         artifact = getArtifact( project, "maven-test-test", "scope-provided" );
         assertNull( "Check no provided dependencies are transitive", artifact );
         artifact = getArtifact( project, "maven-test-test", "scope-test" );
         assertNull( "Check no test dependencies are transitive", artifact );
-        */
-        /*
+
+
         artifact = getArtifact( project, "maven-test-test", "scope-compile" );
         System.out.println( "a = " + artifact );
         System.out.println( "b = " + artifact.getScope() );
@@ -82,7 +81,6 @@ public class ProjectClasspathTest
         checkGroupIdScope( project, "compile", "maven-test-default" );
         artifact = getArtifact( project, "maven-test-default", "scope-runtime" );
         assertEquals( "Check scope", "runtime", artifact.getScope() );
-        */
     }
 
     private void checkGroupIdScope( MavenProject project, String scopeValue, String groupId )
