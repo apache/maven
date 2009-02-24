@@ -37,7 +37,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
 
     public MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest()
     {
-        super( "[2.1.0,)" );
+        super( "[2.0.11,2.1.0-M1),[2.1.0,)" );
     }
 
     /**
