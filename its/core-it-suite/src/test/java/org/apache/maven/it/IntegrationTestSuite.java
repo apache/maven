@@ -232,6 +232,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2861RelocationsAndRangesTest.class );
         suite.addTestSuite( MavenITmng2843PluginConfigPropertiesInjectionTest.class );
         suite.addTestSuite( MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest.class );
+        suite.addTestSuite( MavenITmng2820PomCommentsTest.class );
         suite.addTestSuite( MavenITmng2790LastUpdatedMetadataTest.class );
         suite.addTestSuite( MavenITmng2749ExtensionAvailableToPluginTest.class );
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
