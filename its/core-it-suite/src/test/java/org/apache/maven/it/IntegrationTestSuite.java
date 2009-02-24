@@ -244,6 +244,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2591MergeInheritedPluginConfigTest.class );
         suite.addTestSuite( MavenITmng2562TimestampTest.class );
         suite.addTestSuite( MavenITmng2539PluginDependenciesComeFromPluginReposTest.class );
+        suite.addTestSuite( MavenITmng2362DeployedPomEncodingTest.class );
         suite.addTestSuite( MavenITmng2339BadProjectInterpolationTest.class );
         suite.addTestSuite( MavenITmng2318LocalParentResolutionTest.class );
         suite.addTestSuite( MavenITmng2293CustomPluginParamImplTest.class );
