@@ -26,12 +26,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.transform.ArtifactTransformation;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
@@ -40,10 +36,10 @@ import org.apache.maven.project.interpolation.StringSearchModelInterpolator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.RecursionInterceptor;
+import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.interpolation.ValueSource;
-import org.codehaus.plexus.interpolation.object.FieldBasedObjectInterpolator;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -52,36 +48,17 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public class VersionExpressionTransformation
     extends StringSearchModelInterpolator
     implements Initializable, ArtifactTransformation
 {
-
-    private static Set BLACKLISTED_FIELD_NAMES;
-    
-    private static final Set WHITELISTED_FIELD_NAMES;
-    
-    static
-    {
-        Set whitelist = new HashSet();
-        
-        whitelist.add( "version" );
-        whitelist.add( "dependencies" );
-        whitelist.add( "build" );
-        whitelist.add( "plugins" );
-        whitelist.add( "reporting" );
-        whitelist.add( "parent" );
-        
-        WHITELISTED_FIELD_NAMES = whitelist;
-    }
 
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
@@ -246,31 +223,37 @@ public class VersionExpressionTransformation
             IOUtil.close( reader );
         }
         
-        interpolateVersions( model, projectDir, pbConfig );
-        
-        Writer writer = null;
-        try
-        {
-            outputFile.getParentFile().mkdirs();
-            
-            writer = new FileWriter( outputFile );
-            
-            new MavenXpp3Writer().write( writer, model );
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
+        interpolateVersions( pomFile, outputFile, model, projectDir, pbConfig );
         
         return outputFile;
     }
 
-    protected void interpolateVersions( Model model, File projectDir, ProjectBuilderConfiguration config )
+    protected void interpolateVersions( File pomFile, File outputFile, Model model, File projectDir, ProjectBuilderConfiguration config )
         throws ModelInterpolationException
     {
         boolean debugEnabled = getLogger().isDebugEnabled();
 
-        Interpolator interpolator = getInterpolator();
+        // NOTE: We want to interpolate version expressions ONLY, and want to do so without requiring the
+        // use of the XPP3 Model reader/writers, which have a tendency to lose XML comments and such.
+        // SOOO, we're using a two-stage string interpolation here. The first stage selects all XML 'version'
+        // elements, and subjects their values to interpolation in the second stage.
+        Interpolator interpolator = new StringSearchInterpolator( "<version>", "</version>" );
+        
+        // The second-stage interpolator is the 'normal' one used in all Model interpolation throughout
+        // maven-project.
+        Interpolator secondaryInterpolator = getInterpolator();
+        
+        // We'll just reuse the recursion interceptor...not sure it makes any difference.
+        RecursionInterceptor recursionInterceptor = getRecursionInterceptor();
+        
+        // This is a ValueSource implementation that simply delegates to the second-stage "real" interpolator
+        // once we've isolated the version elements from the input XML.
+        interpolator.addValueSource( new SecondaryInterpolationValueSource( secondaryInterpolator, recursionInterceptor ) );
+        
+        // The primary interpolator is searching for version XML elements, and interpolating their values. Since
+        // '<version>' and '</version>' are the delimiters for this, the interpolator will remove these tokens
+        // from the result. So, we need to put them back before including the interpolated result.
+        interpolator.addPostProcessor( new VersionRestoringPostProcessor() );
 
         List valueSources = createValueSources( model, projectDir, config );
         List postProcessors = createPostProcessors( model, projectDir, config );
@@ -280,25 +263,40 @@ public class VersionExpressionTransformation
             for ( Iterator it = valueSources.iterator(); it.hasNext(); )
             {
                 ValueSource vs = (ValueSource) it.next();
-                interpolator.addValueSource( vs );
+                secondaryInterpolator.addValueSource( vs );
             }
 
             for ( Iterator it = postProcessors.iterator(); it.hasNext(); )
             {
                 InterpolationPostProcessor postProcessor = (InterpolationPostProcessor) it.next();
 
-                interpolator.addPostProcessor( postProcessor );
+                secondaryInterpolator.addPostProcessor( postProcessor );
             }
 
+            String pomContents;
             try
             {
-                FieldBasedObjectInterpolator objInterpolator =
-                    new FieldBasedObjectInterpolator( BLACKLISTED_FIELD_NAMES,
-                                                      FieldBasedObjectInterpolator.DEFAULT_BLACKLISTED_PACKAGE_PREFIXES );
-
+                FileReader reader = null;
                 try
                 {
-                    objInterpolator.interpolate( model, getInterpolator(), getRecursionInterceptor() );
+                    reader = new FileReader( pomFile );
+                    StringWriter writer = new StringWriter();
+                    IOUtil.copy( reader, writer );
+                    
+                    pomContents = writer.toString();
+                }
+                catch ( IOException e )
+                {
+                    throw new ModelInterpolationException( "Error reading POM for version-expression interpolation: " + e.getMessage(), e );
+                }
+                finally
+                {
+                    IOUtil.close( reader );
+                }
+                
+                try
+                {
+                    pomContents = interpolator.interpolate( pomContents );
                 }
                 catch ( InterpolationException e )
                 {
@@ -307,18 +305,7 @@ public class VersionExpressionTransformation
 
                 if ( debugEnabled )
                 {
-                    List feedback = new ArrayList();
-                    if ( objInterpolator.hasWarnings() )
-                    {
-                        feedback.addAll( objInterpolator.getWarnings() );
-                    }
-
-                    List internalFeedback = interpolator.getFeedback();
-                    if ( internalFeedback != null && !internalFeedback.isEmpty() )
-                    {
-                        feedback.addAll( internalFeedback );
-                    }
-
+                    List feedback = interpolator.getFeedback();
                     if ( feedback != null && !feedback.isEmpty() )
                     {
                         getLogger().debug( "Maven encountered the following problems while transforming POM versions:" );
@@ -364,52 +351,100 @@ public class VersionExpressionTransformation
                 for ( Iterator iterator = valueSources.iterator(); iterator.hasNext(); )
                 {
                     ValueSource vs = (ValueSource) iterator.next();
-                    interpolator.removeValuesSource( vs );
+                    secondaryInterpolator.removeValuesSource( vs );
                 }
 
                 for ( Iterator iterator = postProcessors.iterator(); iterator.hasNext(); )
                 {
                     InterpolationPostProcessor postProcessor = (InterpolationPostProcessor) iterator.next();
-                    interpolator.removePostProcessor( postProcessor );
+                    secondaryInterpolator.removePostProcessor( postProcessor );
                 }
 
                 getInterpolator().clearAnswers();
             }
+            
+            Writer writer = null;
+            try
+            {
+                outputFile.getParentFile().mkdirs();
+                
+                writer = new FileWriter( outputFile );
+                
+                IOUtil.copy( new StringReader( pomContents ), writer );
+            }
+            catch ( IOException e )
+            {
+                throw new ModelInterpolationException( "Failed to write transformed POM: " + outputFile.getAbsolutePath(), e );
+            }
+            finally
+            {
+                IOUtil.close( writer );
+            }
         }
-
+        
         // if ( error != null )
         // {
         // throw error;
         // }
     }
 
-    public void initialize()
-        throws InitializationException
+    private static final class SecondaryInterpolationValueSource
+        implements ValueSource
     {
-        super.initialize();
         
-        synchronized ( VersionExpressionTransformation.class )
+        private Interpolator secondary;
+        private final RecursionInterceptor recursionInterceptor;
+        private List localFeedback = new ArrayList();
+        
+        public SecondaryInterpolationValueSource( Interpolator secondary, RecursionInterceptor recursionInterceptor )
         {
-            if ( BLACKLISTED_FIELD_NAMES == null )
-            {
-                Set fieldNames = new HashSet();
-
-                Class[] classes = { Model.class, Dependency.class, Plugin.class, ReportPlugin.class };
-                for ( int i = 0; i < classes.length; i++ )
-                {
-                    Field[] fields = classes[i].getDeclaredFields();
-                    for ( int j = 0; j < fields.length; j++ )
-                    {
-                        if ( !WHITELISTED_FIELD_NAMES.contains( fields[j].getName() ) )
-                        {
-                            fieldNames.add( fields[j].getName() );
-                        }
-                    }
-                }
-
-                BLACKLISTED_FIELD_NAMES = fieldNames;
-            }
+            this.secondary = secondary;
+            this.recursionInterceptor = recursionInterceptor;
         }
+
+        public void clearFeedback()
+        {
+            secondary.clearFeedback();
+        }
+
+        public List getFeedback()
+        {
+            List result = secondary.getFeedback();
+            if ( result != null )
+            {
+                result = new ArrayList( result );
+            }
+            
+            result.addAll( localFeedback );
+            
+            return result;
+        }
+
+        public Object getValue( String expression )
+        {
+            try
+            {
+                return secondary.interpolate( expression, recursionInterceptor );
+            }
+            catch ( InterpolationException e )
+            {
+                localFeedback.add( "Error during version expression interpolation." );
+                localFeedback.add( e );
+            }
+            
+            return null;
+        }
+    }
+    
+    private static final class VersionRestoringPostProcessor
+        implements InterpolationPostProcessor
+    {
+
+        public Object execute( String expression, Object value )
+        {
+            return "<version>" + value + "</version>";
+        }
+        
     }
 
 }

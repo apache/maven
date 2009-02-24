@@ -64,13 +64,10 @@ public class DefaultArtifactInstaller
         // Here, we also set a flag indicating that the POM has been shunted through the Artifact,
         // and to expect the transformed version to be available in the Artifact afterwards...
         boolean useArtifactFile = false;
+        File oldArtifactFile = artifact.getFile();
         if ( "pom".equals( artifact.getType() ) )
         {
-            if ( artifact.getFile() == null )
-            {
-                artifact.setFile( source );
-            }
-            
+            artifact.setFile( source );
             useArtifactFile = true;
         }
         
@@ -84,6 +81,7 @@ public class DefaultArtifactInstaller
             if ( useArtifactFile )
             {
                 source = artifact.getFile();
+                artifact.setFile( oldArtifactFile );
             }
 
             String localPath = localRepository.pathOf( artifact );
