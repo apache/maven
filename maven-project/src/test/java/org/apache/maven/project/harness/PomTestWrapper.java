@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -202,7 +203,14 @@ public class PomTestWrapper
 
     public Object getValue( String expression )
     {
-        return context.getValue( expression );
+        try
+        {
+            return context.getValue( expression );
+        }
+        catch ( JXPathNotFoundException e )
+        {
+            return null;
+        }
     }
 
     public boolean xPathExpressionEqualsValue( String expression, String value )

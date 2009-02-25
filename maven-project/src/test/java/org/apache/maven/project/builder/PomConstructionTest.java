@@ -813,19 +813,6 @@ public class PomConstructionTest
     }
 
     /** MNG-4027
-    public void testProjectInjectedDependencies()
-        throws Exception
-    {
-        PomTestWrapper pom = buildPom( "profile-injected-dependencies" );
-        assertEquals( 4, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
-        assertEquals( "a", pom.getValue( "dependencies[1]/artifactId" ) );
-        assertEquals( "c", pom.getValue( "dependencies[2]/artifactId" ) );
-        assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
-        assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
-    }
-    //*/
-    
-    /** MNG-4027
     public void testProfileInjectedDependencies()
         throws Exception
     {
@@ -853,7 +840,6 @@ public class PomConstructionTest
     }
     //*/
 
-
     /** MNG-4040 */
     public void testProfileModuleInheritance()
         throws Exception
@@ -862,6 +848,42 @@ public class PomConstructionTest
         assertEquals(0, ( (List<?>) pom.getValue( "modules" ) ).size());
 
     }
+
+    public void testPluginConfigurationUsingAttributesWithoutPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-config-attributes/wo-plugin-mngt" );
+        assertEquals( "src", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@todir" ) );
+        assertEquals( "true", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@overwrite" ) );
+        assertEquals( "target", pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@dir" ) );
+        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
+        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
+    }
+
+    /** FIXME: MNG-4053
+    public void testPluginConfigurationUsingAttributesWithPluginManagement()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-config-attributes/w-plugin-mngt" );
+        assertEquals( "src", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@todir" ) );
+        assertEquals( "true", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@overwrite" ) );
+        assertEquals( "target", pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@dir" ) );
+        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
+        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
+    }
+
+    public void testPluginConfigurationUsingAttributesWithPluginManagementAndProfile()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPomFromMavenProject( "plugin-config-attributes/w-profile", "maven-core-it" );
+        assertEquals( "src", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@todir" ) );
+        assertEquals( "true", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@overwrite" ) );
+        assertEquals( "target", pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@dir" ) );
+        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
+        assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
+    }
+    //*/
+
     private void assertPathWithNormalizedFileSeparators( Object value )
     {
         assertEquals( new File( value.toString() ).getPath(), value.toString() );

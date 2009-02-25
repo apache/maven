@@ -146,4 +146,11 @@ class Xpp3DomNodePointer
     {
         return new Xpp3DomNodeIterator( this, test, reverse, startWith );
     }
+
+    @Override
+    public NodeIterator attributeIterator( QName qname )
+    {
+        return new Xpp3DomAttributeIterator( this, qname );
+    }
+
 }
