@@ -105,30 +105,35 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        if(projectDescriptor == null)
+        if ( projectDescriptor == null )
         {
-            throw new IllegalArgumentException("projectDescriptor: null");
+            throw new IllegalArgumentException( "projectDescriptor: null" );
         }
 
-        if(config == null)
+        if ( config == null )
         {
-            throw new IllegalArgumentException("config: null");
+            throw new IllegalArgumentException( "config: null" );
+        }
+
+        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
+        try
+        {
+            artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( projectBuilder.getSuperModel().getRepositories() ) );
+        }
+        catch ( InvalidRepositoryException e )
+        {
+            throw new ProjectBuildingException( "Cannot create repositories from super model.", e.getMessage() );
         }
         
-       List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( );
-       artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
-       if(config.getRemoteRepositories() != null) 
-       {
-    	   artifactRepositories.addAll(config.getRemoteRepositories());
-       }
-        
-        MavenProject project = readModelFromLocalPath( "unknown", 
-                                                       projectDescriptor, 
-                                                       new DefaultPomArtifactResolver( config.getLocalRepository(), 
-                                                                                       artifactRepositories, repositorySystem ), config );
+        if ( config.getRemoteRepositories() != null )
+        {
+            artifactRepositories.addAll( config.getRemoteRepositories() );
+        }
+
+        MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, new DefaultPomArtifactResolver( config.getLocalRepository(), artifactRepositories, repositorySystem ), config );
 
         project.setFile( projectDescriptor );
-        
+
         project = buildWithProfiles( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
 
         Build build = project.getBuild();
@@ -176,9 +181,17 @@ public class DefaultMavenProjectBuilder
         if ( project != null )
         {            
             return project;
-        }        
+        }
+        
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
-        artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( projectBuilder.getSuperModel() ) );
+        try
+        {
+            artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( projectBuilder.getSuperModel().getRepositories() ) );
+        }
+        catch ( InvalidRepositoryException e )
+        {
+            throw new ProjectBuildingException( "Cannot create repositories from super model.", e.getMessage() );
+        }
         
         File f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
         repositorySystem.findModelFromRepository( artifact, artifactRepositories, localRepository );

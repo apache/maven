@@ -75,24 +75,24 @@ public interface MavenRepositorySystem
 
     // Repository creation
 
+    // maven model
     List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories )
         throws InvalidRepositoryException;
 
-    ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo )
+    // maven model
+    ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repository )
         throws InvalidRepositoryException;
 
-    ArtifactRepository buildArtifactRepository( Repository repo )
+    // maven model
+    ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
-
+        
     ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException;
 
     ArtifactRepository createRepository( String url, String repositoryId );
 
     ArtifactRepository createRepository( String url, String repositoryId, ArtifactRepositoryPolicy snapshotsPolicy, ArtifactRepositoryPolicy releasesPolicy );
-
-    List<ArtifactRepository> buildArtifactRepositories( Model model )
-        throws ProjectBuildingException;
 
     void setGlobalUpdatePolicy( String policy );
 

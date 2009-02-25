@@ -31,6 +31,7 @@ public class TestProjectBuilder
     @Requirement(hint="test")
     private ArtifactResolver artifactResolver;
     
-    @Requirement(hint="test")
-    private MavenRepositorySystem repositorySystem;        
+    // Causing problems
+    //@Requirement(hint="test")
+    //private MavenRepositorySystem repositorySystem;        
 }

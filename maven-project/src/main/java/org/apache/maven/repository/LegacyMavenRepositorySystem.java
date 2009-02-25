@@ -394,21 +394,6 @@ public class LegacyMavenRepositorySystem
         }
     }
 
-    public List<ArtifactRepository> buildArtifactRepositories( Model model )
-        throws ProjectBuildingException
-    {
-        try
-        {
-            return buildArtifactRepositories( model.getRepositories() );
-        }
-        catch ( InvalidRepositoryException e )
-        {
-            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-
-            throw new ProjectBuildingException( projectId, e.getMessage(), e );
-        }
-    }
-
     private List normalizeToArtifactRepositories( List remoteArtifactRepositories, String projectId )
         throws ProjectBuildingException
     {

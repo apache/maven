@@ -309,7 +309,16 @@ public class DefaultArtifactResolver
 
         ArtifactResolutionResult result;
 
-        result = artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners, conflictResolvers );
+        result = artifactCollector.collect(
+        		artifacts, 
+        		originatingArtifact,
+				managedVersions, 
+				localRepository, 
+				remoteRepositories, 
+				source,
+				filter, 
+				listeners, 
+				conflictResolvers );
 
         // We have collected all the problems so let's mimic the way the old code worked and just blow up right here.
         // That's right lets just let it rip right here and send a big incomprehensible blob of text at unsuspecting
@@ -391,9 +400,15 @@ public class DefaultArtifactResolver
         // This is an attempt to get the metadata for the artifacts we are ultimately trying to resolve.
         // We still
 
-        ArtifactResolutionResult result = artifactCollector.collect( artifacts, originatingArtifact, 
-                                                                     managedVersions, localRepository, 
-                                                                     remoteRepositories, source, filter, listeners );
+        ArtifactResolutionResult result = artifactCollector.collect( 
+        		artifacts, 
+        		originatingArtifact,                                                                      
+        		managedVersions, 
+        		localRepository,                                                                      
+        		remoteRepositories, 
+        		source, 
+        		filter, 
+        		listeners );
 
         // Let's grab all the repositories that were gleaned. This we should know up front. I'm not sure
         // what the metadata source is doing. Repositories in POMs are deadly.
