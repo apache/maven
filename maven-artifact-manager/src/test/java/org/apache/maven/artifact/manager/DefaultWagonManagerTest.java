@@ -21,10 +21,8 @@ package org.apache.maven.artifact.manager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -32,19 +30,18 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
-import org.apache.maven.wagon.authorization.AuthorizationException;
-import org.apache.maven.wagon.events.TransferListener;
-import org.apache.maven.wagon.observers.Debug;
+import org.apache.maven.wagon.providers.http.LightweightHttpWagon;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.easymock.MockControl;
+
+import edu.umd.cs.mtc.MultithreadedTestCase;
+import edu.umd.cs.mtc.TestFramework;
 
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
@@ -53,9 +50,11 @@ import org.easymock.MockControl;
 public class DefaultWagonManagerTest
     extends PlexusTestCase
 {
-    private WagonManager wagonManager;
+    private static final int NUM_EXECUTIONS = 1000;
 
-    private TransferListener transferListener = new Debug();
+    private static final String TEST_USER_AGENT = "Test-Agent/1.0";
+
+    private WagonManager wagonManager;
 
     private ArtifactFactory artifactFactory;
 
@@ -65,7 +64,7 @@ public class DefaultWagonManagerTest
         super.setUp();
 
         wagonManager = (WagonManager) lookup( WagonManager.ROLE );
-        
+
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
 
@@ -81,7 +80,7 @@ public class DefaultWagonManagerTest
         assertFalse( artifact.getFile().exists() );
         return artifact;
     }
-    
+
     private Artifact createTestArtifact( String directory, String type )
         throws IOException
     {
@@ -94,12 +93,12 @@ public class DefaultWagonManagerTest
         assertFalse( artifact.getFile().exists() );
         return artifact;
     }
-    
+
     public void testAddMirrorWithNullRepositoryId()
     {
         wagonManager.addMirror( null, "test", "http://www.nowhere.com/" );
     }
-    
+
     public void testGetArtifactSha1MissingMd5Present()
         throws IOException, UnsupportedProtocolException, TransferFailedException, ResourceDoesNotExistException
     {
@@ -110,7 +109,7 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ) + ".md5", "bad_checksum" );
-        
+
         wagonManager.getArtifact( artifact, repo );
 
         assertTrue( artifact.getFile().exists() );
@@ -122,7 +121,7 @@ public class DefaultWagonManagerTest
             new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub() );
         return repo;
     }
-    
+
     /**
      * checks the handling of urls
      */
@@ -257,18 +256,16 @@ public class DefaultWagonManagerTest
      */
     public void testMirrorStopOnFirstMatch()
     {
-        //exact matches win first
+        // exact matches win first
         wagonManager.addMirror( "a2", "a,b", "http://a2" );
         wagonManager.addMirror( "a", "a", "http://a" );
-        //make sure repeated entries are skipped
+        // make sure repeated entries are skipped
         wagonManager.addMirror( "a", "a", "http://a3" );
-        
+
         wagonManager.addMirror( "b", "b", "http://b" );
         wagonManager.addMirror( "c", "d,e", "http://de" );
         wagonManager.addMirror( "c", "*", "http://wildcard" );
         wagonManager.addMirror( "c", "e,f", "http://ef" );
-        
-    
 
         ArtifactRepository repo = null;
         repo = wagonManager.getMirrorRepository( getRepo( "a", "http://a.a" ) );
@@ -279,18 +276,18 @@ public class DefaultWagonManagerTest
 
         repo = wagonManager.getMirrorRepository( getRepo( "c", "http://c.c" ) );
         assertEquals( "http://wildcard", repo.getUrl() );
-        
+
         repo = wagonManager.getMirrorRepository( getRepo( "d", "http://d" ) );
         assertEquals( "http://de", repo.getUrl() );
-        
+
         repo = wagonManager.getMirrorRepository( getRepo( "e", "http://e" ) );
         assertEquals( "http://de", repo.getUrl() );
-        
+
         repo = wagonManager.getMirrorRepository( getRepo( "f", "http://f" ) );
         assertEquals( "http://wildcard", repo.getUrl() );
 
     }
-    
+
     /**
      * Build an ArtifactRepository object.
      * 
@@ -384,6 +381,52 @@ public class DefaultWagonManagerTest
         }
     }
 
+    public void testGetWagonMultithreaded()
+        throws Throwable
+    {
+        DefaultWagonManager manager = (DefaultWagonManager) wagonManager;
+        manager.setHttpUserAgent( TEST_USER_AGENT );
+        assertNotNull( manager.getHttpUserAgent() );
+
+        TestFramework.runOnce( new MultithreadedTestCase()
+        {
+            private Repository repository;
+
+            public void initialize()
+            {
+                repository = new Repository();
+                repository.setProtocol( "http" );
+                repository.setId( "server" );
+            }
+
+            public void thread1()
+                throws Exception
+            {
+                for ( int i = 0; i < NUM_EXECUTIONS; i++ )
+                {
+                    runThread();
+                }
+            }
+
+            public void thread2()
+                throws Exception
+            {
+                for ( int i = 0; i < NUM_EXECUTIONS; i++ )
+                {
+                    runThread();
+                }
+            }
+
+            private void runThread()
+                throws Exception
+            {
+                LightweightHttpWagon wagon = (LightweightHttpWagon) wagonManager.getWagon( repository );
+                assertEquals( TEST_USER_AGENT, wagon.getHttpHeaders().getProperty( "User-Agent" ) );
+                container.release( wagon );
+            }
+        } );
+    }
+
     /**
      * Checks the verification of checksums.
      */
@@ -399,7 +442,7 @@ public class DefaultWagonManagerTest
         Artifact artifact = createTestArtifact( "target/test-data/sample-art", "jar" );
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
-        
+
         artifact.getFile().delete();
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "lower-case-checksum" );

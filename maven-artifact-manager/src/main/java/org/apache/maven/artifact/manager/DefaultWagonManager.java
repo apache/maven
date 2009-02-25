@@ -1038,9 +1038,7 @@ public class DefaultWagonManager
         configureWagon( wagon, repository.getId(), repository.getProtocol() );
     }
 
-    private void configureWagon( Wagon wagon,
-                                 String repositoryId,
-                                 String protocol )
+    private void configureWagon( Wagon wagon, String repositoryId, String protocol )
         throws WagonConfigurationException
     {
         PlexusConfiguration config = (PlexusConfiguration) serverConfigurationMap.get( repositoryId ); 
@@ -1054,7 +1052,7 @@ public class DefaultWagonManager
             ComponentConfigurator componentConfigurator = null;
             try
             {
-                componentConfigurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE );
+                componentConfigurator = (ComponentConfigurator) container.lookup( ComponentConfigurator.ROLE, "wagon" );
                 componentConfigurator.configureComponent( wagon, config, container.getContainerRealm() );
             }
             catch ( final ComponentLookupException e )
