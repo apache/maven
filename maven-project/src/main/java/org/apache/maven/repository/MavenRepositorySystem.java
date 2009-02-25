@@ -87,8 +87,6 @@ public interface MavenRepositorySystem
 
     ArtifactRepository createRepository( String url, String repositoryId );
 
-    ArtifactRepository createRepository( String url, String repositoryId, ArtifactRepositoryPolicy snapshotsPolicy, ArtifactRepositoryPolicy releasesPolicy );
-
     void setGlobalUpdatePolicy( String policy );
 
     void setGlobalChecksumPolicy( String policy );

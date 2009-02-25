@@ -335,11 +335,6 @@ public class LegacyMavenRepositorySystem
         return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
     }
 
-    public ArtifactRepository createRepository( String url, String repositoryId, ArtifactRepositoryPolicy snapshotsPolicy, ArtifactRepositoryPolicy releasesPolicy )
-    {
-        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
-    }
-
     public void setGlobalUpdatePolicy( String policy )
     {
         artifactRepositoryFactory.setGlobalUpdatePolicy( policy );
