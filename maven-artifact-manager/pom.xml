@@ -68,7 +68,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>edu.umd.cs.mtc</groupId>
-      <artifactId>multithreadedtc</artifactId>
+      <artifactId>multithreadedtc-jdk14</artifactId>
       <version>1.01</version>
       <scope>test</scope>
     </dependency>
