@@ -625,8 +625,27 @@ public class DefaultPluginManager
         }
         catch ( ComponentLookupException e )
         {
-            throw new PluginManagerException( "Unable to find the mojo '" + mojoDescriptor.getRoleHint() +
-                "' in the plugin '" + pluginDescriptor.getPluginLookupKey() + "'", e );
+            Throwable cause = e.getCause();
+            while( cause != null && !(cause instanceof NoClassDefFoundError ) )
+            {
+                cause = cause.getCause();
+            }
+            
+            if ( cause != null && ( cause instanceof NoClassDefFoundError ) )
+            {
+                throw new PluginManagerException( "Unable to load the mojo '" + mojoDescriptor.getRoleHint()
+                                                  + "' in the plugin '" + pluginDescriptor.getPluginLookupKey() + "'. A required class is missing: "
+                                                  + cause.getMessage(), e );
+            }
+            
+            throw new PluginManagerException( "Unable to find the mojo '" + mojoDescriptor.getGoal() +
+                "' (or one of its required components) in the plugin '" + pluginDescriptor.getPluginLookupKey() + "'", e );
+        }
+        catch ( NoClassDefFoundError e )
+        {
+            throw new PluginManagerException( "Unable to load the mojo '" + mojoDescriptor.getRoleHint()
+                + "' in the plugin '" + pluginDescriptor.getPluginLookupKey() + "'. A required class is missing: "
+                + e.getMessage(), e );
         }
 
         if ( plugin instanceof ContextEnabled )
@@ -1316,6 +1335,11 @@ public class DefaultPluginManager
             throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
                                                     "Unable to retrieve component configurator for plugin configuration",
                                                     e );
+        }
+        catch ( NoClassDefFoundError e )
+        {
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
+                                                    "A required class was missing during mojo configuration: " + e.getMessage(), e );
         }
         catch ( LinkageError e )
         {

@@ -33,7 +33,7 @@ public class PluginManagerException
         super( message );
     }
 
-    public PluginManagerException( String message, Exception e )
+    public PluginManagerException( String message, Throwable e )
     {
         super( message, e );
     }
