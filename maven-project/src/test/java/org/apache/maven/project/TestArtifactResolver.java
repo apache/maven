@@ -62,7 +62,7 @@ public class TestArtifactResolver
 
     @Requirement
     private MavenRepositorySystem repositorySystem;
-    
+        
     static class Source
         implements ArtifactMetadataSource
     {

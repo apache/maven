@@ -20,6 +20,7 @@ package org.apache.maven.project;
  */
 
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -28,5 +29,8 @@ public class TestProjectBuilder
     extends DefaultMavenProjectBuilder
 {
     @Requirement(hint="test")
-    private ArtifactResolver artifactResolver;    
+    private ArtifactResolver artifactResolver;
+    
+    @Requirement(hint="test")
+    private MavenRepositorySystem repositorySystem;        
 }

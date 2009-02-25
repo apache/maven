@@ -1705,8 +1705,7 @@ public class MavenProject
                                 ArtifactFilter dependencyFilter )
         throws InvalidDependencyVersionException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope,
-                                                    dependencyFilter, this );
+        return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope, dependencyFilter, this );
     }
 
     public void addProjectReference( MavenProject project )

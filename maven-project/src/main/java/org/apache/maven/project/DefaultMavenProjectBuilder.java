@@ -257,7 +257,7 @@ public class DefaultMavenProjectBuilder
             .setMetadataSource( repositorySystem );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
-
+                
         project.setArtifacts( result.getArtifacts() );
 
         return new MavenProjectBuildingResult( project, result );

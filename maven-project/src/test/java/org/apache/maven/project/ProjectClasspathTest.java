@@ -29,6 +29,12 @@ public class ProjectClasspathTest
 {
     private String dir = "projects/scope/";
     
+    public void setUp() throws Exception 
+    {
+		super.setUp();
+		projectBuilder = lookup(MavenProjectBuilder.class, "test");
+	}
+    
     public void testProjectClasspath()
         throws Exception
     {
@@ -51,7 +57,6 @@ public class ProjectClasspathTest
         assertNull( "Check no provided dependencies are transitive", artifact );
         artifact = getArtifact( project, "maven-test-test", "scope-test" );
         assertNull( "Check no test dependencies are transitive", artifact );
-
 
         artifact = getArtifact( project, "maven-test-test", "scope-compile" );
         System.out.println( "a = " + artifact );
@@ -104,7 +109,8 @@ public class ProjectClasspathTest
     }
 
     private Artifact getArtifact( MavenProject project, String groupId, String artifactId )
-    {  System.out.println(groupId + ":" + artifactId);
+    {  
+    	System.out.println( "[ Looking for " + groupId + ":" + artifactId + " ]");
         for ( Iterator i = project.getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
