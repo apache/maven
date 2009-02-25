@@ -31,6 +31,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.Build;
@@ -194,7 +196,22 @@ public class DefaultMavenProjectBuilder
         }
         
         File f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-        repositorySystem.findModelFromRepository( artifact, artifactRepositories, localRepository );
+        try
+        {
+            repositorySystem.findModelFromRepository( artifact, artifactRepositories, localRepository );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new ProjectBuildingException( project.getId(), "Error resolving project artifact.", e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new ProjectBuildingException( project.getId(), "Error finding project artifact.", e );
+        }
+        catch ( InvalidRepositoryException e )
+        {
+            throw new ProjectBuildingException( project.getId(), "Error with repository specified in project.", e );
+        }
 
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 

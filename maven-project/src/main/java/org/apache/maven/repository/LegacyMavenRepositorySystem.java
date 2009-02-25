@@ -53,7 +53,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
@@ -128,7 +127,7 @@ public class LegacyMavenRepositorySystem
         {
             return null;
         }
-        
+
         return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope );
     }
 
@@ -143,7 +142,7 @@ public class LegacyMavenRepositorySystem
         {
             return null;
         }
-        
+
         return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
     }
 
@@ -160,8 +159,8 @@ public class LegacyMavenRepositorySystem
         }
 
         return artifactFactory.createExtensionArtifact( groupId, artifactId, versionRange );
-    }    
-    
+    }
+
     public Artifact createParentArtifact( String groupId, String artifactId, String version )
     {
         return artifactFactory.createParentArtifact( groupId, artifactId, version );
@@ -178,7 +177,7 @@ public class LegacyMavenRepositorySystem
         {
             return null;
         }
-        
+
         return artifactFactory.createPluginArtifact( groupId, artifactId, versionRange );
     }
 
@@ -348,7 +347,7 @@ public class LegacyMavenRepositorySystem
     // Taken from RepositoryHelper
 
     public void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
-        throws ProjectBuildingException
+        throws InvalidRepositoryException, ArtifactResolutionException, ArtifactNotFoundException    
     {
 
         if ( cache.containsKey( artifact.getId() ) )
@@ -374,26 +373,15 @@ public class LegacyMavenRepositorySystem
             projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
         }
 
-        try
-        {
-            artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
+        artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
 
-            File file = projectArtifact.getFile();
-            artifact.setFile( file );
-            cache.put( artifact.getId(), artifact );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new ProjectBuildingException( projectId, "Error getting POM for '" + projectId + "' from the repository: " + e.getMessage(), e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " + e.getMessage(), e );
-        }
+        File file = projectArtifact.getFile();
+        artifact.setFile( file );
+        cache.put( artifact.getId(), artifact );
     }
 
     private List normalizeToArtifactRepositories( List remoteArtifactRepositories, String projectId )
-        throws ProjectBuildingException
+        throws InvalidRepositoryException
     {
         List normalized = new ArrayList( remoteArtifactRepositories.size() );
 
@@ -409,21 +397,14 @@ public class LegacyMavenRepositorySystem
             else if ( item instanceof Repository )
             {
                 Repository repo = (Repository) item;
-                try
-                {
-                    item = buildArtifactRepository( repo );
+                item = buildArtifactRepository( repo );
 
-                    normalized.add( item );
-                    normalizationNeeded = true;
-                }
-                catch ( InvalidRepositoryException e )
-                {
-                    throw new ProjectBuildingException( projectId, "Error building artifact repository for id: " + repo.getId(), e );
-                }
+                normalized.add( item );
+                normalizationNeeded = true;
             }
             else
             {
-                throw new ProjectBuildingException( projectId, "Error building artifact repository from non-repository information item: " + item );
+                throw new InvalidRepositoryException( projectId, "Error building artifact repository from non-repository information item: " + item );
             }
         }
 
@@ -471,8 +452,8 @@ public class LegacyMavenRepositorySystem
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
         return artifactResolver.resolve( request );
-    }    
-    
+    }
+
     // ------------------------------------------------------------------------
     // Extracted from DefaultWagonManager
     // ------------------------------------------------------------------------

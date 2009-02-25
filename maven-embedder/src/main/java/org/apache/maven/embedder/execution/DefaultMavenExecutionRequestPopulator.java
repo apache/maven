@@ -208,8 +208,8 @@ public class DefaultMavenExecutionRequestPopulator
 
                 profileManager.addProfile( profile );
 
-                // We need to convert profile repositories to artifact repositories
-
+                // We need to convert profile repositories to artifact repositories                
+                
                 for ( Iterator j = profile.getRepositories().iterator(); j.hasNext(); )
                 {
                     Repository r = (Repository) j.next();

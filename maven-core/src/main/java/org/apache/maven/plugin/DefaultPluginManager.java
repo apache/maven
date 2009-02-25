@@ -138,7 +138,7 @@ public class DefaultPluginManager
     protected PluginVersionManager pluginVersionManager;
 
     @Requirement
-    protected MavenRepositorySystem repositoryTools;
+    protected MavenRepositorySystem repositorySystem;
 
     @Requirement
     protected RuntimeInformation runtimeInformation;
@@ -393,7 +393,7 @@ public class DefaultPluginManager
         
         try
         {
-            projectPluginDependencies = repositoryTools.createArtifacts(
+            projectPluginDependencies = repositorySystem.createArtifacts(
                                                                              plugin.getDependencies(),
                                                                              null,
                                                                              coreArtifactFilterManager.getCoreArtifactFilter(),
@@ -409,7 +409,7 @@ public class DefaultPluginManager
 
         try
         {
-            resolutionGroup = repositoryTools.retrieve( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
+            resolutionGroup = repositorySystem.retrieve( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
@@ -458,9 +458,9 @@ public class DefaultPluginManager
             .setRemoteRepostories( repositories.isEmpty() ? Collections.EMPTY_LIST : new ArrayList( repositories ) )
             .setManagedVersionMap( pluginManagedDependencies )
             .setFilter( filter )                
-            .setMetadataSource( repositoryTools );        
+            .setMetadataSource( repositorySystem );        
         
-        ArtifactResolutionResult result = repositoryTools.resolve( request );
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         if ( result.hasErrorArtifactExceptions() )
         {
@@ -548,13 +548,13 @@ public class DefaultPluginManager
                 MavenProject p = (MavenProject) i.next();
 
                 resolveTransitiveDependencies( session,
-                                               repositoryTools,
+                                               repositorySystem,
                                                mojoDescriptor.isDependencyResolutionRequired(),
                                                p,
                                                mojoDescriptor.isAggregator() );
             }
 
-            downloadDependencies( project, session, repositoryTools );
+            downloadDependencies( project, session, repositorySystem );
         }
 
         String goalName = mojoDescriptor.getFullGoalName();
