@@ -181,7 +181,7 @@ public class LegacyMavenRepositorySystem
         return artifactFactory.createPluginArtifact( groupId, artifactId, versionRange );
     }
 
-    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
+    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper project )
         throws InvalidDependencyVersionException
     {
         return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, project );

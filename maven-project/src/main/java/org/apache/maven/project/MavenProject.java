@@ -68,6 +68,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.repository.MavenRepositoryWrapper;
 import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -87,7 +88,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * </ol>
  */
 public class MavenProject
-    implements Cloneable
+    implements Cloneable, MavenRepositoryWrapper
 {
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
 
@@ -1704,6 +1705,11 @@ public class MavenProject
     public String getDefaultGoal()
     {
         return getBuild() != null ? getBuild().getDefaultGoal() : null;
+    }
+    
+    public Artifact find( Artifact artifact )
+    {
+        return replaceWithActiveArtifact( artifact );
     }
 
     public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )

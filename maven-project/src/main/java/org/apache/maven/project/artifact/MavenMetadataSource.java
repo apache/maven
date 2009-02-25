@@ -55,6 +55,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.validation.ModelValidationResult;
+import org.apache.maven.repository.MavenRepositoryWrapper;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -461,7 +462,7 @@ public class MavenMetadataSource
                                                  List<Dependency> dependencies,
                                                  String inheritedScope, 
                                                  ArtifactFilter dependencyFilter,
-                                                 MavenProject project )
+                                                 MavenRepositoryWrapper reactor )
         throws InvalidDependencyVersionException
     {
         Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>( dependencies.size() );
@@ -486,7 +487,7 @@ public class MavenMetadataSource
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new InvalidDependencyVersionException( project.getId(), d, project.getFile(), e );
+                throw new InvalidDependencyVersionException( reactor.getId(), d, reactor.getFile(), e );
             }
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),
@@ -527,9 +528,9 @@ public class MavenMetadataSource
 
                 artifact.setDependencyFilter( artifactFilter );
 
-                if ( project != null )
+                if ( reactor != null )
                 {
-                    artifact = project.replaceWithActiveArtifact( artifact );
+                    artifact = reactor.find( artifact );
                 }
 
                 projectArtifacts.add( artifact );
