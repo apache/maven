@@ -49,9 +49,6 @@ import org.apache.maven.wagon.events.TransferListener;
 public interface MavenRepositorySystem
     extends ArtifactMetadataSource // This needs to be removed
 {
-    // More then one "local" repository is required, could be layered locals or workspaces
-    // Remove ResolutionGroup
-    // Only have one resolve() method
     // Artifact creation: This needs to be reduced to fewer, if not one, method. 
 
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
@@ -71,7 +68,7 @@ public interface MavenRepositorySystem
     Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, boolean optional );
 
     Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, String inheritedScope );
-
+    
     Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
         throws InvalidDependencyVersionException;
 
@@ -84,8 +81,7 @@ public interface MavenRepositorySystem
     // maven model
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
-
-    // Just use a File here
+        
     ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException;
 
@@ -97,6 +93,8 @@ public interface MavenRepositorySystem
 
     // Artifact resolution
 
+    //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
+
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     // This can be reduced to the request/result
@@ -104,7 +102,7 @@ public interface MavenRepositorySystem
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
-        throws ProjectBuildingException;
+        throws InvalidRepositoryException, ArtifactResolutionException, ArtifactNotFoundException;
 
     // Version retrieval or metadata operations
 
@@ -113,14 +111,14 @@ public interface MavenRepositorySystem
 
     List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
-
+    
     // These are only showing up in tests, not called from anywhere else in the core
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
 
     public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
-
+        
     // Mirrors
 
     ArtifactRepository getMirrorRepository( ArtifactRepository repository );
@@ -134,11 +132,11 @@ public interface MavenRepositorySystem
     void addMirror( String id, String mirrorOf, String url );
 
     // Network enablement
-
+    
     void setOnline( boolean online );
 
     boolean isOnline();
-
+    
     // This doesn't belong here
     void setInteractive( boolean interactive );
 
