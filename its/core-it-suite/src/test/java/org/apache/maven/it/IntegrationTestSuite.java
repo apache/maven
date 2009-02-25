@@ -239,6 +239,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2739RequiredRepositoryElementsTest.class );
         suite.addTestSuite( MavenITmng2720SiblingClasspathArtifactsTest.class );
         suite.addTestSuite( MavenITmng2695OfflinePluginSnapshotsTest.class );
+        suite.addTestSuite( MavenITmng2690MojoLoadingErrorsTest.class );
         suite.addTestSuite( MavenITmng2668UsePluginDependenciesForSortingTest.class );
         suite.addTestSuite( MavenITmng2605BogusProfileActivationTest.class );
         suite.addTestSuite( MavenITmng2591MergeInheritedPluginConfigTest.class );

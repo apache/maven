@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>maven-it-plugins</artifactId>
+    <groupId>org.apache.maven.its.plugins</groupId>
+    <version>2.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>maven-it-plugin-error</artifactId>
+  <packaging>maven-plugin</packaging>
+  
+  <name>Maven Integration Test Plugin :: Error Mojos</name>
+  <description>
+    A test plugin that throws various sorts of errors when loaded or executed. This plugin is designed to test Maven's ability
+    to repackage runtime exceptions and other similar errors in a way that helps the user.
+  </description>
+  <inceptionYear>2009</inceptionYear>
+
+  <properties>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <excludes>
+            <exclude>**/org/apache/maven/plugin/coreit/MojoComponentLookupExceptionMojo*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

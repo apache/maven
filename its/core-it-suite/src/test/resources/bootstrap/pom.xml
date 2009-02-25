@@ -149,6 +149,12 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-error</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>maven-it-plugin-fork</artifactId>
       <version>${itPluginVersion}</version>
       <scope>runtime</scope>
