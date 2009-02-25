@@ -46,6 +46,7 @@ public class MavenMetadataSourceTest
     protected void setUp()
         throws Exception
     {
+        super.setUp();
         repositorySystem = lookup( MavenRepositorySystem.class );
     }
     
@@ -113,9 +114,7 @@ public class MavenMetadataSourceTest
 
         MavenProject project = new MavenProject( model );
 
-        ArtifactFactory factory = lookup( ArtifactFactory.class );
-
-        project.setArtifacts( project.createArtifacts( factory, null, null ) );
+        project.setArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
 
         String key = ArtifactUtils.versionlessKey( groupId, artifactId );
 
@@ -166,10 +165,8 @@ public class MavenMetadataSourceTest
 
         injector.injectDefaults( model );
 
-        ArtifactFactory factory = lookup( ArtifactFactory.class );
-
-        project.setArtifacts( project.createArtifacts( factory, null, null ) );
-
+        project.setArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
+        
         String key = ArtifactUtils.versionlessKey( groupId, artifactId );
 
         Map artifactMap = project.getArtifactMap();
