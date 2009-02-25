@@ -29,6 +29,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.ArrayList;
@@ -39,7 +40,14 @@ import java.util.Set;
 
 public class MavenMetadataSourceTest
     extends PlexusTestCase
-{
+{    
+    private MavenRepositorySystem repositorySystem;
+    
+    protected void setUp()
+        throws Exception
+    {
+        repositorySystem = lookup( MavenRepositorySystem.class );
+    }
     
     public void testShouldNotCarryExclusionsOverFromDependencyToDependency()
         throws Exception
@@ -72,7 +80,7 @@ public class MavenMetadataSourceTest
         
         MavenProject project = new MavenProject( new Model() );
         
-        Set result = MavenMetadataSource.createArtifacts( factory, deps, null, dependencyFilter, project );
+        Set result = repositorySystem.createArtifacts( deps, null, dependencyFilter, project );
         
         for ( Iterator it = result.iterator(); it.hasNext(); )
         {
