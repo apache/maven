@@ -226,7 +226,7 @@ under the License.
                     <artifactItem>
                       <groupId>emma</groupId>
                       <artifactId>emma</artifactId>
-                      <version>2.0.5312</version>
+                      <version>2.1.5320</version>
                     </artifactItem>
                   </artifactItems>
                   <outputDirectory>${project.build.directory}/distro/lib</outputDirectory>
@@ -237,7 +237,7 @@ under the License.
           <plugin>
             <groupId>org.sonatype.maven.plugin</groupId>
             <artifactId>emma4it-maven-plugin</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <version>1.2</version>
             <configuration>
               <jarSets>
                 <jarSet>
@@ -284,18 +284,6 @@ under the License.
           </plugin>
         </plugins>
       </build>
-      <repositories>
-        <repository>
-          <id>sonatype.org</id>
-          <url>http://repository.sonatype.org/content/groups/public</url>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>sonatype.org</id>
-          <url>http://repository.sonatype.org/content/groups/public</url>
-        </pluginRepository>
-      </pluginRepositories>
     </profile>
   </profiles>
 </project>
