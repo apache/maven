@@ -1661,7 +1661,7 @@ public class MavenProject
     public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter dependencyFilter )
         throws InvalidDependencyVersionException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope, dependencyFilter, this );
+        return repositorySystem.createArtifacts( getDependencies(), inheritedScope, dependencyFilter, this );
     }
 
     public void addProjectReference( MavenProject project )
