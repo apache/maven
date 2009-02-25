@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,15 +46,17 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
@@ -180,14 +183,88 @@ public class LegacyMavenRepositorySystem
         return artifactFactory.createPluginArtifact( groupId, artifactId, versionRange );
     }
 
-    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper project )
+    /**
+     * @return {@link Set} &lt; {@link Artifact} >
+     * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
+     */
+    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
         throws InvalidDependencyVersionException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, project );
-    }
+        Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>( dependencies.size() );
 
-    //
+        for ( Iterator<Dependency> i = dependencies.iterator(); i.hasNext(); )
+        {
+            Dependency d = i.next();
 
+            String scope = d.getScope();
+
+            if ( StringUtils.isEmpty( scope ) )
+            {
+                scope = Artifact.SCOPE_COMPILE;
+
+                d.setScope( scope );
+            }
+
+            VersionRange versionRange;
+            try
+            {
+                versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new InvalidDependencyVersionException( reactor.getId(), d, reactor.getFile(), e );
+            }
+            Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
+                                                                          versionRange, d.getType(), d.getClassifier(),
+                                                                          scope, inheritedScope, d.isOptional() );
+
+            if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
+            {
+                artifact.setFile( new File( d.getSystemPath() ) );
+            }
+
+            ArtifactFilter artifactFilter = dependencyFilter;
+
+            if ( ( artifact != null ) && ( ( artifactFilter == null ) || artifactFilter.include( artifact ) ) )
+            {
+                if ( ( d.getExclusions() != null ) && !d.getExclusions().isEmpty() )
+                {
+                    List<String> exclusions = new ArrayList<String>();
+                    for ( Iterator<Exclusion> j = d.getExclusions().iterator(); j.hasNext(); )
+                    {
+                        Exclusion e = j.next();
+                        exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
+                    }
+
+                    ArtifactFilter newFilter = new ExcludesArtifactFilter( exclusions );
+
+                    if ( artifactFilter != null )
+                    {
+                        AndArtifactFilter filter = new AndArtifactFilter();
+                        filter.add( artifactFilter );
+                        filter.add( newFilter );
+                        artifactFilter = filter;
+                    }
+                    else
+                    {
+                        artifactFilter = newFilter;
+                    }
+                }
+
+                artifact.setDependencyFilter( artifactFilter );
+
+                if ( reactor != null )
+                {
+                    artifact = reactor.find( artifact );
+                }
+
+                projectArtifacts.add( artifact );
+            }
+        }
+
+        return projectArtifacts;
+    }    
+    
     public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
