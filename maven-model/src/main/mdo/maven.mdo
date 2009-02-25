@@ -2395,7 +2395,7 @@
 
     <class>
       <name>DeploymentRepository</name>
-      <superClass>RepositoryBase</superClass>
+      <superClass>Repository</superClass>
       <version>4.0.0</version>
       <description>Repository contains the information needed for deploying to the remote
         repository.</description>

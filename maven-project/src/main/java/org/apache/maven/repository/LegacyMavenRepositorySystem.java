@@ -53,8 +53,6 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DeploymentRepository;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.project.MavenProject;
@@ -201,22 +199,6 @@ public class LegacyMavenRepositorySystem
         }
         
         return repos;
-    }
-
-    public ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo )
-        throws InvalidRepositoryException
-    {
-        if ( repo != null )
-        {
-            String id = repo.getId();
-            String url = repo.getUrl();
-
-            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(), repo.isUniqueVersion() );
-        }
-        else
-        {
-            return null;
-        }
     }
 
     public ArtifactRepository buildArtifactRepository( Repository repo )

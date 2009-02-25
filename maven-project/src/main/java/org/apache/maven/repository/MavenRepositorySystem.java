@@ -80,10 +80,6 @@ public interface MavenRepositorySystem
         throws InvalidRepositoryException;
 
     // maven model
-    ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repository )
-        throws InvalidRepositoryException;
-
-    // maven model
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
         

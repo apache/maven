@@ -207,12 +207,12 @@ public class MavenProject
      *
      * @param model - may not be null
      * @param artifactFactory - may not be null
-     * @param mavenTools - may not be null
+     * @param repositorySystem - may not be null
      * @param mavenProjectBuilder
      * @param projectBuilderConfiguration
      * @throws InvalidRepositoryException
      */
-    public MavenProject( Model model, MavenRepositorySystem mavenTools, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
+    public MavenProject( Model model, MavenRepositorySystem repositorySystem, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
         if(model == null)
@@ -220,7 +220,7 @@ public class MavenProject
             throw new IllegalArgumentException("model: null");
         }
 
-        if(mavenTools == null)
+        if(repositorySystem == null)
         {
             throw new IllegalArgumentException("mavenTools: null");
         }
@@ -228,18 +228,18 @@ public class MavenProject
         setModel( model );
         this.mavenProjectBuilder = mavenProjectBuilder;
         this.projectBuilderConfiguration = projectBuilderConfiguration;
-        this.repositorySystem = mavenTools;
+        this.repositorySystem = repositorySystem;
         originalModel = model;
         DistributionManagement dm = model.getDistributionManagement();
 
         if ( dm != null )
         {
-            ArtifactRepository repo = mavenTools.buildDeploymentArtifactRepository( dm.getRepository() );
+            ArtifactRepository repo = repositorySystem.buildArtifactRepository( dm.getRepository() );
             setReleaseArtifactRepository( repo );
 
             if ( dm.getSnapshotRepository() != null )
             {
-                repo = mavenTools.buildDeploymentArtifactRepository( dm.getSnapshotRepository() );
+                repo = repositorySystem.buildArtifactRepository( dm.getSnapshotRepository() );
                 setSnapshotArtifactRepository( repo );
             }
         }
@@ -257,7 +257,7 @@ public class MavenProject
                 repoSet.addAll( model.getPluginRepositories() );
             }
 
-            setRemoteArtifactRepositories( mavenTools.buildArtifactRepositories( new ArrayList<Repository>( repoSet ) ) );
+            setRemoteArtifactRepositories( repositorySystem.buildArtifactRepositories( new ArrayList<Repository>( repoSet ) ) );
         }
         catch ( Exception e )
         {
