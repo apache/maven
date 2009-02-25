@@ -1,22 +1,18 @@
 package org.apache.maven.project;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
@@ -42,9 +38,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -79,13 +73,14 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
- * The concern of the project is provide runtime values based on the model. <p/>
- * The values in the model remain untouched but during the process of building a
- * project notions like inheritance and interpolation can be added. This allows
- * to have an entity which is useful in a runtime while preserving the model so
- * that it can be marshalled and unmarshalled without being tainted by runtime
- * requirements. <p/>We need to leave the model intact because we don't want
- * the following:
+ * The concern of the project is provide runtime values based on the model.
+ * <p/>
+ * The values in the model remain untouched but during the process of building a project notions
+ * like inheritance and interpolation can be added. This allows to have an entity which is useful in
+ * a runtime while preserving the model so that it can be marshalled and unmarshalled without being
+ * tainted by runtime requirements.
+ * <p/>
+ * We need to leave the model intact because we don't want the following:
  * <ol>
  * <li>We don't want interpolated values being written back into the model.
  * <li>We don't want inherited values being written back into the model.
@@ -166,7 +161,7 @@ public class MavenProject
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ProjectBuilderConfiguration projectBuilderConfiguration;
-    
+
     private MavenRepositorySystem repositorySystem;
     //
 
@@ -195,16 +190,16 @@ public class MavenProject
 
     public MavenProject( Model model )
     {
-        if(model == null)
+        if ( model == null )
         {
-            throw new IllegalArgumentException("model: null");
+            throw new IllegalArgumentException( "model: null" );
         }
         setModel( model );
     }
 
     /**
      * Constructor
-     *
+     * 
      * @param model - may not be null
      * @param artifactFactory - may not be null
      * @param repositorySystem - may not be null
@@ -215,14 +210,14 @@ public class MavenProject
     public MavenProject( Model model, MavenRepositorySystem repositorySystem, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
-        if(model == null)
+        if ( model == null )
         {
-            throw new IllegalArgumentException("model: null");
+            throw new IllegalArgumentException( "model: null" );
         }
 
-        if(repositorySystem == null)
+        if ( repositorySystem == null )
         {
-            throw new IllegalArgumentException("mavenTools: null");
+            throw new IllegalArgumentException( "mavenTools: null" );
         }
 
         setModel( model );
@@ -371,9 +366,7 @@ public class MavenProject
             {
                 try
                 {
-                    parent = mavenProjectBuilder.buildFromRepository( getParentArtifact(),
-                                                                      this.remoteArtifactRepositories,
-                                                                      projectBuilderConfiguration.getLocalRepository() );
+                    parent = mavenProjectBuilder.buildFromRepository( getParentArtifact(), this.remoteArtifactRepositories, projectBuilderConfiguration.getLocalRepository() );
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -520,8 +513,7 @@ public class MavenProject
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
-                    Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
                     addArtifactPath( a, list );
                 }
@@ -542,8 +534,7 @@ public class MavenProject
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
-                    Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
                     list.add( a );
                 }
@@ -568,8 +559,7 @@ public class MavenProject
             Artifact a = (Artifact) i.next();
 
             // TODO: let the scope handler deal with this
-            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) ||
-                Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
 
@@ -1102,10 +1092,10 @@ public class MavenProject
     }
 
     /**
-     * All dependencies that this project has, including transitive ones.
-     * Contents are lazily populated, so depending on what phases have run dependencies in some scopes won't be included.
-     * eg. if only compile phase has run, dependencies with scope test won't be included.
-     *
+     * All dependencies that this project has, including transitive ones. Contents are lazily
+     * populated, so depending on what phases have run dependencies in some scopes won't be
+     * included. eg. if only compile phase has run, dependencies with scope test won't be included.
+     * 
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
@@ -1147,18 +1137,13 @@ public class MavenProject
                     version = p.getVersion();
                 }
 
-                Artifact artifact;
-                try
-                {
-                    artifact = repositorySystem.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
-                                                                VersionRange.createFromVersionSpec( version ) );
-                }
-                catch ( InvalidVersionSpecificationException e )
+                Artifact artifact = repositorySystem.createPluginArtifact( p.getGroupId(), p.getArtifactId(), version );
+
+                if ( artifact == null )
                 {
                     return pluginArtifacts;
                 }
-
-                if ( artifact != null )
+                else
                 {
                     pluginArtifacts.add( artifact );
                 }
@@ -1183,7 +1168,7 @@ public class MavenProject
 
     public Set<Artifact> getReportArtifacts()
     {
-        if( reportArtifacts != null )
+        if ( reportArtifacts != null )
         {
             return reportArtifacts;
         }
@@ -1206,16 +1191,7 @@ public class MavenProject
                     version = p.getVersion();
                 }
 
-                Artifact artifact = null;
-                try
-                {
-                    artifact = repositorySystem.createPluginArtifact( p.getGroupId(), p.getArtifactId(),
-                                                                     VersionRange.createFromVersionSpec( version ) );
-                }
-                catch ( InvalidVersionSpecificationException e )
-                {
-                    //throw new InvalidProjectVersionException( projectId, "Report plugin: " + p.getKey(), version, pomLocation, e );
-                }
+                Artifact artifact = repositorySystem.createPluginArtifact( p.getGroupId(), p.getArtifactId(), version );
 
                 if ( artifact != null )
                 {
@@ -1246,7 +1222,7 @@ public class MavenProject
 
     public Set<Artifact> getExtensionArtifacts()
     {
-        if( extensionArtifacts != null )
+        if ( extensionArtifacts != null )
         {
             return extensionArtifacts;
         }
@@ -1268,16 +1244,7 @@ public class MavenProject
                     version = ext.getVersion();
                 }
 
-                Artifact artifact = null;
-                try
-                {
-                    VersionRange versionRange = VersionRange.createFromVersionSpec( version );
-                    artifact = repositorySystem.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(), versionRange );
-                }
-                catch ( InvalidVersionSpecificationException e )
-                {
-
-                }
+                Artifact artifact = repositorySystem.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(), version );
 
                 if ( artifact != null )
                 {
@@ -1423,8 +1390,8 @@ public class MavenProject
     }
 
     /**
-     * @return a list of ArtifactRepository objects constructed
-     *         from the Repository objects returned by getPluginRepositories.
+     * @return a list of ArtifactRepository objects constructed from the Repository objects returned
+     *         by getPluginRepositories.
      */
     public List<ArtifactRepository> getPluginArtifactRepositories()
     {
@@ -1433,14 +1400,12 @@ public class MavenProject
 
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
-        return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null )
-            ? getSnapshotArtifactRepository()
-            : getReleaseArtifactRepository();
+        return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null ) ? getSnapshotArtifactRepository() : getReleaseArtifactRepository();
     }
 
     public List<Repository> getPluginRepositories()
     {
-//        return model.getPluginRepositories();
+        //        return model.getPluginRepositories();
         return getModel().getRepositories();
     }
 
@@ -1461,9 +1426,9 @@ public class MavenProject
 
         if ( attachedArtifacts.contains( artifact ) )
         {
-             //should add logger to this class:
-             System.out.println("[Warning] Duplicate artifact: " + artifact.toString());
-             return;
+            //should add logger to this class:
+            System.out.println( "[Warning] Duplicate artifact: " + artifact.toString() );
+            return;
             //throw new DuplicateArtifactAttachmentException( this, artifact );
         }
 
@@ -1478,7 +1443,6 @@ public class MavenProject
         }
         return attachedArtifacts;
     }
-
 
     public Xpp3Dom getReportConfiguration( String pluginGroupId, String pluginArtifactId, String reportSetId )
     {
@@ -1544,7 +1508,7 @@ public class MavenProject
 
     /**
      * Direct dependencies that this project has.
-     *
+     * 
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getArtifacts() to get all transitive dependencies
      */
@@ -1596,58 +1560,50 @@ public class MavenProject
 
             List<Dependency> deps;
             DependencyManagement dependencyManagement = getDependencyManagement();
-            if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null ) &&
-                ( deps.size() > 0 ) )
+            if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null ) && ( deps.size() > 0 ) )
             {
                 map = new ManagedVersionMap( map );
                 for ( Iterator<Dependency> i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
                 {
                     Dependency d = i.next();
 
-                    try
-                    {
-                        VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
+                    Artifact artifact = repositorySystem.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getClassifier(), d.getScope(), d.isOptional() );
 
-                        Artifact artifact = repositorySystem.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                                      versionRange, d.getType(),
-                                                                                      d.getClassifier(), d.getScope(),
-                                                                                      d.isOptional() );
-
-                        if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && ( d.getSystemPath() != null ) )
-                        {
-                            artifact.setFile( new File( d.getSystemPath() ) );
-                        }
-
-                        // If the dependencyManagement section listed exclusions,
-                        // add them to the managed artifacts here so that transitive
-                        // dependencies will be excluded if necessary.
-
-                        if ( ( null != d.getExclusions() ) && !d.getExclusions().isEmpty() )
-                        {
-                            List<String> exclusions = new ArrayList<String>();
-
-                            for ( Iterator<Exclusion> j = d.getExclusions().iterator(); j.hasNext(); )
-                            {
-                                Exclusion e = j.next();
-
-                                exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
-                            }
-
-                            ExcludesArtifactFilter eaf = new ExcludesArtifactFilter( exclusions );
-
-                            artifact.setDependencyFilter( eaf );
-                        }
-                        else
-                        {
-                            artifact.setDependencyFilter( null );
-                        }
-
-                        map.put( d.getManagementKey(), artifact );
-                    }
-                    catch ( InvalidVersionSpecificationException e )
+                    if ( artifact == null )
                     {
                         map = Collections.emptyMap();
                     }
+
+                    if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && ( d.getSystemPath() != null ) )
+                    {
+                        artifact.setFile( new File( d.getSystemPath() ) );
+                    }
+
+                    // If the dependencyManagement section listed exclusions,
+                    // add them to the managed artifacts here so that transitive
+                    // dependencies will be excluded if necessary.
+
+                    if ( ( null != d.getExclusions() ) && !d.getExclusions().isEmpty() )
+                    {
+                        List<String> exclusions = new ArrayList<String>();
+
+                        for ( Iterator<Exclusion> j = d.getExclusions().iterator(); j.hasNext(); )
+                        {
+                            Exclusion e = j.next();
+
+                            exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
+                        }
+
+                        ExcludesArtifactFilter eaf = new ExcludesArtifactFilter( exclusions );
+
+                        artifact.setDependencyFilter( eaf );
+                    }
+                    else
+                    {
+                        artifact.setDependencyFilter( null );
+                    }
+
+                    map.put( d.getManagementKey(), artifact );
                 }
             }
             else
@@ -1701,8 +1657,7 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} >
      * @todo the lazy initialisation of this makes me uneasy.
      */
-    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
-                                ArtifactFilter dependencyFilter )
+    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter dependencyFilter )
         throws InvalidDependencyVersionException
     {
         return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope, dependencyFilter, this );
@@ -1710,8 +1665,7 @@ public class MavenProject
 
     public void addProjectReference( MavenProject project )
     {
-        projectReferences.put(
-            getProjectReferenceId( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
+        projectReferences.put( getProjectReferenceId( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
     }
 
     /**
@@ -1756,8 +1710,7 @@ public class MavenProject
     {
         if ( ( getProjectReferences() != null ) && !getProjectReferences().isEmpty() )
         {
-            String refId = getProjectReferenceId( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(),
-                                                  pluginArtifact.getVersion() );
+            String refId = getProjectReferenceId( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
             MavenProject ref = getProjectReferences().get( refId );
             if ( ( ref != null ) && ( ref.getArtifact() != null ) )
             {
@@ -1773,10 +1726,10 @@ public class MavenProject
                     }
                     else
                     {
-/* TODO...
-                        logger.warn( "Artifact found in the reactor has not been built when it's use was " +
-                            "attempted - resolving from the repository instead" );
-*/
+                        /* TODO...
+                                                logger.warn( "Artifact found in the reactor has not been built when it's use was " +
+                                                    "attempted - resolving from the repository instead" );
+                        */
                     }
                 }
 
@@ -1794,21 +1747,18 @@ public class MavenProject
 
                 /**
                  * Patch/workaround for: MNG-2871
-                 *
-                 * We want to use orginal artifact (packaging:ejb) when we are
-                 * resolving ejb-client package and we didn't manage to find
-                 * attached to project one.
-                 *
-                 * The scenario is such that somebody run "mvn test" in composity project,
-                 * and ejb-client.jar will not be attached to ejb.jar (because it is done in package phase)
-                 *
+                 * 
+                 * We want to use orginal artifact (packaging:ejb) when we are resolving ejb-client
+                 * package and we didn't manage to find attached to project one.
+                 * 
+                 * The scenario is such that somebody run "mvn test" in composity project, and
+                 * ejb-client.jar will not be attached to ejb.jar (because it is done in package
+                 * phase)
+                 * 
                  * We prefer in such a case use orginal sources (of ejb.jar) instead of failure
                  */
-                if ( ( ref.getArtifactId().equals( pluginArtifact.getArtifactId() ) ) &&
-                    ( ref.getGroupId().equals( pluginArtifact.getGroupId() ) ) &&
-                    ( ref.getArtifact().getType().equals( "ejb" ) ) &&
-                    ( pluginArtifact.getType().equals( "ejb-client" ) ) &&
-                    ( ( ref.getArtifact().getFile() != null ) && ref.getArtifact().getFile().exists() ) )
+                if ( ( ref.getArtifactId().equals( pluginArtifact.getArtifactId() ) ) && ( ref.getGroupId().equals( pluginArtifact.getGroupId() ) ) && ( ref.getArtifact().getType().equals( "ejb" ) )
+                    && ( pluginArtifact.getType().equals( "ejb-client" ) ) && ( ( ref.getArtifact().getFile() != null ) && ref.getArtifact().getFile().exists() ) )
                 {
                     pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
                     return pluginArtifact;
@@ -1863,12 +1813,11 @@ public class MavenProject
     }
 
     public void writeModel( Writer writer )
-           throws IOException
+        throws IOException
     {
         MavenXpp3Writer pomWriter = new MavenXpp3Writer();
         pomWriter.write( writer, getModel() );
     }
-
 
     /**
      * @throws CloneNotSupportedException
@@ -1961,8 +1910,7 @@ public class MavenProject
 
         if ( project.getPluginArtifactRepositories() != null )
         {
-            setPluginArtifactRepositories(
-                ( Collections.unmodifiableList( project.getPluginArtifactRepositories() ) ) );
+            setPluginArtifactRepositories( ( Collections.unmodifiableList( project.getPluginArtifactRepositories() ) ) );
         }
 
         if ( project.getCollectedProjects() != null )
@@ -1997,7 +1945,7 @@ public class MavenProject
             setScriptSourceRoots( ( new ArrayList<String>( project.getScriptSourceRoots() ) ) );
         }
 
-        setModel(  project.getModel() );
+        setModel( project.getModel() );
 
         if ( project.getOriginalModel() != null )
         {

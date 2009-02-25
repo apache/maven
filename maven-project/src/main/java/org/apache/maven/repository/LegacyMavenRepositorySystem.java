@@ -47,6 +47,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
@@ -116,28 +117,68 @@ public class LegacyMavenRepositorySystem
         return artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
     }
 
-    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, boolean optional )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, boolean optional )
     {
+        VersionRange versionRange;
+        try
+        {
+            versionRange = VersionRange.createFromVersionSpec( version );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            return null;
+        }
+        
         return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope );
     }
 
-    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, String inheritedScope )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, String inheritedScope )
     {
+        VersionRange versionRange;
+        try
+        {
+            versionRange = VersionRange.createFromVersionSpec( version );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            return null;
+        }
+        
         return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
     }
 
-    public Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange )
+    public Artifact createExtensionArtifact( String groupId, String artifactId, String version )
     {
-        return artifactFactory.createExtensionArtifact( groupId, artifactId, versionRange );
-    }
+        VersionRange versionRange;
+        try
+        {
+            versionRange = VersionRange.createFromVersionSpec( version );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            return null;
+        }
 
+        return artifactFactory.createExtensionArtifact( groupId, artifactId, versionRange );
+    }    
+    
     public Artifact createParentArtifact( String groupId, String artifactId, String version )
     {
         return artifactFactory.createParentArtifact( groupId, artifactId, version );
     }
 
-    public Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange )
+    public Artifact createPluginArtifact( String groupId, String artifactId, String version )
     {
+        VersionRange versionRange;
+        try
+        {
+            versionRange = VersionRange.createFromVersionSpec( version );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            return null;
+        }
+        
         return artifactFactory.createPluginArtifact( groupId, artifactId, versionRange );
     }
 

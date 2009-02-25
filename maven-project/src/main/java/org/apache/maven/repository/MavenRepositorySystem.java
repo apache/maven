@@ -49,8 +49,7 @@ import org.apache.maven.wagon.events.TransferListener;
 public interface MavenRepositorySystem
     extends ArtifactMetadataSource // This needs to be removed
 {
-    // Artifact creation: This needs to be reduced to fewer, if not one, method. We also need to get rid of the legacy
-    // VersionRange from the system.
+    // Artifact creation: This needs to be reduced to fewer, if not one, method. 
 
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
 
@@ -60,15 +59,15 @@ public interface MavenRepositorySystem
 
     Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId );
 
-    Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange );
+    Artifact createPluginArtifact( String groupId, String artifactId, String version );
 
-    Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange );
+    Artifact createExtensionArtifact( String groupId, String artifactId, String version );
 
     Artifact createParentArtifact( String groupId, String artifactId, String version );
 
-    Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, boolean optional );
+    Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, boolean optional );
 
-    Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, String inheritedScope );
+    Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, String inheritedScope );
     
     Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
         throws InvalidDependencyVersionException;

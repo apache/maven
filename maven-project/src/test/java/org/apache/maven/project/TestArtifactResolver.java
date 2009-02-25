@@ -169,12 +169,10 @@ public class TestArtifactResolver
 
                     d.setScope( scope );
                 }
-
-                VersionRange versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                 
                 Artifact artifact = repositorySystem.createDependencyArtifact( d.getGroupId(), 
                                                                                d.getArtifactId(),
-                                                                               versionRange, 
+                                                                               d.getVersion(), 
                                                                                d.getType(),
                                                                                d.getClassifier(), 
                                                                                scope,
