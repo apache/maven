@@ -41,6 +41,7 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -450,16 +451,22 @@ public class DefaultPluginManager
 
         repositories.addAll( project.getRemoteArtifactRepositories() );
 
-        ArtifactResolutionResult result = repositoryTools.resolveTransitively(
-                                                                                dependencies,
-                                                                                pluginArtifact,
-                                                                                pluginManagedDependencies,
-                                                                                localRepository,
-                                                                                repositories.isEmpty()
-                                                                                ? Collections.EMPTY_LIST
-                                                                                : new ArrayList( repositories ),
-                                                                                filter );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( pluginArtifact )
+            .setArtifactDependencies( dependencies )
+            .setLocalRepository( localRepository )
+            .setRemoteRepostories( repositories.isEmpty() ? Collections.EMPTY_LIST : new ArrayList( repositories ) )
+            .setManagedVersionMap( pluginManagedDependencies )
+            .setFilter( filter )                
+            .setMetadataSource( repositoryTools );        
+        
+        ArtifactResolutionResult result = repositoryTools.resolve( request );
 
+        if ( result.hasErrorArtifactExceptions() )
+        {
+            throw result.getErrorArtifactExceptions().get( 0 );
+        }
+        
         Set<Artifact> resolved = new LinkedHashSet<Artifact>();
 
         for ( Iterator<Artifact> it = result.getArtifacts().iterator(); it.hasNext(); )
@@ -1471,7 +1478,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     protected void resolveTransitiveDependencies( MavenSession context,
-                                                MavenRepositorySystem repositoryTools,
+                                                MavenRepositorySystem repositorySystem,
                                                 String scope,
                                                 MavenProject project,
                                                 boolean isAggregator )
@@ -1479,7 +1486,7 @@ public class DefaultPluginManager
         InvalidDependencyVersionException
     {
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
-        Artifact artifact = repositoryTools.createBuildArtifact( project.getGroupId(),
+        Artifact artifact = repositorySystem.createBuildArtifact( project.getGroupId(),
                                                                  project.getArtifactId(),
                                                                  project.getVersion(),
                                                                  project.getPackaging() );
@@ -1490,43 +1497,45 @@ public class DefaultPluginManager
         if ( project.getDependencyArtifacts() == null )
         {
             // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
-            project.setDependencyArtifacts( repositoryTools.createArtifacts( project.getDependencies(), null, null, project ) );
+            project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
         }
 
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( project.getArtifact() )
+            .setArtifactDependencies( project.getDependencyArtifacts() )
+            .setLocalRepository( context.getLocalRepository() )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( project.getManagedVersionMap() )
+            .setFilter( filter )                
+            .setMetadataSource( repositorySystem );
+                 
         Set resolvedArtifacts;
-        try
-        {
-            ArtifactResolutionResult result = repositoryTools.resolveTransitively(
-                                                                                   project.getDependencyArtifacts(),
-                                                                                   artifact,
-                                                                                   project.getManagedVersionMap(),
-                                                                                   context.getLocalRepository(),
-                                                                                   project.getRemoteArtifactRepositories(),
-                                                                                   filter );
+        
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
 
-            resolvedArtifacts = result.getArtifacts();
-        }
-        catch( MultipleArtifactsNotFoundException e )
+        if ( result.hasErrorArtifactExceptions() )
         {
-            /*only do this if we are an aggregating plugin: MNG-2277
+            /*
+             
+            only do this if we are an aggregating plugin: MNG-2277
             if the dependency doesn't yet exist but is in the reactor, then
-            all we can do is warn and skip it. A better fix can be inserted into 2.1*/
-            if ( isAggregator
-                 && checkMissingArtifactsInReactor( context.getSortedProjects(),
-                                                    e.getMissingArtifacts() ) )
+            all we can do is warn and skip it. A better fix can be inserted into 2.1
+            
+            */
+            if ( isAggregator && checkMissingArtifactsInReactor( context.getSortedProjects(), result.getMissingArtifacts() ) )
             {
-                resolvedArtifacts = new LinkedHashSet( e.getResolvedArtifacts() );
+                resolvedArtifacts = new LinkedHashSet( result.getArtifacts() );
             }
             else
             {
                 //we can't find all the artifacts in the reactor so bubble the exception up.
-                throw e;
+                throw result.getErrorArtifactExceptions().get( 0 );
             }
         }
-
-        project.setArtifacts( resolvedArtifacts );
+        
+        project.setArtifacts( result.getArtifacts() );
     }
 
     /**
@@ -1542,8 +1551,7 @@ public class DefaultPluginManager
      * @param missing the artifacts that can't be found
      * @return true if ALL missing artifacts are found in the reactor.
      */
-    private boolean checkMissingArtifactsInReactor( Collection projects,
-                                                    Collection missing )
+    private boolean checkMissingArtifactsInReactor( Collection projects, Collection missing )
     {
         Collection foundInReactor = new HashSet();
         Iterator iter = missing.iterator();
@@ -1582,7 +1590,7 @@ public class DefaultPluginManager
 
     private void downloadDependencies( MavenProject project,
                                        MavenSession context,
-                                       MavenRepositorySystem repositoryTools )
+                                       MavenRepositorySystem repositorySystem )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = context.getLocalRepository();
@@ -1592,7 +1600,7 @@ public class DefaultPluginManager
         {
             Artifact artifact = (Artifact) it.next();
 
-            repositoryTools.resolve( artifact, localRepository, remoteArtifactRepositories );
+            repositorySystem.resolve( artifact, localRepository, remoteArtifactRepositories );
         }
     }
 

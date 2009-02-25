@@ -86,7 +86,7 @@ public class DefaultMavenExecutionRequestPopulator
     private MavenSettingsBuilder settingsBuilder;
 
     @Requirement
-    private MavenRepositorySystem mavenTools;
+    private MavenRepositorySystem repositorySystem;
 
     // 2009-02-12 Oleg: this component is defined in maven-core components.xml
     // because it already has another declared (not generated) component
@@ -217,7 +217,7 @@ public class DefaultMavenExecutionRequestPopulator
                     ArtifactRepository ar;
                     try
                     {
-                        ar = mavenTools.buildArtifactRepository( r );
+                        ar = repositorySystem.buildArtifactRepository( r );
                     }
                     catch ( InvalidRepositoryException e )
                     {
@@ -354,12 +354,12 @@ public class DefaultMavenExecutionRequestPopulator
         {
             if ( request.isUpdateSnapshots() )
             {
-                mavenTools.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
+                repositorySystem.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
             }
             else if ( request.isNoSnapshotUpdates() )
             {
                 getLogger().info( "+ Supressing SNAPSHOT updates." );
-                mavenTools.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
+                repositorySystem.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
             }
         }
     }
@@ -371,7 +371,7 @@ public class DefaultMavenExecutionRequestPopulator
     private void checksumPolicy( MavenExecutionRequest request,
                                  Configuration configuration )
     {
-        mavenTools.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
+        repositorySystem.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
     }
 
     // ------------------------------------------------------------------------
@@ -387,17 +387,17 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.isOffline() )
         {
-            mavenTools.setOnline( false );
+            repositorySystem.setOnline( false );
         }
         else if ( ( request.getSettings() != null ) && request.getSettings().isOffline() )
         {
-            mavenTools.setOnline( false );
+            repositorySystem.setOnline( false );
         }
         else
         {
-            mavenTools.setDownloadMonitor( request.getTransferListener() );
+            repositorySystem.setDownloadMonitor( request.getTransferListener() );
 
-            mavenTools.setOnline( true );
+            repositorySystem.setOnline( true );
         } 
 
         try
@@ -422,7 +422,7 @@ public class DefaultMavenExecutionRequestPopulator
                     throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
                 }
 
-                mavenTools.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
+                repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
             }
 
             for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
@@ -441,9 +441,9 @@ public class DefaultMavenExecutionRequestPopulator
 					throw new SettingsConfigurationException( "Error decrypting server password/passphrase.", e );
 				}
                 
-                mavenTools.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
+                repositorySystem.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
 
-                mavenTools.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
+                repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
             }
 
             RepositoryPermissions defaultPermissions = new RepositoryPermissions();
@@ -452,7 +452,7 @@ public class DefaultMavenExecutionRequestPopulator
             {
                 Mirror mirror = (Mirror) i.next();
 
-                mavenTools.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+                repositorySystem.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
             }
     }
 
@@ -516,7 +516,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         try
         {
-            return mavenTools.createLocalRepository( localRepositoryPath, MavenEmbedder.DEFAULT_LOCAL_REPO_ID );
+            return repositorySystem.createLocalRepository( localRepositoryPath, MavenEmbedder.DEFAULT_LOCAL_REPO_ID );
         }
         catch ( IOException e )
         {

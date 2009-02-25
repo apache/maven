@@ -85,7 +85,8 @@ public class ArtifactResolutionResult
         {
             artifacts = new LinkedHashSet<Artifact>();
 
-            for (ResolutionNode node : resolutionNodes) {
+            for (ResolutionNode node : resolutionNodes) 
+            {
                 artifacts.add(node.getArtifact());
             }
         }
@@ -95,7 +96,8 @@ public class ArtifactResolutionResult
 
     public Set<ResolutionNode> getArtifactResolutionNodes()
     {
-        if (resolutionNodes == null) {
+        if ( resolutionNodes == null) 
+        {
             return Collections.emptySet();
         }
 

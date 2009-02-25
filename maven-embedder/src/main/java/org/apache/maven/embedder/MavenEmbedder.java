@@ -458,42 +458,6 @@ public class MavenEmbedder
     }
 
     // ----------------------------------------------------------------------
-    // Artifacts
-    // ----------------------------------------------------------------------
-
-    public Artifact createArtifact( String groupId,
-                                    String artifactId,
-                                    String version,
-                                    String scope,
-                                    String type )
-    {
-        return repositoryTools.createArtifact( groupId, artifactId, version, scope, type );
-    }
-
-    public Artifact createArtifactWithClassifier( String groupId,
-                                                  String artifactId,
-                                                  String version,
-                                                  String type,
-                                                  String classifier )
-    {
-        return repositoryTools.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
-    }
-
-    public void resolve( Artifact artifact,
-                         List remoteRepositories,
-                         ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        repositoryTools.resolve( artifact, localRepository, remoteRepositories );
-    }
-
-    // ----------------------------------------------------------------------
-    // Plugins
-    // ----------------------------------------------------------------------
-    // ----------------------------------------------------------------------
-    // Execution of phases/goals
-    // ----------------------------------------------------------------------
-    // ----------------------------------------------------------------------
     // Lifecycle information
     // ----------------------------------------------------------------------
 

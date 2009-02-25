@@ -1,22 +1,18 @@
 package org.apache.maven.repository;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
@@ -65,7 +61,6 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -74,63 +69,63 @@ import org.codehaus.plexus.util.StringUtils;
  */
 @Component(role = MavenRepositorySystem.class)
 public class LegacyMavenRepositorySystem
-    implements MavenRepositorySystem, LogEnabled
+    implements MavenRepositorySystem
 {
     @Requirement
     private ArtifactFactory artifactFactory;
 
     @Requirement
     private ArtifactResolver artifactResolver;
-    
+
     @Requirement
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     @Requirement
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
-        
+
     @Requirement
     private WagonManager wagonManager;
-    
+
     @Requirement
     private ArtifactMetadataSource artifactMetadataSource;
-        
+
     @Requirement
     private Logger logger;
-    
+
     private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();
-    
+
     // Artifact Creation
-    
-    public Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type)
+
+    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
-    	return artifactFactory.createArtifact(groupId, artifactId, version, scope, type);
+        return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
     }
 
-    public Artifact createArtifactWithClassifier(String groupId, String artifactId, String version, String type, String classifier)
+    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier )
     {
-    	return artifactFactory.createArtifactWithClassifier(groupId, artifactId, version, type, classifier);
+        return artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
     }
-    
-    public Artifact createBuildArtifact(String groupId, String artifactId, String version, String packaging )
+
+    public Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging )
     {
-    	return artifactFactory.createBuildArtifact(groupId, artifactId, version, packaging );    	
+        return artifactFactory.createBuildArtifact( groupId, artifactId, version, packaging );
     }
-    
+
     public Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId )
     {
-    	return artifactFactory.createProjectArtifact(groupId, artifactId, metaVersionId );    	
+        return artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
     }
 
     public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, boolean optional )
     {
-        return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope );        
+        return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope );
     }
 
     public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, String inheritedScope )
     {
-        return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );        
+        return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
     }
-    
+
     public Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange )
     {
         return artifactFactory.createExtensionArtifact( groupId, artifactId, versionRange );
@@ -140,44 +135,32 @@ public class LegacyMavenRepositorySystem
     {
         return artifactFactory.createParentArtifact( groupId, artifactId, version );
     }
-    
+
     public Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange )
     {
         return artifactFactory.createPluginArtifact( groupId, artifactId, versionRange );
     }
-    
+
     public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
         throws InvalidDependencyVersionException
     {
         return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, project );
     }
-    
+
     //
-    
-    public List<ArtifactVersion> retrieveAvailableVersions(Artifact artifact,
-			ArtifactRepository localRepository,
-			List<ArtifactRepository> remoteRepositories)
-			throws ArtifactMetadataRetrievalException 
-	{
-        return artifactMetadataSource.retrieveAvailableVersions(artifact, localRepository, remoteRepositories);
-	}
-    
+
+    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        return artifactMetadataSource.retrieveAvailableVersions( artifact, localRepository, remoteRepositories );
+    }
+
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        return artifactMetadataSource.retrieve(artifact, localRepository, remoteRepositories);
+        return artifactMetadataSource.retrieve( artifact, localRepository, remoteRepositories );
     }
-    
-    public ArtifactResolutionResult resolveTransitively(
-			Set<Artifact> artifacts, Artifact originatingArtifact,
-			Map managedVersions, ArtifactRepository localRepository,
-			List<ArtifactRepository> remoteRepositories,
-			ArtifactFilter filter )
-			throws ArtifactResolutionException, ArtifactNotFoundException 
-    {
-    	return artifactResolver.resolveTransitively(artifacts, originatingArtifact, remoteRepositories, localRepository, artifactMetadataSource );    	
-	}
-    
+
     // ----------------------------------------------------------------------------
     // Code snagged from ProjectUtils: this will have to be moved somewhere else
     // but just trying to collect it all in one place right now.
@@ -188,7 +171,7 @@ public class LegacyMavenRepositorySystem
     {
         List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
 
-        for( Repository mavenRepo : repositories )
+        for ( Repository mavenRepo : repositories )
         {
             ArtifactRepository artifactRepo = buildArtifactRepository( mavenRepo );
 
@@ -197,7 +180,7 @@ public class LegacyMavenRepositorySystem
                 repos.add( artifactRepo );
             }
         }
-        
+
         return repos;
     }
 
@@ -214,7 +197,7 @@ public class LegacyMavenRepositorySystem
                 throw new InvalidRepositoryException( "Repository ID must not be empty (URL is: " + url + ").", url );
             }
 
-            if ( url == null || url.trim().length() < 1 )                
+            if ( url == null || url.trim().length() < 1 )
             {
                 throw new InvalidRepositoryException( "Repository URL must not be empty (ID is: " + id + ").", id );
             }
@@ -255,7 +238,7 @@ public class LegacyMavenRepositorySystem
 
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
     }
-    
+
     // From MavenExecutionRequestPopulator
 
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
@@ -310,13 +293,10 @@ public class LegacyMavenRepositorySystem
 
         return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
     }
-    
-    public ArtifactRepository createRepository( String url,
-                                                String repositoryId,
-                                                ArtifactRepositoryPolicy snapshotsPolicy,
-                                                ArtifactRepositoryPolicy releasesPolicy )
+
+    public ArtifactRepository createRepository( String url, String repositoryId, ArtifactRepositoryPolicy snapshotsPolicy, ArtifactRepositoryPolicy releasesPolicy )
     {
-        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );        
+        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
     }
 
     public void setGlobalUpdatePolicy( String policy )
@@ -326,11 +306,11 @@ public class LegacyMavenRepositorySystem
 
     public void setGlobalChecksumPolicy( String policy )
     {
-        artifactRepositoryFactory.setGlobalChecksumPolicy( policy );        
+        artifactRepositoryFactory.setGlobalChecksumPolicy( policy );
     }
-    
+
     // Taken from RepositoryHelper
-    
+
     public void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
@@ -353,7 +333,7 @@ public class LegacyMavenRepositorySystem
         else
         {
             logger.debug( "Attempting to build MavenProject instance for Artifact (" + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ") of type: "
-                          + artifact.getType() + "; constructing POM artifact instead." );
+                + artifact.getType() + "; constructing POM artifact instead." );
 
             projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
         }
@@ -440,52 +420,48 @@ public class LegacyMavenRepositorySystem
         return ArtifactUtils.versionlessKey( gid, aid );
     }
 
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
-    }
-    
     /**
      * Resolves the specified artifact
-     *
+     * 
      * @param artifact the artifact to resolve
      * @throws IOException if there is a problem resolving the artifact
      */
     public void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        /* FIXME: Not sure what this was meant to do here but right now it screws up several ITs
-        File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-        artifact.setFile( artifactFile );
-        //*/
         artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+    }
+
+    public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
+    {
+        return artifactResolver.resolve( request );
     }    
     
     // ------------------------------------------------------------------------
     // Extracted from DefaultWagonManager
     // ------------------------------------------------------------------------
-    
+
     private static final String WILDCARD = "*";
 
     private static final String EXTERNAL_WILDCARD = "external:*";
-    
+
     private static int anonymousMirrorIdSeed = 0;
 
     private boolean online = true;
 
     private boolean interactive = true;
-        
+
     private TransferListener downloadMonitor;
-    
-    private Map<String,ProxyInfo> proxies = new HashMap<String,ProxyInfo>();
-    
-    private Map<String,AuthenticationInfo> authenticationInfoMap = new HashMap<String,AuthenticationInfo>();
-    
-    private Map<String,RepositoryPermissions> serverPermissionsMap = new HashMap<String,RepositoryPermissions>();
-    
+
+    private Map<String, ProxyInfo> proxies = new HashMap<String, ProxyInfo>();
+
+    private Map<String, AuthenticationInfo> authenticationInfoMap = new HashMap<String, AuthenticationInfo>();
+
+    private Map<String, RepositoryPermissions> serverPermissionsMap = new HashMap<String, RepositoryPermissions>();
+
     //used LinkedMap to preserve the order.
-    private Map<String,ArtifactRepository> mirrors = new LinkedHashMap<String,ArtifactRepository>();
-    
+    private Map<String, ArtifactRepository> mirrors = new LinkedHashMap<String, ArtifactRepository>();
+
     public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
     {
         ArtifactRepository mirror = getMirror( repository );
@@ -499,17 +475,16 @@ public class LegacyMavenRepositorySystem
             }
 
             logger.debug( "Using mirror: " + mirror.getId() + " for repository: " + repository.getId() + "\n(mirror url: " + mirror.getUrl() + ")" );
-            repository = artifactRepositoryFactory.createArtifactRepository( id, mirror.getUrl(),
-                                                                     repository.getLayout(), repository.getSnapshots(),
-                                                                     repository.getReleases() );
+            repository = artifactRepositoryFactory.createArtifactRepository( id, mirror.getUrl(), repository.getLayout(), repository.getSnapshots(), repository.getReleases() );
         }
         return repository;
-    }    
-    
+    }
+
     /**
-     * This method finds a matching mirror for the selected repository. If there is an exact match, this will be used.
-     * If there is no exact match, then the list of mirrors is examined to see if a pattern applies.
-     *
+     * This method finds a matching mirror for the selected repository. If there is an exact match,
+     * this will be used. If there is no exact match, then the list of mirrors is examined to see if
+     * a pattern applies.
+     * 
      * @param originalRepository See if there is a mirror for this repository.
      * @return the selected mirror or null if none are found.
      */
@@ -536,13 +511,10 @@ public class LegacyMavenRepositorySystem
     }
 
     /**
-     * This method checks if the pattern matches the originalRepository.
-     * Valid patterns:
-     * * = everything
-     * external:* = everything not on the localhost and not file based.
-     * repo,repo1 = repo or repo1
-     * *,!repo1 = everything except repo1
-     *
+     * This method checks if the pattern matches the originalRepository. Valid patterns: * =
+     * everything external:* = everything not on the localhost and not file based. repo,repo1 = repo
+     * or repo1 *,!repo1 = everything except repo1
+     * 
      * @param originalRepository to compare for a match.
      * @param pattern used for match. Currently only '*' is supported.
      * @return true if the repository is a match to this pattern.
@@ -561,36 +533,43 @@ public class LegacyMavenRepositorySystem
         {
             // process the list
             String[] repos = pattern.split( "," );
-            for (String repo : repos) {
+            for ( String repo : repos )
+            {
                 // see if this is a negative match
-                if (repo.length() > 1 && repo.startsWith("!")) {
-                    if (originalId.equals(repo.substring(1))) {
+                if ( repo.length() > 1 && repo.startsWith( "!" ) )
+                {
+                    if ( originalId.equals( repo.substring( 1 ) ) )
+                    {
                         // explicitly exclude. Set result and stop processing.
                         result = false;
                         break;
                     }
                 }
                 // check for exact match
-                else if (originalId.equals(repo)) {
+                else if ( originalId.equals( repo ) )
+                {
                     result = true;
                     break;
                 }
                 // check for external:*
-                else if (EXTERNAL_WILDCARD.equals(repo) && isExternalRepo(originalRepository)) {
+                else if ( EXTERNAL_WILDCARD.equals( repo ) && isExternalRepo( originalRepository ) )
+                {
                     result = true;
                     // don't stop processing in case a future segment explicitly excludes this repo
-                } else if (WILDCARD.equals(repo)) {
+                }
+                else if ( WILDCARD.equals( repo ) )
+                {
                     result = true;
                     // don't stop processing in case a future segment explicitly excludes this repo
                 }
             }
         }
         return result;
-    }    
-    
+    }
+
     /**
      * Checks the URL to see if this repository refers to an external repository
-     *
+     * 
      * @param originalRepository
      * @return true if external.
      */
@@ -599,15 +578,15 @@ public class LegacyMavenRepositorySystem
         try
         {
             URL url = new URL( originalRepository.getUrl() );
-            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" ) || url.getProtocol().equals("file" ) );
+            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" ) || url.getProtocol().equals( "file" ) );
         }
         catch ( MalformedURLException e )
         {
             // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
             return false;
         }
-    }  
-    
+    }
+
     public void addMirror( String id, String mirrorOf, String url )
     {
         if ( id == null )
@@ -615,12 +594,12 @@ public class LegacyMavenRepositorySystem
             id = "mirror-" + anonymousMirrorIdSeed++;
             logger.warn( "You are using a mirror that doesn't declare an <id/> element. Using \'" + id + "\' instead:\nId: " + id + "\nmirrorOf: " + mirrorOf + "\nurl: " + url + "\n" );
         }
-        
+
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
         mirrors.put( mirrorOf, mirror );
     }
-    
+
     public void setOnline( boolean online )
     {
         this.online = online;
@@ -635,12 +614,12 @@ public class LegacyMavenRepositorySystem
     {
         this.interactive = interactive;
     }
-    
+
     public void setDownloadMonitor( TransferListener downloadMonitor )
     {
         this.downloadMonitor = downloadMonitor;
-    } 
-    
+    }
+
     public void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )
     {
         ProxyInfo proxyInfo = new ProxyInfo();
@@ -663,8 +642,8 @@ public class LegacyMavenRepositorySystem
         authInfo.setPassphrase( passphrase );
 
         authenticationInfoMap.put( repositoryId, authInfo );
-    }    
-    
+    }
+
     public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
     {
         RepositoryPermissions permissions = new RepositoryPermissions();
@@ -689,14 +668,9 @@ public class LegacyMavenRepositorySystem
         }
     }
 
-    public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {
-        return artifactResolver.resolve( request );
-    }
-
     // These two methods are here so that the ArtifactMetadataSource is implemented so that I can pass this into an ArtifactResolutionRequest.
     // Intermediate measure before separating the RepositorySystem out into its own module.
-    
+
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
@@ -707,10 +681,10 @@ public class LegacyMavenRepositorySystem
         throws ArtifactMetadataRetrievalException
     {
         return artifactMetadataSource.retrieveRelocatedArtifact( artifact, localRepository, remoteRepositories );
-    }    
-    
+    }
+
     // Test for this stuff
-    
+
     /*
      
     public void testAddMirrorWithNullRepositoryId()

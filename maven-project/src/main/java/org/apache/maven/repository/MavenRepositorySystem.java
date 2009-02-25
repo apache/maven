@@ -98,11 +98,8 @@ public interface MavenRepositorySystem
 
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
+    // This can be reduced to the request/result
     void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
-                                                  List<ArtifactRepository> remoteRepositories, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
