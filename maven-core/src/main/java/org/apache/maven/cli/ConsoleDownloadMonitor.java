@@ -38,6 +38,7 @@ public class ConsoleDownloadMonitor
     extends AbstractConsoleDownloadMonitor
 {
     private Map/* <Resource,Integer> */downloads;
+    private int maxLength;
 
     public ConsoleDownloadMonitor( Logger logger )
     {
@@ -80,19 +81,26 @@ public class ConsoleDownloadMonitor
             downloads.put( resource, complete );
         }
 
+        StringBuffer buf = new StringBuffer();
         for ( Iterator i = downloads.entrySet().iterator(); i.hasNext(); )
         {
             Map.Entry entry = (Map.Entry) i.next();
             Long complete = (Long) entry.getValue();
             String status =
                 getDownloadStatusForResource( complete.longValue(), ( (Resource) entry.getKey() ).getContentLength() );
-            out.print( status );
+            buf.append( status );
             if ( i.hasNext() )
             {
-                out.print( " " );
+                buf.append( " " );
             }
         }
-        out.print( "\r" );
+        
+        if ( buf.length() > maxLength )
+        {
+            maxLength = buf.length();
+        }
+        
+        out.print( buf.toString() + "\r" );
     }
 
     String getDownloadStatusForResource( long progress, long total )
@@ -109,7 +117,15 @@ public class ConsoleDownloadMonitor
 
     public synchronized void transferCompleted( TransferEvent transferEvent )
     {
-        super.transferCompleted( transferEvent );
+        StringBuffer line = new StringBuffer( createCompletionLine( transferEvent ) );
+        
+        while ( line.length() < maxLength )
+        {
+            line.append( " " );
+        }
+        maxLength = 0;
+        
+        out.println( line );
         downloads.remove( transferEvent.getResource() );
     }
 }
