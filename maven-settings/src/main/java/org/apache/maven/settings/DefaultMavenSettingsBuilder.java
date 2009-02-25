@@ -89,7 +89,7 @@ public class DefaultMavenSettingsBuilder
     {
         Settings settings = null;
 
-        if ( settingsFile.exists() && settingsFile.isFile() )
+        if ( settingsFile != null && settingsFile.exists() && settingsFile.isFile() )
         {
             Reader reader = null;
             try
