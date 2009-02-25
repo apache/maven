@@ -52,8 +52,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
@@ -182,7 +180,7 @@ public class LegacyMavenRepositorySystem
         return artifactFactory.createPluginArtifact( groupId, artifactId, versionRange );
     }
 
-    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
+    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper project )
         throws InvalidDependencyVersionException
     {
         return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, project );
