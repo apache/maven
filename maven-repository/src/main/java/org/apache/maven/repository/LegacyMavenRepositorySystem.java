@@ -56,7 +56,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+//import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
@@ -188,7 +188,7 @@ public class LegacyMavenRepositorySystem
      * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
      */
     public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
-        throws InvalidDependencyVersionException
+        throws VersionNotFoundException
     {
         Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>( dependencies.size() );
 
@@ -212,7 +212,7 @@ public class LegacyMavenRepositorySystem
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new InvalidDependencyVersionException( reactor.getId(), d, reactor.getFile(), e );
+                throw new VersionNotFoundException( reactor.getId(), d, reactor.getFile(), e );
             }
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),

@@ -33,7 +33,6 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.wagon.events.TransferListener;
 
 /**
@@ -63,7 +62,7 @@ public interface MavenRepositorySystem
     Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, String inheritedScope );
     
     Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
-        throws InvalidDependencyVersionException;
+        throws VersionNotFoundException;
 
     // Repository creation
 
