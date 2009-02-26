@@ -7,7 +7,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
-import org.apache.maven.profiles.activation.ProfileActivator;
 import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
@@ -34,29 +33,6 @@ public interface ProjectErrorReporter
     Throwable findReportedException( Throwable error );
 
     boolean isStackTraceRecommended( Throwable error );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * DefaultProfileAdvisor.applyActivatedProfiles(..)
-     * DefaultProfileAdvisor.applyActivatedExternalProfiles(..)
-     * --&gt; DefaultProfileAdvisor.applyActivatedProfiles(..) (private)
-     * --&gt; DefaultProfileAdvisor.getArtifactRepositoriesFromActiveProfiles(..)
-     *     --&gt; DefaultProfileManager.getActiveProfiles(..)
-     *         --&gt; DefaultProfileManager.isActive(..) (private)
-     *             --&gt; ProfileActivator.canDetermineActivation(..)
-     *             --&gt; ProfileActivator.isActive(..)
-     *         &lt;------ ProfileActivationException
-     * &lt;------ ProjectBuildingException
-     * </pre>
-     */
-    void reportActivatorError( ProfileActivator activator,
-                               Model model,
-                               File pomFile,
-                               Profile profile,
-                               ProfileActivationContext context,
-                               ProfileActivationException cause );
 
     /**
      * <b>Call Stack:</b>

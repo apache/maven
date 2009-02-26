@@ -30,7 +30,6 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
-import org.apache.maven.profiles.activation.ProfileActivator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 

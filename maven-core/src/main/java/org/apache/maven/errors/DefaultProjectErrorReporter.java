@@ -13,7 +13,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
-import org.apache.maven.profiles.activation.ProfileActivator;
 import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.InvalidProjectVersionException;
@@ -74,7 +73,6 @@ public class DefaultProjectErrorReporter
     }
 
     /**
-     * @see ProjectErrorReporter#hasInformationFor(java.lang.Throwable)
      */
     public Throwable findReportedException( Throwable error )
     {
@@ -137,48 +135,7 @@ public class DefaultProjectErrorReporter
         formattedMessages.put( error, formattedMessage );
     }
 
-    /**
-     * @see ProjectErrorReporter#reportActivatorErrorWhileApplyingProfiles(org.apache.maven.profiles.activation.ProfileActivator, org.apache.maven.model.Model, java.io.File, org.apache.maven.model.Profile, org.apache.maven.profiles.activation.ProfileActivationContext, org.apache.maven.profiles.activation.ProfileActivationException)
-     */
-    public void reportActivatorError( ProfileActivator activator,
-                                      Model model,
-                                      File pomFile,
-                                      Profile profile,
-                                      ProfileActivationContext context,
-                                      ProfileActivationException cause )
-    {
-        StringWriter writer = new StringWriter();
 
-        writer.write( NEWLINE );
-        writer.write( "Profile activator: " );
-        writer.write( activator.getClass().getName() );
-        writer.write( " experienced an error while processing profile:" );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( profile.getId() );
-        writer.write( " (source: " );
-        writer.write( profile.getSource() );
-        writer.write( ")" );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Error message: " );
-        writer.write( NEWLINE );
-        writer.write( cause.getMessage() );
-
-        addStandardInfo( model.getId(), pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForActivatorError( activator,
-                                                            model.getId(),
-                                                            pomFile,
-                                                            profile,
-                                                            context,
-                                                            cause ), writer );
-
-        registerBuildError( cause, writer.toString(), cause.getCause() );
-    }
-
-    /**
-     * @see ProjectErrorReporter#reportActivatorLookupError(java.lang.String, java.io.File, org.apache.maven.model.Profile, org.codehaus.plexus.component.repository.exception.ComponentLookupException)
-     */
     public void reportActivatorLookupError( Model model,
                                             File pomFile,
                                             Profile profile,
@@ -275,9 +232,7 @@ public class DefaultProjectErrorReporter
         registerBuildError( cause, writer.toString(), cause.getCause() );
     }
 
-    /**
-     * @see ProjectErrorReporter#reportInvalidRepositoryWhileGettingRepositoriesFromProfiles(org.apache.maven.model.Repository, java.lang.String, java.io.File, org.apache.maven.artifact.InvalidRepositoryException)
-     */
+   
     public void reportInvalidRepositoryWhileGettingRepositoriesFromProfiles( Repository repo,
                                                                              Model model,
                                                                              File pomFile,
