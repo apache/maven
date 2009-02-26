@@ -244,6 +244,7 @@ under the License.
     <module>maven-embedder</module>
     <module>maven-toolchain</module>
     <module>maven-compat</module>
+    <module>maven-repository</module>
   </modules>
   <!--start-->
   <dependencies>
