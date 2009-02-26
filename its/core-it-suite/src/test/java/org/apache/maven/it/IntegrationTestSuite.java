@@ -182,6 +182,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3652UserAgentHeaderTest.class );
         suite.addTestSuite( MavenITmng3642DynamicResourcesTest.class );
         suite.addTestSuite( MavenITmng3641ProfileActivationWarningTest.class );
+        suite.addTestSuite( MavenITmng3621UNCInheritedPathsTest.class );
         suite.addTestSuite( MavenITmng3600DeploymentModeDefaultsTest.class );
         suite.addTestSuite( MavenITmng3599useHttpProxyForWebDAVTest.class );
         suite.addTestSuite( MavenITmng3586SystemScopePluginDependencyTest.class );
