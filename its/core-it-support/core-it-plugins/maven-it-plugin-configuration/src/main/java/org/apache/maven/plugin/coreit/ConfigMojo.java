@@ -64,7 +64,7 @@ public class ConfigMojo
     /**
      * The path to the properties file into which to save the mojo configuration.
      * 
-     * @parameter expression="${config.propertiesFile}
+     * @parameter expression="${config.propertiesFile}"
      */
     private File propertiesFile;
 
