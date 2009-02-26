@@ -151,6 +151,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3821EqualPluginExecIdsTest.class );
         suite.addTestSuite( MavenITmng3819PluginDepPlexusUtilsTest.class );
         suite.addTestSuite( MavenITmng3813PluginClassPathOrderingTest.class );
+        suite.addTestSuite( MavenITmng3811ReportingPluginConfigurationInheritanceTest.class );
         suite.addTestSuite( MavenITmng3810BadProfileActivationTest.class );
         suite.addTestSuite( MavenITmng3808ReportInheritenceOrderingTest.class );
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
