@@ -499,7 +499,12 @@ public class DefaultModelInheritanceAssembler
             uncleanPath = uncleanPath.substring( protocolIdx + 3 );
         }
 
-        if ( uncleanPath.startsWith( "/" ) )
+        if ( uncleanPath.startsWith( "//" ) )
+        {
+            // preserve leading double slash for UNC paths like "file:////host/pom.xml"
+            cleanedPath += "//";
+        }
+        else if ( uncleanPath.startsWith( "/" ) )
         {
             cleanedPath += "/";
         }

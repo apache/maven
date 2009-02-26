@@ -221,6 +221,18 @@ public class DefaultModelInheritanceAssemblerTest
         assertEquals( "Append with path adjustment failed.", "http://maven.apache.org/shared/file-management", result );
     }
 
+    public void testAppendPathUNC()
+    {
+        String parentPath = "file:////host/shared/maven-shared-parent";
+        String childPath = "file-management";
+        String pathAdjustment = null;
+
+        String result =
+            ( (DefaultModelInheritanceAssembler) assembler ).appendPath( parentPath, childPath, pathAdjustment, true );
+
+        assertEquals( "file:////host/shared/maven-shared-parent/file-management", result );
+    }
+
     public void testDistributionManagementInheritance()
     {
         Model parent = makeBaseModel( "parent" );
