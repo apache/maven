@@ -49,6 +49,7 @@ import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.VersionNotFoundException;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -271,11 +272,12 @@ public class DefaultMavenProjectBuilder
         {
             project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
         }
-        catch ( InvalidDependencyVersionException e )
+        catch ( VersionNotFoundException e )
         {
+            InvalidDependencyVersionException ee = new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
             throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ),
                                                 "Unable to build project due to an invalid dependency version: " +
-                                                    e.getMessage(), projectDescriptor, e );
+                                                    e.getMessage(), projectDescriptor, ee );
         }
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()

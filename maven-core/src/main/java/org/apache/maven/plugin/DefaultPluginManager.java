@@ -79,6 +79,7 @@ import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.VersionNotFoundException;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelMarshaller;
 import org.apache.maven.shared.model.ModelProperty;
@@ -399,10 +400,11 @@ public class DefaultPluginManager
                                                                              coreArtifactFilterManager.getCoreArtifactFilter(),
                                                                              project );            
         }
-        catch ( InvalidDependencyVersionException e )
+        catch ( VersionNotFoundException e )
         {
+            InvalidDependencyVersionException ee = new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
             throw new InvalidPluginException( "Plugin '" + plugin + "' is invalid: "
-                                              + e.getMessage(), e );
+                                              + e.getMessage(), ee );
         }
 
         ResolutionGroup resolutionGroup;
@@ -1497,7 +1499,16 @@ public class DefaultPluginManager
         if ( project.getDependencyArtifacts() == null )
         {
             // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
-            project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
+            try
+            {
+                project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
+            }
+            catch ( VersionNotFoundException e )
+            {
+                InvalidDependencyVersionException ee = new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
+                
+                throw ee;
+            }
         }
 
         ArtifactFilter filter = new ScopeArtifactFilter( scope );

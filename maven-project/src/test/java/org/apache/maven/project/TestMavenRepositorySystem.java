@@ -15,6 +15,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.repository.LegacyMavenRepositorySystem;
 import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -63,9 +64,11 @@ public class TestMavenRepositorySystem
         {
             artifacts = createArtifacts( model.getDependencies(), artifact.getScope(), null, null );
         }
-        catch ( InvalidDependencyVersionException e )
+        catch ( VersionNotFoundException e )
         {
-            throw new ArtifactMetadataRetrievalException( e );
+            InvalidDependencyVersionException ee = new InvalidDependencyVersionException(e.getProjectId(), e.getDependency(),e.getPomFile(), e.getCauseException() );
+            
+            throw new ArtifactMetadataRetrievalException( ee );
         }
 
         List artifactRepositories;

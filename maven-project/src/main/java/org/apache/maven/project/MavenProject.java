@@ -70,6 +70,7 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.repository.MavenRepositoryWrapper;
 import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -1661,7 +1662,14 @@ public class MavenProject
     public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter dependencyFilter )
         throws InvalidDependencyVersionException
     {
-        return repositorySystem.createArtifacts( getDependencies(), inheritedScope, dependencyFilter, this );
+        try
+        {
+            return repositorySystem.createArtifacts( getDependencies(), inheritedScope, dependencyFilter, this );
+        }
+        catch ( VersionNotFoundException e )
+        {
+            throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
+        }
     }
 
     public void addProjectReference( MavenProject project )

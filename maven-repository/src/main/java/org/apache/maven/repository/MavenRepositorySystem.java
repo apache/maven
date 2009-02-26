@@ -62,7 +62,7 @@ public interface MavenRepositorySystem
     Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, String inheritedScope );
     
     Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
-        throws VersionNotFoundException;
+    throws VersionNotFoundException;
 
     // Repository creation
 
