@@ -137,7 +137,7 @@ public class DefaultMavenProjectBuilder
 
         project.setFile( projectDescriptor );
 
-        project = buildWithProfiles( project.getModel(), config, projectDescriptor, project.getParentFile(), true );
+        project = buildWithProfiles( project.getModel(), config, projectDescriptor, project.getParentFile());
 
         Build build = project.getBuild();
         // NOTE: setting this script-source root before path translation, because
@@ -217,7 +217,7 @@ public class DefaultMavenProjectBuilder
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), new DefaultPomArtifactResolver( config.getLocalRepository(), artifactRepositories, repositorySystem ), config );
-        project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile(), false );
+        project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile() );
         artifact.setFile( f );
         project.setVersion( artifact.getVersion() );
 
@@ -301,7 +301,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private MavenProject buildWithProfiles( Model model, ProjectBuilderConfiguration config, File projectDescriptor,
-                                        File parentDescriptor, boolean isReactorProject )
+                                        File parentDescriptor )
         throws ProjectBuildingException
     {
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
@@ -331,14 +331,9 @@ public class DefaultMavenProjectBuilder
 
         List<Profile> projectProfiles = new ArrayList<Profile>();
 
-        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( model,
-                                                                       isReactorProject ? projectDescriptor : null,
-                                                                       isReactorProject, profileActivationContext ) );
+        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( model, profileActivationContext ) );
 
-        projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( model,
-                                                                               isReactorProject ? projectDescriptor
-                                                                                               : null,
-                                                                               externalProfileManager ) );
+        projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( model, externalProfileManager ) );
 
         MavenProject project;
         
