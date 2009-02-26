@@ -42,7 +42,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -78,7 +77,6 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.ProfilesConversionUtils;
 import org.apache.maven.profiles.ProfilesRoot;
 import org.apache.maven.profiles.activation.ProfileActivationException;
-import org.apache.maven.project.artifact.ArtifactWithProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.ProjectArtifactFactory;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
@@ -992,6 +990,34 @@ public class DefaultMavenProjectBuilder
 
         activeProfiles.addAll( injectedProfiles );
 
+        // --------------------------------------------------------------------------------
+        // MNG-3641: print a warning if one of the profiles to be activated explicitly
+        // was not activated
+
+        if ( config != null && config.getGlobalProfileManager() != null )
+        {
+            // get all activated profile ids
+            List activeProfileIds = new ArrayList();
+
+            for ( Iterator it = activeProfiles.iterator(); it.hasNext(); )
+            {
+                activeProfileIds.add( ( (Profile) it.next() ).getId() );
+            }
+
+            for ( Iterator it = config.getGlobalProfileManager().getExplicitlyActivatedIds().iterator(); it.hasNext(); )
+            {
+                String explicitProfileId = (String) it.next();
+
+                if ( !activeProfileIds.contains( explicitProfileId ) )
+                {
+                    getLogger().warn( "Profile with id: \'" + explicitProfileId + "\' has not been activated." );
+                }
+
+            }
+        }
+        
+        // --------------------------------------------------------------------------------
+        
         Build dynamicBuild = model.getBuild();
 
         model.setBuild( ModelUtils.cloneBuild( dynamicBuild ) );
