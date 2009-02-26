@@ -25,9 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.it.util.IOUtil;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.it.util.StringUtils;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
