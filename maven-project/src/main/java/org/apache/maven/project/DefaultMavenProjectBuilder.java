@@ -38,7 +38,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.MavenProfilesBuilder;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
@@ -65,9 +64,6 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultMavenProjectBuilder
     implements MavenProjectBuilder, LogEnabled
 {
-    @Requirement
-    protected MavenProfilesBuilder profilesBuilder;
-
     @Requirement
     private ModelValidator validator;
 
