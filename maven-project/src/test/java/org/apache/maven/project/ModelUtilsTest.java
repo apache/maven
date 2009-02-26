@@ -193,8 +193,7 @@ public class ModelUtilsTest
         Xpp3Dom result3Config = (Xpp3Dom) result3.getConfiguration();
 
         assertNotNull( result3Config );
-        // Carlos: Current behavior is not to merge the ocnfiguration, although dont know why 
-        assertNull( result3Config.getChild( "key" ) );
+        assertNotNull( result3Config.getChild( "key" ) );
         assertNotNull( result3Config.getChild( "key2" ) );
 
         //assertEquals( "value", result3Config.getChild( "key" ).getValue() );

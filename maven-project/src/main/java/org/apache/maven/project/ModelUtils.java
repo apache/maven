@@ -798,11 +798,22 @@ public final class ModelUtils
             child.setVersion( parent.getVersion() );
         }
 
-        // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
 
         boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
 
+        // merge configuration just like with build plugins	
+        if ( parentIsInherited )
+        {
+            Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
+            Xpp3Dom parentConfiguration = (Xpp3Dom) parent.getConfiguration();
+
+            childConfiguration = Xpp3Dom.mergeXpp3Dom( childConfiguration, parentConfiguration );
+
+            child.setConfiguration( childConfiguration );
+        }
+
+        // from here to the end of the method is dealing with merging of the <executions/> section.
         List parentReportSets = parent.getReportSets();
 
         if ( ( parentReportSets != null ) && !parentReportSets.isEmpty() )
