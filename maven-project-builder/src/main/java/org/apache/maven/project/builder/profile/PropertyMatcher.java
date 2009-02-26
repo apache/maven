@@ -25,8 +25,14 @@ public class PropertyMatcher implements ActiveProfileMatcher {
             }
         }
 
-        if(name == null || value == null) {
+        if(name == null )
+        {
             return false;
+        }
+
+        if(value == null)
+        {
+            return !name.startsWith("!");
         }
 
         for(InterpolatorProperty ip : properties) {

@@ -227,6 +227,7 @@ public class PomTransformer
 
                 ModelContainerAction action = pluginContainer.containerAction( managementContainer );
 
+                //Join Execution Containers
                 if ( action.equals( ModelContainerAction.JOIN ) || action.equals( ModelContainerAction.DELETE ) )
                 {
                     ModelDataSource pluginDatasource = new DefaultModelDataSource(  pluginContainer.getProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES );

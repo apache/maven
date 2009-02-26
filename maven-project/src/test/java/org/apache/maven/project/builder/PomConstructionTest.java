@@ -81,6 +81,19 @@ public class PomConstructionTest
     }
 
     /**
+     * Will throw exception if url is empty. MNG-4050 
+     *
+     * @throws Exception
+     */
+    /*
+    public void testEmptyUrl()
+        throws Exception
+    {
+        buildPomFromMavenProject( "empty-distMng-repo-url", null );
+    }
+    */
+
+    /**
      * Will throw exception if doesn't find parent(s) in build
      *
      * @throws Exception

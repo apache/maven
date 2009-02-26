@@ -23,21 +23,29 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
-import org.apache.maven.profiles.activation.ProfileActivator;
+import org.apache.maven.shared.model.ModelContainer;
+import org.apache.maven.shared.model.ModelProperty;
+import org.apache.maven.shared.model.ModelMarshaller;
+import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.project.builder.factories.IdModelContainerFactory;
+import org.apache.maven.project.builder.ProjectUri;
+import org.apache.maven.project.builder.PomTransformer;
+import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.profile.*;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+import org.codehaus.plexus.util.xml.pull.MXSerializer;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.io.*;
+import java.lang.reflect.Method;
+
 
 public class DefaultProfileManager
     implements ProfileManager
@@ -258,49 +266,79 @@ public class DefaultProfileManager
         }
     }
 
+    private static List<ActiveProfileMatcher> matchers = Arrays.asList(new FileMatcher(),
+        new JdkMatcher(), new OperatingSystemMatcher(), new PropertyMatcher());
+
     private boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
-        List<ProfileActivator> activators = null;
-
+        //TODO: Using reflection now. Need to replace with custom mapper
+        StringWriter writer = new StringWriter();
+        XmlSerializer serializer = new MXSerializer();
+        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
+        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
         try
         {
-            activators = container.lookupList( ProfileActivator.class );
+            serializer.setOutput( writer );
+            serializer.startDocument("UTF-8", null );
+        } catch (IOException e) {
+            
+        }
 
-            for ( ProfileActivator activator : activators )
-            {
-                if ( activator.canDetermineActivation( profile, context ) )
-                {
-                    if ( activator.isActive( profile, context ) )
-                    {
-                        container.getLogger().debug(
-                            "Profile: " + profile.getId() + " is active. (source: " + profile.getSource() + ")" );
-                        return true;
-                    }
-                }
-            }
+        try {
+            MavenXpp3Writer w = new MavenXpp3Writer();
+            Class c = Class.forName("org.apache.maven.model.io.xpp3.MavenXpp3Writer");
 
-            return false;
-        }
-        catch ( ComponentLookupException e )
+            Class partypes[] = new Class[3];
+            partypes[0] = Profile.class;
+            partypes[1] = String.class;
+            partypes[2] = XmlSerializer.class;
+
+            Method meth = c.getDeclaredMethod(
+                         "writeProfile", partypes);
+            meth.setAccessible(true);
+            
+            Object arglist[] = new Object[3];
+            arglist[0] = profile;
+            arglist[1] = "profile";
+            arglist[2] = serializer;
+
+            meth.invoke(w, arglist);
+            serializer.endDocument();
+        } catch (Exception e)
         {
-            throw new ProfileActivationException( "Cannot retrieve list of profile activators.", e );
+            throw new ProfileActivationException(e.getMessage(), e);
         }
-        finally
+
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(
+                context.getExecutionProperties(),
+                PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
+
+        List<ModelProperty> p;
+        try
+        {                                                                   
+            p = ModelMarshaller.marshallXmlToModelProperties(new ByteArrayInputStream(writer.getBuffer().toString().getBytes()),
+                    ProjectUri.Profiles.Profile.xUri, PomTransformer.URIS);
+        } catch (IOException e) {
+            throw new ProfileActivationException(e.getMessage());
+        }
+        //Serializer adds in extra node, strip it out
+        List<ModelProperty> p2 = new ArrayList<ModelProperty>();
+        for(ModelProperty mp : p)
         {
-            container.getContext().put( "SystemProperties", null );
-            if ( activators != null )
+            p2.add(new ModelProperty(mp.getUri().replaceFirst("profile/", ""), mp.getResolvedValue()));
+        }
+        
+        ModelContainer mc = new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri).create(p2);
+        for(ActiveProfileMatcher matcher : matchers)
+        {
+            if(matcher.isMatch(mc, interpolatorProperties))
             {
-                try
-                {
-                    container.releaseAll( activators );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    container.getLogger().debug( "Error releasing profile activators - ignoring.", e );
-                }
+                return true;
             }
         }
+        return false;
     }
 
     /* (non-Javadoc)
@@ -341,18 +379,6 @@ public class DefaultProfileManager
         return profileActivationContext.getActiveByDefaultProfileIds();
     }
 
-    private static String getVersion( Model model )
-    {
-        Parent parent = model.getParent();
-
-        String version = model.getVersion();
-        if ( ( parent != null ) && ( version == null ) )
-        {
-            version = parent.getVersion();
-        }
-
-        return version;
-    }
 
     public static String getGroupId( Model model )
     {

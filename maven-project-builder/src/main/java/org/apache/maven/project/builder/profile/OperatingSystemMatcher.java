@@ -45,7 +45,16 @@ public class OperatingSystemMatcher implements ActiveProfileMatcher {
                     || (key.equals("${os.family}") && property.getUri().equals(ProjectUri.Profiles.Profile.Activation.Os.family))
                     || (key.equals("${os.name}") && property.getUri().equals(ProjectUri.Profiles.Profile.Activation.Os.name)) )
             {
-               return interpolatorProperty.getValue().equals(property.getResolvedValue());
+
+                if(property.getResolvedValue().startsWith("!"))
+                {
+                    return !interpolatorProperty.getValue().equals(property.getResolvedValue());
+                }
+                else
+                {
+                    return interpolatorProperty.getValue().equals(property.getResolvedValue());    
+                }
+
             }
         }
         return true;
