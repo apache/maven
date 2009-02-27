@@ -46,27 +46,7 @@ public class DefaultMirrorBuilder
 
         mirrors.put( mirrorOf, mirror );
     }
-    
-    public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
-    {
-        ArtifactRepository mirror = getMirror( repository );
-        if ( mirror != null )
-        {
-            String id = mirror.getId();
-            if ( id == null )
-            {
-                // TODO: this should be illegal in settings.xml
-                id = repository.getId();
-            }
-
-            logger.debug( "Using mirror: " + mirror.getId() + " for repository: " + repository.getId() + "\n(mirror url: " + mirror.getUrl() + ")" );
-            repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
-                                                                     repository.getLayout(), repository.getSnapshots(),
-                                                                     repository.getReleases() );
-        }
-        return repository;
-    }    
-    
+        
     /**
      * This method finds a matching mirror for the selected repository. If there is an exact match,
      * this will be used. If there is no exact match, then the list of mirrors is examined to see if
@@ -98,6 +78,34 @@ public class DefaultMirrorBuilder
         return selectedMirror;
     }
 
+    public void clearMirrors()
+    {
+        mirrors.clear();    
+        anonymousMirrorIdSeed = 0;
+    }       
+    
+    // Make these available to tests
+    
+    ArtifactRepository getMirrorRepository( ArtifactRepository repository )
+    {
+        ArtifactRepository mirror = getMirror( repository );
+        if ( mirror != null )
+        {
+            String id = mirror.getId();
+            if ( id == null )
+            {
+                // TODO: this should be illegal in settings.xml
+                id = repository.getId();
+            }
+
+            logger.debug( "Using mirror: " + mirror.getId() + " for repository: " + repository.getId() + "\n(mirror url: " + mirror.getUrl() + ")" );
+            repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
+                                                                     repository.getLayout(), repository.getSnapshots(),
+                                                                     repository.getReleases() );
+        }
+        return repository;
+    }    
+        
     /**
      * This method checks if the pattern matches the originalRepository. Valid patterns: * =
      * everything external:* = everything not on the localhost and not file based. repo,repo1 = repo
@@ -107,7 +115,7 @@ public class DefaultMirrorBuilder
      * @param pattern used for match. Currently only '*' is supported.
      * @return true if the repository is a match to this pattern.
      */
-    public boolean matchPattern( ArtifactRepository originalRepository, String pattern )
+    boolean matchPattern( ArtifactRepository originalRepository, String pattern )
     {
         boolean result = false;
         String originalId = originalRepository.getId();
@@ -162,7 +170,7 @@ public class DefaultMirrorBuilder
      * @param originalRepository
      * @return true if external.
      */
-    public boolean isExternalRepo( ArtifactRepository originalRepository )
+    boolean isExternalRepo( ArtifactRepository originalRepository )
     {
         try
         {
@@ -175,10 +183,4 @@ public class DefaultMirrorBuilder
             return false;
         }
     }
-
-    public void clearMirrors()
-    {
-        mirrors.clear();    
-        anonymousMirrorIdSeed = 0;
-    }       
 }

@@ -8,12 +8,12 @@ import org.codehaus.plexus.PlexusTestCase;
 public class MirrorProcessorTest
     extends PlexusTestCase
 {
-    private MirrorBuilder mirrorBuilder;
+    private DefaultMirrorBuilder mirrorBuilder;
     
     protected void setUp()
         throws Exception
     {
-        mirrorBuilder = lookup( MirrorBuilder.class );
+        mirrorBuilder = (DefaultMirrorBuilder) lookup( MirrorBuilder.class );
         mirrorBuilder.clearMirrors();
     }
     
