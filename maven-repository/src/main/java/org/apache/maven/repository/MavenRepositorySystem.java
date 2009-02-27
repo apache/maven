@@ -111,18 +111,6 @@ public interface MavenRepositorySystem
     public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
         
-    // Mirrors
-
-    ArtifactRepository getMirrorRepository( ArtifactRepository repository );
-
-    ArtifactRepository getMirror( ArtifactRepository originalRepository );
-
-    boolean matchPattern( ArtifactRepository originalRepository, String pattern );
-
-    boolean isExternalRepo( ArtifactRepository originalRepository );
-
-    void addMirror( String id, String mirrorOf, String url );
-
     // Network enablement
     
     void setOnline( boolean online );
