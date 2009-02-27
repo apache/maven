@@ -40,7 +40,6 @@ import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.apache.maven.repository.MavenRepositorySystem;
@@ -568,7 +567,7 @@ public class DefaultMavenExecutionRequestPopulator
         ProfileActivationContext activationContext = request.getProfileActivationContext();
         if ( activationContext == null )
         {
-            activationContext = new DefaultProfileActivationContext( request.getProperties(), false );
+            activationContext = new ProfileActivationContext( request.getProperties(), false );
         }
 
         activationContext.setExplicitlyActiveProfileIds( request.getActiveProfiles() );

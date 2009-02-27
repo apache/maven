@@ -26,6 +26,6 @@ public interface ProfileInjector
 {
     String ROLE = ProfileInjector.class.getName();
 
-    void inject( Profile profile, Model model );
+    Model inject( Profile profile, Model model );
 
 }

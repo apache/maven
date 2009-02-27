@@ -41,117 +41,6 @@ public class DefaultProfileInjectorTest
     extends TestCase
 {
 
-    public void testShouldUseMainPluginDependencyVersionOverManagedDepVersion()
-    {
-        PluginContainer profile = new PluginContainer();
-        Plugin profilePlugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
-        Dependency profileDep = createDependency( "g", "a", "2" );
-        profilePlugin.addDependency( profileDep );
-        profile.addPlugin( profilePlugin );
-
-        PluginContainer model = new PluginContainer();
-        Plugin plugin = createPlugin( "group", "artifact", "1", Collections.EMPTY_MAP );
-        Dependency dep = createDependency( "g", "a", "1" );
-        plugin.addDependency( dep );
-        model.addPlugin( plugin );
-
-        new DefaultProfileInjector().injectPlugins( profile, model );
-
-        assertEquals( profileDep.getVersion(), ((Dependency) plugin.getDependencies().get( 0 ) ).getVersion() );
-    }
-
-    private Dependency createDependency( String gid,
-                                         String aid,
-                                         String ver )
-    {
-        Dependency dep = new Dependency();
-        dep.setGroupId( gid );
-        dep.setArtifactId( aid );
-        dep.setVersion( ver );
-
-        return dep;
-    }
-
-    /**
-     * Test that this is the resulting ordering of plugins after merging:
-     *
-     * Given:
-     *
-     *   model: X -> A -> B -> D -> E
-     *   profile: Y -> A -> C -> D -> F
-     *
-     * Result:
-     *
-     *   X -> Y -> A -> B -> C -> D -> E -> F
-     */
-    public void testShouldPreserveOrderingOfPluginsAfterProfileMerge()
-    {
-        PluginContainer profile = new PluginContainer();
-
-        profile.addPlugin( createPlugin( "group", "artifact", "1.0", Collections.EMPTY_MAP ) );
-        profile.addPlugin( createPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key", "value" ) ) );
-
-        PluginContainer model = new PluginContainer();
-
-        model.addPlugin( createPlugin( "group3", "artifact3", "1.0", Collections.EMPTY_MAP ) );
-        model.addPlugin( createPlugin( "group2", "artifact2", "1.0", Collections.singletonMap( "key2", "value2" ) ) );
-
-        new DefaultProfileInjector().injectPlugins( profile, model );
-
-        List results = model.getPlugins();
-
-        assertEquals( 3, results.size() );
-
-        Plugin result1 = (Plugin) results.get( 0 );
-
-        assertEquals( "group3", result1.getGroupId() );
-        assertEquals( "artifact3", result1.getArtifactId() );
-
-        Plugin result2 = (Plugin) results.get( 1 );
-
-        assertEquals( "group", result2.getGroupId() );
-        assertEquals( "artifact", result2.getArtifactId() );
-
-        Plugin result3 = (Plugin) results.get( 2 );
-
-        assertEquals( "group2", result3.getGroupId() );
-        assertEquals( "artifact2", result3.getArtifactId() );
-
-        Xpp3Dom result3Config = (Xpp3Dom) result3.getConfiguration();
-
-        assertNotNull( result3Config );
-
-        assertEquals( "value", result3Config.getChild( "key" ).getValue() );
-        assertEquals( "value2", result3Config.getChild( "key2" ).getValue() );
-    }
-
-    private Plugin createPlugin( String groupId, String artifactId, String version, Map configuration )
-    {
-        Plugin plugin = new Plugin();
-        plugin.setGroupId( groupId );
-        plugin.setArtifactId( artifactId );
-        plugin.setVersion( version );
-
-        Xpp3Dom config = new Xpp3Dom( "configuration" );
-
-        if( configuration != null )
-        {
-            for ( Iterator it = configuration.entrySet().iterator(); it.hasNext(); )
-            {
-                Map.Entry entry = (Map.Entry) it.next();
-
-                Xpp3Dom param = new Xpp3Dom( String.valueOf( entry.getKey() ) );
-                param.setValue( String.valueOf( entry.getValue() ) );
-
-                config.addChild( param );
-            }
-        }
-
-        plugin.setConfiguration( config );
-
-        return plugin;
-    }
-
     public void testProfilePluginConfigurationShouldOverrideCollidingModelPluginConfiguration()
     {
         Plugin mPlugin = new Plugin();
@@ -198,7 +87,7 @@ public class DefaultProfileInjectorTest
 
         profile.setBuild( pBuild );
 
-        new DefaultProfileInjector().inject( profile, model );
+        model = new DefaultProfileInjector().inject( profile, model );
 
         Build rBuild = model.getBuild();
         Plugin rPlugin = (Plugin) rBuild.getPlugins().get( 0 );
@@ -264,7 +153,7 @@ public class DefaultProfileInjectorTest
 
         profile.setBuild( pBuild );
 
-        new DefaultProfileInjector().inject( profile, model );
+        model = new DefaultProfileInjector().inject( profile, model );
 
         Build rBuild = model.getBuild();
         Plugin rPlugin = (Plugin) rBuild.getPlugins().get( 0 );
@@ -308,13 +197,14 @@ public class DefaultProfileInjectorTest
 
         profile.addRepository( pRepository );
 
-        new DefaultProfileInjector().inject( profile, model );
+        model = new DefaultProfileInjector().inject( profile, model );
 
-        Repository rRepository = (Repository) model.getRepositories().get( 0 );
+        Repository rRepository = model.getRepositories().get( 0 );
 
         assertEquals( "http://www.yahoo.com", rRepository.getUrl() );
     }
 
+    /*
     public void testShouldPreserveModelModulesWhenProfileHasNone()
     {
         Model model = new Model();
@@ -324,7 +214,7 @@ public class DefaultProfileInjectorTest
         Profile profile = new Profile();
         profile.setId( "testId" );
 
-        new DefaultProfileInjector().inject( profile, model );
+        model = new DefaultProfileInjector().inject( profile, model );
 
         List rModules = model.getModules();
 
@@ -332,10 +222,6 @@ public class DefaultProfileInjectorTest
         assertEquals( "module1", rModules.get( 0 ) );
     }
 
-    // NOTE: The execution-id's are important, because they are NOT in
-    // alphabetical order. The trunk version of Maven currently injects
-    // profiles into a TreeMap, then calls map.values(), which puts the
-    // executions in alphabetical order...the WRONG order.
     public void testShouldPreserveOrderingOfProfileInjectedPluginExecutions()
     {
         Plugin profilePlugin = new Plugin();
@@ -376,7 +262,7 @@ public class DefaultProfileInjectorTest
         Model model = new Model();
         model.setBuild( build );
 
-        new DefaultProfileInjector().inject( profile, model );
+        model = new DefaultProfileInjector().inject( profile, model );
 
         List plugins = model.getBuild().getPlugins();
         assertNotNull( plugins );
@@ -403,4 +289,5 @@ public class DefaultProfileInjectorTest
         assertEquals( "y", e.getId() );
 
     }
+    */
 }

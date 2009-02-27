@@ -29,9 +29,9 @@ public class TestProfileInjector
     implements ProfileInjector
 {
 
-    public void inject( Profile profile, Model model )
+    public Model inject( Profile profile, Model model )
     {
-        // do nothing.
+        return null;
     }
 
 }

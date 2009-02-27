@@ -23,7 +23,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.PlexusTestCase;
@@ -136,7 +135,7 @@ public abstract class AbstractMavenProjectTestCase
         throws Exception
     {
         Properties props = System.getProperties();
-        ProfileActivationContext ctx = new DefaultProfileActivationContext( props, false );
+        ProfileActivationContext ctx = new ProfileActivationContext( props, false );
 
         ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
         pbc.setLocalRepository( getLocalRepository() );

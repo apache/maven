@@ -24,7 +24,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.shared.model.ModelContainer;
@@ -87,7 +86,7 @@ public class DefaultProfileManager
     private ProfileActivationContext createDefaultActivationContext()
     {
 
-        return new DefaultProfileActivationContext(System.getProperties(), false );
+        return new ProfileActivationContext(System.getProperties(), false );
     }
 
     public ProfileActivationContext getProfileActivationContext()

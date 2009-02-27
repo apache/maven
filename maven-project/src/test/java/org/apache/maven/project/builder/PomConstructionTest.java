@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.util.*;
 
 import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.activation.DefaultProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -48,8 +47,6 @@ public class PomConstructionTest
 
     private static String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
 
-    private ProjectBuilder projectBuilder;
-
     private MavenProjectBuilder mavenProjectBuilder;
 
     private MavenRepositorySystem mavenTools;
@@ -66,7 +63,6 @@ public class PomConstructionTest
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = lookup( MavenProjectBuilder.class );
-        projectBuilder = lookup( ProjectBuilder.class );
         mavenTools = lookup( MavenRepositorySystem.class );
         pomArtifactResolver = new PomArtifactResolver()
         {
@@ -133,10 +129,10 @@ public class PomConstructionTest
     {
         File pom = new File( testDirectory, "micromailer/micromailer-1.0.3.pom" );
         PomArtifactResolver resolver = artifactResolver( "micromailer" );
-        PomClassicDomainModel model = projectBuilder.buildModel( pom, null, resolver );
+        PomClassicDomainModel model = mavenProjectBuilder.buildModel( pom, null, resolver );
         // This should be 2
         //assertEquals( 2, model.getLineageCount() );
-        PomTestWrapper tester = new PomTestWrapper( (PomClassicDomainModel) model );
+        PomTestWrapper tester = new PomTestWrapper( model );
         assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
@@ -915,7 +911,7 @@ public class PomConstructionTest
         {
             pomFile = new File( pomFile, "pom.xml" );
         }
-        return new PomTestWrapper( pomFile, (PomClassicDomainModel) projectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
+        return new PomTestWrapper( pomFile, mavenProjectBuilder.buildModel( pomFile, null, pomArtifactResolver ) );
     }
 
     private PomTestWrapper buildPomFromMavenProject( String pomPath, String profileId )
@@ -928,14 +924,14 @@ public class PomConstructionTest
         }
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
         config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
-        ProfileActivationContext pCtx = new DefaultProfileActivationContext(null, true);
+        ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
         if(profileId != null)
         {
             pCtx.setExplicitlyActiveProfileIds(Arrays.asList(profileId));
         }
 
         config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
-        return new PomTestWrapper( pomFile, projectBuilder.buildFromLocalPath( pomFile, null, pomArtifactResolver,
+        return new PomTestWrapper( pomFile, mavenProjectBuilder.buildFromLocalPath( pomFile, null, pomArtifactResolver,
                 config, mavenProjectBuilder ) );
     }
 

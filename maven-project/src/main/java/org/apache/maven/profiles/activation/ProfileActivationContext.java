@@ -20,40 +20,133 @@ package org.apache.maven.profiles.activation;
  */
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-public interface ProfileActivationContext
+public class ProfileActivationContext
 {
 
-    List getExplicitlyActiveProfileIds();
+    private boolean isCustomActivatorFailureSuppressed;
 
-    List getExplicitlyInactiveProfileIds();
+    private final Properties executionProperties;
 
-    Properties getExecutionProperties();
+    List explicitlyActive;
 
-    boolean isCustomActivatorFailureSuppressed();
+    List explicitlyInactive;
 
-    void setCustomActivatorFailureSuppressed( boolean suppressed );
+    private List activeByDefault;
 
-    void setExplicitlyActiveProfileIds( List inactive );
+    public ProfileActivationContext( Properties executionProperties, boolean isCustomActivatorFailureSuppressed )
+    {
+        this.executionProperties = executionProperties;
+        this.isCustomActivatorFailureSuppressed = isCustomActivatorFailureSuppressed;
+    }
 
-    void setExplicitlyInactiveProfileIds( List inactive );
+    public Properties getExecutionProperties()
+    {
+        return executionProperties;
+    }
 
-    void setActive( String profileId );
+    public boolean isCustomActivatorFailureSuppressed()
+    {
+        return isCustomActivatorFailureSuppressed;
+    }
 
-    void setInactive( String profileId );
+    public void setCustomActivatorFailureSuppressed( boolean suppressed )
+    {
+        isCustomActivatorFailureSuppressed = suppressed;
+    }
 
-    boolean isExplicitlyActive( String profileId );
+    public List getExplicitlyActiveProfileIds()
+    {
+        if ( explicitlyActive == null )
+        {
+            return Collections.EMPTY_LIST;
+        }
 
-    boolean isExplicitlyInactive( String profileId );
+        return explicitlyActive;
+    }
 
-    List getActiveByDefaultProfileIds();
+    public void setExplicitlyActiveProfileIds( List active )
+    {
+        explicitlyActive = active;
+    }
 
-    void setActiveByDefaultProfileIds( List activeByDefault );
+    public List getExplicitlyInactiveProfileIds()
+    {
+        if ( explicitlyInactive == null )
+        {
+            return Collections.EMPTY_LIST;
+        }
 
-    void setActiveByDefault( String profileId );
+        return explicitlyInactive;
+    }
 
-    boolean isActiveByDefault( String profileId );
+    public void setExplicitlyInactiveProfileIds( List inactive )
+    {
+        explicitlyInactive = inactive;
+    }
+
+    public void setActive( String profileId )
+    {
+        if ( explicitlyActive == null )
+        {
+            explicitlyActive = new ArrayList();
+        }
+
+        explicitlyActive.add( profileId );
+    }
+
+    public void setInactive( String profileId )
+    {
+        if ( explicitlyInactive == null )
+        {
+            explicitlyInactive = new ArrayList();
+        }
+
+        explicitlyInactive.add( profileId );
+    }
+
+    public boolean isExplicitlyActive( String profileId )
+    {
+        return ( explicitlyActive != null ) && explicitlyActive.contains( profileId );
+    }
+
+    public boolean isExplicitlyInactive( String profileId )
+    {
+        return ( explicitlyInactive != null ) && explicitlyInactive.contains( profileId );
+    }
+
+    public List getActiveByDefaultProfileIds()
+    {
+        if ( activeByDefault == null )
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        return activeByDefault;
+    }
+
+    public boolean isActiveByDefault( String profileId )
+    {
+        return ( activeByDefault != null ) && activeByDefault.contains( profileId );
+    }
+
+    public void setActiveByDefault( String profileId )
+    {
+        if ( activeByDefault == null )
+        {
+            activeByDefault = new ArrayList();
+        }
+
+        activeByDefault.add( profileId );
+    }
+
+    public void setActiveByDefaultProfileIds( List activeByDefault )
+    {
+        this.activeByDefault = activeByDefault;
+    }
 
 }

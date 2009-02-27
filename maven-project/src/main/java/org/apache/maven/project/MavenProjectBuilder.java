@@ -18,9 +18,14 @@ package org.apache.maven.project;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.model.Model;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Collection;
 
 public interface MavenProjectBuilder
 {
@@ -47,4 +52,28 @@ public interface MavenProjectBuilder
 
     MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
+
+    PomClassicDomainModel buildModel( File pom,
+                                             Collection<InterpolatorProperty> interpolatorProperties,
+                                             PomArtifactResolver resolver )
+        throws IOException;
+
+    /**
+     * Returns a maven project for the specified input stream.
+     *
+     * @param pom                         input stream of the model
+     * @param interpolatorProperties      properties used for interpolation of properties within the model
+     * @param resolver                    artifact resolver used in resolving artifacts
+     * @param projectBuilderConfiguration
+     * @return a maven project for the specified input stream
+     * @throws IOException if there is a problem in the construction of the maven project
+     */
+    MavenProject buildFromLocalPath(File pom,
+                                    Collection<InterpolatorProperty> interpolatorProperties,
+                                    PomArtifactResolver resolver,
+                                    ProjectBuilderConfiguration projectBuilderConfiguration,
+                                    MavenProjectBuilder mavenProjectBuilder)
+        throws IOException;
+
+    Model getSuperModel();
 }

@@ -68,7 +68,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.PomInterpolatorTag;
@@ -155,9 +154,6 @@ public class DefaultPluginManager
 
     @Requirement
     private PluginRepository pluginRepository;
-
-    @Requirement
-    private ProjectBuilder projectBuilder;
 
     public DefaultPluginManager()
     {
