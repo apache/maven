@@ -79,7 +79,7 @@ public class MirrorProcessorTest
 
     }
 
-    public void xtestMirrorStopOnFirstMatch()
+    public void testMirrorStopOnFirstMatch()
     {
         //exact matches win first
         mirrorBuilder.addMirror( "a2", "a,b", "http://a2" );

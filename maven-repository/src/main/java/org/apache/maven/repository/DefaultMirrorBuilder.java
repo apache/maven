@@ -42,7 +42,13 @@ public class DefaultMirrorBuilder
 
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
-        mirrors.put( mirrorOf, mirror );
+        //System.out.println( mirror + " --> " + mirrorOf );
+        
+        //first one must win so don't insert more.
+        if (!mirrors.containsKey( mirrorOf ))
+        {
+          mirrors.put( mirrorOf, mirror );
+        }
     }
         
     /**
@@ -67,6 +73,8 @@ public class DefaultMirrorBuilder
                     if ( matchPattern( originalRepository, pattern ) )
                     {
                         selectedMirror = mirrors.get( pattern );
+                        //stop on the first match.
+                        break;
                     }
                 }
             }
