@@ -42,8 +42,6 @@ public class DefaultMirrorBuilder
 
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
-        System.out.println( mirror + " --> " + mirrorOf );
-
         mirrors.put( mirrorOf, mirror );
     }
         
