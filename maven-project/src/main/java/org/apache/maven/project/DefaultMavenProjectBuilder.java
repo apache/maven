@@ -22,6 +22,7 @@ package org.apache.maven.project;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.lang.reflect.Method;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -37,9 +38,9 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.activation.ProfileActivationContext;
 import org.apache.maven.profiles.activation.ProfileActivationException;
-import org.apache.maven.profiles.build.ProfileAdvisor;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.*;
 import org.apache.maven.project.builder.profile.ProfileContext;
@@ -58,6 +59,9 @@ import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+import org.codehaus.plexus.util.xml.pull.MXSerializer;
+import org.codehaus.plexus.PlexusContainer;
 
 
 /**
@@ -71,10 +75,10 @@ public class DefaultMavenProjectBuilder
     private ModelValidator validator;
 
     @Requirement
-    private ProfileAdvisor profileAdvisor;
+    private MavenRepositorySystem repositorySystem;
 
     @Requirement
-    private MavenRepositorySystem repositorySystem;
+    private PlexusContainer container;
 
     @Requirement
     List<ModelEventListener> listeners;
@@ -306,15 +310,15 @@ public class DefaultMavenProjectBuilder
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
         ProfileActivationContext profileActivationContext;
-        
+
+        List<Profile> projectProfiles = new ArrayList<Profile>();
         ProfileManager externalProfileManager = config.getGlobalProfileManager();
         
         if ( externalProfileManager != null )
         {
-            // used to trigger the caching of SystemProperties in the container context...
             try
             {
-                externalProfileManager.getActiveProfiles();
+                projectProfiles.addAll(externalProfileManager.getActiveProfiles( model ));
             }
             catch ( ProfileActivationException e )
             {
@@ -326,13 +330,24 @@ public class DefaultMavenProjectBuilder
         else
         {
             profileActivationContext = new ProfileActivationContext( config.getExecutionProperties(), false );
+
+            ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
+            profileManager.addProfiles( model.getProfiles() );
+            try
+            {
+                projectProfiles.addAll( profileManager.getActiveProfiles( model ));
+            }
+            catch (ProfileActivationException e)
+            {
+                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.",
+                                                    projectDescriptor, e );
+            }
         }
 
-        List<Profile> projectProfiles = new ArrayList<Profile>();
-
-        projectProfiles.addAll( profileAdvisor.applyActivatedProfiles( model, profileActivationContext ) );
-
-        projectProfiles.addAll( profileAdvisor.applyActivatedExternalProfiles( model, externalProfileManager ) );
+        for( Profile profile : projectProfiles )
+        {
+            inject( profile, model );
+        }
 
         MavenProject project;
         
@@ -356,6 +371,89 @@ public class DefaultMavenProjectBuilder
         project.setActiveProfiles( projectProfiles );
 
         return project;
+    }
+
+    private Model inject( Profile profile, Model model )
+    {
+        //TODO: Using reflection now. Need to replace with custom mapper
+        StringWriter writer = new StringWriter();
+        XmlSerializer serializer = new MXSerializer();
+        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
+        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
+        try
+        {
+            serializer.setOutput( writer );
+            serializer.startDocument("UTF-8", null );
+        } catch (IOException e) {
+
+        }
+
+        try {
+            MavenXpp3Writer w = new MavenXpp3Writer();
+            Class c = Class.forName("org.apache.maven.model.io.xpp3.MavenXpp3Writer");
+
+            Class partypes[] = new Class[3];
+            partypes[0] = Profile.class;
+            partypes[1] = String.class;
+            partypes[2] = XmlSerializer.class;
+
+            Method meth = c.getDeclaredMethod(
+                         "writeProfile", partypes);
+            meth.setAccessible(true);
+
+            Object arglist[] = new Object[3];
+            arglist[0] = profile;
+            arglist[1] = "profile";
+            arglist[2] = serializer;
+
+            meth.invoke(w, arglist);
+            serializer.endDocument();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        Set<String> uris = new HashSet(PomTransformer.URIS);
+        uris.add(ProjectUri.Profiles.Profile.Build.Plugins.Plugin.configuration);
+
+        List<ModelProperty> p;
+        try
+        {
+            p = ModelMarshaller.marshallXmlToModelProperties(new ByteArrayInputStream(writer.getBuffer().toString().getBytes()),
+                    ProjectUri.Profiles.xUri, uris);
+        } catch (IOException e) {
+            return null;
+        }
+
+            List<ModelProperty> transformed = new ArrayList<ModelProperty>();
+            for(ModelProperty mp : p)
+            {
+                if(mp.getUri().startsWith(ProjectUri.Profiles.Profile.xUri) && !mp.getUri().equals(ProjectUri.Profiles.Profile.id)
+                        && !mp.getUri().startsWith(ProjectUri.Profiles.Profile.Activation.xUri) )
+                {
+                    transformed.add(new ModelProperty(mp.getUri().replace(ProjectUri.Profiles.Profile.xUri, ProjectUri.xUri),
+                            mp.getResolvedValue()));
+                }
+            }
+
+        PomTransformer transformer = new PomTransformer( new PomClassicDomainModelFactory() );
+        ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
+
+        PomClassicDomainModel transformedDomainModel;
+        try {
+            transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( Arrays.asList(  new PomClassicDomainModel(transformed), convertToDomainModel(model)),
+                                                                                                    transformer,
+                                                                                                    transformer,
+                                                                                                    Collections.EMPTY_LIST,
+                                                                                                    null,
+                                                                                                    null ) );
+            return convertFromInputStreamToModel(transformedDomainModel.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+
     }
 
     private MavenProject readModelFromLocalPath( String projectId, File projectDescriptor, PomArtifactResolver resolver, ProjectBuilderConfiguration config )
