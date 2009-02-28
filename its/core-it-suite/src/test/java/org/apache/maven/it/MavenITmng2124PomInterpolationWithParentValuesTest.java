@@ -43,6 +43,8 @@ public class MavenITmng2124PomInterpolationWithParentValuesTest
         File child = new File( testDir, "parent/child" );
 
         Verifier verifier = new Verifier( child.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

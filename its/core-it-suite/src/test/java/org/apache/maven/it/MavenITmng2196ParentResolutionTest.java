@@ -25,13 +25,16 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2196">MNG-2196</a>.
+ */
 public class MavenITmng2196ParentResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
 
     public MavenITmng2196ParentResolutionTest()
     {
-        super( "(,2.0.2),(2.0.2,)" );
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**
@@ -43,12 +46,14 @@ public class MavenITmng2196ParentResolutionTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2196" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
-        
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2196" );
+
         if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
         {
-            verifier.executeGoal( "package" );
+            verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
         }
@@ -56,7 +61,7 @@ public class MavenITmng2196ParentResolutionTest
         {
             try
             {
-                verifier.executeGoal( "package" );
+                verifier.executeGoal( "validate" );
                 verifier.verifyErrorFreeLog();
             }
             catch ( VerificationException e )
@@ -68,5 +73,5 @@ public class MavenITmng2196ParentResolutionTest
             throw new VerificationException( "Build should have failed with java.io.IOException" );           
         }
     }
-}
 
+}

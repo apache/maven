@@ -24,6 +24,9 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2130">MNG-2130</a>.
+ */
 public class MavenITmng2130ParentLookupFromReactorCacheTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -34,18 +37,19 @@ public class MavenITmng2130ParentLookupFromReactorCacheTest
 
     /**
      * Test that parent-POMs cached during a build are available as parents
-     * to other POMs in the multimodule build. [MNG-2130]
+     * to other POMs in the multimodule build.
      */
     public void testitMNG2130()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2130" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifact( "org.apache.maven.it0099", "maven-it-it0099-parent", "1", "pom" );
-        verifier.executeGoal( "package" );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.mng2130" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}
