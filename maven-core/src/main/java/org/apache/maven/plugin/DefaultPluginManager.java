@@ -354,8 +354,9 @@ public class DefaultPluginManager
                 getLogger().debug( "Removing invalid plugin realm." );
                 realmManager.disposePluginRealm( projectPlugin );
 
-                throw new PluginManagerException( projectPlugin, "The PluginDescriptor for the plugin "
-                                                 + projectPlugin.getKey() + " was not found. Should have been in realm: " + pluginRealm, project );
+                throw new PluginManagerException( projectPlugin, "The plugin descriptor for the plugin "
+                    + projectPlugin.getKey() + " was not found. Should have been in realm: " + pluginRealm
+                    + " Please verify that the plugin JAR " + pluginArtifact.getFile() + " is intact.", project );
             }
 
             pluginDescriptor.setPluginArtifact( pluginArtifact );
