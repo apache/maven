@@ -27,24 +27,27 @@ import java.io.File;
 public class MavenITmng2668UsePluginDependenciesForSortingTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng2668UsePluginDependenciesForSortingTest()
     {
         // TODO: fix for 3.0+
         super( "(2.1.0-M1,3.0-alpha-1)" ); // 2.1.0-M2+
     }
 
-    public void testmng2668()
+    public void testitMNG2668()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2668" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2668" );
-        verifier.executeGoal( "install" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2668", "project", "1.0-SNAPSHOT", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2668", "tools", "1.0-SNAPSHOT", "jar" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng2668", "project", "1.0-SNAPSHOT", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng2668", "tools", "1.0-SNAPSHOT", "jar" );
     }
 
 }

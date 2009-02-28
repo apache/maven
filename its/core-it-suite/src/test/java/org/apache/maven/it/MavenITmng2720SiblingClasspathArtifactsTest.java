@@ -42,44 +42,61 @@ import java.util.List;
 public class MavenITmng2720SiblingClasspathArtifactsTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng2720SiblingClasspathArtifactsTest()
         throws InvalidVersionSpecificationException
     {
         super( "[2.1.0,)" );
     }
 
-    public void testIT ()
+    public void testIT()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2720" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        
-        verifier.executeGoal( "package" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "child2/target" );
+        verifier.deleteDirectory( "child3/target" );
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        List compileClassPath = verifier.loadLines( "child2/target/compile.classpath", "UTF-8" );
-        assertTrue( find( "child1-1.jar", compileClassPath ) );
+        List classPath;
+
+        classPath = verifier.loadLines( "child2/target/compile.txt", "UTF-8" );
+        assertMainJar( classPath );
+
+        classPath = verifier.loadLines( "child2/target/runtime.txt", "UTF-8" );
+        assertMainJar( classPath );
+
+        classPath = verifier.loadLines( "child2/target/test.txt", "UTF-8" );
+        assertMainJar( classPath );
         
-        compileClassPath = verifier.loadLines( "child3/target/compile.classpath", "UTF-8" );
-        assertFalse( find( "child1-1.jar", compileClassPath ) );
-        assertTrue( find( "child1-1-tests.jar", compileClassPath ) );
-        
+        classPath = verifier.loadLines( "child3/target/compile.txt", "UTF-8" );
+        assertTestJar( classPath );
+
+        classPath = verifier.loadLines( "child3/target/runtime.txt", "UTF-8" );
+        assertTestJar( classPath );
+
+        classPath = verifier.loadLines( "child3/target/test.txt", "UTF-8" );
+        assertTestJar( classPath );
     }
 
-    private boolean find( String pathSubstr, List classPath )
+    private void assertMainJar( List classPath )
     {
-        for ( Iterator it = classPath.iterator(); it.hasNext(); )
-        {
-            String path = (String) it.next();
-            
-            if ( path.indexOf( pathSubstr ) > -1 )
-            {
-                return true;
-            }
-        }
-        
-        return false;
+        assertTrue( classPath.toString(), classPath.contains( "main.jar" ) );
+        assertFalse( classPath.toString(), classPath.contains( "main" ) );
+        assertFalse( classPath.toString(), classPath.contains( "test.jar" ) );
+        assertFalse( classPath.toString(), classPath.contains( "test" ) );
     }
+
+    private void assertTestJar( List classPath )
+    {
+        assertFalse( classPath.toString(), classPath.contains( "main.jar" ) );
+        assertFalse( classPath.toString(), classPath.contains( "main" ) );
+        assertTrue( classPath.toString(), classPath.contains( "test.jar" ) );
+        assertFalse( classPath.toString(), classPath.contains( "test" ) );
+    }
+
 }
