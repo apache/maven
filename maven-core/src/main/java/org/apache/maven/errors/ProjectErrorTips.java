@@ -5,8 +5,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.RepositoryBase;
-import org.apache.maven.profiles.activation.ProfileActivationContext;
-import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.InvalidProjectVersionException;
 import org.apache.maven.project.MavenProject;

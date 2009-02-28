@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.project.ProfileManager;
 import org.apache.maven.shared.model.ModelEventListener;
 
 public class DefaultProjectBuilderConfiguration

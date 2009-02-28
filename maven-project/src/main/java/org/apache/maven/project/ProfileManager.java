@@ -1,4 +1,4 @@
-package org.apache.maven.profiles;
+package org.apache.maven.project;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,8 +21,8 @@ package org.apache.maven.profiles;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.activation.ProfileActivationContext;
-import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.project.ProfileActivationContext;
+import org.apache.maven.project.ProfileActivationException;
 
 import java.util.List;
 import java.util.Map;

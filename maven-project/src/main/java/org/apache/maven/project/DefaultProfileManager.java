@@ -1,4 +1,4 @@
-package org.apache.maven.profiles;
+package org.apache.maven.project;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,8 +24,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.profiles.activation.ProfileActivationContext;
-import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.apache.maven.project.ProfileActivationContext;
+import org.apache.maven.project.ProfileActivationException;
+import org.apache.maven.project.ProfileManager;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelMarshaller;
@@ -105,7 +106,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#addProfile(org.apache.maven.model.Profile)
+    * @see org.apache.maven.project.ProfileManager#addProfile(org.apache.maven.model.Profile)
     */
     public void addProfile( Profile profile )
     {
@@ -129,7 +130,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.lang.String)
+    * @see org.apache.maven.project.ProfileManager#explicitlyActivate(java.lang.String)
     */
     public void explicitlyActivate( String profileId )
     {
@@ -143,7 +144,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.util.List)
+    * @see org.apache.maven.project.ProfileManager#explicitlyActivate(java.util.List)
     */
     public void explicitlyActivate( List profileIds )
     {
@@ -156,7 +157,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.lang.String)
+    * @see org.apache.maven.project.ProfileManager#explicitlyDeactivate(java.lang.String)
     */
     public void explicitlyDeactivate( String profileId )
     {
@@ -170,7 +171,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.util.List)
+    * @see org.apache.maven.project.ProfileManager#explicitlyDeactivate(java.util.List)
     */
     public void explicitlyDeactivate( List profileIds )
     {
@@ -341,7 +342,7 @@ public class DefaultProfileManager
     }
 
     /* (non-Javadoc)
-     * @see org.apache.maven.profiles.ProfileManager#addProfiles(java.util.List)
+     * @see org.apache.maven.project.ProfileManager#addProfiles(java.util.List)
      */
     public void addProfiles( List profiles )
     {

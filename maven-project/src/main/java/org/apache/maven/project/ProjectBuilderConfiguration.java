@@ -1,9 +1,7 @@
 package org.apache.maven.project;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.shared.model.ModelEventListener;
-import org.codehaus.plexus.PlexusContainer;
+import org.apache.maven.project.ProfileManager;
 
 import java.util.Date;
 import java.util.List;

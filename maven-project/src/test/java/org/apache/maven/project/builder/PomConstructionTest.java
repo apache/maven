@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.*;
 
-import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.activation.ProfileActivationContext;
+import org.apache.maven.project.DefaultProfileManager;
+import org.apache.maven.project.ProfileActivationContext;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.artifact.Artifact;

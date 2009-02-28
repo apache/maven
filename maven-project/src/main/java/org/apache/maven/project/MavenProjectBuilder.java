@@ -17,7 +17,7 @@ package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.project.ProfileManager;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.model.Model;
