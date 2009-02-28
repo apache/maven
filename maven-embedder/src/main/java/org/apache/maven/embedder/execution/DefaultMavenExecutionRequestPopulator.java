@@ -195,7 +195,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         List settingsActiveProfileIds = settings.getActiveProfiles();
 
-        profileManager.explicitlyActivate( settingsActiveProfileIds );
+        profileManager.getProfileActivationContext().setExplicitlyActiveProfileIds( settingsActiveProfileIds );
 
         if ( ( settingsProfiles != null ) && !settingsProfiles.isEmpty() )
         {

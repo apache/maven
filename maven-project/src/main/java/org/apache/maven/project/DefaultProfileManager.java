@@ -259,18 +259,12 @@ public class DefaultProfileManager
         try
         {                                                                   
             p = ModelMarshaller.marshallXmlToModelProperties(new ByteArrayInputStream(writer.getBuffer().toString().getBytes()),
-                    ProjectUri.Profiles.Profile.xUri, PomTransformer.URIS);
+                    ProjectUri.Profiles.xUri, PomTransformer.URIS);
         } catch (IOException e) {
             throw new ProfileActivationException(e.getMessage());
         }
-        //Serializer adds in extra node, strip it out
-        List<ModelProperty> p2 = new ArrayList<ModelProperty>();
-        for(ModelProperty mp : p)
-        {
-            p2.add(new ModelProperty(mp.getUri().replaceFirst("profile/", ""), mp.getResolvedValue()));
-        }
         
-        ModelContainer mc = new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri).create(p2);
+        ModelContainer mc = new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri).create(p);
         for(ActiveProfileMatcher matcher : matchers)
         {
             if(matcher.isMatch(mc, interpolatorProperties))

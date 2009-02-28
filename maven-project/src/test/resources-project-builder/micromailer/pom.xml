@@ -5,7 +5,8 @@
 	<parent>
 		<groupId>org.sonatype.spice</groupId>
 		<artifactId>spice-parent</artifactId>
-		<version>9</version>
+		<version>11</version>
+        <relativePath>spice-parent-9.pom</relativePath>
 	</parent>
 
 	<groupId>org.sonatype.micromailer</groupId>
