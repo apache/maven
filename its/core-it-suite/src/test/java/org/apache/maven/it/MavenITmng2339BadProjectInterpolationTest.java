@@ -37,12 +37,12 @@ public class MavenITmng2339BadProjectInterpolationTest
     public void testitMNG2339a()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2339/a" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2339/a" );
 
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dversion=foo" );
@@ -57,12 +57,13 @@ public class MavenITmng2339BadProjectInterpolationTest
     public void testitMNG2339b()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-2339/b" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2339/b" );
 
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         verifier.setLogFileName( "log-pom-specified.txt" );
         verifier.executeGoal( "initialize" );
@@ -74,6 +75,8 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.resetStreams();
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dversion=2" );

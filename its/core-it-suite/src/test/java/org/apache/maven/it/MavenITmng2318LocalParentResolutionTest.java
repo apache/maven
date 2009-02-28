@@ -45,8 +45,10 @@ public class MavenITmng2318LocalParentResolutionTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2318" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "clean" );
+        verifier.setAutoclean( false );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

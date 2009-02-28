@@ -33,15 +33,23 @@ public class MavenITmng2539PluginDependenciesComeFromPluginReposTest
         super( "(2.0.4,)" );
     }
 
+    /**
+     * Verify that dependencies specified in plugins are also retrieved from ordinary/non-plugin repositories.
+     */
     public void testitMNG2539()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2539" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2539" );
-        verifier.executeGoal( "clean" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/log.txt" );
     }
 
 }

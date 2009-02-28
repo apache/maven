@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2293">MNG-2293</a>.
@@ -41,16 +39,15 @@ public class MavenITmng2293CustomPluginParamImplTest
     }
 
     /**
-     * Verify that default implementation of an implementation for a complex object works as
-     * expected [MNG-2293]
+     * Verify that default implementation of an implementation for a complex object works as expected.
      */
     public void testitMNG2293()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2293" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        List cliOptions = new ArrayList();
-        verifier.setCliOptions( cliOptions );
+        verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

@@ -23,6 +23,9 @@ import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.it.Verifier;
 
 import java.io.File;
+import java.util.Date;
+import java.util.Properties;
+import java.text.SimpleDateFormat;
 
 public class MavenITmng2562TimestampTest
     extends AbstractMavenIntegrationTestCase
@@ -30,16 +33,26 @@ public class MavenITmng2562TimestampTest
     
     public MavenITmng2562TimestampTest()
     {
-        super( "[2.1.0-M1,)"); // 2.1.0+ only
+        super( "[2.1.0-M1,)" ); // 2.1.0+ only
     }
 
-    public void testitMNG2562() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-                "/mng-2562");
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
-        verifier.executeGoal("verify");
+    public void testitMNG2562()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2562" );
 
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/pom.properties" );
+        String timestamp = props.getProperty( "project.properties.timestamp", "" );
+        assertTrue( timestamp, timestamp.matches( "[0-9]{8}-[0-9]{4}" ) );
+        Date date = new SimpleDateFormat( "yyyyMMdd-HHmm" ).parse( timestamp );
+        assertTrue( new Date() + " vs " + date, Math.abs( System.currentTimeMillis() - date.getTime() ) < 24 * 60 * 60 * 1000 );
     }
+
 }

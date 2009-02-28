@@ -19,40 +19,43 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.maven.its.mng2562</groupId>
-    <artifactId>mng-2562-timestamp</artifactId>
-    <packaging>pom</packaging>
-    <version>1.0</version>
-    <name>Apache Maven: mng-2562-timestamp</name>
+  <modelVersion>4.0.0</modelVersion>
 
-    <build>
-        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.its.plugins</groupId>
-                <version>2.1-SNAPSHOT</version>
-                <artifactId>maven-it-plugin-project-interpolation</artifactId>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>verify-property</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <properties>
-                        <property>
-                            <name>timestamp</name>
-                            <value>${build.timestamp}</value>
-                        </property>
-                    </properties>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <properties>
-        <timestamp>${build.timestamp}</timestamp>
-    </properties>
+  <groupId>org.apache.maven.its.mng2562</groupId>
+  <artifactId>timestamp</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+
+  <name>Maven Integration Test :: MNG-2562</name> 
+  <description>
+    Verify that the property build.timestamp is available for POM interpolation.
+  </description>
+
+  <properties>
+    <timestamp>${build.timestamp}</timestamp>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <version>2.1-SNAPSHOT</version>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <outputFile>target/pom.properties</outputFile>
+          <expressions>
+            <expression>project/properties</expression>
+          </expressions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -21,7 +21,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven.its.it0106</groupId>
+    <groupId>org.apache.maven.its.mng2318</groupId>
     <artifactId>B</artifactId>
     <version>1</version>
   </parent>
