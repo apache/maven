@@ -25,6 +25,9 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2124">MNG-2124</a>.
+ */
 public class MavenITmng2124PomInterpolationWithParentValuesTest
     extends AbstractMavenIntegrationTestCase
 {

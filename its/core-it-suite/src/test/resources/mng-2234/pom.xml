@@ -1,8 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>org.apache.maven.its.mng2234</groupId>
-  <artifactId>test-artifact</artifactId>
+  <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-2234</name> 
+  <description>
+    Verify that the activeProfile section from the settings.xml can also activate profiles specified in the POM,
+    i.e. outside of the settings.xml.
+  </description>
+
   <profiles>
     <profile>
       <id>env-test</id>
@@ -14,6 +22,8 @@
             <version>2.1-SNAPSHOT</version>
             <executions>
               <execution>
+                <id>test</id>
+                <phase>validate</phase>
                 <goals>
                   <goal>touch</goal>
                 </goals>

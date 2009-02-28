@@ -20,8 +20,7 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -35,26 +34,33 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng2254PomEncodingTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng2254PomEncodingTest()
     {
         super( "(2.0.7,)" ); // 2.0.8+
     }
 
+    /**
+     * Verify that the encoding declaration of the POM is respected.
+     */
     public void testitMNG2254 ()
         throws Exception
     {
-        // The testdir is computed from the location of this
-        // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2254" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-N" );
-        verifier.executeGoal( "compile" );
-
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "utf-8/target" );
+        verifier.deleteDirectory( "latin-1/target" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-
         verifier.resetStreams();
+
+        Properties utf8 = verifier.loadProperties( "utf-8/target/pom.properties" );
+        assertEquals( "TEST-CHARS: \u00DF\u0131\u03A3\u042F\u05D0\u20AC", utf8.getProperty( "project.description" ) );
+
+        Properties latin1 = verifier.loadProperties( "latin-1/target/pom.properties" );
+        assertEquals( "TEST-CHARS: \u00C4\u00D6\u00DC\u00E4\u00F6\u00FC\u00DF", latin1.getProperty( "project.description" ) );
     }
+
 }

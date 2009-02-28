@@ -26,31 +26,40 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2234">MNG-2234</a>.
+ */
 public class MavenITmng2234ActiveProfilesFromSettingsTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng2234ActiveProfilesFromSettingsTest()
     {
         super( "(2.0.8,)" );
     }
 
-    public void testitMNG2234 ()
+    /**
+     * Verify that the activeProfile section from the settings.xml can also activate profiles specified in the POM,
+     * i.e. outside of the settings.xml.
+     */
+    public void testitMNG2234()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2234" );
 
-        Verifier verifier;
-
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-s" );
         cliOptions.add( "settings.xml" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "install" );
-
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "target/touch.txt" );
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/touch.txt" );
     }
+
 }
