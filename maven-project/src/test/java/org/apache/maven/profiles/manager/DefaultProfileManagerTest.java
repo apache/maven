@@ -70,7 +70,7 @@ public class DefaultProfileManagerTest
         profileManager.addProfile( notActivated );
         profileManager.addProfile( defaultActivated );
 
-        List active = profileManager.getActiveProfiles();
+        List active = profileManager.getActiveProfiles( null );
 
         assertNotNull( active );
         assertEquals( 1, active.size() );
@@ -109,7 +109,7 @@ public class DefaultProfileManagerTest
         profileManager.addProfile( syspropActivated );
         profileManager.addProfile( defaultActivated );
 
-        List active = profileManager.getActiveProfiles();
+        List active = profileManager.getActiveProfiles( null );
 
         assertNotNull( active );
         assertEquals( 1, active.size() );
@@ -138,7 +138,7 @@ public class DefaultProfileManagerTest
 
         profileManager.addProfile( syspropActivated );
 
-        List active = profileManager.getActiveProfiles();
+        List active = profileManager.getActiveProfiles( null );
 
         assertNotNull( active );
         assertEquals( 0, active.size() );
@@ -166,9 +166,9 @@ public class DefaultProfileManagerTest
 
         profileManager.addProfile( syspropActivated );
 
-        profileManager.explicitlyActivate( "syspropActivated" );
+        ctx.setActive( "syspropActivated" );
 
-        List active = profileManager.getActiveProfiles();
+        List active = profileManager.getActiveProfiles( null );
 
         assertNotNull( active );
         assertEquals( 1, active.size() );
@@ -197,9 +197,9 @@ public class DefaultProfileManagerTest
 
         profileManager.addProfile( syspropActivated );
 
-        profileManager.explicitlyDeactivate( "syspropActivated" );
+        ctx.setInactive( "syspropActivated" );
 
-        List active = profileManager.getActiveProfiles();
+        List active = profileManager.getActiveProfiles( null );
 
         assertNotNull( active );
         assertEquals( 0, active.size() );
@@ -228,7 +228,7 @@ public class DefaultProfileManagerTest
 
         profileManager.addProfile( osActivated );
 
-        List active = profileManager.getActiveProfiles();
+        List active = profileManager.getActiveProfiles( null );
 
         assertNotNull( active );
         assertEquals( 1, active.size() );

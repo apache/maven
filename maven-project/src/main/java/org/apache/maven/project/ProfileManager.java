@@ -31,59 +31,13 @@ public interface ProfileManager
 {
     void addProfile( Profile profile );
 
-    /**
-     * @deprecated Use {@link ProfileActivationContext} methods instead.
-     */
-    void explicitlyActivate( String profileId );
-
-    /**
-     * @deprecated Use {@link ProfileActivationContext} methods instead.
-     */
-    void explicitlyActivate( List profileIds );
-
-    /**
-     * @deprecated Use {@link ProfileActivationContext} methods instead.
-     */
-    void explicitlyDeactivate( String profileId );
-
-    /**
-     * @deprecated Use {@link ProfileActivationContext} methods instead.
-     */
-    void explicitlyDeactivate( List profileIds );
-
-    /**
-     * @deprecated Use {@link ProfileActivationContext} methods instead.
-     */
-    void activateAsDefault( String profileId );
-
     ProfileActivationContext getProfileActivationContext();
 
     void setProfileActivationContext( ProfileActivationContext profileActivationContext );
 
-    /**
-     * @deprecated Use {@link ProfileManager#getActiveProfiles(Model)} instead.
-     */
-    List getActiveProfiles()
-        throws ProfileActivationException;
-
-    void addProfiles( List profiles );
+    void addProfiles( List<Profile> profiles );
 
     Map getProfilesById();
-
-    /**
-     * @deprecated Use {@link ProfileActivationContext} methods instead.
-     */
-    List getExplicitlyActivatedIds();
-
-    /**
-     * @deprecated Use {@link ProfileActivationContext} methods instead.
-     */
-    List getExplicitlyDeactivatedIds();
-
-    /**
-     * @deprecated Use {@link ProfileActivationContext} methods instead.
-     */
-    List getIdsActivatedByDefault();
 
     List getActiveProfiles( Model model )
         throws ProfileActivationException;

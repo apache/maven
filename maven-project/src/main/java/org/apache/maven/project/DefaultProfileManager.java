@@ -129,66 +129,6 @@ public class DefaultProfileManager
         }
     }
 
-    /* (non-Javadoc)
-    * @see org.apache.maven.project.ProfileManager#explicitlyActivate(java.lang.String)
-    */
-    public void explicitlyActivate( String profileId )
-    {
-        List activatedIds = profileActivationContext.getExplicitlyActiveProfileIds();
-        if ( !activatedIds.contains( profileId ) )
-        {
-            container.getLogger().debug( "Profile with id: \'" + profileId + "\' has been explicitly activated." );
-
-            profileActivationContext.setActive( profileId );
-        }
-    }
-
-    /* (non-Javadoc)
-    * @see org.apache.maven.project.ProfileManager#explicitlyActivate(java.util.List)
-    */
-    public void explicitlyActivate( List profileIds )
-    {
-        for ( Iterator it = profileIds.iterator(); it.hasNext(); )
-        {
-            String profileId = (String) it.next();
-
-            explicitlyActivate( profileId );
-        }
-    }
-
-    /* (non-Javadoc)
-    * @see org.apache.maven.project.ProfileManager#explicitlyDeactivate(java.lang.String)
-    */
-    public void explicitlyDeactivate( String profileId )
-    {
-        List deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
-        if ( !deactivatedIds.contains( profileId ) )
-        {
-            container.getLogger().debug( "Profile with id: \'" + profileId + "\' has been explicitly deactivated." );
-
-            profileActivationContext.setInactive( profileId );
-        }
-    }
-
-    /* (non-Javadoc)
-    * @see org.apache.maven.project.ProfileManager#explicitlyDeactivate(java.util.List)
-    */
-    public void explicitlyDeactivate( List profileIds )
-    {
-        for ( Iterator it = profileIds.iterator(); it.hasNext(); )
-        {
-            String profileId = (String) it.next();
-
-            explicitlyDeactivate( profileId );
-        }
-    }
-
-    public List getActiveProfiles()
-        throws ProfileActivationException
-    {
-        return getActiveProfiles( null );
-    }
-
     // TODO: Portions of this logic are duplicated in o.a.m.p.b.p.ProfileContext, something is wrong here
     public List getActiveProfiles( Model model )
         throws ProfileActivationException
@@ -344,7 +284,7 @@ public class DefaultProfileManager
     /* (non-Javadoc)
      * @see org.apache.maven.project.ProfileManager#addProfiles(java.util.List)
      */
-    public void addProfiles( List profiles )
+    public void addProfiles( List<Profile> profiles )
     {
         for ( Iterator it = profiles.iterator(); it.hasNext(); )
         {
@@ -354,7 +294,7 @@ public class DefaultProfileManager
         }
     }
 
-    public void activateAsDefault( String profileId )
+    private void activateAsDefault( String profileId )
     {
         List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
 
@@ -362,21 +302,6 @@ public class DefaultProfileManager
         {
             profileActivationContext.setActiveByDefault( profileId );
         }
-    }
-
-    public List getExplicitlyActivatedIds()
-    {
-        return profileActivationContext.getExplicitlyActiveProfileIds();
-    }
-
-    public List getExplicitlyDeactivatedIds()
-    {
-        return profileActivationContext.getExplicitlyInactiveProfileIds();
-    }
-
-    public List getIdsActivatedByDefault()
-    {
-        return profileActivationContext.getActiveByDefaultProfileIds();
     }
 
 
