@@ -881,6 +881,15 @@ public class PomConstructionTest
     }
     //*/
 
+    public void testPomEncoding()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "pom-encoding/utf-8" );
+        assertEquals( "TEST-CHARS: \u00DF\u0131\u03A3\u042F\u05D0\u20AC", pom.getValue( "description" ) );
+        pom = buildPom( "pom-encoding/latin-1" );
+        assertEquals( "TEST-CHARS: \u00C4\u00D6\u00DC\u00E4\u00F6\u00FC\u00DF", pom.getValue( "description" ) );
+    }
+
     private void assertPathWithNormalizedFileSeparators( Object value )
     {
         assertEquals( new File( value.toString() ).getPath(), value.toString() );
