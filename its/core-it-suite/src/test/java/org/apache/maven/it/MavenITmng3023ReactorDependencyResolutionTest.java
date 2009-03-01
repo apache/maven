@@ -54,13 +54,14 @@ public class MavenITmng3023ReactorDependencyResolutionTest
 
         // First pass. Make sure the dependency cannot be resolved.
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         verifier.setLogFileName( "log-a.txt" );
         
         verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
         
         try
         {
-            verifier.executeGoal( "initialize" );
+            verifier.executeGoal( "validate" );
             fail( "Expected failure to resolve dependency artifact without at least calling 'compile' phase." );
         }
         catch ( VerificationException e )
@@ -87,11 +88,12 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         verifier.setLogFileName( "log-b.txt" );
-        
+        verifier.deleteDirectory( "consumer/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
         
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
@@ -118,11 +120,13 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         
         verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
         
+        verifier.deleteDirectory( "consumer/target" );
         verifier.setLogFileName( "log-c-1.txt" );
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
@@ -130,8 +134,9 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
         assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
         
+        verifier.deleteDirectory( "consumer/target" );
         verifier.setLogFileName( "log-c-2.txt" );
-        verifier.executeGoal( "initialize" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
