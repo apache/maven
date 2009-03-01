@@ -7,14 +7,6 @@
   <version>2.0</version>
   <name>project</name>
   <url>http://maven.apache.org</url>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <distributionManagement>
     <repository>
       <id>id</id>

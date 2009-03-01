@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.List;
 
 public class MavenITmng2861RelocationsAndRangesTest
     extends AbstractMavenIntegrationTestCase
@@ -39,9 +40,16 @@ public class MavenITmng2861RelocationsAndRangesTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2861" );
 
         Verifier verifier = new Verifier( new File( testDir, "MNG-2861" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "A/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2861" );
-        verifier.executeGoal( "install" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
+
+        List artifacts = verifier.loadLines( "A/target/artifacts.txt", "UTF-8" );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2861:B:jar:1.0-SNAPSHOT" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2861.new:project:jar:2.0" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2861:C:jar:1.0-SNAPSHOT" ) );
     }
 
 }
