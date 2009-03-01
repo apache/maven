@@ -1,26 +1,37 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>MNG-2861</artifactId>
     <groupId>org.apache.maven.its.mng2861</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+
   <artifactId>B</artifactId>
-  <name>B</name>
   <version>1.0-SNAPSHOT</version>
+
+  <name>B</name>
   <url>http://maven.apache.org</url>
+
   <dependencies>
     <dependency>
-      <groupId>oldgroupId</groupId>
+      <groupId>org.apache.maven.its.mng2861.old</groupId>
       <artifactId>project</artifactId>
       <version>[1.2,)</version>
     </dependency>
   </dependencies>
+
   <repositories>
     <repository>
       <id>id</id>
       <url>file://localhost/${basedir}/../../repo</url>
-      <releases><enabled>true</enabled></releases>
+      <releases>
+        <checksumPolicy>ignore</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
 </project>
