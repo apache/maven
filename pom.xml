@@ -379,7 +379,7 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.doxia</groupId>
         <artifactId>doxia-sink-api</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.0</version>
       </dependency>
       <!-- Plexus -->
       <dependency>
