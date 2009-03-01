@@ -44,6 +44,17 @@ public class ArtifactResolutionRequest
 
     private List<ConflictResolver> conflictResolvers;
 
+    public ArtifactResolutionRequest()
+    {        
+    }
+    
+    public ArtifactResolutionRequest( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
+    {        
+        this.artifact = artifact;
+        this.localRepository = localRepository;
+        this.remoteRepostories = remoteRepositories;
+    }
+    
     public Artifact getArtifact()
     {
         return artifact;
