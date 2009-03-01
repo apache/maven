@@ -44,7 +44,7 @@ under the License.
             <id>install</id>
             <phase>validate</phase>
             <configuration>
-              <mainFile>main.jar</mainFile>
+              <mainFile>pom.xml</mainFile>
               <attachedFile>attached.jar</attachedFile>
               <artifactType>test-jar</artifactType>
               <artifactClassifier>tests</artifactClassifier>

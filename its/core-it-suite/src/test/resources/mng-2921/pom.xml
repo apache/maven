@@ -39,6 +39,7 @@ under the License.
   <modules>
     <module>tests</module>
     <module>ejbs</module>
+    <module>producer</module>
     <module>consumer</module>
   </modules>
 

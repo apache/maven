@@ -28,29 +28,50 @@ under the License.
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ejbs</artifactId>
-  <packaging>ejb</packaging>
+  <artifactId>producer</artifactId>
+  <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-2921 :: EJB Client JAR Provider</name> 
+  <name>Maven Integration Test :: MNG-2921 :: Dependency Provider</name> 
 
   <build>
     <plugins>
       <plugin>
+        <!-- NOTE: It is essential part of this test that this module provides multiple attached artifacts! -->
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-artifact</artifactId>
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>install</id>
+            <id>package-main</id>
             <phase>validate</phase>
             <configuration>
               <mainFile>pom.xml</mainFile>
-              <attachedFile>attached.jar</attachedFile>
+            </configuration>
+            <goals>
+              <goal>set</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>package-tests</id>
+            <phase>validate</phase>
+            <configuration>
+              <attachedFile>tests.jar</attachedFile>
+              <artifactType>test-jar</artifactType>
+              <artifactClassifier>tests</artifactClassifier>
+            </configuration>
+            <goals>
+              <goal>attach</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>package-client</id>
+            <phase>validate</phase>
+            <configuration>
+              <attachedFile>client.jar</attachedFile>
               <artifactType>ejb-client</artifactType>
               <artifactClassifier>client</artifactClassifier>
             </configuration>
             <goals>
-              <goal>set</goal>
               <goal>attach</goal>
             </goals>
           </execution>
