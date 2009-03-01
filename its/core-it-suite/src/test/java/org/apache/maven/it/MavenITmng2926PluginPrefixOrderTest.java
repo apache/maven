@@ -40,41 +40,42 @@ public class MavenITmng2926PluginPrefixOrderTest
         super( "(2.0.6,)" );
     }
 
+    /**
+     * Verify that when resolving plugin prefixes the group org.apache.maven.plugins is searched before
+     * org.codehaus.mojo and that custom groups from the settings are searched before these standard ones.
+     */
     public void testitMNG2926()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2926" );
 
         Verifier verifier;
-        //use my custom settings upon invocation.
-        ArrayList cli = new ArrayList();
 
-        // Install the parent POM, extension and the plugin
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2926" );
+        verifier.deleteArtifact( "org.apache.maven.plugins", "mng-2926", "0.1", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.plugins", "mng-2926", "0.1", "pom" );
+        verifier.deleteArtifact( "org.codehaus.mojo", "mng-2926", "0.1", "jar" );
+        verifier.deleteArtifact( "org.codehaus.mojo", "mng-2926", "0.1", "pom" );
+        verifier.resetStreams();
 
-        verifier.executeGoal( "install" );
+        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.setLogFileName( "log-default.txt" );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings-default.xml" );
+        verifier.executeGoal( "mng-2926:apache" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
-        // 2008-09-29 Oleg: fixed the test. If current settings.xml contains codehause group, 
-        // default order will be changed. Artificially make currently set groups disappear
-        
-        // now run the test. Since we have apache and codehaus, i should get the apache one first
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2926/test-project" );
-        cli.add("-s '" +testDir.getAbsolutePath()+"/settings-apache.xml'");
-        verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setCliOptions( cli );
-        verifier.executeGoal( "it0119:apache" );
-        verifier.verifyErrorFreeLog();
 
-        cli.clear();
-//      now run the test. Since we have apache and codehaus and a prefix in my settings, i should get the custom one first
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2926/test-project" );
         verifier = new Verifier( testDir.getAbsolutePath() );
-        
-        cli.add("-s '" +testDir.getAbsolutePath()+"/settings.xml'");
-        verifier.setCliOptions( cli );
-        verifier.executeGoal( "it0119:custom" );
+        verifier.setAutoclean( false );
+        verifier.setLogFileName( "log-custom.txt" );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings-custom.xml" );
+        verifier.executeGoal( "mng-2926:custom" );
         verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
     }
+
 }

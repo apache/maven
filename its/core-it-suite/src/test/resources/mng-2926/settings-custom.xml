@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <pluginGroups>
+    <pluginGroup>org.apache.maven.its.mng2926</pluginGroup>
+  </pluginGroups>
+</settings>
