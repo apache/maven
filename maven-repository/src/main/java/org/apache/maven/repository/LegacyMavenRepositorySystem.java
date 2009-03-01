@@ -454,7 +454,7 @@ public class LegacyMavenRepositorySystem
             projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
         }
 
-        artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
+        resolve( projectArtifact, localRepository, remoteArtifactRepositories );
 
         File file = projectArtifact.getFile();
         artifact.setFile( file );
