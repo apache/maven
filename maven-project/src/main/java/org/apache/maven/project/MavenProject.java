@@ -1845,7 +1845,7 @@ public class MavenProject
         }
         
         StringBuffer message = new StringBuffer();
-        message.append( "A dependency of the current project (or of one the plugins used in its build)was found in the reactor, " );
+        message.append( "A dependency of the current project (or of one the plugins used in its build) was found in the reactor, " );
         message.append( "\nbut had not been built at the time it was requested. It will be resolved from the repository instead." );
         message.append( "\n\nCurrent Project: " ).append( getName() );
         message.append( "\nRequested Dependency: " ).append( artifact.getId() );
