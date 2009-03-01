@@ -1797,40 +1797,17 @@ public class MavenProject
                     {
                         if ( attached.getFile() != null && attached.getFile().exists() )
                         {
-                            /* TODO: if I use the original, I get an exception below:
-                                java.lang.UnsupportedOperationException: Cannot change the download information for an attached artifact. It is derived from the main artifact.
-                                at org.apache.maven.project.artifact.AttachedArtifact.setDownloadUrl(AttachedArtifact.java:89)
-                                at org.apache.maven.project.artifact.MavenMetadataSource.retrieve(MavenMetadataSource.java:205)
-                                at org.apache.maven.artifact.resolver.DefaultArtifactCollector.recurse(DefaultArtifactCollector.java:275)
-                                at org.apache.maven.artifact.resolver.DefaultArtifactCollector.collect(DefaultArtifactCollector.java:67)
-                                at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:223)
-                                at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:211)
-                                at org.apache.maven.artifact.resolver.DefaultArtifactResolver.resolveTransitively(DefaultArtifactResolver.java:182)
-                                at org.apache.maven.plugin.DefaultPluginManager.resolveTransitiveDependencies(DefaultPluginManager.java:1117)
-                                at org.apache.maven.plugin.DefaultPluginManager.executeMojo(DefaultPluginManager.java:366)
-                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoals(DefaultLifecycleExecutor.java:534)
-                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalWithLifecycle(DefaultLifecycleExecutor.java:475)
-                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoal(DefaultLifecycleExecutor.java:454)
-                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeGoalAndHandleFailures(DefaultLifecycleExecutor.java:306)
-                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.executeTaskSegments(DefaultLifecycleExecutor.java:273)
-                                at org.apache.maven.lifecycle.DefaultLifecycleExecutor.execute(DefaultLifecycleExecutor.java:140)
-                                at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:322)
-                                at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:115)
-                                at org.apache.maven.cli.MavenCli.main(MavenCli.java:256)
-                            */
-                            
                             Artifact resultArtifact = ArtifactUtils.copyArtifact( attached );
                             resultArtifact.setScope( pluginArtifact.getScope() );
-                            
+
                             return resultArtifact;
                         }
+                        else
+                        {
+                            logMissingSiblingProjectArtifact( pluginArtifact );
+                            break;
+                        }
                     }
-                    else
-                    {
-                        logMissingSiblingProjectArtifact( pluginArtifact );
-                    }
-                    
-                    break;
                 }
             }
         }
