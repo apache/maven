@@ -61,6 +61,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
         File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
                                              verifier.newDefaultFilterProperties() );
@@ -77,7 +78,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         {
             verifier.setLogFileName( "log-parent-a.txt" );
             // this will ensure that all relevant plugins are present.
-            verifier.executeGoal( "initialize" );
+            verifier.executeGoal( "validate" );
         }
         catch ( VerificationException e )
         {
@@ -91,15 +92,15 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         // re-run in offline mode, should still succeed by using local repo
         verifier.setLogFileName( "log-parent-b.txt" );
-        verifier.executeGoal( "initialize" );
+        verifier.executeGoal( "validate" );
 
         // clear out the parent POM if it's in the local repository.
-        verifier.deleteArtifact( "org.apache.maven.its.mng2883", "parent", "1.0-SNAPSHOT", "pom" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
         try
         {
             verifier.setLogFileName( "log-parent-c.txt" );
-            verifier.executeGoal( "initialize" );
+            verifier.executeGoal( "validate" );
 
             fail( "Build should fail with unresolvable parent POM." );
         }
@@ -159,6 +160,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
         List cliOptions = new ArrayList();
 
@@ -176,7 +178,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         {
             verifier.setLogFileName( "log-dep-a.txt" );
             // this will ensure that all relevant plugins are present.
-            verifier.executeGoal( "compile" );
+            verifier.executeGoal( "validate" );
         }
         catch ( VerificationException e )
         {
@@ -190,16 +192,15 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         // re-run in offline mode, should still succeed by using local repo
         verifier.setLogFileName( "log-dep-b.txt" );
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "validate" );
 
         // clear out the dependency if it's in the local repository.
-        verifier.deleteArtifact( "org.apache.maven.its.mng2883", "dep", "1.0-SNAPSHOT", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2883", "dep", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
         try
         {
             verifier.setLogFileName( "log-dep-c.txt" );
-            verifier.executeGoal( "compile" );
+            verifier.executeGoal( "validate" );
 
             fail( "Build should fail with unresolvable dependency artifact." );
         }
@@ -261,6 +262,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
         List cliOptions = new ArrayList();
 
@@ -286,8 +288,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier.executeGoal( "org.apache.maven.its.mng2883:plugin:1.0-SNAPSHOT:run" );
 
         // clear out the dependency if it's in the local repository.
-        verifier.deleteArtifact( "org.apache.maven.its.mng2883", "plugin", "1.0-SNAPSHOT", "pom" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng2883", "plugin", "1.0-SNAPSHOT", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
         try
         {
