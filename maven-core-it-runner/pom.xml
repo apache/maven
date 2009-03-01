@@ -17,21 +17,20 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven</groupId>
   <version>2.1.0-SNAPSHOT</version>
   <artifactId>maven-core-it-runner</artifactId>
   <name>Integration Test Executor</name>
-    
+
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/branches/maven-2.1.x/maven-core-it-runner</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.1.x/maven-core-it-runner</developerConnection>
     <url>https://svn.apache.org/repos/asf/maven/components/branches/maven-2.1.x/maven-core-it-runner</url>
   </scm>
-    
+
   <repositories>
     <repository>
       <id>test-plugins</id>
@@ -44,7 +43,7 @@ under the License.
       </snapshots>
     </repository>
   </repositories>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
