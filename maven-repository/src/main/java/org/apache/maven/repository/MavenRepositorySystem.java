@@ -127,4 +127,8 @@ public interface MavenRepositorySystem
     void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );
 
     void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions );
+    
+    // Mirrors
+    
+    void addMirror( String id, String mirrorOf, String url );
 }

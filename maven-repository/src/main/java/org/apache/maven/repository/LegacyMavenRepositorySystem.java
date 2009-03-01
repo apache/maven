@@ -91,6 +91,9 @@ public class LegacyMavenRepositorySystem
     private ArtifactMetadataSource artifactMetadataSource;
 
     @Requirement
+    private MirrorBuilder mirrorBuilder;
+    
+    @Requirement
     private Logger logger;
 
     private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();
@@ -625,5 +628,12 @@ public class LegacyMavenRepositorySystem
         throws ArtifactMetadataRetrievalException
     {
         return artifactMetadataSource.retrieveRelocatedArtifact( artifact, localRepository, remoteRepositories );
+    }
+    
+    // Mirror 
+    
+    public void addMirror( String id, String mirrorOf, String url )
+    {
+        mirrorBuilder.addMirror( id, mirrorOf, url );
     }
 }
