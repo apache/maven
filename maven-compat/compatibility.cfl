@@ -62,3 +62,8 @@ plugin happy.
 h2. Changes to the CLI
 * Log file support has been added i.e mvn -l log.txt clean install
 * Plugin registry option has not been supported in the core and it lagged around in the CLI
+
+h2. Repositories
+
+Support for non-unique SNAPSHOT deployments will be dropped.
+
