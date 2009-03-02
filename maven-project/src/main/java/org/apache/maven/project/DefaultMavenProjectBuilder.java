@@ -206,15 +206,15 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new ProjectBuildingException( project.getId(), "Error resolving project artifact.", e );
+            throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
         catch ( ArtifactNotFoundException e )
         {
-            throw new ProjectBuildingException( project.getId(), "Error finding project artifact.", e );
+            throw new ProjectBuildingException( artifact.getId(), "Error finding project artifact.", e );
         }
         catch ( InvalidRepositoryException e )
         {
-            throw new ProjectBuildingException( project.getId(), "Error with repository specified in project.", e );
+            throw new ProjectBuildingException( artifact.getId(), "Error with repository specified in project.", e );
         }
 
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
