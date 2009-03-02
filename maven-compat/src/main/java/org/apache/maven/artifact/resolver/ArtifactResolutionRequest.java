@@ -23,12 +23,6 @@ public class ArtifactResolutionRequest
 
     private Set<Artifact> artifactDependencies;
 
-    private String groupId;
-
-    private String artifactId;
-
-    private String version;
-
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
@@ -37,15 +31,14 @@ public class ArtifactResolutionRequest
 
     private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
 
-    // This should really be a component. Different impls can can be composed to account for different forms of metadata.
-    private ArtifactMetadataSource metadataSource;
-
     private Map managedVersionMap;
 
     private List<ConflictResolver> conflictResolvers;
 
+    private ArtifactMetadataSource metadataSource;
+
     public ArtifactResolutionRequest()
-    {        
+    {  
     }
     
     public ArtifactResolutionRequest( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
@@ -67,11 +60,6 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public boolean hasArtifact()
-    {
-        return artifact != null;
-    }
-
     public ArtifactResolutionRequest setArtifactDependencies( Set<Artifact> artifactDependencies )
     {
         this.artifactDependencies = artifactDependencies;
@@ -82,57 +70,6 @@ public class ArtifactResolutionRequest
     public Set<Artifact> getArtifactDependencies()
     {
         return artifactDependencies;
-    }
-
-    public String getGroupId()
-    {
-        if ( artifact != null )
-        {
-            return artifact.getGroupId();
-        }
-
-        return groupId;
-    }
-
-    public ArtifactResolutionRequest setGroupId( String groupId )
-    {
-        this.groupId = groupId;
-
-        return this;
-    }
-
-    public String getArtifactId()
-    {
-        if ( artifact != null )
-        {
-            return artifact.getArtifactId();
-        }
-
-        return artifactId;
-    }
-
-    public ArtifactResolutionRequest setArtifactId( String artifactId )
-    {
-        this.artifactId = artifactId;
-
-        return this;
-    }
-
-    public String getVersion()
-    {
-        if ( artifact != null )
-        {
-            return artifact.getVersion();
-        }
-
-        return version;
-    }
-
-    public ArtifactResolutionRequest setVersion( String version )
-    {
-        this.version = version;
-
-        return this;
     }
 
     public ArtifactRepository getLocalRepository()
@@ -234,12 +171,7 @@ public class ArtifactResolutionRequest
     {
         StringBuffer sb = new StringBuffer()
                 .append( "REQUEST: " ).append(  "\n" )
-                .append(getGroupId())
-                .append(":")
-                .append(getArtifactId())
-                .append(":")
-                .append(getVersion() ).append(  "\n" )
-                .append(  "artifact: " ).append( artifact ).append(  "\n" )
+                .append( "artifact: " ).append( artifact ).append(  "\n" )
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
                 .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
                 .append( "metadataSource: " ).append(  metadataSource ).append(  "\n" );
