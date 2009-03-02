@@ -27,7 +27,7 @@ h3. Supported Compatibility
 * org.apache.maven.artifact.factory.ArtifactFactory
 * org.apache.maven.artifact.handler.ArtifactHandler
 * org.apache.maven.artifact.installer.ArtifactInstaller
-* org.apache.maven.artifact.manager.WagonManager
+* org.apache.maven.artifact.manager.WagonManager (1)
 * org.apache.maven.artifact.repository.ArtifactRepository
 * org.apache.maven.artifact.repository.ArtifactRepositoryPolicy
 * org.apache.maven.artifact.repository.ArtifactRepositoryFactory
@@ -35,6 +35,9 @@ h3. Supported Compatibility
 * org.apache.maven.artifact.resolver.ArtifactResolver
 * org.apache.maven.artifact.resolver.filter.ArtifactFilter
 * org.apache.maven.artifact.resolver.filter.Artifact
+
+(1) In r746285 various methods have been removed from the WagonManager which breaks the maven-project-info-reports-plugin, the
+maven-site-plugin and the maven-stage-plugin, e.g. due to a linkage error on getAuthentaticationInfo().
 
 h3. Unsupported Compatibility
 * org.apache.maven.artifact.metadata.ArtifactMetadataSource
