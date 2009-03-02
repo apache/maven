@@ -68,10 +68,14 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     public PomClassicDomainModel( List<ModelProperty> modelProperties )
     {
         this.modelProperties = modelProperties;
-        try {
-            inputBytes = IOUtil.toByteArray( ModelMarshaller.unmarshalModelPropertiesToXml(modelProperties, ProjectUri.baseUri));
-        } catch (IOException e) {
-
+        try
+        {
+            String xml = ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
+            inputBytes = xml.getBytes( "UTF-8" );
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalStateException( "Unmarshalling of model properties failed", e );
         }
         initializeProperties( modelProperties );
     }
