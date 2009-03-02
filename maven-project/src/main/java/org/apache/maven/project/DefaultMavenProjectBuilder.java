@@ -346,7 +346,7 @@ public class DefaultMavenProjectBuilder
 
         for( Profile profile : projectProfiles )
         {
-            inject( profile, model );
+            model = inject( profile, model );
         }
 
         MavenProject project;
