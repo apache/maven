@@ -19,7 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
@@ -33,15 +32,10 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -125,8 +119,7 @@ public class TestArtifactResolver
             List artifactRepositories;
             try
             {
-                artifactRepositories =
-                    repositorySystem.buildArtifactRepositories( model.getRepositories() );
+                artifactRepositories = repositorySystem.buildArtifactRepositories( model.getRepositories() );
             }
             catch ( InvalidRepositoryException e )
             {
@@ -198,35 +191,5 @@ public class TestArtifactResolver
     public Source source()
     {
         return new Source( repositorySystem, container );
-    }
-
-    /**
-     * @noinspection RefusedBequest
-     */
-    @Override
-    public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
-        throws ArtifactResolutionException
-    {
-        artifact.setFile( new File( "dummy" ) );
-    }
-
-    @Override
-    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
-                                                         ArtifactRepository localRepository, List remoteRepositories,
-                                                         ArtifactMetadataSource source, ArtifactFilter filter )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        return super.resolveTransitively( artifacts, originatingArtifact, localRepository, remoteRepositories,
-                                          new Source( repositorySystem, container ), filter );
-    }
-
-    @Override
-    public ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact,
-                                                         List remoteRepositories, ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        return super.resolveTransitively( artifacts, originatingArtifact, remoteRepositories, localRepository,
-                                          new Source( repositorySystem, container ) );
     }
 }

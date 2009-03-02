@@ -376,6 +376,28 @@ public class DefaultArtifactResolver
             listeners.add( new WarningResolutionListener( getLogger() ) );
         }
                 
+        if ( request.getArtifactDependencies() == null || request.getArtifactDependencies().size() == 0 )
+        {
+            ArtifactResolutionResult result = new ArtifactResolutionResult();
+            
+            try
+            {
+                resolve( request.getArtifact(), request.getRemoteRepostories(), request.getLocalRepository() );
+                
+                result.addArtifact( request.getArtifact() );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                result.addErrorArtifactException( e );
+            }
+            catch ( ArtifactNotFoundException e )
+            {
+                result.addMissingArtifact( request.getArtifact() );
+            }
+            
+            return result;
+        }
+        
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         ArtifactResolutionResult result = artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
 

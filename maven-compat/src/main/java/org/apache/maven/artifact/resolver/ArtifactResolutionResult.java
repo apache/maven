@@ -49,11 +49,16 @@ public class ArtifactResolutionResult
 {
     private Artifact originatingArtifact;
 
+
+    private List<Artifact> missingArtifacts;
+
+    // Exceptions
+
+    private List<Exception> exceptions = new ArrayList<Exception>();
+    
     private List<Exception> versionRangeViolations;
 
     private List<ArtifactResolutionException> metadataResolutionExceptions;
-
-    private List<Artifact> missingArtifacts;
 
     private List<CyclicDependencyException> circularDependencyExceptions;
 
@@ -129,7 +134,21 @@ public class ArtifactResolutionResult
 
         return this;
     }
-
+    
+    // ------------------------------------------------------------------------
+    // Exceptions
+    // ------------------------------------------------------------------------
+    
+    public boolean hasExceptions()
+    {
+        return exceptions.size() > 0;
+    }
+    
+    public List<Exception> getExceptions()
+    {        
+        return exceptions;
+    }
+    
     // ------------------------------------------------------------------------
     // Version Range Violations
     // ------------------------------------------------------------------------
@@ -149,6 +168,8 @@ public class ArtifactResolutionResult
         versionRangeViolations = initList( versionRangeViolations );
 
         versionRangeViolations.add( e );
+        
+        exceptions.add( e );
 
         return this;
     }
@@ -177,6 +198,8 @@ public class ArtifactResolutionResult
         metadataResolutionExceptions = initList( metadataResolutionExceptions );
 
         metadataResolutionExceptions.add( e );
+        
+        exceptions.add( e );
 
         return this;
     }
@@ -205,6 +228,8 @@ public class ArtifactResolutionResult
         errorArtifactExceptions = initList( errorArtifactExceptions );
 
         errorArtifactExceptions.add( e );
+        
+        exceptions.add( e );
 
         return this;
     }
@@ -232,6 +257,8 @@ public class ArtifactResolutionResult
         circularDependencyExceptions = initList( circularDependencyExceptions );
 
         circularDependencyExceptions.add( e );
+        
+        exceptions.add( e );
 
         return this;
     }

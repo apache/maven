@@ -29,9 +29,5 @@ public class TestProjectBuilder
     extends DefaultMavenProjectBuilder
 {
     @Requirement(hint="test")
-    private ArtifactResolver artifactResolver;
-    
-    // Causing problems
-    //@Requirement(hint="test")
-    //private MavenRepositorySystem repositorySystem;        
+    private ArtifactResolver artifactResolver;    
 }

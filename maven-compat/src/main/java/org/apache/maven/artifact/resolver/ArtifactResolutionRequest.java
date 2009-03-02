@@ -233,12 +233,17 @@ public class ArtifactResolutionRequest
     public String toString()
     {
         StringBuffer sb = new StringBuffer()
+                .append( "REQUEST: " ).append(  "\n" )
                 .append(getGroupId())
                 .append(":")
                 .append(getArtifactId())
                 .append(":")
-                .append(getVersion());
-
+                .append(getVersion() ).append(  "\n" )
+                .append(  "artifact: " ).append( artifact ).append(  "\n" )
+                .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
+                .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
+                .append( "metadataSource: " ).append(  metadataSource ).append(  "\n" );
+        
         return sb.toString();
     }
 }

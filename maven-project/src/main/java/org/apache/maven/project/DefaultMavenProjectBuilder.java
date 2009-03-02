@@ -303,7 +303,7 @@ public class DefaultMavenProjectBuilder
                                                 "Unable to build project due to an invalid dependency version: " +
                                                     e.getMessage(), projectDescriptor, ee );
         }
-
+        
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( project.getArtifact() )
             .setArtifactDependencies( project.getDependencyArtifacts() )
@@ -311,9 +311,18 @@ public class DefaultMavenProjectBuilder
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() )
             .setMetadataSource( repositorySystem );
-
+        
         ArtifactResolutionResult result = repositorySystem.resolve( request );
                 
+        if ( result.hasExceptions() )
+        {
+            Exception e = result.getExceptions().get( 0 );
+            
+            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ),
+                                                "Unable to build project due to an invalid dependency version: " +
+                                                    e.getMessage(), projectDescriptor, e );
+        }
+        
         project.setArtifacts( result.getArtifacts() );
 
         return new MavenProjectBuildingResult( project, result );
