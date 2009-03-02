@@ -44,5 +44,9 @@ under the License.
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-logging-api</artifactId>
+    </dependency>
   </dependencies>
 </project>
