@@ -419,9 +419,13 @@ public class DefaultMavenProjectBuilder
         List<ModelProperty> p;
         try
         {
-            p = ModelMarshaller.marshallXmlToModelProperties(new ByteArrayInputStream(writer.getBuffer().toString().getBytes()),
-                    ProjectUri.Profiles.xUri, uris);
-        } catch (IOException e) {
+            String xml = writer.getBuffer().toString();
+            p =
+                ModelMarshaller.marshallXmlToModelProperties( new ByteArrayInputStream( xml.getBytes( "UTF-8" ) ),
+                                                              ProjectUri.Profiles.xUri, uris );
+        }
+        catch ( IOException e )
+        {
             return null;
         }
 
