@@ -32,11 +32,11 @@ public class ProfileActivationContext
 
     private final Properties executionProperties;
 
-    List explicitlyActive;
+    private List<String> explicitlyActive;
 
-    List explicitlyInactive;
+    private List<String> explicitlyInactive;
 
-    private List activeByDefault;
+    private List<String> activeByDefault;
 
     public ProfileActivationContext( Properties executionProperties, boolean isCustomActivatorFailureSuppressed )
     {
@@ -59,32 +59,32 @@ public class ProfileActivationContext
         isCustomActivatorFailureSuppressed = suppressed;
     }
 
-    public List getExplicitlyActiveProfileIds()
+    public List<String> getExplicitlyActiveProfileIds()
     {
         if ( explicitlyActive == null )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return explicitlyActive;
     }
 
-    public void setExplicitlyActiveProfileIds( List active )
+    public void setExplicitlyActiveProfileIds( List<String> active )
     {
         explicitlyActive = active;
     }
 
-    public List getExplicitlyInactiveProfileIds()
+    public List<String> getExplicitlyInactiveProfileIds()
     {
         if ( explicitlyInactive == null )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return explicitlyInactive;
     }
 
-    public void setExplicitlyInactiveProfileIds( List inactive )
+    public void setExplicitlyInactiveProfileIds( List<String> inactive )
     {
         explicitlyInactive = inactive;
     }
@@ -93,7 +93,7 @@ public class ProfileActivationContext
     {
         if ( explicitlyActive == null )
         {
-            explicitlyActive = new ArrayList();
+            explicitlyActive = new ArrayList<String>();
         }
 
         explicitlyActive.add( profileId );
@@ -103,7 +103,7 @@ public class ProfileActivationContext
     {
         if ( explicitlyInactive == null )
         {
-            explicitlyInactive = new ArrayList();
+            explicitlyInactive = new ArrayList<String>();
         }
 
         explicitlyInactive.add( profileId );
@@ -119,11 +119,11 @@ public class ProfileActivationContext
         return ( explicitlyInactive != null ) && explicitlyInactive.contains( profileId );
     }
 
-    public List getActiveByDefaultProfileIds()
+    public List<String> getActiveByDefaultProfileIds()
     {
         if ( activeByDefault == null )
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         return activeByDefault;
@@ -138,13 +138,13 @@ public class ProfileActivationContext
     {
         if ( activeByDefault == null )
         {
-            activeByDefault = new ArrayList();
+            activeByDefault = new ArrayList<String>();
         }
 
         activeByDefault.add( profileId );
     }
 
-    public void setActiveByDefaultProfileIds( List activeByDefault )
+    public void setActiveByDefaultProfileIds( List<String> activeByDefault )
     {
         this.activeByDefault = activeByDefault;
     }
