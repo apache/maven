@@ -171,6 +171,8 @@ public class DefaultArtifactCollector
 
                                 set.add( node );
                                 
+                                // This is required right now.
+                                result.addArtifact( artifact );
                                 result.addRequestedArtifact( artifact );
                             }
                         }

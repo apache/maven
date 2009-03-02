@@ -157,8 +157,7 @@ public class ArtifactResolverTest
         };
 
         ArtifactResolutionResult result =
-            artifactResolver.resolveTransitively( Collections.singleton( g ), projectArtifact, remoteRepositories(),
-                                                  localRepository(), mds );
+            artifactResolver.resolveTransitively( Collections.singleton( g ), projectArtifact, remoteRepositories(), localRepository(), mds );
 
         assertEquals( 2, result.getArtifacts().size() );
 
