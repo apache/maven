@@ -36,7 +36,6 @@ under the License.
     <repository>
       <id>repo</id>
       <url>file://localhost/${project.basedir}/target/repo</url>
-      <uniqueVersion>false</uniqueVersion>
     </repository>
   </distributionManagement>
 
