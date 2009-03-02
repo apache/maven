@@ -41,7 +41,7 @@ public class DefaultArtifactRepository
 
     private ArtifactRepositoryPolicy releases;
 
-    private boolean uniqueVersion;
+    private boolean uniqueVersion = true;
 
     private boolean blacklisted;
 
