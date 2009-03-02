@@ -96,6 +96,18 @@ public class LegacyMavenRepositorySystem
     @Requirement
     private Logger logger;
 
+    private boolean online = true;
+
+    private boolean interactive = true;
+
+    private TransferListener downloadMonitor;
+
+    private Map<String, ProxyInfo> proxies = new HashMap<String, ProxyInfo>();
+
+    private Map<String, AuthenticationInfo> authenticationInfoMap = new HashMap<String, AuthenticationInfo>();
+
+    private Map<String, RepositoryPermissions> serverPermissionsMap = new HashMap<String, RepositoryPermissions>();
+    
     private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();
 
     // Artifact Creation
@@ -454,7 +466,7 @@ public class LegacyMavenRepositorySystem
             projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
         }
 
-        resolve( projectArtifact, localRepository, remoteArtifactRepositories );
+        resolve( new ArtifactResolutionRequest( projectArtifact, localRepository, remoteArtifactRepositories ) );
 
         File file = projectArtifact.getFile();
         artifact.setFile( file );
@@ -518,34 +530,10 @@ public class LegacyMavenRepositorySystem
         return ArtifactUtils.versionlessKey( gid, aid );
     }
 
-    /**
-     * Resolves the specified artifact
-     * 
-     * @param artifact the artifact to resolve
-     * @throws IOException if there is a problem resolving the artifact
-     */
-    public void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        artifactResolver.resolve( artifact, remoteRepositories, localRepository );
-    }
-
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {
+    {        
         return artifactResolver.resolve( request );
     }
-
-    private boolean online = true;
-
-    private boolean interactive = true;
-
-    private TransferListener downloadMonitor;
-
-    private Map<String, ProxyInfo> proxies = new HashMap<String, ProxyInfo>();
-
-    private Map<String, AuthenticationInfo> authenticationInfoMap = new HashMap<String, AuthenticationInfo>();
-
-    private Map<String, RepositoryPermissions> serverPermissionsMap = new HashMap<String, RepositoryPermissions>();
 
     public void setOnline( boolean online )
     {

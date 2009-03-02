@@ -63,8 +63,8 @@ public class ArtifactResolutionResult
 
     private List<ArtifactRepository> repositories;
 
-    private Set<ResolutionNode> resolutionNodes;
-
+    private Set<Artifact> requestedArtifacts;
+    
     private Set<Artifact> artifacts;
 
     public Artifact getOriginatingArtifact()
@@ -79,40 +79,37 @@ public class ArtifactResolutionResult
         return this;
     }
 
-    public Set<Artifact> getArtifacts()
+    public void addArtifact( Artifact artifact )
     {
         if ( artifacts == null )
         {
             artifacts = new LinkedHashSet<Artifact>();
-
-            for (ResolutionNode node : resolutionNodes) 
-            {
-                artifacts.add(node.getArtifact());
-            }
         }
 
+        artifacts.add( artifact );        
+    }
+    
+    public Set<Artifact> getArtifacts()
+    {
         return artifacts;
     }
 
-    public Set<ResolutionNode> getArtifactResolutionNodes()
+    public void addRequestedArtifact( Artifact artifact )
     {
-        if ( resolutionNodes == null) 
+        if ( requestedArtifacts == null )
         {
-            return Collections.emptySet();
+            requestedArtifacts = new LinkedHashSet<Artifact>();
         }
 
-        return resolutionNodes;
+        requestedArtifacts.add( artifact );        
     }
-
-    public void setArtifactResolutionNodes( final Set<ResolutionNode> resolutionNodes )
+    
+    public Set<Artifact> getRequestedArtifacts()
     {
-        this.resolutionNodes = resolutionNodes;
-
-        // clear the cache
-        this.artifacts = null;
-    }
-
-    public List getMissingArtifacts()
+        return requestedArtifacts;
+    }    
+    
+    public List<Artifact> getMissingArtifacts()
     {
         return missingArtifacts == null ? Collections.EMPTY_LIST : missingArtifacts;
     }

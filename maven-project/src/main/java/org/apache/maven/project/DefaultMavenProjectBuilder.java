@@ -19,10 +19,25 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -35,33 +50,39 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.ProfileManager;
-import org.apache.maven.project.DefaultProfileManager;
-import org.apache.maven.project.ProfileActivationContext;
-import org.apache.maven.project.ProfileActivationException;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.builder.*;
+import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.project.builder.PomClassicDomainModelFactory;
+import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.PomTransformer;
+import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.MavenRepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
-import org.apache.maven.shared.model.*;
+import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.shared.model.ModelContainer;
+import org.apache.maven.shared.model.ModelEventListener;
+import org.apache.maven.shared.model.ModelMarshaller;
+import org.apache.maven.shared.model.ModelProperty;
+import org.apache.maven.shared.model.ModelTransformerContext;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.plexus.util.xml.pull.XmlSerializer;
-import org.codehaus.plexus.util.xml.pull.MXSerializer;
-import org.codehaus.plexus.PlexusContainer;
 
 
 /**
@@ -303,8 +324,7 @@ public class DefaultMavenProjectBuilder
         this.logger = logger;
     }
 
-    private MavenProject buildWithProfiles( Model model, ProjectBuilderConfiguration config, File projectDescriptor,
-                                        File parentDescriptor )
+    private MavenProject buildWithProfiles( Model model, ProjectBuilderConfiguration config, File projectDescriptor, File parentDescriptor )
         throws ProjectBuildingException
     {
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
@@ -763,31 +783,6 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws IOException
-    {
-        if(localRepository == null || remoteRepositories == null)
-        {
-            throw new IOException("LocalRepository or RemoteRepositories: null");
-        }
-
-        File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-        artifact.setFile( artifactFile );
-
-        try
-        {
-            repositorySystem.resolve( artifact, localRepository, remoteRepositories );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new IOException( e.getMessage() );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new IOException( e.getMessage() );
-        }
-    }
-
     private List<DomainModel> getDomainModelParentsFromRepository( PomClassicDomainModel domainModel,
                                                                    ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                                                                    List<InterpolatorProperty> properties,
@@ -807,14 +802,15 @@ public class DefaultMavenProjectBuilder
         Artifact artifactParent = repositorySystem.createParentArtifact( domainModel.getParentGroupId(),
                 domainModel.getParentArtifactId(), domainModel.getParentVersion() );
 
-        resolve( artifactParent, localRepository, remoteRepositories );
+        ArtifactResolutionResult result = repositorySystem.resolve( new ArtifactResolutionRequest( artifactParent, localRepository, remoteRepositories ) );
 
         PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( artifactParent.getFile() );
 
         if ( !parentDomainModel.matchesParentOf( domainModel ) )
         {
-            logger.debug( "Parent pom ids do not match: Parent File = " + artifactParent.getFile().getAbsolutePath() +
-                ": Child ID = " + domainModel.getId() );
+            //shane: what does this mean exactly and why does it occur
+            logger.debug( "Parent pom ids do not match: Parent File = " + artifactParent.getFile().getAbsolutePath() + ": Child ID = " + domainModel.getId() );
+            
             return domainModels;
         }
 

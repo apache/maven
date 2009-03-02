@@ -31,7 +31,7 @@ public class ArtifactResolutionRequest
 
     private ArtifactRepository localRepository;
 
-    private List<ArtifactRepository> remoteRepostories;
+    private List<ArtifactRepository> remoteRepositories;
 
     private ArtifactFilter filter;
 
@@ -52,7 +52,7 @@ public class ArtifactResolutionRequest
     {        
         this.artifact = artifact;
         this.localRepository = localRepository;
-        this.remoteRepostories = remoteRepositories;
+        this.remoteRepositories = remoteRepositories;
     }
     
     public Artifact getArtifact()
@@ -149,12 +149,12 @@ public class ArtifactResolutionRequest
 
     public List<ArtifactRepository> getRemoteRepostories()
     {
-        return remoteRepostories;
+        return remoteRepositories;
     }
 
     public ArtifactResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )
     {
-        this.remoteRepostories = remoteRepostories;
+        this.remoteRepositories = remoteRepostories;
 
         return this;
     }
@@ -176,6 +176,13 @@ public class ArtifactResolutionRequest
         return listeners;
     }
 
+    public ArtifactResolutionRequest setListeners( List<ResolutionListener> listeners )
+    {        
+        this.listeners = listeners;
+        
+        return this;
+    }
+    
     public ArtifactResolutionRequest addListener( ResolutionListener listener )
     {
         listeners.add( listener );

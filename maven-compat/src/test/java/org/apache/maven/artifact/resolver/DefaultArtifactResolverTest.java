@@ -9,7 +9,7 @@ public class DefaultArtifactResolverTest
     public void testLookup()
         throws Exception
     {
-        ArtifactResolver resolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE, "default" );
+        ArtifactResolver resolver = lookup( ArtifactResolver.class, "default" );
     }
 
 }

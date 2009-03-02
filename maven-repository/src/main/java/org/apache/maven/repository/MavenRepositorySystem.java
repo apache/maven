@@ -89,14 +89,10 @@ public interface MavenRepositorySystem
 
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
-    // This can be reduced to the request/result
-    void resolve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
+    // Metadata
 
     void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws InvalidRepositoryException, ArtifactResolutionException, ArtifactNotFoundException;
-
-    // Version retrieval or metadata operations
 
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;

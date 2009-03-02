@@ -19,6 +19,10 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -32,10 +36,6 @@ import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryM
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.codehaus.plexus.util.FileUtils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 public class ArtifactUpdatePolicyTest
     extends AbstractArtifactComponentTestCase
 {
@@ -46,7 +46,7 @@ public class ArtifactUpdatePolicyTest
 
     private static final long TWO_DAYS = 2 * 86400L * 1000L;
 
-    private ArtifactResolver artifactResolver;
+    private DefaultArtifactResolver artifactResolver;
 
     private List<ArtifactRepository> remoteRepositories;
 
@@ -70,7 +70,7 @@ public class ArtifactUpdatePolicyTest
     {
         super.setUp();
 
-        artifactResolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
+        artifactResolver = (DefaultArtifactResolver) lookup( ArtifactResolver.class );
 
         remoteRepositories = remoteRepositories();
         remoteRepository = (DefaultArtifactRepository) remoteRepositories.get( 0 );

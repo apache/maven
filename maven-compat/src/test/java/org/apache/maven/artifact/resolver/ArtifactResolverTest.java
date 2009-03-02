@@ -19,14 +19,6 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,6 +26,14 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 // It would be cool if there was a hook that i could use to setup a test environment.
 // I want to setup a local/remote repositories for testing but i don't want to have
@@ -48,7 +48,7 @@ import java.util.Set;
 public class ArtifactResolverTest
     extends AbstractArtifactComponentTestCase
 {
-    private ArtifactResolver artifactResolver;
+    private DefaultArtifactResolver artifactResolver;
 
     private Artifact projectArtifact;
 
@@ -58,7 +58,7 @@ public class ArtifactResolverTest
     {
         super.setUp();
 
-        artifactResolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
+        artifactResolver = (DefaultArtifactResolver) lookup( ArtifactResolver.class );
 
         projectArtifact = createLocalArtifact( "project", "3.0" );
     }

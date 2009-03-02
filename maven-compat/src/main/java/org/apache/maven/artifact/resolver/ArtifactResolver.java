@@ -19,123 +19,13 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * I want to use it for hidding the fact that sometime artifact must be
- * downloaded. I am just asking LocalRepository for given artifact and I don't
- * care if it is alredy there or how it will get there.
- *
- * @author Michal Maczka
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface ArtifactResolver
 {
-    String ROLE = ArtifactResolver.class.getName();
-
-    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    @Deprecated
-    void resolve( Artifact artifact,
-                  List<ArtifactRepository> remoteRepositories,
-                  ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    @Deprecated
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
-                                                  Artifact originatingArtifact,
-                                                  List<ArtifactRepository> remoteRepositories,
-                                                  ArtifactRepository localRepository,
-                                                  ArtifactMetadataSource source )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    @Deprecated
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
-                                                  Artifact originatingArtifact,
-                                                  List<ArtifactRepository> remoteRepositories,
-                                                  ArtifactRepository localRepository,
-                                                  ArtifactMetadataSource source,
-                                                  List<ResolutionListener> listeners )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    @Deprecated
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
-                                                  Artifact originatingArtifact,
-                                                  ArtifactRepository localRepository,
-                                                  List<ArtifactRepository> remoteRepositories,
-                                                  ArtifactMetadataSource source,
-                                                  ArtifactFilter filter )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    @Deprecated
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
-                                                  Artifact originatingArtifact,
-                                                  Map managedVersions,
-                                                  ArtifactRepository localRepository,
-                                                  List<ArtifactRepository> remoteRepositories,
-                                                  ArtifactMetadataSource source )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    @Deprecated
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
-                                                  Artifact originatingArtifact,
-                                                  Map managedVersions,
-                                                  ArtifactRepository localRepository,
-                                                  List<ArtifactRepository> remoteRepositories,
-                                                  ArtifactMetadataSource source,
-                                                  ArtifactFilter filter )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    @Deprecated
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
-                                                  Artifact originatingArtifact,
-                                                  Map managedVersions,
-                                                  ArtifactRepository localRepository,
-                                                  List<ArtifactRepository> remoteRepositories,
-                                                  ArtifactMetadataSource source,
-                                                  ArtifactFilter filter,
-                                                  List<ResolutionListener> listeners )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    /**
-     * @since 3.0
-     * @deprecated use {@link #resolve(ArtifactResolutionRequest)}
-     */
-    @Deprecated
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
-                                                  Artifact originatingArtifact,
-                                                  Map managedVersions,
-                                                  ArtifactRepository localRepository,
-                                                  List<ArtifactRepository> remoteRepositories,
-                                                  ArtifactMetadataSource source,
-                                                  ArtifactFilter filter,
-                                                  List<ResolutionListener> listeners,
-                                                  List<ConflictResolver> conflictResolvers )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    @Deprecated
-    void resolveAlways( Artifact artifact,
-                        List<ArtifactRepository> remoteRepositories,
-                        ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
-    // New API
-
-    /** @since 3.0 */
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
+    
+    ArtifactResolutionResult resolveWithExceptions( ArtifactResolutionRequest request )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 }

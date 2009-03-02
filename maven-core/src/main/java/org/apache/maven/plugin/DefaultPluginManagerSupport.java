@@ -19,17 +19,17 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Plugin;
@@ -43,6 +43,8 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.realm.RealmScanningUtils;
+import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
@@ -51,19 +53,13 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component(role = PluginManagerSupport.class)
 public class DefaultPluginManagerSupport
     implements PluginManagerSupport, LogEnabled, Contextualizable
 {
     @Requirement
-    private ArtifactResolver artifactResolver;
-    
-    @Requirement
-    private ArtifactFactory artifactFactory;
-    
+    private MavenRepositorySystem repositorySystem;
+        
     @Requirement
     private MavenProjectBuilder mavenProjectBuilder;
     
@@ -85,16 +81,6 @@ public class DefaultPluginManagerSupport
         ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = session.getLocalRepository();
-
-        VersionRange versionRange;
-        try
-        {
-            versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new PluginManagerException( plugin, e );
-        }
 
         List remoteRepositories = new ArrayList();
 
@@ -122,25 +108,19 @@ public class DefaultPluginManagerSupport
 
         checkPluginDependencySpec( plugin, pluginProject );
 
-        Artifact pluginArtifact = artifactFactory.createPluginArtifact( plugin.getGroupId(),
-                                                                        plugin.getArtifactId(),
-                                                                        versionRange );
+        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion() );
 
         pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
-        artifactResolver.resolve( pluginArtifact, remoteRepositories, localRepository );
+        repositorySystem.resolve( new ArtifactResolutionRequest( pluginArtifact, localRepository, remoteRepositories ) );
 
         return pluginArtifact;
     }
 
-    public MavenProject buildPluginProject( Plugin plugin,
-                                            ArtifactRepository localRepository,
-                                            List remoteRepositories )
+    public MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List remoteRepositories )
         throws InvalidPluginException
     {
-        Artifact artifact = artifactFactory.createProjectArtifact( plugin.getGroupId(),
-                                                                   plugin.getArtifactId(),
-                                                                   plugin.getVersion() );
+        Artifact artifact = repositorySystem.createProjectArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion() );
         try
         {
             return mavenProjectBuilder.buildFromRepository( artifact,
@@ -183,19 +163,17 @@ public class DefaultPluginManagerSupport
         }
     }
 
-    public void checkPluginDependencySpec( Plugin plugin,
-                                           MavenProject pluginProject )
+    public void checkPluginDependencySpec( Plugin plugin, MavenProject pluginProject )
         throws InvalidPluginException
     {
         ArtifactFilter filter = new ScopeArtifactFilter( "runtime" );
         try
         {
-            pluginProject.createArtifacts( artifactFactory, null, filter );
+            repositorySystem.createArtifacts( pluginProject.getDependencies(), null, filter, pluginProject );
         }
-        catch ( InvalidDependencyVersionException e )
+        catch ( VersionNotFoundException e )
         {
-            throw new InvalidPluginException( "Plugin: " + plugin.getKey()
-                                              + " has a dependency with an invalid version.", e );
+            throw new InvalidPluginException( "Plugin: " + plugin.getKey() + " has a dependency with an invalid version." );
         }
     }
 

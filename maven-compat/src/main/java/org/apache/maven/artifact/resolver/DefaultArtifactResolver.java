@@ -291,34 +291,28 @@ public class DefaultArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter, List<ResolutionListener> listeners,
-                                                         List<ConflictResolver> conflictResolvers )
+                                                          List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter, List<ResolutionListener> listeners,
+                                                          List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        if ( listeners == null )
-        {
-            // TODO: this is simplistic.
-            listeners = new ArrayList<ResolutionListener>();
-            if ( getLogger().isDebugEnabled() )
-            {
-                listeners.add( new DebugResolutionListener( getLogger() ) );
-            }
-
-            listeners.add( new WarningResolutionListener( getLogger() ) );
-        }
-
-        ArtifactResolutionResult result;
-
-        result = artifactCollector.collect(
-        		artifacts, 
-        		originatingArtifact,
-				managedVersions, 
-				localRepository, 
-				remoteRepositories, 
-				source,
-				filter, 
-				listeners, 
-				conflictResolvers );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+        .setArtifact( originatingArtifact )
+        .setArtifactDependencies( artifacts )
+        .setManagedVersionMap( managedVersions )
+        .setLocalRepository( localRepository )
+        .setRemoteRepostories( remoteRepositories )
+        .setMetadataSource( source )
+        .setFilter( filter )
+        .setListeners( listeners )
+        .setConflictResolvers( conflictResolvers );        
+        
+        return resolveWithExceptions( request );
+    }
+    
+    public ArtifactResolutionResult resolveWithExceptions( ArtifactResolutionRequest request )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {            
+        ArtifactResolutionResult result = resolve( request );
 
         // We have collected all the problems so let's mimic the way the old code worked and just blow up right here.
         // That's right lets just let it rip right here and send a big incomprehensible blob of text at unsuspecting
@@ -347,29 +341,9 @@ public class DefaultArtifactResolver
             throw result.getVersionRangeViolation( 0 );
         }
 
-        List<Artifact> resolvedArtifacts = new ArrayList<Artifact>();
-
-        List<Artifact> missingArtifacts = new ArrayList<Artifact>();
-
-        for ( ResolutionNode node : result.getArtifactResolutionNodes() )
+        if ( result.getMissingArtifacts().size() > 0 )
         {
-            try
-            {
-                resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
-
-                resolvedArtifacts.add( node.getArtifact() );
-            }
-            catch ( ArtifactNotFoundException anfe )
-            {
-                getLogger().debug( anfe.getMessage(), anfe );
-
-                missingArtifacts.add( node.getArtifact() );
-            }
-        }
-
-        if ( missingArtifacts.size() > 0 )
-        {
-            throw new MultipleArtifactsNotFoundException( originatingArtifact, resolvedArtifacts, missingArtifacts, remoteRepositories );
+            throw new MultipleArtifactsNotFoundException( request.getArtifact(), new ArrayList( result.getArtifacts() ), result.getMissingArtifacts(), request.getRemoteRepostories() );
         }
 
         return result;
@@ -382,33 +356,28 @@ public class DefaultArtifactResolver
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
         Artifact originatingArtifact = request.getArtifact();
-
         Set<Artifact> artifacts = request.getArtifactDependencies();
-
         Map managedVersions = request.getManagedVersionMap();
-
         ArtifactRepository localRepository = request.getLocalRepository();
-
         List<ArtifactRepository> remoteRepositories = request.getRemoteRepostories();
-
         ArtifactMetadataSource source = request.getMetadataSource();
-
         List<ResolutionListener> listeners = request.getListeners();
-
         ArtifactFilter filter = request.getFilter();
 
-        // This is an attempt to get the metadata for the artifacts we are ultimately trying to resolve.
-        // We still
+        if ( listeners == null )
+        {
+            listeners = new ArrayList<ResolutionListener>();
+            
+            if ( getLogger().isDebugEnabled() )
+            {
+                listeners.add( new DebugResolutionListener( getLogger() ) );
+            }
 
-        ArtifactResolutionResult result = artifactCollector.collect( 
-        		artifacts, 
-        		originatingArtifact,                                                                      
-        		managedVersions, 
-        		localRepository,                                                                      
-        		remoteRepositories, 
-        		source, 
-        		filter, 
-        		listeners );
+            listeners.add( new WarningResolutionListener( getLogger() ) );
+        }
+                
+        // After the collection we will have the artifact object in the result but they will not be resolved yet.
+        ArtifactResolutionResult result = artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
 
         // Let's grab all the repositories that were gleaned. This we should know up front. I'm not sure
         // what the metadata source is doing. Repositories in POMs are deadly.
@@ -418,23 +387,25 @@ public class DefaultArtifactResolver
         // so we give this back to the calling code and let them deal with this information
         // appropriately.
 
-        if ( result.hasMetadataResolutionExceptions() || result.hasVersionRangeViolations() )
+        if ( result.hasMetadataResolutionExceptions() || result.hasVersionRangeViolations() || result.hasCircularDependencyExceptions() )
         {
             return result;
         }
 
-        for ( ResolutionNode node : result.getArtifactResolutionNodes() )
+        for ( Artifact requestedArtifact : result.getRequestedArtifacts() )
         {
             try
             {
-                resolve( node.getArtifact(), node.getRemoteRepositories(), localRepository );
+                resolve( requestedArtifact, remoteRepositories, localRepository );
+                
+                result.addArtifact( requestedArtifact );
             }
             catch ( ArtifactNotFoundException anfe )
             {
                 // These are cases where the artifact just isn't present in any of the remote repositories
                 // because it wasn't deployed, or it was deployed in the wrong place.
 
-                result.addMissingArtifact( node.getArtifact() );
+                result.addMissingArtifact( requestedArtifact );                               
             }
             catch ( ArtifactResolutionException e )
             {

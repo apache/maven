@@ -43,7 +43,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -480,10 +479,7 @@ public class DefaultPluginManager
             resolved.add( artifact );
         }
 
-        getLogger().debug(
-                           "Using the following artifacts for classpath of: "
-                                           + pluginArtifact.getId() + ":\n\n"
-                                           + resolved.toString().replace( ',', '\n' ) );
+        getLogger().debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + resolved.toString().replace( ',', '\n' ) );
 
         return resolved;
     }
@@ -1602,13 +1598,13 @@ public class DefaultPluginManager
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = context.getLocalRepository();
-        List remoteArtifactRepositories = project.getRemoteArtifactRepositories();
+        List<ArtifactRepository> remoteArtifactRepositories = project.getRemoteArtifactRepositories();
 
-        for ( Iterator it = project.getArtifacts().iterator(); it.hasNext(); )
+        for ( Iterator<Artifact> it = project.getArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
 
-            repositorySystem.resolve( artifact, localRepository, remoteArtifactRepositories );
+            repositorySystem.resolve( new ArtifactResolutionRequest( artifact, localRepository, remoteArtifactRepositories ) );
         }
     }
 

@@ -170,6 +170,8 @@ public class DefaultArtifactCollector
                                 artifact.setDependencyTrail( node.getDependencyTrail() );
 
                                 set.add( node );
+                                
+                                result.addRequestedArtifact( artifact );
                             }
                         }
                     }
@@ -180,8 +182,6 @@ public class DefaultArtifactCollector
                 }
             }
         }
-
-        result.setArtifactResolutionNodes( set );
 
         return result;
     }
