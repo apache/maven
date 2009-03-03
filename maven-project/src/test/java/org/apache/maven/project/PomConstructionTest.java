@@ -70,13 +70,13 @@ public class PomConstructionTest
      *
      * @throws Exception
      */
-    /*
+ 
     public void testEmptyUrl()
         throws Exception
     {
         buildPomFromMavenProject( "empty-distMng-repo-url", null );
     }
-    */
+    
 
     /**
      * Tests that modules is not overriden by profile
@@ -117,7 +117,16 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "plugin-config-properties" );
         assertEquals( "my.property", pom.getValue( "build/plugins[1]/configuration[1]/systemProperties[1]/property[1]/name" ) );
     }
-
+    
+    /*MNG-3900*/
+    /*
+    public void testProfilePropertiesInterpolation()
+    	throws Exception 
+    {
+    	PomTestWrapper pom = buildPomFromMavenProject( "profile-properties-interpolation", "a" );
+    	assertEquals("PASSED", pom.getValue("properties[1]/test"));
+    }
+	*/
 
     // Some better conventions for the test poms needs to be created and each of these tests
     // that represent a verification of a specification item needs to be a couple lines at most.
@@ -133,8 +142,9 @@ public class PomConstructionTest
     {
       // This should be 2
       //assertEquals( 2, model.getLineageCount() );
-      //PomTestWrapper tester = buildPom("micromailer");
-      //assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
+      PomTestWrapper tester = buildPom("micromailer");
+     // System.out.println(tester.getDomainModel().asString());
+     // assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
     /*MNG-

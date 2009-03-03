@@ -631,7 +631,6 @@ public class DefaultMavenProjectBuilder
         for(ModelContainer mc : profileContainers)
         {
             List<ModelProperty> transformed = new ArrayList<ModelProperty>();
-            //transformed.add(new ModelProperty(ProjectUri.xUri, null));
             for(ModelProperty mp : mc.getProperties())
             {
                 if(mp.getUri().startsWith(ProjectUri.Profiles.Profile.xUri) && !mp.getUri().equals(ProjectUri.Profiles.Profile.id)
