@@ -303,8 +303,7 @@ public class DefaultArtifactResolver
         .setRemoteRepostories( remoteRepositories )
         .setMetadataSource( source )
         .setFilter( filter )
-        .setListeners( listeners )
-        .setConflictResolvers( conflictResolvers );        
+        .setListeners( listeners );
         
         return resolveWithExceptions( request );
     }

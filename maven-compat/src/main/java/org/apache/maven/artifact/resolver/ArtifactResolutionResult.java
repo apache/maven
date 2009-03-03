@@ -40,7 +40,6 @@ import java.util.Set;
  * - file system errors: permissions
  *
  * @author Jason van Zyl
- * @version $Id$
  * @TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
  * complex requiring a long list of checks, need to create a parent/interfact/encapsulation
  * for the types of exceptions
@@ -48,7 +47,6 @@ import java.util.Set;
 public class ArtifactResolutionResult
 {
     private Artifact originatingArtifact;
-
 
     private List<Artifact> missingArtifacts;
 

@@ -1,15 +1,14 @@
 package org.apache.maven.artifact.resolver;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 /**
  * A resolution request allows you to either use an existing MavenProject, or a coordinate (gid:aid:version)
@@ -21,20 +20,25 @@ public class ArtifactResolutionRequest
 {
     private Artifact artifact;
 
+    // Needs to go away
     private Set<Artifact> artifactDependencies;
 
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
 
+    // Not sure what to do with this?
+    // Scope
+    // Lock down lists
     private ArtifactFilter filter;
 
+    // Needs to go away
     private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
 
+    // This is like a filter but overrides all transitive versions 
     private Map managedVersionMap;
 
-    private List<ConflictResolver> conflictResolvers;
-
+    // This should not be in here, it's a component
     private ArtifactMetadataSource metadataSource;
 
     public ArtifactResolutionRequest()
@@ -151,18 +155,6 @@ public class ArtifactResolutionRequest
     public ArtifactResolutionRequest setManagedVersionMap( Map managedVersionMap )
     {
         this.managedVersionMap = managedVersionMap;
-
-        return this;
-    }
-
-    public List<ConflictResolver> getConflictResolvers()
-    {
-        return conflictResolvers;
-    }
-
-    public ArtifactResolutionRequest setConflictResolvers( List<ConflictResolver> conflictResolvers )
-    {
-        this.conflictResolvers = conflictResolvers;
 
         return this;
     }

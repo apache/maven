@@ -24,8 +24,5 @@ package org.apache.maven.artifact.resolver;
  */
 public interface ArtifactResolver
 {
-    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
-    
-    ArtifactResolutionResult resolveWithExceptions( ArtifactResolutionRequest request )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
+    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );    
 }
