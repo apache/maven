@@ -172,6 +172,10 @@ public class DefaultMavenProjectBuilder
         project.setFile( projectDescriptor );
 
         setBuildOutputDirectoryOnParent( project );
+
+        hm.put( ArtifactUtils.artifactId( project.getGroupId(), project.getArtifactId(), "pom", project.getVersion() ),
+                project );
+
         return project;
     }
 
