@@ -98,6 +98,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -105,7 +106,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @Component(role=PluginManager.class)
 public class DefaultPluginManager
-    extends AbstractLogEnabled
     implements PluginManager
 {
     private static final List RESERVED_GROUP_IDS;
@@ -154,6 +154,9 @@ public class DefaultPluginManager
     @Requirement
     private PluginRepository pluginRepository;
 
+    @Requirement
+    private Logger logger;
+    
     public DefaultPluginManager()
     {
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
@@ -185,16 +188,16 @@ public class DefaultPluginManager
 
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
-        getLogger().debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
+        logger.debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
         if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
         {
-            getLogger().debug( "Resolving version for plugin: " + plugin.getKey() );
+            logger.debug( "Resolving version for plugin: " + plugin.getKey() );
             pluginVersion = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(),
                                                                         plugin.getArtifactId(),
                                                                         project, session );
             plugin.setVersion( pluginVersion );
 
-            getLogger().debug( "Resolved to version: " + pluginVersion );
+            logger.debug( "Resolved to version: " + pluginVersion );
         }
 
         return verifyVersionedPlugin( plugin, project, session );
@@ -207,7 +210,7 @@ public class DefaultPluginManager
         ArtifactResolutionException, InvalidPluginException,
         PluginManagerException, PluginNotFoundException
     {
-        getLogger().debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
+        logger.debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
 
         ArtifactRepository localRepository = session.getLocalRepository();
 
@@ -226,7 +229,7 @@ public class DefaultPluginManager
             }
             else
             {
-                getLogger().debug(
+                logger.debug(
                                    "Skipping resolution for Maven built-in plugin: "
                                                    + plugin.getKey() );
             }
@@ -292,10 +295,9 @@ public class DefaultPluginManager
 
         Set<Artifact> artifactSet = getPluginArtifacts( pluginArtifact, projectPlugin, project, session.getLocalRepository() );
 
-        List<Artifact> artifacts = ( artifactSet == null || artifactSet.isEmpty() )
-                        ? new ArrayList<Artifact>() : new ArrayList<Artifact>( artifactSet );
+        List<Artifact> artifacts = ( artifactSet == null || artifactSet.isEmpty() ) ? new ArrayList<Artifact>() : new ArrayList<Artifact>( artifactSet );
 
-        getLogger().debug( "Got plugin artifacts:\n\n" + artifacts );
+        logger.debug( "Got plugin artifacts:\n\n" + artifacts );
 
         MavenRealmManager realmManager = session.getRealmManager();
         ClassRealm pluginRealm = realmManager.getPluginRealm( projectPlugin );
@@ -303,12 +305,9 @@ public class DefaultPluginManager
         {
             try
             {
-                pluginRealm = realmManager.createPluginRealm( projectPlugin,
-                                                              pluginArtifact,
-                                                              artifacts,
-                                                              coreArtifactFilterManager.getArtifactFilter() );
+                pluginRealm = realmManager.createPluginRealm( projectPlugin, pluginArtifact, artifacts, coreArtifactFilterManager.getArtifactFilter() );
 
-                getLogger().debug( "Created realm: " + pluginRealm + " for plugin: " + projectPlugin.getKey() );
+                logger.debug( "Created realm: " + pluginRealm + " for plugin: " + projectPlugin.getKey() );
             }
             catch ( RealmManagementException e )
             {
@@ -319,7 +318,7 @@ public class DefaultPluginManager
 
             try
             {
-                getLogger().debug( "Discovering components in realm: " + pluginRealm );
+                logger.debug( "Discovering components in realm: " + pluginRealm );
 
                 container.discoverComponents( pluginRealm );
             }
@@ -336,7 +335,7 @@ public class DefaultPluginManager
             // The PluginCollector will now know about the plugin we are trying to load
             // ----------------------------------------------------------------------------
 
-            getLogger().debug(
+            logger.debug(
                                "Checking for plugin descriptor for: " + projectPlugin.getKey()
                                                + " with version: " + projectPlugin.getVersion() + " in collector: " + pluginCollector );
 
@@ -344,13 +343,13 @@ public class DefaultPluginManager
 
             if ( pluginDescriptor == null )
             {
-                if ( ( pluginRealm != null ) && getLogger().isDebugEnabled() )
+                if ( ( pluginRealm != null ) && logger.isDebugEnabled() )
                 {
-                    getLogger().debug( "Plugin Realm: " );
+                    logger.debug( "Plugin Realm: " );
                     pluginRealm.display();
                 }
 
-                getLogger().debug( "Removing invalid plugin realm." );
+                logger.debug( "Removing invalid plugin realm." );
                 realmManager.disposePluginRealm( projectPlugin );
 
                 throw new PluginManagerException( projectPlugin, "The plugin descriptor for the plugin "
@@ -360,7 +359,7 @@ public class DefaultPluginManager
 
             pluginDescriptor.setPluginArtifact( pluginArtifact );
 
-            getLogger().debug( "Realm for plugin: " + plugin.getKey() + ":\n" + pluginRealm );
+            logger.debug( "Realm for plugin: " + plugin.getKey() + ":\n" + pluginRealm );
         }
         else
         {
@@ -479,7 +478,7 @@ public class DefaultPluginManager
             resolved.add( artifact );
         }
 
-        getLogger().debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + resolved.toString().replace( ',', '\n' ) );
+        logger.debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + resolved.toString().replace( ',', '\n' ) );
 
         return resolved;
     }
@@ -518,7 +517,7 @@ public class DefaultPluginManager
 
         if ( mojoDescriptor.getDeprecated() != null )
         {
-            getLogger().warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
+            logger.warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
         }
 
         Model model = project.getModel();
@@ -614,7 +613,7 @@ public class DefaultPluginManager
 
             pluginRealm = pluginDescriptor.getClassRealm();
 
-            getLogger().debug( "Setting context classloader for plugin to: " + pluginRealm.getId() + " (instance is: " + pluginRealm + ")" );
+            logger.debug( "Setting context classloader for plugin to: " + pluginRealm.getId() + " (instance is: " + pluginRealm + ")" );
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
 
@@ -655,7 +654,7 @@ public class DefaultPluginManager
         }
         catch ( LinkageError e )
         {
-            if ( getLogger().isFatalErrorEnabled() )
+            if ( logger.isFatalErrorEnabled() )
             {
                 StringBuffer sb = new StringBuffer();
                 sb.append( mojoDescriptor.getImplementation() ).append( "#execute() caused a linkage error (" );
@@ -683,7 +682,7 @@ public class DefaultPluginManager
                 }
                 while( r != null );
 
-                getLogger().fatalError(
+                logger.fatalError(
                                        sb.toString(), e );
             }
 
@@ -701,7 +700,7 @@ public class DefaultPluginManager
                 }
                 catch ( ComponentLifecycleException e )
                 {
-                    getLogger().debug( "Error releasing mojo for: " + goalExecId, e );
+                    logger.debug( "Error releasing mojo for: " + goalExecId, e );
                 }
             }
 
@@ -821,7 +820,7 @@ public class DefaultPluginManager
         try
         {
 
-        getLogger().debug(
+        logger.debug(
                            "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm "
                                            + pluginRealm.getId() + " - descRealmId="
                                            + mojoDescriptor.getRealm() );
@@ -840,13 +839,13 @@ public class DefaultPluginManager
 
         if ( mojo != null )
         {
-            getLogger().debug(
+            logger.debug(
                                "Looked up - " + mojo + " - "
                                                + mojo.getClass().getClassLoader() );
         }
         else
         {
-            getLogger().warn( "No luck." );
+            logger.warn( "No luck." );
         }
 
         if ( report && !( mojo instanceof MavenReport ) )
@@ -866,7 +865,7 @@ public class DefaultPluginManager
             ( (ContextEnabled) mojo ).setPluginContext( pluginContext );
         }
 
-        mojo.setLog( new DefaultLog( getLogger() ) );
+        mojo.setLog( new DefaultLog( logger ) );
 
         XmlPlexusConfiguration pomConfiguration;
 
@@ -894,7 +893,7 @@ public class DefaultPluginManager
                                                                                           session,
                                                                                           mojoExecution,
                                                                                           pathTranslator,
-                                                                                          getLogger(),
+                                                                                          logger,
                                                                                           session.getExecutionProperties() );
 
         PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration(
@@ -965,7 +964,7 @@ public class DefaultPluginManager
 
                         buffer.append( " is deprecated:" ).append( "\n\n" ).append( param.getDeprecated() ).append( "\n" );
 
-                        getLogger().warn( buffer.toString() );
+                        logger.warn( buffer.toString() );
                     }
                 }
             }
@@ -982,7 +981,7 @@ public class DefaultPluginManager
         ClassRealm projectRealm = realmManager.getProjectRealm( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         if ( projectRealm == null )
         {
-            getLogger().debug( "Realm for project: " + project.getId() + " not found. Using container realm instead." );
+            logger.debug( "Realm for project: " + project.getId() + " not found. Using container realm instead." );
 
             projectRealm = container.getContainerRealm();
         }
@@ -997,7 +996,7 @@ public class DefaultPluginManager
 
         if ( pluginRealm == null )
         {
-            getLogger().debug( "Realm for plugin: " + pluginDescriptor.getId() + " not found. Using project realm instead." );
+            logger.debug( "Realm for plugin: " + pluginDescriptor.getId() + " not found. Using project realm instead." );
 
             pluginRealm = projectRealm;
             realmActions.add( new PluginRealmAction( pluginDescriptor ) );
@@ -1008,7 +1007,7 @@ public class DefaultPluginManager
             realmActions.add( new PluginRealmAction( pluginDescriptor, pluginRealm ) );
         }
 
-        getLogger().debug( "Setting realm for plugin descriptor: " + pluginDescriptor.getId() + " to: " + pluginRealm );
+        logger.debug( "Setting realm for plugin descriptor: " + pluginDescriptor.getId() + " to: " + pluginRealm );
         pluginDescriptor.setClassRealm( pluginRealm );
         pluginDescriptor.setArtifacts( realmManager.getPluginArtifacts( plugin ) );
     }
@@ -1036,7 +1035,7 @@ public class DefaultPluginManager
                 // ideally, this would be elevated above the true debug output, but below the default INFO level...
                 // [BP] (2004-07-18): need to understand the context more but would prefer this could be either WARN or
                 // removed - shouldn't need DEBUG to diagnose a problem most of the time.
-                getLogger().debug(
+                logger.debug(
                                    "*** WARNING: Configuration \'" + child.getName()
                                                    + "\' is not used in goal \'"
                                                    + mojoDescriptor.getFullGoalName()
@@ -1167,7 +1166,7 @@ public class DefaultPluginManager
                 String deprecated = parameter.getDeprecated();
                 if ( StringUtils.isNotEmpty( deprecated ) )
                 {
-                    getLogger().warn( "DEPRECATED [" + parameter.getName() + "]: " + deprecated );
+                    logger.warn( "DEPRECATED [" + parameter.getName() + "]: " + deprecated );
                 }
             }
         }
@@ -1364,16 +1363,16 @@ public class DefaultPluginManager
                 configurator = container.lookup( ComponentConfigurator.class, "basic" );
             }
 
-            ConfigurationListener listener = new DebugConfigurationListener( getLogger() );
+            ConfigurationListener listener = new DebugConfigurationListener( logger );
 
-            getLogger().debug( "Configuring mojo '" + mojoDescriptor.getId() + "' with "
+            logger.debug( "Configuring mojo '" + mojoDescriptor.getId() + "' with "
                                + ( configuratorId == null ? "basic" : configuratorId )
                                + " configurator -->" );
 
             // This needs to be able to use methods
             configurator.configureComponent( plugin, configuration, expressionEvaluator, realm, listener );
 
-            getLogger().debug( "-- end configuration --" );
+            logger.debug( "-- end configuration --" );
         }
         catch ( ComponentConfigurationException e )
         {
@@ -1391,9 +1390,9 @@ public class DefaultPluginManager
         }
         catch ( LinkageError e )
         {
-            if ( getLogger().isFatalErrorEnabled() )
+            if ( logger.isFatalErrorEnabled() )
             {
-                getLogger().fatalError(
+                logger.fatalError(
                                         configurator.getClass().getName() + "#configureComponent(...) caused a linkage error ("
                                             + e.getClass().getName() + ") and may be out-of-date. Check the realms:" );
 
@@ -1408,7 +1407,7 @@ public class DefaultPluginManager
                         sb.append( '\n' );
                     }
                 }
-                getLogger().fatalError( sb.toString() );
+                logger.fatalError( sb.toString() );
 
                 ClassRealm containerRealm = container.getContainerRealm();
                 sb = new StringBuffer();
@@ -1421,7 +1420,7 @@ public class DefaultPluginManager
                         sb.append( '\n' );
                     }
                 }
-                getLogger().fatalError( sb.toString() );
+                logger.fatalError( sb.toString() );
             }
 
             throw new PluginConfigurationException(
@@ -1439,7 +1438,7 @@ public class DefaultPluginManager
                 }
                 catch ( ComponentLifecycleException e )
                 {
-                    getLogger().debug( "Failed to release plugin container - ignoring." );
+                    logger.debug( "Failed to release plugin container - ignoring." );
                 }
             }
         }
@@ -1560,7 +1559,7 @@ public class DefaultPluginManager
                     //TODO: the packaging could be different, but the exception doesn't contain that info
                     //most likely it would be produced by the project we just found in the reactor since all
                     //the other info matches. Assume it's ok.
-                    getLogger().warn( "The dependency: "
+                    logger.warn( "The dependency: "
                                       + p.getId()
                                       + " can't be resolved but has been found in the reactor.\nThis dependency has been excluded from the plugin execution. You should rerun this mojo after executing mvn install.\n" );
 
