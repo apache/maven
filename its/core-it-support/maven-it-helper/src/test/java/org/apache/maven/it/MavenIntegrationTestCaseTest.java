@@ -49,4 +49,25 @@ public class MavenIntegrationTestCaseTest
         assertEquals( expected, test.removePattern( new DefaultArtifactVersion( version ) ).toString() );
     }
 
+    public void testRequiresMavenVersion()
+    {
+        System.setProperty( "maven.version", "2.1" );
+
+        AbstractMavenIntegrationTestCase test = new AbstractMavenIntegrationTestCase( "[2.0,)" )
+        {
+            // test case with version range
+        };
+
+        try
+        {
+            test.requiresMavenVersion( "[3.0,)" );
+        }
+        catch ( RuntimeException e )
+        {
+            // expected
+        }
+
+        test.requiresMavenVersion( "[2.0,)" );
+    }
+
 }
