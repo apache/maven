@@ -1,29 +1,28 @@
 package org.apache.maven.embedder.execution;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -39,8 +38,8 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.project.DefaultProfileManager;
-import org.apache.maven.project.ProfileManager;
 import org.apache.maven.project.ProfileActivationContext;
+import org.apache.maven.project.ProfileManager;
 import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.apache.maven.repository.MavenRepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
@@ -48,30 +47,22 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.SettingsUtils;
-import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 /**
- * Things that we deal with in this populator to ensure that we have a valid {@MavenExecutionRequest}
+ * Things that we deal with in this populator to ensure that we have a valid
+ * {@MavenExecutionRequest}
  * <p/>
- * - POM
- * - Settings
- * - Local Repository
- * - Snapshot update policies
- * - Repository checksum policies
- * - Artifact transfer mechanism configuration
- * - Eventing/Logging configuration
- * - Profile manager configuration
+ * - POM - Settings - Local Repository - Snapshot update policies - Repository checksum policies -
+ * Artifact transfer mechanism configuration - Eventing/Logging configuration - Profile manager
+ * configuration
  */
 @Component(role = MavenExecutionRequestPopulator.class)
 public class DefaultMavenExecutionRequestPopulator
@@ -89,11 +80,10 @@ public class DefaultMavenExecutionRequestPopulator
 
     // 2009-02-12 Oleg: this component is defined in maven-core components.xml
     // because it already has another declared (not generated) component
-    @Requirement( hint = "maven" )
+    @Requirement(hint = "maven")
     private SecDispatcher securityDispatcher;
 
-    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request,
-                                                   Configuration configuration )
+    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
     {
         eventing( request, configuration );
@@ -119,12 +109,11 @@ public class DefaultMavenExecutionRequestPopulator
         profileManager( request, configuration );
 
         processSettings( request, configuration );
-                
+
         return request;
     }
 
-    private void reporter( MavenExecutionRequest request,
-                           Configuration configuration )
+    private void reporter( MavenExecutionRequest request, Configuration configuration )
     {
         if ( request.getErrorReporter() == null )
         {
@@ -139,8 +128,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void executionProperties( MavenExecutionRequest request,
-                                      Configuration configuration )
+    private void executionProperties( MavenExecutionRequest request, Configuration configuration )
     {
         Properties requestProperties = request.getProperties();
 
@@ -216,7 +204,7 @@ public class DefaultMavenExecutionRequestPopulator
                 profileManager.addProfile( profile );
 
                 // We need to convert profile repositories to artifact repositories                
-                
+
                 for ( Iterator<Repository> j = profile.getRepositories().iterator(); j.hasNext(); )
                 {
                     Repository r = j.next();
@@ -234,6 +222,86 @@ public class DefaultMavenExecutionRequestPopulator
                     request.addRemoteRepository( ar );
                 }
             }
+        }
+
+        processRepositoriesInSettings( request, configuration );
+    }
+
+    private void processRepositoriesInSettings( MavenExecutionRequest request, Configuration configuration )
+        throws MavenEmbedderException
+    {
+        Settings settings = request.getSettings();
+
+        Proxy proxy = settings.getActiveProxy();
+
+        if ( proxy != null )
+        {
+            if ( proxy.getHost() == null )
+            {
+                throw new MavenEmbedderException( "Proxy in settings.xml has no host" );
+            }
+
+            repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
+        }
+
+        for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+        {
+            Server server = (Server) i.next();
+
+            String pass;
+            String phrase;
+            try
+            {
+                pass = securityDispatcher.decrypt( server.getPassword() );
+                phrase = securityDispatcher.decrypt( server.getPassphrase() );
+            }
+            catch ( SecDispatcherException e )
+            {
+                throw new MavenEmbedderException( "Error decrypting server password/passphrase.", e );
+            }
+
+            repositorySystem.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
+
+            repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
+        }
+
+        for ( Iterator<Mirror> i = settings.getMirrors().iterator(); i.hasNext(); )
+        {
+            Mirror mirror = i.next();
+
+            repositorySystem.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+        }
+
+        // <mirrors>
+        //   <mirror>
+        //     <id>nexus</id>
+        //     <mirrorOf>*</mirrorOf>
+        //     <url>http://repository.sonatype.org/content/groups/public</url>
+        //   </mirror>
+        // </mirrors>        
+
+        if ( request.getRemoteRepositories() != null )
+        {
+            Set<ArtifactRepository> remoteRepositoriesWithMirrors = new LinkedHashSet<ArtifactRepository>();
+            
+            for ( ArtifactRepository repository : request.getRemoteRepositories() )
+            {                
+                // Check to see if we have a valid mirror for this repository
+                ArtifactRepository mirror = repositorySystem.getMirror( repository );
+                
+                if ( mirror != null )
+                {
+                    // If there is a valid mirror for this repository then we'll enter the mirror as a replacement for this repository.
+                    remoteRepositoriesWithMirrors.add( mirror );
+                }
+                else
+                {
+                    // If we have no valid mirrors for this repository we will keep this repository in the list.
+                    remoteRepositoriesWithMirrors.add( repository );
+                }
+            }
+
+            request.setRemoteRepositories( new ArrayList<ArtifactRepository>( remoteRepositoriesWithMirrors ) );
         }
     }
 
@@ -304,7 +372,7 @@ public class DefaultMavenExecutionRequestPopulator
             try
             {
                 Settings settings = settingsBuilder.buildSettings( request );
-                
+
                 request.setSettings( new SettingsAdapter( request, settings ) );
             }
             catch ( Exception e )
@@ -314,8 +382,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void localRepository( MavenExecutionRequest request,
-                                  Configuration configuration )
+    private void localRepository( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
     {
         // ------------------------------------------------------------------------
@@ -336,13 +403,12 @@ public class DefaultMavenExecutionRequestPopulator
             request.setLocalRepositoryPath( new File( request.getLocalRepository().getBasedir() ).getAbsoluteFile() );
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Snapshot Policy
     // ------------------------------------------------------------------------
 
-    private void snapshotPolicy( MavenExecutionRequest request,
-                                 Configuration configuration )
+    private void snapshotPolicy( MavenExecutionRequest request, Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Snapshot Repository Update Policies
@@ -375,8 +441,7 @@ public class DefaultMavenExecutionRequestPopulator
     // Checksum Policy
     // ------------------------------------------------------------------------
 
-    private void checksumPolicy( MavenExecutionRequest request,
-                                 Configuration configuration )
+    private void checksumPolicy( MavenExecutionRequest request, Configuration configuration )
     {
         repositorySystem.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
     }
@@ -405,75 +470,20 @@ public class DefaultMavenExecutionRequestPopulator
             repositorySystem.setDownloadMonitor( request.getTransferListener() );
 
             repositorySystem.setOnline( true );
-        } 
-
-        try
-        {
-            resolveParameters( request.getSettings() );
         }
-        catch ( Exception e )
-        {
-            throw new MavenEmbedderException( "Unable to configure Maven for execution", e );
-        }
-    }
-
-    private void resolveParameters( Settings settings )
-        throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
-    {
-            Proxy proxy = settings.getActiveProxy();
-
-            if ( proxy != null )
-            {
-                if ( proxy.getHost() == null )
-                {
-                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
-                }
-
-                repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
-            }
-
-            for ( Iterator<Server> i = settings.getServers().iterator(); i.hasNext(); )
-            {
-                Server server = i.next();
-                
-                String pass;
-                String phrase;
-				try 
-				{
-					pass = securityDispatcher.decrypt( server.getPassword() );					
-					phrase = securityDispatcher.decrypt( server.getPassphrase() );					
-				} 
-				catch (SecDispatcherException e) 
-				{
-					throw new SettingsConfigurationException( "Error decrypting server password/passphrase.", e );
-				}
-                
-                repositorySystem.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
-
-                repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
-            }
-
-            RepositoryPermissions defaultPermissions = new RepositoryPermissions();
-            
-            for ( Iterator<Mirror> i = settings.getMirrors().iterator(); i.hasNext(); )
-            {
-                Mirror mirror = i.next();
-
-                repositorySystem.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
-            }
     }
 
     /**
      * decrypt settings passwords and passphrases
      * 
      * @param settings settings to process
-     * @throws IOException 
+     * @throws IOException
      */
     private void decrypt( Settings settings )
-    	throws IOException
+        throws IOException
     {
         List<Server> servers = settings.getServers();
-        
+
         if ( servers != null && !servers.isEmpty() )
         {
             try
@@ -495,7 +505,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings, Configuration configuration ) 
+    public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings, Configuration configuration )
         throws MavenEmbedderException
     {
         String localRepositoryPath = null;
@@ -529,13 +539,12 @@ public class DefaultMavenExecutionRequestPopulator
             throw new MavenEmbedderException( "Cannot create local repository.", e );
         }
     }
-    
+
     // ------------------------------------------------------------------------
     // Eventing
     // ------------------------------------------------------------------------
 
-    private void eventing( MavenExecutionRequest request,
-                           Configuration configuration )
+    private void eventing( MavenExecutionRequest request, Configuration configuration )
     {
         // ------------------------------------------------------------------------
         // Event Monitor/Logging

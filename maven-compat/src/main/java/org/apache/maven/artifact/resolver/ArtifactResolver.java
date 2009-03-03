@@ -34,8 +34,12 @@ public interface ArtifactResolver
 {
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );    
     
-    // Used directory by Surefire ...
+    // USED BY SUREFIRE
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;    
+        
+    // USED BY REMOTE RESOURCES PLUGIN
+    void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepositor )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 }

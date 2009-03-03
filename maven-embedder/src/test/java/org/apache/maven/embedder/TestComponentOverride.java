@@ -19,19 +19,17 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import java.io.File;
+
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import java.io.File;
 
 /** @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a> */
 public class TestComponentOverride
-    extends TestCase
+    extends PlexusTestCase
 {
-    private String basedir;
-
     private MavenEmbedder maven;
 
     protected PlexusContainer container;
@@ -39,8 +37,6 @@ public class TestComponentOverride
     protected void setUp()
         throws Exception
     {
-        basedir = System.getProperty( "basedir" );
-
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
         Configuration request = new DefaultConfiguration();
@@ -49,9 +45,15 @@ public class TestComponentOverride
 
         request.setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
 
-        request.addExtension( new File( basedir, "src/test/extensions" ).toURI().toURL() );
+        File extensions = new File( getBasedir(), "src/test/extensions" );
+        
+        assertTrue( extensions.exists() );
+        
+        request.addExtension( extensions.toURI().toURL() );
 
         maven = new MavenEmbedder( request );
+        
+        container = maven.getPlexusContainer();
     }
 
     public void testComponentOverride()
@@ -61,8 +63,7 @@ public class TestComponentOverride
 
         assertNotNull( factory );
 
-        assertTrue( "Expecting " + CustomArtifactFactory.class.getName() + " but was " + factory.getClass().getName(),
-                    CustomArtifactFactory.class.isAssignableFrom( factory.getClass() ) );
+        assertTrue( "Expecting " + CustomArtifactFactory.class.getName() + " but was " + factory.getClass().getName(), CustomArtifactFactory.class.isAssignableFrom( factory.getClass() ) );
 
         // test wheter the requirement is injected - if not, it nullpointers
         factory.createArtifact( "testGroupId", "testArtifactId", "testVersion", "compile", "jar" );

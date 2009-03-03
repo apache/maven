@@ -247,9 +247,11 @@ public class DefaultMavenExecutionRequest
         this.inactiveProfiles = inactiveProfiles;
     }
 
-    public void setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
+    public MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
         this.remoteRepositories = remoteRepositories;
+        
+        return this;
     }
 
     public void setProjectBuildingConfiguration( ProjectBuilderConfiguration projectBuildingConfiguration )

@@ -42,15 +42,12 @@ public class DefaultMirrorBuilder
 
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
-        //System.out.println( mirror + " --> " + mirrorOf );
-        
-        //first one must win so don't insert more.
-        if (!mirrors.containsKey( mirrorOf ))
+        if ( !mirrors.containsKey( mirrorOf ) )
         {
-          mirrors.put( mirrorOf, mirror );
+            mirrors.put( mirrorOf, mirror );
         }
     }
-        
+            
     /**
      * This method finds a matching mirror for the selected repository. If there is an exact match,
      * this will be used. If there is no exact match, then the list of mirrors is examined to see if
@@ -189,4 +186,6 @@ public class DefaultMirrorBuilder
             return false;
         }
     }
+    
+    
 }

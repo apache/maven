@@ -211,6 +211,15 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setGlobalSettingsFile( File globalSettingsFile );
 
     MavenExecutionRequest addRemoteRepository( ArtifactRepository repository );
+    /**
+     * Set a new list of remote repositories to use the execution request. This is necessary if you perform
+     * transformations on the remote repositories being used. For example if you replace existing repositories with
+     * mirrors then it's easier to just replace the whole list with a new list of transformed repositories.
+     * 
+     * @param repositories
+     * @return
+     */
+    MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> repositories );
     List<ArtifactRepository> getRemoteRepositories();
 
     MavenExecutionRequest setRealmManager( MavenRealmManager realmManager );
