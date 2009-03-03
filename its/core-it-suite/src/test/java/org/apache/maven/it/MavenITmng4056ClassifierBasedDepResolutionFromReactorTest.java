@@ -51,6 +51,7 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4056" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
