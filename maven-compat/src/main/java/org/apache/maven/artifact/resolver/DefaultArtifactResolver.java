@@ -46,7 +46,7 @@ import org.codehaus.plexus.util.FileUtils;
 /**
  * @author Jason van Zyl
  */
-@Component(role=ArtifactResolver.class)
+@Component(role = ArtifactResolver.class)
 public class DefaultArtifactResolver
     extends AbstractLogEnabled
     implements ArtifactResolver
@@ -66,7 +66,7 @@ public class DefaultArtifactResolver
 
     @Requirement
     private ArtifactCollector artifactCollector;
-    
+
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------
@@ -83,8 +83,7 @@ public class DefaultArtifactResolver
         resolve( artifact, remoteRepositories, localRepository, true );
     }
 
-    private void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                          ArtifactRepository localRepository, boolean force )
+    private void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean force )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( artifact == null )
@@ -104,14 +103,12 @@ public class DefaultArtifactResolver
 
             if ( !systemFile.exists() )
             {
-                throw new ArtifactNotFoundException( "System artifact: " + artifact + " not found in path: "
-                    + systemFile, artifact );
+                throw new ArtifactNotFoundException( "System artifact: " + artifact + " not found in path: " + systemFile, artifact );
             }
 
             if ( !systemFile.isFile() )
             {
-                throw new ArtifactNotFoundException( "System artifact: " + artifact + " is not a file: " + systemFile,
-                                                     artifact );
+                throw new ArtifactNotFoundException( "System artifact: " + artifact + " is not a file: " + systemFile, artifact );
             }
 
             artifact.setResolved( true );
@@ -133,7 +130,7 @@ public class DefaultArtifactResolver
             boolean localCopy = isLocalCopy( artifact );
 
             destination = artifact.getFile();
-                             
+
             boolean resolved = false;
 
             // There are three conditions in which we'll go after the artifact here:
@@ -158,8 +155,7 @@ public class DefaultArtifactResolver
 
                     if ( !artifact.isResolved() && !destination.exists() )
                     {
-                        throw new ArtifactResolutionException(
-                                                               "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
+                        throw new ArtifactResolutionException( "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
                                                                artifact, remoteRepositories );
                     }
                 }
@@ -200,8 +196,7 @@ public class DefaultArtifactResolver
                     }
                     catch ( IOException e )
                     {
-                        throw new ArtifactResolutionException( "Unable to copy resolved artifact for local use: "
-                            + e.getMessage(), artifact, remoteRepositories, e );
+                        throw new ArtifactResolutionException( "Unable to copy resolved artifact for local use: " + e.getMessage(), artifact, remoteRepositories, e );
                     }
                 }
 
@@ -291,26 +286,19 @@ public class DefaultArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
-                                                          List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter, List<ResolutionListener> listeners,
-                                                          List<ConflictResolver> conflictResolvers )
+                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter, List<ResolutionListener> listeners,
+                                                         List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-        .setArtifact( originatingArtifact )
-        .setArtifactDependencies( artifacts )
-        .setManagedVersionMap( managedVersions )
-        .setLocalRepository( localRepository )
-        .setRemoteRepostories( remoteRepositories )
-        .setMetadataSource( source )
-        .setFilter( filter )
-        .setListeners( listeners );
-        
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( originatingArtifact ).setArtifactDependencies( artifacts ).setManagedVersionMap( managedVersions )
+            .setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories ).setMetadataSource( source ).setFilter( filter ).setListeners( listeners );
+
         return resolveWithExceptions( request );
     }
-    
+
     public ArtifactResolutionResult resolveWithExceptions( ArtifactResolutionRequest request )
         throws ArtifactResolutionException, ArtifactNotFoundException
-    {            
+    {
         ArtifactResolutionResult result = resolve( request );
 
         // We have collected all the problems so let's mimic the way the old code worked and just blow up right here.
@@ -366,7 +354,7 @@ public class DefaultArtifactResolver
         if ( listeners == null )
         {
             listeners = new ArrayList<ResolutionListener>();
-            
+
             if ( getLogger().isDebugEnabled() )
             {
                 listeners.add( new DebugResolutionListener( getLogger() ) );
@@ -374,15 +362,15 @@ public class DefaultArtifactResolver
 
             listeners.add( new WarningResolutionListener( getLogger() ) );
         }
-                
+
         if ( request.getArtifactDependencies() == null || request.getArtifactDependencies().size() == 0 )
         {
             ArtifactResolutionResult result = new ArtifactResolutionResult();
-            
+
             try
             {
                 resolve( request.getArtifact(), request.getRemoteRepostories(), request.getLocalRepository() );
-                
+
                 result.addArtifact( request.getArtifact() );
             }
             catch ( ArtifactResolutionException e )
@@ -393,10 +381,10 @@ public class DefaultArtifactResolver
             {
                 result.addMissingArtifact( request.getArtifact() );
             }
-            
+
             return result;
         }
-        
+
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         ArtifactResolutionResult result = artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
 
@@ -413,27 +401,30 @@ public class DefaultArtifactResolver
             return result;
         }
 
-        for ( Artifact requestedArtifact : result.getRequestedArtifacts() )
+        if ( result.getArtifacts() != null )
         {
-            try
+            for ( Artifact artifact : result.getArtifacts() )
             {
-                resolve( requestedArtifact, remoteRepositories, localRepository );
-                
-                result.addArtifact( requestedArtifact );
-            }
-            catch ( ArtifactNotFoundException anfe )
-            {
-                // These are cases where the artifact just isn't present in any of the remote repositories
-                // because it wasn't deployed, or it was deployed in the wrong place.
+                try
+                {
+                    resolve( artifact, remoteRepositories, localRepository );
 
-                result.addMissingArtifact( requestedArtifact );                               
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                // This is really a wagon TransferFailedException so something went wrong after we successfully
-                // retrieved the metadata.
+                    result.addArtifact( artifact );
+                }
+                catch ( ArtifactNotFoundException anfe )
+                {
+                    // These are cases where the artifact just isn't present in any of the remote repositories
+                    // because it wasn't deployed, or it was deployed in the wrong place.
 
-                result.addErrorArtifactException( e );
+                    result.addMissingArtifact( artifact );
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    // This is really a wagon TransferFailedException so something went wrong after we successfully
+                    // retrieved the metadata.
+
+                    result.addErrorArtifactException( e );
+                }
             }
         }
 

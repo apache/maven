@@ -542,11 +542,7 @@ public class DefaultPluginManager
             {
                 MavenProject p = (MavenProject) i.next();
 
-                resolveTransitiveDependencies( session,
-                                               repositorySystem,
-                                               mojoDescriptor.isDependencyResolutionRequired(),
-                                               p,
-                                               mojoDescriptor.isAggregator() );
+                resolveTransitiveDependencies( session, repositorySystem, mojoDescriptor.isDependencyResolutionRequired(), p, mojoDescriptor.isAggregator() );
             }
 
             downloadDependencies( project, session, repositorySystem );
@@ -1473,18 +1469,14 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     protected void resolveTransitiveDependencies( MavenSession context,
-                                                MavenRepositorySystem repositorySystem,
-                                                String scope,
-                                                MavenProject project,
-                                                boolean isAggregator )
-        throws ArtifactResolutionException, ArtifactNotFoundException,
-        InvalidDependencyVersionException
+                                                  MavenRepositorySystem repositorySystem,
+                                                  String scope,
+                                                  MavenProject project,
+                                                  boolean isAggregator )
+        throws ArtifactResolutionException, ArtifactNotFoundException, InvalidDependencyVersionException
     {
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
-        Artifact artifact = repositorySystem.createBuildArtifact( project.getGroupId(),
-                                                                 project.getArtifactId(),
-                                                                 project.getVersion(),
-                                                                 project.getPackaging() );
+        Artifact artifact = repositorySystem.createBuildArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), project.getPackaging() );
 
         // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
         // check this with yourkit as a hot spot.
@@ -1498,25 +1490,21 @@ public class DefaultPluginManager
             }
             catch ( VersionNotFoundException e )
             {
-                InvalidDependencyVersionException ee = new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
-                
-                throw ee;
+                throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
             }
         }
 
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( project.getArtifact() )
+            .setArtifact( artifact )
             .setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( context.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() )
             .setFilter( filter )                
             .setMetadataSource( repositorySystem );
-                 
-        Set resolvedArtifacts;
-        
+                         
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         if ( result.hasErrorArtifactExceptions() )
@@ -1530,7 +1518,6 @@ public class DefaultPluginManager
             */
             if ( isAggregator && checkMissingArtifactsInReactor( context.getSortedProjects(), result.getMissingArtifacts() ) )
             {
-                resolvedArtifacts = new LinkedHashSet( result.getArtifacts() );
             }
             else
             {

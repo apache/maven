@@ -164,6 +164,7 @@ public class ArtifactResolutionRequest
         StringBuffer sb = new StringBuffer()
                 .append( "REQUEST: " ).append(  "\n" )
                 .append( "artifact: " ).append( artifact ).append(  "\n" )
+                .append( artifactDependencies ).append(  "\n" )
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
                 .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
                 .append( "metadataSource: " ).append(  metadataSource ).append(  "\n" );
