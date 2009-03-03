@@ -87,6 +87,8 @@ under the License.
             </goals>
             <configuration>
               <projectArtifacts>target/artifacts.txt</projectArtifacts>
+              <compileClassPath>target/compile.txt</compileClassPath>
+              <significantPathLevels>2</significantPathLevels>
             </configuration>
           </execution>
         </executions>

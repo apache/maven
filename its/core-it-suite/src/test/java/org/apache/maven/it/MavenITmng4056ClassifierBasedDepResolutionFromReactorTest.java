@@ -65,6 +65,10 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest
             artifacts.contains( "org.apache.maven.its.mng4056:producer:javadoc:javadoc:0.1" ) );
         assertTrue( artifacts.toString(), 
             artifacts.contains( "org.apache.maven.its.mng4056:producer:ejb-client:client:0.1" ) );
+
+        List classpath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        assertTrue( classpath.toString(), classpath.contains( "producer/test.jar" ) );
+        assertTrue( classpath.toString(), classpath.contains( "producer/client.jar" ) );
     }
 
 }
