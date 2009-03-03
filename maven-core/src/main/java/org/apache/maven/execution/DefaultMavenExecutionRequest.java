@@ -55,7 +55,7 @@ public class DefaultMavenExecutionRequest
 
     private List profiles;
 
-    private List pluginGroups = new ArrayList();
+    private List<String> pluginGroups = new ArrayList<String>();
 
     private boolean usePluginUpdateOverride;
 
@@ -77,7 +77,7 @@ public class DefaultMavenExecutionRequest
 
     private File basedir;
 
-    private List goals;
+    private List<String> goals;
 
     private boolean useReactor = false;
 
@@ -95,11 +95,11 @@ public class DefaultMavenExecutionRequest
 
     private boolean showErrors = false;
 
-    private List eventMonitors;
+    private List<EventMonitor> eventMonitors;
 
-    private List activeProfiles;
+    private List<String> activeProfiles;
 
-    private List inactiveProfiles;
+    private List<String> inactiveProfiles;
 
     private TransferListener transferListener;
 
@@ -181,7 +181,7 @@ public class DefaultMavenExecutionRequest
         return localRepositoryPath;
     }
 
-    public List getGoals()
+    public List<String> getGoals()
     {
         return goals;
     }
@@ -222,7 +222,7 @@ public class DefaultMavenExecutionRequest
         return interactiveMode;
     }
 
-    public List getEventMonitors()
+    public List<EventMonitor> getEventMonitors()
     {
         return eventMonitors;
     }
@@ -232,17 +232,17 @@ public class DefaultMavenExecutionRequest
         this.basedir = basedir;
     }
 
-    public void setEventMonitors( List eventMonitors )
+    public void setEventMonitors( List<EventMonitor> eventMonitors )
     {
         this.eventMonitors = eventMonitors;
     }
 
-    public void setActiveProfiles( List activeProfiles )
+    public void setActiveProfiles( List<String> activeProfiles )
     {
         this.activeProfiles = activeProfiles;
     }
 
-    public void setInactiveProfiles( List inactiveProfiles )
+    public void setInactiveProfiles( List<String> inactiveProfiles )
     {
         this.inactiveProfiles = inactiveProfiles;
     }
@@ -257,20 +257,20 @@ public class DefaultMavenExecutionRequest
         this.projectBuildingConfiguration = projectBuildingConfiguration;
     }
 
-    public List getActiveProfiles()
+    public List<String> getActiveProfiles()
     {
         if ( activeProfiles == null )
         {
-            activeProfiles = new ArrayList();
+            activeProfiles = new ArrayList<String>();
         }
         return activeProfiles;
     }
 
-    public List getInactiveProfiles()
+    public List<String> getInactiveProfiles()
     {
         if ( inactiveProfiles == null )
         {
-            inactiveProfiles = new ArrayList();
+            inactiveProfiles = new ArrayList<String>();
         }
         return inactiveProfiles;
     }
@@ -335,7 +335,7 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public MavenExecutionRequest setGoals( List goals )
+    public MavenExecutionRequest setGoals( List<String> goals )
     {
         this.goals = goals;
 
@@ -417,14 +417,14 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public MavenExecutionRequest addActiveProfiles( List profiles )
+    public MavenExecutionRequest addActiveProfiles( List<String> profiles )
     {
         getActiveProfiles().addAll( profiles );
 
         return this;
     }
 
-    public MavenExecutionRequest addInactiveProfiles( List profiles )
+    public MavenExecutionRequest addInactiveProfiles( List<String> profiles )
     {
         getInactiveProfiles().addAll( profiles );
 
@@ -435,7 +435,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( eventMonitors == null )
         {
-            eventMonitors = new ArrayList();
+            eventMonitors = new ArrayList<EventMonitor>();
         }
 
         eventMonitors.add( monitor );
@@ -574,12 +574,12 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public List getPluginGroups()
+    public List<String> getPluginGroups()
     {
         return pluginGroups;
     }
 
-    public MavenExecutionRequest setPluginGroups( List pluginGroups )
+    public MavenExecutionRequest setPluginGroups( List<String> pluginGroups )
     {
         this.pluginGroups = pluginGroups;
 

@@ -38,9 +38,9 @@ import java.util.Properties;
 public class DefaultConfiguration
     implements Configuration
 {
-    private List inactives;
+    private List<String> inactives;
 
-    private List actives;
+    private List<String> actives;
 
     private File userSettings;
 
@@ -50,8 +50,7 @@ public class DefaultConfiguration
 
     private Properties systemProperties;
 
-    /** List&lt;URL&gt;. */
-    private List extensions = new ArrayList();
+    private List<URL> extensions = new ArrayList<URL>();
 
     private MavenEmbedderLogger logger;
 
@@ -65,8 +64,7 @@ public class DefaultConfiguration
 
     private CoreErrorReporter errorReporter;
 
-    /** List&lt;EventMonitor&gt;. */
-    private List eventMonitors;
+    private List<EventMonitor> eventMonitors;
 
     /** Creates a new instance of DefaultConfiguration */
     public DefaultConfiguration()
@@ -87,34 +85,34 @@ public class DefaultConfiguration
         return this;
     }
 
-    public Configuration addActiveProfiles( List profiles )
+    public Configuration addActiveProfiles( List<String> profiles )
     {
         getActiveProfiles().addAll( profiles );
 
         return this;
     }
 
-    public Configuration addInactiveProfiles( List profiles )
+    public Configuration addInactiveProfiles( List<String> profiles )
     {
         getInactiveProfiles().addAll( profiles );
 
         return this;
     }
 
-    public List getActiveProfiles()
+    public List<String> getActiveProfiles()
     {
         if ( actives == null )
         {
-            actives = new ArrayList();
+            actives = new ArrayList<String>();
         }
         return actives;
     }
 
-    public List getInactiveProfiles()
+    public List<String> getInactiveProfiles()
     {
         if ( inactives == null )
         {
-            inactives = new ArrayList();
+            inactives = new ArrayList<String>();
         }
         return inactives;
     }
@@ -168,7 +166,7 @@ public class DefaultConfiguration
         extensions.add( url );
     }
 
-    public List getExtensions()
+    public List<URL> getExtensions()
     {
         return extensions;
     }
@@ -255,7 +253,7 @@ public class DefaultConfiguration
     {
         if ( eventMonitors == null )
         {
-            eventMonitors = new ArrayList();
+            eventMonitors = new ArrayList<EventMonitor>();
         }
 
         eventMonitors.add( eventMonitor );
@@ -263,12 +261,12 @@ public class DefaultConfiguration
         return this;
     }
 
-    public List getEventMonitors()
+    public List<EventMonitor> getEventMonitors()
     {
         return eventMonitors;
     }
 
-    public Configuration setEventMonitors( List eventMonitors )
+    public Configuration setEventMonitors( List<EventMonitor> eventMonitors )
     {
         this.eventMonitors = eventMonitors;
         return this;

@@ -89,8 +89,8 @@ public interface MavenExecutionRequest
     Date getStartTime();
 
     // Goals
-    MavenExecutionRequest setGoals( List goals );
-    List getGoals();
+    MavenExecutionRequest setGoals( List<String> goals );
+    List<String> getGoals();
 
     // Properties
     MavenExecutionRequest setProperties( Properties properties );
@@ -113,7 +113,7 @@ public interface MavenExecutionRequest
 
     // Event monitors
     MavenExecutionRequest addEventMonitor( EventMonitor monitor );
-    List getEventMonitors();
+    List<EventMonitor> getEventMonitors();
 
     // Pom
     MavenExecutionRequest setPomFile( String pomFilename );
@@ -165,12 +165,12 @@ public interface MavenExecutionRequest
     List getProfiles();
     MavenExecutionRequest setProfiles( List profiles );
     MavenExecutionRequest addActiveProfile( String profile );
-    MavenExecutionRequest addActiveProfiles( List profiles );
-    List getActiveProfiles();
+    MavenExecutionRequest addActiveProfiles( List<String> profiles );
+    List<String> getActiveProfiles();
     //MAPI: do we really need to do this? deactivate active profile? seems confusing.
     MavenExecutionRequest addInactiveProfile( String profile );
-    MavenExecutionRequest addInactiveProfiles( List profiles );
-    List getInactiveProfiles();
+    MavenExecutionRequest addInactiveProfiles( List<String> profiles );
+    List<String> getInactiveProfiles();
 
     // Proxies
     List getProxies();
@@ -185,8 +185,8 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setMirrors( List mirrors );
 
     // Plugin groups
-    List getPluginGroups();
-    MavenExecutionRequest setPluginGroups( List pluginGroups );
+    List<String> getPluginGroups();
+    MavenExecutionRequest setPluginGroups( List<String> pluginGroups );
 
     boolean isUsePluginUpdateOverride();
     MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );
@@ -211,7 +211,7 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setGlobalSettingsFile( File globalSettingsFile );
 
     MavenExecutionRequest addRemoteRepository( ArtifactRepository repository );
-    List getRemoteRepositories();
+    List<ArtifactRepository> getRemoteRepositories();
 
     MavenExecutionRequest setRealmManager( MavenRealmManager realmManager );
     MavenRealmManager getRealmManager();

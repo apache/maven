@@ -95,10 +95,10 @@ public interface Configuration
     Configuration addInactiveProfile( String profile );
 
     /** Add a list of String instances with names of profiles to activate. */
-    Configuration addActiveProfiles( List profiles );
+    Configuration addActiveProfiles( List<String> profiles );
 
     /** Add a list of String instances with names of profiles to inactivate. */
-    Configuration addInactiveProfiles( List profiles );
+    Configuration addInactiveProfiles( List<String> profiles );
 
     /** Set a customizer callback implemetation that will be given a chance to modify the plexus container on startup. */
     Configuration setConfigurationCustomizer( ContainerCustomizer customizer );
@@ -106,9 +106,9 @@ public interface Configuration
     /** set the system properties to be used during the lifecycle of the embedder. Excluding the time when executing the project, then the properties from MavenExecutionRequestare used. */
     Configuration setSystemProperties( Properties properties );
 
-    List getActiveProfiles();
+    List<String> getActiveProfiles();
 
-    List getInactiveProfiles();
+    List<String> getInactiveProfiles();
 
     // ----------------------------------------------------------------------------
     // Container Customizer
@@ -128,7 +128,7 @@ public interface Configuration
 
     void addExtension( URL url );
 
-    List getExtensions();
+    List<URL> getExtensions();
 
     Configuration setRealmManager( MavenRealmManager realmManager );
 
@@ -148,7 +148,7 @@ public interface Configuration
 
     Configuration addEventMonitor( EventMonitor eventMonitor );
 
-    Configuration setEventMonitors( List eventMonitors );
+    Configuration setEventMonitors( List<EventMonitor> eventMonitors );
 
-    List getEventMonitors();
+    List<EventMonitor> getEventMonitors();
 }
