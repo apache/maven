@@ -83,7 +83,7 @@ public class MercuryRepositorySystem
         try
         {
             List<ArtifactMetadata> mercuryMetadataList =
-                _mercury.resolve( repos, null, MercuryAdaptor.toMetadata( request.getArtifact() ) );
+                _mercury.resolve( repos, null, MercuryAdaptor.toMercuryMetadata( request.getArtifact() ) );
 
             List<org.apache.maven.mercury.artifact.Artifact> mercuryArtifactList =
                 _mercury.read( repos, mercuryMetadataList );

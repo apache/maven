@@ -87,7 +87,7 @@ public class MercuryAdaptor
         return res;
     }
 
-    public static ArtifactBasicMetadata toBasicMetadata( Artifact a )
+    public static ArtifactBasicMetadata toMercuryBasicMetadata( Artifact a )
     {
         ArtifactBasicMetadata md = new ArtifactBasicMetadata();
         md.setGroupId( a.getGroupId() );
@@ -99,7 +99,7 @@ public class MercuryAdaptor
         return md;
     }
 
-    public static ArtifactMetadata toMetadata( Artifact a )
+    public static ArtifactMetadata toMercuryMetadata( Artifact a )
     {
         ArtifactMetadata md = new ArtifactMetadata();
         md.setGroupId( a.getGroupId() );
