@@ -36,7 +36,8 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
 
     public MavenITmng3885UniqueVersionFromParentProfileTest()
     {
-        super( "(2.0.10,)" );
+        // support for non-unique deployments removed in 3.x (see MNG-4059)
+        super( "(2.0.10,3.0-alpha-1)" );
     }
 
     /**
