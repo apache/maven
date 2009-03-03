@@ -65,7 +65,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
  */
 @Component(role = Maven.class)
 public class DefaultMaven
-    implements Maven, LogEnabled
+    implements Maven
 {
     @Requirement
     protected MavenProjectBuilder projectBuilder;
@@ -79,6 +79,7 @@ public class DefaultMaven
     @Requirement
     protected RuntimeInformation runtimeInformation;
 
+    @Requirement
     private Logger logger;
 
     // ----------------------------------------------------------------------
@@ -89,6 +90,96 @@ public class DefaultMaven
     // artifact resolution
     // lifecycle execution
 
+    public MavenExecutionResult execute( MavenExecutionRequest request )
+    {
+        request.setStartTime( new Date() );
+
+        MavenExecutionResult result = new DefaultMavenExecutionResult();
+
+        ReactorManager reactorManager = createReactorManager( request, result );
+
+        if ( result.hasExceptions() )
+        {
+            return result;
+        }
+
+        EventDispatcher dispatcher = new DeprecationEventDispatcher( MavenEvents.DEPRECATIONS, request.getEventMonitors() );
+
+        String event = MavenEvents.MAVEN_EXECUTION;
+
+        dispatcher.dispatchStart( event, request.getBaseDirectory() );
+
+        MavenSession session = createSession( request, reactorManager, dispatcher );
+
+        if ( request.getGoals() != null )
+        {
+            for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
+            {
+                String goal = (String) i.next();
+
+                if ( goal == null )
+                {
+                    i.remove();
+                    continue;
+                }
+
+                TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
+
+                if ( !tvr.isTaskValid() )
+                {
+                    Exception e = tvr.generateInvalidTaskException();
+                    result.addException( e );
+                    dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+                    return result;
+                }
+            }
+        }
+
+        logger.info( "Scanning for projects..." );
+
+        if ( reactorManager.hasMultipleProjects() )
+        {
+            logger.info( "Reactor build order: " );
+
+            for ( Iterator i = reactorManager.getSortedProjects().iterator(); i.hasNext(); )
+            {
+                MavenProject project = (MavenProject) i.next();
+
+                logger.info( "  " + project.getName() );
+            }
+        }
+
+        try
+        {
+            lifecycleExecutor.execute( session, reactorManager, dispatcher );
+        }
+        catch ( LifecycleExecutionException e )
+        {
+            result.addException( e );
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+            return result;
+        }
+        catch ( BuildFailureException e )
+        {
+            result.addException( e );
+            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
+
+            return result;
+        }
+
+        result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
+
+        result.setProject( reactorManager.getTopLevelProject() );
+
+        result.setBuildPlans( session.getBuildPlans() );
+
+        dispatcher.dispatchEnd( event, request.getBaseDirectory() );
+
+        return result;
+    }    
+    
     public ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result )
     {
         List projects;
@@ -142,96 +233,6 @@ public class DefaultMaven
         return reactorManager;
     }
 
-    public MavenExecutionResult execute( MavenExecutionRequest request )
-    {
-        request.setStartTime( new Date() );
-
-        MavenExecutionResult result = new DefaultMavenExecutionResult();
-
-        ReactorManager reactorManager = createReactorManager( request, result );
-
-        if ( result.hasExceptions() )
-        {
-            return result;
-        }
-
-        EventDispatcher dispatcher = new DeprecationEventDispatcher( MavenEvents.DEPRECATIONS, request.getEventMonitors() );
-
-        String event = MavenEvents.MAVEN_EXECUTION;
-
-        dispatcher.dispatchStart( event, request.getBaseDirectory() );
-
-        MavenSession session = createSession( request, reactorManager, dispatcher );
-
-        if ( request.getGoals() != null )
-        {
-            for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
-            {
-                String goal = (String) i.next();
-
-                if ( goal == null )
-                {
-                    i.remove();
-                    continue;
-                }
-
-                TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
-
-                if ( !tvr.isTaskValid() )
-                {
-                    Exception e = tvr.generateInvalidTaskException();
-                    result.addException( e );
-                    dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-                    return result;
-                }
-            }
-        }
-
-        getLogger().info( "Scanning for projects..." );
-
-        if ( reactorManager.hasMultipleProjects() )
-        {
-            getLogger().info( "Reactor build order: " );
-
-            for ( Iterator i = reactorManager.getSortedProjects().iterator(); i.hasNext(); )
-            {
-                MavenProject project = (MavenProject) i.next();
-
-                getLogger().info( "  " + project.getName() );
-            }
-        }
-
-        try
-        {
-            lifecycleExecutor.execute( session, reactorManager, dispatcher );
-        }
-        catch ( LifecycleExecutionException e )
-        {
-            result.addException( e );
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-            return result;
-        }
-        catch ( BuildFailureException e )
-        {
-            result.addException( e );
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-            return result;
-        }
-
-        result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
-
-        result.setProject( reactorManager.getTopLevelProject() );
-
-        result.setBuildPlans( session.getBuildPlans() );
-
-        dispatcher.dispatchEnd( event, request.getBaseDirectory() );
-
-        return result;
-    }
-
     protected List getProjects( MavenExecutionRequest request )
         throws MavenExecutionException
     {
@@ -271,7 +272,7 @@ public class DefaultMaven
 
                 if ( RELEASE_POMv4.equals( file.getName() ) )
                 {
-                    getLogger().info( "NOTE: Using release-pom: " + file + " in reactor build." );
+                    logger.info( "NOTE: Using release-pom: " + file + " in reactor build." );
 
                     usingReleasePom = true;
                 }
@@ -319,7 +320,7 @@ public class DefaultMaven
 
                         if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
                         {
-                            getLogger().warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
+                            logger.warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
 
                             continue;
                         }
@@ -463,15 +464,5 @@ public class DefaultMaven
                 it.remove();
             }
         }
-    }
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
     }
 }
