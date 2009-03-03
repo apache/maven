@@ -54,7 +54,7 @@ under the License.
     <plexusPluginManagerVersion>1.0-alpha-1</plexusPluginManagerVersion>
     <plexusUtilsVersion>1.5.8</plexusUtilsVersion>
     <wagonVersion>1.0-beta-4</wagonVersion>
-    <modelBuilderVersion>1.4-SNAPSHOT</modelBuilderVersion>
+    <modelBuilderVersion>1.4</modelBuilderVersion>
     <mercuryVersion>1.0.0-alpha-4</mercuryVersion>
     <mercuryMp3Version>1.0-alpha-1</mercuryMp3Version>
     <securityDispatcherVersion>1.0</securityDispatcherVersion>

@@ -245,9 +245,7 @@ public class DefaultMaven
         }
         catch ( IOException e )
         {
-            throw new MavenExecutionException(
-                "Error selecting project files for the reactor: " + e.getMessage(),
-                e );
+            throw new MavenExecutionException( "Error selecting project files for the reactor: " + e.getMessage(), e );
         }
 
         projects = collectProjects( files, request, !request.useReactor() );
@@ -255,9 +253,7 @@ public class DefaultMaven
         return projects;
     }
 
-    private List collectProjects( List files,
-                                  MavenExecutionRequest request,
-                                  boolean isRoot )
+    private List collectProjects( List files, MavenExecutionRequest request, boolean isRoot )
         throws MavenExecutionException
     {
         List projects = new ArrayList( files.size() );
