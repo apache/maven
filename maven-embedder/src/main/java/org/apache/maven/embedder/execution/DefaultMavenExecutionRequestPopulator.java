@@ -158,7 +158,7 @@ public class DefaultMavenExecutionRequestPopulator
         Properties userProperties = request.getUserProperties();
         if ( userProperties != null )
         {
-            for ( Iterator it = userProperties.keySet().iterator(); it.hasNext(); )
+            for ( Iterator<?> it = userProperties.keySet().iterator(); it.hasNext(); )
             {
                 String key = (String) it.next();
                 if ( !requestProperties.containsKey( key ) )
@@ -190,6 +190,8 @@ public class DefaultMavenExecutionRequestPopulator
         ProfileManager profileManager = request.getProfileManager();
 
         Settings settings = request.getSettings();
+
+        request.setPluginGroups( settings.getPluginGroups() );
 
         List settingsProfiles = settings.getProfiles();
 
@@ -548,11 +550,11 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         // Now, add in any event monitors from the Configuration instance.
-        List configEventMonitors = configuration.getEventMonitors();
+        List<EventMonitor> configEventMonitors = configuration.getEventMonitors();
 
         if ( ( configEventMonitors != null ) && !configEventMonitors.isEmpty() )
         {
-            for ( Iterator it = configEventMonitors.iterator(); it.hasNext(); )
+            for ( Iterator<EventMonitor> it = configEventMonitors.iterator(); it.hasNext(); )
             {
                 EventMonitor monitor = (EventMonitor) it.next();
                 request.addEventMonitor( monitor );
