@@ -1,5 +1,13 @@
 package org.apache.maven.artifact.resolver;
 
+import java.util.List;
+import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,4 +33,9 @@ package org.apache.maven.artifact.resolver;
 public interface ArtifactResolver
 {
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );    
+    
+    // Used directory by Surefire ...
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                                                  ArtifactMetadataSource source, ArtifactFilter filter )
+        throws ArtifactResolutionException, ArtifactNotFoundException;    
 }
