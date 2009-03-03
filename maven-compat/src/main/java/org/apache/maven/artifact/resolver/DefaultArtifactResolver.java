@@ -408,8 +408,6 @@ public class DefaultArtifactResolver
                 try
                 {
                     resolve( artifact, remoteRepositories, localRepository );
-
-                    result.addArtifact( artifact );
                 }
                 catch ( ArtifactNotFoundException anfe )
                 {
