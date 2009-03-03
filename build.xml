@@ -94,11 +94,6 @@ END SNIPPET: ant-bootstrap -->
         <snapshots enabled="true"/>
         <releases enabled="false"/>
       </remoteRepository>
-      <!-- TODO: remove when model-builder:1.4 is released -->
-      <remoteRepository url="http://repository.sonatype.org/content/repositories/snapshots">
-        <snapshots enabled="true"/>
-        <releases enabled="false"/>
-      </remoteRepository>
       <!-- /TODO -->
       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
     </artifact:dependencies>
