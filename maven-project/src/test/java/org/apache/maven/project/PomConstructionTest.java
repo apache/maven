@@ -79,6 +79,19 @@ public class PomConstructionTest
     */
 
     /**
+     * Tests that modules is not overriden by profile
+     * 
+     * @throws Exception
+     */
+    public void testProfileModules()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPomFromMavenProject( "profile-module", "a" );
+        assertEquals( "test-prop", pom.getValue( "properties[1]/b" ) );//verifies profile applied
+        assertEquals( "test-module", pom.getValue( "modules[1]" ) );
+    }
+
+    /**
      * Will throw exception if doesn't find parent(s) in build
      *
      * @throws Exception

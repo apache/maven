@@ -36,6 +36,39 @@ public class JdkMatcherTest {
     }
 
     @org.junit.Test
+    public void jdkVersionDoesNotMatchWithNotSymbol()  {
+        List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.xUri, null));
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.xUri , null));
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.jdk , "!1.5"));
+
+        ModelContainer modelContainer = new DefaultModelContainer(modelProperties);
+
+        List<InterpolatorProperty> props = new ArrayList<InterpolatorProperty>();
+        props.add(new InterpolatorProperty("${java.specification.version}" , "1.5"));
+
+        JdkMatcher matcher = new JdkMatcher();
+        assertTrue(!matcher.isMatch(modelContainer, props));
+    }
+
+    @org.junit.Test
+    public void jdkVersionDoesMatchWithNotSymbol()  {
+        List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.xUri, null));
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.xUri , null));
+        modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.Activation.jdk , "!1.5"));
+
+        ModelContainer modelContainer = new DefaultModelContainer(modelProperties);
+
+        List<InterpolatorProperty> props = new ArrayList<InterpolatorProperty>();
+        props.add(new InterpolatorProperty("${java.specification.version}" , "1.6"));
+
+        JdkMatcher matcher = new JdkMatcher();
+        assertTrue(matcher.isMatch(modelContainer, props));
+    }
+
+
+    @org.junit.Test
     public void jdkVersionNotMatches()  {
         List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
         modelProperties.add(new ModelProperty(ProjectUri.Profiles.Profile.xUri, null));
