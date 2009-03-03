@@ -193,7 +193,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         request.setPluginGroups( settings.getPluginGroups() );
 
-        List settingsProfiles = settings.getProfiles();
+        List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
 
         List<String> settingsActiveProfileIds = settings.getActiveProfiles();
 
@@ -207,9 +207,9 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( ( settingsProfiles != null ) && !settingsProfiles.isEmpty() )
         {
-            for ( Iterator it = settings.getProfiles().iterator(); it.hasNext(); )
+            for ( Iterator<org.apache.maven.settings.Profile> it = settings.getProfiles().iterator(); it.hasNext(); )
             {
-                org.apache.maven.settings.Profile rawProfile = (org.apache.maven.settings.Profile) it.next();
+                org.apache.maven.settings.Profile rawProfile = it.next();
 
                 Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
 
@@ -217,9 +217,9 @@ public class DefaultMavenExecutionRequestPopulator
 
                 // We need to convert profile repositories to artifact repositories                
                 
-                for ( Iterator j = profile.getRepositories().iterator(); j.hasNext(); )
+                for ( Iterator<Repository> j = profile.getRepositories().iterator(); j.hasNext(); )
                 {
-                    Repository r = (Repository) j.next();
+                    Repository r = j.next();
 
                     ArtifactRepository ar;
                     try
@@ -432,9 +432,9 @@ public class DefaultMavenExecutionRequestPopulator
                 repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
             }
 
-            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+            for ( Iterator<Server> i = settings.getServers().iterator(); i.hasNext(); )
             {
-                Server server = (Server) i.next();
+                Server server = i.next();
                 
                 String pass;
                 String phrase;
@@ -455,9 +455,9 @@ public class DefaultMavenExecutionRequestPopulator
 
             RepositoryPermissions defaultPermissions = new RepositoryPermissions();
             
-            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
+            for ( Iterator<Mirror> i = settings.getMirrors().iterator(); i.hasNext(); )
             {
-                Mirror mirror = (Mirror) i.next();
+                Mirror mirror = i.next();
 
                 repositorySystem.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
             }
@@ -469,7 +469,6 @@ public class DefaultMavenExecutionRequestPopulator
      * @param settings settings to process
      * @throws IOException 
      */
-    @SuppressWarnings("unchecked")
     private void decrypt( Settings settings )
     	throws IOException
     {
