@@ -1725,36 +1725,36 @@ public class MavenProject
         {
             String refId = getProjectReferenceId( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
             MavenProject ref = getProjectReferences().get( refId );
-            if ( ( ref != null ) && ( ref.getArtifact() != null ) )
+            if ( ref != null )
             {
-                // TODO: if not matching, we should get the correct artifact from that project (attached)
-                if ( ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
+                if ( ref.getArtifact() != null
+                    && ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
                 {
                     // if the project artifact doesn't exist, don't use it. We haven't built that far.
-                    if ( ( ref.getArtifact().getFile() != null ) && ref.getArtifact().getFile().exists() )
+                    if ( ref.getArtifact().getFile() != null && ref.getArtifact().getFile().exists() )
                     {
                         // FIXME: Why aren't we using project.getArtifact() for the second parameter here??
-                        pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
-                        return pluginArtifact;
+                        Artifact resultArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
+                        return resultArtifact;
                     }
                     else
                     {
-                        /* TODO...
-                                                logger.warn( "Artifact found in the reactor has not been built when it's use was " +
-                                                    "attempted - resolving from the repository instead" );
-                        */
+                        logMissingSiblingProjectArtifact( pluginArtifact );
                     }
                 }
 
-                Iterator<Artifact> itr = ref.getAttachedArtifacts().iterator();
-                while ( itr.hasNext() )
+                Artifact attached = findMatchingArtifact( ref.getAttachedArtifacts(), pluginArtifact );
+                if ( attached != null )
                 {
-                    Artifact attached = (Artifact) itr.next();
-                    if ( attached.getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
+                    if ( attached.getFile() != null && attached.getFile().exists() )
                     {
                         Artifact resultArtifact = ArtifactUtils.copyArtifact( attached );
                         resultArtifact.setScope( pluginArtifact.getScope() );
                         return resultArtifact;
+                    }
+                    else
+                    {
+                        logMissingSiblingProjectArtifact( pluginArtifact );
                     }
                 }
 
@@ -1779,6 +1779,89 @@ public class MavenProject
             }
         }
         return pluginArtifact;
+    }
+
+    /**
+     * Tries to resolve the specified artifact from the given collection of attached project artifacts.
+     * 
+     * @param artifacts The attached artifacts, may be <code>null</code>.
+     * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
+     * @return The matching artifact or <code>null</code> if not found.
+     */
+    private Artifact findMatchingArtifact( List<Artifact> artifacts, Artifact requestedArtifact )
+    {
+        if ( artifacts != null && !artifacts.isEmpty() )
+        {
+            // first try matching by dependency conflict id
+            String requestedId = requestedArtifact.getDependencyConflictId();
+            for ( Artifact artifact : artifacts )
+            {
+                if ( requestedId.equals( artifact.getDependencyConflictId() ) )
+                {
+                    return artifact;
+                }
+            }
+
+            // next try matching by repository conflict id
+            requestedId = getRepositoryConflictId( requestedArtifact );
+            for ( Artifact artifact : artifacts )
+            {
+                if ( requestedId.equals( getRepositoryConflictId( artifact ) ) )
+                {
+                    return artifact;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the repository conflict id of the specified artifact. Unlike the dependency conflict id, the repository
+     * conflict id uses the artifact file extension instead of the artifact type. Hence, the repository conflict id more
+     * closely reflects the identity of artifacts as perceived by a repository.
+     * 
+     * @param artifact The artifact, must not be <code>null</code>.
+     * @return The repository conflict id, never <code>null</code>.
+     */
+    private String getRepositoryConflictId( Artifact artifact )
+    {
+        StringBuffer buffer = new StringBuffer( 128 );
+        buffer.append( artifact.getGroupId() );
+        buffer.append( ':' ).append( artifact.getArtifactId() );
+        if ( artifact.getArtifactHandler() != null )
+        {
+            buffer.append( ':' ).append( artifact.getArtifactHandler().getExtension() );
+        }
+        else
+        {
+            buffer.append( ':' ).append( artifact.getType() );
+        }
+        if ( artifact.hasClassifier() )
+        {
+            buffer.append( ':' ).append( artifact.getClassifier() );
+        }
+        return buffer.toString();
+    }
+
+    private void logMissingSiblingProjectArtifact( Artifact artifact )
+    {
+        /* TODO
+        if ( logger == null )
+        {
+            return;
+        }
+        
+        StringBuffer message = new StringBuffer();
+        message.append( "A dependency of the current project (or of one the plugins used in its build) was found in the reactor, " );
+        message.append( "\nbut had not been built at the time it was requested. It will be resolved from the repository instead." );
+        message.append( "\n\nCurrent Project: " ).append( getName() );
+        message.append( "\nRequested Dependency: " ).append( artifact.getId() );
+        message.append( "\n\nNOTE: You may need to run this build to the 'compile' lifecycle phase, or farther, in order to build the dependency artifact." );
+        message.append( "\n" );
+        
+        logger.warn( message.toString() );
+        */
     }
 
     public void clearExecutionProject()
