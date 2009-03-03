@@ -50,6 +50,8 @@ public class MavenITmng2136ActiveByDefaultProfileTest
         systemProperties.put( "expression.outputFile", new File( testDir, "target/expression.properties" ).getPath() );
         systemProperties.put( "expression.expressions", "project/properties" );
         verifier.setSystemProperties( systemProperties );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -58,7 +60,12 @@ public class MavenITmng2136ActiveByDefaultProfileTest
         Properties props = verifier.loadProperties( "target/expression.properties" );
         assertNull( props.getProperty( "project.properties.it0102.testOutput" ) );
         assertEquals( "Success", props.getProperty( "project.properties.testOutput" ) );
-        assertEquals( "Present", props.getProperty( "project.properties.profilesXmlValue" ) );
+        assertEquals( "PASSED", props.getProperty( "project.properties.settingsValue" ) );
+        if ( matchesVersionRange( "[2.0,3.0-alpha-1)" ) )
+        {
+            // support for profiles.xml removed from 3.x (see MNG-4060)
+            assertEquals( "Present", props.getProperty( "project.properties.profilesXmlValue" ) );
+        }
     }
 
 }

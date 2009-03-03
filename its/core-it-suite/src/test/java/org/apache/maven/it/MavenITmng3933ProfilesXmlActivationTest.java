@@ -39,7 +39,8 @@ public class MavenITmng3933ProfilesXmlActivationTest
 
     public MavenITmng3933ProfilesXmlActivationTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        // support for profiles.xml removed from 3.x (see MNG-4060)
+        super( "[2.0,3.0-alpha-1)" );
     }
 
     /**

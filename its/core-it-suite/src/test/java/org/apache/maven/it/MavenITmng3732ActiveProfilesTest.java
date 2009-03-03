@@ -68,12 +68,25 @@ public class MavenITmng3732ActiveProfilesTest
         ids.add( props.getProperty( "project.activeProfiles.1.id", "" ) );
         ids.add( props.getProperty( "project.activeProfiles.2.id", "" ) );
         Collections.sort( ids );
-        assertEquals( Arrays.asList( new String[] { "pom", "profiles", "settings" } ), ids );
-        assertEquals( "3", props.getProperty( "project.activeProfiles" ) );
 
-        assertEquals( "PASSED-1", props.getProperty( "project.properties.pomProperty" ) );
-        assertEquals( "PASSED-2", props.getProperty( "project.properties.settingsProperty" ) );
-        assertEquals( "PASSED-3", props.getProperty( "project.properties.profilesProperty" ) );
+        // support for profiles.xml removed from 3.x (see MNG-4060)
+        if ( matchesVersionRange( "[2.0,3.0-alpha-1)" ) )
+        {
+            assertEquals( Arrays.asList( new String[] { "pom", "profiles", "settings" } ), ids );
+            assertEquals( "3", props.getProperty( "project.activeProfiles" ) );
+
+            assertEquals( "PASSED-1", props.getProperty( "project.properties.pomProperty" ) );
+            assertEquals( "PASSED-2", props.getProperty( "project.properties.settingsProperty" ) );
+            assertEquals( "PASSED-3", props.getProperty( "project.properties.profilesProperty" ) );
+        }
+        else
+        {
+            assertEquals( Arrays.asList( new String[] { "pom", "settings" } ), ids );
+            assertEquals( "2", props.getProperty( "project.activeProfiles" ) );
+    
+            assertEquals( "PASSED-1", props.getProperty( "project.properties.pomProperty" ) );
+            assertEquals( "PASSED-2", props.getProperty( "project.properties.settingsProperty" ) );
+        }
     }
 
 }

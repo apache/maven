@@ -45,6 +45,9 @@ public class MavenITmng3948ParentResolutionFromProfileReposTest
     public void testitFromProfilesXml()
         throws Exception
     {
+        // support for profiles.xml removed from 3.x (see MNG-4060)
+        requiresMavenVersion( "[2.0,3.0-alpha-1)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3948/test-1" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
