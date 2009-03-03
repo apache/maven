@@ -32,14 +32,24 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
  */
 public interface ArtifactResolver
 {
-    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );    
-    
+
+    void setOnline( boolean online );
+
+    boolean isOnline();
+
+    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
+
     // USED BY SUREFIRE
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+    @Deprecated
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                  ArtifactRepository localRepository,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
-        throws ArtifactResolutionException, ArtifactNotFoundException;    
-        
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
     // USED BY REMOTE RESOURCES PLUGIN
+    @Deprecated
     void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepositor )
         throws ArtifactResolutionException, ArtifactNotFoundException;
+
 }

@@ -51,6 +51,9 @@ public class DefaultArtifactResolver
     extends AbstractLogEnabled
     implements ArtifactResolver
 {
+
+    private boolean online = true;
+
     // ----------------------------------------------------------------------
     // Components
     // ----------------------------------------------------------------------
@@ -70,6 +73,16 @@ public class DefaultArtifactResolver
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------
+
+    public void setOnline( boolean online )
+    {
+        this.online = online;
+    }
+
+    public boolean isOnline()
+    {
+        return online;
+    }
 
     public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
@@ -139,8 +152,13 @@ public class DefaultArtifactResolver
             // 3. the artifact is a snapshot and is not a locally installed snapshot
 
             // TODO: Should it matter whether it's a locally installed snapshot??
-            if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) )
+            if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy && isOnline() ) )
             {
+                if ( !isOnline() )
+                {
+                    throw new ArtifactNotFoundException( "The repository system is offline.", artifact );
+                }
+
                 try
                 {
                     if ( artifact.getRepository() != null )

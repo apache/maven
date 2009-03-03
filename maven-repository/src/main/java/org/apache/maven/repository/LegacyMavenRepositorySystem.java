@@ -88,8 +88,6 @@ public class LegacyMavenRepositorySystem
     @Requirement
     private Logger logger;
 
-    private boolean online = true;
-
     private boolean interactive = true;
 
     private TransferListener downloadMonitor;
@@ -529,12 +527,12 @@ public class LegacyMavenRepositorySystem
 
     public void setOnline( boolean online )
     {
-        this.online = online;
+        artifactResolver.setOnline( online );
     }
 
     public boolean isOnline()
     {
-        return online;
+        return artifactResolver.isOnline();
     }
 
     public void setInteractive( boolean interactive )
