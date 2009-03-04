@@ -340,31 +340,6 @@ public class DefaultProjectErrorReporter
         registerBuildError( cause, writer.toString() );
     }
 
-    public void reportBadNonDependencyProjectArtifactVersion( MavenProject project,
-                                                              File pomFile,
-                                                              InvalidProjectVersionException cause )
-    {
-        StringWriter writer = new StringWriter();
-
-        writer.write( NEWLINE );
-        writer.write( "You have an invalid version in your POM:" );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Location: " );
-        writer.write( cause.getLocationInPom() );
-        writer.write( NEWLINE );
-        writer.write( NEWLINE );
-        writer.write( "Reason: " );
-        writer.write( cause.getMessage() );
-        writer.write( NEWLINE );
-
-        addStandardInfo( project.getId(), pomFile, writer );
-        addTips( ProjectErrorTips.getTipsForBadNonDependencyArtifactSpec( project, pomFile, cause ),
-                 writer );
-
-        registerBuildError( cause, writer.toString() );
-    }
-
 
     public void reportProjectValidationFailure( MavenProject project,
                                                 File pomFile,

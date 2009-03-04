@@ -637,22 +637,7 @@ public class DefaultMavenProjectBuilder
         ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(domainModel.getModelProperties(),
                 PomTransformer.MODEL_CONTAINER_FACTORIES), activeProfileIds, inactiveProfileIds, properties);
 
-        Collection<ModelContainer> profileContainers = profileContext.getActiveProfiles();
-
-        for(ModelContainer mc : profileContainers)
-        {
-            List<ModelProperty> transformed = new ArrayList<ModelProperty>();
-            for(ModelProperty mp : mc.getProperties())
-            {
-                if(mp.getUri().startsWith(ProjectUri.Profiles.Profile.xUri) && !mp.getUri().equals(ProjectUri.Profiles.Profile.id)
-                        && !mp.getUri().startsWith(ProjectUri.Profiles.Profile.Activation.xUri) )
-                {
-                    transformed.add(new ModelProperty(mp.getUri().replace(ProjectUri.Profiles.Profile.xUri, ProjectUri.xUri),
-                            mp.getResolvedValue()));
-                }
-            }
-            domainModels.add(new PomClassicDomainModel(transformed, false));
-        }
+        domainModels.addAll( transformProfiles(profileContext) );
         domainModels.add( domainModel );
         
         File parentFile = null;
@@ -840,6 +825,16 @@ public class DefaultMavenProjectBuilder
         //Process Profiles
         ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(parentDomainModel.getModelProperties(),
                 PomTransformer.MODEL_CONTAINER_FACTORIES), activeProfileIds, inactiveProfileIds, properties);
+        domainModels.addAll( transformProfiles(profileContext) );
+
+        domainModels.addAll( getDomainModelParentsFromRepository( parentDomainModel, localRepository, remoteRepositories, properties,
+                                                                  activeProfileIds, inactiveProfileIds ) );
+        return domainModels;
+    }
+    
+    private static List<DomainModel> transformProfiles( ProfileContext profileContext ) throws IOException
+    {
+        List<DomainModel> domainModels = new ArrayList<DomainModel>();
         Collection<ModelContainer> profileContainers = profileContext.getActiveProfiles();
 
         for(ModelContainer mc : profileContainers)
@@ -857,10 +852,7 @@ public class DefaultMavenProjectBuilder
             }
 
             domainModels.add(new PomClassicDomainModel(transformed));
-        }
-
-        domainModels.addAll( getDomainModelParentsFromRepository( parentDomainModel, localRepository, remoteRepositories, properties,
-                                                                  activeProfileIds, inactiveProfileIds ) );
+        }   
         return domainModels;
     }
 
