@@ -31,64 +31,6 @@ under the License.
     <itDir>${java.io.tmpdir}/${pom.artifactId}-${pom.version}</itDir>
   </properties>
 
-  <profiles>
-    <profile>
-      <id>update</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <file>
-          <exists>${itDir}/pom.xml</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-scm-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>scm</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>update</goal>
-                </goals>
-                <configuration>
-                  <workingDirectory>${itDir}</workingDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>checkout</id>
-      <activation>
-        <file>
-          <missing>${itDir}/pom.xml</missing>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-scm-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>scm</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>checkout</goal>
-                </goals>
-                <configuration>
-                  <checkoutDirectory>${itDir}</checkoutDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
   <build>
     <resources>
       <resource>
@@ -102,6 +44,17 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.3</version>
+          <configuration>
+            <filesets>
+              <fileset>
+                <directory>${itDir}</directory>
+              </fileset>
+            </filesets>
+          </configuration>
+        </plugin>
+        <plugin>
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.2</version>
         </plugin>
@@ -113,7 +66,17 @@ under the License.
         <version>1.1</version>
         <configuration>
           <connectionUrl>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/${integrationTestSVNDir}</connectionUrl>
+          <checkoutDirectory>${itDir}</checkoutDirectory>
         </configuration>
+        <executions>
+          <execution>
+            <id>scm</id>
+            <phase>package</phase>
+            <goals>
+              <goal>checkout</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

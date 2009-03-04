@@ -250,6 +250,7 @@ TODO:
       <arg value="${maven.home}\bin\mvn.bat"/>
       <arg value="-e"/>
       <arg value="-B"/>
+      <arg value="clean"/>
       <arg value="package"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
@@ -281,6 +282,7 @@ TODO:
       <env key="M2_HOME" value="${maven.home}"/>
       <arg value="-e"/>
       <arg value="-B"/>
+      <arg value="clean"/>
       <arg value="package"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
     </exec>
