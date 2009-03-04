@@ -14,10 +14,10 @@ import java.util.ArrayList;
  */
 public class ModulesNotInheritedTransformerRule implements TransformerRemovalRule
 {
-    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, int domainIndex)
+    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, boolean isMostSpecialized)
             throws DataSourceException
     {
-        if (domainIndex > 0)
+        if (!isMostSpecialized)
         {
             ModelProperty modulesProperty = PomTransformer.getPropertyFor(ProjectUri.Modules.xUri, modelProperties);
             if (modulesProperty != null)

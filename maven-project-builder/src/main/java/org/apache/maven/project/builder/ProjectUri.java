@@ -1375,7 +1375,7 @@ public class ProjectUri
                     "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/status";
             }
 
-            public static String properties = "http://apache.org/maven/project/profiles#collection/profile/properties#collection";
+            public static String properties = "http://apache.org/maven/project/profiles#collection/profile/properties";
         }
     }
 

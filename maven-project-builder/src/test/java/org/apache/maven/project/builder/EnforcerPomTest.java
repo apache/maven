@@ -41,8 +41,8 @@ public class EnforcerPomTest
         mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.artifactId, "aid"));
         mp2.add(new ModelProperty(ProjectUri.Dependencies.Dependency.classifier, "tests"));
 
-        DomainModel childModel = new DefaultDomainModel(mp2);
-        DomainModel parentModel = new DefaultDomainModel(mp);
+        DomainModel childModel = new DefaultDomainModel(mp2, true);
+        DomainModel parentModel = new DefaultDomainModel(mp, false);
 
         ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
 

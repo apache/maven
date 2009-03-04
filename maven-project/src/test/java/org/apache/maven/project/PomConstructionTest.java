@@ -119,14 +119,14 @@ public class PomConstructionTest
     }
     
     /*MNG-3900*/
-    /*
     public void testProfilePropertiesInterpolation()
     	throws Exception 
     {
-    	PomTestWrapper pom = buildPomFromMavenProject( "profile-properties-interpolation", "a" );
+    	PomTestWrapper pom = buildPomFromMavenProject( "profile-properties-interpolation", "interpolation-profile" );
     	assertEquals("PASSED", pom.getValue("properties[1]/test"));
+    	assertEquals("PASSED", pom.getValue("properties[1]/property"));
     }
-	*/
+
 
     // Some better conventions for the test poms needs to be created and each of these tests
     // that represent a verification of a specification item needs to be a couple lines at most.

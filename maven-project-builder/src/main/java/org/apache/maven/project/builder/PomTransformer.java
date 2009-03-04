@@ -95,6 +95,7 @@ public class PomTransformer
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
                                                                           ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
                                                                           ProjectUri.Build.Plugins.xUri,
+                                                                          ProjectUri.properties,
                                                                           ProjectUri.Build.Plugins.Plugin.configuration,
                                                                           ProjectUri.Reporting.Plugins.xUri,
                                                                           ProjectUri.Reporting.Plugins.Plugin.configuration,
@@ -472,24 +473,21 @@ public class PomTransformer
         boolean containsDistSnapRepo = false;
         boolean containsDistSite = false;
 
-        int domainModelIndex = -1;
 
         for ( DomainModel domainModel : domainModels )
         {
-            domainModelIndex++;
-
             List<ModelProperty> tmp = domainModel.getModelProperties();
 
-            List clearedProperties = new ArrayList<ModelProperty>();
+            List<ModelProperty> clearedProperties = new ArrayList<ModelProperty>();
 
             for(TransformerRule rule : transformerRules)
             {
-                rule.execute(tmp, domainModelIndex);
+                rule.execute(tmp, domainModel.isMostSpecialized());
             }
 
             for(TransformerRemovalRule rule : transformerRemovalRules)
             {
-                tmp.removeAll(rule.executeWithReturnPropertiesToRemove(tmp, domainModelIndex));
+                tmp.removeAll(rule.executeWithReturnPropertiesToRemove(tmp, domainModel.isMostSpecialized()));
             }
 
             // Project URL TransformerRule
@@ -506,7 +504,7 @@ public class PomTransformer
             // Profiles TransformerRule: not inherited
             // Prerequisites TransformerRule: not inherited
             // DistributionManagent.Relocation TransformerRule: not inherited
-            if ( domainModelIndex > 0 )
+            if ( !domainModel.isMostSpecialized() )
             {
                 for ( ModelProperty mp : tmp )
                 {
@@ -581,7 +579,7 @@ public class PomTransformer
         //Rules processed on collapsed pom
 
         //TransformerRule: Remove duplicate filters
-        modelProperties.removeAll(new DuplicateFiltersTransformerRule().executeWithReturnPropertiesToRemove( modelProperties , 0));
+        modelProperties.removeAll(new DuplicateFiltersTransformerRule().executeWithReturnPropertiesToRemove( modelProperties , false));
 
         //TransformerRule: Build plugin config overrides reporting plugin config
         return new OverideConfigTransformerRule().execute( modelProperties );

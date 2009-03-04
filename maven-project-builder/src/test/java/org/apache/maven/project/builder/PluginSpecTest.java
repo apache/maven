@@ -49,12 +49,12 @@ public class PluginSpecTest {
         mp.add(new ModelProperty(ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.Execution.Goals.goal, "xpp3-reader"));
         mp.add(new ModelProperty(ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.Execution.Goals.goal, "xpp3-writer"));
 
-        DomainModel parentModel = new DefaultDomainModel(mp);
+        DomainModel parentModel = new DefaultDomainModel(mp, false);
 
         ModelTransformerContext ctx = new ModelTransformerContext(PomTransformer.MODEL_CONTAINER_INFOS );
 
         ModelTransformer transformer = new PomTransformer(new DefaultDomainModelFactory());
-        DomainModel domainModel = ctx.transform( Arrays.asList(parentModel, new DefaultDomainModel(mp0)), transformer, transformer );
+        DomainModel domainModel = ctx.transform( Arrays.asList(parentModel, new DefaultDomainModel(mp0, true)), transformer, transformer );
 
 
         List<ModelContainerFactory> factories = new ArrayList<ModelContainerFactory>(PomTransformer.MODEL_CONTAINER_FACTORIES);

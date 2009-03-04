@@ -18,10 +18,10 @@ import java.util.Arrays;
  */
 public class DefaultDependencyScopeTransformerRule implements TransformerRule
 {
-    public void execute(List<ModelProperty> modelProperties, int domainIndex)
+    public void execute(List<ModelProperty> modelProperties, boolean isMostSpecialized)
         throws DataSourceException
     {
-        if(domainIndex == 0)
+        if(isMostSpecialized)
         {
             ModelDataSource s = new DefaultModelDataSource( modelProperties, Arrays.asList( new ArtifactModelContainerFactory()) );
             for(ModelContainer mc : s.queryFor(ProjectUri.Dependencies.Dependency.xUri))

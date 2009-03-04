@@ -478,7 +478,7 @@ public class DefaultMavenProjectBuilder
 
         PomClassicDomainModel transformedDomainModel;
         try {
-            transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( Arrays.asList(  new PomClassicDomainModel(transformed), convertToDomainModel(model)),
+            transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( Arrays.asList(  new PomClassicDomainModel(transformed, false), convertToDomainModel(model, true)),
                                                                                                     transformer,
                                                                                                     transformer,
                                                                                                     Collections.EMPTY_LIST,
@@ -619,8 +619,10 @@ public class DefaultMavenProjectBuilder
 
         PomClassicDomainModel domainModel = new PomClassicDomainModel( pom );
         domainModel.setProjectDirectory( pom.getParentFile() );
+        domainModel.setMostSpecialized(true);
+        
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
-        domainModels.add( domainModel );
+
 
         //Process Profile on most specialized child model
         ProfileContext profileContext = new ProfileContext(new DefaultModelDataSource(domainModel.getModelProperties(),
@@ -640,9 +642,10 @@ public class DefaultMavenProjectBuilder
                             mp.getResolvedValue()));
                 }
             }
-            domainModels.add(new PomClassicDomainModel(transformed));
+            domainModels.add(new PomClassicDomainModel(transformed, false));
         }
-
+        domainModels.add( domainModel );
+        
         File parentFile = null;
         int lineageCount = 0;
         if ( domainModel.getParentId() != null )
@@ -672,7 +675,7 @@ public class DefaultMavenProjectBuilder
             domainModels.addAll( mavenParents );
         }
 
-        domainModels.add( convertToDomainModel( getSuperModel() ) );
+        domainModels.add( convertToDomainModel( getSuperModel() , false ));
 
         PomTransformer transformer = new PomTransformer( new PomClassicDomainModelFactory() );
 
@@ -691,7 +694,7 @@ public class DefaultMavenProjectBuilder
         return transformedDomainModel;
     }
 
-    private PomClassicDomainModel convertToDomainModel(Model model) throws IOException
+    private PomClassicDomainModel convertToDomainModel(Model model, boolean isMostSpecialized) throws IOException
     {
         if ( model == null )
         {
@@ -712,7 +715,7 @@ public class DefaultMavenProjectBuilder
                 out.close();
             }
         }
-        return new PomClassicDomainModel(new ByteArrayInputStream(baos.toByteArray()));
+        return new PomClassicDomainModel(new ByteArrayInputStream(baos.toByteArray()), isMostSpecialized);
     }
 
     protected MavenProject buildFromLocalPath(File pom,

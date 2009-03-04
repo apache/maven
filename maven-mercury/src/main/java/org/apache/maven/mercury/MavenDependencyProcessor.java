@@ -96,6 +96,7 @@ public final class MavenDependencyProcessor
             }
 
             MavenDomainModel domainModel = new MavenDomainModel( superBytes );
+            domainModel.setMostSpecialized(true);
             domainModels.add( domainModel );
 
             Collection<ModelContainer> activeProfiles = domainModel.getActiveProfileContainers( interpolatorProperties );

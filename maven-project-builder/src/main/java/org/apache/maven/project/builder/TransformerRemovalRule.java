@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface TransformerRemovalRule {
 
-        List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, int domainIndex)
+        List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, boolean isMostSpecialized)
             throws DataSourceException;
 }

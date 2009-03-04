@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class MissingVersionTransformerRule implements TransformerRule
 {
-    public void execute(List<ModelProperty> modelProperties, int domainIndex) throws DataSourceException
+    public void execute(List<ModelProperty> modelProperties, boolean isMostSpecialized) throws DataSourceException
     {        
         if ( PomTransformer.getPropertyFor( ProjectUri.version, modelProperties ) == null )
         {

@@ -48,6 +48,7 @@
 			<!-- This profile defines the properties to use for interpolation. -->
 			<properties>
 				<test>PASSED</test>
+				<test1>PASSED</test1>
 			</properties>
 		</profile>
 	</profiles>

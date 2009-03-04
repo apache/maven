@@ -9,6 +9,6 @@ import java.io.IOException;
 
 public class DefaultDomainModelFactory implements DomainModelFactory {
     public DomainModel createDomainModel(List<ModelProperty> modelProperties) throws IOException {
-        return new DefaultDomainModel(modelProperties);
+        return new DefaultDomainModel(modelProperties, false);
     }
 }

@@ -17,11 +17,11 @@ import java.util.ArrayList;
  */
 public class NotInheritedPluginTransformerRule implements TransformerRemovalRule
 {
-    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, int domainIndex)
+    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, boolean isMostSpecialized)
             throws DataSourceException
     {
         List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
-        if ( domainIndex > 0 )
+        if ( !isMostSpecialized)
         {
             ModelDataSource source = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
             List<ModelContainer> containers = source.queryFor( ProjectUri.Build.Plugins.Plugin.xUri );

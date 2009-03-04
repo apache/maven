@@ -13,8 +13,8 @@ public class DefaultDomainModel extends PomClassicDomainModel {
 
     private List<ModelProperty> modelProperties;
 
-    public DefaultDomainModel(List<ModelProperty> modelProperties) {
-        super( modelProperties);
+    public DefaultDomainModel(List<ModelProperty> modelProperties, boolean isMostSpecialized) {
+        super( modelProperties, isMostSpecialized);
         this.modelProperties = modelProperties;
     }
 

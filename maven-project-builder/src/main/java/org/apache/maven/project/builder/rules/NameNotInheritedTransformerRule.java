@@ -13,11 +13,11 @@ import java.util.ArrayList;
  */
 public class NameNotInheritedTransformerRule implements TransformerRemovalRule
 {
-    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, int domainIndex)
+    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, boolean isMostSpecialized)
             throws DataSourceException
     {
         List<ModelProperty> removedProperties = new ArrayList<ModelProperty>();
-        if ( domainIndex > 0 )
+        if ( !isMostSpecialized )
         {
             for ( ModelProperty mp : modelProperties )
             {

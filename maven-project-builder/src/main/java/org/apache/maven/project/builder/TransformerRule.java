@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface TransformerRule
 {
-    void execute(List<ModelProperty> modelProperties, int domainIndex) throws DataSourceException;
+    void execute(List<ModelProperty> modelProperties, boolean isMostSpecialized) throws DataSourceException;
 
 }

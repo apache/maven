@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class DuplicateFiltersTransformerRule implements TransformerRemovalRule
 {
-    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, int domainIndex)
+    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, boolean isMostSpecialized)
             throws DataSourceException
     {
         List<ModelProperty> removedProperties = new ArrayList<ModelProperty>();

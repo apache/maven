@@ -62,6 +62,8 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     private List<ModelProperty> modelProperties;
     
     private int lineageCount;
+    
+    private boolean isMostSpecialized = false;
 
     private String parentGroupId = null, parentArtifactId = null, parentVersion = null, parentId = null, parentRelativePath;
 
@@ -79,6 +81,13 @@ public class PomClassicDomainModel implements InputStreamDomainModel
         }
         initializeProperties( modelProperties );
     }
+    
+    public PomClassicDomainModel( List<ModelProperty> modelProperties, boolean isMostSpecialized )
+    {
+    	this( modelProperties );
+    	this.isMostSpecialized = isMostSpecialized;
+    }
+    
 
     /**
      * Constructor
@@ -97,6 +106,13 @@ public class PomClassicDomainModel implements InputStreamDomainModel
         modelProperties = getModelProperties();
         initializeProperties( modelProperties );
     }
+    
+    public PomClassicDomainModel( InputStream inputStream, boolean isMostSpecialized )
+    	throws IOException
+	{
+    	this( inputStream );
+    	this.isMostSpecialized = isMostSpecialized;
+	}    
 
     private void initializeProperties(List<ModelProperty> modelProperties)
     {
@@ -299,7 +315,7 @@ public class PomClassicDomainModel implements InputStreamDomainModel
             s.add(ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.xUri);
             s.add(ProjectUri.Profiles.Profile.Reporting.Plugins.Plugin.ReportSets.ReportSet.configuration);
             s.add(ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Executions.Execution.configuration);
-
+            s.add(ProjectUri.Profiles.Profile.properties);
             s.add(ProjectUri.Profiles.Profile.modules);
             s.add(ProjectUri.Profiles.Profile.Dependencies.xUri);
             s.add(ProjectUri.Profiles.Profile.Build.Plugins.Plugin.configuration);
@@ -365,5 +381,15 @@ public class PomClassicDomainModel implements InputStreamDomainModel
             return false;
         }
     }
+
+	public boolean isMostSpecialized() 
+	{
+		return isMostSpecialized;
+	}
+
+	public void setMostSpecialized(boolean isMostSpecialized) 
+	{
+		this.isMostSpecialized = isMostSpecialized;	
+	}
 
 }

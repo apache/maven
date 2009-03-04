@@ -19,12 +19,12 @@ import java.util.Arrays;
  */
 public class NotInheritedPluginExecutionTransformerRule implements TransformerRemovalRule
 {
-    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, int domainIndex)
+    public List<ModelProperty> executeWithReturnPropertiesToRemove(List<ModelProperty> modelProperties, boolean isMostSpecialized)
             throws DataSourceException
     {
         List<ModelProperty> removeProperties = new ArrayList<ModelProperty>();
 
-        if ( domainIndex > 0 )
+        if ( !isMostSpecialized)
         {
             ModelDataSource source = new DefaultModelDataSource( modelProperties, Arrays.asList(
                     new ArtifactModelContainerFactory(), new PluginExecutionIdModelContainerFactory() ));
