@@ -1484,6 +1484,7 @@ public class DefaultPluginManager
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
+            .setResolveRoot( false )
             .setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( context.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
