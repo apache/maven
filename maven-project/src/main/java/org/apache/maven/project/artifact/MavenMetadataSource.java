@@ -36,9 +36,11 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
@@ -47,6 +49,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.validation.ModelValidationResult;
+import org.apache.maven.repository.LegacyMavenRepositorySystem;
+import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -502,6 +506,25 @@ public class MavenMetadataSource
         private MavenProject project;
 
         private Artifact pomArtifact;
+    }
+
+    // USED BY MAVEN ASSEMBLY PLUGIN
+    @Deprecated
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies,
+                                                 String inheritedScope, ArtifactFilter dependencyFilter,
+                                                 MavenProject project )
+        throws InvalidDependencyVersionException
+    {
+        try
+        {
+            return LegacyMavenRepositorySystem.createArtifacts( artifactFactory, dependencies, inheritedScope,
+                                                                dependencyFilter, project );
+        }
+        catch ( VersionNotFoundException e )
+        {
+            throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(),
+                                                         e.getCauseException() );
+        }
     }
 
 }

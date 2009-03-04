@@ -191,7 +191,15 @@ public class LegacyMavenRepositorySystem
      * @return {@link Set} &lt; {@link Artifact} >
      * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
      */
-    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
+    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope,
+                                          ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
+        throws VersionNotFoundException
+    {
+        return createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, reactor );
+    }
+
+    @Deprecated
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory,List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
         throws VersionNotFoundException
     {
         Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>( dependencies.size() );
