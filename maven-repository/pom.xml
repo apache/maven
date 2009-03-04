@@ -27,7 +27,7 @@ under the License.
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-repository</artifactId>
-  <name>Maven Project</name>
+  <name>Maven Repository</name>
   <description>Repository System interface for Maven.</description>
   <dependencies>
     <dependency>
@@ -57,8 +57,8 @@ under the License.
     </dependency>
     
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>                                                                                
-      <artifactId>plexus-jetty6</artifactId>                                                                                
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty6</artifactId>
       <scope>test</scope>
     </dependency>
     
@@ -102,19 +102,20 @@ under the License.
     </dependency>
     
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-          <executions>                                                                                                          
-            <execution>                                                                                                         
-              <goals>                                                                                                           
-                <goal>generate-metadata</goal>                                                                                  
-                <goal>generate-test-metadata</goal>                                                                             
-              </goals>                                                                                                          
-            </execution>                                                                                                        
-          </executions>                                                                                                         
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate-metadata</goal>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
       </plugin>
 
       <plugin>
