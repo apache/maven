@@ -372,10 +372,7 @@ public class DefaultPluginManager
         }
     }
 
-    private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact,
-                                    Plugin plugin,
-                                    MavenProject project,
-                                    ArtifactRepository localRepository )
+    private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin plugin, MavenProject project, ArtifactRepository localRepository )
         throws InvalidPluginException, ArtifactNotFoundException, ArtifactResolutionException
     {
         ArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
@@ -389,17 +386,12 @@ public class DefaultPluginManager
         
         try
         {
-            projectPluginDependencies = repositorySystem.createArtifacts(
-                                                                             plugin.getDependencies(),
-                                                                             null,
-                                                                             coreArtifactFilterManager.getCoreArtifactFilter(),
-                                                                             project );            
+            projectPluginDependencies = repositorySystem.createArtifacts( plugin.getDependencies(), null, coreArtifactFilterManager.getCoreArtifactFilter(), project );            
         }
         catch ( VersionNotFoundException e )
         {
             InvalidDependencyVersionException ee = new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
-            throw new InvalidPluginException( "Plugin '" + plugin + "' is invalid: "
-                                              + e.getMessage(), ee );
+            throw new InvalidPluginException( "Plugin '" + plugin + "' is invalid: " + e.getMessage(), ee );
         }
 
         ResolutionGroup resolutionGroup;
@@ -410,19 +402,14 @@ public class DefaultPluginManager
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
-            throw new ArtifactResolutionException(
-                                                   "Unable to download metadata from repository for plugin '"
-                                                                   + pluginArtifact.getId() + "': "
-                                                                   + e.getMessage(),
-                                                   pluginArtifact, e );
+            throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" + pluginArtifact.getId() + "': " + e.getMessage(), pluginArtifact, e );
         }
 
         /* get plugin managed versions */
         Map pluginManagedDependencies = new HashMap();
         try
         {
-            MavenProject pluginProject =
-                mavenProjectBuilder.buildFromRepository( pluginArtifact, project.getRemoteArtifactRepositories(), localRepository );
+            MavenProject pluginProject = mavenProjectBuilder.buildFromRepository( pluginArtifact, project.getRemoteArtifactRepositories(), localRepository );
             
             if ( pluginProject != null )
             {
@@ -447,7 +434,7 @@ public class DefaultPluginManager
         repositories.addAll( resolutionGroup.getResolutionRepositories() );
 
         repositories.addAll( project.getRemoteArtifactRepositories() );
-
+        
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( pluginArtifact )
             .setArtifactDependencies( dependencies )
@@ -458,10 +445,10 @@ public class DefaultPluginManager
             .setMetadataSource( repositorySystem );        
         
         ArtifactResolutionResult result = repositorySystem.resolve( request );
-
-        if ( result.hasErrorArtifactExceptions() )
+        
+        if ( result.hasExceptions() )
         {
-            throw result.getErrorArtifactExceptions().get( 0 );
+            result.getExceptions().get(  0 ).printStackTrace();
         }
         
         Set<Artifact> resolved = new LinkedHashSet<Artifact>();

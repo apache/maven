@@ -23,9 +23,9 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
-import org.apache.maven.project.DefaultProfileManager;
-import org.apache.maven.project.ProfileManager;
-import org.apache.maven.project.ProfileActivationContext;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileActivationContext;
+import org.apache.maven.profiles.ProfileManager;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.List;

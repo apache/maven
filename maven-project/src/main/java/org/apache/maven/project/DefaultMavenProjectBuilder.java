@@ -52,6 +52,10 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileActivationContext;
+import org.apache.maven.profiles.ProfileActivationException;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomClassicDomainModelFactory;
@@ -143,6 +147,7 @@ public class DefaultMavenProjectBuilder
         }
 
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
+        
         try
         {
             artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( getSuperModel().getRepositories() ) );
@@ -173,8 +178,7 @@ public class DefaultMavenProjectBuilder
 
         setBuildOutputDirectoryOnParent( project );
 
-        hm.put( ArtifactUtils.artifactId( project.getGroupId(), project.getArtifactId(), "pom", project.getVersion() ),
-                project );
+        hm.put( ArtifactUtils.artifactId( project.getGroupId(), project.getArtifactId(), "pom", project.getVersion() ), project );
 
         return project;
     }
@@ -307,9 +311,12 @@ public class DefaultMavenProjectBuilder
                                                 "Unable to build project due to an invalid dependency version: " +
                                                     e.getMessage(), projectDescriptor, ee );
         }
+                     
+        Artifact pomArtifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+        pomArtifact.setFile( projectDescriptor );
         
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( project.getArtifact() )
+            .setArtifact( pomArtifact )
             .setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( config.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
@@ -326,6 +333,8 @@ public class DefaultMavenProjectBuilder
                                                 "Unable to build project due to an invalid dependency version: " +
                                                     e.getMessage(), projectDescriptor, e );
         }
+        
+        System.out.println( result );
         
         project.setArtifacts( result.getArtifacts() );
 
@@ -736,10 +745,7 @@ public class DefaultMavenProjectBuilder
                            projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext() != null ) ?
                            projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds() : new ArrayList<String>();
 
-        PomClassicDomainModel domainModel = buildModel( pom,
-                interpolatorProperties,
-                                                        activeProfileIds, inactiveProfileIds,
-                                                        localRepository, remoteRepositories );
+        PomClassicDomainModel domainModel = buildModel( pom, interpolatorProperties, activeProfileIds, inactiveProfileIds, localRepository, remoteRepositories );
 
         try
         {

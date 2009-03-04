@@ -1,22 +1,18 @@
 package org.apache.maven.artifact.resolver;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import org.apache.maven.artifact.Artifact;
@@ -32,17 +28,13 @@ import java.util.Set;
 /**
  * Specific problems during resolution that we want to account for:
  * <p/>
- * - missing metadata
- * - version range violations
- * - version circular dependencies
- * - missing artifacts
- * - network/transfer errors
- * - file system errors: permissions
- *
+ * - missing metadata - version range violations - version circular dependencies - missing artifacts
+ * - network/transfer errors - file system errors: permissions
+ * 
  * @author Jason van Zyl
  * @TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
- * complex requiring a long list of checks, need to create a parent/interfact/encapsulation
- * for the types of exceptions
+ *       complex requiring a long list of checks, need to create a parent/interfact/encapsulation
+ *       for the types of exceptions
  */
 public class ArtifactResolutionResult
 {
@@ -53,7 +45,7 @@ public class ArtifactResolutionResult
     // Exceptions
 
     private List<Exception> exceptions = new ArrayList<Exception>();
-    
+
     private List<Exception> versionRangeViolations;
 
     private List<ArtifactResolutionException> metadataResolutionExceptions;
@@ -67,7 +59,7 @@ public class ArtifactResolutionResult
     private List<ArtifactRepository> repositories;
 
     private Set<Artifact> requestedArtifacts;
-    
+
     private Set<Artifact> artifacts;
 
     public Artifact getOriginatingArtifact()
@@ -89,9 +81,9 @@ public class ArtifactResolutionResult
             artifacts = new LinkedHashSet<Artifact>();
         }
 
-        artifacts.add( artifact );        
+        artifacts.add( artifact );
     }
-    
+
     public Set<Artifact> getArtifacts()
     {
         return artifacts;
@@ -104,14 +96,14 @@ public class ArtifactResolutionResult
             requestedArtifacts = new LinkedHashSet<Artifact>();
         }
 
-        requestedArtifacts.add( artifact );        
+        requestedArtifacts.add( artifact );
     }
-    
+
     public Set<Artifact> getRequestedArtifacts()
     {
         return requestedArtifacts;
-    }    
-    
+    }
+
     public List<Artifact> getMissingArtifacts()
     {
         return missingArtifacts == null ? Collections.EMPTY_LIST : missingArtifacts;
@@ -132,21 +124,21 @@ public class ArtifactResolutionResult
 
         return this;
     }
-    
+
     // ------------------------------------------------------------------------
     // Exceptions
     // ------------------------------------------------------------------------
-    
+
     public boolean hasExceptions()
     {
         return exceptions.size() > 0;
     }
-    
+
     public List<Exception> getExceptions()
-    {        
+    {
         return exceptions;
     }
-    
+
     // ------------------------------------------------------------------------
     // Version Range Violations
     // ------------------------------------------------------------------------
@@ -158,15 +150,15 @@ public class ArtifactResolutionResult
 
     /**
      * @TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
-     * {@link #getVersionRangeViolation(int)} but it's not used like that in
-     * {@link DefaultArtifactCollector}
+     *       {@link #getVersionRangeViolation(int)} but it's not used like that in
+     *       {@link DefaultArtifactCollector}
      */
     public ArtifactResolutionResult addVersionRangeViolation( Exception e )
     {
         versionRangeViolations = initList( versionRangeViolations );
 
         versionRangeViolations.add( e );
-        
+
         exceptions.add( e );
 
         return this;
@@ -196,7 +188,7 @@ public class ArtifactResolutionResult
         metadataResolutionExceptions = initList( metadataResolutionExceptions );
 
         metadataResolutionExceptions.add( e );
-        
+
         exceptions.add( e );
 
         return this;
@@ -226,7 +218,7 @@ public class ArtifactResolutionResult
         errorArtifactExceptions = initList( errorArtifactExceptions );
 
         errorArtifactExceptions.add( e );
-        
+
         exceptions.add( e );
 
         return this;
@@ -234,7 +226,8 @@ public class ArtifactResolutionResult
 
     public List<ArtifactResolutionException> getErrorArtifactExceptions()
     {
-        if (errorArtifactExceptions == null) {
+        if ( errorArtifactExceptions == null )
+        {
             return Collections.emptyList();
         }
 
@@ -255,7 +248,7 @@ public class ArtifactResolutionResult
         circularDependencyExceptions = initList( circularDependencyExceptions );
 
         circularDependencyExceptions.add( e );
-        
+
         exceptions.add( e );
 
         return this;
@@ -268,7 +261,8 @@ public class ArtifactResolutionResult
 
     public List<CyclicDependencyException> getCircularDependencyExceptions()
     {
-        if (circularDependencyExceptions == null) {
+        if ( circularDependencyExceptions == null )
+        {
             return Collections.emptyList();
         }
 
@@ -281,7 +275,8 @@ public class ArtifactResolutionResult
 
     public List<ArtifactRepository> getRepositories()
     {
-        if (repositories == null) {
+        if ( repositories == null )
+        {
             return Collections.emptyList();
         }
 
@@ -298,7 +293,7 @@ public class ArtifactResolutionResult
     //
     // Internal
     //
-    
+
     private <T> List<T> initList( final List<T> l )
     {
         if ( l == null )
@@ -306,5 +301,36 @@ public class ArtifactResolutionResult
             return new ArrayList<T>();
         }
         return l;
+    }
+
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+
+        if ( artifacts != null )
+        {
+            int i = 1;
+            sb.append( "---------" ).append( "\n" );
+            sb.append( artifacts.size() ).append( "\n" );
+            for ( Artifact a : artifacts )
+            {
+                if ( a.getClassifier() == null )
+                {
+                    sb.append( "NULL NULL" );
+                    continue;
+                }
+
+                sb.append( i ).append( " " ).append( a ).append( "\n" );
+                i++;
+            }
+            sb.append( "---------" ).append( "\n" );
+        }
+        else
+        {
+            System.out.println( "NULL set of artifacts!");
+        }
+        
+
+        return sb.toString();
     }
 }

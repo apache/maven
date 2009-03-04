@@ -144,8 +144,7 @@ public class MavenMetadataSource
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
     
-    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository,
-                                                        List<ArtifactRepository> remoteRepositories )
+    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         if ( remoteRepositories == null )
@@ -170,8 +169,7 @@ public class MavenMetadataSource
         do
         {
             // TODO: can we just modify the original?
-            pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                                 artifact.getVersion(), artifact.getScope() );
+            pomArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
 
             if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
             {

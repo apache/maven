@@ -11,7 +11,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
-import org.apache.maven.project.ProfileActivationContext;
+import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.*;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;

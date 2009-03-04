@@ -1,4 +1,4 @@
-package org.apache.maven.project;
+package org.apache.maven.profiles;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,9 +24,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.project.ProfileActivationContext;
-import org.apache.maven.project.ProfileActivationException;
-import org.apache.maven.project.ProfileManager;
+import org.apache.maven.profiles.ProfileActivationContext;
+import org.apache.maven.profiles.ProfileActivationException;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelMarshaller;

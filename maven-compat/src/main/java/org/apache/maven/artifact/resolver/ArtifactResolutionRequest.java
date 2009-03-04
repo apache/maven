@@ -41,6 +41,8 @@ public class ArtifactResolutionRequest
     // This should not be in here, it's a component
     private ArtifactMetadataSource metadataSource;
 
+    private boolean resolveRoot = true;
+    
     public ArtifactResolutionRequest()
     {  
     }
@@ -159,6 +161,18 @@ public class ArtifactResolutionRequest
         return this;
     }
 
+    public ArtifactResolutionRequest setResolveRoot( boolean resolveRoot )
+    {
+        this.resolveRoot = resolveRoot;
+        
+        return this;
+    }
+    
+    public boolean isResolveRoot()
+    {
+        return resolveRoot;
+    }
+    
     public String toString()
     {
         StringBuffer sb = new StringBuffer()

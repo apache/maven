@@ -1,4 +1,4 @@
-package org.apache.maven.project;
+package org.apache.maven.profiles;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +19,18 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
-import org.apache.maven.project.ProfileActivationContext;
-import org.apache.maven.project.ProfileActivationException;
-
-import java.util.List;
-import java.util.Map;
-
-public interface ProfileManager
+public class ProfileActivationException
+    extends Exception
 {
-    void addProfile( Profile profile );
 
-    ProfileActivationContext getProfileActivationContext();
+    public ProfileActivationException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 
-    void setProfileActivationContext( ProfileActivationContext profileActivationContext );
+    public ProfileActivationException( String message )
+    {
+        super( message );
+    }
 
-    void addProfiles( List<Profile> profiles );
-
-    Map getProfilesById();
-
-    List getActiveProfiles( Model model )
-        throws ProfileActivationException;
 }

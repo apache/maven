@@ -348,7 +348,7 @@ public class DefaultArtifactResolver
 
         if ( result.getMissingArtifacts().size() > 0 )
         {
-            throw new MultipleArtifactsNotFoundException( request.getArtifact(), new ArrayList( result.getArtifacts() ), result.getMissingArtifacts(), request.getRemoteRepostories() );
+            throw new MultipleArtifactsNotFoundException( request.getArtifact(), result.getMissingArtifacts(), request.getRemoteRepostories() );
         }
 
         return result;
@@ -360,7 +360,7 @@ public class DefaultArtifactResolver
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
-        Artifact originatingArtifact = request.getArtifact();
+        Artifact rootArtifact = request.getArtifact();
         Set<Artifact> artifacts = request.getArtifactDependencies();
         Map managedVersions = request.getManagedVersionMap();
         ArtifactRepository localRepository = request.getLocalRepository();
@@ -381,34 +381,39 @@ public class DefaultArtifactResolver
             listeners.add( new WarningResolutionListener( getLogger() ) );
         }
 
-        if ( request.getArtifactDependencies() == null || request.getArtifactDependencies().size() == 0 )
-        {
-            ArtifactResolutionResult result = new ArtifactResolutionResult();
+        ArtifactResolutionResult result = new ArtifactResolutionResult();
 
+        // The root artifact may, or may not be resolved so we need to check before we attempt to resolve.
+        // This is often an artifact like a POM that is taken from disk and we already have hold of the
+        // file reference. But this may be a Maven Plugin that we need to resolve from a remote repository
+        // as well as its dependencies.
+        
+        if ( rootArtifact.getFile() == null )
+        {
             try
             {
-                resolve( request.getArtifact(), request.getRemoteRepostories(), request.getLocalRepository() );
-
-                result.addArtifact( request.getArtifact() );
+                resolve( rootArtifact, remoteRepositories, localRepository );
+                result.addArtifact( rootArtifact );
             }
             catch ( ArtifactResolutionException e )
             {
                 result.addErrorArtifactException( e );
+                return result;
             }
             catch ( ArtifactNotFoundException e )
             {
                 result.addMissingArtifact( request.getArtifact() );
+                return result;
             }
-
-            return result;
         }
 
+        if ( artifacts == null || artifacts.size() == 0 )
+        {
+            return result;
+        } 
+        
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
-        ArtifactResolutionResult result = artifactCollector.collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
-
-        // Let's grab all the repositories that were gleaned. This we should know up front. I'm not sure
-        // what the metadata source is doing. Repositories in POMs are deadly.
-        result.setRepositories( remoteRepositories );
+        result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
 
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information

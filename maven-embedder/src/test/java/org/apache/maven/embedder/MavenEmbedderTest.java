@@ -176,7 +176,7 @@ public class MavenEmbedderTest
         MavenExecutionResult result = maven.execute( request );
 
         assertNoExceptions( result );
-
+        
         MavenProject project = result.getProject();
 
         assertEquals( "embedder-test-project", project.getArtifactId() );

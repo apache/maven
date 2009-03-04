@@ -1,7 +1,7 @@
 package org.apache.maven.project;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.project.ProfileManager;
+import org.apache.maven.profiles.ProfileManager;
 
 import java.util.Date;
 import java.util.List;
