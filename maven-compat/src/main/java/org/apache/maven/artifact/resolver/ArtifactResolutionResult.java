@@ -44,7 +44,7 @@ public class ArtifactResolutionResult
 
     // Exceptions
 
-    private List<Exception> exceptions = new ArrayList<Exception>();
+    private List<Exception> exceptions;
 
     private List<Exception> versionRangeViolations;
 
@@ -104,6 +104,11 @@ public class ArtifactResolutionResult
         return requestedArtifacts;
     }
 
+    public boolean hasMissingArtifacts()
+    {
+        return missingArtifacts != null && !missingArtifacts.isEmpty();
+    }
+
     public List<Artifact> getMissingArtifacts()
     {
         return missingArtifacts == null ? Collections.<Artifact> emptyList() : missingArtifacts;
@@ -131,12 +136,12 @@ public class ArtifactResolutionResult
 
     public boolean hasExceptions()
     {
-        return exceptions.size() > 0;
+        return exceptions != null && !exceptions.isEmpty();
     }
 
     public List<Exception> getExceptions()
     {
-        return exceptions;
+        return exceptions == null ? Collections.<Exception> emptyList() : exceptions;
     }
 
     // ------------------------------------------------------------------------
@@ -159,6 +164,8 @@ public class ArtifactResolutionResult
 
         versionRangeViolations.add( e );
 
+        exceptions = initList( exceptions );
+
         exceptions.add( e );
 
         return this;
@@ -169,9 +176,9 @@ public class ArtifactResolutionResult
         return (OverConstrainedVersionException) versionRangeViolations.get( i );
     }
 
-    public List getVersionRangeViolations()
+    public List<Exception> getVersionRangeViolations()
     {
-        return versionRangeViolations == null ? Collections.EMPTY_LIST : versionRangeViolations;
+        return versionRangeViolations == null ? Collections.<Exception> emptyList() : versionRangeViolations;
     }
 
     // ------------------------------------------------------------------------
@@ -189,6 +196,8 @@ public class ArtifactResolutionResult
 
         metadataResolutionExceptions.add( e );
 
+        exceptions = initList( exceptions );
+
         exceptions.add( e );
 
         return this;
@@ -199,9 +208,10 @@ public class ArtifactResolutionResult
         return metadataResolutionExceptions.get( i );
     }
 
-    public List getMetadataResolutionExceptions()
+    public List<ArtifactResolutionException> getMetadataResolutionExceptions()
     {
-        return metadataResolutionExceptions == null ? Collections.EMPTY_LIST : metadataResolutionExceptions;
+        return metadataResolutionExceptions == null ? Collections.<ArtifactResolutionException> emptyList()
+                        : metadataResolutionExceptions;
     }
 
     // ------------------------------------------------------------------------
@@ -218,6 +228,8 @@ public class ArtifactResolutionResult
         errorArtifactExceptions = initList( errorArtifactExceptions );
 
         errorArtifactExceptions.add( e );
+
+        exceptions = initList( exceptions );
 
         exceptions.add( e );
 
@@ -248,6 +260,8 @@ public class ArtifactResolutionResult
         circularDependencyExceptions = initList( circularDependencyExceptions );
 
         circularDependencyExceptions.add( e );
+
+        exceptions = initList( exceptions );
 
         exceptions.add( e );
 

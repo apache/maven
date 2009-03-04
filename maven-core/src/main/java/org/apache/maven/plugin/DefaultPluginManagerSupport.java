@@ -27,6 +27,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -40,7 +42,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.realm.RealmScanningUtils;
 import org.apache.maven.repository.MavenRepositorySystem;
@@ -59,6 +60,9 @@ public class DefaultPluginManagerSupport
 {
     @Requirement
     private MavenRepositorySystem repositorySystem;
+
+    @Requirement
+    private ResolutionErrorHandler resolutionErrorHandler;
         
     @Requirement
     private MavenProjectBuilder mavenProjectBuilder;
@@ -112,7 +116,10 @@ public class DefaultPluginManagerSupport
 
         pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
-        repositorySystem.resolve( new ArtifactResolutionRequest( pluginArtifact, localRepository, remoteRepositories ) );
+        ArtifactResolutionRequest request =
+            new ArtifactResolutionRequest( pluginArtifact, localRepository, remoteRepositories );
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        resolutionErrorHandler.throwErrors( request, result );
 
         return pluginArtifact;
     }

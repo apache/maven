@@ -41,6 +41,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
@@ -84,7 +85,10 @@ public class LegacyMavenRepositorySystem
 
     @Requirement
     private MirrorBuilder mirrorBuilder;
-    
+
+    @Requirement
+    private ResolutionErrorHandler resolutionErrorHandler;
+
     @Requirement
     private Logger logger;
 
@@ -464,7 +468,10 @@ public class LegacyMavenRepositorySystem
             projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
         }
 
-        resolve( new ArtifactResolutionRequest( projectArtifact, localRepository, remoteArtifactRepositories ) );
+        ArtifactResolutionRequest request =
+            new ArtifactResolutionRequest( projectArtifact, localRepository, remoteArtifactRepositories );
+        ArtifactResolutionResult result = resolve( request );
+        resolutionErrorHandler.throwErrors( request, result );
 
         File file = projectArtifact.getFile();
         artifact.setFile( file );

@@ -43,6 +43,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -138,6 +139,9 @@ public class DefaultPluginManager
 
     @Requirement
     protected MavenRepositorySystem repositorySystem;
+
+    @Requirement
+    private ResolutionErrorHandler resolutionErrorHandler;
 
     @Requirement
     protected RuntimeInformation runtimeInformation;
@@ -445,11 +449,7 @@ public class DefaultPluginManager
             .setMetadataSource( repositorySystem );        
         
         ArtifactResolutionResult result = repositorySystem.resolve( request );
-        
-        if ( result.hasExceptions() )
-        {
-            result.getExceptions().get(  0 ).printStackTrace();
-        }
+        resolutionErrorHandler.throwErrors( request, result );
         
         Set<Artifact> resolved = new LinkedHashSet<Artifact>();
 
@@ -1494,7 +1494,7 @@ public class DefaultPluginManager
                          
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
-        if ( result.hasErrorArtifactExceptions() )
+        if ( result.hasMissingArtifacts() )
         {
             /*
              
@@ -1503,15 +1503,14 @@ public class DefaultPluginManager
             all we can do is warn and skip it. A better fix can be inserted into 2.1
             
             */
-            if ( isAggregator && checkMissingArtifactsInReactor( context.getSortedProjects(), result.getMissingArtifacts() ) )
+            if ( isAggregator
+                && checkMissingArtifactsInReactor( context.getSortedProjects(), result.getMissingArtifacts() ) )
             {
-            }
-            else
-            {
-                //we can't find all the artifacts in the reactor so bubble the exception up.
-                throw result.getErrorArtifactExceptions().get( 0 );
+                // all found, so clear up the result state to prevent the error handler from blowing up
+                result.setUnresolvedArtifacts( null );
             }
         }
+        resolutionErrorHandler.throwErrors( request, result );
         
         project.setArtifacts( result.getArtifacts() );
     }
