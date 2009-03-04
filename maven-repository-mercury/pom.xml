@@ -29,17 +29,28 @@ under the License.
   <artifactId>maven-repository-mercury</artifactId>
   <name>Mercury Repository </name>
   <description>Mercury implementation for the Maven Repository System</description>
-  
+
   <properties>
     <mercury.version>1.0-alpha-6-SNAPSHOT</mercury.version>
-    <plexus.lang.version>1.1</plexus.lang.version>
   </properties>
-  
+
   <dependencies>
 
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-repository</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-mercury</artifactId>
     </dependency>
 
     <dependency>
@@ -54,7 +65,31 @@ under the License.
 
     <dependency>
       <groupId>org.apache.maven.mercury</groupId>
-      <artifactId>mercury-plexus</artifactId>
+      <artifactId>mercury-external</artifactId>
+      <version>${mercury.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-util</artifactId>
+      <version>${mercury.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-md-sat</artifactId>
+      <version>${mercury.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-repo-api</artifactId>
+      <version>${mercury.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-repo-local-m2</artifactId>
       <version>${mercury.version}</version>
     </dependency>
 
@@ -63,20 +98,54 @@ under the License.
       <artifactId>mercury-repo-remote-m2</artifactId>
       <version>${mercury.version}</version>
     </dependency>
-      
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-lang</artifactId>
-        <version>${plexus.lang.version}</version>
-      </dependency>
-      
+
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-artifact</artifactId>
+      <version>${mercury.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-plexus</artifactId>
+      <version>${mercury.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-transport-http</artifactId>
+      <version>${mercury.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>                                                                                
+      <artifactId>plexus-jetty6</artifactId>                                                                                
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>plexus-webdav</artifactId>
+      <scope>test</scope>
+    </dependency>
+  
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
+          <executions>                                                                                                          
+            <execution>                                                                                                         
+              <goals>                                                                                                           
+                <goal>generate-metadata</goal>                                                                                  
+                <goal>generate-test-metadata</goal>                                                                             
+              </goals>                                                                                                          
+            </execution>                                                                                                        
+          </executions>                                                                                                         
       </plugin>
     </plugins>
   </build>
+
 </project>

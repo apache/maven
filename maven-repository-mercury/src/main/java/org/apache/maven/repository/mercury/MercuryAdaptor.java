@@ -26,10 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.mercury.builder.api.DependencyProcessor;
@@ -60,7 +58,7 @@ public class MercuryAdaptor
         if ( localRepository != null )
         {
             LocalRepositoryM2 lr =
-                new LocalRepositoryM2( localRepository.getId(), new File( localRepository.getBasedir() ),
+                new LocalRepositoryM2( localRepository.getId(), new File( localRepository.getUrl() ),
                                        dependencyProcessor );
             res.add( lr );
         }
@@ -111,14 +109,33 @@ public class MercuryAdaptor
         return md;
     }
 
-    public static Artifact toMavenArtifact( org.apache.maven.mercury.artifact.Artifact a )
+    public static Artifact toMavenArtifact( ArtifactFactory af, org.apache.maven.mercury.artifact.Artifact a )
     {
-        VersionRange vr = VersionRange.createFromVersion( a.getVersion() );
-        Artifact ma =
-            new DefaultArtifact( a.getGroupId(), a.getArtifactId(), vr, a.getScope(), a.getType(), a.getClassifier(),
-                                 null );
+        Artifact ma = a.getClassifier() == null 
+                        ? af.createArtifact( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getScope(), a.getType() )
+                        : af.createArtifactWithClassifier( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getType(), a.getClassifier() )
+                        ;
+        ma.setScope( a.getScope() );
+        
+        ma.setFile( a.getFile() );
 
         return ma;
+    }
+    
+    public static Artifact toMavenArtifact( ArtifactFactory af, org.apache.maven.mercury.artifact.ArtifactBasicMetadata a )
+    {
+        Artifact ma = a.getClassifier() == null 
+                                ? af.createArtifact( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getScope(), a.getType() )
+                                : af.createArtifactWithClassifier( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getType(), a.getClassifier() )
+                                ;
+        ma.setScope( a.getScope() );
+
+        return ma;
+    }
+    
+    public static Artifact toMavenArtifact( ArtifactFactory af, String name )
+    {
+        return toMavenArtifact( af, new ArtifactBasicMetadata(name) );
     }
 
 }

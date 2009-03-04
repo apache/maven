@@ -19,13 +19,10 @@ under the License.
 
 package org.apache.maven.repository.mercury;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -37,9 +34,6 @@ import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.plexus.PlexusMercury;
 import org.apache.maven.mercury.repository.api.Repository;
 import org.apache.maven.mercury.repository.api.RepositoryException;
-import org.apache.maven.mercury.repository.local.m2.LocalRepositoryM2;
-import org.apache.maven.mercury.repository.remote.m2.RemoteRepositoryM2;
-import org.apache.maven.mercury.transport.api.Server;
 import org.apache.maven.mercury.util.Util;
 import org.apache.maven.repository.LegacyMavenRepositorySystem;
 import org.apache.maven.repository.MavenRepositorySystem;
@@ -64,6 +58,9 @@ public class MercuryRepositorySystem
 
     @Requirement
     PlexusMercury _mercury;
+
+    @Requirement
+    ArtifactFactory _artifactFactory;
 
     @Override
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
@@ -90,7 +87,7 @@ public class MercuryRepositorySystem
 
             if ( !Util.isEmpty( mercuryArtifactList ) )
                 for ( org.apache.maven.mercury.artifact.Artifact a : mercuryArtifactList )
-                    result.addArtifact( MercuryAdaptor.toMavenArtifact( a ) );
+                    result.addArtifact( MercuryAdaptor.toMavenArtifact( _artifactFactory, a ) );
         }
         catch ( RepositoryException e )
         {
