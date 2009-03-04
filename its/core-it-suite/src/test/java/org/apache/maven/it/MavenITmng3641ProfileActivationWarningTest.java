@@ -57,7 +57,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         List logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertFalse( logFile.contains( "[WARNING] Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
+        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
 
         // (2) Second run: make sure the profile was not found and a warning was printed.
         verifier = new Verifier( testDir.getAbsolutePath() );
@@ -68,7 +68,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertTrue( logFile.contains( "[WARNING] Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
+        assertTrue( logFile.contains( "Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
 
         // (3) Third run: make sure the first profile is found while the other is not and a warning was printed
         // accordingly.
@@ -80,8 +80,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertFalse( logFile.contains( "[WARNING] Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
-        assertTrue( logFile.contains( "[WARNING] Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
+        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
+        assertTrue( logFile.contains( "Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
 
         // (4) Fourth run: make sure the warning is only printed when the profile is missing in all projects
         verifier = new Verifier( testDir.getAbsolutePath() );
@@ -92,6 +92,6 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertFalse( logFile.contains( "[WARNING] Profile with id: 'mng-3641-it-provided-profile-child' has not been activated." ) );
+        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile-child' has not been activated." ) );
     }
 }
