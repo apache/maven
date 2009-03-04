@@ -52,7 +52,7 @@ public class DefaultProfileManager
 {
     private MutablePlexusContainer container;
 
-    private Map profilesById = new LinkedHashMap();
+    private Map<String, Profile> profilesById = new LinkedHashMap<String, Profile>();
 
     private ProfileActivationContext profileActivationContext;
 
@@ -100,7 +100,7 @@ public class DefaultProfileManager
         this.profileActivationContext = profileActivationContext;
     }
 
-    public Map getProfilesById()
+    public Map<String, Profile> getProfilesById()
     {
         return profilesById;
     }
@@ -130,80 +130,71 @@ public class DefaultProfileManager
     }
 
     // TODO: Portions of this logic are duplicated in o.a.m.p.b.p.ProfileContext, something is wrong here
-    public List getActiveProfiles( Model model )
+    public List<Profile> getActiveProfiles( Model model )
         throws ProfileActivationException
     {
+        List<Profile> activeFromPom = new ArrayList<Profile>();
+        List<Profile> activeExternal = new ArrayList<Profile>();
 
-        try
+        for ( Iterator it = profilesById.entrySet().iterator(); it.hasNext(); )
         {
-            List activeFromPom = new ArrayList();
-            List activeExternal = new ArrayList();
+            Map.Entry entry = (Entry) it.next();
 
-            for ( Iterator it = profilesById.entrySet().iterator(); it.hasNext(); )
+            String profileId = (String) entry.getKey();
+            Profile profile = (Profile) entry.getValue();
+
+            boolean shouldAdd = false;
+            if ( profileActivationContext.isExplicitlyActive( profileId ) )
             {
-                Map.Entry entry = (Entry) it.next();
-
-                String profileId = (String) entry.getKey();
-                Profile profile = (Profile) entry.getValue();
-
-                boolean shouldAdd = false;
-                if ( profileActivationContext.isExplicitlyActive( profileId ) )
-                {
-                    shouldAdd = true;
-                }
-                else if ( isActive( profile, profileActivationContext ) )
-                {
-                    shouldAdd = true;
-                }
-
-                if ( !profileActivationContext.isExplicitlyInactive( profileId ) && shouldAdd )
-                {
-                    if ( "pom".equals( profile.getSource() ) )
-                    {
-                        activeFromPom.add( profile );
-                    }
-                    else
-                    {
-                        activeExternal.add( profile );
-                    }
-                }
+                shouldAdd = true;
+            }
+            else if ( isActive( profile, profileActivationContext ) )
+            {
+                shouldAdd = true;
             }
 
-            if ( activeFromPom.isEmpty() )
+            if ( !profileActivationContext.isExplicitlyInactive( profileId ) && shouldAdd )
             {
-                List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
-
-                List deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
-
-                for ( Iterator it = defaultIds.iterator(); it.hasNext(); )
+                if ( "pom".equals( profile.getSource() ) )
                 {
-                    String profileId = (String) it.next();
-
-                    // If this profile was excluded, don't add it back in
-                    // Fixes MNG-3545
-                    if ( deactivatedIds.contains( profileId ) )
-                    {
-                        continue;
-                    }
-                    Profile profile = (Profile) profilesById.get( profileId );
-
-                    if ( profile != null )
-                    {
-                        activeFromPom.add( profile );
-                    }
+                    activeFromPom.add( profile );
+                }
+                else
+                {
+                    activeExternal.add( profile );
                 }
             }
-
-            List allActive = new ArrayList( activeFromPom.size() + activeExternal.size() );
-
-            allActive.addAll( activeExternal );
-            allActive.addAll( activeFromPom );
-
-            return allActive;
         }
-        finally
+
+        if ( activeFromPom.isEmpty() )
         {
+            List<String> defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
+
+            List<String> deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
+
+            for ( String profileId : defaultIds )
+            {
+                // If this profile was excluded, don't add it back in
+                // Fixes MNG-3545
+                if ( deactivatedIds.contains( profileId ) )
+                {
+                    continue;
+                }
+                Profile profile = (Profile) profilesById.get( profileId );
+
+                if ( profile != null )
+                {
+                    activeFromPom.add( profile );
+                }
+            }
         }
+
+        List<Profile> allActive = new ArrayList<Profile>( activeFromPom.size() + activeExternal.size() );
+
+        allActive.addAll( activeExternal );
+        allActive.addAll( activeFromPom );
+
+        return allActive;
     }
 
     private static List<ActiveProfileMatcher> matchers = Arrays.asList(new FileMatcher(),

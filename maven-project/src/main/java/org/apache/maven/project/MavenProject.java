@@ -510,10 +510,8 @@ public class MavenProject
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts() )
         {
-            Artifact a = (Artifact) i.next();
-
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
@@ -530,10 +528,8 @@ public class MavenProject
     {
         List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts() )
         {
-            Artifact a = (Artifact) i.next();
-
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
@@ -558,10 +554,8 @@ public class MavenProject
 
         List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts()  )
         {
-            Artifact a = (Artifact) i.next();
-
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
@@ -589,10 +583,8 @@ public class MavenProject
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts() )
         {
-            Artifact a = (Artifact) i.next();
-
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 File file = a.getFile();
@@ -610,10 +602,8 @@ public class MavenProject
     {
         List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts() )
         {
-            Artifact a = (Artifact) i.next();
-
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
@@ -634,10 +624,8 @@ public class MavenProject
 
         List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts()  )
         {
-            Artifact a = (Artifact) i.next();
-
             Dependency dependency = new Dependency();
 
             dependency.setArtifactId( a.getArtifactId() );
@@ -659,10 +647,8 @@ public class MavenProject
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts() )
         {
-            Artifact a = (Artifact) i.next();
-
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
@@ -684,10 +670,8 @@ public class MavenProject
     {
         List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts()  )
         {
-            Artifact a = (Artifact) i.next();
-
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
@@ -712,10 +696,8 @@ public class MavenProject
 
         List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
 
-        for ( Iterator<Artifact> i = artifacts.iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts()  )
         {
-            Artifact a = (Artifact) i.next();
-
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
             {
@@ -741,10 +723,8 @@ public class MavenProject
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts() )
         {
-            Artifact a = (Artifact) i.next();
-
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
@@ -761,10 +741,8 @@ public class MavenProject
     {
         List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts()  )
         {
-            Artifact a = (Artifact) i.next();
-
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
@@ -789,10 +767,8 @@ public class MavenProject
 
         List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
 
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : getArtifacts()  )
         {
-            Artifact a = (Artifact) i.next();
-
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
@@ -1359,6 +1335,7 @@ public class MavenProject
         }
     }
 
+    //TODO: remove ModelUtils
     public void injectPluginManagementInfo( Plugin plugin )
     {
         PluginManagement pm = getModelBuild().getPluginManagement();
@@ -1409,7 +1386,6 @@ public class MavenProject
 
     public List<Repository> getPluginRepositories()
     {
-        //        return model.getPluginRepositories();
         return getModel().getRepositories();
     }
 

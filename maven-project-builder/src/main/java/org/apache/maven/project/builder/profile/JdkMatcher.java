@@ -12,7 +12,6 @@ import java.util.List;
 public class JdkMatcher
     implements ActiveProfileMatcher
 {
-    // TODO: Ranges
     public boolean isMatch( ModelContainer modelContainer, List<InterpolatorProperty> properties )
     {
         if ( modelContainer == null )
@@ -39,9 +38,9 @@ public class JdkMatcher
                         {
                             return !version.equals( modelProperty.getResolvedValue().replaceFirst( "!", "" ) );
                         }
-                        else if ( isRange( modelProperty.getResolvedValue()) )
+                        else if ( isRange( modelProperty.getResolvedValue() ) )
                         {
-                            return isInRange( version, getRange( modelProperty.getResolvedValue()));
+                            return isInRange( version, getRange( modelProperty.getResolvedValue() ) );
                         }
                         else
                         {
@@ -58,62 +57,63 @@ public class JdkMatcher
 
     private static boolean isInRange( String value, List<RangeValue> range )
     {
-            int leftRelation = getRelationOrder(value, range.get( 0 ), true);
-            
-            if( leftRelation == 0)
-            {
-                return true;
-            }
-            
-            if(leftRelation < 0)
-            {
-                return false;
-            }
-            
-            return getRelationOrder(value, range.get( 1 ), false) <= 0;
-    }
-    
-    private static int getRelationOrder(String value, RangeValue rangeValue, boolean isLeft)
-    {
-        List<String> valueTokens = Arrays.asList(value.split( "." ));
-        List<String> rangeValueTokens = Arrays.asList(rangeValue.value.split( "." ));
-        
-        int max = Math.max( valueTokens.size(), rangeValueTokens.size() );
-        addZeroTokens(valueTokens, max);
-        addZeroTokens(rangeValueTokens, max);
-       
-        if(value.equals( rangeValue.value ) )
+        int leftRelation = getRelationOrder( value, range.get( 0 ), true );
+
+        if ( leftRelation == 0 )
         {
-            return (rangeValue.isClosed()) ? 0 : -1;
+            return true;
         }
 
-        for( int i = 0; i < valueTokens.size() ; i++)
+        if ( leftRelation < 0 )
+        {
+            return false;
+        }
+
+        return getRelationOrder( value, range.get( 1 ), false ) <= 0;
+    }
+
+    private static int getRelationOrder( String value, RangeValue rangeValue, boolean isLeft )
+    {
+        List<String> valueTokens = Arrays.asList( value.split( "." ) );
+        List<String> rangeValueTokens = Arrays.asList( rangeValue.value.split( "." ) );
+
+        int max = Math.max( valueTokens.size(), rangeValueTokens.size() );
+        addZeroTokens( valueTokens, max );
+        addZeroTokens( rangeValueTokens, max );
+
+        if ( value.equals( rangeValue.value ) )
+        {
+            return ( rangeValue.isClosed() ) ? 0 : -1;
+        }
+
+        for ( int i = 0; i < valueTokens.size(); i++ )
         {
             int x = Integer.getInteger( valueTokens.get( i ) );
             int y = Integer.getInteger( rangeValueTokens.get( i ) );
-            if( x < y)
+            if ( x < y )
             {
                 return -1;
             }
-            else if( x > y)
+            else if ( x > y )
             {
                 return 1;
             }
         }
-        return 0;            
+        return 0;
     }
-    
-    private static void addZeroTokens(List<String> tokens, int max)
+
+    private static void addZeroTokens( List<String> tokens, int max )
     {
-        if(tokens.size() < max)
+        if ( tokens.size() < max )
         {
-            for(int i = 0; i < (max - tokens.size()) ; i++){
+            for ( int i = 0; i < ( max - tokens.size() ); i++ )
+            {
                 tokens.add( "0" );
             }
-        }        
+        }
     }
-    
-    private static boolean isRange(String value)
+
+    private static boolean isRange( String value )
     {
         return value.contains( "," );
     }
@@ -139,12 +139,12 @@ public class JdkMatcher
             else if ( token.endsWith( ")" ) )
             {
                 ranges.add( new RangeValue( token.replace( ")", "" ), false ) );
-            } 
-            
+            }
+
         }
-        if(ranges.size() < 2)
+        if ( ranges.size() < 2 )
         {
-                ranges.add( new RangeValue("99999999", false));
+            ranges.add( new RangeValue( "99999999", false ) );
         }
         return ranges;
     }

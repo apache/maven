@@ -33,8 +33,8 @@ public interface ProfileManager
 
     void addProfiles( List<Profile> profiles );
 
-    Map getProfilesById();
+    Map<String, Profile> getProfilesById();
 
-    List getActiveProfiles( Model model )
+    List<Profile> getActiveProfiles( Model model )
         throws ProfileActivationException;
 }
