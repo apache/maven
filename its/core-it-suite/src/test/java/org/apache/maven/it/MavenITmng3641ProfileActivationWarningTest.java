@@ -82,5 +82,16 @@ public class MavenITmng3641ProfileActivationWarningTest
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertFalse( logFile.contains( "[WARNING] Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
         assertTrue( logFile.contains( "[WARNING] Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
+
+        // (4) Fourth run: make sure the warning is only printed when the profile is missing in all projects
+        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setCliOptions( Collections.singletonList( "-P mng-3641-it-provided-profile-child" ) );
+        verifier.setLogFileName( "log-4.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        assertFalse( logFile.contains( "[WARNING] Profile with id: 'mng-3641-it-provided-profile-child' has not been activated." ) );
     }
 }

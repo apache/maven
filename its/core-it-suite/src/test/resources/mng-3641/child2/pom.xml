@@ -22,21 +22,13 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.mng3641</groupId>
-  <artifactId>profile-test</artifactId>
-  <version>1</version>
+  <parent>
+    <groupId>org.apache.maven.its.mng3641</groupId>
+    <artifactId>profile-test</artifactId>
+    <version>1</version>
+  </parent>
+  <artifactId>child2</artifactId>
   <packaging>pom</packaging>
 
-  <name>MNG-3641 - Profile activation warning test</name>
-
-  <profiles>
-    <profile>
-      <id>mng-3641-it-provided-profile</id>
-    </profile>
-  </profiles>  
-
-  <modules>
-    <module>child1</module>
-    <module>child2</module>
-  </modules>
+  <name>MNG-3641 - Profile activation warning test - child 2</name>
 </project>
