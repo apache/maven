@@ -308,7 +308,7 @@ public class DefaultArtifactResolver
                                                          List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( originatingArtifact ).setArtifactDependencies( artifacts ).setManagedVersionMap( managedVersions )
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( originatingArtifact ).setResolveRoot( false ).setArtifactDependencies( artifacts ).setManagedVersionMap( managedVersions )
             .setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories ).setMetadataSource( source ).setFilter( filter ).setListeners( listeners );
 
         return resolveWithExceptions( request );
@@ -388,7 +388,7 @@ public class DefaultArtifactResolver
         // file reference. But this may be a Maven Plugin that we need to resolve from a remote repository
         // as well as its dependencies.
         
-        if ( rootArtifact.getFile() == null )
+        if ( request.isResolveRoot() && rootArtifact.getFile() == null )
         {
             try
             {
