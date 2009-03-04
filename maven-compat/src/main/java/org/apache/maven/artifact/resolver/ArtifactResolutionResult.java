@@ -106,7 +106,7 @@ public class ArtifactResolutionResult
 
     public List<Artifact> getMissingArtifacts()
     {
-        return missingArtifacts == null ? Collections.EMPTY_LIST : missingArtifacts;
+        return missingArtifacts == null ? Collections.<Artifact> emptyList() : missingArtifacts;
     }
 
     public ArtifactResolutionResult addMissingArtifact( Artifact artifact )

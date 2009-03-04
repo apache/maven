@@ -30,6 +30,7 @@ public interface ToolchainManager
 {
 
     // NOTE: Some plugins like Surefire access this field directly!
+    @Deprecated
     String ROLE = ToolchainManager.class.getName();
 
     /**

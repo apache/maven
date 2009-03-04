@@ -33,6 +33,10 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 public interface ArtifactResolver
 {
 
+    // USED BY MAVEN ASSEMBLY PLUGIN 2.2-beta-2 
+    @Deprecated
+    String ROLE = ArtifactResolver.class.getName();
+
     void setOnline( boolean online );
 
     boolean isOnline();
