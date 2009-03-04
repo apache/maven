@@ -98,7 +98,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentRepositoryExc
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -170,23 +169,15 @@ public class DefaultPluginManager
     //
     // ----------------------------------------------------------------------
 
-    public Plugin getPluginDefinitionForPrefix( String prefix,
-                                                MavenSession session,
-                                                MavenProject project )
+    public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
     {
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
         // use for the mapping manager in here
-        return pluginMappingManager.getByPrefix( prefix, session.getPluginGroups(),
-                                                 project.getRemoteArtifactRepositories(),
-                                                 session.getLocalRepository() );
+        return pluginMappingManager.getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
     }
 
-    public PluginDescriptor verifyPlugin( Plugin plugin,
-                                          MavenProject project,
-                                          MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException,
-        ArtifactNotFoundException, InvalidPluginException,
-        PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
+    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
     {
         String pluginVersion = plugin.getVersion();
 

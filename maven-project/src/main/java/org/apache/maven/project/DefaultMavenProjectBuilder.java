@@ -208,7 +208,7 @@ public class DefaultMavenProjectBuilder
         return buildFromRepository( artifact, remoteArtifactRepositories, localRepository );
     }
 
-    public MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
+    public MavenProject buildFromRepository( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         MavenProject project = hm.get( artifact.getId() );
@@ -218,7 +218,7 @@ public class DefaultMavenProjectBuilder
             return project;
         }
         
-        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
+        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
         try
         {
             artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( getSuperModel().getRepositories() ) );
@@ -246,7 +246,9 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( artifact.getId(), "Error with repository specified in project.", e );
         }
 
-        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration()
+            .setLocalRepository( localRepository )
+            .setRemoteRepositories( remoteRepositories );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), config.getLocalRepository(), artifactRepositories, config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile() );

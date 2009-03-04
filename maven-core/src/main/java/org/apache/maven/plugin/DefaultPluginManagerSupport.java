@@ -78,11 +78,8 @@ public class DefaultPluginManagerSupport
 
     private Context containerContext;
 
-    public Artifact resolvePluginArtifact( Plugin plugin,
-                                           MavenProject project,
-                                           MavenSession session )
-        throws PluginManagerException, InvalidPluginException, PluginVersionResolutionException,
-        ArtifactResolutionException, ArtifactNotFoundException
+    public Artifact resolvePluginArtifact( Plugin plugin, MavenProject project, MavenSession session )
+        throws PluginManagerException, InvalidPluginException, PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = session.getLocalRepository();
 
@@ -102,11 +99,8 @@ public class DefaultPluginManagerSupport
 
         if(pluginProject == null)
         {
-            pluginProject = buildPluginProject( plugin,
-                                                localRepository,
-                                                remoteRepositories );
+            pluginProject = buildPluginProject( plugin, localRepository, remoteRepositories );
         }
-
 
         checkRequiredMavenVersion( plugin, pluginProject, localRepository, remoteRepositories );
 
@@ -116,8 +110,7 @@ public class DefaultPluginManagerSupport
 
         pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
-        ArtifactResolutionRequest request =
-            new ArtifactResolutionRequest( pluginArtifact, localRepository, remoteRepositories );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, remoteRepositories );
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
 
@@ -130,9 +123,7 @@ public class DefaultPluginManagerSupport
         Artifact artifact = repositorySystem.createProjectArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion() );
         try
         {
-            return mavenProjectBuilder.buildFromRepository( artifact,
-                                                            remoteRepositories,
-                                                            localRepository );
+            return mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
         }
         catch ( ProjectBuildingException e )
         {
