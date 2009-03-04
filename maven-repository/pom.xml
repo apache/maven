@@ -51,13 +51,54 @@ under the License.
       <artifactId>wagon-file</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>                                                                                
+      <artifactId>plexus-jetty6</artifactId>                                                                                
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>plexus-webdav</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
   </dependencies>
   <build>
     <plugins>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
+          <executions>                                                                                                          
+            <execution>                                                                                                         
+              <goals>                                                                                                           
+                <goal>generate-metadata</goal>                                                                                  
+                <goal>generate-test-metadata</goal>                                                                             
+              </goals>                                                                                                          
+            </execution>                                                                                                        
+          </executions>                                                                                                         
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>package-tests</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
     </plugins>
   </build>
 </project>
