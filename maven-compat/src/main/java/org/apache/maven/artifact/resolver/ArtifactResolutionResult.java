@@ -328,22 +328,11 @@ public class ArtifactResolutionResult
             sb.append( artifacts.size() ).append( "\n" );
             for ( Artifact a : artifacts )
             {
-                if ( a.getClassifier() == null )
-                {
-                    sb.append( "NULL NULL" );
-                    continue;
-                }
-
                 sb.append( i ).append( " " ).append( a ).append( "\n" );
                 i++;
             }
             sb.append( "---------" ).append( "\n" );
         }
-        else
-        {
-            System.out.println( "NULL set of artifacts!");
-        }
-        
 
         return sb.toString();
     }
