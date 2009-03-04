@@ -83,6 +83,9 @@ END SNIPPET: ant-bootstrap -->
     <mercury:local-repository location="${maven.repo.local}"/>
     <mercury:remote-repository id="central" location="${maven.repo.central}"/>
 
+  	<property name="tsFormat" value="HH:mm:ss"/>
+  	<tstamp><format property="start.time" pattern="${tsFormat}"/></tstamp>
+
   	<!-- classpaths with default names: mercury.classpath, mercury.classpath.test, mercury.classpath.runtime -->
     <mercury:resolve-dependencies scope="compile">
       <mercury:dependency source="maven:${basedir}/dependencies.xml"/>
@@ -95,6 +98,12 @@ END SNIPPET: ant-bootstrap -->
       </mercury:exclusions>
 
     </mercury:resolve-dependencies>
+
+    <tstamp><format property="stop.time" pattern="${tsFormat}"/></tstamp>
+  	
+    <echo>===============================</echo>
+    <echo>Start ${start.time}, stop ${stop.time}</echo>
+    <echo>===============================</echo>
 
   	<delete file="${basedir}/dependencies.xml"/>
     
@@ -182,11 +191,12 @@ END SNIPPET: ant-bootstrap -->
         <include name="*/src/main/*"/>
       </dirset>
     </path>
-
+<!--
     <echo>========================================================================</echo>
     <property name="mc" refid="mercury.classpath"/>
     <echo>mercury.classpath=${mc}</echo>
     <echo>========================================================================</echo>
+-->
   	
     <mkdir dir="bootstrap/target/classes"/>
   	
