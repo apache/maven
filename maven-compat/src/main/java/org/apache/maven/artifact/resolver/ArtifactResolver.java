@@ -1,6 +1,7 @@
 package org.apache.maven.artifact.resolver;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -49,6 +50,14 @@ public interface ArtifactResolver
                                                   ArtifactRepository localRepository,
                                                   List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    // USED BY MAVEN ASSEMBLY PLUGIN
+    @Deprecated
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories,
+                                                         ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     // USED BY REMOTE RESOURCES PLUGIN
