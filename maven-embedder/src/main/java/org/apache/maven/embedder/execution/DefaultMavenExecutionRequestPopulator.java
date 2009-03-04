@@ -18,6 +18,7 @@ package org.apache.maven.embedder.execution;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.DefaultProfileManager;
@@ -224,7 +226,42 @@ public class DefaultMavenExecutionRequestPopulator
             }
         }
 
+        injectDefaultRepositories( request );
+
         processRepositoriesInSettings( request, configuration );
+    }
+
+    private void injectDefaultRepositories( MavenExecutionRequest request )
+        throws MavenEmbedderException
+    {
+        Set<String> definedRepositories = new HashSet<String>();
+        if ( request.getRemoteRepositories() != null )
+        {
+            for ( ArtifactRepository repository : request.getRemoteRepositories() )
+            {
+                definedRepositories.add( repository.getId() );
+            }
+        }
+
+        if ( !definedRepositories.contains( "central" ) )
+        {
+            Repository repo = new Repository();
+            repo.setId( "central" );
+            repo.setUrl( "http://repo1.maven.org/maven2" );
+            repo.setName( "Maven Repository Switchboard" );
+            RepositoryPolicy snapshotPolicy = new RepositoryPolicy();
+            snapshotPolicy.setEnabled( false );
+            repo.setSnapshots( snapshotPolicy );
+            try
+            {
+                ArtifactRepository ar = repositorySystem.buildArtifactRepository( repo );
+                request.addRemoteRepository( ar );
+            }
+            catch ( InvalidRepositoryException e )
+            {
+                throw new MavenEmbedderException( "Cannot create remote repository " + repo.getId(), e );
+            }
+        }
     }
 
     private void processRepositoriesInSettings( MavenExecutionRequest request, Configuration configuration )

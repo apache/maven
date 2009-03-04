@@ -208,8 +208,6 @@ END SNIPPET: ant-bootstrap -->
       <arg value="install"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
       <arg value="-Dsurefire.useFile=${surefire.useFile}"/>
-      <arg value="--global-settings"/>
-      <arg file="apache-maven/src/conf/settings.xml"/>
     </java>
   </target>
 
