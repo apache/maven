@@ -73,6 +73,9 @@ public class MavenITmng3475BaseAlignedDirTest
             assertPathEquals( testDir, "target/site", configProps.getProperty( "mapParam.reportingOutputDirectory" ) );
         }
 
+        // show that using relative paths is aligned for File configuration properties regardless
+        assertPathEquals( testDir, "target/site", configProps.getProperty( "fileParam" ) );
+
         /*
          * NOTE: The script source directory is deliberately excluded from the checks due to MNG-3741.
          */

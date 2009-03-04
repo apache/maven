@@ -60,6 +60,7 @@ under the License.
             <buildScriptSourceDirectory>${project.build.scriptSourceDirectory}</buildScriptSourceDirectory>
             <reportingOutputDirectory>${project.reporting.outputDirectory}</reportingOutputDirectory>
           </mapParam>
+          <fileParam>${project.reporting.outputDirectory}</fileParam>
         </configuration>
         <executions>
           <execution>
