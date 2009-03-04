@@ -333,6 +333,7 @@ public class DefaultArtifactResolver
             nodes.add( node );
         }
 
+        List resolutionExceptions = new ArrayList();
         try
         {
             for ( Iterator i = nodesByGroupId.values().iterator(); i.hasNext(); )
@@ -340,7 +341,7 @@ public class DefaultArtifactResolver
                 List nodes = (List) i.next();
                 resolveArtifactPool.execute( new ResolveArtifactTask( resolveArtifactPool, latch, nodes,
                                                                       localRepository, resolvedArtifacts,
-                                                                      missingArtifacts ) );
+                                                                      missingArtifacts, resolutionExceptions ) );
             }
             latch.await();
         }
@@ -348,18 +349,12 @@ public class DefaultArtifactResolver
         {
             throw new ArtifactResolutionException( "Resolution interrupted", null, e );
         }
-        catch ( RuntimeException ex )
-        {
-            if ( ex.getCause() instanceof ArtifactResolutionException )
-            {
-                throw (ArtifactResolutionException) ex.getCause();
-            }
-            else
-            {
-                throw ex;
-            }
-        } 
 
+        if ( !resolutionExceptions.isEmpty() )
+        {
+            throw (ArtifactResolutionException) resolutionExceptions.get( 0 );
+        }
+        
         if ( missingArtifacts.size() > 0 )
         {
             throw new MultipleArtifactsNotFoundException( originatingArtifact, resolvedArtifacts, missingArtifacts,
@@ -413,8 +408,11 @@ public class DefaultArtifactResolver
 
         private ThreadPoolExecutor pool;
 
+        private List resolutionExceptions;
+
         public ResolveArtifactTask( ThreadPoolExecutor pool, CountDownLatch latch, List nodes,
-                                    ArtifactRepository localRepository, List resolvedArtifacts, List missingArtifacts )
+                                    ArtifactRepository localRepository, List resolvedArtifacts, List missingArtifacts,
+                                    List resolutionExceptions )
         {
             this.nodes = nodes;
             this.localRepository = localRepository;
@@ -422,6 +420,7 @@ public class DefaultArtifactResolver
             this.missingArtifacts = missingArtifacts;
             this.latch = latch;
             this.pool = pool;
+            this.resolutionExceptions = resolutionExceptions;
         }
 
         public void run()
@@ -435,14 +434,17 @@ public class DefaultArtifactResolver
                 if ( i.hasNext() )
                 {
                     pool.execute( new ResolveArtifactTask( pool, latch, nodes, localRepository, resolvedArtifacts,
-                                                           missingArtifacts ) );
+                                                           missingArtifacts, resolutionExceptions ) );
                 }
             }
             catch ( ArtifactResolutionException e )
             {
-                throw new RuntimeException( e );
+                resolutionExceptions.add( e );
             }
-            latch.countDown();
+            finally 
+            {
+                latch.countDown();
+            }
         }
 
         private void resolveArtifact( ResolutionNode node )
@@ -466,5 +468,10 @@ public class DefaultArtifactResolver
     {
         resolveArtifactPool.setCorePoolSize( threads );
         resolveArtifactPool.setMaximumPoolSize( threads );
+    }
+
+    void setWagonManager( WagonManager wagonManager )
+    {
+        this.wagonManager = wagonManager;
     }
 }

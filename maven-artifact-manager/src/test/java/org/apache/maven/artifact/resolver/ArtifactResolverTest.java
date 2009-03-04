@@ -19,6 +19,14 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -26,12 +34,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import org.apache.maven.wagon.TransferFailedException;
+import org.easymock.MockControl;
 
 // It would be cool if there was a hook that i could use to setup a test environment.
 // I want to setup a local/remote repositories for testing but i don't want to have
@@ -46,6 +50,31 @@ import java.util.Set;
 public class ArtifactResolverTest
     extends AbstractArtifactComponentTestCase
 {
+    private static class ArtifactMetadataSourceImplementation
+        implements ArtifactMetadataSource
+    {
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                         List remoteRepositories )
+            throws ArtifactMetadataRetrievalException
+        {
+            return new ResolutionGroup( artifact, Collections.EMPTY_SET, remoteRepositories );
+        }
+
+        public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                               List remoteRepositories )
+        {
+            throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+        }
+
+        public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                   ArtifactRepository localRepository,
+                                                   List remoteRepositories )
+            throws ArtifactMetadataRetrievalException
+        {
+            return artifact;
+        }
+    }
+
     private ArtifactResolver artifactResolver;
 
     private Artifact projectArtifact;
@@ -100,7 +129,7 @@ public class ArtifactResolverTest
 
         Artifact h = createLocalArtifact( "h", "1.0" );
 
-        ArtifactMetadataSource mds = new ArtifactMetadataSource()
+        ArtifactMetadataSource mds = new ArtifactMetadataSourceImplementation()
         {
             public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
                                              List remoteRepositories )
@@ -123,20 +152,6 @@ public class ArtifactResolverTest
                 }
 
                 return new ResolutionGroup( artifact, dependencies, remoteRepositories );
-            }
-
-            public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                                   List remoteRepositories )
-            {
-                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
-            }
-
-            public Artifact retrieveRelocatedArtifact( Artifact artifact,
-                                                       ArtifactRepository localRepository,
-                                                       List remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                return artifact;
             }
         };
 
@@ -164,7 +179,7 @@ public class ArtifactResolverTest
         Artifact j = createRemoteArtifact( "j", "1.0" );
         deleteLocalArtifact( j );
 
-        ArtifactMetadataSource mds = new ArtifactMetadataSource()
+        ArtifactMetadataSource mds = new ArtifactMetadataSourceImplementation()
         {
             public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
                                              List remoteRepositories )
@@ -187,20 +202,6 @@ public class ArtifactResolverTest
                 }
 
                 return new ResolutionGroup( artifact, dependencies, remoteRepositories );
-            }
-
-            public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                                   List remoteRepositories )
-            {
-                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
-            }
-
-            public Artifact retrieveRelocatedArtifact( Artifact artifact,
-                                                       ArtifactRepository localRepository,
-                                                       List remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                return artifact;
             }
         };
 
@@ -287,5 +288,78 @@ public class ArtifactResolverTest
      }
      */
 
+    public void testResolutionFailureWhenMultipleArtifactsNotPresentInRemoteRepository()
+        throws Exception
+    {
+        Artifact i = createArtifact( "i", "1.0" );
+        Artifact n = createArtifact( "n", "1.0" );
+        Artifact o = createArtifact( "o", "1.0" );
+    
+        try
+        {
+            ArtifactMetadataSource mds = new ArtifactMetadataSourceImplementation();
+            artifactResolver.resolveTransitively( new HashSet( Arrays.asList( new Artifact[] { i, n, o } ) ),
+                                                  projectArtifact, remoteRepositories(), localRepository(), mds );
+            fail( "Resolution succeeded when it should have failed" );
+        }
+        catch ( MultipleArtifactsNotFoundException expected )
+        {
+            List repos = expected.getRemoteRepositories();
+            assertEquals( 1, repos.size() );
+            assertEquals( "test", ( (ArtifactRepository) repos.get( 0 ) ).getId() );
+            
+            List missingArtifacts = expected.getMissingArtifacts();
+            assertEquals( 2, missingArtifacts.size() );
+            assertTrue( missingArtifacts.contains( n ) );
+            assertTrue( missingArtifacts.contains( o ) );
+            assertFalse( missingArtifacts.contains( i ) );
+        }
+    }
+
+    /**
+     * Test deadlocking (which occurs even with a single artifact in error).
+     */
+    public void testResolveWithException()
+        throws Exception
+    {
+        ArtifactRepository repository = remoteRepository();
+        List remoteRepositories = Collections.singletonList( repository );
+
+        Artifact a1 = createArtifact( "testGroup", "artifactId", "1.0", "jar" );
+
+        ArtifactMetadataSource mds = new ArtifactMetadataSourceImplementation();
+
+        DefaultArtifactResolver artifactResolver = (DefaultArtifactResolver) this.artifactResolver;
+
+        MockControl control = MockControl.createControl( WagonManager.class );
+        WagonManager wagonManager = (WagonManager) control.getMock();
+        artifactResolver.setWagonManager( wagonManager );
+
+        wagonManager.isOnline();
+        control.setReturnValue( true );
+        wagonManager.getArtifact( a1, remoteRepositories );
+        control.setThrowable( new TransferFailedException( "message" ) );
+        wagonManager.getMirrorRepository( repository );
+        control.setReturnValue( repository );
+
+        control.replay();
+
+        try
+        {
+            artifactResolver.resolveTransitively( new LinkedHashSet( Arrays.asList( new Artifact[] { a1 } ) ),
+                                                  projectArtifact, remoteRepositories, localRepository(), mds );
+            fail( "Resolution succeeded when it should have failed" );
+        }
+        catch ( ArtifactResolutionException expected )
+        {
+            List repos = expected.getRemoteRepositories();
+            assertEquals( 1, repos.size() );
+            assertEquals( "test", ( (ArtifactRepository) repos.get( 0 ) ).getId() );
+
+            assertEquals( "testGroup", expected.getGroupId() );
+        }
+
+        control.verify();
+    }
 }
 
