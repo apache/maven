@@ -149,26 +149,6 @@ public interface ProjectErrorReporter
                                                 Repository repo,
                                                 InvalidRepositoryException cause );
 
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * ...
-     * --&gt; DefaultMavenProjectBuilder.buildFromRepository(..)
-     *  DefaultMavenProjectBuilder.build(..)
-     * --&gt; DefaultMavenProjectBuilder.buildFromSourceFileInternal(..) (private)
-     *     --&gt; DefaultMavenProjectBuilder.buildInternal(..) (private)
-     *         --&gt; DefaultMavenProjectBuilder.processProjectLogic(..) (private)
-     *             --&gt; DefaultMavenProjectBuilder.createPluginArtifacts(..)
-     *             --&gt; DefaultMavenProjectBuilder.createReportArtifacts(..)
-     *             --&gt; DefaultMavenProjectBuilder.createExtensionArtifacts(..)
-     *             &lt;-- InvalidProjectVersionException
-     * &lt;---------- ProjectBuildingException
-     * </pre>
-     */
-    void reportBadNonDependencyProjectArtifactVersion( MavenProject project,
-                                                       File pomFile,
-                                                       InvalidProjectVersionException cause );
 
     /**
      * <b>Call Stack:</b>
@@ -188,24 +168,6 @@ public interface ProjectErrorReporter
     void reportProjectValidationFailure( MavenProject project,
                                          File pomFile,
                                          InvalidProjectModelException error );
-
-    /**
-     * <b>Call Stack:</b>
-     * <br/>
-     * <pre>
-     * ...
-     * --&gt; DefaultMavenProjectBuilder.buildFromRepository(..)
-     *  DefaultMavenProjectBuilder.build(..)
-     * --&gt; DefaultMavenProjectBuilder.buildFromSourceFileInternal(..) (private)
-     *     --&gt; DefaultMavenProjectBuilder.buildInternal(..) (private)
-     *         --&gt; DefaultMavenProjectBuilder.createManagedVersionMap(..) (private)
-     *         &lt;-- InvalidDependencyVersionException
-     * &lt;---------- ProjectBuildingException
-     * </pre>
-     */
-    void reportBadManagedDependencyVersion( MavenProject projectBeingBuilt,
-                                            File pomFile,
-                                            InvalidDependencyVersionException cause );
 
     /**
      * <b>Call Stack:</b>
