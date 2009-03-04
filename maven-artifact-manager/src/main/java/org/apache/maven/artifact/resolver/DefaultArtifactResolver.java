@@ -333,7 +333,7 @@ public class DefaultArtifactResolver
             nodes.add( node );
         }
 
-        List resolutionExceptions = new ArrayList();
+        List resolutionExceptions = Collections.synchronizedList( new ArrayList() );
         try
         {
             for ( Iterator i = nodesByGroupId.values().iterator(); i.hasNext(); )
