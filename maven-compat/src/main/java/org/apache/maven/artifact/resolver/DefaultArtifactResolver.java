@@ -70,6 +70,9 @@ public class DefaultArtifactResolver
     @Requirement
     private ArtifactCollector artifactCollector;
 
+    @Requirement
+    private ResolutionErrorHandler resolutionErrorHandler;
+
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------
@@ -323,33 +326,7 @@ public class DefaultArtifactResolver
         // That's right lets just let it rip right here and send a big incomprehensible blob of text at unsuspecting
         // users. Bad dog!
 
-        // Metadata cannot be found
-
-        if ( result.hasMetadataResolutionExceptions() )
-        {
-            throw result.getMetadataResolutionException( 0 );
-        }
-
-        // Metadata cannot be retrieved
-
-        // Cyclic Dependency Error
-
-        if ( result.hasCircularDependencyExceptions() )
-        {
-            throw result.getCircularDependencyException( 0 );
-        }
-
-        // Version Range Violation
-
-        if ( result.hasVersionRangeViolations() )
-        {
-            throw result.getVersionRangeViolation( 0 );
-        }
-
-        if ( result.getMissingArtifacts().size() > 0 )
-        {
-            throw new MultipleArtifactsNotFoundException( request.getArtifact(), result.getMissingArtifacts(), request.getRemoteRepostories() );
-        }
+        resolutionErrorHandler.throwErrors( request, result );
 
         return result;
     }
