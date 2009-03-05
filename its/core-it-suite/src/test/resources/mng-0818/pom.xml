@@ -32,19 +32,6 @@ under the License.
     Test that depending on a WAR doesn't also get its dependencies transitively.
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.it0080</groupId>
