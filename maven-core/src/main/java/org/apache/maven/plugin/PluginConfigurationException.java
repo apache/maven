@@ -35,39 +35,28 @@ public class PluginConfigurationException
 
     private String originalMessage;
 
-    public PluginConfigurationException(
-                                         PluginDescriptor pluginDescriptor,
-                                         String originalMessage )
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage )
     {
         super( originalMessage );
         this.pluginDescriptor = pluginDescriptor;
         this.originalMessage = originalMessage;
     }
 
-    public PluginConfigurationException(
-                                         PluginDescriptor pluginDescriptor,
-                                         String originalMessage,
-                                         ExpressionEvaluationException cause )
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage, ExpressionEvaluationException cause )
     {
         super( cause );
         this.pluginDescriptor = pluginDescriptor;
         this.originalMessage = originalMessage;
     }
 
-    public PluginConfigurationException(
-                                        PluginDescriptor pluginDescriptor,
-                                        String originalMessage,
-                                        ComponentConfigurationException cause )
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage, ComponentConfigurationException cause )
    {
        super( cause );
        this.pluginDescriptor = pluginDescriptor;
        this.originalMessage = originalMessage;
    }
 
-    public PluginConfigurationException(
-                                        PluginDescriptor pluginDescriptor,
-                                        String originalMessage,
-                                        ComponentLookupException cause )
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage, ComponentLookupException cause )
    {
        super( cause );
        this.pluginDescriptor = pluginDescriptor;

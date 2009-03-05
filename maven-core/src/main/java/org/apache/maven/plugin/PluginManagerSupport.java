@@ -14,15 +14,10 @@ import java.util.List;
 public interface PluginManagerSupport
 {
 
-    Artifact resolvePluginArtifact( Plugin plugin,
-                                    MavenProject project,
-                                    MavenSession session )
-        throws PluginManagerException, InvalidPluginException, PluginVersionResolutionException,
-        ArtifactResolutionException, ArtifactNotFoundException;
+    Artifact resolvePluginArtifact( Plugin plugin, MavenProject project, MavenSession session )
+        throws PluginManagerException, InvalidPluginException, PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException;
 
-    MavenProject buildPluginProject( Plugin plugin,
-                                     ArtifactRepository localRepository,
-                                     List remoteRepositories )
+    MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List remoteRepositories )
         throws InvalidPluginException;
 
     /**
@@ -30,18 +25,11 @@ public interface PluginManagerSupport
      * @todo would be better to store this in the plugin descriptor, but then it won't be available to the version
      * manager which executes before the plugin is instantiated
      */
-    void checkRequiredMavenVersion( Plugin plugin,
-                                    MavenProject pluginProject,
-                                    ArtifactRepository localRepository,
-                                    List remoteRepositories )
+    void checkRequiredMavenVersion( Plugin plugin, MavenProject pluginProject, ArtifactRepository localRepository, List remoteRepositories )
         throws PluginVersionResolutionException, InvalidPluginException;
 
-    void checkPluginDependencySpec( Plugin plugin,
-                                    MavenProject pluginProject )
+    void checkPluginDependencySpec( Plugin plugin, MavenProject pluginProject )
         throws InvalidPluginException;
 
-    PluginDescriptor loadIsolatedPluginDescriptor( Plugin plugin,
-                                                   MavenProject project,
-                                                   MavenSession session );
-
+    PluginDescriptor loadIsolatedPluginDescriptor( Plugin plugin, MavenProject project, MavenSession session );
 }

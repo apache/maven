@@ -19,7 +19,6 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 

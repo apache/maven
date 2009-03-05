@@ -35,36 +35,18 @@ import org.apache.maven.reporting.MavenReport;
  */
 public interface PluginManager
 {
-    String ROLE = PluginManager.class.getName();
+    void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
+        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
 
-    void executeMojo( MavenProject project,
-                      MojoExecution execution,
-                      MavenSession session )
-        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
-        InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
+    MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
+        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException, ArtifactResolutionException;
 
-    MavenReport getReport( MavenProject project,
-                           MojoExecution mojoExecution,
-                           MavenSession session )
-        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException,
-        ArtifactResolutionException;
+    Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project );
 
-    Plugin getPluginDefinitionForPrefix( String prefix,
-                                         MavenSession session,
-                                         MavenProject project );
+    PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException;
 
-    PluginDescriptor verifyPlugin( Plugin plugin,
-                                   MavenProject project,
-                                   MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException;
-
-    PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin,
-                                         MavenProject project,
-                                         MavenSession session )
-        throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException,
-        InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException;
+    PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
+        throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException;
 
 }

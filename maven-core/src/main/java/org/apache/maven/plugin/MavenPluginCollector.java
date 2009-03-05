@@ -19,28 +19,34 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
-import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 
-import java.util.*;
-
 public class MavenPluginCollector
-    implements ComponentDiscoveryListener, LogEnabled
+    implements ComponentDiscoveryListener
 {
+    @Requirement
+    private Logger logger;
+    
     private Set pluginsInProcess = new HashSet();
 
     private Map<String, PluginDescriptor> pluginDescriptors = new HashMap();
 
     private Map pluginIdsByPrefix = new HashMap();
-
-    private Logger logger;
 
     // ----------------------------------------------------------------------
     // Mojo discovery

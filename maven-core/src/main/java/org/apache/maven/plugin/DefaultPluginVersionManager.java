@@ -126,10 +126,7 @@ public class DefaultPluginVersionManager
         return version;
     }
 
-    private String getVersionFromPluginConfig( String groupId,
-                                               String artifactId,
-                                               MavenProject project,
-                                               boolean resolveAsReportPlugin )
+    private String getVersionFromPluginConfig( String groupId, String artifactId, MavenProject project, boolean resolveAsReportPlugin )
     {
         String version = null;
 

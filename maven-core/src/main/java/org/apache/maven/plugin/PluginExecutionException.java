@@ -9,25 +9,19 @@ public class PluginExecutionException
 
     private final MojoExecution mojoExecution;
 
-    public PluginExecutionException( MojoExecution mojoExecution,
-                                     MavenProject project,
-                                     String message )
+    public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, String message )
     {
         super( mojoExecution.getMojoDescriptor(), project, message );
         this.mojoExecution = mojoExecution;
     }
 
-    public PluginExecutionException( MojoExecution mojoExecution,
-                                     MavenProject project,
-                                     MojoExecutionException cause )
+    public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, MojoExecutionException cause )
     {
         super( mojoExecution.getMojoDescriptor(), project, "Mojo execution failed.", cause );
         this.mojoExecution = mojoExecution;
     }
 
-    public PluginExecutionException( MojoExecution mojoExecution,
-                                     MavenProject project,
-                                     DuplicateArtifactAttachmentException cause )
+    public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, DuplicateArtifactAttachmentException cause )
     {
         super( mojoExecution.getMojoDescriptor(), project, "Mojo execution failed.", cause );
         this.mojoExecution = mojoExecution;
@@ -37,5 +31,4 @@ public class PluginExecutionException
     {
         return mojoExecution;
     }
-
 }

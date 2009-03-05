@@ -50,10 +50,7 @@ public class PluginManagerException
 
     private MavenProject project;
 
-    protected PluginManagerException( Plugin plugin,
-                                      String message,
-                                      MavenProject project,
-                                      Throwable cause )
+    protected PluginManagerException( Plugin plugin, String message, MavenProject project, Throwable cause )
     {
         super( message, cause );
 
@@ -63,9 +60,7 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    protected PluginManagerException( Plugin plugin,
-                                      String message,
-                                      Throwable cause )
+    protected PluginManagerException( Plugin plugin, String message, Throwable cause )
     {
         super( message, cause );
 
@@ -74,9 +69,7 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    protected PluginManagerException( MojoDescriptor mojoDescriptor,
-                                      String message,
-                                      Throwable cause )
+    protected PluginManagerException( MojoDescriptor mojoDescriptor, String message, Throwable cause )
     {
         super( message, cause );
         pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
@@ -85,9 +78,7 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    protected PluginManagerException( MojoDescriptor mojoDescriptor,
-                                      MavenProject project,
-                                      String message )
+    protected PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message )
     {
         super( message );
         this.project = project;
@@ -97,10 +88,7 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    protected PluginManagerException( MojoDescriptor mojoDescriptor,
-                                      MavenProject project,
-                                      String message,
-                                      Throwable cause )
+    protected PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message, Throwable cause )
     {
         super( message, cause );
         this.project = project;
@@ -110,8 +98,7 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    public PluginManagerException( Plugin plugin,
-                                   InvalidVersionSpecificationException cause )
+    public PluginManagerException( Plugin plugin, InvalidVersionSpecificationException cause )
     {
         super( cause );
 
@@ -120,9 +107,7 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( Plugin plugin,
-                                   String message,
-                                   PlexusConfigurationException cause )
+    public PluginManagerException( Plugin plugin, String message, PlexusConfigurationException cause )
     {
         super( message, cause );
 
@@ -131,9 +116,7 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( Plugin plugin,
-                                   String message,
-                                   ComponentRepositoryException cause )
+    public PluginManagerException( Plugin plugin, String message, ComponentRepositoryException cause )
     {
         super( message, cause );
 
@@ -142,10 +125,7 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( MojoDescriptor mojoDescriptor,
-                                   MavenProject project,
-                                   String message,
-                                   NoSuchRealmException cause )
+    public PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message, NoSuchRealmException cause )
     {
         super( message, cause );
 
@@ -156,10 +136,7 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    public PluginManagerException( MojoDescriptor mojoDescriptor,
-                                   String message,
-                                   MavenProject project,
-                                   PlexusContainerException cause )
+    public PluginManagerException( MojoDescriptor mojoDescriptor, String message, MavenProject project, PlexusContainerException cause )
     {
         super( message, cause );
 
@@ -173,9 +150,7 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    public PluginManagerException( Plugin plugin,
-                                   String message,
-                                   PlexusContainerException cause )
+    public PluginManagerException( Plugin plugin, String message, PlexusContainerException cause )
     {
         super( message, cause );
 
@@ -184,9 +159,7 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( Plugin plugin,
-                                   String message,
-                                   RealmManagementException cause )
+    public PluginManagerException( Plugin plugin, String message, RealmManagementException cause )
     {
         super( message, cause );
 
@@ -195,9 +168,7 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( Plugin plugin,
-                                   String message,
-                                   MavenProject project )
+    public PluginManagerException( Plugin plugin, String message, MavenProject project )
     {
         super( message );
 

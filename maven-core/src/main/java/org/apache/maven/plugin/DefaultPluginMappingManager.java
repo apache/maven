@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,9 +45,11 @@ import java.util.Map;
  */
 @Component(role = PluginMappingManager.class)
 public class DefaultPluginMappingManager
-    extends AbstractLogEnabled
     implements PluginMappingManager
 {
+    @Requirement
+    private Logger logger;
+    
     @Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;
 
@@ -58,7 +61,7 @@ public class DefaultPluginMappingManager
         // if not found, try from the remote repository
         if ( !pluginDefinitionsByPrefix.containsKey( pluginPrefix ) )
         {
-            getLogger().info( "Searching repository for plugin with prefix: \'" + pluginPrefix + "\'." );
+            logger.info( "Searching repository for plugin with prefix: \'" + pluginPrefix + "\'." );
 
             loadPluginMappings( groupIds, pluginRepositories, localRepository );
         }
@@ -67,7 +70,7 @@ public class DefaultPluginMappingManager
 
         if ( result == null )
         {
-            getLogger().debug( "Failed to resolve plugin from prefix: " + pluginPrefix, new Throwable() );
+            logger.debug( "Failed to resolve plugin from prefix: " + pluginPrefix, new Throwable() );
         }
 
         return result;
@@ -90,16 +93,16 @@ public class DefaultPluginMappingManager
         for ( Iterator it = pluginGroupIds.iterator(); it.hasNext(); )
         {
             String groupId = (String) it.next();
-            getLogger().debug( "Loading plugin prefixes from group: " + groupId );
+            logger.debug( "Loading plugin prefixes from group: " + groupId );
             try
             {
                 loadPluginMappings( groupId, pluginRepositories, localRepository );
             }
             catch ( RepositoryMetadataResolutionException e )
             {
-                getLogger().warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
+                logger.warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
 
-                getLogger().debug( "Error resolving plugin-mapping metadata for groupId: " + groupId + ".", e );
+                logger.debug( "Error resolving plugin-mapping metadata for groupId: " + groupId + ".", e );
             }
         }
     }
@@ -109,7 +112,7 @@ public class DefaultPluginMappingManager
     {
         RepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
 
-        getLogger().debug( "Checking repositories:\n" + pluginRepositories + "\n\nfor plugin prefix metadata: " + groupId );
+        logger.debug( "Checking repositories:\n" + pluginRepositories + "\n\nfor plugin prefix metadata: " + groupId );
         repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
 
         Metadata repoMetadata = metadata.getMetadata();
@@ -118,7 +121,7 @@ public class DefaultPluginMappingManager
             for ( Iterator pluginIterator = repoMetadata.getPlugins().iterator(); pluginIterator.hasNext(); )
             {
                 Plugin mapping = (Plugin) pluginIterator.next();
-                getLogger().debug( "Found plugin: " + mapping.getName() + " with prefix: " + mapping.getPrefix() );
+                logger.debug( "Found plugin: " + mapping.getName() + " with prefix: " + mapping.getPrefix() );
 
                 String prefix = mapping.getPrefix();
 

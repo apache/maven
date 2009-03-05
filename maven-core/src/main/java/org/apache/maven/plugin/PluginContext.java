@@ -11,5 +11,4 @@ public interface PluginContext {
     Object getMojoParameterFor(MojoExecution mojoExecution, String xPath) throws Exception;
 
     void executeMojo(MojoExecution mojoExecution, MavenSession session) throws Exception;
-
 }

@@ -31,6 +31,5 @@ import java.util.List;
  */
 public interface PluginMappingManager
 {
-    Plugin getByPrefix( String pluginPrefix, List groupIds, List pluginRepositories,
-                        ArtifactRepository localRepository );
+    Plugin getByPrefix( String pluginPrefix, List groupIds, List pluginRepositories, ArtifactRepository localRepository );
 }
