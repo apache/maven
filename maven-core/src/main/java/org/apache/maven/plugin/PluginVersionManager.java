@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.version;
+package org.apache.maven.plugin;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,29 +19,17 @@ package org.apache.maven.plugin.version;
  * under the License.
  */
 
-public class PluginVersionNotFoundException
-    extends Exception
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.project.MavenProject;
+
+public interface PluginVersionManager
 {
-    private final String groupId;
+    String ROLE = PluginVersionManager.class.getName();
 
-    private final String artifactId;
+    String resolvePluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException;
 
-    public PluginVersionNotFoundException( String groupId, String artifactId )
-    {
-        super( "The plugin \'" + groupId + ":" + artifactId + "\' does not exist or no valid version could be found" );
-
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-    }
-
-    public String getGroupId()
-    {
-        return groupId;
-    }
-
-    public String getArtifactId()
-    {
-        return artifactId;
-    }
-
+    String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException;
 }

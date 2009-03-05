@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.version;
+package org.apache.maven.plugin;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

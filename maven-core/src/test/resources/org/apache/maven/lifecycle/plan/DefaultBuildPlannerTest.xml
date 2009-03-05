@@ -20,7 +20,7 @@ under the License.
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.plugin.loader.PluginLoader</role>
+      <role>org.apache.maven.plugin.PluginLoader</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.lifecycle.plan.testutils.TestPluginLoader</implementation>
     </component>

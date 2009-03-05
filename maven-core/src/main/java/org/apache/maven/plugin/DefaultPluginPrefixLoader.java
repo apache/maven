@@ -1,10 +1,7 @@
-package org.apache.maven.plugin.loader;
+package org.apache.maven.plugin;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.MavenPluginCollector;
-import org.apache.maven.plugin.PluginManagerSupport;
-import org.apache.maven.plugin.PluginMappingManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 //import org.apache.maven.settings.Settings;

@@ -3,8 +3,8 @@ package org.apache.maven.lifecycle;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.PluginConfigurationException;
+import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 

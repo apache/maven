@@ -9,7 +9,7 @@
       <id>Nexus</id>
       <mirrorOf>*</mirrorOf>
       <name>Nexus</name>
-      <url>http://repository.sonatype.org:8081/content/groups/sonatype-grid</url>
+      <url>http://repository.sonatype.org/content/groups/public</url>
     </mirror>
   </mirrors>
   <profiles>

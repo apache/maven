@@ -5,10 +5,10 @@ import org.apache.maven.lifecycle.MojoBindingUtils;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.plugin.PluginLoader;
+import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.loader.PluginLoader;
-import org.apache.maven.plugin.loader.PluginLoaderException;
 import org.apache.maven.project.MavenProject;
 
 import java.util.HashMap;

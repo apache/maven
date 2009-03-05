@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.loader;
+package org.apache.maven.plugin;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;

@@ -2,7 +2,7 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.InvalidTaskException;
 import org.apache.maven.plugin.InvalidPluginException;
-import org.apache.maven.plugin.loader.PluginLoaderException;
+import org.apache.maven.plugin.PluginLoaderException;
 
 /** @author Jason van Zyl */
 public class TaskValidationResult

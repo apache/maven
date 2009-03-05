@@ -62,9 +62,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.apache.maven.plugin.version.PluginVersionManager;
-import org.apache.maven.plugin.version.PluginVersionNotFoundException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -187,9 +184,7 @@ public class DefaultPluginManager
         if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
         {
             logger.debug( "Resolving version for plugin: " + plugin.getKey() );
-            pluginVersion = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(),
-                                                                        plugin.getArtifactId(),
-                                                                        project, session );
+            pluginVersion = pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, session );
             plugin.setVersion( pluginVersion );
 
             logger.debug( "Resolved to version: " + pluginVersion );
@@ -198,12 +193,8 @@ public class DefaultPluginManager
         return verifyVersionedPlugin( plugin, project, session );
     }
 
-    private PluginDescriptor verifyVersionedPlugin( Plugin plugin,
-                                                    MavenProject project,
-                                                    MavenSession session )
-        throws PluginVersionResolutionException, ArtifactNotFoundException,
-        ArtifactResolutionException, InvalidPluginException,
-        PluginManagerException, PluginNotFoundException
+    private PluginDescriptor verifyVersionedPlugin( Plugin plugin, MavenProject project, MavenSession session )
+        throws PluginVersionResolutionException, ArtifactNotFoundException, ArtifactResolutionException, InvalidPluginException, PluginManagerException, PluginNotFoundException
     {
         logger.debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
 
@@ -224,9 +215,7 @@ public class DefaultPluginManager
             }
             else
             {
-                logger.debug(
-                                   "Skipping resolution for Maven built-in plugin: "
-                                                   + plugin.getKey() );
+                logger.debug( "Skipping resolution for Maven built-in plugin: " + plugin.getKey() );
             }
 
             project.addPlugin( plugin );
@@ -243,8 +232,7 @@ public class DefaultPluginManager
             {
                 throw new PluginNotFoundException( plugin, e );
             }
-            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() )
-                      && version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
+            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) && version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
             {
                 throw new PluginNotFoundException( plugin, e );
             }
@@ -261,12 +249,8 @@ public class DefaultPluginManager
         return pluginDescriptor;
     }
 
-    protected void addPlugin( Plugin plugin,
-                              Artifact pluginArtifact,
-                              MavenProject project,
-                              MavenSession session )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException,
-        InvalidPluginException
+    protected void addPlugin( Plugin plugin, Artifact pluginArtifact, MavenProject project, MavenSession session )
+        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException
     {
         // ----------------------------------------------------------------------------
         // Get the dependencies for the Plugin
