@@ -163,7 +163,7 @@ public class MavenSession
         return request.getSettings();
     }
 
-    public List getSortedProjects()
+    public List<MavenProject> getSortedProjects()
     {
         return reactorManager.getSortedProjects();
     }

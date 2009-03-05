@@ -19,7 +19,6 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -47,13 +46,12 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 @Component(role = PluginManagerSupport.class)
 public class DefaultPluginManagerSupport
-    implements PluginManagerSupport, LogEnabled, Contextualizable
+    implements PluginManagerSupport, Contextualizable
 {
     @Requirement
     private MavenRepositorySystem repositorySystem;
@@ -70,7 +68,7 @@ public class DefaultPluginManagerSupport
     @Requirement
     private PluginVersionManager pluginVersionManager;
     
-    //@Requirement
+    @Requirement
     private Logger logger;
 
     private Context containerContext;
@@ -80,26 +78,9 @@ public class DefaultPluginManagerSupport
     {
         ArtifactRepository localRepository = session.getLocalRepository();
 
-        List remoteRepositories = new ArrayList();
+        MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
 
-        remoteRepositories.addAll( project.getRemoteArtifactRepositories() );
-
-        MavenProject pluginProject = null;
-        for(MavenProject mp : (List<MavenProject>) session.getSortedProjects())
-        {
-            if(mp.getId().equals(project.getId()))
-            {
-                pluginProject = mp;
-                break;
-            }
-        }
-
-        if(pluginProject == null)
-        {
-            pluginProject = buildPluginProject( plugin, localRepository, remoteRepositories );
-        }
-
-        checkRequiredMavenVersion( plugin, pluginProject, localRepository, remoteRepositories );
+        checkRequiredMavenVersion( plugin, pluginProject, localRepository, project.getRemoteArtifactRepositories() );
 
         checkPluginDependencySpec( plugin, pluginProject );
 
@@ -107,8 +88,10 @@ public class DefaultPluginManagerSupport
 
         pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, remoteRepositories );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
+        
         ArtifactResolutionResult result = repositorySystem.resolve( request );
+        
         resolutionErrorHandler.throwErrors( request, result );
 
         return pluginArtifact;
@@ -133,26 +116,17 @@ public class DefaultPluginManagerSupport
      * @todo would be better to store this in the plugin descriptor, but then it won't be available to the version
      * manager which executes before the plugin is instantiated
      */
-    public void checkRequiredMavenVersion( Plugin plugin,
-                                           MavenProject pluginProject,
-                                           ArtifactRepository localRepository,
-                                           List remoteRepositories )
+    public void checkRequiredMavenVersion( Plugin plugin, MavenProject pluginProject, ArtifactRepository localRepository, List remoteRepositories )
         throws PluginVersionResolutionException, InvalidPluginException
     {
         // if we don't have the required Maven version, then ignore an update
-        if ( ( pluginProject.getPrerequisites() != null )
-             && ( pluginProject.getPrerequisites().getMaven() != null ) )
+        if ( ( pluginProject.getPrerequisites() != null ) && ( pluginProject.getPrerequisites().getMaven() != null ) )
         {
-            DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion(
-                                                                                 pluginProject.getPrerequisites()
-                                                                                              .getMaven() );
+            DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
 
             if ( runtimeInformation.getApplicationInformation().getVersion().compareTo( requiredVersion ) < 0 )
             {
-                throw new PluginVersionResolutionException( plugin.getGroupId(),
-                                                            plugin.getArtifactId(),
-                                                            "Plugin requires Maven version "
-                                                                            + requiredVersion );
+                throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(), "Plugin requires Maven version " + requiredVersion );
             }
         }
     }
@@ -171,18 +145,13 @@ public class DefaultPluginManagerSupport
         }
     }
 
-    public PluginDescriptor loadIsolatedPluginDescriptor( Plugin plugin,
-                                                          MavenProject project,
-                                                          MavenSession session )
+    public PluginDescriptor loadIsolatedPluginDescriptor( Plugin plugin, MavenProject project, MavenSession session )
     {
         if ( plugin.getVersion() == null )
         {
             try
             {
-                plugin.setVersion( pluginVersionManager.resolvePluginVersion( plugin.getGroupId(),
-                                                                              plugin.getArtifactId(),
-                                                                              project,
-                                                                              session ) );
+                plugin.setVersion( pluginVersionManager.resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, session ) );
             }
             catch ( PluginVersionResolutionException e )
             {
@@ -239,11 +208,7 @@ public class DefaultPluginManagerSupport
 
         try
         {
-            List componentSetDescriptors = RealmScanningUtils.scanForComponentSetDescriptors( artifact,
-                                                                                              discoverer,
-                                                                                              containerContext,
-                                                                                              "Plugin: "
-                                                                                                              + plugin.getKey() );
+            List componentSetDescriptors = RealmScanningUtils.scanForComponentSetDescriptors( artifact, discoverer, containerContext, "Plugin: " + plugin.getKey() );
 
             if ( !componentSetDescriptors.isEmpty() )
             {
@@ -257,11 +222,6 @@ public class DefaultPluginManagerSupport
         }
 
         return null;
-    }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
     }
 
     public void contextualize( Context context )

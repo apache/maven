@@ -374,7 +374,7 @@ public class DefaultPluginManager
         }
 
         ResolutionGroup resolutionGroup;
-
+        
         try
         {
             resolutionGroup = repositorySystem.retrieve( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
@@ -407,18 +407,12 @@ public class DefaultPluginManager
 
         // followed by the plugin's default artifact set
         dependencies.addAll( resolutionGroup.getArtifacts() );
-
-        Set repositories = new LinkedHashSet();
-
-        repositories.addAll( resolutionGroup.getResolutionRepositories() );
-
-        repositories.addAll( project.getRemoteArtifactRepositories() );
         
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( pluginArtifact )
             .setArtifactDependencies( dependencies )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( repositories.isEmpty() ? Collections.EMPTY_LIST : new ArrayList( repositories ) )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( pluginManagedDependencies )
             .setFilter( filter )                
             .setMetadataSource( repositorySystem );        
@@ -449,12 +443,8 @@ public class DefaultPluginManager
     // Mojo execution
     // ----------------------------------------------------------------------
 
-    public void executeMojo( MavenProject project,
-                             MojoExecution mojoExecution,
-                             MavenSession session )
-        throws ArtifactResolutionException, MojoFailureException,
-        ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException,
-        PluginConfigurationException
+    public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
+        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -462,19 +452,13 @@ public class DefaultPluginManager
         // anything that wants to execute a mojo.
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
-            throw new PluginExecutionException( mojoExecution, project,
-                                              "Cannot execute mojo: "
-                                                              + mojoDescriptor.getGoal()
-                                                              + ". It requires a project with an existing pom.xml, but the build is not using one." );
+            throw new PluginExecutionException( mojoExecution, project, "Cannot execute mojo: " + mojoDescriptor.getGoal() + ". It requires a project with an existing pom.xml, but the build is not using one." );
         }
 
         if ( mojoDescriptor.isOnlineRequired() && session.isOffline() )
         {
             // TODO: Should we error out, or simply warn and skip??
-            throw new PluginExecutionException( mojoExecution, project,
-                                              "Mojo: "
-                                                              + mojoDescriptor.getGoal()
-                                                              + " requires online mode for execution. Maven is currently offline." );
+            throw new PluginExecutionException( mojoExecution, project, "Mojo: " + mojoDescriptor.getGoal() + " requires online mode for execution. Maven is currently offline." );
         }
 
         if ( mojoDescriptor.getDeprecated() != null )
@@ -488,7 +472,7 @@ public class DefaultPluginManager
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {
-            Collection projects;
+            Collection<MavenProject> projects;
 
             if ( mojoDescriptor.isAggregator() )
             {

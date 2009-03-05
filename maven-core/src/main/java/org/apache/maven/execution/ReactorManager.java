@@ -155,7 +155,7 @@ public class ReactorManager
         return sorter.hasMultipleProjects();
     }
 
-    public List getSortedProjects()
+    public List<MavenProject> getSortedProjects()
     {
         return sorter.getSortedProjects();
     }
@@ -194,7 +194,7 @@ public class ReactorManager
     {
         private final DAG dag;
 
-        private final List sortedProjects;
+        private final List<MavenProject> sortedProjects;
 
         private MavenProject topLevelProject;
 
@@ -221,7 +221,7 @@ public class ReactorManager
         // In this case, both the verify and the report goals are called
         // in a different lifecycle. Though the compiler-plugin has a valid usecase, although
         // that seems to work fine. We need to take versions and lifecycle into account.
-        public ProjectSorter( List projects )
+        public ProjectSorter( List<MavenProject> projects )
             throws CycleDetectedException, DuplicateProjectException
         {
             dag = new DAG();
@@ -380,7 +380,7 @@ public class ReactorManager
             return topLevelProject;
         }
 
-        public List getSortedProjects()
+        public List<MavenProject> getSortedProjects()
         {
             return sortedProjects;
         }
