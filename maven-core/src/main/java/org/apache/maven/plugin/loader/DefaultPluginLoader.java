@@ -17,7 +17,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -29,11 +28,12 @@ import org.codehaus.plexus.logging.Logger;
  */
 @Component(role = PluginLoader.class)
 public class DefaultPluginLoader
-    implements PluginLoader, LogEnabled
+    implements PluginLoader
 {
     @Requirement
     private PluginManager pluginManager;
 
+    @Requirement
     private Logger logger;
 
     /**

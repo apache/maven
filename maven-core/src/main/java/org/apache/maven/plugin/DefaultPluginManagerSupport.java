@@ -127,8 +127,7 @@ public class DefaultPluginManagerSupport
         }
         catch ( ProjectBuildingException e )
         {
-            throw new InvalidPluginException( "Unable to build project for plugin '"
-                                              + plugin.getKey() + "': " + e.getMessage(), e );
+            throw new InvalidPluginException( "Unable to build project for plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
         }
     }
 

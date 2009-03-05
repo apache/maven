@@ -28,10 +28,11 @@ public interface ArtifactRepositoryLayout
 {
     String ROLE = ArtifactRepositoryLayout.class.getName();
 
+    String getId();
+    
     String pathOf( Artifact artifact );
 
-    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
-                                          ArtifactRepository repository );
+    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
 
     String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata );
 }

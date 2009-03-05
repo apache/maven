@@ -43,7 +43,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Relocation;
-import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -354,9 +353,9 @@ public class MavenMetadataSource
                 }
             }
 
-            List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
+            //List repositories = aggregateRepositoryLists( remoteRepositories, project.getRemoteArtifactRepositories() );
 
-            result = new ResolutionGroup( pomArtifact, artifacts, repositories );
+            result = new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
         }
 
         return result;
@@ -389,6 +388,7 @@ public class MavenMetadataSource
         }
     }
 
+    /*
     private List aggregateRepositoryLists( List remoteRepositories, List remoteArtifactRepositories )
         throws ArtifactMetadataRetrievalException
     {
@@ -445,6 +445,7 @@ public class MavenMetadataSource
 
         return repositories;
     }
+    */
 
     public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
                                                             List<ArtifactRepository> remoteRepositories )

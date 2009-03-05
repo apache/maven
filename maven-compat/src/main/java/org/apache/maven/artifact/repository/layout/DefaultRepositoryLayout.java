@@ -38,6 +38,11 @@ public class DefaultRepositoryLayout
 
     private static final char ARTIFACT_SEPARATOR = '-';
 
+    public String getId()
+    {
+        return "default";
+    }
+    
     public String pathOf( Artifact artifact )
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();

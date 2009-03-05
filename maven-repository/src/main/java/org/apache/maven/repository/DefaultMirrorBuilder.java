@@ -75,7 +75,6 @@ public class DefaultMirrorBuilder
                     }
                 }
             }
-
         }
         
         return selectedMirror;
@@ -102,9 +101,7 @@ public class DefaultMirrorBuilder
             }
 
             logger.debug( "Using mirror: " + mirror.getId() + " for repository: " + repository.getId() + "\n(mirror url: " + mirror.getUrl() + ")" );
-            repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
-                                                                     repository.getLayout(), repository.getSnapshots(),
-                                                                     repository.getReleases() );
+            repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(), repository.getLayout(), repository.getSnapshots(), repository.getReleases() );
         }
         return repository;
     }    

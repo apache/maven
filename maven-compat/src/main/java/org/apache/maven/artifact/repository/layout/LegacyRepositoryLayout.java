@@ -34,6 +34,11 @@ public class LegacyRepositoryLayout
 {
     private static final String PATH_SEPARATOR = "/";
 
+    public String getId()
+    {
+        return "legacy";
+    }
+    
     public String pathOf( Artifact artifact )
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();

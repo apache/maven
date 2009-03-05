@@ -487,6 +487,11 @@ public class DefaultWagonManagerTest
     private final class ArtifactRepositoryLayoutStub
         implements ArtifactRepositoryLayout
     {
+        public String getId()
+        {
+            return "test";
+        }
+        
         public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
         {
             return "path";

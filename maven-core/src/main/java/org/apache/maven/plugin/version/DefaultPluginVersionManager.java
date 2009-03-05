@@ -59,29 +59,19 @@ public class DefaultPluginVersionManager
     @Requirement
     private RuntimeInformation runtimeInformation;
 
-    public String resolvePluginVersion( String groupId,
-                                        String artifactId,
-                                        MavenProject project,
-                                        MavenSession session )
+    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
         return resolvePluginVersion( groupId, artifactId, project, session.getLocalRepository(), false );
     }
 
-    public String resolveReportPluginVersion( String groupId,
-                                              String artifactId,
-                                              MavenProject project,
-                                              MavenSession session )
+    public String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
         return resolvePluginVersion( groupId, artifactId, project, session.getLocalRepository(), true );
     }
 
-    private String resolvePluginVersion( String groupId,
-                                         String artifactId,
-                                         MavenProject project,
-                                         ArtifactRepository localRepository,
-                                         boolean resolveAsReportPlugin )
+    private String resolvePluginVersion( String groupId, String artifactId, MavenProject project, ArtifactRepository localRepository, boolean resolveAsReportPlugin )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.

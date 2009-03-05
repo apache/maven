@@ -29,6 +29,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
@@ -325,9 +326,16 @@ public class DefaultMavenExecutionRequestPopulator
             {                
                 // Check to see if we have a valid mirror for this repository
                 ArtifactRepository mirror = repositorySystem.getMirror( repository );
-                
+                                                
                 if ( mirror != null )
                 {
+                    // Make sure that we take the the properties of the repository we are mirroring we want to direct
+                    // all requests for this mirror at the mirror, but the mirror specification does not allow for
+                    // any of the regular settings.
+                    mirror.setLayout( repository.getLayout() );
+                    mirror.setSnapshotUpdatePolicy( repository.getSnapshots() );
+                    mirror.setReleaseUpdatePolicy( repository.getReleases() );                
+                    
                     // If there is a valid mirror for this repository then we'll enter the mirror as a replacement for this repository.
                     remoteRepositoriesWithMirrors.add( mirror );
                 }

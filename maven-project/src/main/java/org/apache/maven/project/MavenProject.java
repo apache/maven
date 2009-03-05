@@ -243,6 +243,9 @@ public class MavenProject
             }
         }
 
+        setRemoteArtifactRepositories( projectBuilderConfiguration.getRemoteRepositories() );
+        
+        /*
         try
         {
             Set<Repository> repoSet = new LinkedHashSet<Repository>();
@@ -262,6 +265,7 @@ public class MavenProject
         {
             e.printStackTrace();
         }
+        */
     }
 
     /**

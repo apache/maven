@@ -20,6 +20,11 @@ public class FlatRepositoryLayout
 
     private static final char GROUP_SEPARATOR = '.';
 
+    public String getId()
+    {
+        return "flat";
+    }
+    
     public String pathOf( Artifact artifact )
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();

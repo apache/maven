@@ -52,9 +52,7 @@ public class DefaultArtifactRepository
      * @param url    the URL of the repository
      * @param layout the layout of the repository
      */
-    public DefaultArtifactRepository( String id,
-                                      String url,
-                                      ArtifactRepositoryLayout layout )
+    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
     {
         this( id, url, layout, null, null );
     }
@@ -67,10 +65,7 @@ public class DefaultArtifactRepository
      * @param layout        the layout of the repository
      * @param uniqueVersion whether to assign each snapshot a unique version
      */
-    public DefaultArtifactRepository( String id,
-                                      String url,
-                                      ArtifactRepositoryLayout layout,
-                                      boolean uniqueVersion )
+    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, boolean uniqueVersion )
     {
         super( id, url );
         this.layout = layout;
@@ -86,11 +81,7 @@ public class DefaultArtifactRepository
      * @param snapshots the policies to use for snapshots
      * @param releases  the policies to use for releases
      */
-    public DefaultArtifactRepository( String id,
-                                      String url,
-                                      ArtifactRepositoryLayout layout,
-                                      ArtifactRepositoryPolicy snapshots,
-                                      ArtifactRepositoryPolicy releases )
+    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
     {
         super( id, url );
 
@@ -129,17 +120,27 @@ public class DefaultArtifactRepository
         return layout.pathOfLocalRepositoryMetadata( metadata, repository );
     }
 
+    public void setLayout( ArtifactRepositoryLayout layout )
+    {
+        this.layout = layout;
+    }
+    
     public ArtifactRepositoryLayout getLayout()
     {
         return layout;
     }
 
+    public void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy snapshots )
+    {
+        this.snapshots = snapshots;
+    }
+    
     public ArtifactRepositoryPolicy getSnapshots()
     {
         return snapshots;
     }
 
-    public void setReleases( ArtifactRepositoryPolicy releases )
+    public void setReleaseUpdatePolicy( ArtifactRepositoryPolicy releases )
     {
         this.releases = releases;
     }
@@ -167,5 +168,18 @@ public class DefaultArtifactRepository
     public void setBlacklisted( boolean blacklisted )
     {
         this.blacklisted = blacklisted;
+    }
+    
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        
+        sb.append( "             id: " + getId() ).append(  "\n" );
+        sb.append( "            url: " + getUrl() ).append(  "\n" );
+        sb.append( "         layout: " + layout.getId() ).append(  "\n" );
+        sb.append( "snapshot policy: [update => " + snapshots.getUpdatePolicy() ).append(  " ]\n" );
+        sb.append( " release policy: [update => " + releases.getUpdatePolicy() ).append(  " ]\n" );        
+        
+        return sb.toString();
     }
 }

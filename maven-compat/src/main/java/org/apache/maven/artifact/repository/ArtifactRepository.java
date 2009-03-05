@@ -35,8 +35,7 @@ public interface ArtifactRepository
 
     String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata );
 
-    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
-                                          ArtifactRepository repository );
+    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
 
     String getUrl();
 
@@ -47,11 +46,14 @@ public interface ArtifactRepository
     String getId();
 
     ArtifactRepositoryPolicy getSnapshots();
-
+    void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy );
+    
     ArtifactRepositoryPolicy getReleases();
-
+    void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy );
+    
     ArtifactRepositoryLayout getLayout();
-
+    void setLayout( ArtifactRepositoryLayout layout );
+    
     String getKey();
 
     boolean isUniqueVersion();
