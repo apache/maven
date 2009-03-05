@@ -32,19 +32,6 @@ under the License.
     fields in case the field type is both provided by a plugin dependency and by a build extension. 
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <build>
     <extensions>
       <!-- load component api and implementation into core/extension realm -->
