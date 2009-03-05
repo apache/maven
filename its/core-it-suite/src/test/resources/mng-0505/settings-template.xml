@@ -20,15 +20,25 @@ under the License.
 -->
 
 <settings>
-  <!--
-  Make sure the test queries only the test repo.
-  -->
-  <mirrors>
-    <mirror>
-      <id>mng-0505</id>
-      <name>mng-0505</name>
-      <url>@baseurl@/target/null</url>
-      <mirrorOf>central</mirrorOf>
-    </mirror>
-  </mirrors>
+  <profiles>
+    <profile>
+      <id>maven-core-it-repo</id>
+      <repositories>
+        <repository>
+          <!-- NOTE: Override central to make sure the test queries only the test repo -->
+          <id>central</id>
+          <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>maven-core-it-repo</activeProfile>
+  </activeProfiles>
 </settings>

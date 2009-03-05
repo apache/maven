@@ -31,19 +31,6 @@ under the License.
     Test version range support.
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng0505</groupId>
