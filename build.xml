@@ -89,8 +89,13 @@ END SNIPPET: ant-bootstrap -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
       <localRepository path="${maven.repo.local}"/>
       <!-- TODO: remove when Modello 1.0.1 is released -->
-      <remoteRepository url="http://repo1.maven.org/" id="central"/>
-      <remoteRepository url="http://snapshots.repository.codehaus.org/" id="codehaus.snapshots">
+      <remoteRepository url="http://repo1.maven.org/"/>
+      <remoteRepository url="http://snapshots.repository.codehaus.org/">
+        <snapshots enabled="true"/>
+        <releases enabled="false"/>
+      </remoteRepository>
+      <!-- TODO: remove when model-builder:1.4 is released -->
+      <remoteRepository url="http://repository.sonatype.org/content/repositories/snapshots">
         <snapshots enabled="true"/>
         <releases enabled="false"/>
       </remoteRepository>
@@ -204,6 +209,7 @@ END SNIPPET: ant-bootstrap -->
       <classpath refid="maven.classpath"/>
       <arg value="-e"/>
       <arg value="-B"/>
+      <arg value="-s ${basedir}/settings-booty.xml"/>
       <arg value="clean"/>
       <arg value="install"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
