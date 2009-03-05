@@ -105,7 +105,7 @@ public class DefaultMirrorBuilder
                     
                     // I would like a mirrored repository to be visually different but we'll put another field
                     // in the repository as changing the ID hoses up authentication.
-                    //repository.setId( repository.getId() + "-" + mirror.getId() );
+                    repository.setId( mirror.getId() );
                 }
             }
         }
