@@ -131,14 +131,14 @@ public class DefaultMavenProjectBuilder
         return build( project, configuration );
     }
 
-    public MavenProject build( File projectDescriptor, ProjectBuilderConfiguration config )
+    public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-        MavenProject project = readModelFromLocalPath( "unknown", projectDescriptor, config.getLocalRepository(), config.getRemoteRepositories(), config );
+        MavenProject project = readModelFromLocalPath( "unknown", pomFile, configuration.getLocalRepository(), configuration.getRemoteRepositories(), configuration );
 
-        project.setFile( projectDescriptor );
+        project.setFile( pomFile );
 
-        project = buildWithProfiles( project.getModel(), config, projectDescriptor, project.getParentFile() );
+        project = buildWithProfiles( project.getModel(), configuration, pomFile, project.getParentFile() );
 
         Build build = project.getBuild();
         // NOTE: setting this script-source root before path translation, because
@@ -146,7 +146,7 @@ public class DefaultMavenProjectBuilder
         project.addScriptSourceRoot( build.getScriptSourceDirectory() );
         project.addCompileSourceRoot( build.getSourceDirectory() );
         project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
-        project.setFile( projectDescriptor );
+        project.setFile( pomFile );
 
         setBuildOutputDirectoryOnParent( project );
 
@@ -271,11 +271,6 @@ public class DefaultMavenProjectBuilder
         project.setArtifacts( result.getArtifacts() );
 
         return new MavenProjectBuildingResult( project, result );
-    }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
     }
 
     private MavenProject buildWithProfiles( Model model, ProjectBuilderConfiguration config, File projectDescriptor, File parentDescriptor )
