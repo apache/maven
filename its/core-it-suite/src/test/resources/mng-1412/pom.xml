@@ -31,19 +31,6 @@ under the License.
     Check that dependencies are available in classpath in same order as declared in POM.
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <dependencies>
     <!-- model dependencies first, in the order given -->
     <dependency>
