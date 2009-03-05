@@ -117,20 +117,4 @@ public class MavenPluginCollector
 
         return result;
     }
-
-    protected Logger getLogger()
-    {
-        if ( logger == null )
-        {
-            logger = new ConsoleLogger( Logger.LEVEL_INFO, "internal" );
-        }
-
-        return logger;
-    }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
-    }
-
 }
