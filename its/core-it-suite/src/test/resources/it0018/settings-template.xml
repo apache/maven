@@ -19,26 +19,25 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project>
-  <modelVersion>4.0.0</modelVersion>
-
-  <groupId>org.apache.maven.its.it0018</groupId>
-  <artifactId>maven-it-it0018</artifactId>
-  <version>1.0</version>
-
-  <name>Maven Integration Test :: it0018</name> 
-  <description>
-    Ensure that managed dependencies for dependency POMs are calculated
-    correctly when resolved. Removes managed-dep-1.0.3 and checks it is
-    redownloaded.
-  </description>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.its.it0018</groupId>
-      <artifactId>sub-project</artifactId>
-      <version>1</version>
-    </dependency>
-  </dependencies>
-
-</project>
+<settings>
+  <profiles>
+    <profile>
+      <id>maven-core-it-repo</id>
+      <repositories>
+        <repository>
+          <id>maven-core-it</id>
+          <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>maven-core-it-repo</activeProfile>
+  </activeProfiles>
+</settings>
