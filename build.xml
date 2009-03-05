@@ -204,6 +204,7 @@ END SNIPPET: ant-bootstrap -->
       <classpath refid="maven.classpath"/>
       <arg value="-e"/>
       <arg value="-B"/>
+      <arg value="-X"/>
       <arg value="clean"/>
       <arg value="install"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
