@@ -64,7 +64,10 @@ END SNIPPET: ant-bootstrap -->
     <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
   	<property name="maven.repo.local"   value="${user.home}/.m2/repository"/>
-    <property name="maven.repo.central" value="http://repository.sonatype.org/content/groups/public"/>  	
+    <property name="maven.repo.central" value="http://repository.sonatype.org/content/groups/public"/>
+<!--
+    <property name="maven.repo.central" value="http://repo1.maven.org/maven2"/>
+-->   
     <property name="surefire.useFile" value="true"/>    
     <echo>maven.home = ${maven.home}</echo>
   </target>
@@ -101,17 +104,32 @@ END SNIPPET: ant-bootstrap -->
 
     <tstamp><format property="stop.time" pattern="${tsFormat}"/></tstamp>
   	
-    <echo>===============================</echo>
-    <echo>Start ${start.time}, stop ${stop.time}</echo>
-    <echo>===============================</echo>
+    <echo>=======================================</echo>
+    <echo>Mercury: start ${start.time}, stop ${stop.time}</echo>
+    <echo>=======================================</echo>
 
   	<delete file="${basedir}/dependencies.xml"/>
+
+    <tstamp><format property="modello.start.time" pattern="${tsFormat}"/></tstamp>
     
     <!-- only one named classpath: modello.classpath -->
     <mercury:resolve-dependencies pathid="modello.classpath" scope="runtime">
       <mercury:dependency id="org.codehaus.modello:modello-maven-plugin:${pom.properties.modelloVersion}"/>
     </mercury:resolve-dependencies>
 
+  	<tstamp><format property="modello.stop.time" pattern="${tsFormat}"/></tstamp>
+    
+    <echo>=======================================</echo>
+    <echo>Modello: start ${modello.start.time}, stop ${modello.stop.time}</echo>
+    <echo>=======================================</echo>
+
+<!--
+    <echo>========================================================================</echo>
+    <property name="modello.cp" refid="modello.classpath"/>
+    <echo>modello.cp=${modello.cp}</echo>
+    <echo>========================================================================</echo>
+-->
+  	
   </target>
 
   <target name="process-classes" depends="pull" description="generates plexus component metadata.">
