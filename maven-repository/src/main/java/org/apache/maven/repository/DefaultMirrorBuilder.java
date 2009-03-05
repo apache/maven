@@ -102,7 +102,10 @@ public class DefaultMirrorBuilder
                 {       
                     // We basically just want to take the URL
                     repository.setUrl( mirror.getUrl() );
-                    repository.setId( repository.getId() + "-" + mirror.getId() );
+                    
+                    // I would like a mirrored repository to be visually different but we'll put another field
+                    // in the repository as changing the ID hoses up authentication.
+                    //repository.setId( repository.getId() + "-" + mirror.getId() );
                 }
             }
         }
