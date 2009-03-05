@@ -62,7 +62,6 @@ import org.apache.maven.plugin.PluginContext;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.PluginRepository;
 import org.apache.maven.plugin.PluginVersionNotFoundException;
 import org.apache.maven.plugin.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
@@ -143,8 +142,6 @@ public class MavenEmbedder
     private MavenExecutionRequestPopulator populator;
 
     private BuildPlanner buildPlanner;
-
-    private PluginRepository pluginRepository;
     
     // ----------------------------------------------------------------------
     // Configuration
@@ -619,8 +616,6 @@ public class MavenEmbedder
             populator = container.lookup( MavenExecutionRequestPopulator.class );
 
             buildPlanner = container.lookup( BuildPlanner.class );
-
-            pluginRepository = container.lookup( PluginRepository.class );
 
             repositoryTools = container.lookup( MavenRepositorySystem.class );
             
