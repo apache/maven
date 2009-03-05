@@ -176,7 +176,7 @@ public class DefaultArtifactRepository
         
         sb.append( "             id: " + getId() ).append(  "\n" );
         sb.append( "            url: " + getUrl() ).append(  "\n" );
-        sb.append( "         layout: " + layout != null ? layout.getId() : "none"  ).append(  "\n" );
+        sb.append( "         layout: " + ( layout != null ? layout.getId() : "none" ) ).append( "\n" );
         sb.append( "snapshot policy: [update => " + snapshots.getUpdatePolicy() ).append(  " ]\n" );
         sb.append( " release policy: [update => " + releases.getUpdatePolicy() ).append(  " ]\n" );        
         

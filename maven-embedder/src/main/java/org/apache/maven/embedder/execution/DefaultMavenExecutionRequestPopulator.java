@@ -17,10 +17,8 @@ package org.apache.maven.embedder.execution;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -29,7 +27,6 @@ import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
@@ -198,31 +195,24 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( ( settingsProfiles != null ) && !settingsProfiles.isEmpty() )
         {
-            for ( Iterator<org.apache.maven.settings.Profile> it = settings.getProfiles().iterator(); it.hasNext(); )
+            for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
             {
-                org.apache.maven.settings.Profile rawProfile = it.next();
-
                 Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
 
                 profileManager.addProfile( profile );
 
-                // We need to convert profile repositories to artifact repositories                
+                // We need to convert profile repositories to artifact repositories
 
-                for ( Iterator<Repository> j = profile.getRepositories().iterator(); j.hasNext(); )
+                for ( Repository r : profile.getRepositories() )
                 {
-                    Repository r = j.next();
-
-                    ArtifactRepository ar;
                     try
                     {
-                        ar = repositorySystem.buildArtifactRepository( r );
+                        request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
                         throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
                     }
-
-                    request.addRemoteRepository( ar );
                 }
             }
         }
@@ -282,10 +272,8 @@ public class DefaultMavenExecutionRequestPopulator
             repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
         }
 
-        for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+        for ( Server server : settings.getServers() )
         {
-            Server server = (Server) i.next();
-
             String pass;
             String phrase;
             try
@@ -303,10 +291,8 @@ public class DefaultMavenExecutionRequestPopulator
             repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
         }
 
-        for ( Iterator<Mirror> i = settings.getMirrors().iterator(); i.hasNext(); )
+        for ( Mirror mirror : settings.getMirrors() )
         {
-            Mirror mirror = i.next();
-
             repositorySystem.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
         }
 
@@ -318,7 +304,17 @@ public class DefaultMavenExecutionRequestPopulator
         //   </mirror>
         // </mirrors>        
 
+        System.out.println( "ORIGINAL REPOSITORIES" );
+        for ( ArtifactRepository repo : request.getRemoteRepositories() )
+        {
+            System.out.println( repo );
+        }
         request.setRemoteRepositories( repositorySystem.getMirrors( request.getRemoteRepositories() ) );       
+        System.out.println( "MIRRORED REPOSITORIES" );
+        for ( ArtifactRepository repo : request.getRemoteRepositories() )
+        {
+            System.out.println( repo );
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -489,38 +485,6 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    /**
-     * decrypt settings passwords and passphrases
-     * 
-     * @param settings settings to process
-     * @throws IOException
-     */
-    private void decrypt( Settings settings )
-        throws IOException
-    {
-        List<Server> servers = settings.getServers();
-
-        if ( servers != null && !servers.isEmpty() )
-        {
-            try
-            {
-                for ( Server server : servers )
-                {
-                    if ( server.getPassword() != null )
-                    {
-                        server.setPassword( securityDispatcher.decrypt( server.getPassword() ) );
-                    }
-                }
-            }
-            catch ( Exception e )
-            {
-                // 2009-02-12 Oleg: get do this because 2 levels up Exception is
-                // caught, not exception type does not matter
-                throw new IOException( e.getMessage() );
-            }
-        }
-    }
-
     public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings, Configuration configuration )
         throws MavenEmbedderException
     {
@@ -578,9 +542,8 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( ( configEventMonitors != null ) && !configEventMonitors.isEmpty() )
         {
-            for ( Iterator<EventMonitor> it = configEventMonitors.iterator(); it.hasNext(); )
+            for ( EventMonitor monitor : configEventMonitors )
             {
-                EventMonitor monitor = (EventMonitor) it.next();
                 request.addEventMonitor( monitor );
             }
         }
