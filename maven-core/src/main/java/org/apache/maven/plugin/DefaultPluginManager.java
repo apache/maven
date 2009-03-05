@@ -152,9 +152,6 @@ public class DefaultPluginManager
     private PluginManagerSupport pluginManagerSupport;
 
     @Requirement
-    private PluginRepository pluginRepository;
-
-    @Requirement
     private Logger logger;
     
     public DefaultPluginManager()

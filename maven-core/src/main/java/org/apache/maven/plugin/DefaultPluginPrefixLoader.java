@@ -16,8 +16,9 @@ import java.util.Set;
 
 @Component(role = PluginPrefixLoader.class)
 public class DefaultPluginPrefixLoader
-    implements PluginPrefixLoader, LogEnabled
+    implements PluginPrefixLoader
 {
+    @Requirement
     private Logger logger;
 
     @Requirement
@@ -41,9 +42,7 @@ public class DefaultPluginPrefixLoader
      *         and try to resolve based on that.</li>
      * </ol>
      */
-    public Plugin findPluginForPrefix( String prefix,
-                                       MavenProject project,
-                                       MavenSession session )
+    public Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         Set descriptors = pluginCollector.getPluginDescriptorsForPrefix( prefix );
@@ -60,8 +59,7 @@ public class DefaultPluginPrefixLoader
                 PluginDescriptor pd = (PluginDescriptor) it.next();
 
                 Plugin projectPlugin = (Plugin) projectPluginMap.get( pd.getPluginLookupKey() );
-                if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null )
-                     && projectPlugin.getVersion().equals( pd.getVersion() ) )
+                if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) && projectPlugin.getVersion().equals( pd.getVersion() ) )
                 {
                     pluginDescriptor = pd;
                     break;
@@ -89,9 +87,7 @@ public class DefaultPluginPrefixLoader
             plugin = new Plugin();
             plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
 
-            PluginDescriptor pluginDescriptor = pluginManagerSupport.loadIsolatedPluginDescriptor( plugin,
-                                                                                                   project,
-                                                                                                   session );
+            PluginDescriptor pluginDescriptor = pluginManagerSupport.loadIsolatedPluginDescriptor( plugin, project, session );
             plugin = toPlugin( pluginDescriptor );
         }
 
@@ -123,9 +119,7 @@ public class DefaultPluginPrefixLoader
      * Look for a plugin configured in the current project that has a prefix matching the one
      * specified. Return the {@link PluginDescriptor} if a match is found.
      */
-    private PluginDescriptor loadFromProjectForPrefixQuery( String prefix,
-                                                            MavenProject project,
-                                                            MavenSession session )
+    private PluginDescriptor loadFromProjectForPrefixQuery( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
         PluginDescriptor result = null;
@@ -152,15 +146,10 @@ public class DefaultPluginPrefixLoader
      * Look for a plugin in the pluginGroups specified in the settings.xml that has a prefix
      * matching the one specified. Return the {@link PluginDescriptor} if a match is found.
      */
-    private Plugin loadFromPrefixMapper( String prefix,
-                                         MavenProject project,
-                                         MavenSession session )
+    private Plugin loadFromPrefixMapper( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {
-        Plugin plugin = pluginMappingManager.getByPrefix( prefix,
-                                                          session.getPluginGroups(),
-                                                          project.getRemoteArtifactRepositories(),
-                                                          session.getLocalRepository() );
+        Plugin plugin = pluginMappingManager.getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
 
         if ( plugin != null )
         {
@@ -173,10 +162,4 @@ public class DefaultPluginPrefixLoader
 
         return plugin;
     }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
-    }
-
 }
