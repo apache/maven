@@ -55,6 +55,9 @@ public class MavenITmng0768OfflineModeTest
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.it0069" );
             verifier.setLogFileName( "log1.txt" );
+            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+            verifier.getCliOptions().add( "--settings" );
+            verifier.getCliOptions().add( "settings.xml" );
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
