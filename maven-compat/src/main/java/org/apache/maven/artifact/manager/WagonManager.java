@@ -26,19 +26,11 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
-import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
-import org.apache.maven.wagon.repository.RepositoryPermissions;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Manages <a href="http://maven.apache.org/wagon">Wagon</a> related operations in Maven.
@@ -114,4 +106,8 @@ public interface WagonManager
 
     // All the tests fail that are specifically look for the contents of the listener fail without this.
     void setDownloadMonitor( TransferListener listener );    
+
+    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
+                                String passphrase );
+
 }

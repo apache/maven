@@ -29,6 +29,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
@@ -68,6 +69,10 @@ import org.codehaus.plexus.util.StringUtils;
 public class LegacyMavenRepositorySystem
     implements MavenRepositorySystem
 {
+
+    @Requirement
+    private WagonManager wagonManager;
+
     @Requirement
     private ArtifactFactory artifactFactory;
 
@@ -573,7 +578,8 @@ public class LegacyMavenRepositorySystem
         proxies.put( protocol, proxyInfo );
     }
 
-    public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase )
+    public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
+                                       String passphrase )
     {
         AuthenticationInfo authInfo = new AuthenticationInfo();
         authInfo.setUserName( username );
@@ -582,6 +588,8 @@ public class LegacyMavenRepositorySystem
         authInfo.setPassphrase( passphrase );
 
         authenticationInfoMap.put( repositoryId, authInfo );
+
+        wagonManager.addAuthenticationInfo( repositoryId, username, password, privateKey, passphrase );
     }
 
     public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
