@@ -81,6 +81,13 @@ public class DefaultUpdateCheckManager
     {
         File file = artifact.getFile();
 
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                               "Determining update check for " + artifact + " (" + file + ") from " + repository
+                                   + " (enabled = " + policy.isEnabled() + ")" );
+        }
+
         if ( !policy.isEnabled() )
         {
             return false;
@@ -260,6 +267,7 @@ public class DefaultUpdateCheckManager
     {
         if ( !touchfile.canRead() )
         {
+            getLogger().debug( "Skipped unreadable touchfile " + touchfile + " for key " + key );
             return null;
         }
 
