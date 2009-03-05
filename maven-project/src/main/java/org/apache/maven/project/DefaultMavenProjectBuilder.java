@@ -74,7 +74,6 @@ import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -89,7 +88,7 @@ import org.codehaus.plexus.util.xml.pull.XmlSerializer;
  */
 @Component(role = MavenProjectBuilder.class)
 public class DefaultMavenProjectBuilder
-    implements MavenProjectBuilder, LogEnabled
+    implements MavenProjectBuilder
 {
     @Requirement
     private ModelValidator validator;
@@ -103,6 +102,7 @@ public class DefaultMavenProjectBuilder
     @Requirement
     List<ModelEventListener> listeners;
 
+    @Requirement
     private Logger logger;
 
     //DO NOT USE, it is here only for backward compatibility reasons. The existing
@@ -162,7 +162,7 @@ public class DefaultMavenProjectBuilder
         return buildFromRepository( artifact, remoteArtifactRepositories, localRepository );
     }
 
-    public MavenProject buildFromRepository( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
         MavenProject project = hm.get( artifact.getId() );
@@ -191,7 +191,9 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( artifact.getId(), "Error with repository specified in project.", e );
         }
 
-        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ).setRemoteRepositories( remoteRepositories );
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration()   
+            .setLocalRepository( localRepository )
+            .setRemoteRepositories( remoteRepositories );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), config.getLocalRepository(), remoteRepositories, config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile() );
@@ -233,10 +235,10 @@ public class DefaultMavenProjectBuilder
         return superProject;
     }
 
-    public MavenProjectBuildingResult buildProjectWithDependencies( File projectDescriptor, ProjectBuilderConfiguration config )
+    public MavenProjectBuildingResult buildProjectWithDependencies( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-        MavenProject project = build( projectDescriptor, config );
+        MavenProject project = build( pomFile, configuration );
 
         try
         {
@@ -246,14 +248,14 @@ public class DefaultMavenProjectBuilder
         {
             InvalidDependencyVersionException ee = new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
             throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(),
-                                                projectDescriptor, ee );
+                                                pomFile, ee );
         }
 
         Artifact pomArtifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-        pomArtifact.setFile( projectDescriptor );
+        pomArtifact.setFile( pomFile );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pomArtifact ).setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( config.getLocalRepository() ).setRemoteRepostories( project.getRemoteArtifactRepositories() ).setManagedVersionMap( project.getManagedVersionMap() )
+            .setLocalRepository( configuration.getLocalRepository() ).setRemoteRepostories( project.getRemoteArtifactRepositories() ).setManagedVersionMap( project.getManagedVersionMap() )
             .setMetadataSource( repositorySystem );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
@@ -263,10 +265,8 @@ public class DefaultMavenProjectBuilder
             Exception e = result.getExceptions().get( 0 );
 
             throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(),
-                                                projectDescriptor, e );
+                                                pomFile, e );
         }
-
-        System.out.println( result );
 
         project.setArtifacts( result.getArtifacts() );
 
