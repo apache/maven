@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -37,8 +36,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -97,8 +94,6 @@ public class LegacyMavenRepositorySystem
     @Requirement
     private Logger logger;
 
-    private boolean interactive = true;
-
     private TransferListener downloadMonitor;
 
     private Map<String, ProxyInfo> proxies = new HashMap<String, ProxyInfo>();
@@ -107,8 +102,6 @@ public class LegacyMavenRepositorySystem
 
     private Map<String, RepositoryPermissions> serverPermissionsMap = new HashMap<String, RepositoryPermissions>();
     
-    private static HashMap<String, Artifact> cache = new HashMap<String, Artifact>();
-
     // Artifact Creation
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
@@ -298,29 +291,6 @@ public class LegacyMavenRepositorySystem
         return artifactMetadataSource.retrieve( artifact, localRepository, remoteRepositories );
     }
 
-    // ----------------------------------------------------------------------------
-    // Code snagged from ProjectUtils: this will have to be moved somewhere else
-    // but just trying to collect it all in one place right now.
-    // ----------------------------------------------------------------------------
-
-    public List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories )
-        throws InvalidRepositoryException
-    {
-        List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
-
-        for ( Repository mavenRepo : repositories )
-        {
-            ArtifactRepository artifactRepo = buildArtifactRepository( mavenRepo );
-
-            if ( !repos.contains( artifactRepo ) )
-            {
-                repos.add( artifactRepo );
-            }
-        }
-
-        return repos;
-    }
-
     public ArtifactRepository buildArtifactRepository( Repository repo )
         throws InvalidRepositoryException
     {
@@ -444,57 +414,6 @@ public class LegacyMavenRepositorySystem
         artifactRepositoryFactory.setGlobalChecksumPolicy( policy );
     }
 
-    // Taken from RepositoryHelper
-
-    public void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
-        throws InvalidRepositoryException, ArtifactResolutionException, ArtifactNotFoundException    
-    {        
-        if ( cache.containsKey( artifact.getId() ) )
-        {
-            artifact.setFile( cache.get( artifact.getId() ).getFile() );
-        }
-        
-        // if the artifact is not a POM, we need to construct a POM artifact based on the artifact parameter given.
-        /*
-        if ( "pom".equals( artifact.getType() ) )
-        {
-            projectArtifact = artifact;
-        }
-        else
-        {
-            logger.debug( "Attempting to build MavenProject instance for Artifact (" + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ") of type: "
-                + artifact.getType() + "; constructing POM artifact instead." );
-
-            projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
-        }
-        */
-        
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, localRepository, remoteArtifactRepositories );
-        ArtifactResolutionResult result = resolve( request );
-        resolutionErrorHandler.throwErrors( request, result );
-        
-        cache.put( artifact.getId(), artifact );
-    }
-
-    private String safeVersionlessKey( String groupId, String artifactId )
-    {
-        String gid = groupId;
-
-        if ( StringUtils.isEmpty( gid ) )
-        {
-            gid = "unknown";
-        }
-
-        String aid = artifactId;
-
-        if ( StringUtils.isEmpty( aid ) )
-        {
-            aid = "unknown";
-        }
-
-        return ArtifactUtils.versionlessKey( gid, aid );
-    }
-
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {        
         return artifactResolver.resolve( request );
@@ -508,11 +427,6 @@ public class LegacyMavenRepositorySystem
     public boolean isOnline()
     {
         return artifactResolver.isOnline();
-    }
-
-    public void setInteractive( boolean interactive )
-    {
-        this.interactive = interactive;
     }
 
     public void setDownloadMonitor( TransferListener downloadMonitor )
@@ -593,11 +507,6 @@ public class LegacyMavenRepositorySystem
         mirrorBuilder.addMirror( id, mirrorOf, url );
     }
     
-    public ArtifactRepository getMirror( ArtifactRepository repository )
-    {
-        return mirrorBuilder.getMirror( repository );
-    }
-
     public List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories )
     {
         return mirrorBuilder.getMirrors( repositories );

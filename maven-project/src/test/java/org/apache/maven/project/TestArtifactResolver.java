@@ -70,8 +70,7 @@ public class TestArtifactResolver
             this.container = container;
         }
 
-        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                         List<ArtifactRepository> remoteRepositories )
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             Model model = null;
@@ -116,17 +115,7 @@ public class TestArtifactResolver
                 throw new ArtifactMetadataRetrievalException( e );
             }
 
-            List artifactRepositories;
-            try
-            {
-                artifactRepositories = repositorySystem.buildArtifactRepositories( model.getRepositories() );
-            }
-            catch ( InvalidRepositoryException e )
-            {
-                throw new ArtifactMetadataRetrievalException( e );
-            }
-
-            return new ResolutionGroup( artifact, artifacts, artifactRepositories );
+            return new ResolutionGroup( artifact, artifacts, remoteRepositories );
         }
 
         public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
@@ -163,13 +152,7 @@ public class TestArtifactResolver
                     d.setScope( scope );
                 }
                 
-                Artifact artifact = repositorySystem.createDependencyArtifact( d.getGroupId(), 
-                                                                               d.getArtifactId(),
-                                                                               d.getVersion(), 
-                                                                               d.getType(),
-                                                                               d.getClassifier(), 
-                                                                               scope,
-                                                                               inheritedScope );
+                Artifact artifact = repositorySystem.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),  d.getType(), d.getClassifier(),  scope, inheritedScope );
                 if ( artifact != null )
                 {
                     projectArtifacts.add( artifact );

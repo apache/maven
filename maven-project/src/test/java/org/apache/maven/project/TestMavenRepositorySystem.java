@@ -71,16 +71,6 @@ public class TestMavenRepositorySystem
             throw new ArtifactMetadataRetrievalException( ee );
         }
 
-        List artifactRepositories;
-        try
-        {
-            artifactRepositories = buildArtifactRepositories( model.getRepositories() );
-        }
-        catch ( InvalidRepositoryException e )
-        {
-            throw new ArtifactMetadataRetrievalException( e );
-        }
-
-        return new ResolutionGroup( artifact, artifacts, artifactRepositories );
+        return new ResolutionGroup( artifact, artifacts, remoteRepositories );
     }
 }

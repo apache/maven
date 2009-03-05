@@ -67,10 +67,6 @@ public interface MavenRepositorySystem
     // Repository creation
 
     // maven model
-    List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories )
-        throws InvalidRepositoryException;
-
-    // maven model
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
         
@@ -91,9 +87,6 @@ public interface MavenRepositorySystem
 
     // Metadata
 
-    void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
-        throws InvalidRepositoryException, ArtifactResolutionException, ArtifactNotFoundException;
-
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
@@ -113,9 +106,6 @@ public interface MavenRepositorySystem
 
     boolean isOnline();
     
-    // This doesn't belong here
-    void setInteractive( boolean interactive );
-
     void setDownloadMonitor( TransferListener downloadMonitor );
 
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
@@ -127,9 +117,6 @@ public interface MavenRepositorySystem
     // Mirrors
     
     void addMirror( String id, String mirrorOf, String url );
-    
-    ArtifactRepository getMirror( ArtifactRepository repository );
-    
-    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );
-    
+        
+    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );    
 }

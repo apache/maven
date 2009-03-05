@@ -43,6 +43,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -91,6 +92,9 @@ public class DefaultMavenProjectBuilder
     implements MavenProjectBuilder
 {
     @Requirement
+    private Logger logger;
+    
+    @Requirement
     private ModelValidator validator;
 
     @Requirement
@@ -101,9 +105,9 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     List<ModelEventListener> listeners;
-
+    
     @Requirement
-    private Logger logger;
+    private ResolutionErrorHandler resolutionErrorHandler;    
 
     //DO NOT USE, it is here only for backward compatibility reasons. The existing
     // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
@@ -172,32 +176,25 @@ public class DefaultMavenProjectBuilder
             return project;
         }
 
-        File f = ( artifact.getFile() != null ) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, localRepository, remoteRepositories );
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+                
         try
         {
-            repositorySystem.findModelFromRepository( artifact, remoteRepositories, localRepository );
+            resolutionErrorHandler.throwErrors( request, result );
         }
         catch ( ArtifactResolutionException e )
         {
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new ProjectBuildingException( artifact.getId(), "Error finding project artifact.", e );
-        }
-        catch ( InvalidRepositoryException e )
-        {
-            throw new ProjectBuildingException( artifact.getId(), "Error with repository specified in project.", e );
-        }
-
+        
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration()   
             .setLocalRepository( localRepository )
             .setRemoteRepositories( remoteRepositories );
 
         project = readModelFromLocalPath( "unknown", artifact.getFile(), config.getLocalRepository(), remoteRepositories, config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile() );
-        artifact.setFile( f );
+        artifact.setFile( artifact.getFile() );
         project.setVersion( artifact.getVersion() );
 
         hm.put( artifact.getId(), project );
@@ -424,15 +421,9 @@ public class DefaultMavenProjectBuilder
 
     }
 
-    private MavenProject readModelFromLocalPath( String projectId, File projectDescriptor, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                                 ProjectBuilderConfiguration config )
+    private MavenProject readModelFromLocalPath( String projectId, File pomFile, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        if ( projectDescriptor == null )
-        {
-            throw new IllegalArgumentException( "projectDescriptor: null, Project Id =" + projectId );
-        }
-
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
 
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
@@ -449,11 +440,11 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            mavenProject = buildFromLocalPath( projectDescriptor, interpolatorProperties, localRepository, remoteRepositories, config, this );
+            mavenProject = buildFromLocalPath( pomFile, interpolatorProperties, localRepository, remoteRepositories, config, this );
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( projectId, "File = " + projectDescriptor.getAbsolutePath(), e );
+            throw new ProjectBuildingException( projectId, "File = " + pomFile.getAbsolutePath(), e );
         }
 
         return mavenProject;
@@ -649,7 +640,6 @@ public class DefaultMavenProjectBuilder
     private static Model convertFromInputStreamToModel( InputStream inputStream )
         throws IOException
     {
-
         try
         {
             return new MavenXpp3Reader().read( ReaderFactory.newXmlReader( inputStream ) );
