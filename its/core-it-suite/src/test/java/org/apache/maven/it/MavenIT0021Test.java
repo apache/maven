@@ -45,6 +45,9 @@ public class MavenIT0021Test
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.it0021" );
         verifier.getSystemProperties().setProperty( "includeProfile", "true" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.getCliOptions().add( "-Pprofile-2" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
