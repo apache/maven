@@ -31,19 +31,6 @@ under the License.
     Verify that maven-1 POMs will be ignored but not stop the resolution process.
   </description>
 
-  <repositories>
-    <repository>
-      <id>test</id>
-      <url>file:test-repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.it0059</groupId>
