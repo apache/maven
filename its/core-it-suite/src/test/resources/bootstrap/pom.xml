@@ -35,56 +35,6 @@ under the License.
     config all around in the IT POMs.
   </description>
 
-  <!-- TODO: Remove once IT support plugins/artifacts have been released -->
-  <repositories>
-    <repository>
-      <id>maven.it</id>
-      <name>Apache Maven Integration Testing Snapshot Repository</name>
-      <url>http://repository.sonatype.org/content/repositories/maven.snapshots</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>http://repository.apache.org/snapshots</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven.it</id>
-      <name>Apache Maven Integration Testing Snapshot Repository</name>
-      <url>http://repository.sonatype.org/content/repositories/maven.snapshots</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>http://repository.apache.org/snapshots</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-
   <properties>
     <itPluginVersion>2.1-SNAPSHOT</itPluginVersion>
     <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
