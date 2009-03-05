@@ -107,9 +107,11 @@ END SNIPPET: ant-bootstrap -->
     <echo>========================================================================</echo>
     <echo>Mercury: start ${start.time}, stop ${stop.time}</echo>
     <echo>========================================================================</echo>
+<!--  	
     <property name="mc" refid="mercury.classpath"/>
     <echo>mercury.classpath=${mc}</echo>
     <echo>========================================================================</echo>
+-->
 
   	<delete file="${basedir}/dependencies.xml"/>
 
