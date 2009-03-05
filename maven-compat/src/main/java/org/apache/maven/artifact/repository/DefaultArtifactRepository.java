@@ -174,11 +174,11 @@ public class DefaultArtifactRepository
     {
         StringBuffer sb = new StringBuffer();
         
-        sb.append( "             id: " + getId() ).append(  "\n" );
-        sb.append( "            url: " + getUrl() ).append(  "\n" );
+        sb.append( "             id: " + getId() ).append( "\n" );
+        sb.append( "            url: " + getUrl() ).append( "\n" );
         sb.append( "         layout: " + ( layout != null ? layout.getId() : "none" ) ).append( "\n" );
-        sb.append( "snapshot policy: [update => " + snapshots.getUpdatePolicy() ).append(  " ]\n" );
-        sb.append( " release policy: [update => " + releases.getUpdatePolicy() ).append(  " ]\n" );        
+        sb.append( "snapshot policy: [update => " + snapshots.getUpdatePolicy() ).append( "]\n" );
+        sb.append( " release policy: [update => " + releases.getUpdatePolicy() ).append( "]\n" );
         
         return sb.toString();
     }
