@@ -34,31 +34,6 @@ under the License.
     hosts releases and a snapshot plugin might easily use a released parent.
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it-repo-0</id>
-      <url>file:///${basedir}/repo-0</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven-core-it-repo-1</id>
-      <url>file:///${basedir}/repo-1</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-
   <build>
     <plugins>
       <plugin>
