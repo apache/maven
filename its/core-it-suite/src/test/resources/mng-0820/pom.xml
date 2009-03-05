@@ -32,19 +32,6 @@ under the License.
     Verify that the collector selecting a particular version gets the correct subtree.
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <!--
   This project has the following *raw* dependency tree:
 
