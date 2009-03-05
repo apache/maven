@@ -42,9 +42,7 @@ public final class ProjectUtils
     {
     }
 
-    public static List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories,
-                                                  ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                  PlexusContainer container )
+    public static List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer container )
         throws InvalidRepositoryException
     {
 
