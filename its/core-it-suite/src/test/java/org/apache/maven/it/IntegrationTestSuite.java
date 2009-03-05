@@ -91,6 +91,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4068AuthenticatedMirrorTest.class );
         suite.addTestSuite( MavenITmng4056ClassifierBasedDepResolutionFromReactorTest.class );
         suite.addTestSuite( MavenITmng4053PluginConfigAttributesTest.class );
         suite.addTestSuite( MavenITmng4040ProfileInjectedModulesTest.class );
