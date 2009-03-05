@@ -26,7 +26,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,15 +38,11 @@ import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.errors.CoreReporterManager;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
-import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.lifecycle.LifecycleException;
 import org.apache.maven.lifecycle.LifecycleUtils;
-import org.apache.maven.lifecycle.plan.BuildPlan;
-import org.apache.maven.lifecycle.plan.BuildPlanner;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -58,7 +53,6 @@ import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.PluginContext;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -94,9 +88,7 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -129,20 +121,20 @@ public class MavenEmbedder
     // Components
     // ----------------------------------------------------------------------
 
+    private Maven maven;
+
+    private PluginManager pluginManager;
+
     private MavenProjectBuilder mavenProjectBuilder;
 
+    private MavenRepositorySystem repositorySystem;
+    
     private MavenXpp3Reader modelReader;
 
     private MavenXpp3Writer modelWriter;
-
-    private MavenRepositorySystem repositoryTools;
     
-    private Maven maven;
-
     private MavenExecutionRequestPopulator populator;
-
-    private BuildPlanner buildPlanner;
-    
+        
     // ----------------------------------------------------------------------
     // Configuration
     // ----------------------------------------------------------------------
@@ -161,8 +153,6 @@ public class MavenEmbedder
 
     private Configuration configuration;
 
-    private PluginContext pluginContext;
-
     // ----------------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------------
@@ -180,17 +170,17 @@ public class MavenEmbedder
 
     public Collection<MojoExecution> getMojoExecutionsForGoal(String goal) throws Exception
     {
-        return pluginContext.getMojoExecutionsForGoal( goal );
+        return pluginManager.getMojoExecutionsForGoal( goal );
     }
 
     public Object getMojoParameterFor(MojoExecution mojoExecution, String xPath) throws Exception
     {
-        return pluginContext.getMojoParameterFor( mojoExecution, xPath);
+        return pluginManager.getMojoParameterFor( mojoExecution, xPath);
     }
 
     public void executeMojo(MojoExecution mojoExecution, MavenSession mavenSession ) throws Exception
     {
-        pluginContext.executeMojo( mojoExecution, mavenSession );
+        pluginManager.executeMojo( mojoExecution, mavenSession );
     }
 
     // ----------------------------------------------------------------------
@@ -457,54 +447,6 @@ public class MavenEmbedder
     // Lifecycle information
     // ----------------------------------------------------------------------
 
-    public BuildPlan getBuildPlan( List goals,
-                                   MavenProject project )
-        throws MavenEmbedderException
-    {
-        return getBuildPlan( goals, project, false );
-    }
-
-    public BuildPlan getBuildPlan( List goals,
-                                   MavenProject project,
-                                   boolean allowUnbindableMojos )
-        throws MavenEmbedderException
-    {
-        MavenExecutionRequest req = DefaultMavenExecutionRequest.copy( request );
-        req.setGoals( goals );
-
-        EventDispatcher dispatcher = new DefaultEventDispatcher( req.getEventMonitors() );
-
-        ReactorManager rm;
-
-        try
-        {
-            rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
-        }
-        catch ( CycleDetectedException e )
-        {
-            // impossible, only one project.
-            throw new MavenEmbedderException( "Cycle detected in single-project reactor manager during build-plan lookup.", e );
-        }
-        catch ( DuplicateProjectException e )
-        {
-            // impossible, only one project.
-            throw new MavenEmbedderException( "Duplicate project detected in single-project reactor manager during build-plan lookup.", e );
-        }
-
-        MavenSession session = new MavenSession( container, request, dispatcher, rm );
-
-        try
-        {
-            return buildPlanner.constructBuildPlan( goals, project, session, allowUnbindableMojos );
-        }
-        catch ( LifecycleException e )
-        {
-            throw new MavenEmbedderException( "Failed to construct build-plan for project: "
-                                              + project.getId() + " using goals: '"
-                                              + StringUtils.join( goals.iterator(), ", " ) + "'", e );
-        }
-    }
-
     public List getLifecyclePhases()
     {
         return getBuildLifecyclePhases();
@@ -615,9 +557,7 @@ public class MavenEmbedder
 
             populator = container.lookup( MavenExecutionRequestPopulator.class );
 
-            buildPlanner = container.lookup( BuildPlanner.class );
-
-            repositoryTools = container.lookup( MavenRepositorySystem.class );
+            repositorySystem = container.lookup( MavenRepositorySystem.class );
             
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.

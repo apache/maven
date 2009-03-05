@@ -1,5 +1,7 @@
 package org.apache.maven.lifecycle.binding;
 
+import java.util.StringTokenizer;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
@@ -7,12 +9,10 @@ import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginLoader;
 import org.apache.maven.plugin.PluginLoaderException;
-import org.apache.maven.plugin.PluginPrefixLoader;
+import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.util.StringTokenizer;
 
 /**
  * Responsible for constructing or parsing MojoBinding instances from one of several sources, potentially
@@ -26,7 +26,7 @@ public class DefaultMojoBindingFactory
     implements MojoBindingFactory
 {
     @Requirement
-    PluginPrefixLoader pluginPrefixLoader;
+    PluginManager pluginPrefixLoader;
 
     /**
      * Parse the specified mojo string into a MojoBinding, optionally allowing plugin-prefix references.
