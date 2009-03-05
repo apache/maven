@@ -83,11 +83,11 @@ public class DefaultPluginManagerSupport
 
         MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
 
+        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion() );
+        
         checkRequiredMavenVersion( plugin, pluginProject, localRepository, project.getRemoteArtifactRepositories() );
 
         checkPluginDependencySpec( plugin, pluginProject );
-
-        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion() );
 
         pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
@@ -100,13 +100,15 @@ public class DefaultPluginManagerSupport
         return pluginArtifact;
     }
 
-    public MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List remoteRepositories )
+    public MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws InvalidPluginException
     {
         Artifact artifact = repositorySystem.createProjectArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion() );
         try
         {
-            return mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
+            MavenProject p = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
+            
+            return p;
         }
         catch ( ProjectBuildingException e )
         {

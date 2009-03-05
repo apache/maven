@@ -17,7 +17,7 @@ public interface PluginManagerSupport
     Artifact resolvePluginArtifact( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginManagerException, InvalidPluginException, PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException;
 
-    MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List remoteRepositories )
+    MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws InvalidPluginException;
 
     /**

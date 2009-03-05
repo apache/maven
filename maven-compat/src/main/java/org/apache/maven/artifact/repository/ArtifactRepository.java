@@ -38,12 +38,14 @@ public interface ArtifactRepository
     String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
 
     String getUrl();
+    void setUrl( String url );
 
     String getBasedir();
 
     String getProtocol();
 
     String getId();
+    void setId( String id );
 
     ArtifactRepositoryPolicy getSnapshots();
     void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy );

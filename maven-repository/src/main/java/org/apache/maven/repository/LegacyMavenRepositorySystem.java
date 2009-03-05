@@ -448,19 +448,14 @@ public class LegacyMavenRepositorySystem
 
     public void findModelFromRepository( Artifact artifact, List remoteArtifactRepositories, ArtifactRepository localRepository )
         throws InvalidRepositoryException, ArtifactResolutionException, ArtifactNotFoundException    
-    {
-
+    {        
         if ( cache.containsKey( artifact.getId() ) )
         {
             artifact.setFile( cache.get( artifact.getId() ).getFile() );
         }
-
-        String projectId = safeVersionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
-        remoteArtifactRepositories = normalizeToArtifactRepositories( remoteArtifactRepositories, projectId );
-
-        Artifact projectArtifact;
-
+        
         // if the artifact is not a POM, we need to construct a POM artifact based on the artifact parameter given.
+        /*
         if ( "pom".equals( artifact.getType() ) )
         {
             projectArtifact = artifact;
@@ -472,53 +467,13 @@ public class LegacyMavenRepositorySystem
 
             projectArtifact = artifactFactory.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() );
         }
-
-        ArtifactResolutionRequest request =
-            new ArtifactResolutionRequest( projectArtifact, localRepository, remoteArtifactRepositories );
+        */
+        
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, localRepository, remoteArtifactRepositories );
         ArtifactResolutionResult result = resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
-
-        File file = projectArtifact.getFile();
-        artifact.setFile( file );
+        
         cache.put( artifact.getId(), artifact );
-    }
-
-    private List normalizeToArtifactRepositories( List remoteArtifactRepositories, String projectId )
-        throws InvalidRepositoryException
-    {
-        List normalized = new ArrayList( remoteArtifactRepositories.size() );
-
-        boolean normalizationNeeded = false;
-        for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
-        {
-            Object item = it.next();
-
-            if ( item instanceof ArtifactRepository )
-            {
-                normalized.add( item );
-            }
-            else if ( item instanceof Repository )
-            {
-                Repository repo = (Repository) item;
-                item = buildArtifactRepository( repo );
-
-                normalized.add( item );
-                normalizationNeeded = true;
-            }
-            else
-            {
-                throw new InvalidRepositoryException( projectId, "Error building artifact repository from non-repository information item: " + item );
-            }
-        }
-
-        if ( normalizationNeeded )
-        {
-            return normalized;
-        }
-        else
-        {
-            return remoteArtifactRepositories;
-        }
     }
 
     private String safeVersionlessKey( String groupId, String artifactId )

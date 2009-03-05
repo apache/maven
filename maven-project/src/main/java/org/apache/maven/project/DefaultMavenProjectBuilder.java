@@ -217,21 +217,12 @@ public class DefaultMavenProjectBuilder
         {            
             return project;
         }
-        
-        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
-        try
-        {
-            artifactRepositories.addAll( repositorySystem.buildArtifactRepositories( getSuperModel().getRepositories() ) );
-        }
-        catch ( InvalidRepositoryException e )
-        {
-            throw new ProjectBuildingException( "Cannot create repositories from super model.", e.getMessage() );
-        }
-        
+                
         File f = (artifact.getFile() != null) ? artifact.getFile() : new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-        try
-        {
-            repositorySystem.findModelFromRepository( artifact, artifactRepositories, localRepository );
+        
+        try        
+        {            
+            repositorySystem.findModelFromRepository( artifact, remoteRepositories, localRepository );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -250,7 +241,8 @@ public class DefaultMavenProjectBuilder
             .setLocalRepository( localRepository )
             .setRemoteRepositories( remoteRepositories );
 
-        project = readModelFromLocalPath( "unknown", artifact.getFile(), config.getLocalRepository(), artifactRepositories, config );
+        project = readModelFromLocalPath( "unknown", artifact.getFile(), config.getLocalRepository(), remoteRepositories
+                                          , config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile() );
         artifact.setFile( f );
         project.setVersion( artifact.getVersion() );

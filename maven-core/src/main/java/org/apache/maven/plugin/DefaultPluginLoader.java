@@ -64,7 +64,7 @@ public class DefaultPluginLoader
      */
     public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException
-    {
+    {               
         if ( plugin.getGroupId() == null )
         {
             plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );

@@ -194,11 +194,7 @@ public class DefaultBuildPlanner
                                     final boolean allowUnbindableMojos )
         throws LifecyclePlannerException, LifecycleSpecificationException, LifecycleLoaderException
     {
-        PluginDescriptor pluginDescriptor = loadPluginDescriptor( mojoBinding,
-                                                                  plan,
-                                                                  project,
-                                                                  session,
-                                                                  allowUnbindableMojos );
+        PluginDescriptor pluginDescriptor = loadPluginDescriptor( mojoBinding, plan, project, session, allowUnbindableMojos );
 
         if ( pluginDescriptor == null )
         {
@@ -314,14 +310,11 @@ public class DefaultBuildPlanner
         }
     }
 
-    private PluginDescriptor loadPluginDescriptor( final MojoBinding mojoBinding,
-                                                   final BuildPlan plan,
-                                                   final MavenProject project,
-                                                   final MavenSession session,
-                                                   final boolean allowUnbindableMojos )
+    private PluginDescriptor loadPluginDescriptor( final MojoBinding mojoBinding, final BuildPlan plan, final MavenProject project, final MavenSession session, final boolean allowUnbindableMojos )
         throws LifecyclePlannerException
     {
         PluginDescriptor pluginDescriptor = null;
+        
         try
         {
             pluginDescriptor = pluginLoader.loadPlugin( mojoBinding, project, session );
@@ -330,9 +323,7 @@ public class DefaultBuildPlanner
         {
             if ( allowUnbindableMojos )
             {
-                String message = "Failed to load plugin: "
-                + MojoBindingUtils.createPluginKey( mojoBinding )
-                + ". Adding to late-bound plugins list.\nReason: " + e.getMessage();
+                String message = "Failed to load plugin: " + MojoBindingUtils.createPluginKey( mojoBinding ) + ". Adding to late-bound plugins list.\nReason: " + e.getMessage();
 
                 if ( logger.isDebugEnabled() )
                 {

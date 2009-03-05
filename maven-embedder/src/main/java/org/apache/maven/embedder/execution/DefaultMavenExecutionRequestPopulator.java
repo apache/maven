@@ -274,19 +274,20 @@ public class DefaultMavenExecutionRequestPopulator
 
         for ( Server server : settings.getServers() )
         {
-            String pass;
-            String phrase;
+            String password;
+            String passPhrase;
+            
             try
             {
-                pass = securityDispatcher.decrypt( server.getPassword() );
-                phrase = securityDispatcher.decrypt( server.getPassphrase() );
+                password = securityDispatcher.decrypt( server.getPassword() );
+                passPhrase = securityDispatcher.decrypt( server.getPassphrase() );
             }
             catch ( SecDispatcherException e )
             {
                 throw new MavenEmbedderException( "Error decrypting server password/passphrase.", e );
             }
 
-            repositorySystem.addAuthenticationInfo( server.getId(), server.getUsername(), pass, server.getPrivateKey(), phrase );
+            repositorySystem.addAuthenticationInfo( server.getId(), server.getUsername(), password, server.getPrivateKey(), passPhrase );
 
             repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
         }
