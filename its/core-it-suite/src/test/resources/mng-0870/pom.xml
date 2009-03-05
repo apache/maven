@@ -37,29 +37,4 @@ under the License.
     <module>plugin</module>
     <module>project</module>
   </modules>
-
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>@baseurl@/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven-core-it</id>
-      <url>@baseurl@/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 </project>
