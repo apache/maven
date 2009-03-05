@@ -31,7 +31,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 // This class needs to stick around because it was exposed the the remote resources plugin started using it instead of
@@ -43,7 +42,7 @@ public final class ProjectUtils
     {
     }
 
-    public static List buildArtifactRepositories( List<Repository> repositories,
+    public static List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories,
                                                   ArtifactRepositoryFactory artifactRepositoryFactory,
                                                   PlexusContainer container )
         throws InvalidRepositoryException
@@ -56,13 +55,7 @@ public final class ProjectUtils
             remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, container ) );
         }
 
-        // FIXME: remove
-        System.out.println( "REMOTE REPOSITORIES: " + remoteRepositories );
-
         remoteRepositories = rs( container ).getMirrors( remoteRepositories );
-
-        // FIXME: remove
-        System.out.println( "MIRRORED REPOSITORIES: " + remoteRepositories );
 
         return remoteRepositories;
     }
