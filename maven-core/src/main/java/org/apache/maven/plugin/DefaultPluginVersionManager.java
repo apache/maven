@@ -42,13 +42,16 @@ import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
 @Component(role = PluginVersionManager.class)
 public class DefaultPluginVersionManager
-    extends AbstractLogEnabled
     implements PluginVersionManager
 {
+    @Requirement
+    private Logger logger;
+    
     @Requirement
     private MavenRepositorySystem repositoryTools;
 	
@@ -76,7 +79,7 @@ public class DefaultPluginVersionManager
         // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
         String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
 
-        getLogger().debug( "Version from POM: " + version );
+        logger.debug( "Version from POM: " + version );
 
         // NOTE: We CANNOT check the current project version here, so delay it until later.
         // It will prevent plugins from building themselves, if they are part of the lifecycle mapping.
@@ -94,7 +97,7 @@ public class DefaultPluginVersionManager
                 }
             }
         }
-        getLogger().debug( "Version from another POM in the reactor: " + version );
+        logger.debug( "Version from another POM in the reactor: " + version );
 
         // third pass...we're always checking for latest install/deploy, so retrieve the version for LATEST metadata and
         // also set that resolved version as the <useVersion/> in settings.xml.
@@ -102,7 +105,7 @@ public class DefaultPluginVersionManager
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.LATEST_VERSION );
-            getLogger().debug( "Version from LATEST metadata: " + version );
+            logger.debug( "Version from LATEST metadata: " + version );
         }
 
         // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
@@ -111,7 +114,7 @@ public class DefaultPluginVersionManager
         {
             // 1. resolve the version to be used
             version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.RELEASE_VERSION );
-            getLogger().debug( "Version from RELEASE metadata: " + version );
+            logger.debug( "Version from RELEASE metadata: " + version );
         }
 
         // if we still haven't found a version, then fail early before we get into the update goop.
@@ -164,14 +167,10 @@ public class DefaultPluginVersionManager
         return version;
     }
 
-    private String resolveMetaVersion( String groupId,
-                                       String artifactId,
-                                       MavenProject project,
-                                       ArtifactRepository localRepository,
-                                       String metaVersionId )
+    private String resolveMetaVersion( String groupId, String artifactId, MavenProject project, ArtifactRepository localRepository, String metaVersionId )
         throws PluginVersionResolutionException, InvalidPluginException
     {
-        getLogger().info( "Attempting to resolve a version for plugin: " + groupId + ":" + artifactId + " using meta-version: " + metaVersionId  );
+        logger.info( "Attempting to resolve a version for plugin: " + groupId + ":" + artifactId + " using meta-version: " + metaVersionId  );
 
         Artifact artifact = repositoryTools.createProjectArtifact( groupId, artifactId, metaVersionId );
 
@@ -182,8 +181,7 @@ public class DefaultPluginVersionManager
         // This takes the spec version and resolves a real version
         try
         {
-            ResolutionGroup resolutionGroup =
-                repositoryTools.retrieve( artifact, localRepository, project.getRemoteArtifactRepositories() );
+            ResolutionGroup resolutionGroup = repositoryTools.retrieve( artifact, localRepository, project.getRemoteArtifactRepositories() );
 
             // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
             // artifact.
@@ -232,7 +230,7 @@ public class DefaultPluginVersionManager
                         {
                             String range = "[" + mavenVersion + ",]";
 
-                            getLogger().debug( "Plugin: "
+                            logger.debug( "Plugin: "
                                                + pluginProject.getId()
                                                + " specifies a simple prerequisite Maven version of: "
                                                + mavenVersion
@@ -244,14 +242,12 @@ public class DefaultPluginVersionManager
                     }
                     catch ( InvalidVersionSpecificationException e )
                     {
-                        getLogger().debug( "Invalid prerequisite Maven version: " + mavenVersion + " for plugin: " + pluginProject.getId() +
-                                                                        e.getMessage() );
+                        logger.debug( "Invalid prerequisite Maven version: " + mavenVersion + " for plugin: " + pluginProject.getId() + e.getMessage() );
                     }
 
                     if ( ( mavenRange != null ) && !mavenRange.containsVersion( runtimeInformation.getApplicationInformation().getVersion() ) )
                     {
-                        getLogger().info( "Ignoring available plugin version: " + artifactVersion +
-                            " for: " + groupId + ":" + artifactId + " as it requires Maven version matching: " + mavenVersion );
+                        logger.info( "Ignoring available plugin version: " + artifactVersion + " for: " + groupId + ":" + artifactId + " as it requires Maven version matching: " + mavenVersion );
 
                         VersionRange vr;
                         try
@@ -260,29 +256,25 @@ public class DefaultPluginVersionManager
                         }
                         catch ( InvalidVersionSpecificationException e )
                         {
-                            throw new PluginVersionResolutionException( groupId, artifactId,
-                                                                        "Error getting available plugin versions: " +
-                                                                            e.getMessage(), e );
+                            throw new PluginVersionResolutionException( groupId, artifactId, "Error getting available plugin versions: " + e.getMessage(), e );
                         }
 
-                        getLogger().debug( "Trying " + vr );
+                        logger.debug( "Trying " + vr );
+                        
                         try
                         {
-                            List versions = repositoryTools.retrieveAvailableVersions( artifact, localRepository,
-                                                                                              project.getRemoteArtifactRepositories() );
+                            List versions = repositoryTools.retrieveAvailableVersions( artifact, localRepository, project.getRemoteArtifactRepositories() );
                             ArtifactVersion v = vr.matchVersion( versions );
                             artifactVersion = v != null ? v.toString() : null;
                         }
                         catch ( ArtifactMetadataRetrievalException e )
                         {
-                            throw new PluginVersionResolutionException( groupId, artifactId,
-                                                                        "Error getting available plugin versions: " +
-                                                                            e.getMessage(), e );
+                            throw new PluginVersionResolutionException( groupId, artifactId, "Error getting available plugin versions: " + e.getMessage(), e );
                         }
 
                         if ( artifactVersion != null )
                         {
-                            getLogger().debug( "Found " + artifactVersion );
+                            logger.debug( "Found " + artifactVersion );
                         }
                         else
                         {
@@ -294,11 +286,13 @@ public class DefaultPluginVersionManager
 
             version = artifactVersion;
         }
+        
         if( version == null )
         {
             version = artifactVersion;
         }
-        getLogger().info( "Using version: " + version + " of plugin: " + groupId + ":" + artifactId );
+        
+        logger.info( "Using version: " + version + " of plugin: " + groupId + ":" + artifactId );
 
         return version;
     }
