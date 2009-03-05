@@ -129,4 +129,7 @@ public interface MavenRepositorySystem
     void addMirror( String id, String mirrorOf, String url );
     
     ArtifactRepository getMirror( ArtifactRepository repository );
+    
+    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );
+    
 }

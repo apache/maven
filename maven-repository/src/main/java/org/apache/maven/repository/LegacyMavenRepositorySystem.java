@@ -634,4 +634,9 @@ public class LegacyMavenRepositorySystem
     {
         return mirrorBuilder.getMirror( repository );
     }
+
+    public List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories )
+    {
+        return mirrorBuilder.getMirrors( repositories );
+    }
 }

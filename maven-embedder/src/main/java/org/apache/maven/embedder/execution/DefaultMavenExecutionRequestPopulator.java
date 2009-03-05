@@ -318,36 +318,7 @@ public class DefaultMavenExecutionRequestPopulator
         //   </mirror>
         // </mirrors>        
 
-        if ( request.getRemoteRepositories() != null )
-        {
-            Set<ArtifactRepository> remoteRepositoriesWithMirrors = new LinkedHashSet<ArtifactRepository>();
-            
-            for ( ArtifactRepository repository : request.getRemoteRepositories() )
-            {                
-                // Check to see if we have a valid mirror for this repository
-                ArtifactRepository mirror = repositorySystem.getMirror( repository );
-                                                
-                if ( mirror != null )
-                {
-                    // Make sure that we take the the properties of the repository we are mirroring we want to direct
-                    // all requests for this mirror at the mirror, but the mirror specification does not allow for
-                    // any of the regular settings.
-                    mirror.setLayout( repository.getLayout() );
-                    mirror.setSnapshotUpdatePolicy( repository.getSnapshots() );
-                    mirror.setReleaseUpdatePolicy( repository.getReleases() );                
-                    
-                    // If there is a valid mirror for this repository then we'll enter the mirror as a replacement for this repository.
-                    remoteRepositoriesWithMirrors.add( mirror );
-                }
-                else
-                {
-                    // If we have no valid mirrors for this repository we will keep this repository in the list.
-                    remoteRepositoriesWithMirrors.add( repository );
-                }
-            }
-
-            request.setRemoteRepositories( new ArrayList<ArtifactRepository>( remoteRepositoriesWithMirrors ) );
-        }
+        request.setRemoteRepositories( repositorySystem.getMirrors( request.getRemoteRepositories() ) );       
     }
 
     // ------------------------------------------------------------------------

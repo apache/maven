@@ -26,11 +26,16 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
+import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+// This class needs to stick around because it was exposed the the remote resources plugin started using it instead of
+// getting the repositories from the project.
 
 public final class ProjectUtils
 {
@@ -38,27 +43,20 @@ public final class ProjectUtils
     {
     }
 
-    public static List buildArtifactRepositories( List repositories,
+    public static List buildArtifactRepositories( List<Repository> repositories,
                                                   ArtifactRepositoryFactory artifactRepositoryFactory,
                                                   PlexusContainer container )
         throws InvalidRepositoryException
     {
 
-        List repos = new ArrayList();
-
-        for ( Iterator i = repositories.iterator(); i.hasNext(); )
+        List<ArtifactRepository> remoteRepositories = new ArrayList<ArtifactRepository>();
+        
+        for ( Repository r : repositories )
         {
-            Repository mavenRepo = (Repository) i.next();
-
-            ArtifactRepository artifactRepo =
-                buildArtifactRepository( mavenRepo, artifactRepositoryFactory, container );
-
-            if ( !repos.contains( artifactRepo ) )
-            {
-                repos.add( artifactRepo );
-            }
+            remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, container ) );
         }
-        return repos;
+        
+        return rs( container ).getMirrors( remoteRepositories );        
     }
 
     public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
@@ -71,8 +69,7 @@ public final class ProjectUtils
             String id = repo.getId();
             String url = repo.getUrl();
 
-            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(),
-                                                                                 repo.isUniqueVersion() );
+            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(), repo.isUniqueVersion() );
         }
         else
         {
@@ -134,4 +131,18 @@ public final class ProjectUtils
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
     }
 
+    private static MavenRepositorySystem rs( PlexusContainer c )
+    {
+        MavenRepositorySystem rs = null;
+        
+        try
+        {
+            rs = c.lookup( MavenRepositorySystem.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+        }
+        
+        return rs;
+    }
 }

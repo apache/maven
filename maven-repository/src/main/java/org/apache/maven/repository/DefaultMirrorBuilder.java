@@ -2,7 +2,10 @@ package org.apache.maven.repository;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -85,6 +88,40 @@ public class DefaultMirrorBuilder
         mirrors.clear();    
         anonymousMirrorIdSeed = 0;
     }       
+    
+    public List<ArtifactRepository> getMirrors( List<ArtifactRepository> remoteRepositories )
+    {
+        Set<ArtifactRepository> remoteRepositoriesWithMirrors = new LinkedHashSet<ArtifactRepository>();
+
+        if ( remoteRepositories != null )
+        {            
+            for ( ArtifactRepository repository : remoteRepositories)
+            {                
+                // Check to see if we have a valid mirror for this repository
+                ArtifactRepository mirror = getMirror( repository );
+                                                
+                if ( mirror != null )
+                {                    
+                    // Make sure that we take the the properties of the repository we are mirroring we want to direct
+                    // all requests for this mirror at the mirror, but the mirror specification does not allow for
+                    // any of the regular settings.
+                    mirror.setLayout( repository.getLayout() );
+                    mirror.setSnapshotUpdatePolicy( repository.getSnapshots() );
+                    mirror.setReleaseUpdatePolicy( repository.getReleases() );                
+                                        
+                    // If there is a valid mirror for this repository then we'll enter the mirror as a replacement for this repository.
+                    remoteRepositoriesWithMirrors.add( mirror );
+                }
+                else
+                {
+                    // If we have no valid mirrors for this repository we will keep this repository in the list.
+                    remoteRepositoriesWithMirrors.add( repository );
+                }
+            }
+        }
+        
+        return new ArrayList<ArtifactRepository>( remoteRepositoriesWithMirrors );
+    }
     
     // Make these available to tests
     

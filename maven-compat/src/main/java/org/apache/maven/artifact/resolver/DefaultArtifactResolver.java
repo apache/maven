@@ -345,7 +345,7 @@ public class DefaultArtifactResolver
         ArtifactMetadataSource source = request.getMetadataSource();
         List<ResolutionListener> listeners = request.getListeners();
         ArtifactFilter filter = request.getFilter();
-
+        
         if ( listeners == null )
         {
             listeners = new ArrayList<ResolutionListener>();
