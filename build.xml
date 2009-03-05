@@ -209,7 +209,6 @@ END SNIPPET: ant-bootstrap -->
       <classpath refid="maven.classpath"/>
       <arg value="-e"/>
       <arg value="-B"/>
-      <arg value="-s ${basedir}/settings-booty.xml"/>
       <arg value="clean"/>
       <arg value="install"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
