@@ -104,9 +104,12 @@ END SNIPPET: ant-bootstrap -->
 
     <tstamp><format property="stop.time" pattern="${tsFormat}"/></tstamp>
   	
-    <echo>=======================================</echo>
+    <echo>========================================================================</echo>
     <echo>Mercury: start ${start.time}, stop ${stop.time}</echo>
-    <echo>=======================================</echo>
+    <echo>========================================================================</echo>
+    <property name="mc" refid="mercury.classpath"/>
+    <echo>mercury.classpath=${mc}</echo>
+    <echo>========================================================================</echo>
 
   	<delete file="${basedir}/dependencies.xml"/>
 
@@ -209,12 +212,6 @@ END SNIPPET: ant-bootstrap -->
         <include name="*/src/main/*"/>
       </dirset>
     </path>
-<!--
-    <echo>========================================================================</echo>
-    <property name="mc" refid="mercury.classpath"/>
-    <echo>mercury.classpath=${mc}</echo>
-    <echo>========================================================================</echo>
--->
   	
     <mkdir dir="bootstrap/target/classes"/>
   	
