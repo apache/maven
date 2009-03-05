@@ -32,18 +32,4 @@ under the License.
     plugin artifactId from it's prefix using the pluginGroups in
     the provided settings.xml.
   </description>
-
-  <!--remove when the IT plugins are actually release-->
-  <pluginRepositories>
-      <pluginRepository>
-          <id>apache.snapshots</id>
-          <url>http://repository.apache.org/snapshots</url>
-          <snapshots>
-              <enabled>true</enabled>
-          </snapshots>
-          <releases>
-              <enabled>false</enabled>
-          </releases>
-      </pluginRepository>
-  </pluginRepositories>
 </project>
