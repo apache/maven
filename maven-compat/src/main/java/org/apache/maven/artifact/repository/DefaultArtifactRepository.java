@@ -173,13 +173,15 @@ public class DefaultArtifactRepository
     public String toString()
     {
         StringBuffer sb = new StringBuffer();
-        
-        sb.append( "             id: " + getId() ).append( "\n" );
-        sb.append( "            url: " + getUrl() ).append( "\n" );
-        sb.append( "         layout: " + ( layout != null ? layout.getId() : "none" ) ).append( "\n" );
-        sb.append( "snapshot policy: [update => " + snapshots.getUpdatePolicy() ).append( "]\n" );
-        sb.append( " release policy: [update => " + releases.getUpdatePolicy() ).append( "]\n" );
-        
+
+        sb.append( "       id: " ).append( getId() ).append( "\n" );
+        sb.append( "      url: " ).append( getUrl() ).append( "\n" );
+        sb.append( "   layout: " ).append( layout != null ? layout.getId() : "none" ).append( "\n" );
+        sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );
+        sb.append( ", update => " ).append( snapshots.getUpdatePolicy() ).append( "]\n" );
+        sb.append( " releases: [enabled => " ).append( releases.isEnabled() );
+        sb.append( ", update => " ).append( releases.getUpdatePolicy() ).append( "]\n" );
+
         return sb.toString();
     }
 }

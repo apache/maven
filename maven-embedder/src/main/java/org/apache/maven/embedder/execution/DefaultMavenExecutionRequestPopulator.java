@@ -304,7 +304,17 @@ public class DefaultMavenExecutionRequestPopulator
         //   </mirror>
         // </mirrors>        
 
-        request.setRemoteRepositories( repositorySystem.getMirrors( request.getRemoteRepositories() ) );       
+        System.out.println( "ORIGINAL REPOSITORIES" );
+        for ( ArtifactRepository repo : request.getRemoteRepositories() )
+        {
+            System.out.println( repo );
+        }
+        request.setRemoteRepositories( repositorySystem.getMirrors( request.getRemoteRepositories() ) );
+        System.out.println( "MIRRORED REPOSITORIES" );
+        for ( ArtifactRepository repo : request.getRemoteRepositories() )
+        {
+            System.out.println( repo );
+        }
     }
 
     // ------------------------------------------------------------------------
