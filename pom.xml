@@ -467,6 +467,16 @@ under the License.
         <artifactId>mercury-external</artifactId>
         <version>${mercuryVersion}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven.mercury</groupId>
+        <artifactId>mercury-plexus</artifactId>
+        <version>${mercuryVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.mercury</groupId>
+        <artifactId>mercury-repo-virtual</artifactId>
+        <version>${mercuryVersion}</version>
+      </dependency>
     <dependency>
       <groupId>org.sonatype.mercury</groupId>
       <artifactId>mercury-mp3-cli</artifactId>
