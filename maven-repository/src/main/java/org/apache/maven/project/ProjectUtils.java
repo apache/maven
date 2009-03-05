@@ -55,11 +55,14 @@ public final class ProjectUtils
         {
             remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, container ) );
         }
-        
+
+        // FIXME: remove
+        System.out.println( "REMOTE REPOSITORIES: " + remoteRepositories );
+
         remoteRepositories = rs( container ).getMirrors( remoteRepositories );
 
         // FIXME: remove
-        System.out.println("REMOTE REPOSITORIES: " + remoteRepositories);
+        System.out.println( "MIRRORED REPOSITORIES: " + remoteRepositories );
 
         return remoteRepositories;
     }
