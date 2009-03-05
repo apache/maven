@@ -26,7 +26,6 @@ import java.util.Set;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
@@ -97,10 +96,6 @@ public class DefaultMavenExecutionRequestPopulator
         settings( request, configuration );
 
         localRepository( request, configuration );
-
-        snapshotPolicy( request, configuration );
-
-        checksumPolicy( request, configuration );
 
         artifactTransferMechanism( request, configuration );
 
@@ -405,48 +400,6 @@ public class DefaultMavenExecutionRequestPopulator
         {
             request.setLocalRepositoryPath( new File( request.getLocalRepository().getBasedir() ).getAbsoluteFile() );
         }
-    }
-
-    // ------------------------------------------------------------------------
-    // Snapshot Policy
-    // ------------------------------------------------------------------------
-
-    private void snapshotPolicy( MavenExecutionRequest request, Configuration configuration )
-    {
-        // ------------------------------------------------------------------------
-        // Snapshot Repository Update Policies
-        //
-        // Set the global policies for snapshot updates.
-        // ------------------------------------------------------------------------
-
-        boolean snapshotPolicySet = false;
-
-        if ( request.isOffline() )
-        {
-            snapshotPolicySet = true;
-        }
-
-        if ( !snapshotPolicySet )
-        {
-            if ( request.isUpdateSnapshots() )
-            {
-                repositorySystem.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
-            }
-            else if ( request.isNoSnapshotUpdates() )
-            {
-                getLogger().info( "+ Supressing SNAPSHOT updates." );
-                repositorySystem.setGlobalUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER );
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // Checksum Policy
-    // ------------------------------------------------------------------------
-
-    private void checksumPolicy( MavenExecutionRequest request, Configuration configuration )
-    {
-        repositorySystem.setGlobalChecksumPolicy( request.getGlobalChecksumPolicy() );
     }
 
     // ------------------------------------------------------------------------

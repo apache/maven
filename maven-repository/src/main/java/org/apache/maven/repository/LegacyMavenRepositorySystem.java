@@ -404,16 +404,6 @@ public class LegacyMavenRepositorySystem
         return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
     }
 
-    public void setGlobalUpdatePolicy( String policy )
-    {
-        artifactRepositoryFactory.setGlobalUpdatePolicy( policy );
-    }
-
-    public void setGlobalChecksumPolicy( String policy )
-    {
-        artifactRepositoryFactory.setGlobalChecksumPolicy( policy );
-    }
-
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {        
         return artifactResolver.resolve( request );

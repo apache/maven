@@ -39,7 +39,7 @@ import org.apache.maven.wagon.events.TransferListener;
  * @author Jason van Zyl
  */
 public interface MavenRepositorySystem
-    extends ArtifactMetadataSource // This needs to be removed
+    extends ArtifactMetadataSource // This needs to be removed and it's here because it's passed into the resolver. not sure why we didn't just inject the metadata source.
 {
     // Artifact creation: This needs to be reduced to fewer, if not one, method. 
 
@@ -74,10 +74,6 @@ public interface MavenRepositorySystem
         throws IOException;
 
     ArtifactRepository createRepository( String url, String repositoryId );
-
-    void setGlobalUpdatePolicy( String policy );
-
-    void setGlobalChecksumPolicy( String policy );
 
     // Artifact resolution
 
