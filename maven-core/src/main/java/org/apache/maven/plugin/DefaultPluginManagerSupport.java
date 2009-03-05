@@ -76,6 +76,9 @@ public class DefaultPluginManagerSupport
     public Artifact resolvePluginArtifact( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginManagerException, InvalidPluginException, PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException
     {
+        logger.debug( "Resolving plugin artifact " + plugin.getKey() + " from "
+            + project.getRemoteArtifactRepositories() );
+
         ArtifactRepository localRepository = session.getLocalRepository();
 
         MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
