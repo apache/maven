@@ -67,6 +67,7 @@ public class DefaultUpdateCheckManager
         // artifacts.
         if ( !artifact.isSnapshot() )
         {
+            getLogger().debug( "Skipping update check for non-snapshot artifact " + artifact );
             return false;
         }
 
