@@ -125,6 +125,14 @@ public class DefaultUpdateCheckManager
         // artifacts available.
         ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                               "Determining update check for " + metadata + " (" + file + ") from " + repository
+                                   + " (snapshot = " + metadata.isSnapshot() + ", enabled = " + policy.isEnabled()
+                                   + ")" );
+        }
+
         if ( !policy.isEnabled() )
         {
             return false;
