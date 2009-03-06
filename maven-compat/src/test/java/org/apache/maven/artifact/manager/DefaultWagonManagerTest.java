@@ -67,7 +67,7 @@ public class DefaultWagonManagerTest
     {
         super.setUp();
 
-        wagonManager = (DefaultWagonManager) lookup( WagonManager.ROLE );
+        wagonManager = (DefaultWagonManager) lookup( WagonManager.class );
         
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
@@ -92,7 +92,7 @@ public class DefaultWagonManagerTest
         };
         TransferListener listener = new TransferListener();
         wagonManager.setDownloadMonitor(listener);                                                                                     
-        wagonManager.getArtifact( artifact, repos, false );
+        wagonManager.getArtifact( artifact, repos, listener, false );
         assertEquals(1, listener.events.size());
     }
     

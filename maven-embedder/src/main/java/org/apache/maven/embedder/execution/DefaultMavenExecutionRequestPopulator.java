@@ -423,8 +423,6 @@ public class DefaultMavenExecutionRequestPopulator
         }
         else
         {
-            repositorySystem.setDownloadMonitor( request.getTransferListener() );
-
             repositorySystem.setOnline( true );
         }
     }

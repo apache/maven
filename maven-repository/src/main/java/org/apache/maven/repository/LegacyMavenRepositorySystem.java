@@ -94,8 +94,6 @@ public class LegacyMavenRepositorySystem
     @Requirement
     private Logger logger;
 
-    private TransferListener downloadMonitor;
-
     private Map<String, ProxyInfo> proxies = new HashMap<String, ProxyInfo>();
 
     private Map<String, AuthenticationInfo> authenticationInfoMap = new HashMap<String, AuthenticationInfo>();
@@ -386,7 +384,7 @@ public class LegacyMavenRepositorySystem
         return url;
     }
 
-    public ArtifactRepository createRepository( String url, String repositoryId )
+    private ArtifactRepository createRepository( String url, String repositoryId )
     {
         // snapshots vs releases
         // offline = to turning the update policy off
@@ -405,7 +403,7 @@ public class LegacyMavenRepositorySystem
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {        
+    {                        
         return artifactResolver.resolve( request );
     }
 
@@ -417,11 +415,6 @@ public class LegacyMavenRepositorySystem
     public boolean isOnline()
     {
         return artifactResolver.isOnline();
-    }
-
-    public void setDownloadMonitor( TransferListener downloadMonitor )
-    {
-        this.downloadMonitor = downloadMonitor;
     }
 
     public void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )

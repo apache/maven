@@ -38,9 +38,10 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
@@ -48,7 +49,6 @@ import org.codehaus.plexus.util.FileUtils;
  */
 @Component(role = ArtifactResolver.class)
 public class DefaultArtifactResolver
-    extends AbstractLogEnabled
     implements ArtifactResolver
 {
 
@@ -58,6 +58,9 @@ public class DefaultArtifactResolver
     // Components
     // ----------------------------------------------------------------------
 
+    @Requirement 
+    private Logger logger;
+    
     @Requirement
     private WagonManager wagonManager;
 
@@ -87,19 +90,19 @@ public class DefaultArtifactResolver
         return online;
     }
 
-    public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+    public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener resolutionListener )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        resolve( artifact, remoteRepositories, localRepository, false );
+        resolve( artifact, remoteRepositories, localRepository, resolutionListener, false );
     }
 
-    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        resolve( artifact, remoteRepositories, localRepository, true );
+        resolve( artifact, remoteRepositories, localRepository, downloadMonitor, true );
     }
 
-    private void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean force )
+    private void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor, boolean force )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( artifact == null )
@@ -167,11 +170,11 @@ public class DefaultArtifactResolver
                     if ( artifact.getRepository() != null )
                     {
                         // the transformations discovered the artifact - so use it exclusively
-                        wagonManager.getArtifact( artifact, artifact.getRepository(), force );
+                        wagonManager.getArtifact( artifact, artifact.getRepository(), downloadMonitor, force );
                     }
                     else
                     {
-                        wagonManager.getArtifact( artifact, remoteRepositories, force );
+                        wagonManager.getArtifact( artifact, remoteRepositories, downloadMonitor, force );
                     }
 
                     if ( !artifact.isResolved() && !destination.exists() )
@@ -350,12 +353,12 @@ public class DefaultArtifactResolver
         {
             listeners = new ArrayList<ResolutionListener>();
 
-            if ( getLogger().isDebugEnabled() )
+            if ( logger.isDebugEnabled() )
             {
-                listeners.add( new DebugResolutionListener( getLogger() ) );
+                listeners.add( new DebugResolutionListener( logger ) );
             }
 
-            listeners.add( new WarningResolutionListener( getLogger() ) );
+            listeners.add( new WarningResolutionListener( logger ) );
         }
 
         ArtifactResolutionResult result = new ArtifactResolutionResult();
@@ -407,7 +410,7 @@ public class DefaultArtifactResolver
             {
                 try
                 {
-                    resolve( artifact, remoteRepositories, localRepository );
+                    resolve( artifact, remoteRepositories, localRepository, request.getTransferListener() );
                 }
                 catch ( ArtifactNotFoundException anfe )
                 {
@@ -427,5 +430,11 @@ public class DefaultArtifactResolver
         }
 
         return result;
+    }
+
+    public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        resolve( artifact, remoteRepositories, localRepository, null );
     }
 }

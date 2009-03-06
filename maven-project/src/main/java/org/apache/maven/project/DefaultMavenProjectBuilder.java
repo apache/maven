@@ -252,7 +252,9 @@ public class DefaultMavenProjectBuilder
         pomArtifact.setFile( pomFile );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pomArtifact ).setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( configuration.getLocalRepository() ).setRemoteRepostories( project.getRemoteArtifactRepositories() ).setManagedVersionMap( project.getManagedVersionMap() )
+            .setLocalRepository( configuration.getLocalRepository() )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( project.getManagedVersionMap() )
             .setMetadataSource( repositorySystem );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );

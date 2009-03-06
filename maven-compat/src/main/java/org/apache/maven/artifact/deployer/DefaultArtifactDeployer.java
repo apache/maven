@@ -80,7 +80,7 @@ public class DefaultArtifactDeployer
                 FileUtils.copyFile( source, artifactFile );
             }
 
-            wagonManager.putArtifact( source, artifact, deploymentRepository );
+            wagonManager.putArtifact( source, artifact, deploymentRepository, null );
 
             // must be after the artifact is installed
             for ( ArtifactMetadata metadata : artifact.getMetadataList() )

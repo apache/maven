@@ -40,7 +40,12 @@ import java.util.List;
  */
 public interface WagonManager
 {
-    String ROLE = WagonManager.class.getName();
+    
+    void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener downloadMonitor, boolean forceUpdateCheck )
+        throws TransferFailedException, ResourceDoesNotExistException;
+
+    void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository, TransferListener downloadMonitor )
+        throws TransferFailedException;
 
     /**
      * Get a Wagon provider that understands the protocol passed as argument.
@@ -66,48 +71,21 @@ public interface WagonManager
     Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException;
 
-    void getArtifact( Artifact artifact,
-                      List<ArtifactRepository> remoteRepositories )
+    void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener tl, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifact( Artifact artifact,
-                      List<ArtifactRepository> remoteRepositories,
-                      boolean forceUpdateCheck )
-    	throws TransferFailedException, ResourceDoesNotExistException;
-
-    void getArtifact( Artifact artifact,
-                      ArtifactRepository repository )
+    void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener tl )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifact( Artifact artifact,
-                      ArtifactRepository repository,
-                      boolean forceUpdateCheck )
-        throws TransferFailedException, ResourceDoesNotExistException;
-
-    void putArtifact( File source,
-                      Artifact artifact,
-                      ArtifactRepository deploymentRepository )
+    void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
         throws TransferFailedException;
 
-    void putArtifactMetadata( File source,
-                              ArtifactMetadata artifactMetadata,
-                              ArtifactRepository repository )
-        throws TransferFailedException;
-
-    void getArtifactMetadata( ArtifactMetadata metadata,
-                              ArtifactRepository remoteRepository,
-                              File destination,
-                              String checksumPolicy )
+    void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination, String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
-                                                      File file, String checksumPolicyWarn )
+    void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File file, String checksumPolicyWarn )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    // All the tests fail that are specifically look for the contents of the listener fail without this.
-    void setDownloadMonitor( TransferListener listener );    
-
-    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
-                                String passphrase );
+    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );
 
 }

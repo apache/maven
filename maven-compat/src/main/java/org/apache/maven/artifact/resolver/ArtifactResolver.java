@@ -8,6 +8,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.wagon.events.TransferListener;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -62,7 +63,12 @@ public interface ArtifactResolver
 
     // USED BY REMOTE RESOURCES PLUGIN
     @Deprecated
-    void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepositor )
+    void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    // USED BY REMOTE RESOURCES PLUGIN
+    @Deprecated
+    void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+    
 }

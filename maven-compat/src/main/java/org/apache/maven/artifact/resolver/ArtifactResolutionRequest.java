@@ -9,6 +9,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * A resolution request allows you to either use an existing MavenProject, or a coordinate (gid:aid:version)
@@ -41,6 +42,8 @@ public class ArtifactResolutionRequest
     // This should not be in here, it's a component
     private ArtifactMetadataSource metadataSource;
 
+    private TransferListener transferListener;
+    
     private boolean resolveRoot = true;
     
     public ArtifactResolutionRequest()
@@ -171,8 +174,19 @@ public class ArtifactResolutionRequest
     public boolean isResolveRoot()
     {
         return resolveRoot;
-    }
+    }        
     
+    public TransferListener getTransferListener()
+    {
+        return transferListener;
+    }
+
+    public ArtifactResolutionRequest setTransferListener( TransferListener transferListener )
+    {
+        this.transferListener = transferListener;
+        return this;
+    }
+
     public String toString()
     {
         StringBuffer sb = new StringBuffer()

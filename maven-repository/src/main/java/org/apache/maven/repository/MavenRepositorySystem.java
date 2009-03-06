@@ -73,10 +73,6 @@ public interface MavenRepositorySystem
     ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException;
 
-    ArtifactRepository createRepository( String url, String repositoryId );
-
-    // Artifact resolution
-
     //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
 
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
@@ -102,8 +98,6 @@ public interface MavenRepositorySystem
 
     boolean isOnline();
     
-    void setDownloadMonitor( TransferListener downloadMonitor );
-
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
 
     void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );

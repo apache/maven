@@ -24,19 +24,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -51,7 +48,6 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.proxy.ProxyInfoProvider;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -59,26 +55,23 @@ import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 @Component(role=WagonManager.class)
 public class DefaultWagonManager
-    extends AbstractLogEnabled
     implements WagonManager
 {
     private static final String[] CHECKSUM_IDS = {"md5", "sha1"};
 
     /** have to match the CHECKSUM_IDS */
     private static final String[] CHECKSUM_ALGORITHMS = {"MD5", "SHA-1"};
-        
+
+    @Requirement
+    private Logger logger;
+    
     @Requirement
     private PlexusContainer container;
 
@@ -95,12 +88,6 @@ public class DefaultWagonManager
 
     /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
     private Map<String,XmlPlexusConfiguration> serverConfigurationMap = new HashMap<String,XmlPlexusConfiguration>();
-
-    private TransferListener downloadMonitor;
-
-    private boolean online = true;
-
-    private boolean interactive = true;
 
     private RepositoryPermissions defaultRepositoryPermissions;
 
@@ -120,6 +107,13 @@ public class DefaultWagonManager
 
     private String httpUserAgent = "Apache-Maven/3.0-alpha-1";
 
+    private TransferListener downloadMonitor;
+    
+    public void setDownloadMonitor( TransferListener downloadMonitor )
+    {
+        this.downloadMonitor = downloadMonitor;        
+    }
+    
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException
@@ -160,27 +154,26 @@ public class DefaultWagonManager
         return wagon;
     }
 
-    public void putArtifact( File source,
-                             Artifact artifact,
-                             ArtifactRepository deploymentRepository )
+    public void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
+        throws TransferFailedException
+    {
+        putRemoteFile( deploymentRepository, source, deploymentRepository.pathOf( artifact ), downloadMonitor );
+    }
+    
+    public void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository, TransferListener downloadMonitor )
         throws TransferFailedException
     {
         putRemoteFile( deploymentRepository, source, deploymentRepository.pathOf( artifact ), downloadMonitor );
     }
 
-    public void putArtifactMetadata( File source,
-                                     ArtifactMetadata artifactMetadata,
-                                     ArtifactRepository repository )
+    public void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
         throws TransferFailedException
     {
-        getLogger().info( "Uploading " + artifactMetadata );
+        logger.info( "Uploading " + artifactMetadata );
         putRemoteFile( repository, source, repository.pathOfRemoteRepositoryMetadata( artifactMetadata ), null );
     }
 
-    private void putRemoteFile( ArtifactRepository repository,
-                                File source,
-                                String remotePath,
-                                TransferListener downloadMonitor )
+    private void putRemoteFile( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
         throws TransferFailedException
     {
         String protocol = repository.getProtocol();
@@ -233,7 +226,7 @@ public class DefaultWagonManager
             catch ( CredentialsDataSourceException e )
             {
                 String err = "Problem with server credentials: " + e.getMessage();
-                getLogger().error( err );
+                logger.error( err );
                 throw new TransferFailedException( err );
             }
             finally
@@ -315,22 +308,31 @@ public class DefaultWagonManager
 
     // NOTE: It is not possible that this method throws TransferFailedException under current conditions.
     // FIXME: Change the throws clause to reflect the fact that we're never throwing TransferFailedException
-    public void getArtifact( Artifact artifact,
-                             List<ArtifactRepository> remoteRepositories  )
+    public void getArtifact( Artifact artifact, ArtifactRepository remoteRepository, boolean force )
+    throws TransferFailedException, ResourceDoesNotExistException
+    {
+        getArtifact( artifact, remoteRepository, downloadMonitor, force );
+    }
+    
+    public void getArtifact( Artifact artifact, ArtifactRepository remoteRepository )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        getArtifact( artifact, remoteRepository, downloadMonitor, true );
+    }
+    
+    public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener downloadMonitor  )
         throws TransferFailedException, ResourceDoesNotExistException
 	{
-    	getArtifact( artifact, remoteRepositories, true );
+    	getArtifact( artifact, remoteRepositories, downloadMonitor, true );
 	}
 
-    public void getArtifact( Artifact artifact,
-                             List<ArtifactRepository> remoteRepositories,
-                             boolean force )
+    public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         for (ArtifactRepository repository : remoteRepositories) {
             try
             {
-                getArtifact( artifact, repository, force );
+                getArtifact( artifact, repository, downloadMonitor, force );
 
                 if (artifact.isResolved())
                 {
@@ -342,12 +344,12 @@ public class DefaultWagonManager
                 // This one we will eat when looking through remote repositories
                 // because we want to cycle through them all before squawking.
 
-                getLogger().debug( "Unable to get resource '" + artifact.getId() + "' from repository " +
+                logger.debug( "Unable to get resource '" + artifact.getId() + "' from repository " +
                     repository.getId() + " (" + repository.getUrl() + ")", e );
             }
             catch ( TransferFailedException e )
             {
-                getLogger().debug( "Unable to get resource '" + artifact.getId() + "' from repository " +
+                logger.debug( "Unable to get resource '" + artifact.getId() + "' from repository " +
                     repository.getId() + " (" + repository.getUrl() + ")", e );
             }
         }
@@ -359,17 +361,14 @@ public class DefaultWagonManager
         }
     }
 
-    public void getArtifact( Artifact artifact,
-                             ArtifactRepository repository )
+    public void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener downloadMonitor )
         throws TransferFailedException,
                ResourceDoesNotExistException
     {
-        getArtifact( artifact, repository, true );
+        getArtifact( artifact, repository, downloadMonitor, true );
     }
 
-    public void getArtifact( Artifact artifact,
-                             ArtifactRepository repository,
-                             boolean force )
+    public void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOf( artifact );
@@ -378,18 +377,18 @@ public class DefaultWagonManager
 
         if ( !policy.isEnabled() )
         {
-            getLogger().debug( "Skipping disabled repository " + repository.getId() );
+            logger.debug( "Skipping disabled repository " + repository.getId() );
         }
         else if ( repository.isBlacklisted() )
         {
-            getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
+            logger.debug( "Skipping blacklisted repository " + repository.getId() );
         }
         // If the artifact is a snapshot, we need to determine whether it's time to check this repository for an update:
         // 1. If it's forced, then check
         // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.
         else if ( artifact.isSnapshot() && ( force || updateCheckManager.isUpdateRequired( artifact, repository ) ) )
         {
-            getLogger().debug( "Trying repository " + repository.getId() );
+            logger.debug( "Trying repository " + repository.getId() );
 
             try
             {
@@ -400,7 +399,7 @@ public class DefaultWagonManager
             	updateCheckManager.touch( artifact, repository );
             }
 
-            getLogger().debug( "  Artifact resolved" );
+            logger.debug( "  Artifact resolved" );
 
             artifact.setResolved( true );
         }
@@ -414,7 +413,7 @@ public class DefaultWagonManager
             // if POM is not present locally, try and get it if it's forced, out of date, or has not been attempted yet  
             if ( force || updateCheckManager.isPomUpdateRequired( artifact, repository ) )
             {
-                getLogger().debug( "Trying repository " + repository.getId() );
+                logger.debug( "Trying repository " + repository.getId() );
 
                 try
                 {
@@ -428,7 +427,7 @@ public class DefaultWagonManager
                     throw e;
                 }
 
-                getLogger().debug( "  Artifact resolved" );
+                logger.debug( "  Artifact resolved" );
 
                 artifact.setResolved( true );
             }
@@ -448,11 +447,11 @@ public class DefaultWagonManager
         // don't write touch-file for release artifacts.
         else if ( !artifact.isSnapshot() )
         {
-            getLogger().debug( "Trying repository " + repository.getId() );
+            logger.debug( "Trying repository " + repository.getId() );
 
             getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
 
-            getLogger().debug( "  Artifact resolved" );
+            logger.debug( "  Artifact resolved" );
 
             artifact.setResolved( true );
         }
@@ -598,7 +597,7 @@ public class DefaultWagonManager
                         // repository's checksum checking policy.
                         if ( firstRun )
                         {
-                            getLogger().warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
+                            logger.warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
                             retry = true;
                         }
                         else
@@ -608,7 +607,7 @@ public class DefaultWagonManager
                     }
                     catch ( ResourceDoesNotExistException sha1TryException )
                     {
-                        getLogger().debug( "SHA1 not found, trying MD5", sha1TryException );
+                        logger.debug( "SHA1 not found, trying MD5", sha1TryException );
 
                         // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
                         // file...we'll try again with the MD5 checksum.
@@ -719,7 +718,7 @@ public class DefaultWagonManager
         else if ( !ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals( checksumPolicy ) )
         {
             // warn if it is set to anything other than ignore
-            getLogger().warn( "*** CHECKSUM FAILED - " + message + " - IGNORING" );
+            logger.warn( "*** CHECKSUM FAILED - " + message + " - IGNORING" );
         }
         // otherwise it is ignore
     }
@@ -794,7 +793,7 @@ public class DefaultWagonManager
         }
         catch ( ConnectionException e )
         {
-            getLogger().error( "Problem disconnecting from wagon - ignoring: " + e.getMessage() );
+            logger.error( "Problem disconnecting from wagon - ignoring: " + e.getMessage() );
         }
     }
 
@@ -807,8 +806,8 @@ public class DefaultWagonManager
         }
         catch ( ComponentLifecycleException e )
         {
-            getLogger().error( "Problem releasing wagon - ignoring: " + e.getMessage() );
-            getLogger().debug( "", e );
+            logger.error( "Problem releasing wagon - ignoring: " + e.getMessage() );
+            logger.debug( "", e );
         }
     }
     
@@ -918,32 +917,6 @@ public class DefaultWagonManager
         }
     }
 
-    public void setInteractive( boolean interactive )
-    {
-        this.interactive = interactive;
-    }
-
-    public void findAndRegisterWagons( PlexusContainer container )
-    {
-        try
-        {
-            Map wagons = container.lookupMap( Wagon.ROLE );
-
-            registerWagons( wagons.keySet(), container );
-        }
-        catch ( ComponentLookupException e )
-        {
-            // no wagons found in the extension
-        }
-    }
-
-    /** @deprecated Wagons are discovered in plugin and extension realms now. */
-    @Deprecated
-    public void registerWagons( Collection wagons,
-                                PlexusContainer extensionContainer )
-    {
-    }
-
     /**
      * Applies the server configuration to the wagon
      *
@@ -986,7 +959,7 @@ public class DefaultWagonManager
                     }
                     catch ( ComponentLifecycleException e )
                     {
-                        getLogger().error( "Problem releasing configurator - ignoring: " + e.getMessage() );
+                        logger.error( "Problem releasing configurator - ignoring: " + e.getMessage() );
                     }
                 }
 
@@ -1008,12 +981,5 @@ public class DefaultWagonManager
     public String getHttpUserAgent()
     {
         return httpUserAgent;
-    }
-    
-    // Things to remove
-    
-    public void setDownloadMonitor( TransferListener listener )
-    {
-        this.downloadMonitor = listener;
     }
 }
