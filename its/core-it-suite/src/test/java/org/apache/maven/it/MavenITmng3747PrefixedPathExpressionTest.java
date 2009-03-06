@@ -20,6 +20,7 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
+import java.util.Properties;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -45,20 +46,17 @@ public class MavenITmng3747PrefixedPathExpressionTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3747" );
-        File pluginDir = new File( testDir, "maven-mng3747-plugin" );
-        File projectDir = new File( testDir, "project" );
 
-        Verifier verifier;
-
-        verifier = new Verifier( pluginDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-        
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        assertEquals( "path is: " + new File( testDir, "relative" ).getAbsolutePath() + "/somepath", 
+            props.getProperty( "stringParam" ) );
     }
+
 }
