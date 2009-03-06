@@ -24,8 +24,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.Properties;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-377">MNG-377</a>.
@@ -53,17 +51,18 @@ public class MavenITmng0377PluginLookupFromPrefixTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings.xml" );
-        verifier.setCliOptions( cliOptions );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng0377" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         Properties systemProperties = new Properties();
-        systemProperties.put( "log.logFile", "target/file.txt" );
+        systemProperties.put( "touch.outputFile", "target/file.txt" );
         verifier.setSystemProperties( systemProperties );
-        verifier.executeGoal( "itlog-file:reset" );
-        verifier.assertFilePresent( "target/file.txt" );
+        verifier.executeGoal( "itprefix:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/file.txt" );
     }
 
 }
