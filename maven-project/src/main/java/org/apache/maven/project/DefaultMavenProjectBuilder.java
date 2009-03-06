@@ -695,7 +695,17 @@ public class DefaultMavenProjectBuilder
 
         Artifact artifactParent = repositorySystem.createParentArtifact( domainModel.getParentGroupId(), domainModel.getParentArtifactId(), domainModel.getParentVersion() );
 
-        ArtifactResolutionResult result = repositorySystem.resolve( new ArtifactResolutionRequest( artifactParent, localRepository, remoteRepositories ) );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifactParent, localRepository, remoteRepositories );
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        try
+        {
+            resolutionErrorHandler.throwErrors( request, result );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw (IOException) new IOException( "The parent POM " + artifactParent
+                + " could not be retrieved from any repository" ).initCause( e );
+        }
 
         PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( artifactParent.getFile() );
 

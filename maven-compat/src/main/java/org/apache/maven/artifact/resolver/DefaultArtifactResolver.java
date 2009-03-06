@@ -162,7 +162,8 @@ public class DefaultArtifactResolver
             {
                 if ( !isOnline() )
                 {
-                    throw new ArtifactNotFoundException( "The repository system is offline.", artifact );
+                    throw new ArtifactResolutionException( "The repository system is offline and the artifact "
+                        + artifact + " is not available in the local repository.", artifact );
                 }
 
                 try
