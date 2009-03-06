@@ -1,5 +1,13 @@
 package org.apache.maven.lifecycle.plan;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
@@ -9,8 +17,8 @@ import org.apache.maven.lifecycle.binding.LifecycleBindingManager;
 import org.apache.maven.lifecycle.binding.MojoBindingFactory;
 import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.lifecycle.model.MojoBinding;
-import org.apache.maven.plugin.PluginLoader;
 import org.apache.maven.plugin.PluginLoaderException;
+import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -18,14 +26,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
 
 /**
  * Responsible for creating a plan of execution for a given project and list of tasks. This build plan consists of
@@ -41,7 +41,7 @@ public class DefaultBuildPlanner
     implements BuildPlanner, LogEnabled
 {
     @Requirement
-    private PluginLoader pluginLoader;
+    private PluginManager pluginLoader;
 
     @Requirement
     private LifecycleBindingManager lifecycleBindingManager;

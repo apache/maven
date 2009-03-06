@@ -7,7 +7,6 @@ import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.PluginLoader;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;

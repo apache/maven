@@ -168,17 +168,20 @@ public class MavenEmbedder
         return request;
     }
 
-    public Collection<MojoExecution> getMojoExecutionsForGoal(String goal) throws Exception
+    public Collection<MojoExecution> getMojoExecutionsForGoal(String goal) 
+        throws Exception
     {
         return pluginManager.getMojoExecutionsForGoal( goal );
     }
 
-    public Object getMojoParameterFor(MojoExecution mojoExecution, String xPath) throws Exception
+    public Object getMojoParameterFor(MojoExecution mojoExecution, String xPath) 
+        throws Exception
     {
         return pluginManager.getMojoParameterFor( mojoExecution, xPath);
     }
 
-    public void executeMojo(MojoExecution mojoExecution, MavenSession mavenSession ) throws Exception
+    public void executeMojo(MojoExecution mojoExecution, MavenSession mavenSession ) 
+        throws Exception
     {
         pluginManager.executeMojo( mojoExecution, mavenSession );
     }
@@ -213,7 +216,7 @@ public class MavenEmbedder
     }
 
     public Model readModel( File file )
-    throws XmlPullParserException, IOException
+        throws XmlPullParserException, IOException
     {
         Reader reader = ReaderFactory.newXmlReader( file );
 
@@ -228,14 +231,12 @@ public class MavenEmbedder
     }
 
     public Model readModel( Reader reader )
-    throws XmlPullParserException, IOException
+        throws XmlPullParserException, IOException
     {
     	return modelReader.read( reader );
     }
 
-    public void writeModel( Writer writer,
-                            Model model,
-                            boolean namespaceDeclaration )
+    public void writeModel( Writer writer, Model model, boolean namespaceDeclaration )
         throws IOException
     {
         modelWriter.write( writer, model );
@@ -315,8 +316,7 @@ public class MavenEmbedder
      * mkleint: protected so that IDE integrations can selectively allow downloading artifacts
      * from remote repositories (if they prohibit by default on project loading)
      */
-    protected void verifyPlugin( Plugin plugin,
-                                 MavenProject project )
+    protected void verifyPlugin( Plugin plugin, MavenProject project )
         throws ComponentLookupException, ArtifactResolutionException, PluginVersionResolutionException,
         ArtifactNotFoundException, InvalidPluginException, PluginManagerException,
         PluginNotFoundException, PluginVersionNotFoundException
@@ -331,7 +331,7 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     public MavenProject readProject( File mavenProject )
-    throws ProjectBuildingException, MavenExecutionException
+        throws ProjectBuildingException, MavenExecutionException
     {
         CoreErrorReporter errorReporter = request.getErrorReporter();
         errorReporter.clearErrors();
@@ -367,22 +367,7 @@ public class MavenEmbedder
 
             CoreReporterManager.setReporter( errorReporter );
 
-            // This is necessary to make the MavenEmbedderProjectWithExtensionReadingTest work which uses
-            // a custom type for a dependency like this:
-            //
-            // <dependency>
-            //   <groupId>junit</groupId>
-            //   <artifactId>junit</artifactId>
-            //   <version>3.8.1</version>
-            //   <scope>test</scope>
-            //   <type>mkleint</type>
-            // </dependency>
-            //
-            // If the artifact handlers are not loaded up-front then this dependency element is not
-            // registered as an artifact and is not added to the classpath elements.
-
             readProject( request.getPom(), request );
-
         }
         catch ( MavenEmbedderException e )
         {
@@ -540,8 +525,6 @@ public class MavenEmbedder
                 configuration.getContainerCustomizer().customize( container );
             }
 
-            handleExtensions( configuration.getExtensions() );
-
             // ----------------------------------------------------------------------
             // Lookup each of the components we need to provide the desired
             // client interface.
@@ -570,49 +553,6 @@ public class MavenEmbedder
         catch ( ComponentLookupException e )
         {
             throw new MavenEmbedderException( "Cannot lookup required component.", e );
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    // Lifecycle
-    // ----------------------------------------------------------------------
-
-    private void handleExtensions( List extensions )
-        throws MavenEmbedderException
-    {
-        ClassRealm childRealm;
-        try
-        {
-            childRealm = container.getContainerRealm().createChildRealm( "embedder-extensions" );
-        }
-        catch ( DuplicateRealmException e1 )
-        {
-            try
-            {
-                childRealm = classWorld.getRealm( "embedder-extensions" );
-            }
-            catch ( NoSuchRealmException e )
-            {
-                throw new MavenEmbedderException( "Cannot create realm 'extensions'", e );
-            }
-        }
-
-        for ( Iterator it = extensions.iterator(); it.hasNext(); )
-        {
-            childRealm.addURL( (URL) it.next() );
-        }
-
-        try
-        {
-            container.discoverComponents( childRealm );
-        }
-        catch ( PlexusConfigurationException e )
-        {
-            throw new MavenEmbedderException( "Configuration error while discovering extension components", e );
-        }
-        catch ( ComponentRepositoryException e )
-        {
-            throw new MavenEmbedderException( "Component repository error while discovering extension components", e );
         }
     }
 

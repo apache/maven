@@ -4,7 +4,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleLoaderException;
 import org.apache.maven.lifecycle.LifecycleSpecificationException;
 import org.apache.maven.lifecycle.model.MojoBinding;
-import org.apache.maven.plugin.PluginLoader;
 import org.apache.maven.project.MavenProject;
 
 /**

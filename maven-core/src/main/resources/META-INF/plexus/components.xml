@@ -42,7 +42,7 @@ use a configuration source to pull in the lifecycle information.
       <implementation>org.apache.maven.lifecycle.binding.DefaultLifecycleBindingManager</implementation>
       <requirements>
         <requirement>
-          <role>org.apache.maven.plugin.PluginLoader</role>
+          <role>org.apache.maven.plugin.PluginManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.lifecycle.LifecycleBindingLoader</role>

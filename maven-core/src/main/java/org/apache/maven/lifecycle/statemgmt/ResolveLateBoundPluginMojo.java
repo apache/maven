@@ -7,8 +7,8 @@ import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginLoader;
 import org.apache.maven.plugin.PluginLoaderException;
+import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -19,7 +19,7 @@ public class ResolveLateBoundPluginMojo extends AbstractMojo
     /**
      * @component
      */
-    private PluginLoader pluginLoader;
+    private PluginManager pluginLoader;
 
     private String groupId;
 

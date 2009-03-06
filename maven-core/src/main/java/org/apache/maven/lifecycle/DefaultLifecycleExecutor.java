@@ -46,7 +46,6 @@ import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginLoader;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
@@ -82,9 +81,6 @@ public class DefaultLifecycleExecutor
 {
     @Requirement
     private PluginManager pluginManager;
-
-    @Requirement
-    private PluginLoader pluginLoader;
 
     @Requirement
     private BuildPlanner buildPlanner;
@@ -446,10 +442,7 @@ public class DefaultLifecycleExecutor
             PluginDescriptor pluginDescriptor;
             try
             {
-                pluginDescriptor = pluginLoader.loadPlugin(
-                    mojoBinding,
-                    project,
-                    session );
+                pluginDescriptor = pluginManager.loadPlugin( mojoBinding, project, session );
             }
             catch ( PluginLoaderException e )
             {
@@ -846,10 +839,7 @@ public class DefaultLifecycleExecutor
             session,
             true );
 
-        PluginDescriptor descriptor = pluginLoader.loadPlugin(
-            binding,
-            project,
-            session );
+        PluginDescriptor descriptor = pluginManager.loadPlugin( binding, project, session );
 
         MojoDescriptor mojoDescriptor = descriptor.getMojo( binding.getGoal() );
 

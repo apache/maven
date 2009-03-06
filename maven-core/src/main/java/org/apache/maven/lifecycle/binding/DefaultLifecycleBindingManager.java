@@ -21,8 +21,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
-import org.apache.maven.plugin.PluginLoader;
 import org.apache.maven.plugin.PluginLoaderException;
+import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
@@ -31,7 +31,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -52,7 +51,7 @@ public class DefaultLifecycleBindingManager
     implements LifecycleBindingManager, LogEnabled
 {
     @Requirement
-    private PluginLoader pluginLoader;
+    private PluginManager pluginLoader;
 
     @Requirement
     private MojoBindingFactory mojoBindingFactory;
