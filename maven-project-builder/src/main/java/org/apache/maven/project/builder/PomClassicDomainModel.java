@@ -382,14 +382,20 @@ public class PomClassicDomainModel implements InputStreamDomainModel
         }
     }
 
-	public boolean isMostSpecialized() 
-	{
-		return isMostSpecialized;
-	}
+    public boolean isMostSpecialized()
+    {
+        return isMostSpecialized;
+    }
 
-	public void setMostSpecialized(boolean isMostSpecialized) 
-	{
-		this.isMostSpecialized = isMostSpecialized;	
-	}
+    public void setMostSpecialized( boolean isMostSpecialized )
+    {
+        this.isMostSpecialized = isMostSpecialized;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.valueOf( id );
+    }
 
 }
