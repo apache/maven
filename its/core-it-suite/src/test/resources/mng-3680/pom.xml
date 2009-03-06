@@ -11,19 +11,6 @@
   <description>
     Verify that dependencies with invalid POMs can still be used without failing the build.
   </description>
-  
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <dependencies>
     <dependency>
