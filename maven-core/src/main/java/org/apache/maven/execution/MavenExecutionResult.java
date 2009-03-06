@@ -53,10 +53,4 @@ public interface MavenExecutionResult
     MavenExecutionResult addException( Throwable e );
 
     boolean hasExceptions();
-
-    BuildPlan getBuildPlan( String projectId );
-
-    BuildPlan getBuildPlan( MavenProject project );
-
-    void setBuildPlans( Map buildPlan );
 }

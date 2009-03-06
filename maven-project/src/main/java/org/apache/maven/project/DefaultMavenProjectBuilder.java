@@ -162,7 +162,14 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteArtifactRepositories, ArtifactRepository localRepository, boolean allowStubs )
         throws ProjectBuildingException
     {
-        return buildFromRepository( artifact, remoteArtifactRepositories, localRepository );
+        Artifact pomArtifact = artifact;
+        
+        if ( !artifact.getType().equals( "pom" ) )
+        {
+            pomArtifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+        }
+        
+        return buildFromRepository( pomArtifact, remoteArtifactRepositories, localRepository );
     }
 
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )

@@ -42,8 +42,6 @@ public class DefaultMavenExecutionResult
 
     private ReactorManager reactorManager;
 
-    private Map buildPlans;
-
     public MavenExecutionResult setProject( MavenProject project )
     {
         this.project = project;
@@ -112,20 +110,5 @@ public class DefaultMavenExecutionResult
         this.reactorManager = reactorManager;
 
         return this;
-    }
-
-    public BuildPlan getBuildPlan( String projectId )
-    {
-        return (BuildPlan) buildPlans.get( projectId );
-    }
-
-    public BuildPlan getBuildPlan( MavenProject project )
-    {
-        return (BuildPlan) buildPlans.get( project.getId() );
-    }
-
-    public void setBuildPlans( Map buildPlans )
-    {
-        this.buildPlans = buildPlans;
     }
 }

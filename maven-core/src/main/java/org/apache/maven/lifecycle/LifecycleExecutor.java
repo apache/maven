@@ -40,8 +40,6 @@ import org.apache.maven.project.MavenProject;
  */
 public interface LifecycleExecutor
 {
-    String ROLE = LifecycleExecutor.class.getName();
-
     /**
      * Provides a fail-fast way to check that all goals specified in {@link MavenExecutionRequest#getGoals()}
      * or {@link MavenSession#getGoals()} is valid.

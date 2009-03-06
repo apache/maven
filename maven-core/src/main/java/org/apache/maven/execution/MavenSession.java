@@ -19,8 +19,17 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Stack;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.lifecycle.plan.BuildPlan;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -31,17 +40,6 @@ import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Stack;
 
 /**
  * @author Jason van Zyl
@@ -65,12 +63,7 @@ public class MavenSession
 
     private Map reports = new LinkedHashMap();
 
-    private Map buildPlans = new HashMap();
-
-    public MavenSession( PlexusContainer container,
-                         MavenExecutionRequest request,
-                         EventDispatcher eventDispatcher,
-                         ReactorManager reactorManager )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, EventDispatcher eventDispatcher, ReactorManager reactorManager )
     {
         this.container = container;
 
@@ -267,26 +260,6 @@ public class MavenSession
         }
 
         return reports.keySet();
-    }
-
-    public BuildPlan getBuildPlan( String projectId )
-    {
-        return (BuildPlan) buildPlans.get( projectId );
-    }
-
-    public BuildPlan getBuildPlan( MavenProject project )
-    {
-        return (BuildPlan) buildPlans.get( project.getId() );
-    }
-
-    public void setBuildPlan( MavenProject project, BuildPlan buildPlan )
-    {
-        buildPlans.put( project.getId(), buildPlan );
-    }
-
-    public Map getBuildPlans()
-    {
-        return buildPlans;
     }
 
     public ProjectBuilderConfiguration getProjectBuilderConfiguration()

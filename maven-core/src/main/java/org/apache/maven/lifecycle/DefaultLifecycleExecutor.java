@@ -147,15 +147,6 @@ public class DefaultLifecycleExecutor
 
         List taskSegments = segmentTaskListByAggregationNeeds( goals, session, rootProject );
 
-        try
-        {
-            buildPlanner.constructInitialProjectBuildPlans( session );
-        }
-        catch ( LifecycleException e )
-        {
-            throw new LifecycleExecutionException( "Failed to construct one or more initial build plans." + " Reason: " + e.getMessage(), e );
-        }
-
         executeTaskSegments( taskSegments, reactorManager, session, rootProject, dispatcher );
     }
 
@@ -169,11 +160,7 @@ public class DefaultLifecycleExecutor
      * method will iterate through each project, and execute all the goals implied
      * by the current task segment.
      */
-    private void executeTaskSegments( final List taskSegments,
-                                      final ReactorManager reactorManager,
-                                      final MavenSession session,
-                                      final MavenProject rootProject,
-                                      final EventDispatcher dispatcher )
+    private void executeTaskSegments( List taskSegments, ReactorManager reactorManager, MavenSession session, MavenProject rootProject, EventDispatcher dispatcher )
         throws LifecycleExecutionException, BuildFailureException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
@@ -377,10 +364,7 @@ public class DefaultLifecycleExecutor
      * of MojoBindings, each fully configured to execute, which enables us to enumerate the full build plan to the debug
      * log-level, complete with the configuration each mojo will use.
      */
-    private List getLifecycleBindings( final List tasks,
-                                       final MavenProject project,
-                                       final MavenSession session,
-                                       final String targetDescription )
+    private List getLifecycleBindings( List tasks, MavenProject project, MavenSession session, String targetDescription )
         throws LifecycleExecutionException
     {
         List mojoBindings;
@@ -421,13 +405,9 @@ public class DefaultLifecycleExecutor
      * is not the root project of the reactor (using {@link ReactorManager#getTopLevelProject()},
      * then print a DEBUG message and skip that execution.
      */
-    private void executeGoalAndHandleFailures( final MojoBinding mojoBinding,
-                                               final MavenSession session,
-                                               final EventDispatcher dispatcher,
-                                               final String event,
-                                               final ReactorManager rm,
-                                               final long buildStartTime,
-                                               final String target,
+    private void executeGoalAndHandleFailures( MojoBinding mojoBinding, MavenSession session, EventDispatcher dispatcher, String event, ReactorManager rm,
+                                               long buildStartTime,
+                                               String target,
                                                boolean allowAggregators )
         throws LifecycleExecutionException, MojoFailureException
     {

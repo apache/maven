@@ -124,6 +124,9 @@ public class DefaultPluginManager
     }
 
     @Requirement
+    private Logger logger;
+    
+    @Requirement
     protected PlexusContainer container;
 
     protected PluginDescriptorBuilder pluginDescriptorBuilder;
@@ -148,9 +151,6 @@ public class DefaultPluginManager
 
     @Requirement
     protected MavenProjectBuilder mavenProjectBuilder;
-
-    @Requirement
-    private Logger logger;
 
     @Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;    

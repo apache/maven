@@ -22,16 +22,6 @@ public interface BuildPlanner
     /**
      * Orchestrates construction of the build plan which will be used by the user of LifecycleExecutor.
      */
-    BuildPlan constructBuildPlan( List tasks,
-                                  MavenProject project,
-                                  MavenSession session,
-                                  boolean allowUnbindableMojos )
-        throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException;
-
-    void constructInitialProjectBuildPlans( MavenSession session )
-        throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException;
-
-    BuildPlan constructInitialProjectBuildPlan( MavenProject project,
-                                                MavenSession session )
+    BuildPlan constructBuildPlan( List tasks, MavenProject project, MavenSession session, boolean allowUnbindableMojos )
         throws LifecycleLoaderException, LifecycleSpecificationException, LifecyclePlannerException;
 }
