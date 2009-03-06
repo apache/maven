@@ -24,6 +24,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 
@@ -55,7 +56,11 @@ public class MavenIT0142DirectDependencyScopesTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0142" );
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        Properties filterProps = verifier.newDefaultFilterProperties();
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

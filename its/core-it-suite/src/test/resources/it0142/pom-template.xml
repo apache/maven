@@ -26,7 +26,7 @@ under the License.
   <artifactId>consumer</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: it0142</name> 
+  <name>Maven Integration Test :: it0142</name>
   <description>
     Test that the different scopes of direct dependencies end up on the right class paths.
   </description>
@@ -68,19 +68,6 @@ under the License.
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>@baseurl@/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-  
   <build>
     <plugins>
       <plugin>
