@@ -27,16 +27,6 @@ use a configuration source to pull in the lifecycle information.
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.plugin.PluginRepository</role>
-      <role-hint>default</role-hint>
-      <implementation>org.apache.maven.plugin.DefaultPluginRepository</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.plugin.MavenPluginCollector</role>
-        </requirement>
-        </requirements>
-    </component>
-    <component>
       <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.lifecycle.binding.DefaultLifecycleBindingManager</implementation>
