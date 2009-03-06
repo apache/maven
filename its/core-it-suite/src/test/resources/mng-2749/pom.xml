@@ -31,19 +31,6 @@ under the License.
     Verify that plugins can load classes/resources from a build extension.
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <build>
     <extensions>
       <extension>
