@@ -21,12 +21,17 @@ under the License.
 
 <settings>
   <profiles>
+    <!-- NOTE: The ugly formatting is essential part of this test! -->
     <profile>
-      <id>maven-core-it-repo</id>
+      <id>
+        maven-core-it-repo
+      </id>
       <repositories>
         <repository>
           <id>maven-core-it</id>
-          <url>@baseurl@/repo</url>
+          <url>
+            @baseurl@/repo
+          </url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>
           </releases>
@@ -38,6 +43,6 @@ under the License.
     </profile>
   </profiles>
   <activeProfiles>
-    <activeProfile>maven-core-it-repo</activeProfile>
+    <activeProfile>   maven-core-it-repo   </activeProfile>
   </activeProfiles>
 </settings>
