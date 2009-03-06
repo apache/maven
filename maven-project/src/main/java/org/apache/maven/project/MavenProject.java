@@ -243,29 +243,7 @@ public class MavenProject
             }
         }
 
-        setRemoteArtifactRepositories( projectBuilderConfiguration.getRemoteRepositories() );
-        
-        /*
-        try
-        {
-            Set<Repository> repoSet = new LinkedHashSet<Repository>();
-            if ( ( model.getRepositories() != null ) && !model.getRepositories().isEmpty() )
-            {
-                repoSet.addAll( model.getRepositories() );
-            }
-
-            if ( ( model.getPluginRepositories() != null ) && !model.getPluginRepositories().isEmpty() )
-            {
-                repoSet.addAll( model.getPluginRepositories() );
-            }
-
-            setRemoteArtifactRepositories( repositorySystem.buildArtifactRepositories( new ArrayList<Repository>( repoSet ) ) );
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
-        */
+        setRemoteArtifactRepositories( projectBuilderConfiguration.getRemoteRepositories() );       
     }
 
     /**
