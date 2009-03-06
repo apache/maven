@@ -15,7 +15,6 @@ public class ExecutionRule implements ModelContainerRule {
         List<ModelProperty> processedProperties = new ArrayList<ModelProperty>();
 
         for(ModelProperty mp : properties) {
-        	System.out.println("1 - " + mp);
             if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.goal)) {
                 goalProperties.add(mp);
             } else if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.xURI)) {
