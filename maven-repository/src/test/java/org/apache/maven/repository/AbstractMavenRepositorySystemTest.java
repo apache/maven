@@ -35,9 +35,14 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.mercury.util.FileUtil;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
+import org.sonatype.plexus.jetty.DefaultServletContainer;
+import org.sonatype.plexus.webcontainer.ServletContainer;
 
 /**
  *
@@ -60,6 +65,8 @@ public abstract class AbstractMavenRepositorySystemTest
     ArtifactFactory _artifactFactory;
     
     protected MavenRepositorySystem _mrs;
+    
+    protected Startable _server;
     
     @Override
     protected void setUp()
@@ -87,6 +94,22 @@ public abstract class AbstractMavenRepositorySystemTest
         _localRepo = new DefaultArtifactRepository("local", _localBase.getCanonicalPath(), new DefaultRepositoryLayout() );
         
         _artifactFactory = getContainer().lookup( ArtifactFactory.class );
+        
+        _server = (Startable) getContainer().lookup( ServletContainer.class );
+        
+        _server.start();
+    }
+    
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+        
+        if( _server != null )
+            _server.stop();
+        
+        _server = null;
     }
 
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
@@ -123,6 +146,7 @@ public abstract class AbstractMavenRepositorySystemTest
         request.setLocalRepository( _localRepo );
         request.setRemoteRepostories( _remoteRepos );
         request.setArtifact( artifact );
+        request.setResolveRoot( true );
         
         ArtifactResolutionResult res = _mrs.resolve( request );
         
@@ -152,6 +176,23 @@ public abstract class AbstractMavenRepositorySystemTest
         }
 
     }
+
+    
+//    public void testRetrieveVersions() throws Exception
+//    {
+//        Artifact artifact = _artifactFactory.createArtifact( "asm", "asm", "[3.0,3.2)", "compile", "jar" );
+//        
+//        List<ArtifactVersion> res = _mrs.retrieveAvailableVersions( artifact, _localRepo, _remoteRepos );
+//        
+//        assertNotNull( res );
+//        
+//        assertEquals( 2, res.size() );
+//        
+//        assertTrue( res.contains( new DefaultArtifactVersion("3.0") ) );
+//        
+//        assertTrue( res.contains( new DefaultArtifactVersion("3.1") ) );
+//
+//    }
 
     
 }

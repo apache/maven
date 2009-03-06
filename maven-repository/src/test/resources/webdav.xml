@@ -1,9 +1,4 @@
 <plexus>
-  <load-on-start>
-    <component>    
-      <role>org.sonatype.plexus.webcontainer.ServletContainer</role>                                                    
-    </component>
-  </load-on-start>
   <components>
     <component>
       <role>org.sonatype.plexus.webcontainer.ServletContainer</role>
