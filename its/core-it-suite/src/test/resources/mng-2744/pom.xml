@@ -45,19 +45,6 @@ under the License.
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>mng2744</id>
-      <url>file://${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>fail</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>fail</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <build>
     <plugins>
       <plugin>
