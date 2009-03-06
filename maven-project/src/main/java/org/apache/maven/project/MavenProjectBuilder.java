@@ -24,10 +24,6 @@ import org.apache.maven.profiles.ProfileManager;
 
 public interface MavenProjectBuilder
 {
-    boolean STRICT_MODEL_PARSING = true;
-
-    // Used directly by plugins
-
     // site
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;

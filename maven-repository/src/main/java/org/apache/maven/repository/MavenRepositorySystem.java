@@ -60,6 +60,9 @@ public interface MavenRepositorySystem
 
     Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, String inheritedScope );
     
+    //REMOVE
+    // This will disappear when we actually deal with resolving a root dependency and its dependencies. This is used everywhere because of that
+    // deficiency
     Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
         throws VersionNotFoundException;
 
@@ -75,12 +78,14 @@ public interface MavenRepositorySystem
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
-            
+       
+    //REMOVE
     // Network enablement: this needs to go as we will know at a higher level from the embedder if the system is offline or not, we should not have to
     // deal with this here.
     void setOnline( boolean online );
     boolean isOnline();
     
+    //REMOVE
     // These should be associated with repositories and the repositories should be examine as part of metadatda and
     // artifact resolution. So these methods should also not be here.
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );

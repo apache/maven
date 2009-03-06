@@ -34,7 +34,6 @@ import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
@@ -101,8 +100,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentRepositoryExc
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -1354,7 +1351,10 @@ public class DefaultPluginManager
 
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( artifact ).setResolveRoot( false ).setArtifactDependencies( project.getDependencyArtifacts() )
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( artifact )
+            .setResolveRoot( false )
+            .setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( context.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() )
