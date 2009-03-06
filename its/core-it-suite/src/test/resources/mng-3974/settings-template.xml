@@ -20,6 +20,39 @@ under the License.
 -->
 
 <settings>
+  <profiles>
+    <profile>
+      <id>maven-core-it-repo</id>
+      <repositories>
+        <repository>
+          <!-- This one will be matched by exact id -->
+          <id>maven-core-it-a</id>
+          <url>http://maven.apache.org/null</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <!-- This one will be matched by pattern -->
+          <id>maven-core-it-b</id>
+          <url>http://maven.apache.org/null</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>maven-core-it-repo</activeProfile>
+  </activeProfiles>
+
   <mirrors>
     <!-- 
     NOTE: The next block of mirrors matches the first test repo by exact id.
