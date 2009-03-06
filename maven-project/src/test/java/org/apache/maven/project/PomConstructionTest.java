@@ -90,21 +90,6 @@ public class PomConstructionTest
         assertEquals( "test-prop", pom.getValue( "properties[1]/b" ) );//verifies profile applied
         assertEquals( "test-module", pom.getValue( "modules[1]" ) );
     }
-    
-    /**
-     * Tests that modules is not overriden by profile
-     * 
-     * @throws Exception
-     */
-    /*
-    public void testPluginManagementDuplicate()
-        throws Exception
-    {
-        PomTestWrapper pom = buildPom( "plugin-management-duplicate");
-      //  assertEquals("target", pom.getValue("build/plugins[1]/configuration/domParam/copy/fileset@dir"));
-        System.out.println(pom.getDomainModel().asString());
-    }
-    */
 
     /**
      * Will throw exception if doesn't find parent(s) in build
@@ -130,7 +115,6 @@ public class PomConstructionTest
        throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-config-properties" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( "my.property", pom.getValue( "build/plugins[1]/configuration[1]/systemProperties[1]/property[1]/name" ) );
     }
     
@@ -293,7 +277,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "single-configuration-inheritance" );
-        
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules" ) ).size() );
         assertEquals("2.0.6", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/requireMavenVersion[1]/version" ) );
         assertEquals("[2.0.6,)", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[2]/requireMavenVersion[1]/version" ) );

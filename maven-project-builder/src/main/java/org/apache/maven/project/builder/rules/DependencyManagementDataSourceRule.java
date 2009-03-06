@@ -31,11 +31,11 @@ public class DependencyManagementDataSourceRule implements DataSourceRule
 
                 for(ModelContainer mc : exclusionContainers)
                 {
-                    for(ModelContainer mc1 : exclusionContainers.subList(exclusionContainers.indexOf(mc) + 1, exclusionContainers.size()))
+                    for(ModelContainer mc1 : exclusionContainers)
                     {
                         if(!mc.equals(mc1)  && mc.containerAction(mc1).equals(ModelContainerAction.JOIN))
                         {
-                            exclusionSource.join(mc1, mc);
+                            exclusionSource.joinWithOriginalOrder(mc1, mc);
                         }
                     }
                 }

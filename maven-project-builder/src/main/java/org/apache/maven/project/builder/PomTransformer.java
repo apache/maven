@@ -269,7 +269,7 @@ public class PomTransformer
                             if(b.containerAction(c).equals(ModelContainerAction.JOIN))
                             {
                                 //MNG-3995 - property lost here
-                                joinedContainers.addAll(source.joinWithOriginalOrder(b, c).getProperties());
+                                joinedContainers.addAll(source.join(b, c).getProperties());
                                 joinedExecutionContainers.add(a);
                             }
                         }
@@ -361,9 +361,10 @@ public class PomTransformer
                                     new AlwaysJoinModelContainerFactory()));
             for(ModelContainer es : executionSource.queryFor( ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri )) {
                 ExecutionRule rule = new ExecutionRule();
-                System.out.println("----");
-                List<ModelProperty> x = !aContainsAnyOfB(es.getProperties(), joinedContainers) ? es.getProperties() :
-                       rule.execute(es.getProperties());
+               // List<ModelProperty> x = rule.execute(es.getProperties());
+                List<ModelProperty> x = !aContainsAnyOfB(es.getProperties(), joinedContainers) ? rule.execute(es.getProperties()) :
+                        ModelTransformerContext.sort(rule.execute(es.getProperties()),
+                                ProjectUri.Build.Plugins.Plugin.Executions.Execution.xUri);
                 
                 dataSource.replace(es, es.createNewInstance(x));
             }
@@ -410,6 +411,7 @@ public class PomTransformer
                 p.add(mp);
             }
         }
+
         return factory.createDomainModel( p );
     }
 

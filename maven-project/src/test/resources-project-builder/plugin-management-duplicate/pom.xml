@@ -20,7 +20,51 @@ under the License.
 -->
 
 <project>
-	<copy todir="src" overwrite="true">
-		<fileset dir="target" />
-	</copy>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4053</groupId>
+  <artifactId>test2</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-4053</name> 
+  <description>
+    Verify that attributes in plugin configuration elements are not erroneously duplicated to other elements when
+    plugin management is used.
+  </description>
+
+  <build>
+    <!-- NOTE: This test used plugin management for the IT plugin -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.its.plugins</groupId>
+          <artifactId>maven-it-plugin-configuration</artifactId>
+          <version>2.1-SNAPSHOT</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>config</goal>
+            </goals>
+            <configuration>
+              <propertiesFile>target/config.properties</propertiesFile>
+              <domParam>
+                <copy todir="src" overwrite="true">
+                  <fileset dir="target"/>
+                </copy>
+              </domParam>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

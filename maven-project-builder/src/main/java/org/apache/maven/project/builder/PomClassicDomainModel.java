@@ -322,27 +322,6 @@ public class PomClassicDomainModel implements InputStreamDomainModel
             
             modelProperties = ModelMarshaller.marshallXmlToModelProperties(
                 getInputStream(), ProjectUri.baseUri, s );
-            String artifactId = null, groupId = null, version = null;//TODO Expand to full projectId
-            for(ModelProperty mp : modelProperties)
-            {
-            	if( mp.getUri().equals(ProjectUri.artifactId))
-            	{
-            		artifactId = mp.getResolvedValue();         		
-            	}
-            	else if( mp.getUri().equals(ProjectUri.groupId))
-            	{
-            		groupId = mp.getResolvedValue();
-            	} 
-            	else if (mp.getUri().equals(ProjectUri.version))
-            	{
-            		version = mp.getResolvedValue();
-            	}
-            }
-            
-            for(ModelProperty mp : modelProperties)
-            {
-            	mp.setTag(groupId + ":" + artifactId + ":" + version);
-            }
         }
         return new ArrayList<ModelProperty>(modelProperties);
     }

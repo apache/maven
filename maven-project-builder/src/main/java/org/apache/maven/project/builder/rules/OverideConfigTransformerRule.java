@@ -28,7 +28,7 @@ public class OverideConfigTransformerRule implements JoinRule
                 ModelContainerAction action = transformedReportContainer.containerAction( reportContainer );
                 if ( action.equals( ModelContainerAction.JOIN ) )
                 {
-                    source.join( reportContainer, transformedReportContainer  );
+                    source.join( transformedReportContainer, reportContainer );
                     break;
                 }
             }
