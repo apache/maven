@@ -38,11 +38,13 @@ import java.util.List;
 
 public final class ProjectUtils
 {
+    static MavenRepositorySystem rs;
+        
     private ProjectUtils()
     {
     }
 
-    public static List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer container )
+    public static List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
 
@@ -50,90 +52,28 @@ public final class ProjectUtils
         
         for ( Repository r : repositories )
         {
-            remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, container ) );
+            remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, c ) );
         }
 
-        remoteRepositories = rs( container ).getMirrors( remoteRepositories );
+        remoteRepositories = rs( c ).getMirrors( remoteRepositories );
 
         return remoteRepositories;
     }
 
-    public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
-                                                                        ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                                        PlexusContainer container )
+    public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
-        if ( repo != null )
-        {
-            String id = repo.getId();
-            String url = repo.getUrl();
-
-            return artifactRepositoryFactory.createDeploymentArtifactRepository( id, url, repo.getLayout(), repo.isUniqueVersion() );
-        }
-        else
-        {
-            return null;
-        }
+        return rs( c ).buildArtifactRepository( repo );
     }
 
-    public static ArtifactRepository buildArtifactRepository( Repository repo,
-                                                              ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                              PlexusContainer container )
+    public static ArtifactRepository buildArtifactRepository( Repository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
-        if ( repo != null )
-        {
-            String id = repo.getId();
-            String url = repo.getUrl();
-
-            if ( id == null || id.trim().length() < 1 )
-            {
-                throw new MissingRepositoryElementException( "Repository ID must not be empty (URL is: " + url + ")." );
-            }
-
-            if ( url == null || url.trim().length() < 1 )
-            {
-                throw new MissingRepositoryElementException( "Repository URL must not be empty (ID is: " + id + ").",
-                                                             id );
-            }
-
-            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
-            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
-
-            return artifactRepositoryFactory.createArtifactRepository( id, url, repo.getLayout(), snapshots, releases );
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    private static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy )
-    {
-        boolean enabled = true;
-        String updatePolicy = null;
-        String checksumPolicy = null;
-
-        if ( policy != null )
-        {
-            enabled = policy.isEnabled();
-            if ( policy.getUpdatePolicy() != null )
-            {
-                updatePolicy = policy.getUpdatePolicy();
-            }
-            if ( policy.getChecksumPolicy() != null )
-            {
-                checksumPolicy = policy.getChecksumPolicy();
-            }
-        }
-
-        return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
+        return rs( c  ).buildArtifactRepository( repo );        
     }
 
     private static MavenRepositorySystem rs( PlexusContainer c )
     {
-        MavenRepositorySystem rs = null;
-        
         try
         {
             rs = c.lookup( MavenRepositorySystem.class );
