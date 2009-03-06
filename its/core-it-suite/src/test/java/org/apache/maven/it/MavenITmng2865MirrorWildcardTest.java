@@ -41,27 +41,30 @@ public class MavenITmng2865MirrorWildcardTest
     }
 
     /**
-     * Test that the mirror wildcard * matches any repo, in particular local/file repos.
+     * Test that the mirror wildcard * matches any repo, in particular file:// repos.
      */
-    public void testitUserRepos()
+    public void testitFileRepo()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2865/test-1" );
+        testit( "file" );
+    }
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng2865" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
+    /**
+     * Test that the mirror wildcard * matches any repo, in particular http://localhost repos.
+     */
+    public void testitLocalhostRepo()
+        throws Exception
+    {
+        testit( "localhost" );
+    }
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2865", "a", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2865", "b", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2865", "c", "0.1", "jar" );
+    /**
+     * Test that the mirror wildcard * matches any repo, in particular external repos.
+     */
+    public void testitExternalRepo()
+        throws Exception
+    {
+        testit( "external" );
     }
 
     /**
@@ -70,9 +73,15 @@ public class MavenITmng2865MirrorWildcardTest
     public void testitCentralRepo()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2865/test-4" );
+        testit( "central" );
+    }
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+    private void testit( String project )
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2865" );
+
+        Verifier verifier = new Verifier( new File( testDir, project ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2865" );
         Properties filterProps = verifier.newDefaultFilterProperties();
