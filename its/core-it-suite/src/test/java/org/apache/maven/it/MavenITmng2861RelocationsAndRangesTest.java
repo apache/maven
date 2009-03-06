@@ -39,10 +39,13 @@ public class MavenITmng2861RelocationsAndRangesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2861" );
 
-        Verifier verifier = new Verifier( new File( testDir, "MNG-2861" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "A/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2861" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 

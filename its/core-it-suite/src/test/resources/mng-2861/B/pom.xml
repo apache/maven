@@ -22,19 +22,6 @@
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>id</id>
-      <url>file://localhost/${basedir}/../../repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <build>
     <plugins>
       <plugin>
