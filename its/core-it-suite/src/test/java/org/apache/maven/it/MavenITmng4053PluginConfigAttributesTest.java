@@ -36,7 +36,7 @@ public class MavenITmng4053PluginConfigAttributesTest
 
     public MavenITmng4053PluginConfigAttributesTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0.3,)" );
     }
 
     /**
