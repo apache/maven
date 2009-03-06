@@ -86,7 +86,7 @@ public class ArtifactResolutionResult
 
     public Set<Artifact> getArtifacts()
     {
-        return artifacts;
+        return ( artifacts != null ) ? artifacts : Collections.<Artifact> emptySet();
     }
 
     public void addRequestedArtifact( Artifact artifact )
