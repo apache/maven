@@ -39,7 +39,6 @@ import org.apache.maven.wagon.events.TransferListener;
  * @author Jason van Zyl
  */
 public interface MavenRepositorySystem
-    extends ArtifactMetadataSource // This needs to be removed and it's here because it's passed into the resolver. not sure why we didn't just inject the metadata source.
 {
     // Artifact creation: This needs to be reduced to fewer, if not one, method. 
 
@@ -80,16 +79,7 @@ public interface MavenRepositorySystem
     //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
     
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException;
-    
-    // Retrieving available versions is a function of what repositories that you pass in. If you want local and remote versions then you pass
-    // in both those repositories. We don't need two methods here.
-    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException;
-    
-    // These are only showing up in tests, not called from anywhere else in the core
-    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException;
+        throws ArtifactMetadataRetrievalException;   
 
     // Relocated artifacts are stupid. If you you want to move your shit then too bad. You have to support all your users and leave your stuff
     // there. This is just so problematic because it makes Maven folk responsible and makes the system complicated. 

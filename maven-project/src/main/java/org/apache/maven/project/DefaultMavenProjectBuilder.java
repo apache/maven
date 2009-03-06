@@ -260,8 +260,7 @@ public class DefaultMavenProjectBuilder
         ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pomArtifact ).setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( configuration.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
-            .setManagedVersionMap( project.getManagedVersionMap() )
-            .setMetadataSource( repositorySystem );
+            .setManagedVersionMap( project.getManagedVersionMap() );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 

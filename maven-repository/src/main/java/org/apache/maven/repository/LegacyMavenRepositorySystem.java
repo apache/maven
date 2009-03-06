@@ -277,12 +277,6 @@ public class LegacyMavenRepositorySystem
         return projectArtifacts;
     }    
     
-    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
-        return artifactMetadataSource.retrieveAvailableVersions( artifact, localRepository, remoteRepositories );
-    }
-
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
@@ -466,15 +460,6 @@ public class LegacyMavenRepositorySystem
         {
             serverPermissionsMap.put( repositoryId, permissions );
         }
-    }
-
-    // These two methods are here so that the ArtifactMetadataSource is implemented so that I can pass this into an ArtifactResolutionRequest.
-    // Intermediate measure before separating the RepositorySystem out into its own module.
-
-    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException
-    {
-        return artifactMetadataSource.retrieveAvailableVersionsFromDeploymentRepository( artifact, localRepository, remoteRepository );
     }
 
     public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )

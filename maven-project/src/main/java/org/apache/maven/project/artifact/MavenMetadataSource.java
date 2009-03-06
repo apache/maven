@@ -388,65 +388,6 @@ public class MavenMetadataSource
         }
     }
 
-    /*
-    private List aggregateRepositoryLists( List remoteRepositories, List remoteArtifactRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
-        if ( superProject == null )
-        {
-            try
-            {
-                superProject = mavenProjectBuilder.buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new ArtifactMetadataRetrievalException(
-                    "Unable to parse the Maven built-in model: " + e.getMessage(), e );
-            }
-        }
-
-        List repositories = new ArrayList();
-
-        repositories.addAll( remoteRepositories );
-
-        // ensure that these are defined
-        for ( Iterator it = superProject.getRemoteArtifactRepositories().iterator(); it.hasNext(); )
-        {
-            ArtifactRepository superRepo = (ArtifactRepository) it.next();
-
-            for ( Iterator aggregatedIterator = repositories.iterator(); aggregatedIterator.hasNext(); )
-            {
-                ArtifactRepository repo = (ArtifactRepository) aggregatedIterator.next();
-
-                // if the repository exists in the list and was introduced by another POM's super-pom,
-                // remove it...the repository definitions from the super-POM should only be at the end of
-                // the list.
-                // if the repository has been redefined, leave it.
-                if ( repo.getId().equals( superRepo.getId() ) && repo.getUrl().equals( superRepo.getUrl() ) )
-                {
-                    aggregatedIterator.remove();
-                }
-            }
-        }
-
-        if ( remoteArtifactRepositories != null )
-        {
-            // this list should contain the super-POM repositories, so we don't have to explicitly add them back.
-            for ( Iterator it = remoteArtifactRepositories.iterator(); it.hasNext(); )
-            {
-                ArtifactRepository repository = (ArtifactRepository) it.next();
-
-                if ( !repositories.contains( repository ) )
-                {
-                    repositories.add( repository );
-                }
-            }
-        }
-
-        return repositories;
-    }
-    */
-
     public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
                                                             List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException

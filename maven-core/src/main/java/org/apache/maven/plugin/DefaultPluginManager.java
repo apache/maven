@@ -404,8 +404,13 @@ public class DefaultPluginManager
         // followed by the plugin's default artifact set
         dependencies.addAll( resolutionGroup.getArtifacts() );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pluginArtifact ).setArtifactDependencies( dependencies ).setLocalRepository( localRepository )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() ).setManagedVersionMap( pluginManagedDependencies ).setFilter( filter ).setMetadataSource( repositorySystem );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( pluginArtifact )
+            .setArtifactDependencies( dependencies )
+            .setLocalRepository( localRepository )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( pluginManagedDependencies )
+            .setFilter( filter );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
@@ -1348,8 +1353,10 @@ public class DefaultPluginManager
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( artifact ).setResolveRoot( false ).setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( context.getLocalRepository() ).setRemoteRepostories( project.getRemoteArtifactRepositories() ).setManagedVersionMap( project.getManagedVersionMap() )
-            .setFilter( filter ).setMetadataSource( repositorySystem );
+            .setLocalRepository( context.getLocalRepository() )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( project.getManagedVersionMap() )
+            .setFilter( filter );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 

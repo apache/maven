@@ -39,8 +39,10 @@ import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.events.TransferListener;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -76,6 +78,12 @@ public class DefaultArtifactResolver
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
 
+    @Requirement
+    private PlexusContainer container;
+    
+    //@Requirement 
+    private ArtifactMetadataSource metadataSource;
+    
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------
@@ -349,6 +357,18 @@ public class DefaultArtifactResolver
         ArtifactMetadataSource source = request.getMetadataSource();
         List<ResolutionListener> listeners = request.getListeners();
         ArtifactFilter filter = request.getFilter();
+        
+        if ( source == null )
+        {
+            try
+            {
+                source = container.lookup( ArtifactMetadataSource.class );
+            }
+            catch ( ComponentLookupException e )
+            {
+                // Won't happen
+            }
+        }
         
         if ( listeners == null )
         {
