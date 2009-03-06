@@ -33,7 +33,7 @@ public class MavenITmng3288SystemScopeDirTest
 {
     public MavenITmng3288SystemScopeDirTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0.9,)" );
     }
 
     /**
@@ -48,7 +48,7 @@ public class MavenITmng3288SystemScopeDirTest
         verifier.setAutoclean( false );
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution::compile" );
+            verifier.executeGoal( "validate" );
             fail( "Usage of directory instead of file for system-scoped dependency did not fail dependency resolution" );
         }
         catch ( VerificationException e )
