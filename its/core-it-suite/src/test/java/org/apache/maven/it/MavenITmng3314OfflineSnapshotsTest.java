@@ -55,6 +55,9 @@ public class MavenITmng3314OfflineSnapshotsTest
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
             verifier.deleteArtifacts( "org.apache.maven.its.mng3314" );
             verifier.setLogFileName( "log1.txt" );
+            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+            verifier.getCliOptions().add( "--settings" );
+            verifier.getCliOptions().add( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
