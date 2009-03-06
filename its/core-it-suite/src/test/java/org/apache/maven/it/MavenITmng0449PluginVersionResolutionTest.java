@@ -60,7 +60,8 @@ public class MavenITmng0449PluginVersionResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch-new.txt" );
+        verifier.assertFileNotPresent( "target/touch-release.txt" );
+        verifier.assertFilePresent( "target/touch-snapshot.txt" );
         verifier.assertFilePresent( "target/package.txt" );
     }
 
@@ -81,11 +82,12 @@ public class MavenITmng0449PluginVersionResolutionTest
         verifier.getCliOptions().add( "settings.xml" );
         verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.setLogFileName( "log-cli.txt" );
-        verifier.executeGoal( "org.apache.maven.its.mng0449:maven-it-plugin-a:touch-new" );
+        verifier.executeGoal( "org.apache.maven.its.mng0449:maven-it-plugin-a:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch-new.txt" );
+        verifier.assertFileNotPresent( "target/touch-release.txt" );
+        verifier.assertFilePresent( "target/touch-snapshot.txt" );
     }
 
 }

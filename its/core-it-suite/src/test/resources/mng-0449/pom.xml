@@ -44,7 +44,8 @@ under the License.
             <id>test-1</id>
             <phase>validate</phase>
             <goals>
-              <goal>touch-new</goal>
+              <!-- creates target/touch-release.txt in 0.1 and target/touch-snapshot.txt in 0.2-SNAPSHOT -->
+              <goal>touch</goal>
             </goals>
           </execution>
         </executions>
