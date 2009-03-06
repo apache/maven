@@ -48,8 +48,12 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1703" );
+
         Verifier verifier = new Verifier( new File( testDir, "child" ).getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
