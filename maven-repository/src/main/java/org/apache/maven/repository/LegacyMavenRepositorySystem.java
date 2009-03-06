@@ -118,34 +118,19 @@ public class LegacyMavenRepositorySystem
         return artifactFactory.createProjectArtifact( groupId, artifactId, metaVersionId );
     }
 
-    public Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, boolean optional )
+    public Artifact createDependencyArtifact( Dependency d )
     {
         VersionRange versionRange;
         try
         {
-            versionRange = VersionRange.createFromVersionSpec( version );
+            versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
         }
         catch ( InvalidVersionSpecificationException e )
         {
             return null;
         }
 
-        return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope );
-    }
-
-    public Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, String inheritedScope )
-    {
-        VersionRange versionRange;
-        try
-        {
-            versionRange = VersionRange.createFromVersionSpec( version );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            return null;
-        }
-
-        return artifactFactory.createDependencyArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
+        return artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), d.getScope() );
     }
 
     public Artifact createExtensionArtifact( String groupId, String artifactId, String version )

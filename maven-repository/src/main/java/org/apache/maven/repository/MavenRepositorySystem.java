@@ -48,7 +48,8 @@ public interface MavenRepositorySystem
 
     Artifact createPluginArtifact( String groupId, String artifactId, String version );
 
-    Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, boolean optional );
+    // This is still only used in one place.
+    Artifact createDependencyArtifact( Dependency dependency );
     
     //REMOVE
     // This will disappear when we actually deal with resolving a root dependency and its dependencies. This is used everywhere because of that

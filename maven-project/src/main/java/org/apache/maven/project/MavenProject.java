@@ -1528,7 +1528,7 @@ public class MavenProject
                 {
                     Dependency d = i.next();
 
-                    Artifact artifact = repositorySystem.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getClassifier(), d.getScope(), d.isOptional() );
+                    Artifact artifact = repositorySystem.createDependencyArtifact( d );
 
                     if ( artifact == null )
                     {
