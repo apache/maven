@@ -74,41 +74,43 @@ public class DefaultRepositoryMetadataManager
             File file = new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
             if ( updateCheckManager.isUpdateRequired( metadata, repository, file ) )
+            {
+                getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
+                try
                 {
-                    getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
-                    try
-                    {
-                        wagonManager.getArtifactMetadata( metadata, repository, file, policy.getChecksumPolicy() );
-                    }
-                    catch ( ResourceDoesNotExistException e )
-                    {
-                        getLogger().debug( metadata + " could not be found on repository: " + repository.getId() );
+                    wagonManager.getArtifactMetadata( metadata, repository, file, policy.getChecksumPolicy() );
+                }
+                catch ( ResourceDoesNotExistException e )
+                {
+                    getLogger().debug( metadata + " could not be found on repository: " + repository.getId() );
 
-                        // delete the local copy so the old details aren't used.
-                        if ( file.exists() )
-                        {
-                            file.delete();
-                        }
-                    }
-                    catch ( TransferFailedException e )
+                    // delete the local copy so the old details aren't used.
+                    if ( file.exists() )
                     {
-                        getLogger().warn( metadata + " could not be retrieved from repository: " + repository.getId() + " due to an error: " + e.getMessage() );
-                        getLogger().debug( "Exception", e );
-
-                        getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
-                        repository.setBlacklisted( true );
-
-                        // TODO: [jc; 08-Nov-2005] revisit this for 2.1
-                        // suppressing logging to avoid logging this error twice.
-                    }
-                    finally
-                    {
-                        updateCheckManager.touch( metadata, repository, file );
+                        file.delete();
                     }
                 }
+                catch ( TransferFailedException e )
+                {
+                    getLogger().warn(
+                                      metadata + " could not be retrieved from repository: " + repository.getId()
+                                          + " due to an error: " + e.getMessage() );
+                    getLogger().debug( "Exception", e );
+
+                    getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
+                    repository.setBlacklisted( true );
+
+                    // TODO: [jc; 08-Nov-2005] revisit this for 2.1
+                    // suppressing logging to avoid logging this error twice.
+                }
+                finally
+                {
+                    updateCheckManager.touch( metadata, repository, file );
+                }
+            }
             else
             {
-                getLogger().debug( "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
+                getLogger().debug( "Skipping metadata update of " + metadata.getKey() + " from " + repository.getId() );
             }
 
             // TODO: should this be inside the above check?
