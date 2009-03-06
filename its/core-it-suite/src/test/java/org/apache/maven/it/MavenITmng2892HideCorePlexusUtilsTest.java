@@ -53,6 +53,9 @@ public class MavenITmng2892HideCorePlexusUtilsTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar" );
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "pom" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

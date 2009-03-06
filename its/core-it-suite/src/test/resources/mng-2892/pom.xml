@@ -30,19 +30,6 @@ under the License.
   <description>
     Verify that plugins can use their own version of plexus-utils and are not bound to the version bundled in the core.
   </description>
-
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
   
   <build>
     <plugins>
