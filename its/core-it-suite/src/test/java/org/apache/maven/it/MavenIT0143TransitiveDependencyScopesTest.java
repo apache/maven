@@ -239,6 +239,9 @@ public class MavenIT0143TransitiveDependencyScopesTest
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@scope@", scope );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.setLogFileName( "log-" + scope + ".txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
