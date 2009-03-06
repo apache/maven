@@ -20,10 +20,52 @@ under the License.
 -->
 
 <settings>
+  <profiles>
+    <profile>
+      <id>maven-core-it-repo</id>
+      <repositories>
+        <repository>
+          <id>maven-core-it-file</id>
+          <url>@baseurl@/repo-1</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>maven-core-it-localhost</id>
+          <url>http://localhost:@test.port@/repo-2</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>maven-core-it-ext</id>
+          <url>http://maven.apache.org/null</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>maven-core-it-repo</activeProfile>
+  </activeProfiles>
+
   <mirrors>
     <mirror>
       <id>test-a</id>
       <url>@baseurl@/repo-3</url>
+      <!-- should not match anything but maven-core-it-ext -->
       <mirrorOf>external:*</mirrorOf>
     </mirror>
   </mirrors>
