@@ -19,7 +19,6 @@
 
 package org.apache.maven.it;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -44,7 +43,6 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
 {
 
     public MavenITmng2720SiblingClasspathArtifactsTest()
-        throws InvalidVersionSpecificationException
     {
         super( "[2.1.0,)" );
     }
