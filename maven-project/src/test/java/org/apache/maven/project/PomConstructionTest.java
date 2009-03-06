@@ -28,13 +28,9 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.project.harness.PomTestWrapper;
-import org.apache.maven.project.*;
-import org.apache.maven.project.builder.PomClassicDomainModel;
-import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -50,8 +46,6 @@ public class PomConstructionTest
 
     private DefaultMavenProjectBuilder mavenProjectBuilder;
 
-    private MavenRepositorySystem mavenTools;
-
     private File testDirectory;
 
     private File testMixinDirectory;
@@ -62,7 +56,6 @@ public class PomConstructionTest
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
-        mavenTools = lookup( MavenRepositorySystem.class );
     }
 
     /**
@@ -76,20 +69,25 @@ public class PomConstructionTest
     {
         buildPomFromMavenProject( "empty-distMng-repo-url", null );
     }
-    
 
     /**
      * Tests that modules is not overriden by profile
      * 
      * @throws Exception
      */
+    /* FIXME: cf MNG-786
     public void testProfileModules()
         throws Exception
     {
         PomTestWrapper pom = buildPomFromMavenProject( "profile-module", "a" );
-        assertEquals( "test-prop", pom.getValue( "properties[1]/b" ) );//verifies profile applied
-        assertEquals( "test-module", pom.getValue( "modules[1]" ) );
+        assertEquals( "test-prop", pom.getValue( "properties[1]/b" ) );// verifies profile applied
+        assertEquals( 4, ( (List<?>) pom.getValue( "modules" ) ).size() );
+        assertEquals( "module-2", pom.getValue( "modules[1]" ) );
+        assertEquals( "module-1", pom.getValue( "modules[2]" ) );
+        assertEquals( "module-3", pom.getValue( "modules[3]" ) );
+        assertEquals( "module-4", pom.getValue( "modules[4]" ) );
     }
+    //*/
 
     /**
      * Will throw exception if doesn't find parent(s) in build
