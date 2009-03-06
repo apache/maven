@@ -1205,7 +1205,7 @@ public class MavenProject
                     version = ext.getVersion();
                 }
 
-                Artifact artifact = repositorySystem.createExtensionArtifact( ext.getGroupId(), ext.getArtifactId(), version );
+                Artifact artifact = repositorySystem.createArtifact( ext.getGroupId(), ext.getArtifactId(), version, null, "jar" );
 
                 if ( artifact != null )
                 {

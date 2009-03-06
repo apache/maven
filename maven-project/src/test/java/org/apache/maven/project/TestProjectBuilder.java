@@ -28,6 +28,4 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class TestProjectBuilder 
     extends DefaultMavenProjectBuilder
 {
-    @Requirement(hint="test")
-    private ArtifactResolver artifactResolver;    
 }
