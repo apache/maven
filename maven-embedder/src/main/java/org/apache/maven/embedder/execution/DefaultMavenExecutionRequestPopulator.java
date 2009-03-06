@@ -77,8 +77,7 @@ public class DefaultMavenExecutionRequestPopulator
     @Requirement
     private MavenRepositorySystem repositorySystem;
 
-    // 2009-02-12 Oleg: this component is defined in maven-core components.xml
-    // because it already has another declared (not generated) component
+    // 2009-03-05 Oleg: this component is defined sub-classed in this package
     @Requirement(hint = "maven")
     private SecDispatcher securityDispatcher;
 
