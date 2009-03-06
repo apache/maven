@@ -157,8 +157,6 @@ public class DefaultPluginManager
     
     private Map pluginDefinitionsByPrefix = new HashMap();
     
-    private Context containerContext;
-    
     public DefaultPluginManager()
     {
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
@@ -1988,7 +1986,9 @@ public class DefaultPluginManager
 
         try
         {
-            List componentSetDescriptors = RealmScanningUtils.scanForComponentSetDescriptors( artifact, discoverer, containerContext, "Plugin: " + plugin.getKey() );
+            List componentSetDescriptors =
+                RealmScanningUtils.scanForComponentSetDescriptors( artifact, discoverer, container.getContext(),
+                                                                   "Plugin: " + plugin.getKey() );
 
             if ( !componentSetDescriptors.isEmpty() )
             {
@@ -2001,12 +2001,6 @@ public class DefaultPluginManager
         }
 
         return null;
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        containerContext = context;
     }
     
     // Plugin Mapping Manager
