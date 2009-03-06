@@ -23,7 +23,7 @@ under the License.
   <mirrors>
     <mirror>
       <id>test-mirror</id>
-      <url>@baseurl@/repo</url>
+      <url>@baseurl@/../repo</url>
       <mirrorOf>*</mirrorOf>
     </mirror>
   </mirrors>

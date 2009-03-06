@@ -52,7 +52,7 @@ public class MavenITmng2865MirrorWildcardTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2865" );
         Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
@@ -70,13 +70,13 @@ public class MavenITmng2865MirrorWildcardTest
     public void testitCentralRepo()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2865/test-2" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2865/test-4" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2865" );
         Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
