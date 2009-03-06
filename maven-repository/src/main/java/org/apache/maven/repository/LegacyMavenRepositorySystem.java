@@ -461,12 +461,6 @@ public class LegacyMavenRepositorySystem
             serverPermissionsMap.put( repositoryId, permissions );
         }
     }
-
-    public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
-        return artifactMetadataSource.retrieveRelocatedArtifact( artifact, localRepository, remoteRepositories );
-    }
     
     // Mirror 
     

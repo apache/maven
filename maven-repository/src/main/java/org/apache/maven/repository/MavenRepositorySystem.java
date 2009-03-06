@@ -61,7 +61,7 @@ public interface MavenRepositorySystem
     Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, String inheritedScope );
     
     Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
-    throws VersionNotFoundException;
+        throws VersionNotFoundException;
 
     // Repository creation
 
@@ -74,18 +74,8 @@ public interface MavenRepositorySystem
 
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
-    // Metadata
-
     //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
-    
-    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException;   
-
-    // Relocated artifacts are stupid. If you you want to move your shit then too bad. You have to support all your users and leave your stuff
-    // there. This is just so problematic because it makes Maven folk responsible and makes the system complicated. 
-    public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException;
-        
+            
     // Network enablement: this needs to go as we will know at a higher level from the embedder if the system is offline or not, we should not have to
     // deal with this here.
     void setOnline( boolean online );

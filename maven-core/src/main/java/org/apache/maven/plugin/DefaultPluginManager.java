@@ -56,6 +56,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
@@ -366,24 +367,27 @@ public class DefaultPluginManager
             InvalidDependencyVersionException ee = new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
             throw new InvalidPluginException( "Plugin '" + plugin + "' is invalid: " + e.getMessage(), ee );
         }
-
-        ResolutionGroup resolutionGroup;
-
-        try
-        {
-            resolutionGroup = repositorySystem.retrieve( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
-        }
-        catch ( ArtifactMetadataRetrievalException e )
-        {
-            throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" + pluginArtifact.getId() + "': " + e.getMessage(), pluginArtifact, e );
-        }
-
+        
         /* get plugin managed versions */
         Map pluginManagedDependencies = new HashMap();
+        
+        // This is really crappy that we have to do this. The repository system should deal with this. The retrieval of the transitive dependencies.
+        
+        List<Artifact> pluginArtifacts = new ArrayList<Artifact>();
+        
         try
         {
-            MavenProject pluginProject = mavenProjectBuilder.buildFromRepository( pluginArtifact, project.getRemoteArtifactRepositories(), localRepository );
-
+            Artifact pluginPomArtifact = repositorySystem.createProjectArtifact( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
+            
+            // This does not populate the artifacts of the dependenct projects
+            MavenProject pluginProject = mavenProjectBuilder.buildFromRepository( pluginPomArtifact, project.getRemoteArtifactRepositories(), localRepository );
+            
+            // This needs to be changed so that the resolver deals with this
+            for ( Dependency d : pluginProject.getDependencies() )
+            {
+                pluginArtifacts.add( repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() ) );
+            }
+                        
             if ( pluginProject != null )
             {
                 pluginManagedDependencies = pluginProject.getManagedVersionMap();
@@ -391,7 +395,7 @@ public class DefaultPluginManager
         }
         catch ( ProjectBuildingException e )
         {
-            // this can't happen, it would have blowed up at artifactMetadataSource.retrieve()
+            throw new InvalidPluginException( "Error resolving plugin POM " + e.getMessage() );
         }
 
         Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
@@ -400,7 +404,7 @@ public class DefaultPluginManager
         dependencies.addAll( projectPluginDependencies );
 
         // followed by the plugin's default artifact set
-        dependencies.addAll( resolutionGroup.getArtifacts() );
+        dependencies.addAll( pluginArtifacts );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( pluginArtifact )
@@ -1791,23 +1795,7 @@ public class DefaultPluginManager
 
         Artifact artifact = repositorySystem.createProjectArtifact( groupId, artifactId, metaVersionId );
 
-        String key = artifact.getDependencyConflictId();
-
         String version = null;
-
-        // This takes the spec version and resolves a real version
-        try
-        {
-            ResolutionGroup resolutionGroup = repositorySystem.retrieve( artifact, localRepository, project.getRemoteArtifactRepositories() );
-
-            // switching this out with the actual resolved artifact instance, since the MMSource re-creates the pom
-            // artifact.
-            artifact = resolutionGroup.getPomArtifact();
-        }
-        catch ( ArtifactMetadataRetrievalException e )
-        {
-            throw new PluginVersionResolutionException( groupId, artifactId, e.getMessage(), e );
-        }
 
         String artifactVersion = artifact.getVersion();
 
@@ -1819,7 +1807,9 @@ public class DefaultPluginManager
             while ( !pluginValid && ( artifactVersion != null ) )
             {
                 pluginValid = true;
+                
                 MavenProject pluginProject;
+                
                 try
                 {
                     artifact = repositorySystem.createProjectArtifact( groupId, artifactId, artifactVersion );
