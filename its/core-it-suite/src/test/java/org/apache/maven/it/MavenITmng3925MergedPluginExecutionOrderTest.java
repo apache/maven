@@ -38,7 +38,7 @@ public class MavenITmng3925MergedPluginExecutionOrderTest
 
     public MavenITmng3925MergedPluginExecutionOrderTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0.5,)" );
     }
 
     /**
