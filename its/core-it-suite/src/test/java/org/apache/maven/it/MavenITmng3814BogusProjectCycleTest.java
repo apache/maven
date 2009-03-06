@@ -42,7 +42,7 @@ public class MavenITmng3814BogusProjectCycleTest
     /**
      * Verify that the reactor's project sorter considers artifact versions when checking for cycles.
      */
-    public void testitMNG3813()
+    public void testitMNG3814()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3814" );
@@ -50,6 +50,9 @@ public class MavenITmng3814BogusProjectCycleTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3814" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

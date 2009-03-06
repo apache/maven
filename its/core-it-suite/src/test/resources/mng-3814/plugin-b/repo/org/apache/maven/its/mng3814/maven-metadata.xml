@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><metadata>
-  <plugins>
-    <plugin>
-      <name>Unnamed - org.apache.maven.its.mng3814:maven-mng3814a-plugin:maven-plugin:1.0</name>
-      <prefix>mng3814a</prefix>
-      <artifactId>maven-mng3814a-plugin</artifactId>
-    </plugin>
-  </plugins>
-</metadata>
