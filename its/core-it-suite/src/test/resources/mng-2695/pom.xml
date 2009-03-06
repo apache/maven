@@ -31,35 +31,6 @@ under the License.
     Verify that snapshot plugins which are scheduled for an update don't fail the build when in offline mode.
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-        <!-- NOTE: Trigger update regardless of timestamps -->
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-        <!-- NOTE: Trigger update regardless of timestamps -->
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-
   <build>
     <plugins>
       <!-- This has been deployed using uniqueVersion=false, it's the most prominent problem case -->
