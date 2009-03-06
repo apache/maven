@@ -73,15 +73,17 @@ public interface MavenRepositorySystem
     ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException;
 
-    //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
-
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     // Metadata
 
+    //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
+    
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
-
+    
+    // Retrieving available versions is a function of what repositories that you pass in. If you want local and remote versions then you pass
+    // in both those repositories. We don't need two methods here.
     List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
     
@@ -89,19 +91,20 @@ public interface MavenRepositorySystem
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
 
+    // Relocated artifacts are stupid. If you you want to move your shit then too bad. You have to support all your users and leave your stuff
+    // there. This is just so problematic because it makes Maven folk responsible and makes the system complicated. 
     public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
         
-    // Network enablement
-    
+    // Network enablement: this needs to go as we will know at a higher level from the embedder if the system is offline or not, we should not have to
+    // deal with this here.
     void setOnline( boolean online );
-
     boolean isOnline();
     
+    // These should be associated with repositories and the repositories should be examine as part of metadatda and
+    // artifact resolution. So these methods should also not be here.
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
-
     void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );
-
     void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions );
     
     // Mirrors
