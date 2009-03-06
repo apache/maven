@@ -71,6 +71,7 @@ public class PomTestWrapper
         try {
             context = JXPathContext.newContext( new MavenXpp3Reader().read(domainModel.getInputStream()));
         } catch (XmlPullParserException e) {
+        	e.printStackTrace();
             throw new IOException(e.getMessage());
         }
     }

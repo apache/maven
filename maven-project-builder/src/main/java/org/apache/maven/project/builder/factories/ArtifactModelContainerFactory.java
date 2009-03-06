@@ -150,6 +150,10 @@ public final class ArtifactModelContainerFactory
                 }
                 else
                 {
+                	for(ModelProperty mp1 : properties)
+                	{
+                		System.out.println("----" + mp1);
+                	}
                     throw new IllegalArgumentException( "Properties do not contain group id. Artifact ID = "
                         + artifactId + ", Version = " + version );
                 }

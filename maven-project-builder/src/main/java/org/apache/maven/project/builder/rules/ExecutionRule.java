@@ -15,6 +15,7 @@ public class ExecutionRule implements ModelContainerRule {
         List<ModelProperty> processedProperties = new ArrayList<ModelProperty>();
 
         for(ModelProperty mp : properties) {
+        	System.out.println("1 - " + mp);
             if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.goal)) {
                 goalProperties.add(mp);
             } else if(mp.getUri().equals(ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.xURI)) {
@@ -36,25 +37,21 @@ public class ExecutionRule implements ModelContainerRule {
                 } else {
                     x = true;
                 }
-
             }
         }
 
         processedProperties.removeAll(c);
-
         if(!goalProperties.isEmpty()) {
-            Collections.reverse(goalProperties);
             List<ModelProperty> uniqueGoals = new ArrayList<ModelProperty>();
             for(ModelProperty mp : goalProperties) {
                 if(!containsProperty(mp, uniqueGoals)) {
                     uniqueGoals.add(mp);
                 }
             }
-            Collections.reverse(uniqueGoals);
-
+          //  Collections.reverse(uniqueGoals);
             processedProperties.addAll(
                     findIndexOf(ProjectUri.Build.Plugins.Plugin.Executions.Execution.Goals.xURI, processedProperties) + 1,
-                    uniqueGoals);
+                    uniqueGoals);       
         }
 
         List<ModelProperty> emptyTags = new ArrayList<ModelProperty>();
@@ -65,14 +62,13 @@ public class ExecutionRule implements ModelContainerRule {
             }
         }
         processedProperties.removeAll(emptyTags);
-
         return processedProperties;
     }
 
 
     private static int findIndexOf(String uri, List<ModelProperty> modelProperties) {
         for(ModelProperty mp : modelProperties) {
-            if(mp.getUri().equals(uri)) {
+            if(mp.getUri().equals(uri) && mp.getResolvedValue() == null) {
                 return modelProperties.indexOf(mp);
             }
         }
@@ -85,11 +81,6 @@ public class ExecutionRule implements ModelContainerRule {
                 boolean b = (mp.getResolvedValue() == null && modelProperty.getResolvedValue() == null) ||
                         (mp.getResolvedValue() != null && !mp.getResolvedValue().trim().equals("")
                                 && mp.getResolvedValue().equals(modelProperty.getResolvedValue()));
-                /*
-                                boolean b = (mp.getResolvedValue() == null && modelProperty.getResolvedValue() == null) ||
-                        (mp.getResolvedValue() != null && modelProperty.getResolvedValue() != null
-                                && mp.getResolvedValue().equals(modelProperty.getResolvedValue()));
-                 */
                 if(b) {
                     return true;
                 }

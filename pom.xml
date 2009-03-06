@@ -62,7 +62,7 @@ under the License.
     <plexusJetty6Version>1.6</plexusJetty6Version>
     <plexusWebdavVersion>1.0</plexusWebdavVersion>    
     <wagonVersion>1.0-beta-4</wagonVersion>
-    <modelBuilderVersion>1.5</modelBuilderVersion>
+    <modelBuilderVersion>1.7-SNAPSHOT</modelBuilderVersion>
     <mercuryVersion>1.0.0-alpha-4</mercuryVersion>
     <mercuryMp3Version>1.0-alpha-1</mercuryMp3Version>
     <securityDispatcherVersion>1.0</securityDispatcherVersion>
