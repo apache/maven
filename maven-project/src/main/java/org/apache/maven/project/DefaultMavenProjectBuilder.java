@@ -197,7 +197,14 @@ public class DefaultMavenProjectBuilder
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration()   
             .setLocalRepository( localRepository )
             .setRemoteRepositories( remoteRepositories );
-
+        /*
+        if( !artifact.getFile().getName().endsWith(".pom"))
+        {
+			throw new ProjectBuildingException("", "Invalid project extension", artifact.getFile());
+		} else {
+			System.out.println("READ: " + artifact.getFile());
+		}
+        */
         project = readModelFromLocalPath( "unknown", artifact.getFile(), config.getLocalRepository(), remoteRepositories, config );
         project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile() );
         artifact.setFile( artifact.getFile() );
