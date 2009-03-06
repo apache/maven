@@ -110,7 +110,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
 
         List missingMessages = new ArrayList();
-        missingMessages.add( "System is offline." );
+        missingMessages.add( " is offline" );
         missingMessages.add( "org.apache.maven.its.mng2883:parent:pom:1.0-SNAPSHOT" );
 
         List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
@@ -303,7 +303,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
 
         List missingMessages = new ArrayList();
-        missingMessages.add( "System is offline." );
+        missingMessages.add( " is offline" );
         missingMessages.add( "org.apache.maven.its.mng2883:plugin" );
 
         List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
