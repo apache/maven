@@ -54,6 +54,9 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.b" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.c" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.c" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

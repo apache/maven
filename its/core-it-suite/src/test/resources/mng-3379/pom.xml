@@ -132,20 +132,6 @@ under the License.
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file://${basedir}/repo</url>
-      <releases>
-        <!-- NOTE: Be sure the verify the integrity -->
-        <checksumPolicy>fail</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <build>
     <plugins>
       <plugin>
