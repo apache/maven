@@ -44,17 +44,11 @@ public interface MavenRepositorySystem
 
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
 
-    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier );
-
-    Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging );
-
     Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId );
 
     Artifact createPluginArtifact( String groupId, String artifactId, String version );
 
     Artifact createExtensionArtifact( String groupId, String artifactId, String version );
-
-    Artifact createParentArtifact( String groupId, String artifactId, String version );
 
     Artifact createDependencyArtifact( String groupId, String artifactId, String version, String type, String classifier, String scope, boolean optional );
 

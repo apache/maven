@@ -328,7 +328,7 @@ public class DefaultMavenProjectBuilder
 
             validateModel( model, projectDescriptor );
 
-            Artifact projectArtifact = repositorySystem.createBuildArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), project.getPackaging() );
+            Artifact projectArtifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
             project.setArtifact( projectArtifact );
 
             project.setParentFile( parentDescriptor );
@@ -699,7 +699,7 @@ public class DefaultMavenProjectBuilder
             return domainModels;
         }
 
-        Artifact artifactParent = repositorySystem.createParentArtifact( domainModel.getParentGroupId(), domainModel.getParentArtifactId(), domainModel.getParentVersion() );
+        Artifact artifactParent = repositorySystem.createProjectArtifact( domainModel.getParentGroupId(), domainModel.getParentArtifactId(), domainModel.getParentVersion() );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifactParent, localRepository, remoteRepositories );
         ArtifactResolutionResult result = repositorySystem.resolve( request );

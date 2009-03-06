@@ -97,14 +97,4 @@ public class MercuryRepositorySystem
 
         return result;
     }
-
-    @Override
-    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
-        // TODO Auto-generated method stub
-        return super.retrieve( artifact, localRepository, remoteRepositories );
-    }
-
 }

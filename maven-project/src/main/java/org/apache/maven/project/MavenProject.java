@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1238,7 +1237,7 @@ public class MavenProject
         if ( parentArtifact == null && model.getParent() != null )
         {
             Parent p = model.getParent();
-            parentArtifact = repositorySystem.createParentArtifact( p.getGroupId(), p.getArtifactId(), p.getVersion() );
+            parentArtifact = repositorySystem.createProjectArtifact( p.getGroupId(), p.getArtifactId(), p.getVersion() );
         }
         return parentArtifact;
     }
