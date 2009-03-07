@@ -228,6 +228,8 @@ public class MavenProject
         this.projectBuilderConfiguration = projectBuilderConfiguration;
         this.repositorySystem = repositorySystem;
         originalModel = model;
+        
+        /*
         DistributionManagement dm = model.getDistributionManagement();
 
         if ( dm != null )
@@ -235,12 +237,8 @@ public class MavenProject
             ArtifactRepository repo = repositorySystem.buildArtifactRepository( dm.getRepository() );
             setReleaseArtifactRepository( repo );
 
-            if ( dm.getSnapshotRepository() != null )
-            {
-                repo = repositorySystem.buildArtifactRepository( dm.getSnapshotRepository() );
-                setSnapshotArtifactRepository( repo );
-            }
         }
+        */
 
         setRemoteArtifactRepositories( projectBuilderConfiguration.getRemoteRepositories() );       
     }
@@ -1098,7 +1096,7 @@ public class MavenProject
                     version = p.getVersion();
                 }
 
-                Artifact artifact = repositorySystem.createPluginArtifact( p.getGroupId(), p.getArtifactId(), version );
+                Artifact artifact = repositorySystem.createPluginArtifact( p );
 
                 if ( artifact == null )
                 {
@@ -1152,7 +1150,11 @@ public class MavenProject
                     version = p.getVersion();
                 }
 
-                Artifact artifact = repositorySystem.createPluginArtifact( p.getGroupId(), p.getArtifactId(), version );
+                Plugin pp = new Plugin();
+                pp.setGroupId( p.getGroupId() );
+                pp.setArtifactId( p.getArtifactId() );
+                pp.setVersion( version );
+                Artifact artifact = repositorySystem.createPluginArtifact( pp );
 
                 if ( artifact != null )
                 {
@@ -1915,11 +1917,33 @@ public class MavenProject
 
     protected ArtifactRepository getReleaseArtifactRepository()
     {
+        if ( getDistributionManagement().getRepository() != null )
+        {           
+            try
+            {
+                setReleaseArtifactRepository( repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() ) );
+            }
+            catch ( InvalidRepositoryException e )
+            {
+            }
+        }
+        
         return releaseArtifactRepository;
     }
 
     protected ArtifactRepository getSnapshotArtifactRepository()
     {
+        if ( getDistributionManagement().getSnapshotRepository() != null )
+        {           
+            try
+            {
+                setSnapshotArtifactRepository( repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() ) );
+            }
+            catch ( InvalidRepositoryException e )
+            {
+            }
+        }
+        
         return snapshotArtifactRepository;
     }
 
@@ -2041,6 +2065,7 @@ public class MavenProject
             setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
         }
 
+        /*
         if ( project.getReleaseArtifactRepository() != null )
         {
             setReleaseArtifactRepository( project.getReleaseArtifactRepository() );
@@ -2050,6 +2075,7 @@ public class MavenProject
         {
             setSnapshotArtifactRepository( project.getSnapshotArtifactRepository() );
         }
+        */
     }
 
     private void addArtifactPath( Artifact a, List<String> list )

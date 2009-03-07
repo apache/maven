@@ -19,10 +19,7 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.repository.MavenRepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 @Component(role=MavenProjectBuilder.class,hint="test")
 public class TestProjectBuilder 

@@ -45,6 +45,7 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
@@ -153,19 +154,19 @@ public class LegacyMavenRepositorySystem
         return artifactFactory.createParentArtifact( groupId, artifactId, version );
     }
 
-    public Artifact createPluginArtifact( String groupId, String artifactId, String version )
+    public Artifact createPluginArtifact( Plugin plugin )
     {
         VersionRange versionRange;
         try
         {
-            versionRange = VersionRange.createFromVersionSpec( version );
+            versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
         }
         catch ( InvalidVersionSpecificationException e )
         {
             return null;
         }
 
-        return artifactFactory.createPluginArtifact( groupId, artifactId, versionRange );
+        return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
     }
 
     /**

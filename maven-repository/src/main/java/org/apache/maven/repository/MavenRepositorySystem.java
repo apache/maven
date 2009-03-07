@@ -32,6 +32,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.wagon.events.TransferListener;
 
@@ -40,15 +41,12 @@ import org.apache.maven.wagon.events.TransferListener;
  */
 public interface MavenRepositorySystem
 {
-    // Artifact creation: This needs to be reduced to fewer, if not one, method. 
-
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
 
     Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId );
 
-    Artifact createPluginArtifact( String groupId, String artifactId, String version );
-
-    // This is still only used in one place.
+    Artifact createPluginArtifact( Plugin plugin );
+    
     Artifact createDependencyArtifact( Dependency dependency );
     
     //REMOVE

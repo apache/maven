@@ -1846,7 +1846,7 @@ public class DefaultPluginManager
 
         MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
 
-        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion() );
+        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
         checkRequiredMavenVersion( plugin, pluginProject, localRepository, project.getRemoteArtifactRepositories() );
 
