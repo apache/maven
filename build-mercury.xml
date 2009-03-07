@@ -67,7 +67,13 @@ END SNIPPET: ant-bootstrap -->
     <property name="maven.repo.central" value="http://repository.sonatype.org/content/groups/public"/>
 <!--
     <property name="maven.repo.central" value="http://repo1.maven.org/maven2"/>
--->   
+-->
+    <condition property="do.not.clean.local.repo">
+      <not>
+        <isset property="clean.local.repo"/>
+      </not>
+    </condition>
+  	
     <property name="surefire.useFile" value="true"/>    
     <echo>maven.home = ${maven.home}</echo>
   </target>
@@ -76,7 +82,12 @@ END SNIPPET: ant-bootstrap -->
     <delete dir="bootstrap"/>
   </target>
 
-  <target name="pull" depends="init" unless="skip.pull">    
+  <target name="clean-local-repo" description="cleans up local repo" unless="do.not.clean.local.repo">
+    <delete dir="${maven.local.repo}"/>
+  	<mkdir dir="${maven.local.repo}"/>
+  </target>
+
+  <target name="pull" depends="init,clean-local-repo" unless="skip.pull">    
     <property name="verbose" value="false"/>    
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
