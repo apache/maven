@@ -1676,7 +1676,7 @@ public class DefaultLifecycleExecutor
         throws BuildFailureException, LifecycleExecutionException, PluginNotFoundException
     {
         String goal;
-        Plugin plugin;
+        Plugin plugin = null;
 
         PluginDescriptor pluginDescriptor = null;
 
@@ -1701,35 +1701,36 @@ public class DefaultLifecycleExecutor
                 // Steps for retrieving the plugin model instance:
                 // 1. request directly from the plugin collector by prefix
                 pluginDescriptor = pluginManager.getPluginDescriptorForPrefix( prefix );
-
-                // 2. look in the repository via search groups
-                if ( pluginDescriptor == null )
-                {
-                    plugin = pluginManager.getPluginDefinitionForPrefix( prefix, session, project );
-                }
-                else
+                if ( pluginDescriptor != null )
                 {
                     plugin = new Plugin();
-
                     plugin.setGroupId( pluginDescriptor.getGroupId() );
                     plugin.setArtifactId( pluginDescriptor.getArtifactId() );
                     plugin.setVersion( pluginDescriptor.getVersion() );
                 }
 
-                // 3. search plugins in the current POM
+                // 2. search plugins in the current POM
                 if ( plugin == null )
                 {
                     for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
                     {
                         Plugin buildPlugin = (Plugin) i.next();
 
-                        PluginDescriptor desc = verifyPlugin( buildPlugin, project, session.getSettings(), session
-                            .getLocalRepository() );
+                        PluginDescriptor desc =
+                            verifyPlugin( buildPlugin, project, session.getSettings(), session.getLocalRepository() );
                         if ( prefix.equals( desc.getGoalPrefix() ) )
                         {
                             plugin = buildPlugin;
+                            pluginDescriptor = desc;
+                            break;
                         }
                     }
+                }
+
+                // 3. look in the repository via search groups
+                if ( plugin == null )
+                {
+                    plugin = pluginManager.getPluginDefinitionForPrefix( prefix, session, project );
                 }
 
                 // 4. default to o.a.m.plugins and maven-<prefix>-plugin
