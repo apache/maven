@@ -27,15 +27,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
-import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
-import org.apache.maven.project.builder.factories.ExclusionModelContainerFactory;
+import org.apache.maven.mercury.artifact.ArtifactMetadata;
+import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectUri;
-import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
+import org.apache.maven.project.builder.factories.ExclusionModelContainerFactory;
 import org.apache.maven.project.builder.profile.ProfileContext;
 import org.apache.maven.shared.model.DataSourceException;
-import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelDataSource;
@@ -60,7 +59,7 @@ public final class MavenDomainModel
      */
     private String eventHistory;
 
-    private ArtifactBasicMetadata parentMetadata;
+    private ArtifactMetadata parentMetadata;
 
     /**
      * Constructor
@@ -102,10 +101,10 @@ public final class MavenDomainModel
         return getParentMetadata() != null;
     }
 
-    public List<ArtifactBasicMetadata> getDependencyMetadata()
+    public List<ArtifactMetadata> getDependencyMetadata()
         throws DataSourceException
     {
-        List<ArtifactBasicMetadata> metadatas = new ArrayList<ArtifactBasicMetadata>();
+        List<ArtifactMetadata> metadatas = new ArrayList<ArtifactMetadata>();
 
         ModelDataSource source = new DefaultModelDataSource( modelProperties, PomTransformer.MODEL_CONTAINER_FACTORIES );
         for ( ModelContainer modelContainer : source.queryFor( ProjectUri.Dependencies.Dependency.xUri ) )
@@ -124,7 +123,7 @@ public final class MavenDomainModel
         return new ProfileContext( dataSource, null, null, properties ).getActiveProfiles();
     }
 
-    public ArtifactBasicMetadata getParentMetadata()
+    public ArtifactMetadata getParentMetadata()
     {
         if ( parentMetadata != null )
         {
@@ -157,7 +156,7 @@ public final class MavenDomainModel
         {
             return null;
         }
-        parentMetadata = new ArtifactBasicMetadata();
+        parentMetadata = new ArtifactMetadata();
         parentMetadata.setArtifactId( artifactId );
         parentMetadata.setVersion( version );
         parentMetadata.setGroupId( groupId );
@@ -165,9 +164,9 @@ public final class MavenDomainModel
         return copyArtifactBasicMetadata( parentMetadata );
     }
 
-    private ArtifactBasicMetadata copyArtifactBasicMetadata( ArtifactBasicMetadata metadata )
+    private ArtifactMetadata copyArtifactBasicMetadata( ArtifactMetadata metadata )
     {
-        ArtifactBasicMetadata amd = new ArtifactBasicMetadata();
+        ArtifactMetadata amd = new ArtifactMetadata();
         amd.setArtifactId( metadata.getArtifactId() );
         amd.setGroupId( metadata.getGroupId() );
         amd.setVersion( metadata.getVersion() );
@@ -200,12 +199,12 @@ public final class MavenDomainModel
         return new ArrayList<ModelProperty>( modelProperties );
     }
 
-    private ArtifactBasicMetadata transformContainerToMetadata( ModelContainer container )
+    private ArtifactMetadata transformContainerToMetadata( ModelContainer container )
         throws DataSourceException
     {
         List<ModelProperty> modelProperties = container.getProperties();
 
-        ArtifactBasicMetadata metadata = new ArtifactBasicMetadata();
+        ArtifactMetadata metadata = new ArtifactMetadata();
         for ( ModelProperty mp : modelProperties )
         {
             if ( mp.getUri().equals( ProjectUri.Dependencies.Dependency.groupId ) )
@@ -245,11 +244,11 @@ public final class MavenDomainModel
 
         ModelDataSource dataSource = new DefaultModelDataSource( container.getProperties(), Arrays.asList( new ArtifactModelContainerFactory(),
                                                                    new ExclusionModelContainerFactory() ) );
-        List<ArtifactBasicMetadata> exclusions = new ArrayList<ArtifactBasicMetadata>();
+        List<ArtifactMetadata> exclusions = new ArrayList<ArtifactMetadata>();
 
         for ( ModelContainer exclusion : dataSource.queryFor( ProjectUri.Dependencies.Dependency.Exclusions.Exclusion.xUri ) )
         {
-            ArtifactBasicMetadata meta = new ArtifactBasicMetadata();
+            ArtifactMetadata meta = new ArtifactMetadata();
             exclusions.add( meta );
 
             for ( ModelProperty mp : exclusion.getProperties() )

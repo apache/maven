@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
+import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.mercury.metadata.DependencyBuilder;
 import org.apache.maven.mercury.metadata.DependencyBuilderFactory;
 import org.apache.maven.mercury.repository.api.ArtifactBasicResults;
@@ -18,7 +18,6 @@ import org.apache.maven.mercury.repository.api.Repository;
 import org.apache.maven.mercury.repository.api.RepositoryReader;
 import org.apache.maven.mercury.repository.local.m2.LocalRepositoryM2;
 import org.apache.maven.mercury.repository.remote.m2.RemoteRepositoryM2;
-//import org.apache.maven.mercury.spi.http.server.HttpTestServer;
 import org.apache.maven.mercury.transport.api.Server;
 import org.apache.maven.mercury.util.FileUtil;
 import org.junit.After;
@@ -111,7 +110,7 @@ public class MavenDependencyProcessorTest
     }
 
     /**
-     * Test method for {@link org.apache.maven.mercury.MavenDependencyProcessor#getDependencies(org.apache.maven.mercury.artifact.ArtifactBasicMetadata, org.apache.maven.mercury.builder.api.MetadataReader, java.util.Map, java.util.Map)}.
+     * Test method for {@link org.apache.maven.mercury.MavenDependencyProcessor#getDependencies(org.apache.maven.mercury.artifact.ArtifactMetadata, org.apache.maven.mercury.builder.api.MetadataReader, java.util.Map, java.util.Map)}.
      */
     public void testMavenVersion()
     throws Exception
@@ -120,8 +119,8 @@ public class MavenDependencyProcessorTest
         
         String gav = "org.apache.maven.plugins:maven-dependency-plugin:2.0";
         
-        ArtifactBasicMetadata bmd = new ArtifactBasicMetadata( gav );
-        ArrayList<ArtifactBasicMetadata> query = new ArrayList<ArtifactBasicMetadata>(1);
+        ArtifactMetadata bmd = new ArtifactMetadata( gav );
+        ArrayList<ArtifactMetadata> query = new ArrayList<ArtifactMetadata>(1);
         query.add( bmd );
         
         ArtifactBasicResults res = rr.readDependencies( query );
@@ -132,7 +131,7 @@ public class MavenDependencyProcessorTest
         
         assertTrue( res.hasResults() );
         
-        List<ArtifactBasicMetadata> deps = res.getResult( bmd );
+        List<ArtifactMetadata> deps = res.getResult( bmd );
         
         assertNotNull( deps );
         
@@ -140,7 +139,7 @@ public class MavenDependencyProcessorTest
         
         System.out.println(deps);
         
-        for( ArtifactBasicMetadata md : deps )
+        for( ArtifactMetadata md : deps )
             if( "${maven.version}".equals( md.getVersion() ) )
                 fail( "dependency has unresolved variable: "+md.toString() );
     }

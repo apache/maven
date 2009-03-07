@@ -19,12 +19,12 @@ package org.apache.maven.mercury;
  * under the License.
  */
 
-import org.apache.maven.shared.model.DomainModelFactory;
-import org.apache.maven.shared.model.DomainModel;
-import org.apache.maven.shared.model.ModelProperty;
-
-import java.util.List;
 import java.io.IOException;
+import java.util.List;
+
+import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.DomainModelFactory;
+import org.apache.maven.shared.model.ModelProperty;
 
 public class MavenDomainModelFactory
     implements DomainModelFactory
