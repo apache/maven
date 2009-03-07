@@ -83,8 +83,8 @@ END SNIPPET: ant-bootstrap -->
   </target>
 
   <target name="clean-local-repo" description="cleans up local repo" unless="do.not.clean.local.repo">
-    <delete dir="${maven.local.repo}"/>
-  	<mkdir dir="${maven.local.repo}"/>
+    <delete dir="${maven.repo.local}"/>
+  	<mkdir dir="${maven.repo.local}"/>
   </target>
 
   <target name="pull" depends="init,clean-local-repo" unless="skip.pull">    
