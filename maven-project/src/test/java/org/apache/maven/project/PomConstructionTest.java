@@ -271,12 +271,14 @@ public class PomConstructionTest
         assertEquals( "src/main/mdo/security.xml", ( pom.getValue( "build/plugins[1]/executions[2]/configuration[1]/model" ) ));
     }
     
+    /*
     public void testPluginConfigDuplicate()
     throws Exception
 {
     PomTestWrapper pom = buildPom( "plugin-config-duplicate/dup" );
     System.out.println(pom.getDomainModel().asString());
 } 
+*/
 
     /* FIX - REGRESSION
     public void testSingleConfigurationInheritance()
