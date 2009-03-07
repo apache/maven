@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.mercury.artifact.ArtifactBasicMetadata;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.repository.api.Repository;
@@ -85,9 +84,9 @@ public class MercuryAdaptor
         return res;
     }
 
-    public static ArtifactBasicMetadata toMercuryBasicMetadata( Artifact a )
+    public static ArtifactMetadata toMercuryBasicMetadata( Artifact a )
     {
-        ArtifactBasicMetadata md = new ArtifactBasicMetadata();
+        ArtifactMetadata md = new ArtifactMetadata();
         md.setGroupId( a.getGroupId() );
         md.setArtifactId( a.getArtifactId() );
         md.setVersion( a.getVersion() );
@@ -122,7 +121,7 @@ public class MercuryAdaptor
         return ma;
     }
     
-    public static Artifact toMavenArtifact( ArtifactFactory af, org.apache.maven.mercury.artifact.ArtifactBasicMetadata a )
+    public static Artifact toMavenArtifact( ArtifactFactory af, org.apache.maven.mercury.artifact.ArtifactMetadata a )
     {
         Artifact ma = a.getClassifier() == null 
                                 ? af.createArtifact( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getScope(), a.getType() )
@@ -135,7 +134,7 @@ public class MercuryAdaptor
     
     public static Artifact toMavenArtifact( ArtifactFactory af, String name )
     {
-        return toMavenArtifact( af, new ArtifactBasicMetadata(name) );
+        return toMavenArtifact( af, new ArtifactMetadata(name) );
     }
 
 }
