@@ -13,16 +13,16 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.repository.LegacyMavenRepositorySystem;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.LegacyRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-@Component(role = MavenRepositorySystem.class, hint = "test")
+@Component(role = RepositorySystem.class, hint = "test")
 public class TestMavenRepositorySystem
-    extends LegacyMavenRepositorySystem
+    extends LegacyRepositorySystem
 {
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException

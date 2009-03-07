@@ -37,7 +37,7 @@ extends AbstractMavenRepositorySystemTest
     {
         super.setUp();
         
-        _mrs = getContainer().lookup( MavenRepositorySystem.class, "default" );
+        _mrs = getContainer().lookup( RepositorySystem.class, "default" );
     }
 
     // TODO: 2009-03-Oleg : turned it off till we figure out which methods work, which don't

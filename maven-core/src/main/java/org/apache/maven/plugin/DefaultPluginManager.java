@@ -79,7 +79,7 @@ import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
 import org.apache.maven.realm.RealmScanningUtils;
 import org.apache.maven.reporting.MavenReport;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelMarshaller;
@@ -139,7 +139,7 @@ public class DefaultPluginManager
     protected MavenPluginCollector pluginCollector;
 
     @Requirement
-    protected MavenRepositorySystem repositorySystem;
+    protected RepositorySystem repositorySystem;
 
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
@@ -1327,7 +1327,7 @@ public class DefaultPluginManager
     // Artifact resolution
     // ----------------------------------------------------------------------
 
-    protected void resolveTransitiveDependencies( MavenSession context, MavenRepositorySystem repositorySystem, String scope, MavenProject project, boolean isAggregator )
+    protected void resolveTransitiveDependencies( MavenSession context, RepositorySystem repositorySystem, String scope, MavenProject project, boolean isAggregator )
         throws ArtifactResolutionException, ArtifactNotFoundException, InvalidDependencyVersionException
     {
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
@@ -1430,7 +1430,7 @@ public class DefaultPluginManager
     // Artifact downloading
     // ----------------------------------------------------------------------
 
-    private void downloadDependencies( MavenProject project, MavenSession context, MavenRepositorySystem repositorySystem )
+    private void downloadDependencies( MavenProject project, MavenSession context, RepositorySystem repositorySystem )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         ArtifactRepository localRepository = context.getLocalRepository();

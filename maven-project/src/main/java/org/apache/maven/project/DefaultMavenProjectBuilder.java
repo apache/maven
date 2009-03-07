@@ -61,7 +61,7 @@ import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
 import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
@@ -97,7 +97,7 @@ public class DefaultMavenProjectBuilder
     private ModelValidator validator;
 
     @Requirement
-    private MavenRepositorySystem repositorySystem;
+    private RepositorySystem repositorySystem;
 
     @Requirement
     private PlexusContainer container;

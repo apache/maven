@@ -64,7 +64,7 @@ import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.reactor.MissingModuleException;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsConfigurationException;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
@@ -127,7 +127,7 @@ public class MavenEmbedder
 
     private MavenProjectBuilder mavenProjectBuilder;
 
-    private MavenRepositorySystem repositorySystem;
+    private RepositorySystem repositorySystem;
     
     private MavenXpp3Reader modelReader;
 
@@ -540,7 +540,7 @@ public class MavenEmbedder
 
             populator = container.lookup( MavenExecutionRequestPopulator.class );
 
-            repositorySystem = container.lookup( MavenRepositorySystem.class );
+            repositorySystem = container.lookup( RepositorySystem.class );
             
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.

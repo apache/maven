@@ -26,7 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -38,7 +38,7 @@ import java.util.List;
 
 public final class ProjectUtils
 {
-    static MavenRepositorySystem rs;
+    static RepositorySystem rs;
         
     private ProjectUtils()
     {
@@ -72,11 +72,11 @@ public final class ProjectUtils
         return rs( c  ).buildArtifactRepository( repo );        
     }
 
-    private static MavenRepositorySystem rs( PlexusContainer c )
+    private static RepositorySystem rs( PlexusContainer c )
     {
         try
         {
-            rs = c.lookup( MavenRepositorySystem.class );
+            rs = c.lookup( RepositorySystem.class );
         }
         catch ( ComponentLookupException e )
         {

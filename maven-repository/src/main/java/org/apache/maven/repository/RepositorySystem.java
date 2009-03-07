@@ -39,7 +39,7 @@ import org.apache.maven.wagon.events.TransferListener;
 /**
  * @author Jason van Zyl
  */
-public interface MavenRepositorySystem
+public interface RepositorySystem
 {
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
 
@@ -83,7 +83,6 @@ public interface MavenRepositorySystem
     
     // Mirrors
     
-    void addMirror( String id, String mirrorOf, String url );
-        
+    void addMirror( String id, String mirrorOf, String url );        
     List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );    
 }

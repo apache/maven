@@ -20,24 +20,25 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FileInputStream;
-import java.util.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.project.harness.PomTestWrapper;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomConstructionTest
     extends PlexusTestCase
 {
-
     private static String BASE_DIR = "src/test";
 
     private static String BASE_POM_DIR = BASE_DIR + "/resources-project-builder";
@@ -45,6 +46,8 @@ public class PomConstructionTest
     private static String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
 
     private DefaultMavenProjectBuilder mavenProjectBuilder;
+
+    private RepositorySystem mavenTools;
 
     private File testDirectory;
 
@@ -56,6 +59,7 @@ public class PomConstructionTest
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
+        mavenTools = lookup( RepositorySystem.class );
     }
 
     /**

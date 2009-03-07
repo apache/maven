@@ -69,7 +69,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.MavenRepositoryWrapper;
 import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.util.StringUtils;
@@ -165,7 +165,7 @@ public class MavenProject
 
     private ProjectBuilderConfiguration projectBuilderConfiguration;
 
-    private MavenRepositorySystem repositorySystem;
+    private RepositorySystem repositorySystem;
     //
 
     private File parentFile;
@@ -210,7 +210,7 @@ public class MavenProject
      * @param projectBuilderConfiguration
      * @throws InvalidRepositoryException
      */
-    public MavenProject( Model model, MavenRepositorySystem repositorySystem, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
+    public MavenProject( Model model, RepositorySystem repositorySystem, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
         if ( model == null )

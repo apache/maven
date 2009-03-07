@@ -64,7 +64,7 @@ public abstract class AbstractMavenRepositorySystemTest
     
     ArtifactFactory _artifactFactory;
     
-    protected MavenRepositorySystem _mrs;
+    protected RepositorySystem _mrs;
     
     protected Startable _server;
     

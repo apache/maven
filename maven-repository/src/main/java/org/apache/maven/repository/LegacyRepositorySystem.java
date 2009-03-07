@@ -59,9 +59,9 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author Jason van Zyl
  */
-@Component(role = MavenRepositorySystem.class)
-public class LegacyMavenRepositorySystem
-    implements MavenRepositorySystem
+@Component(role = RepositorySystem.class)
+public class LegacyRepositorySystem
+    implements RepositorySystem
 {
 
     @Requirement

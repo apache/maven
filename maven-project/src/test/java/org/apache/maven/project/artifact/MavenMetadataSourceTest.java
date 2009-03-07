@@ -29,7 +29,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.util.ArrayList;
@@ -41,13 +41,13 @@ import java.util.Set;
 public class MavenMetadataSourceTest
     extends PlexusTestCase
 {    
-    private MavenRepositorySystem repositorySystem;
+    private RepositorySystem repositorySystem;
     
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        repositorySystem = lookup( MavenRepositorySystem.class );
+        repositorySystem = lookup( RepositorySystem.class );
     }
     
     public void testShouldNotCarryExclusionsOverFromDependencyToDependency()

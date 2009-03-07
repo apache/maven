@@ -48,7 +48,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.validation.ModelValidationResult;
-import org.apache.maven.repository.LegacyMavenRepositorySystem;
+import org.apache.maven.repository.LegacyRepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -459,7 +459,7 @@ public class MavenMetadataSource
     {
         try
         {
-            return LegacyMavenRepositorySystem.createArtifacts( artifactFactory, dependencies, inheritedScope,
+            return LegacyRepositorySystem.createArtifacts( artifactFactory, dependencies, inheritedScope,
                                                                 dependencyFilter, project );
         }
         catch ( VersionNotFoundException e )

@@ -40,7 +40,7 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.realm.DefaultMavenRealmManager;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -75,7 +75,7 @@ public class DefaultMavenExecutionRequestPopulator
     private MavenSettingsBuilder settingsBuilder;
 
     @Requirement
-    private MavenRepositorySystem repositorySystem;
+    private RepositorySystem repositorySystem;
 
     // 2009-03-05 Oleg: this component is defined sub-classed in this package
     @Requirement(hint = "maven")
