@@ -36,7 +36,7 @@ public class MavenITmng2432PluginPrefixOrderTest
 
     public MavenITmng2432PluginPrefixOrderTest()
     {
-        super( "[3.0-alpha-2,)" );
+        super( "[2.1.0,)" );
     }
 
     /**
