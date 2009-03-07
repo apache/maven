@@ -20,7 +20,7 @@ under the License.
 package org.apache.maven.repository.mercury;
 
 import org.apache.maven.repository.AbstractMavenRepositorySystemTest;
-import org.apache.maven.repository.MavenRepositorySystem;
+import org.apache.maven.repository.RepositorySystem;
 
 /**
  *
@@ -37,6 +37,6 @@ public class MercuryRepositorySystemTest
     {
         super.setUp();
         
-        _mrs = getContainer().lookup( MavenRepositorySystem.class, "mercury" );
+        _mrs = getContainer().lookup( RepositorySystem.class, "mercury" );
     }
 }

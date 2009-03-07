@@ -13,7 +13,7 @@ import java.util.List;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.mercury.metadata.DependencyBuilder;
 import org.apache.maven.mercury.metadata.DependencyBuilderFactory;
-import org.apache.maven.mercury.repository.api.ArtifactBasicResults;
+import org.apache.maven.mercury.repository.api.MetadataResults;
 import org.apache.maven.mercury.repository.api.Repository;
 import org.apache.maven.mercury.repository.api.RepositoryReader;
 import org.apache.maven.mercury.repository.local.m2.LocalRepositoryM2;
@@ -123,7 +123,7 @@ public class MavenDependencyProcessorTest
         ArrayList<ArtifactMetadata> query = new ArrayList<ArtifactMetadata>(1);
         query.add( bmd );
         
-        ArtifactBasicResults res = rr.readDependencies( query );
+        MetadataResults res = rr.readDependencies( query );
         
         assertNotNull( res );
         
