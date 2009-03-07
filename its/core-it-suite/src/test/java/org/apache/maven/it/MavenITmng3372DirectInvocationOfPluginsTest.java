@@ -61,7 +61,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
 
         Verifier verifier = new Verifier( plugin.getAbsolutePath() );
 
-        verifier.deleteArtifact( "org.apache.maven.its.mng3372", "mng3372-maven-plugin", "1", "jar" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3372" );
 
         verifier.executeGoals( Arrays.asList( new String[]{ "clean", "install" } ) );
 
