@@ -3,6 +3,7 @@ package org.apache.maven.project.processor;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 
 public class DependencyProcessor extends BaseProcessor
 {
@@ -74,8 +75,31 @@ public class DependencyProcessor extends BaseProcessor
             targetDependency.setVersion( dependency.getVersion() );
         }
         
-        //TODO: Exclusions
+        if(!dependency.getExclusions().isEmpty())
+        {
+            List<Exclusion> targetExclusions = targetDependency.getExclusions();
+            for(Exclusion e : dependency.getExclusions())
+            {
+                if(!containsExclusion(e, targetExclusions))
+                {
+                    Exclusion e1 = new Exclusion();
+                    e1.setArtifactId( e.getArtifactId() );
+                    e1.setGroupId( e.getGroupId() );
+                    targetExclusions.add( e1 );
+                }
+            }
+        }
     }
     
-  
+    private static boolean containsExclusion(Exclusion exclusion, List<Exclusion> exclusions)
+    {
+        for(Exclusion e :exclusions)
+        {
+            if(e.getGroupId().equals( exclusion.getGroupId() ) && e.getArtifactId().equals( exclusion.getArtifactId() ))
+            {
+                return true;
+            }
+        } 
+        return false;
+    }
 }

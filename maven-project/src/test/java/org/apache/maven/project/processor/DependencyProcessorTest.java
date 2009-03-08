@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 
 import junit.framework.TestCase;
 
@@ -75,5 +76,29 @@ public class DependencyProcessorTest extends TestCase
         assertEquals("aid", dependencies.get( 0 ).getArtifactId());
         assertEquals("gid", dependencies.get( 0 ).getGroupId());
         
-    }     
+    } 
+    
+    public void testExclusionJoin()
+    {
+        DependencyProcessor processor = new DependencyProcessor();
+        List<Dependency> dependencies = new ArrayList<Dependency>();
+        
+        Exclusion e = new Exclusion();
+        e.setArtifactId( "aid" );
+        e.setGroupId( "gid" );
+        
+        Dependency child = new Dependency();
+        child.addExclusion( e );
+        
+        Exclusion e1 = new Exclusion();
+        e1.setArtifactId( "aid1" );
+        e1.setGroupId( "gid1" );  
+        Dependency parent = new Dependency();
+        parent.addExclusion( e1 );
+        
+        processor.process( parent, child, dependencies, false );
+        assertEquals(2, dependencies.get( 0 ).getExclusions().size());
+        assertEquals("aid", dependencies.get( 0 ).getExclusions().get( 0 ).getArtifactId());   
+        assertEquals("aid1", dependencies.get( 0 ).getExclusions().get( 1 ).getArtifactId());
+    }
 }
