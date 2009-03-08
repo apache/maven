@@ -43,15 +43,6 @@ public interface PluginManager
 
     Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException;
-
-    Collection<MojoExecution> getMojoExecutionsForGoal( String goal )
-        throws Exception;
-
-    Object getMojoParameterFor( MojoExecution mojoExecution, String xPath )
-        throws Exception;
-
-    void executeMojo( MojoExecution mojoExecution, MavenSession session )
-        throws Exception;
         
     PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException;

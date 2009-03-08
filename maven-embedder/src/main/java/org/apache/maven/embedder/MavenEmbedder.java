@@ -169,24 +169,6 @@ public class MavenEmbedder
         return request;
     }
 
-    public Collection<MojoExecution> getMojoExecutionsForGoal(String goal) 
-        throws Exception
-    {
-        return pluginManager.getMojoExecutionsForGoal( goal );
-    }
-
-    public Object getMojoParameterFor(MojoExecution mojoExecution, String xPath) 
-        throws Exception
-    {
-        return pluginManager.getMojoParameterFor( mojoExecution, xPath);
-    }
-
-    public void executeMojo(MojoExecution mojoExecution, MavenSession mavenSession ) 
-        throws Exception
-    {
-        pluginManager.executeMojo( mojoExecution, mavenSession );
-    }
-
     // ----------------------------------------------------------------------
     // Accessors
     // ----------------------------------------------------------------------

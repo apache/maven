@@ -1654,45 +1654,6 @@ public class DefaultPluginManager
         return plugin;
     }
 
-    // Plugin Context
-    public Collection<MojoExecution> getMojoExecutionsForGoal( String goal )
-        throws Exception
-    {
-        List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
-
-        for ( PluginDescriptor descriptor : pluginCollector.getPluginDescriptors() )
-        {
-            MojoDescriptor mojoDescriptor = descriptor.getMojo( goal );
-
-            if ( mojoDescriptor != null )
-            {
-                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-                mojoExecution.setConfiguration( Xpp3DomBuilder.build( new StringReader( mojoDescriptor.getMojoConfiguration().toString() ) ) );
-                mojoExecutions.add( mojoExecution );
-            }
-        }
-
-        return mojoExecutions;
-    }
-
-    public Object getMojoParameterFor( MojoExecution mojoExecution, String xPath )
-        throws Exception
-    {
-        Xpp3Dom mojoDescriptorConfiguration = Xpp3DomBuilder.build( new StringReader( mojoExecution.getMojoDescriptor().getMojoConfiguration().toString() ) );
-
-        Xpp3Dom mergedConfig = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoDescriptorConfiguration );
-
-        return JXPathContext.newContext( mergedConfig ).getValue( xPath );
-    }
-
-    public void executeMojo( MojoExecution mojoExecution, MavenSession session )
-        throws Exception
-    {
-        executeMojo( session.getCurrentProject(), mojoExecution, session );
-    }
-
-    // Version Manager
-
     public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
