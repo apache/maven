@@ -249,16 +249,6 @@ under the License.
     <module>maven-compat</module>
     <module>maven-repository</module>
   </modules>
-  <!-- FIXME: Remove once model-builder is released -->
-  <repositories>
-    <repository>
-      <id>spice.snapshots</id>
-      <url>http://repository.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
   <!--start-->
   <dependencies>
     <dependency>
