@@ -27,6 +27,10 @@ use a configuration source to pull in the lifecycle information.
 <component-set>
   <components>
     <component>
+      <role>org.apache.maven.plugin.MavenPluginCollector</role>
+      <implementation>org.apache.maven.plugin.MavenPluginCollector</implementation>
+    </component>  
+    <component>
       <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
       <implementation>org.apache.maven.lifecycle.DefaultLifecycleExecutor</implementation>
       <requirements>
