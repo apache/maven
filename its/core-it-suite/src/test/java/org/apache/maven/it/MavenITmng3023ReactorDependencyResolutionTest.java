@@ -43,10 +43,10 @@ public class MavenITmng3023ReactorDependencyResolutionTest
     /**
      * Test that reactor projects are included in dependency resolution.
      * 
-     * In this pass, the dependency artifact should be missing from the local repository, and since
-     * the 'compile' phase has not been called, the dependency project artifact should not have a
-     * file associated with it. Therefore, the dependency artifact should fail to resolve, and the
-     * build should fail.
+     * In this pass, the dependency artifact should be missing from the local repository, and since the 'compile' phase
+     * has not been called, i.e. the output directory for the compiled classes has not been created yet, the
+     * dependency project artifact should not have a file associated with it. Therefore, the dependency artifact
+     * should fail to resolve, and the build should fail.
      */
     public void testitMNG3023A() throws Exception
     {
@@ -57,6 +57,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-a.txt" );
         
+        verifier.deleteDirectory( "dependency/dependency-classes" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
         
         try
@@ -90,6 +91,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-b.txt" );
+        // The IT doesn't actually run the compiler but merely mimics its effect, i.e. the creation of the output dir
+        new File( testDir, "dependency/dependency-classes" ).mkdirs();
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
         

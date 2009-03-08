@@ -60,7 +60,7 @@ under the License.
               <goal>install</goal>
             </goals>
             <configuration>
-              <mainFile>dependency-classes/dependency-1.jar</mainFile>
+              <mainFile>dependency-1.jar</mainFile>
             </configuration>
           </execution>
         </executions>
