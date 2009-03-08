@@ -926,14 +926,14 @@ public class PomConstructionTest
         assertEquals( "TEST-CHARS: \u00C4\u00D6\u00DC\u00E4\u00F6\u00FC\u00DF", pom.getValue( "description" ) );
     }
 
-    /* FIXME: MNG-4070, fixed in model-builder trunk, awaiting update to model-builder:1.7+
+    /* FIXME: MNG-4070, fixed in model-builder trunk, awaiting update to model-builder:1.7+*/
     public void testXmlWhitespaceHandling()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "xml-whitespace/sub" );
         assertEquals( "org.apache.maven.its.mng4070", pom.getValue( "groupId" ) );
     }
-    //*/
+
 
     private void assertPathWithNormalizedFileSeparators( Object value )
     {
