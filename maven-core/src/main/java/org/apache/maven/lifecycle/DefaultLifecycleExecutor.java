@@ -60,24 +60,21 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project
- *       logging, without much of the event handling)
  */
 @Component(role = LifecycleExecutor.class)
 public class DefaultLifecycleExecutor
-    extends AbstractLogEnabled
     implements LifecycleExecutor
-{    
-    the plugin configuration from the pom is not taken at all, just grab it and then optimize it 
+{
+    @Requirement
+    private Logger logger;
     
     @Requirement
     private PluginManager pluginManager;
@@ -235,9 +232,9 @@ public class DefaultLifecycleExecutor
                 {
                     line();
 
-                    getLogger().info( "Building " + rootProject.getName() );
+                    logger.info( "Building " + rootProject.getName() );
 
-                    getLogger().info( "  " + segment );
+                    logger.info( "  " + segment );
 
                     line();
 
@@ -277,11 +274,11 @@ public class DefaultLifecycleExecutor
                 {
                     line();
 
-                    getLogger().info( "SKIPPING " + rootProject.getName() );
+                    logger.info( "SKIPPING " + rootProject.getName() );
 
-                    getLogger().info( "  " + segment );
+                    logger.info( "  " + segment );
 
-                    getLogger().info( "This project has been banned from further executions due to previous failures." );
+                    logger.info( "This project has been banned from further executions due to previous failures." );
 
                     line();
                 }
@@ -299,9 +296,9 @@ public class DefaultLifecycleExecutor
                     {
                         line();
 
-                        getLogger().info( "Building " + currentProject.getName() );
+                        logger.info( "Building " + currentProject.getName() );
 
-                        getLogger().info( "  " + segment );
+                        logger.info( "  " + segment );
 
                         line();
 
@@ -339,11 +336,11 @@ public class DefaultLifecycleExecutor
                     {
                         line();
 
-                        getLogger().info( "SKIPPING " + currentProject.getName() );
+                        logger.info( "SKIPPING " + currentProject.getName() );
 
-                        getLogger().info( "  " + segment );
+                        logger.info( "  " + segment );
 
-                        getLogger().info( "This project has been banned from further executions due to previous failures." );
+                        logger.info( "This project has been banned from further executions due to previous failures." );
 
                         line();
                     }
@@ -518,7 +515,7 @@ public class DefaultLifecycleExecutor
         }
         else
         {
-            getLogger().info( "No goals needed for project - skipping" );
+            logger.info( "No goals needed for project - skipping" );
         }
     }
 
@@ -610,7 +607,7 @@ public class DefaultLifecycleExecutor
 
         if ( project.getModel().getReports() != null )
         {
-            getLogger().error( "Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
+            logger.error( "Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
         }
 
         if ( project.getReporting() == null || !project.getReporting().isExcludeDefaults() )
@@ -632,7 +629,7 @@ public class DefaultLifecycleExecutor
                 int count = tok.countTokens();
                 if ( count != 2 && count != 3 )
                 {
-                    getLogger().warn( "Invalid default report ignored: '" + report + "' (must be groupId:artifactId[:version])" );
+                    logger.warn( "Invalid default report ignored: '" + report + "' (must be groupId:artifactId[:version])" );
                 }
                 else
                 {
@@ -702,7 +699,7 @@ public class DefaultLifecycleExecutor
 
             if ( forkEntryPoints.contains( mojoDescriptor ) )
             {
-                getLogger().debug( "Omitting report: " + mojoDescriptor.getFullGoalName() + " from reports list. It initiated part of the fork currently executing." );
+                logger.debug( "Omitting report: " + mojoDescriptor.getFullGoalName() + " from reports list. It initiated part of the fork currently executing." );
                 continue;
             }
 
@@ -755,7 +752,7 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-        getLogger().info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
+        logger.info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
 
         if ( mojoDescriptor.isAggregator() )
         {
@@ -765,7 +762,7 @@ public class DefaultLifecycleExecutor
 
                 line();
 
-                getLogger().info( "Building " + reactorProject.getName() );
+                logger.info( "Building " + reactorProject.getName() );
 
                 line();
 
@@ -978,7 +975,7 @@ public class DefaultLifecycleExecutor
                 if ( lifecycleForkers.contains( execution.getMojoDescriptor() ) )
                 {
                     taskIterator.remove();
-                    getLogger().warn( "Removing: " + execution.getMojoDescriptor().getGoal() + " from forked lifecycle, to prevent recursive invocation." );
+                    logger.warn( "Removing: " + execution.getMojoDescriptor().getGoal() + " from forked lifecycle, to prevent recursive invocation." );
                 }
             }
         }
@@ -1106,7 +1103,7 @@ public class DefaultLifecycleExecutor
             }
             catch ( ComponentLookupException e )
             {
-                getLogger().debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " + lifecycle.getId() + ". Error: " + e.getMessage(), e );
+                logger.debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " + lifecycle.getId() + ". Error: " + e.getMessage(), e );
             }
         }
 
@@ -1146,7 +1143,7 @@ public class DefaultLifecycleExecutor
             {
                 if ( plugin.getGoals() != null )
                 {
-                    getLogger().error( "Plugin contains a <goals/> section: this is IGNORED - please use <executions/> instead." );
+                    logger.error( "Plugin contains a <goals/> section: this is IGNORED - please use <executions/> instead." );
                 }
 
                 List executions = plugin.getExecutions();
@@ -1217,7 +1214,7 @@ public class DefaultLifecycleExecutor
         if ( settings.isOffline() && mojoDescriptor.isOnlineRequired() )
         {
             String goal = mojoDescriptor.getGoal();
-            getLogger().warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );
+            logger.warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );
         }
         else
         {
@@ -1354,7 +1351,7 @@ public class DefaultLifecycleExecutor
         {
             if ( isOptionalMojo )
             {
-                getLogger().info( "Skipping missing optional mojo: " + task );
+                logger.info( "Skipping missing optional mojo: " + task );
             }
             else
             {
@@ -1367,7 +1364,7 @@ public class DefaultLifecycleExecutor
 
     protected void line()
     {
-        getLogger().info( "------------------------------------------------------------------------" );
+        logger.info( "------------------------------------------------------------------------" );
     }
 
     public Map getPhaseToLifecycleMap()
