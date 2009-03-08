@@ -379,12 +379,12 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.doxia</groupId>
         <artifactId>doxia-sink-api</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.doxia</groupId>
         <artifactId>doxia-logging-api</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
       </dependency>
       <!-- Plexus -->
       <dependency>
@@ -405,7 +405,7 @@ under the License.
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
-        <version>1.1</version>
+        <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
