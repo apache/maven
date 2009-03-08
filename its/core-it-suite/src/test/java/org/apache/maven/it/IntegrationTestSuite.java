@@ -80,6 +80,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenITmng3714ToolchainsCliOptionTest.class );
         // suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
+        // suite.addTestSuite( MavenITmng3043BestEffortReactorResolutionTest.class );
         // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
         // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
