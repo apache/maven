@@ -249,7 +249,7 @@ public class DefaultProfileManager
         List<ModelProperty> p;
         try
         {                                                                   
-            p = ModelMarshaller.marshallXmlToModelProperties(new ByteArrayInputStream(writer.getBuffer().toString().getBytes()),
+            p = ModelMarshaller.marshallXmlToModelProperties(new ByteArrayInputStream(writer.toString().getBytes( "UTF-8" )),
                     ProjectUri.Profiles.xUri, PomTransformer.URIS);
         } catch (IOException e) {
             throw new ProfileActivationException(e.getMessage());
