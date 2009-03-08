@@ -15,8 +15,6 @@ package org.apache.maven.plugin;
  * the License.
  */
 
-import java.util.Collection;
-
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
