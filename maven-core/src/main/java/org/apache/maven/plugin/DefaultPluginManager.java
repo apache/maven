@@ -414,7 +414,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException
+        throws MojoFailureException, PluginExecutionException, PluginConfigurationException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -454,14 +454,32 @@ public class DefaultPluginManager
                 projects = Collections.singleton( project );
             }
 
-            for ( Iterator i = projects.iterator(); i.hasNext(); )
+            //!!jvz What is this? We resolveTransitiveDependencies() and then a line later downDependencies()? That can't be right. We should also already
+            // know at this point that what we need to execute can't be found. This is the wrong time to find this out.
+            
+            try
             {
-                MavenProject p = (MavenProject) i.next();
+                for ( Iterator i = projects.iterator(); i.hasNext(); )
+                {
+                    MavenProject p = (MavenProject) i.next();
 
-                resolveTransitiveDependencies( session, repositorySystem, mojoDescriptor.isDependencyResolutionRequired(), p, mojoDescriptor.isAggregator() );
+                    resolveTransitiveDependencies( session, repositorySystem, mojoDescriptor.isDependencyResolutionRequired(), p, mojoDescriptor.isAggregator() );
+                }
+
+                downloadDependencies( project, session, repositorySystem );
             }
-
-            downloadDependencies( project, session, repositorySystem );
+            catch ( ArtifactResolutionException e )
+            {
+                throw new PluginExecutionException( mojoExecution, project, e.getMessage() );                
+            }
+            catch ( InvalidDependencyVersionException e )
+            {
+                throw new PluginExecutionException( mojoExecution, project, e.getMessage() );                
+            }
+            catch ( ArtifactNotFoundException e )
+            {
+                throw new PluginExecutionException( mojoExecution, project, e.getMessage() );                
+            }
         }
 
         String goalName = mojoDescriptor.getFullGoalName();
@@ -486,11 +504,11 @@ public class DefaultPluginManager
             }
             catch ( XmlPullParserException e )
             {
-                throw new PluginManagerException( mojoDescriptor, project, "Failed to calculate concrete state for configuration of: " + mojoDescriptor.getHumanReadableKey(), e );
+                throw new PluginExecutionException( mojoExecution, project, "Failed to calculate concrete state for configuration of: " + mojoDescriptor.getHumanReadableKey() );
             }
             catch ( IOException e )
             {
-                throw new PluginManagerException( mojoDescriptor, project, "Failed to calculate concrete state for configuration of: " + mojoDescriptor.getHumanReadableKey(), e );
+                throw new PluginExecutionException( mojoExecution, project, "Failed to calculate concrete state for configuration of: " + mojoDescriptor.getHumanReadableKey() );
             }
         }
 
@@ -593,6 +611,12 @@ public class DefaultPluginManager
             session.getEventDispatcher().dispatchError( event, goalExecId, e );
 
             throw e;
+        }
+        catch ( PluginManagerException e )
+        {
+            session.getEventDispatcher().dispatchError( event, goalExecId, e );
+
+            throw new PluginExecutionException( mojoExecution, project, e.getMessage() );            
         }
         finally
         {

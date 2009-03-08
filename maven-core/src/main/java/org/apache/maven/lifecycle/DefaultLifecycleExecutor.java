@@ -54,7 +54,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.annotations.Component;
@@ -576,18 +575,6 @@ public class DefaultLifecycleExecutor
             catch ( PluginManagerException e )
             {
                 throw new LifecycleExecutionException( "Internal error in the plugin manager executing goal '" + mojoDescriptor.getId() + "': " + e.getMessage(), e );
-            }
-            catch ( ArtifactNotFoundException e )
-            {
-                throw new LifecycleExecutionException( e.getMessage(), e );
-            }
-            catch ( InvalidDependencyVersionException e )
-            {
-                throw new LifecycleExecutionException( e.getMessage(), e );
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                throw new LifecycleExecutionException( e.getMessage(), e );
             }
             catch ( MojoFailureException e )
             {

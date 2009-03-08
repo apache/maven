@@ -31,8 +31,8 @@ import org.apache.maven.reporting.MavenReport;
 public interface PluginManager
 {
     // - find the plugin [extension point: any client may wish to do whatever they choose]
-    // - load the plugin [extension point: we want to take them from a repository, some may take from disk or whatever]
-    // - configure the plugin 
+    // - load the plugin into a classloader [extension point: we want to take them from a repository, some may take from disk or whatever]
+    // - configure the plugin [extension point]
     // - execute the plugin    
     
     Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session );
@@ -40,10 +40,8 @@ public interface PluginManager
     PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException;
     
-    //!!jvz
-    // Clean up the exceptions returned. We should not be coupled to the repository layer. We need to generalize to allow a general plugin mechanism.
     void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
-        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
+        throws MojoFailureException, PluginExecutionException, PluginConfigurationException;
         
     //!!jvz 
     // Reporting    
