@@ -1,12 +1,6 @@
 package org.apache.maven.lifecycle;
 
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginLoaderException;
-import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,79 +22,37 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
  */
 
 /**
- * @author Jason van Zyl
+ * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
 public class LifecycleExecutionException
     extends Exception
 {
-    private final MavenProject project;
+    private MavenProject project;
+    
+    public LifecycleExecutionException( String message )
+    {
+        super( message );
+    }
 
+    public LifecycleExecutionException( Throwable cause )
+    {
+        super( cause );
+    }
+
+    public LifecycleExecutionException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
+    
     public LifecycleExecutionException( String message, MavenProject project )
     {
         super( message );
         this.project = project;
     }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        PluginManagerException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        ArtifactNotFoundException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        ArtifactResolutionException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message,
-                                        MavenProject project, PluginLoaderException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message,
-                                        MavenProject project, LifecycleException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        InvalidDependencyVersionException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message, MavenProject project,
-                                        PluginConfigurationException cause )
-    {
-        super( message, cause );
-        this.project = project;
-    }
-
-    public LifecycleExecutionException( String message,
-                                        Throwable cause )
-    {
-        super( message, cause );
-        project = null;
-    }
-
+    
     public MavenProject getProject()
     {
         return project;
     }
-
 }

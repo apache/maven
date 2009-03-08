@@ -29,6 +29,7 @@ import java.util.List;
  * Describes a single mojo invocation.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @version $Id$
  */
 public class MojoExecution
 {
@@ -37,6 +38,10 @@ public class MojoExecution
     private final MojoDescriptor mojoDescriptor;
 
     private Xpp3Dom configuration;
+
+    private List forkedExecutions = new ArrayList();
+
+    private List reports;
 
     public MojoExecution( MojoDescriptor mojoDescriptor )
     {
@@ -74,8 +79,38 @@ public class MojoExecution
         return configuration;
     }
 
+    public void addMojoExecution( MojoExecution execution )
+    {
+        forkedExecutions.add( execution );
+    }
+
+    public void setReports( List reports )
+    {
+        this.reports = reports;
+    }
+
+    public List getReports()
+    {
+        return reports;
+    }
+
+    public List getForkedExecutions()
+    {
+        return forkedExecutions;
+    }
+
     public void setConfiguration( Xpp3Dom configuration )
     {
         this.configuration = configuration;
+    }
+    
+    public String identify()
+    {
+        StringBuffer sb = new StringBuffer();
+        
+        sb.append( executionId );
+        sb.append( configuration.toString() );
+        
+        return sb.toString();
     }
 }

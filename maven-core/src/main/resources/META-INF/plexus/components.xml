@@ -27,32 +27,12 @@ use a configuration source to pull in the lifecycle information.
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
-      <role-hint>default</role-hint>
-      <implementation>org.apache.maven.lifecycle.binding.DefaultLifecycleBindingManager</implementation>
+      <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
+      <implementation>org.apache.maven.lifecycle.DefaultLifecycleExecutor</implementation>
       <requirements>
         <requirement>
           <role>org.apache.maven.plugin.PluginManager</role>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.lifecycle.LifecycleBindingLoader</role>
-          <field-name>bindingsByPackaging</field-name>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-          <field-name>legacyMappingsByPackaging</field-name>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser</role>
-        </requirement>
-         <requirement>                                                                                                                                        
-           <role>org.codehaus.plexus.PlexusContainer</role>                                                                                                   
-           <role-hint>default</role-hint>                                                                                                                     
-           <field-name>container</field-name>                                                                                                                 
-         </requirement>              
       </requirements>
       <configuration>
         <lifecycles>
@@ -75,7 +55,6 @@ use a configuration source to pull in the lifecycle information.
               <phase>test-compile</phase>
               <phase>process-test-classes</phase>
               <phase>test</phase>
-              <phase>prepare-package</phase>
               <phase>package</phase>
               <phase>pre-integration-test</phase>
               <phase>integration-test</phase>
@@ -113,20 +92,11 @@ use a configuration source to pull in the lifecycle information.
         </lifecycles>
         <!-- START SNIPPET: default-reports -->
         <defaultReports>
-          <report>org.apache.maven.plugins:maven-project-info-reports-plugin:2.0.1</report>
-          <!-- TODO: currently in mojo - should they be defaults any more?
-          <report>org.apache.maven.plugins:maven-checkstyle-plugin</report>
-          <report>org.apache.maven.plugins:maven-javadoc-plugin</report>
-                    <report>org.apache.maven.plugins:maven-changelog-plugin</report>
-                    <report>org.apache.maven.plugins:maven-surefire-report-plugin</report>
-                    <report>org.apache.maven.plugins:maven-jdepend-plugin</report>
-                    <report>org.apache.maven.plugins:maven-jxr-plugin</report>
-                    <report>org.apache.maven.plugins:maven-taglist-plugin</report>
-          -->
+          <report>org.apache.maven.plugins:maven-project-info-reports-plugin:2.1</report>
         </defaultReports>
         <!-- END SNIPPET: default-reports -->
       </configuration>
-    </component> 
+    </component>
 
     <component>
       <role>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher</role>

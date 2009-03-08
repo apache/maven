@@ -26,15 +26,15 @@ package org.apache.maven;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public abstract class BuildFailureException
+public class BuildFailureException
     extends Exception
 {
-    protected BuildFailureException( String message )
+    public BuildFailureException( String message )
     {
         super( message );
     }
 
-    protected BuildFailureException( String message, Throwable cause )
+    public BuildFailureException( String message, Throwable cause )
     {
         super( message, cause );
     }

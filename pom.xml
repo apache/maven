@@ -237,7 +237,6 @@ under the License.
   <modules>
     <module>maven-core</module>
     <module>apache-maven</module>
-    <module>maven-lifecycle</module>
     <module>maven-model</module>
     <module>maven-plugin-api</module>
     <module>maven-project</module>
@@ -248,6 +247,7 @@ under the License.
     <module>maven-toolchain</module>
     <module>maven-compat</module>
     <module>maven-repository</module>
+    <module>maven-repository-mercury</module>    
   </modules>
   <!-- FIXME: Remove once model-builder is released -->
   <repositories>

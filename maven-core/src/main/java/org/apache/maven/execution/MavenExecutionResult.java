@@ -19,12 +19,10 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.lifecycle.plan.BuildPlan;
-import org.apache.maven.project.MavenProject;
-
 import java.util.List;
-import java.util.Map;
+
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.project.MavenProject;
 
 /**
  * @author Jason van Zyl
@@ -35,7 +33,7 @@ public interface MavenExecutionResult
     MavenProject getProject();
 
     MavenExecutionResult setTopologicallySortedProjects( List projects );
-    List getTopologicallySortedProjects();
+    List<MavenProject> getTopologicallySortedProjects();
 
     MavenExecutionResult setArtifactResolutionResult( ArtifactResolutionResult result );
     ArtifactResolutionResult getArtifactResolutionResult();

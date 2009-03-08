@@ -53,8 +53,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.lifecycle.model.MojoBinding;
-import org.apache.maven.lifecycle.statemgmt.StateManagementUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -110,17 +108,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class DefaultPluginManager
     implements PluginManager
 {
-    private static final List RESERVED_GROUP_IDS;
-
-    static
-    {
-        List rgids = new ArrayList();
-
-        rgids.add( StateManagementUtils.GROUP_ID );
-
-        RESERVED_GROUP_IDS = rgids;
-    }
-
     @Requirement
     private Logger logger;
     
@@ -205,17 +192,9 @@ public class DefaultPluginManager
         // the 'Can't find plexus container for plugin: xxx' error.
         try
         {
-            // if the groupId is internal, don't try to resolve it...
-            if ( !RESERVED_GROUP_IDS.contains( plugin.getGroupId() ) )
-            {
-                Artifact pluginArtifact = resolvePluginArtifact( plugin, project, session );
+            Artifact pluginArtifact = resolvePluginArtifact( plugin, project, session );
 
-                addPlugin( plugin, pluginArtifact, project, session );
-            }
-            else
-            {
-                logger.debug( "Skipping resolution for Maven built-in plugin: " + plugin.getKey() );
-            }
+            addPlugin( plugin, pluginArtifact, project, session );
 
             project.addPlugin( plugin );
         }
@@ -2053,9 +2032,11 @@ public class DefaultPluginManager
         RepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
 
         logger.debug( "Checking repositories:\n" + pluginRepositories + "\n\nfor plugin prefix metadata: " + groupId );
+        
         repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
 
         Metadata repoMetadata = metadata.getMetadata();
+        
         if ( repoMetadata != null )
         {
             for ( Iterator pluginIterator = repoMetadata.getPlugins().iterator(); pluginIterator.hasNext(); )
@@ -2086,34 +2067,6 @@ public class DefaultPluginManager
     
     // Plugin Loader
     
-    /**
-     * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding,
-     * using the project for {@link ArtifactRepository} and other supplemental plugin information as
-     * necessary.
-     */
-    public PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        PluginDescriptor pluginDescriptor = null;
-
-        Plugin plugin = new Plugin();
-        plugin.setGroupId( mojoBinding.getGroupId() );
-        plugin.setArtifactId( mojoBinding.getArtifactId() );
-        plugin.setVersion( mojoBinding.getVersion() );
-
-        pluginDescriptor = loadPlugin( plugin, project, session );
-
-        // fill in any blanks once we know more about this plugin.
-        if ( pluginDescriptor != null )
-        {
-            mojoBinding.setGroupId( pluginDescriptor.getGroupId() );
-            mojoBinding.setArtifactId( pluginDescriptor.getArtifactId() );
-            mojoBinding.setVersion( pluginDescriptor.getVersion() );
-        }
-
-        return pluginDescriptor;
-    }
-
     /**
      * Load the {@link PluginDescriptor} instance for the specified plugin, using the project for
      * the {@link ArtifactRepository} and other supplemental plugin information as necessary.
@@ -2164,31 +2117,6 @@ public class DefaultPluginManager
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
-    }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
-    }
-
-    /**
-     * Load the {@link PluginDescriptor} instance for the report plugin implied by the specified MojoBinding,
-     * using the project for {@link ArtifactRepository} and other supplemental report/plugin information as
-     * necessary.
-     */
-    public PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        ReportPlugin plugin = new ReportPlugin();
-        plugin.setGroupId( mojoBinding.getGroupId() );
-        plugin.setArtifactId( mojoBinding.getArtifactId() );
-        plugin.setVersion( mojoBinding.getVersion() );
-
-        PluginDescriptor pluginDescriptor = loadReportPlugin( plugin, project, session );
-
-        mojoBinding.setVersion( pluginDescriptor.getVersion() );
-
-        return pluginDescriptor;
     }
 
     /**

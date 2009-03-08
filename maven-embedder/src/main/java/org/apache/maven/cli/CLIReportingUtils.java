@@ -272,6 +272,7 @@ public final class CLIReportingUtils
         handleGenericException( e, showStackTraces, writer );
 
         MavenProject project = e.getProject();
+        
         if(project != null)
         {
             writer.write( NEWLINE );

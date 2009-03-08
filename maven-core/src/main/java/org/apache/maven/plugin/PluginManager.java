@@ -20,7 +20,6 @@ import java.util.Collection;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -42,14 +41,6 @@ public interface PluginManager
 
     Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project );
 
-    PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException;
-
-    PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException;
-
     Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
         throws PluginLoaderException;
 
@@ -61,37 +52,10 @@ public interface PluginManager
 
     void executeMojo( MojoExecution mojoExecution, MavenSession session )
         throws Exception;
-    
-    // Plugin Loader
-    
-    /**
-     * Load the {@link PluginDescriptor} instance for the specified plugin, using the project for
-     * the {@link ArtifactRepository} and other supplemental plugin information as necessary.
-     */
+        
     PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException;
 
-    /**
-     * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding,
-     * using the project for {@link ArtifactRepository} and other supplemental plugin information as
-     * necessary.
-     */
-    PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-
-    /**
-     * Load the {@link PluginDescriptor} instance for the specified report plugin, using the project for
-     * the {@link ArtifactRepository} and other supplemental report/plugin information as necessary.
-     */
     PluginDescriptor loadReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-
-    /**
-     * Load the {@link PluginDescriptor} instance for the report plugin implied by the specified MojoBinding,
-     * using the project for {@link ArtifactRepository} and other supplemental report/plugin information as
-     * necessary.
-     */
-    PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-    
+        throws PluginLoaderException;    
 }

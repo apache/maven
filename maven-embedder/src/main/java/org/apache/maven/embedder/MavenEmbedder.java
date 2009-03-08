@@ -53,6 +53,7 @@ import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -315,15 +316,13 @@ public class MavenEmbedder
     /**
      * mkleint: protected so that IDE integrations can selectively allow downloading artifacts
      * from remote repositories (if they prohibit by default on project loading)
+     * @throws PluginLoaderException 
      */
     protected void verifyPlugin( Plugin plugin, MavenProject project )
-        throws ComponentLookupException, ArtifactResolutionException, PluginVersionResolutionException,
-        ArtifactNotFoundException, InvalidPluginException, PluginManagerException,
-        PluginNotFoundException, PluginVersionNotFoundException
+        throws ComponentLookupException, PluginLoaderException
     {
-        PluginManager pluginManager = container.lookup( PluginManager.class );
         MavenSession session = new MavenSession( container, request, null, null );
-        pluginManager.verifyPlugin( plugin, project, session );
+        pluginManager.loadPlugin( plugin, project, session );
     }
 
     // ----------------------------------------------------------------------
