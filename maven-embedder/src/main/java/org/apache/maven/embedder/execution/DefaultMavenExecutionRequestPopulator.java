@@ -17,6 +17,7 @@ package org.apache.maven.embedder.execution;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
@@ -38,6 +40,7 @@ import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
+import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.apache.maven.repository.RepositorySystem;
@@ -194,20 +197,29 @@ public class DefaultMavenExecutionRequestPopulator
                 Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
 
                 profileManager.addProfile( profile );
+            }
 
-                // We need to convert profile repositories to artifact repositories
-
-                for ( Repository r : profile.getRepositories() )
+            // We need to convert profile repositories to artifact repositories
+            try
+            {
+                for ( Profile profile : profileManager.getActiveProfiles( new Model() ) )
                 {
-                    try
+                    for ( Repository r : profile.getRepositories() )
                     {
-                        request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
-                    }
-                    catch ( InvalidRepositoryException e )
-                    {
-                        throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
+                        try
+                        {
+                            request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
+                        }
+                        catch ( InvalidRepositoryException e )
+                        {
+                            throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
+                        }
                     }
                 }
+            }
+            catch ( ProfileActivationException e )
+            {
+                throw new MavenEmbedderException( "Cannot determine active profiles", e );
             }
         }
 
