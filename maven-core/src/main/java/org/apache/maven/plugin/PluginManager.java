@@ -27,24 +27,34 @@ import org.apache.maven.reporting.MavenReport;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface PluginManager
 {
-    void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
-        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
-
-    MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException, ArtifactResolutionException;
-
-    Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project );
-
-    Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-        
+    // - find the plugin [extension point: any client may wish to do whatever they choose]
+    // - load the plugin [extension point: we want to take them from a repository, some may take from disk or whatever]
+    // - configure the plugin 
+    // - execute the plugin    
+    
+    Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session );
+    
     PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException;
-
+    
+    //!!jvz
+    // Clean up the exceptions returned. We should not be coupled to the repository layer. We need to generalize to allow a general plugin mechanism.
+    void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
+        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
+        
+    //!!jvz 
+    // Reporting    
+    // As a function inside Maven is wrong. This needs to be entirely delegated to an external system. We need to provide an extension
+    // point for any tools that want to hook into the lifecycle but burning reporting into the core is extremely bad coupling. We need
+    // an aliasing mechanism for the POM as not to break backward compat. During 3.0 we can support this and at 3.1 with changes to the
+    // model we turf it.
+    
+    MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
+        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException, ArtifactResolutionException;
+    
     PluginDescriptor loadReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
         throws PluginLoaderException;    
 }

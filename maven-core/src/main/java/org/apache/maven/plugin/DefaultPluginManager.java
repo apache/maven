@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -151,7 +150,7 @@ public class DefaultPluginManager
     //
     // ----------------------------------------------------------------------
 
-    public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
+    public Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
     {
         // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
         // use for the mapping manager in here
@@ -183,8 +182,6 @@ public class DefaultPluginManager
         throws PluginVersionResolutionException, ArtifactNotFoundException, ArtifactResolutionException, InvalidPluginException, PluginManagerException, PluginNotFoundException
     {
         logger.debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
-
-        ArtifactRepository localRepository = session.getLocalRepository();
 
         // TODO: this might result in an artifact "RELEASE" being resolved continuously
         // FIXME: need to find out how a plugin gets marked as 'installed'
@@ -1521,137 +1518,6 @@ public class DefaultPluginManager
 
         ModelTransformerContext.interpolateModelProperties( modelProperties, ips );
         return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-    }
-
-    // Plugin Prefix Loader
-
-    /**
-     * Determine the appropriate {@link PluginDescriptor} instance for use with the specified plugin
-     * prefix, using the following strategies (in order): <br/>
-     * <ol>
-     * <li>Search for a plugin that has already been loaded with the specified prefix</li>
-     * <li>Search for a plugin configured in the POM that has a matching prefix</li>
-     * <li>Search the pluginGroups specified in the settings.xml for a matching plugin</li>
-     * <li>Use groupId == org.apache.maven.plugins, and artifactId == maven-&lt;prefix&gt;-plugin,
-     * and try to resolve based on that.</li>
-     * </ol>
-     */
-    public Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        Set descriptors = pluginCollector.getPluginDescriptorsForPrefix( prefix );
-        Map projectPluginMap = project.getBuild().getPluginsAsMap();
-
-        Plugin plugin = null;
-
-        if ( descriptors != null )
-        {
-            PluginDescriptor pluginDescriptor = null;
-
-            for ( Iterator it = descriptors.iterator(); it.hasNext(); )
-            {
-                PluginDescriptor pd = (PluginDescriptor) it.next();
-
-                Plugin projectPlugin = (Plugin) projectPluginMap.get( pd.getPluginLookupKey() );
-                if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) && projectPlugin.getVersion().equals( pd.getVersion() ) )
-                {
-                    pluginDescriptor = pd;
-                    break;
-                }
-            }
-
-            plugin = toPlugin( pluginDescriptor );
-        }
-
-        if ( plugin == null )
-        {
-            PluginDescriptor pluginDescriptor = loadFromProjectForPrefixQuery( prefix, project, session );
-
-            plugin = toPlugin( pluginDescriptor );
-        }
-
-        if ( plugin == null )
-        {
-            plugin = loadFromPrefixMapper( prefix, project, session );
-        }
-
-        if ( plugin == null )
-        {
-            plugin = new Plugin();
-            plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
-
-            PluginDescriptor pluginDescriptor = loadIsolatedPluginDescriptor( plugin, project, session );
-            plugin = toPlugin( pluginDescriptor );
-        }
-
-        if ( plugin == null )
-        {
-            throw new PluginLoaderException( "Cannot find plugin with prefix: " + prefix );
-        }
-
-        return plugin;
-    }
-
-    private Plugin toPlugin( PluginDescriptor pluginDescriptor )
-    {
-        if ( pluginDescriptor == null )
-        {
-            return null;
-        }
-
-        Plugin plugin = new Plugin();
-
-        plugin.setGroupId( pluginDescriptor.getGroupId() );
-        plugin.setArtifactId( pluginDescriptor.getArtifactId() );
-        plugin.setVersion( pluginDescriptor.getVersion() );
-
-        return plugin;
-    }
-
-    /**
-     * Look for a plugin configured in the current project that has a prefix matching the one
-     * specified. Return the {@link PluginDescriptor} if a match is found.
-     */
-    private PluginDescriptor loadFromProjectForPrefixQuery( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        PluginDescriptor result = null;
-
-        for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext(); )
-        {
-            Plugin plugin = (Plugin) it.next();
-
-            PluginDescriptor pluginDescriptor = loadIsolatedPluginDescriptor( plugin, project, session );
-
-            if ( ( pluginDescriptor != null ) && prefix.equals( pluginDescriptor.getGoalPrefix() ) )
-            {
-                result = pluginDescriptor;
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Look for a plugin in the pluginGroups specified in the settings.xml that has a prefix
-     * matching the one specified. Return the {@link PluginDescriptor} if a match is found.
-     */
-    private Plugin loadFromPrefixMapper( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        Plugin plugin = getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
-
-        if ( plugin != null )
-        {
-            Plugin projectPlugin = (Plugin) project.getBuild().getPluginsAsMap().get( plugin.getKey() );
-            if ( ( projectPlugin != null ) && ( projectPlugin.getVersion() != null ) )
-            {
-                plugin.setVersion( projectPlugin.getVersion() );
-            }
-        }
-
-        return plugin;
     }
 
     public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )

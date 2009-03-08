@@ -1266,7 +1266,7 @@ public class DefaultLifecycleExecutor
             String prefix = tok.nextToken();
             goal = tok.nextToken();
 
-            plugin = pluginManager.getPluginDefinitionForPrefix( prefix, session, project );
+            plugin = pluginManager.findPluginForPrefix( prefix, project, session );
             
             if ( plugin == null )
             {
