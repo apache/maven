@@ -482,7 +482,8 @@ public class MavenEmbedder
             ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .addComponentDiscoverer( new MavenPluginDiscoverer() )
                 .addComponentDiscoveryListener( new MavenPluginCollector() )
-                .setClassWorld( classWorld ).setName( "embedder" );
+                .setClassWorld( classWorld )
+                .setName( "embedder" );
 
             container = new DefaultPlexusContainer( cc );
         }

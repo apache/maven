@@ -258,7 +258,7 @@ public class DefaultPluginManager
             try
             {
                 pluginRealm = realmManager.createPluginRealm( projectPlugin, pluginArtifact, artifacts, coreArtifactFilterManager.getArtifactFilter() );
-
+                
                 logger.debug( "Created realm: " + pluginRealm + " for plugin: " + projectPlugin.getKey() );
             }
             catch ( RealmManagementException e )
@@ -288,7 +288,7 @@ public class DefaultPluginManager
             logger.debug( "Checking for plugin descriptor for: " + projectPlugin.getKey() + " with version: " + projectPlugin.getVersion() + " in collector: " + pluginCollector );
 
             PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( projectPlugin );
-
+            
             if ( pluginDescriptor == null )
             {
                 if ( ( pluginRealm != null ) && logger.isDebugEnabled() )
@@ -1825,8 +1825,7 @@ public class DefaultPluginManager
     
     // Plugin Mapping Manager
     
-    public org.apache.maven.model.Plugin getByPrefix( String pluginPrefix, List groupIds, List pluginRepositories,
-                                                      ArtifactRepository localRepository )
+    public org.apache.maven.model.Plugin getByPrefix( String pluginPrefix, List groupIds, List pluginRepositories, ArtifactRepository localRepository )
     {
         // if not found, try from the remote repository
         if ( !pluginDefinitionsByPrefix.containsKey( pluginPrefix ) )

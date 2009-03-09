@@ -63,6 +63,17 @@ public class MavenSession
 
     private Map reports = new LinkedHashMap();
 
+    //For testing
+    private ArtifactRepository localRepository;
+    
+    private MavenRealmManager realmManager;
+    
+    public MavenSession( ArtifactRepository localRepository, MavenRealmManager realmManager )    
+    {        
+        this.localRepository = localRepository;
+        this.realmManager = realmManager;
+    }
+    
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, EventDispatcher eventDispatcher, ReactorManager reactorManager )
     {
         this.container = container;
@@ -76,11 +87,15 @@ public class MavenSession
 
     public MavenRealmManager getRealmManager()
     {
+        if ( realmManager != null )
+        {
+            return realmManager;
+        }
+        
         return request.getRealmManager();
     }
 
-    public Map getPluginContext( PluginDescriptor pluginDescriptor,
-                                 MavenProject project )
+    public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
     {
         return reactorManager.getPluginContext( pluginDescriptor, project );
     }
@@ -89,9 +104,14 @@ public class MavenSession
     {
         return container;
     }
-
+    
     public ArtifactRepository getLocalRepository()
     {
+        if ( localRepository != null )
+        {
+            return localRepository;            
+        }
+        
         return request.getLocalRepository();
     }
 

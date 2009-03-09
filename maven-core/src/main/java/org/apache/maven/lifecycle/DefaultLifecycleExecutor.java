@@ -927,7 +927,7 @@ public class DefaultLifecycleExecutor
         return lifecycle;
     }
 
-    private MojoDescriptor getMojoDescriptor( PluginDescriptor pluginDescriptor, String goal )
+    MojoDescriptor getMojoDescriptor( PluginDescriptor pluginDescriptor, String goal )
         throws LifecycleExecutionException
     {
         MojoDescriptor desc = pluginDescriptor.getMojo( goal );

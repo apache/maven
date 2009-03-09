@@ -17,6 +17,7 @@ package org.apache.maven.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -96,7 +97,7 @@ public class LegacyRepositorySystem
     private Map<String, AuthenticationInfo> authenticationInfoMap = new HashMap<String, AuthenticationInfo>();
 
     private Map<String, RepositoryPermissions> serverPermissionsMap = new HashMap<String, RepositoryPermissions>();
-    
+
     // Artifact Creation
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
@@ -171,17 +172,17 @@ public class LegacyRepositorySystem
 
     /**
      * @return {@link Set} &lt; {@link Artifact} >
-     * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
+     * @todo desperately needs refactoring. It's just here because it's implementation is
+     *       maven-project specific
      */
-    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope,
-                                          ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
+    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
         throws VersionNotFoundException
     {
         return createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, reactor );
     }
 
     @Deprecated
-    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory,List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
         throws VersionNotFoundException
     {
         Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>( dependencies.size() );
@@ -208,9 +209,7 @@ public class LegacyRepositorySystem
             {
                 throw new VersionNotFoundException( reactor.getId(), d, reactor.getFile(), e );
             }
-            Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
-                                                                          versionRange, d.getType(), d.getClassifier(),
-                                                                          scope, inheritedScope, d.isOptional() );
+            Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), scope, inheritedScope, d.isOptional() );
 
             if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
             {
@@ -257,8 +256,8 @@ public class LegacyRepositorySystem
         }
 
         return projectArtifacts;
-    }    
-    
+    }
+
     public ArtifactRepository buildArtifactRepository( Repository repo )
         throws InvalidRepositoryException
     {
@@ -319,6 +318,19 @@ public class LegacyRepositorySystem
 
     // From MavenExecutionRequestPopulator
 
+    public ArtifactRepository createLocalRepository( File localRepository )
+        throws InvalidRepositoryException
+    {
+        try
+        {
+            return createRepository( localRepository.toURI().toURL().toString(), "maven.repo.local" );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new InvalidRepositoryException( "Error creating local repository.", "maven.repo.local", e );
+        }
+    }
+
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException
     {
@@ -373,7 +385,7 @@ public class LegacyRepositorySystem
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {                        
+    {
         return artifactResolver.resolve( request );
     }
 
@@ -400,8 +412,7 @@ public class LegacyRepositorySystem
         proxies.put( protocol, proxyInfo );
     }
 
-    public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
-                                       String passphrase )
+    public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase )
     {
         AuthenticationInfo authInfo = new AuthenticationInfo();
         authInfo.setUserName( username );
@@ -437,14 +448,14 @@ public class LegacyRepositorySystem
             serverPermissionsMap.put( repositoryId, permissions );
         }
     }
-    
+
     // Mirror 
-    
+
     public void addMirror( String id, String mirrorOf, String url )
     {
         mirrorBuilder.addMirror( id, mirrorOf, url );
     }
-    
+
     public List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories )
     {
         return mirrorBuilder.getMirrors( repositories );

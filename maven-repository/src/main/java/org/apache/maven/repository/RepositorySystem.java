@@ -15,6 +15,7 @@ package org.apache.maven.repository;
  * the License.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -61,9 +62,13 @@ public interface RepositorySystem
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
         
+    //!!jvz Change this to use a file
     ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException;
 
+    ArtifactRepository createLocalRepository( File localRepository )
+        throws InvalidRepositoryException;
+    
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
