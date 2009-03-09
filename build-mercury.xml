@@ -95,7 +95,7 @@ END SNIPPET: ant-bootstrap -->
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
 
     <mercury:local-repository location="${maven.repo.local}"/>
-    <mercury:remote-repository id="central" location="${maven.repo.central}"/>
+    <mercury:remote-repository id="central" location="${maven.repo.central}" updatePolicy="always"/>
 
   	<property name="tsFormat" value="HH:mm:ss"/>
   	<tstamp><format property="start.time" pattern="${tsFormat}"/></tstamp>
