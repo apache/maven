@@ -56,7 +56,7 @@ under the License.
               <goal>attach</goal>
             </goals>
             <configuration>
-              <attachedFile>test-classes/tests.jar</attachedFile>
+              <attachedFile>classes-test/tests.jar</attachedFile>
               <artifactType>test-jar</artifactType>
               <artifactClassifier>tests</artifactClassifier>
             </configuration>
@@ -69,7 +69,7 @@ under the License.
               <goal>attach</goal>
             </goals>
             <configuration>
-              <attachedFile>main-classes/client.jar</attachedFile>
+              <attachedFile>classes-main/client.jar</attachedFile>
               <artifactType>ejb-client</artifactType>
               <artifactClassifier>client</artifactClassifier>
             </configuration>
