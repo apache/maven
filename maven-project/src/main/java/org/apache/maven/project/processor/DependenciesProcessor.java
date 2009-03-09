@@ -14,30 +14,31 @@ public class DependenciesProcessor
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );
-        Model c = (Model) child;
-        Model p = null;
+        List<Dependency> c = (child != null) ?  (List<Dependency>) child : new ArrayList<Dependency>() ;
+        List<Dependency> p = null;
+        
         if ( parent != null )
         {
-            p = (Model) parent;
+            p = (List<Dependency>) parent;
         }
         List<Dependency> dependencies = ( (Model) target ).getDependencies();
 
         DependencyProcessor processor = new DependencyProcessor();
-        if ( ( p == null || p.getDependencies().isEmpty() ) && !c.getDependencies().isEmpty() )
+        if ( ( p == null || p.isEmpty() ) && !c.isEmpty()  )
         {
-            for ( Dependency dependency : c.getDependencies() )
+            for ( Dependency dependency : c )
             {
                 processor.process( null, dependency, dependencies, isChildMostSpecialized );
             }
         }
         else
         {
-            if ( !c.getDependencies().isEmpty() )
+            if ( !c.isEmpty() )
             {
                 List<Dependency> parentDependencies = new ArrayList<Dependency>();
-                for ( Dependency d1 : c.getDependencies() )
+                for ( Dependency d1 : c)
                 {
-                    for ( Dependency d2 : p.getDependencies() )
+                    for ( Dependency d2 : p)
                     {
                         if ( match( d1, d2 ) )
                         {
@@ -56,9 +57,9 @@ public class DependenciesProcessor
                     processor.process( d2, null, dependencies, isChildMostSpecialized );
                 }
             }
-            else
+            else if( p != null)
             {
-                for ( Dependency d2 : p.getDependencies() )
+                for ( Dependency d2 : p )
                 {
                     processor.process( d2, null, dependencies, isChildMostSpecialized );
                 }

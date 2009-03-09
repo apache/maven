@@ -72,5 +72,12 @@ public class ModelProcessor
         {
             t.setInceptionYear( p.getInceptionYear() );
         }
+        
+        DependenciesProcessor dependenciesProcessor = new DependenciesProcessor();
+        dependenciesProcessor.process( (p != null) ? p.getDependencies() : null, c.getDependencies(), t, isChildMostSpecialized );
+        
+        dependenciesProcessor.process( (p != null && p.getDependencyManagement() != null) ? p.getDependencyManagement().getDependencies(): null,
+                        (c.getDependencyManagement() != null) ? c.getDependencyManagement().getDependencies(): null, t, isChildMostSpecialized );
+        
     }
 }
