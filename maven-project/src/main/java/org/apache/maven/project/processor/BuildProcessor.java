@@ -13,6 +13,5 @@ public class BuildProcessor
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );
-
     }
 }
