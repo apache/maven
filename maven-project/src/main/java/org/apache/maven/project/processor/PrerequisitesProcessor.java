@@ -3,7 +3,8 @@ package org.apache.maven.project.processor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Prerequisites;
 
-public class PrerequisitesProcessor extends BaseProcessor
+public class PrerequisitesProcessor
+    extends BaseProcessor
 {
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
@@ -13,12 +14,12 @@ public class PrerequisitesProcessor extends BaseProcessor
         {
             Model t = (Model) target;
             Model c = (Model) child;
-            if(c.getPrerequisites() == null)
+            if ( c.getPrerequisites() == null )
             {
                 return;
             }
             Prerequisites prerequisites = new Prerequisites();
-            prerequisites.setMaven( c.getPrerequisites().getMaven());
+            prerequisites.setMaven( c.getPrerequisites().getMaven() );
             t.setPrerequisites( prerequisites );
         }
     }

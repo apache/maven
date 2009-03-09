@@ -20,10 +20,10 @@ public class DependenciesProcessor
         {
             p = (Model) parent;
         }
-        List<Dependency> dependencies = ((Model) target).getDependencies();
-        
+        List<Dependency> dependencies = ( (Model) target ).getDependencies();
+
         DependencyProcessor processor = new DependencyProcessor();
-        if ( ( p == null || p.getDependencies().isEmpty() ) && !c.getDependencies().isEmpty())
+        if ( ( p == null || p.getDependencies().isEmpty() ) && !c.getDependencies().isEmpty() )
         {
             for ( Dependency dependency : c.getDependencies() )
             {
@@ -39,9 +39,9 @@ public class DependenciesProcessor
                 {
                     for ( Dependency d2 : p.getDependencies() )
                     {
-                        if(match(d1, d2))
-                        {                            
-                            processor.process( d2, d1, dependencies, isChildMostSpecialized );//JOIN
+                        if ( match( d1, d2 ) )
+                        {
+                            processor.process( d2, d1, dependencies, isChildMostSpecialized );// JOIN
                         }
                         else
                         {
@@ -50,22 +50,22 @@ public class DependenciesProcessor
                         }
                     }
                 }
-                
-                for(Dependency d2 : parentDependencies)
+
+                for ( Dependency d2 : parentDependencies )
                 {
-                    processor.process( d2, null, dependencies, isChildMostSpecialized );    
+                    processor.process( d2, null, dependencies, isChildMostSpecialized );
                 }
             }
             else
             {
-                for(Dependency d2 :  p.getDependencies())
+                for ( Dependency d2 : p.getDependencies() )
                 {
-                    processor.process( d2, null, dependencies, isChildMostSpecialized );    
-                }               
+                    processor.process( d2, null, dependencies, isChildMostSpecialized );
+                }
             }
         }
     }
-    
+
     private static boolean match( Dependency d1, Dependency d2 )
     {
         // TODO: Version ranges ?
@@ -86,5 +86,5 @@ public class DependenciesProcessor
                                                                                                                                    ":" ).append(
                                                                                                                                                  d.getClassifier() );
         return sb.toString();
-    }      
+    }
 }
