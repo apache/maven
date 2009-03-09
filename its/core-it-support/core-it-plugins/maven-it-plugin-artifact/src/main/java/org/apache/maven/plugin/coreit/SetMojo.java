@@ -83,6 +83,11 @@ public class SetMojo
             artifactFile = new File( project.getBasedir(), mainFile );
         }
 
+        if ( !artifactFile.exists() )
+        {
+            getLog().warn( "[MAVEN-CORE-IT-LOG] Main artifact file does not exist: " + artifactFile );
+        }
+
         Artifact artifact = project.getArtifact();
         artifact.setFile( artifactFile );
 

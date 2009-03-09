@@ -104,6 +104,11 @@ public class AttachMojo
             artifactFile = new File( project.getBasedir(), attachedFile );
         }
 
+        if ( !artifactFile.exists() )
+        {
+            getLog().warn( "[MAVEN-CORE-IT-LOG] Attached artifact file does not exist: " + artifactFile );
+        }
+
         helper.attachArtifact( project, artifactType, artifactClassifier, artifactFile );
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Attached artifact file: " + artifactFile );
