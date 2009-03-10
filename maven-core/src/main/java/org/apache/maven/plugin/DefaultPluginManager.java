@@ -16,6 +16,7 @@ package org.apache.maven.plugin;
  */
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -382,7 +383,14 @@ public class DefaultPluginManager
             // This needs to be changed so that the resolver deals with this
             for ( Dependency d : pluginProject.getDependencies() )
             {
-                pluginArtifacts.add( repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() ) );
+                Artifact dependencyArtifact =
+                    repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(),
+                                                     d.getType() );
+                if ( Artifact.SCOPE_SYSTEM.equals( dependencyArtifact.getScope() ) )
+                {
+                    dependencyArtifact.setFile( new File( d.getSystemPath() ) );
+                }
+                pluginArtifacts.add( dependencyArtifact );
             }
                         
             if ( pluginProject != null )
