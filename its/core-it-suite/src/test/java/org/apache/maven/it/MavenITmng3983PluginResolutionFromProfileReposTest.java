@@ -45,6 +45,9 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
     public void testitFromPom()
         throws Exception
     {
+        // TODO: fate of POM repositories in 3.x is unclear, disabled for now
+        requiresMavenVersion( "[2.0,3.0-alpha-1)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3983/test-1" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
