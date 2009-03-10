@@ -11,6 +11,7 @@ import org.apache.maven.shared.model.ModelContainerAction;
 public class DependenciesProcessor
     extends BaseProcessor
 {
+
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );
@@ -21,7 +22,7 @@ public class DependenciesProcessor
         {
             p = (List<Dependency>) parent;
         }
-        List<Dependency> dependencies = ( (Model) target ).getDependencies();
+        List<Dependency> dependencies = (List<Dependency>) target;
 
         DependencyProcessor processor = new DependencyProcessor();
         if ( ( p == null || p.isEmpty() ) && !c.isEmpty()  )

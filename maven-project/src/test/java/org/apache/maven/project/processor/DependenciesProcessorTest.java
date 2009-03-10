@@ -19,13 +19,13 @@ public class DependenciesProcessorTest
 
         List<Dependency> child = Arrays.asList( dependency );
 
-        Model target = new Model();
+        List<Dependency> target = new ArrayList<Dependency>();
 
         DependenciesProcessor processor = new DependenciesProcessor();
         processor.process( null, child, target, false );
 
-        assertEquals( 1, target.getDependencies().size() );
-        assertEquals( "aid", target.getDependencies().get( 0 ).getArtifactId() );
+        assertEquals( 1, target.size() );
+        assertEquals( "aid", target.get( 0 ).getArtifactId() );
     }
 
     public void testParentCopy()
@@ -37,13 +37,13 @@ public class DependenciesProcessorTest
 
         List<Dependency> parent = Arrays.asList( dependency );
 
-        Model target = new Model();
+        List<Dependency> target = new ArrayList<Dependency>();
 
         DependenciesProcessor processor = new DependenciesProcessor();
         processor.process( parent, child, target, false );
 
-        assertEquals( 1, target.getDependencies().size() );
-        assertEquals( "aid", target.getDependencies().get( 0 ).getArtifactId() );
+        assertEquals( 1, target.size() );
+        assertEquals( "aid", target.get( 0 ).getArtifactId() );
     }
 
     public void testDependencyOrder()
@@ -56,14 +56,14 @@ public class DependenciesProcessorTest
         dependency.setArtifactId( "aid" );
         List<Dependency> parent = Arrays.asList( dependency );
 
-        Model target = new Model();
+        List<Dependency> target = new ArrayList<Dependency>();
 
         DependenciesProcessor processor = new DependenciesProcessor();
         processor.process( parent, child, target, false );
 
-        assertEquals( 2, target.getDependencies().size() );
-        assertEquals( "aid1", target.getDependencies().get( 0 ).getArtifactId() );
-        assertEquals( "aid", target.getDependencies().get( 1 ).getArtifactId() );
+        assertEquals( 2, target.size() );
+        assertEquals( "aid1", target.get( 0 ).getArtifactId() );
+        assertEquals( "aid", target.get( 1 ).getArtifactId() );
     }
 
     public void testJoin_NullVersion()
@@ -81,13 +81,13 @@ public class DependenciesProcessorTest
 
         List<Dependency> parent= Arrays.asList( dependency );
 
-        Model target = new Model();
+        List<Dependency> target = new ArrayList<Dependency>();
 
         DependenciesProcessor processor = new DependenciesProcessor();
         processor.process( parent, child, target, false );
 
-        assertEquals( 1, target.getDependencies().size() );
-        assertEquals( "sp", target.getDependencies().get( 0 ).getSystemPath() );
+        assertEquals( 1, target.size() );
+        assertEquals( "sp", target.get( 0 ).getSystemPath() );
     }
 
     public void testJoin_DefaultType()
@@ -107,13 +107,13 @@ public class DependenciesProcessorTest
 
         List<Dependency> parent = Arrays.asList( dependency );
 
-        Model target = new Model();
+        List<Dependency> target = new ArrayList<Dependency>();
 
         DependenciesProcessor processor = new DependenciesProcessor();
         processor.process( parent, child, target, false );
 
-        assertEquals( 1, target.getDependencies().size() );
-        assertEquals( "sp", target.getDependencies().get( 0 ).getSystemPath() );
+        assertEquals( 1, target.size() );
+        assertEquals( "sp", target.get( 0 ).getSystemPath() );
     }
 
     public void testJoin_DifferentClassifiers()
@@ -134,12 +134,12 @@ public class DependenciesProcessorTest
 
         List<Dependency> parent = Arrays.asList( dependency );
 
-        Model target = new Model();
+        List<Dependency> target = new ArrayList<Dependency>();
 
         DependenciesProcessor processor = new DependenciesProcessor();
         processor.process( parent, child, target, false );
 
-        assertEquals( 2, target.getDependencies().size() );
+        assertEquals( 2, target.size() );
     }
 
     public void testJoin_DifferentVersions()
@@ -158,11 +158,11 @@ public class DependenciesProcessorTest
 
         List<Dependency> parent = Arrays.asList( dependency );
 
-        Model target = new Model();
+        List<Dependency> target = new ArrayList<Dependency>();
 
         DependenciesProcessor processor = new DependenciesProcessor();
         processor.process( parent, child, target, false );
 
-        assertEquals( 2, target.getDependencies().size() );
+        assertEquals( 2, target.size() );
     }
 }

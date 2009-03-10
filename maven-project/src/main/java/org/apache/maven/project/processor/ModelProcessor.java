@@ -1,7 +1,12 @@
 package org.apache.maven.project.processor;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 
 /*
@@ -73,11 +78,25 @@ public class ModelProcessor
             t.setInceptionYear( p.getInceptionYear() );
         }
         
+        List<Dependency> deps = new ArrayList<Dependency>();
         DependenciesProcessor dependenciesProcessor = new DependenciesProcessor();
-        dependenciesProcessor.process( (p != null) ? p.getDependencies() : null, c.getDependencies(), t, isChildMostSpecialized );
+        dependenciesProcessor.process( (p != null) ? p.getDependencies() : null, c.getDependencies(), deps, isChildMostSpecialized );
+             
+        if(deps.size() > 0)
+        {
+            t.getDependencies().addAll( deps );
+        }  
         
+        List<Dependency> mngDeps = new ArrayList<Dependency>();
         dependenciesProcessor.process( (p != null && p.getDependencyManagement() != null) ? p.getDependencyManagement().getDependencies(): null,
-                        (c.getDependencyManagement() != null) ? c.getDependencyManagement().getDependencies(): null, t, isChildMostSpecialized );
-        
+                        (c.getDependencyManagement() != null) ? c.getDependencyManagement().getDependencies(): null, mngDeps, isChildMostSpecialized );
+        if(mngDeps.size() > 0)
+        {
+            if(t.getDependencyManagement() == null)
+            {
+                t.setDependencyManagement( new DependencyManagement() );    
+            }
+            t.getDependencyManagement().getDependencies().addAll( mngDeps );
+        }
     }
 }

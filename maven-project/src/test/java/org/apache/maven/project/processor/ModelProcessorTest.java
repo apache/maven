@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 
@@ -155,5 +157,29 @@ public class ModelProcessorTest
 
         parentModel.setInceptionYear( "2001" );
         assertEquals( "2000", targetModel.getInceptionYear() );
+    }
+    
+    public void testDependencyManagementChildCopy()
+    {
+        Model target= new Model();
+        
+        Model child = new Model();
+        
+        Dependency dependency = new Dependency();
+        dependency.setArtifactId( "aid" );
+        
+        DependencyManagement mng = new DependencyManagement();
+        mng.addDependency( dependency );
+        
+        child.setDependencyManagement( mng );
+        
+        ModelProcessor mp = new ModelProcessor( new ArrayList<Processor>() );
+        mp.process( null, child, target, false );       
+        
+        assertNotNull(target.getDependencyManagement());
+        
+        assertEquals(1, target.getDependencyManagement().getDependencies().size());
+        assertEquals("aid", target.getDependencyManagement().getDependencies().get( 0 ).getArtifactId());
+        
     }
 }
