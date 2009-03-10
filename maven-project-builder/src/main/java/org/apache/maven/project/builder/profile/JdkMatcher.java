@@ -74,8 +74,13 @@ public class JdkMatcher
 
     private static int getRelationOrder( String value, RangeValue rangeValue, boolean isLeft )
     {
-        List<String> valueTokens = Arrays.asList( value.split( "." ) );
-        List<String> rangeValueTokens = Arrays.asList( rangeValue.value.split( "." ) );
+        if ( rangeValue.value.length() <= 0 )
+        {
+            return isLeft ? 1 : -1;
+        }
+
+        List<String> valueTokens = new ArrayList<String>( Arrays.asList( value.split( "\\." ) ) );
+        List<String> rangeValueTokens = new ArrayList<String>( Arrays.asList( rangeValue.value.split( "\\." ) ) );
 
         int max = Math.max( valueTokens.size(), rangeValueTokens.size() );
         addZeroTokens( valueTokens, max );
@@ -83,13 +88,17 @@ public class JdkMatcher
 
         if ( value.equals( rangeValue.value ) )
         {
-            return ( rangeValue.isClosed() ) ? 0 : -1;
+            if ( !rangeValue.isClosed() )
+            {
+                return isLeft ? -1 : 1;
+            }
+            return 0;
         }
 
         for ( int i = 0; i < valueTokens.size(); i++ )
         {
-            int x = Integer.getInteger( valueTokens.get( i ) );
-            int y = Integer.getInteger( rangeValueTokens.get( i ) );
+            int x = Integer.parseInt( valueTokens.get( i ) );
+            int y = Integer.parseInt( rangeValueTokens.get( i ) );
             if ( x < y )
             {
                 return -1;
@@ -98,6 +107,10 @@ public class JdkMatcher
             {
                 return 1;
             }
+        }
+        if ( !rangeValue.isClosed() )
+        {
+            return isLeft ? -1 : 1;
         }
         return 0;
     }
@@ -140,7 +153,10 @@ public class JdkMatcher
             {
                 ranges.add( new RangeValue( token.replace( ")", "" ), false ) );
             }
-
+            else if ( token.length() <= 0 )
+            {
+                ranges.add( new RangeValue( "", false ) );
+            }
         }
         if ( ranges.size() < 2 )
         {
@@ -169,6 +185,11 @@ public class JdkMatcher
         public boolean isClosed()
         {
             return isClosed;
+        }
+        
+        public String toString()
+        {
+            return value;
         }
     }
 }
