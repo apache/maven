@@ -68,20 +68,20 @@ public class MavenSession
     
     private MavenRealmManager realmManager;
     
-    public MavenSession( ArtifactRepository localRepository, MavenRealmManager realmManager )    
+    private List<String> pluginGroups;
+    
+    public MavenSession( ArtifactRepository localRepository, List<String> pluginGroups, MavenRealmManager realmManager )    
     {        
         this.localRepository = localRepository;
+        this.pluginGroups = pluginGroups;
         this.realmManager = realmManager;
     }
     
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, EventDispatcher eventDispatcher, ReactorManager reactorManager )
     {
         this.container = container;
-
         this.request = request;
-
         this.eventDispatcher = eventDispatcher;
-
         this.reactorManager = reactorManager;
     }
 
@@ -97,6 +97,11 @@ public class MavenSession
 
     public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
     {
+        if ( reactorManager == null )
+        {
+            return null;
+        }
+        
         return reactorManager.getPluginContext( pluginDescriptor, project );
     }
 
@@ -289,6 +294,11 @@ public class MavenSession
     
     public List<String> getPluginGroups()
     {
+        if ( pluginGroups != null )
+        {
+            return pluginGroups;            
+        }
+        
         return request.getPluginGroups();
     }
     

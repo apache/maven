@@ -136,6 +136,7 @@ public class DefaultPluginManager
     @Requirement
     protected MavenProjectBuilder mavenProjectBuilder;
 
+    //!!jvz This is one of the last components to remove the legacy system.
     @Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;    
     
@@ -413,13 +414,16 @@ public class DefaultPluginManager
     // Mojo execution
     // ----------------------------------------------------------------------
 
+    public void executeMojo( MavenProject project, MojoExecution mojoExecution )
+        throws MojoFailureException, PluginExecutionException, PluginConfigurationException
+    {
+    }    
+    
     public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws MojoFailureException, PluginExecutionException, PluginConfigurationException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        // NOTE: I'm putting these checks in here, since this is the central point of access for
-        // anything that wants to execute a mojo.
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
             throw new PluginExecutionException( mojoExecution, project, "Cannot execute mojo: " + mojoDescriptor.getGoal()
@@ -495,10 +499,9 @@ public class DefaultPluginManager
             try
             {
                 List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getExecutionProperties(),
-                                                                                              PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
-                interpolatorProperties
-                    .addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
+                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties(
+                session.getProjectBuilderConfiguration().getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
+                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
                 String interpolatedDom = interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
                 dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
             }
@@ -532,7 +535,7 @@ public class DefaultPluginManager
         {
             mojo = getConfiguredMojo( session, dom, project, false, mojoExecution, realmActions );
 
-            dispatcher.dispatchStart( event, goalExecId );
+            //dispatcher.dispatchStart( event, goalExecId );
 
             pluginRealm = pluginDescriptor.getClassRealm();
 
@@ -561,7 +564,7 @@ public class DefaultPluginManager
                 session.addReport( mojoDescriptor, (MavenReport) mojo );
             }
 
-            dispatcher.dispatchEnd( event, goalExecId );
+            //dispatcher.dispatchEnd( event, goalExecId );
         }
         catch ( MojoExecutionException e )
         {
@@ -764,11 +767,14 @@ public class DefaultPluginManager
             {
                 Map pluginContext = session.getPluginContext( pluginDescriptor, project );
 
-                pluginContext.put( "project", project );
+                if ( pluginContext != null )
+                {
+                    pluginContext.put( "project", project );
 
-                pluginContext.put( "pluginDescriptor", pluginDescriptor );
+                    pluginContext.put( "pluginDescriptor", pluginDescriptor );
 
-                ( (ContextEnabled) mojo ).setPluginContext( pluginContext );
+                    ( (ContextEnabled) mojo ).setPluginContext( pluginContext );
+                }
             }
 
             mojo.setLog( new DefaultLog( logger ) );
@@ -1876,6 +1882,7 @@ public class DefaultPluginManager
         }
     }
 
+    //!!jvz This should not be here, it's part of pre-processing.
     private void loadPluginMappings( String groupId, List pluginRepositories, ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {

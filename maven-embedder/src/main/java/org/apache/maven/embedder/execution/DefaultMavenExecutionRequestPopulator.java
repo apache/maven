@@ -17,6 +17,7 @@ package org.apache.maven.embedder.execution;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -174,7 +175,7 @@ public class DefaultMavenExecutionRequestPopulator
         Settings settings = request.getSettings();
 
         request.setPluginGroups( settings.getPluginGroups() );
-
+        
         List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
 
         List<String> settingsActiveProfileIds = settings.getActiveProfiles();

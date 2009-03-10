@@ -1,12 +1,19 @@
 package org.apache.maven.lifecycle;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -19,22 +26,31 @@ import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class LifecycleExecutorTest
     extends PlexusTestCase
 {
+    @Requirement
     private MavenProjectBuilder projectBuilder;
     
+    @Requirement
     private RepositorySystem repositorySystem;
     
+    @Requirement
     private PluginManager pluginManager;
     
+    @Requirement
     private DefaultLifecycleExecutor lifecycleExecutor;
 
     protected void setUp()
         throws Exception
     {
+        //!!jvz need these injected into the test cases as this is a pita.
         projectBuilder = lookup( MavenProjectBuilder.class );        
         repositorySystem = lookup( RepositorySystem.class );        
         pluginManager = lookup( PluginManager.class );        
@@ -49,39 +65,83 @@ public class LifecycleExecutorTest
         // - configure the plugin [extension point]
         // - execute the plugin    
         
+        // Our test POM and this is actually the Maven POM so not the best idea.
         File pom = new File( getBasedir(), "src/test/pom.xml" );
-       
-        // For testing I want to use my standard local repository and settings.
+        File targetPom = new File( getBasedir(), "target/pom-plugin.xml" );
+        FileUtils.copyFile( pom, targetPom );
+        if ( !targetPom.getParentFile().exists() )
+        {
+            targetPom.getParentFile().mkdirs();
+        }
         
         ArtifactRepository localRepository = repositorySystem.createLocalRepository( new File( "/Users/jvanzyl/.m2/repository" ) ); 
         
+        Repository repository = new Repository();
+        repository.setUrl( "http://repo1.maven.org/maven2" );
+        repository.setId( "central" );
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
             .setLocalRepository( localRepository )
-            .setRemoteRepositories( null );
+            .setRemoteRepositories( Arrays.asList( repositorySystem.buildArtifactRepository( repository ) ) );
         
-        MavenProject project = projectBuilder.build( pom, configuration );
-        
-        // now i want to grab the configuration for the remote resources plugin
-        
+        MavenProject project = projectBuilder.build( targetPom, configuration );              
         assertEquals( "maven", project.getArtifactId() );
+        assertEquals( "3.0-SNAPSHOT", project.getVersion() );
         
-        Plugin plugin = new Plugin();
-        plugin.setGroupId( "org.apache.maven.plugins" );
-        plugin.setArtifactId( "maven-remote-resources-plugin" );
-        // The version should be specified in the POM.
+        // We need a local repository and realm manager in the session in order to execute a mojo. This
+        // is not really a good situation.
+        MavenRealmManager realmManager = new DefaultMavenRealmManager( getContainer(), new ConsoleLogger( 0, "logger" ) );  
         
-        MavenRealmManager realmManager = new DefaultMavenRealmManager( getContainer(), new ConsoleLogger( 0, "logger" ) );        
-        MavenSession session = new MavenSession( localRepository, realmManager );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setProjectPresent( true )
+            .setPluginGroups( Arrays.asList( new String[]{ "org.apache.maven.plugins"} ) )
+            .setLocalRepository( localRepository )
+            .setRemoteRepositories( Arrays.asList( repositorySystem.buildArtifactRepository( repository ) ) )
+            .setRealmManager( realmManager )
+            .setProperties( new Properties() );
+                                      
+        MavenSession session = new MavenSession( getContainer(), request, null, null );
+        session.setCurrentProject( project );
+              
+        String pluginArtifactId = "remote-resources";
+        String goal = "process";
+        MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( pluginArtifactId + ":" + goal, session, project );        
         
-        PluginDescriptor pd = pluginManager.loadPlugin( plugin, project, session );        
+        PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
         assertNotNull( pd );
         assertEquals( "org.apache.maven.plugins", pd.getGroupId() );
         assertEquals( "maven-remote-resources-plugin", pd.getArtifactId() );
         assertEquals( "1.0", pd.getVersion() );        
         
-        MojoDescriptor mojoDescriptor = pd.getMojo( "process" );
-        assertNotNull( mojoDescriptor );
-        System.out.println( "configuration >>> " + mojoDescriptor.getConfiguration() );
+        MojoExecution me = new MojoExecution( mojoDescriptor );       
+        
+        for ( Plugin bp : project.getBuildPlugins() )
+        {
+            // The POM builder should have merged any configuration at the upper level of the plugin
+            // element with the execution level configuration where our goal is.
+            
+            // We have our plugin
+            if ( bp.getArtifactId().equals( pd.getArtifactId() ) )
+            {
+                // Search through executions
+                for( PluginExecution e : bp.getExecutions() )
+                {         
+                    // Search though goals to match what's been asked for.
+                    for ( String g : e.getGoals() )
+                    {
+                        // This goal matches what's been asked for.                            
+                        if( g.equals( goal ) )
+                        {
+                            me.setConfiguration( (Xpp3Dom) e.getConfiguration() );
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Need some xpath action in here. Make sure the mojoExecution configuration is intact
+                
+        // Now the magical mojo descriptor is complete and I can execute the mojo.
+        pluginManager.executeMojo( project, me, session );        
     }
     
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
