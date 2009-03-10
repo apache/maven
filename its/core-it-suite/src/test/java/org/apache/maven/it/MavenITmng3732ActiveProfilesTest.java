@@ -64,14 +64,15 @@ public class MavenITmng3732ActiveProfilesTest
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         List ids = new ArrayList();
-        ids.add( props.getProperty( "project.activeProfiles.0.id", "" ) );
-        ids.add( props.getProperty( "project.activeProfiles.1.id", "" ) );
-        ids.add( props.getProperty( "project.activeProfiles.2.id", "" ) );
-        Collections.sort( ids );
 
         // support for profiles.xml removed from 3.x (see MNG-4060)
         if ( matchesVersionRange( "[2.0,3.0-alpha-1)" ) )
         {
+            ids.add( props.getProperty( "project.activeProfiles.0.id", "" ) );
+            ids.add( props.getProperty( "project.activeProfiles.1.id", "" ) );
+            ids.add( props.getProperty( "project.activeProfiles.2.id", "" ) );
+            Collections.sort( ids );
+
             assertEquals( Arrays.asList( new String[] { "pom", "profiles", "settings" } ), ids );
             assertEquals( "3", props.getProperty( "project.activeProfiles" ) );
 
@@ -81,6 +82,10 @@ public class MavenITmng3732ActiveProfilesTest
         }
         else
         {
+            ids.add( props.getProperty( "project.activeProfiles.0.id", "" ) );
+            ids.add( props.getProperty( "project.activeProfiles.1.id", "" ) );
+            Collections.sort( ids );
+
             assertEquals( Arrays.asList( new String[] { "pom", "settings" } ), ids );
             assertEquals( "2", props.getProperty( "project.activeProfiles" ) );
     
