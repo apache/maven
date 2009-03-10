@@ -19,6 +19,8 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
@@ -30,6 +32,8 @@ import org.apache.maven.project.MavenProject;
  */
 public interface LifecycleExecutor
 {    
+    List<Lifecycle> getLifecyclePhases();
+    
     TaskValidationResult isTaskValid( String task, MavenSession session, MavenProject rootProject );
     
     void execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )

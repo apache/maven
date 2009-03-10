@@ -29,7 +29,6 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class LifecycleExecutorTest
@@ -67,7 +66,7 @@ public class LifecycleExecutorTest
         
         // Our test POM and this is actually the Maven POM so not the best idea.
         File pom = new File( getBasedir(), "src/test/pom.xml" );
-        File targetPom = new File( getBasedir(), "target/pom-plugin.xml" );
+        File targetPom = new File( getBasedir(), "target/lifecycle-executor/pom-plugin.xml" );
         FileUtils.copyFile( pom, targetPom );
         if ( !targetPom.getParentFile().exists() )
         {
@@ -114,29 +113,29 @@ public class LifecycleExecutorTest
         
         MojoExecution me = new MojoExecution( mojoDescriptor );       
         
-        for ( Plugin bp : project.getBuildPlugins() )
-        {
-            // The POM builder should have merged any configuration at the upper level of the plugin
-            // element with the execution level configuration where our goal is.
-            
-            // We have our plugin
-            if ( bp.getArtifactId().equals( pd.getArtifactId() ) )
-            {
-                // Search through executions
-                for( PluginExecution e : bp.getExecutions() )
-                {         
-                    // Search though goals to match what's been asked for.
-                    for ( String g : e.getGoals() )
-                    {
-                        // This goal matches what's been asked for.                            
-                        if( g.equals( goal ) )
-                        {
-                            me.setConfiguration( (Xpp3Dom) e.getConfiguration() );
-                        }
-                    }
-                }
-            }
-        }
+//        for ( Plugin bp : project.getBuildPlugins() )
+//        {
+//            // The POM builder should have merged any configuration at the upper level of the plugin
+//            // element with the execution level configuration where our goal is.
+//            
+//            // We have our plugin
+//            if ( bp.getArtifactId().equals( pd.getArtifactId() ) )
+//            {
+//                // Search through executions
+//                for( PluginExecution e : bp.getExecutions() )
+//                {         
+//                    // Search though goals to match what's been asked for.
+//                    for ( String g : e.getGoals() )
+//                    {
+//                        // This goal matches what's been asked for.                            
+//                        if( g.equals( goal ) )
+//                        {
+//                            me.setConfiguration( (Xpp3Dom) e.getConfiguration() );
+//                        }
+//                    }
+//                }
+//            }
+//        }
         
         // Need some xpath action in here. Make sure the mojoExecution configuration is intact
                 

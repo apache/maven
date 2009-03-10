@@ -59,6 +59,7 @@ import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -70,10 +71,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  */
 @Component(role = LifecycleExecutor.class)
 public class DefaultLifecycleExecutor
+    extends AbstractLogEnabled
     implements LifecycleExecutor
 {
-    @Requirement
-    private Logger logger;
+    //@Requirement
+    //private getLogger() getLogger();
     
     @Requirement
     private PluginManager pluginManager;
@@ -84,10 +86,11 @@ public class DefaultLifecycleExecutor
 
     private Map phaseToLifecycleMap;
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
+    public List<Lifecycle> getLifecyclePhases()
+    {
+        return lifecycles;
+    }
+    
     public static boolean isValidPhaseName( final String phaseName )
     {
         LifecycleBindings test = new LifecycleBindings();
@@ -231,9 +234,9 @@ public class DefaultLifecycleExecutor
                 {
                     line();
 
-                    logger.info( "Building " + rootProject.getName() );
+                    getLogger().info( "Building " + rootProject.getName() );
 
-                    logger.info( "  " + segment );
+                    getLogger().info( "  " + segment );
 
                     line();
 
@@ -273,11 +276,11 @@ public class DefaultLifecycleExecutor
                 {
                     line();
 
-                    logger.info( "SKIPPING " + rootProject.getName() );
+                    getLogger().info( "SKIPPING " + rootProject.getName() );
 
-                    logger.info( "  " + segment );
+                    getLogger().info( "  " + segment );
 
-                    logger.info( "This project has been banned from further executions due to previous failures." );
+                    getLogger().info( "This project has been banned from further executions due to previous failures." );
 
                     line();
                 }
@@ -295,9 +298,9 @@ public class DefaultLifecycleExecutor
                     {
                         line();
 
-                        logger.info( "Building " + currentProject.getName() );
+                        getLogger().info( "Building " + currentProject.getName() );
 
-                        logger.info( "  " + segment );
+                        getLogger().info( "  " + segment );
 
                         line();
 
@@ -335,11 +338,11 @@ public class DefaultLifecycleExecutor
                     {
                         line();
 
-                        logger.info( "SKIPPING " + currentProject.getName() );
+                        getLogger().info( "SKIPPING " + currentProject.getName() );
 
-                        logger.info( "  " + segment );
+                        getLogger().info( "  " + segment );
 
-                        logger.info( "This project has been banned from further executions due to previous failures." );
+                        getLogger().info( "This project has been banned from further executions due to previous failures." );
 
                         line();
                     }
@@ -514,7 +517,7 @@ public class DefaultLifecycleExecutor
         }
         else
         {
-            logger.info( "No goals needed for project - skipping" );
+            getLogger().info( "No goals needed for project - skipping" );
         }
     }
 
@@ -592,7 +595,7 @@ public class DefaultLifecycleExecutor
 
         if ( project.getModel().getReports() != null )
         {
-            logger.error( "Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
+            getLogger().error( "Plugin contains a <reports/> section: this is IGNORED - please use <reporting/> instead." );
         }
 
         if ( project.getReporting() == null || !project.getReporting().isExcludeDefaults() )
@@ -614,7 +617,7 @@ public class DefaultLifecycleExecutor
                 int count = tok.countTokens();
                 if ( count != 2 && count != 3 )
                 {
-                    logger.warn( "Invalid default report ignored: '" + report + "' (must be groupId:artifactId[:version])" );
+                    getLogger().warn( "Invalid default report ignored: '" + report + "' (must be groupId:artifactId[:version])" );
                 }
                 else
                 {
@@ -684,7 +687,7 @@ public class DefaultLifecycleExecutor
 
             if ( forkEntryPoints.contains( mojoDescriptor ) )
             {
-                logger.debug( "Omitting report: " + mojoDescriptor.getFullGoalName() + " from reports list. It initiated part of the fork currently executing." );
+                getLogger().debug( "Omitting report: " + mojoDescriptor.getFullGoalName() + " from reports list. It initiated part of the fork currently executing." );
                 continue;
             }
 
@@ -737,7 +740,7 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-        logger.info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
+        getLogger().info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
 
         if ( mojoDescriptor.isAggregator() )
         {
@@ -747,7 +750,7 @@ public class DefaultLifecycleExecutor
 
                 line();
 
-                logger.info( "Building " + reactorProject.getName() );
+                getLogger().info( "Building " + reactorProject.getName() );
 
                 line();
 
@@ -960,7 +963,7 @@ public class DefaultLifecycleExecutor
                 if ( lifecycleForkers.contains( execution.getMojoDescriptor() ) )
                 {
                     taskIterator.remove();
-                    logger.warn( "Removing: " + execution.getMojoDescriptor().getGoal() + " from forked lifecycle, to prevent recursive invocation." );
+                    getLogger().warn( "Removing: " + execution.getMojoDescriptor().getGoal() + " from forked lifecycle, to prevent recursive invocation." );
                 }
             }
         }
@@ -1088,7 +1091,7 @@ public class DefaultLifecycleExecutor
             }
             catch ( ComponentLookupException e )
             {
-                logger.debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " + lifecycle.getId() + ". Error: " + e.getMessage(), e );
+                getLogger().debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " + lifecycle.getId() + ". Error: " + e.getMessage(), e );
             }
         }
 
@@ -1128,7 +1131,7 @@ public class DefaultLifecycleExecutor
             {
                 if ( plugin.getGoals() != null )
                 {
-                    logger.error( "Plugin contains a <goals/> section: this is IGNORED - please use <executions/> instead." );
+                    getLogger().error( "Plugin contains a <goals/> section: this is IGNORED - please use <executions/> instead." );
                 }
 
                 List executions = plugin.getExecutions();
@@ -1199,7 +1202,7 @@ public class DefaultLifecycleExecutor
         if ( settings.isOffline() && mojoDescriptor.isOnlineRequired() )
         {
             String goal = mojoDescriptor.getGoal();
-            logger.warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );
+            getLogger().warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );
         }
         else
         {
@@ -1227,7 +1230,7 @@ public class DefaultLifecycleExecutor
         }
         return goals;
     }
-
+    
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException
     {
@@ -1235,12 +1238,14 @@ public class DefaultLifecycleExecutor
         Plugin plugin;
 
         PluginDescriptor pluginDescriptor = null;        
-        String[] taskSegments = StringUtils.split( task, ":" );
         
-        if ( taskSegments.length == 2 )
+        StringTokenizer tok = new StringTokenizer( task, ":" );
+        int numTokens = tok.countTokens();        
+        
+        if ( numTokens == 2 )
         {
-            String prefix = taskSegments[0];
-            goal = taskSegments[1];
+            String prefix = tok.nextToken();
+            goal = tok.nextToken();
             
             // This is the case where someone has executed a single goal from the command line
             // of the form:
@@ -1285,18 +1290,18 @@ public class DefaultLifecycleExecutor
                 plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
             }
         }
-        else if ( taskSegments.length == 3 || taskSegments.length == 4 )
+        else if ( numTokens == 3 || numTokens == 4 )
         {
             plugin = new Plugin();
-            plugin.setGroupId( taskSegments[0] );
-            plugin.setArtifactId( taskSegments[1] );
+            plugin.setGroupId( tok.nextToken() );
+            plugin.setArtifactId( tok.nextToken() );
 
-            if ( taskSegments.length == 4 )
+            if ( numTokens == 4 )
             {
-                plugin.setVersion( taskSegments[3] );
+                plugin.setVersion( tok.nextToken() );
             }
 
-            goal = taskSegments[4];
+            goal = tok.nextToken();
         }
         else
         {
@@ -1336,7 +1341,7 @@ public class DefaultLifecycleExecutor
 
     protected void line()
     {
-        logger.info( "------------------------------------------------------------------------" );
+        getLogger().info( "------------------------------------------------------------------------" );
     }
 
     public Map getPhaseToLifecycleMap()

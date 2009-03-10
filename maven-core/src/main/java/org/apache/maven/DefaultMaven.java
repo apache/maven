@@ -36,6 +36,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.TaskValidationResult;
@@ -80,6 +81,11 @@ public class DefaultMaven
     @Requirement
     private Logger logger;
 
+    public List<Lifecycle> getLifecyclePhases()
+    {
+        return lifecycleExecutor.getLifecyclePhases();
+    }
+    
     // ----------------------------------------------------------------------
     // Project execution
     // ----------------------------------------------------------------------

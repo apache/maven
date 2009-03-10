@@ -19,9 +19,12 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.lifecycle.Lifecycle;
 
 /**
  * @author Jason van Zyl
@@ -40,4 +43,6 @@ public interface Maven
     MavenExecutionResult execute( MavenExecutionRequest request );
 
     ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result );
+    
+    List<Lifecycle> getLifecyclePhases();
 }

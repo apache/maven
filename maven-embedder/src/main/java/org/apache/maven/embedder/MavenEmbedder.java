@@ -418,29 +418,10 @@ public class MavenEmbedder
         return getBuildLifecyclePhases();
     }
 
-    public List getAllLifecyclePhases()
-    {
-        return LifecycleUtils.getValidPhaseNames();
-    }
-
-    public List getDefaultLifecyclePhases()
-    {
-        return getBuildLifecyclePhases();
-    }
 
     public List getBuildLifecyclePhases()
     {
         return LifecycleUtils.getValidBuildPhaseNames();
-    }
-
-    public List getCleanLifecyclePhases()
-    {
-        return LifecycleUtils.getValidCleanPhaseNames();
-    }
-
-    public List getSiteLifecyclePhases()
-    {
-        return LifecycleUtils.getValidSitePhaseNames();
     }
 
     // ----------------------------------------------------------------------
