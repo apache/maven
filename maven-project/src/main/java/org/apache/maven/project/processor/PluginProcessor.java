@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.Xpp3DomUtils;
 
 public class PluginProcessor
     extends BaseProcessor
@@ -72,8 +75,21 @@ public class PluginProcessor
             DependenciesProcessor proc = new DependenciesProcessor();
             proc.process( new ArrayList<Dependency>(p1.getDependencies()), new ArrayList<Dependency>(), p2.getDependencies(), false );            
         }
-         
-        
+
+        if(p1.getConfiguration() != null)
+        {
+            //TODO: Not copying
+            if(p2.getConfiguration() != null)
+            {
+                p2.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) p1.getConfiguration(), (Xpp3Dom) p2.getConfiguration() ));     
+            }
+            else
+            {
+                p2.setConfiguration( p1.getConfiguration() );
+            }
+                
+        }
+       
        // p2.setConfiguration( configuration ) merge nodes
         //Goals
         //Executions
