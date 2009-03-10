@@ -612,7 +612,6 @@
           <name>executionId</name>
           <version>1.0.0</version>
           <identifier>true</identifier>
-          <defaultValue>default</defaultValue>
           <description>A name for this mojo binding, for purposes of merging configurations via inheritance, etc.</description>
           <type>String</type>
         </field>

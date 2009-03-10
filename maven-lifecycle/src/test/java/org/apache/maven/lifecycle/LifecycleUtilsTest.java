@@ -672,7 +672,7 @@ public class LifecycleUtilsTest
         assertEquals( "group", binding2.getGroupId() );
         assertEquals( "artifact", binding2.getArtifactId() );
         assertEquals( "version", binding2.getVersion() );
-        assertEquals( "default", binding2.getExecutionId() );
+        assertEquals( binding.getExecutionId(), binding2.getExecutionId() );
     }
 
     public void testAddMojoBinding_LifecycleBinding_AddOneMojoBindingToEmptyLifecycle()
