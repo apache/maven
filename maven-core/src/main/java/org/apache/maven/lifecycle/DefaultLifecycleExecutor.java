@@ -455,7 +455,7 @@ public class DefaultLifecycleExecutor
 
             validateMojoExecution( mojoBinding, mojoDescriptor, project, allowAggregators );
 
-            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, mojoBinding.getExecutionId() );
 
             mojoExecution.setConfiguration( (Xpp3Dom) mojoBinding.getConfiguration() );
 
