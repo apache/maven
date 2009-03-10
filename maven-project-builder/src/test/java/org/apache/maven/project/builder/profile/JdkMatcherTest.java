@@ -194,7 +194,27 @@ public class JdkMatcherTest {
         JdkMatcher matcher = new JdkMatcher();
         assertFalse(matcher.isMatch(modelContainer, props));
     } 
-    
+
+    /* FIXME: Instead of re-inventing the version comparison logic for the JdkMatcher, can't we recycle stuff from
+    //*  the old artifact code of from Mercury?
+    @org.junit.Test
+    public void jdkVersionRange_WithExclusionPoint()
+    {
+        List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
+        modelProperties.add( new ModelProperty( ProjectUri.Profiles.Profile.xUri, null ) );
+        modelProperties.add( new ModelProperty( ProjectUri.Profiles.Profile.Activation.xUri, null ) );
+        modelProperties.add( new ModelProperty( ProjectUri.Profiles.Profile.Activation.jdk, "(,1.5.2),(1.5.2,)" ) );
+
+        ModelContainer modelContainer = new DefaultModelContainer( modelProperties );
+
+        List<InterpolatorProperty> props = new ArrayList<InterpolatorProperty>();
+        props.add( new InterpolatorProperty( "${java.specification.version}", "1.5" ) );
+
+        JdkMatcher matcher = new JdkMatcher();
+        assertTrue( matcher.isMatch( modelContainer, props ) );
+    }
+    //*/
+
     @org.junit.Test
     public void jdkVersionNotFound()  {
         List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
