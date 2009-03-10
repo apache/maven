@@ -36,7 +36,7 @@ public class JdkMatcher
                     {
                         if ( modelProperty.getResolvedValue().startsWith( "!" ) )
                         {
-                            return !version.equals( modelProperty.getResolvedValue().replaceFirst( "!", "" ) );
+                            return !version.startsWith( modelProperty.getResolvedValue().replaceFirst( "!", "" ) );
                         }
                         else if ( isRange( modelProperty.getResolvedValue() ) )
                         {
@@ -44,7 +44,7 @@ public class JdkMatcher
                         }
                         else
                         {
-                            return version.equals( modelProperty.getResolvedValue() );
+                            return version.startsWith( modelProperty.getResolvedValue() );
                         }
 
                     }
