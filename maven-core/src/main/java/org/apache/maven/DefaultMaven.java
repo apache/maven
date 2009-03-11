@@ -21,6 +21,7 @@ package org.apache.maven;
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -731,7 +732,7 @@ public class DefaultMaven
                     }
                     catch ( SecDispatcherException e )
                     {
-                        throw new SettingsConfigurationException( e.getMessage() );
+                        reportSecurityConfigurationError( "password for proxy '" + proxy.getId() + "'", e );
                     }
                 }
 
@@ -753,7 +754,7 @@ public class DefaultMaven
                     }
                     catch ( SecDispatcherException e )
                     {
-                        throw new SettingsConfigurationException( e.getMessage() );
+                        reportSecurityConfigurationError( "password for server '" + server.getId() + "'", e );
                     }
                 }
                 
@@ -767,7 +768,7 @@ public class DefaultMaven
                     }
                     catch ( SecDispatcherException e )
                     {
-                        throw new SettingsConfigurationException( e.getMessage() );
+                        reportSecurityConfigurationError( "passphrase for server '" + server.getId() + "'", e );
                     }
                 }
 
@@ -828,6 +829,28 @@ public class DefaultMaven
                 }
             }
         }
+    }
+
+    private void reportSecurityConfigurationError( String affectedConfiguration, SecDispatcherException e )
+    {
+        Throwable cause = e;
+
+        String msg = "Not decrypting " + affectedConfiguration + " due to exception in security handler.";
+
+        // Drop to the actual cause, it wraps multiple times
+        while ( cause.getCause() != null )
+        {
+            cause = cause.getCause();
+        }
+
+        // common cause is missing settings-security.xml
+        if ( cause instanceof FileNotFoundException )
+        {
+            msg += "\nEnsure that you have configured your master password file (and relocation if appropriate)\nSee the installation instructions for details.";
+        }
+
+        getLogger().warn( msg + "\nCause: " + cause.getMessage() );
+        getLogger().debug( "Full trace follows", e );
     }
 
     // ----------------------------------------------------------------------
