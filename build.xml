@@ -90,13 +90,6 @@ END SNIPPET: ant-bootstrap -->
     <!-- Pull the dependencies for Modello -->
     <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
       <localRepository path="${maven.repo.local}"/>
-      <!-- TODO: remove when Modello 1.0.1 is released -->
-      <remoteRepository url="http://repo1.maven.org/" id="central"/>
-      <remoteRepository url="http://snapshots.repository.codehaus.org/" id="codehaus.snapshots">
-        <snapshots enabled="true"/>
-        <releases enabled="false"/>
-      </remoteRepository>
-      <!-- /TODO -->
       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
     </artifact:dependencies>
 
