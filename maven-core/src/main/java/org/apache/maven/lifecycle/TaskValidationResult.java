@@ -28,16 +28,7 @@ public class TaskValidationResult
 
     public TaskValidationResult( String invalidTask,
                                  String message,
-                                 LifecycleSpecificationException cause )
-    {
-        this.invalidTask = invalidTask;
-        this.message = message;
-        this.cause = cause;
-    }
-
-    public TaskValidationResult( String invalidTask,
-                                 String message,
-                                 LifecycleLoaderException cause )
+                                 LifecycleExecutionException cause )
     {
         this.invalidTask = invalidTask;
         this.message = message;

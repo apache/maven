@@ -23,42 +23,28 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
-import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.errors.CoreReporterManager;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.lifecycle.LifecycleUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.PluginVersionNotFoundException;
-import org.apache.maven.plugin.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
@@ -81,11 +67,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -314,11 +296,6 @@ public class MavenEmbedder
     public MavenProject readProject( File mavenProject )
         throws ProjectBuildingException, MavenExecutionException
     {
-        CoreErrorReporter errorReporter = request.getErrorReporter();
-        errorReporter.clearErrors();
-
-        CoreReporterManager.setReporter( errorReporter );
-
         return readProject( mavenProject, request );
     }
 
@@ -342,11 +319,6 @@ public class MavenEmbedder
         try
         {
             request = populator.populateDefaults( request, configuration );
-
-            CoreErrorReporter errorReporter = request.getErrorReporter();
-            errorReporter.clearErrors();
-
-            CoreReporterManager.setReporter( errorReporter );
 
             readProject( request.getPom(), request );
         }
@@ -374,9 +346,7 @@ public class MavenEmbedder
 
         try
         {
-            projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies(
-                request.getPom(),
-                request.getProjectBuildingConfiguration() );
+            projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuildingConfiguration() );
         }
         catch ( ProjectBuildingException e )
         {
@@ -407,21 +377,6 @@ public class MavenEmbedder
         // and with that set you could then subsequently execute goals for each of those project.
 
         return result;
-    }
-
-    // ----------------------------------------------------------------------
-    // Lifecycle information
-    // ----------------------------------------------------------------------
-
-    public List getLifecyclePhases()
-    {
-        return getBuildLifecyclePhases();
-    }
-
-
-    public List getBuildLifecyclePhases()
-    {
-        return LifecycleUtils.getValidBuildPhaseNames();
     }
 
     // ----------------------------------------------------------------------
@@ -644,11 +599,6 @@ public class MavenEmbedder
                 return result;
             }
 
-            CoreErrorReporter errorReporter = request.getErrorReporter();
-            errorReporter.clearErrors();
-
-            CoreReporterManager.setReporter( errorReporter );
-
             return maven.execute( request );
         }
         finally
@@ -665,5 +615,10 @@ public class MavenEmbedder
     public PlexusContainer getPlexusContainer()
     {
         return container;
+    }
+
+    public List getLifecyclePhases()
+    {       
+        return maven.getLifecyclePhases();
     }
 }

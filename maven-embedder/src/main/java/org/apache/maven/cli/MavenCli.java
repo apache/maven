@@ -19,6 +19,8 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.embedder.Configuration;
@@ -29,12 +31,9 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
-import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
-
-import java.io.File;
 
 /**
  * @author jason van zyl
@@ -203,7 +202,6 @@ public class MavenCli
         }
 
         Configuration configuration = new DefaultConfiguration()
-            .setErrorReporter( new DefaultCoreErrorReporter() )
             .setUserSettingsFile( userSettingsFile )
             .setGlobalSettingsFile( globalSettingsFile )
             .setClassWorld( classWorld );

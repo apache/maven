@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.lifecycle.Lifecycle;
 
 /**
  * @author Jason van Zyl
@@ -34,15 +33,16 @@ public interface Maven
 {
     static String ROLE = Maven.class.getName();
 
-    //!! CLI pollution
+    //jvz!! CLI pollution
     String POMv4 = "pom.xml";
 
-    //!! release plugin pollution
+    //!!jvz release plugin pollution
     String RELEASE_POMv4 = "release-pom.xml";
 
     MavenExecutionResult execute( MavenExecutionRequest request );
 
-    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result );
+    //!!jvz This should not be exposed but is as a result of the buildProjectWithDependencies 
+    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result );    
     
-    List<Lifecycle> getLifecyclePhases();
+    List getLifecyclePhases();
 }

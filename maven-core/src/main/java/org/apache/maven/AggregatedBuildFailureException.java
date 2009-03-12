@@ -1,7 +1,5 @@
 package org.apache.maven;
 
-import org.apache.maven.lifecycle.MojoBindingUtils;
-import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
@@ -18,18 +16,13 @@ public class AggregatedBuildFailureException
 {
 
     private final String executionRootDirectory;
-    private final MojoBinding binding;
 
     public AggregatedBuildFailureException( String executionRootDirectory,
-                                            MojoBinding binding,
                                             MojoFailureException cause )
     {
-        super( "Build in root directory: " + executionRootDirectory
-               + " failed during execution of aggregator mojo: "
-               + MojoBindingUtils.toString( binding ), cause );
+        super( "Build in root directory: " + executionRootDirectory + " failed during execution of aggregator mojo.", cause );
 
         this.executionRootDirectory = executionRootDirectory;
-        this.binding = binding;
     }
 
     public MojoFailureException getMojoFailureException()
@@ -41,10 +34,4 @@ public class AggregatedBuildFailureException
     {
         return executionRootDirectory;
     }
-
-    public MojoBinding getBinding()
-    {
-        return binding;
-    }
-
 }

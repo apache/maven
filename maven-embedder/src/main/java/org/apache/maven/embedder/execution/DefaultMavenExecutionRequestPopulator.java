@@ -17,7 +17,6 @@ package org.apache.maven.embedder.execution;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +29,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
-import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
@@ -87,8 +85,6 @@ public class DefaultMavenExecutionRequestPopulator
     {
         eventing( request, configuration );
 
-        reporter( request, configuration );
-
         executionProperties( request, configuration );
 
         pom( request, configuration );
@@ -106,21 +102,6 @@ public class DefaultMavenExecutionRequestPopulator
         processSettings( request, configuration );
 
         return request;
-    }
-
-    private void reporter( MavenExecutionRequest request, Configuration configuration )
-    {
-        if ( request.getErrorReporter() == null )
-        {
-            if ( configuration.getErrorReporter() != null )
-            {
-                request.setErrorReporter( configuration.getErrorReporter() );
-            }
-            else
-            {
-                request.setErrorReporter( new DefaultCoreErrorReporter() );
-            }
-        }
     }
 
     private void executionProperties( MavenExecutionRequest request, Configuration configuration )

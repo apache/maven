@@ -31,8 +31,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
-import org.apache.maven.lifecycle.model.LifecycleBinding;
-import org.apache.maven.lifecycle.model.LifecycleBindings;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
@@ -69,14 +67,13 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-@Component(role = LifecycleExecutor.class)
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
     implements LifecycleExecutor
 {
     //@Requirement
     //private getLogger() getLogger();
-    
+
     @Requirement
     private PluginManager pluginManager;
 
@@ -86,25 +83,22 @@ public class DefaultLifecycleExecutor
 
     private Map phaseToLifecycleMap;
 
-    public List<Lifecycle> getLifecyclePhases()
+    public List<String> getLifecyclePhases()
     {
-        return lifecycles;
-    }
-    
-    public static boolean isValidPhaseName( final String phaseName )
-    {
-        LifecycleBindings test = new LifecycleBindings();
-        for ( Iterator it = test.getBindingList().iterator(); it.hasNext(); )
+        for ( Lifecycle lifecycle : lifecycles )
         {
-            LifecycleBinding binding = (LifecycleBinding) it.next();
-
-            if ( binding.getPhaseNamesInOrder().contains( phaseName ) )
+            if ( lifecycle.getId().equals( "default" ) )
             {
-                return true;
+                return lifecycle.getPhases();
             }
         }
 
-        return false;
+        return null;
+    }
+
+    public static boolean isValidPhaseName( final String phaseName )
+    {
+        return true;
     }
 
     /**
@@ -133,16 +127,10 @@ public class DefaultLifecycleExecutor
 
                     return new TaskValidationResult( task, "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator.", e );
                 }
-                catch ( LifecycleSpecificationException e )
+                catch ( LifecycleExecutionException e )
                 {
                     String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or"
                         + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
-
-                    return new TaskValidationResult( task, message, e );
-                }
-                catch ( LifecycleLoaderException e )
-                {
-                    String message = "Failed to load one or more lifecycle definitions which may contain task: '" + task + "'.";
 
                     return new TaskValidationResult( task, message, e );
                 }
@@ -164,19 +152,19 @@ public class DefaultLifecycleExecutor
      * @throws PluginLoaderException
      */
     private MojoDescriptor getMojoDescriptorForDirectInvocation( String task, MavenSession session, MavenProject project )
-        throws InvalidPluginException, LifecycleSpecificationException, LifecycleLoaderException, PluginLoaderException
-    {        
+        throws InvalidPluginException, PluginLoaderException, LifecycleExecutionException
+    {
         MojoDescriptor descriptor;
-        
+
         try
         {
             descriptor = getMojoDescriptor( task, session, project );
         }
         catch ( LifecycleExecutionException e )
         {
-            throw new LifecycleSpecificationException( "Cannot find the specified goal.", e );
+            throw new LifecycleExecutionException( "Cannot find the specified goal.", e );
         }
-                
+
         if ( descriptor == null )
         {
             throw new InvalidPluginException( "Plugin: " + descriptor.getId() + " does not contain referenced mojo: " + descriptor.getGoal() );
@@ -535,7 +523,7 @@ public class DefaultLifecycleExecutor
         for ( Iterator i = goals.iterator(); i.hasNext(); )
         {
             MojoExecution mojoExecution = (MojoExecution) i.next();
-            
+
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
             if ( mojoDescriptor.getExecutePhase() != null || mojoDescriptor.getExecuteGoal() != null )
@@ -1230,23 +1218,23 @@ public class DefaultLifecycleExecutor
         }
         return goals;
     }
-    
+
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException
     {
         String goal;
         Plugin plugin;
 
-        PluginDescriptor pluginDescriptor = null;        
-        
+        PluginDescriptor pluginDescriptor = null;
+
         StringTokenizer tok = new StringTokenizer( task, ":" );
-        int numTokens = tok.countTokens();        
-        
+        int numTokens = tok.countTokens();
+
         if ( numTokens == 2 )
         {
             String prefix = tok.nextToken();
             goal = tok.nextToken();
-            
+
             // This is the case where someone has executed a single goal from the command line
             // of the form:
             //
@@ -1255,9 +1243,9 @@ public class DefaultLifecycleExecutor
             // From the metadata stored on the server which has been created as part of a standard
             // Maven plugin deployment we will find the right PluginDescriptor from the remote
             // repository.
-            
+
             plugin = pluginManager.findPluginForPrefix( prefix, project, session );
-                        
+
             if ( plugin == null )
             {
                 plugin = new Plugin();
@@ -1335,7 +1323,7 @@ public class DefaultLifecycleExecutor
         project.addPlugin( plugin );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
-        
+
         return mojoDescriptor;
     }
 

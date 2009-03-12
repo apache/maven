@@ -26,7 +26,6 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.errors.CoreErrorReporter;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
@@ -226,9 +225,6 @@ public interface MavenExecutionRequest
     MavenRealmManager getRealmManager();
 
     MavenExecutionRequest clearAccumulatedBuildState();
-
-    MavenExecutionRequest setErrorReporter( CoreErrorReporter reporter );
-    CoreErrorReporter getErrorReporter();
 
     ProjectBuilderConfiguration getProjectBuildingConfiguration();
 }

@@ -32,7 +32,7 @@ import org.apache.maven.project.MavenProject;
  */
 public interface LifecycleExecutor
 {    
-    List<Lifecycle> getLifecyclePhases();
+    List<String> getLifecyclePhases();
     
     TaskValidationResult isTaskValid( String task, MavenSession session, MavenProject rootProject );
     

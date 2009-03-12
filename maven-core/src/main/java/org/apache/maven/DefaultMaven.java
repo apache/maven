@@ -81,7 +81,7 @@ public class DefaultMaven
     @Requirement
     private Logger logger;
 
-    public List<Lifecycle> getLifecyclePhases()
+    public List<String> getLifecyclePhases()
     {
         return lifecycleExecutor.getLifecyclePhases();
     }
@@ -462,5 +462,25 @@ public class DefaultMaven
                 it.remove();
             }
         }
+    }
+
+    // Lifecycle phases
+    
+    public List<Lifecycle> getBuildLifecyclePhases()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<Lifecycle> getCleanLifecyclePhases()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<Lifecycle> getSiteLifecyclePhases()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

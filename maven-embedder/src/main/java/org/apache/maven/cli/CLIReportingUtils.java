@@ -12,8 +12,6 @@ import java.util.TimeZone;
 import org.apache.maven.ProjectBuildFailureException;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
-import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.ApplicationInformation;
 import org.apache.maven.execution.DefaultRuntimeInformation;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -85,7 +83,7 @@ public final class CLIReportingUtils
             {
                 Exception e = (Exception) i.next();
                 
-                showError( e, request.isShowErrors(), request.getErrorReporter(), logger );
+                showError( e, request.isShowErrors(), logger );
             }
 
             line( logger );
@@ -133,7 +131,7 @@ public final class CLIReportingUtils
     {
         MavenEmbedderLogger logger = new MavenEmbedderConsoleLogger();
 
-        showError( message, e, showErrors, new DefaultCoreErrorReporter(), logger );
+        showError( message, e, showErrors, logger );
 
         if ( !showErrors )
         {
@@ -141,9 +139,9 @@ public final class CLIReportingUtils
         }
     }
 
-    private static void showError( Exception e, boolean show, CoreErrorReporter reporter, MavenEmbedderLogger logger )
+    private static void showError( Exception e, boolean show, MavenEmbedderLogger logger )
     {
-        showError( null, e, show, reporter, logger );
+        showError( null, e, show, logger );
     }
 
     /**
@@ -155,7 +153,7 @@ public final class CLIReportingUtils
      * @param logger
      */
     //mkleint: public because used in netbeans integration
-    public static void showError( String message, Exception e, boolean showStackTraces, CoreErrorReporter reporter, MavenEmbedderLogger logger )
+    public static void showError( String message, Exception e, boolean showStackTraces, MavenEmbedderLogger logger )
     {
         StringWriter writer = new StringWriter();
 
@@ -167,7 +165,7 @@ public final class CLIReportingUtils
             writer.write( NEWLINE );
         }
 
-        buildErrorMessage( e, showStackTraces, reporter, writer );
+        buildErrorMessage( e, showStackTraces, writer );
 
         writer.write( NEWLINE );
 
@@ -182,34 +180,8 @@ public final class CLIReportingUtils
         logger.error( writer.toString() );
     }
 
-    public static void buildErrorMessage( Exception e, boolean showStackTraces, CoreErrorReporter reporter, StringWriter writer )
-    {        
-        if ( reporter != null )
-        {
-            Throwable reported = reporter.findReportedException( e );
-
-            if ( reported != null )
-            {
-                writer.write( reporter.getFormattedMessage( reported ) );
-
-                if ( showStackTraces )
-                {
-                    writer.write( NEWLINE );
-                    writer.write( NEWLINE );
-                    Throwable cause = reporter.getRealCause( reported );
-                    if ( cause != null )
-                    {
-                        cause.printStackTrace( new PrintWriter( writer ) );
-                    }
-                }
-
-                writer.write( NEWLINE );
-                writer.write( NEWLINE );
-
-                return;
-            }
-        }
-        
+    public static void buildErrorMessage( Exception e, boolean showStackTraces, StringWriter writer )
+    {                
         boolean handled = false;
 
         if ( e instanceof ProjectBuildingException )

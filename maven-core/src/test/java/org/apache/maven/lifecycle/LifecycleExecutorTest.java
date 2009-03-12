@@ -8,8 +8,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
@@ -29,7 +27,6 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class LifecycleExecutorTest
     extends PlexusTestCase
@@ -56,6 +53,11 @@ public class LifecycleExecutorTest
         lifecycleExecutor = (DefaultLifecycleExecutor) lookup( LifecycleExecutor.class );
     }
 
+    public void testLifecyclePhases()
+    {
+        assertNotNull( lifecycleExecutor.getLifecyclePhases() );
+    }
+    
     public void testMojoExecution()
         throws Exception
     {
@@ -112,31 +114,7 @@ public class LifecycleExecutorTest
         assertEquals( "1.0", pd.getVersion() );        
         
         MojoExecution me = new MojoExecution( mojoDescriptor );       
-        
-//        for ( Plugin bp : project.getBuildPlugins() )
-//        {
-//            // The POM builder should have merged any configuration at the upper level of the plugin
-//            // element with the execution level configuration where our goal is.
-//            
-//            // We have our plugin
-//            if ( bp.getArtifactId().equals( pd.getArtifactId() ) )
-//            {
-//                // Search through executions
-//                for( PluginExecution e : bp.getExecutions() )
-//                {         
-//                    // Search though goals to match what's been asked for.
-//                    for ( String g : e.getGoals() )
-//                    {
-//                        // This goal matches what's been asked for.                            
-//                        if( g.equals( goal ) )
-//                        {
-//                            me.setConfiguration( (Xpp3Dom) e.getConfiguration() );
-//                        }
-//                    }
-//                }
-//            }
-//        }
-        
+               
         // Need some xpath action in here. Make sure the mojoExecution configuration is intact
                 
         // Now the magical mojo descriptor is complete and I can execute the mojo.

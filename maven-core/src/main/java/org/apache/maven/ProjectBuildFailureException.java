@@ -1,7 +1,5 @@
 package org.apache.maven;
 
-import org.apache.maven.lifecycle.MojoBindingUtils;
-import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
@@ -19,17 +17,12 @@ public class ProjectBuildFailureException
 {
 
     private final String projectId;
-    private final MojoBinding binding;
 
-    public ProjectBuildFailureException( String projectId,
-                                         MojoBinding binding,
-                                         MojoFailureException cause )
+    public ProjectBuildFailureException( String projectId, MojoFailureException cause )
     {
-        super( "Build for project: " + projectId + " failed during execution of mojo: "
-               + MojoBindingUtils.toString( binding ), cause );
+        super( "Build for project: " + projectId + " failed during execution of mojo.", cause );
 
         this.projectId = projectId;
-        this.binding = binding;
     }
 
     public MojoFailureException getMojoFailureException()
@@ -41,10 +34,4 @@ public class ProjectBuildFailureException
     {
         return projectId;
     }
-
-    public MojoBinding getBinding()
-    {
-        return binding;
-    }
-
 }
