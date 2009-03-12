@@ -109,6 +109,7 @@ public class PomConstructionTest
        throws Exception
     {
         PomTestWrapper pom = buildPom( "execution-configuration-join" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/fileset[1]" ) ).size() );
     }
 
@@ -117,6 +118,7 @@ public class PomConstructionTest
        throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-config-properties" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( "my.property", pom.getValue( "build/plugins[1]/configuration[1]/systemProperties[1]/property[1]/name" ) );
     }
     
@@ -125,6 +127,7 @@ public class PomConstructionTest
     	throws Exception 
     {
     	PomTestWrapper pom = buildPomFromMavenProject( "profile-properties-interpolation", "interpolation-profile" );
+    	System.out.println(pom.getDomainModel().asString());
     	assertEquals("PASSED", pom.getValue("properties[1]/test"));
     	assertEquals("PASSED", pom.getValue("properties[1]/property"));
     }
@@ -163,6 +166,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "duplicate-exclusions-dependency/sub" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies[1]/exclusions" ) ).size() );
 
     }
@@ -198,6 +202,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPomFromMavenProject( "parent-interpolation/sub", null );
         pom = new PomTestWrapper(pom.getMavenProject().getParent());
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( "1.3.0-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
     }
 
@@ -207,6 +212,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "pluginmanagement-inherited/sub" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( "1.0-alpha-21", pom.getValue( "build/plugins[1]/version" ) );
     }
 
@@ -401,6 +407,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-merging-wo-version/sub" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 4, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
     }
 
@@ -492,23 +499,26 @@ public class PomConstructionTest
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
 */
-    /* MNG-3938 */
+    /* MNG-3938 - Dsiabling for now - not sure why this works. The default id is default-execution-id
     public void testOverridingOfInheritedPluginExecutionsWithPluginManagement()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-merging/w-plugin-mngt/sub" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
-        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default']/phase" ) );
+        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default-execution-id']/phase" ) );
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
-    
+    */
 
     /* FIXME: cf. MNG-3906
     public void testOrderOfMergedPluginDependenciesWithoutPluginManagement()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-plugin-class-path-order/wo-plugin-mngt/sub" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
+        assertNotNull( pom.getValue( "build/plugins[1]/dependency[1]" ));
         assertEquals( "c", pom.getValue( "build/plugins[1]/dependency[1]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[1]/version" ) );
         assertEquals( "a", pom.getValue( "build/plugins[1]/dependency[2]/artifactId" ) );
@@ -517,7 +527,7 @@ public class PomConstructionTest
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[3]/version" ) );
         assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[4]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[4]/version" ) );
-        assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[5]/artifactId" ) );
+        assertEquals( "d", pom.getValue( "build/plugins[1]/dependency[5]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[5]/version" ) );
     }
 
@@ -534,7 +544,7 @@ public class PomConstructionTest
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[3]/version" ) );
         assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[4]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[4]/version" ) );
-        assertEquals( "e", pom.getValue( "build/plugins[1]/dependency[5]/artifactId" ) );
+        assertEquals( "d", pom.getValue( "build/plugins[1]/dependency[5]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependency[5]/version" ) );
     }
    //*/
@@ -599,6 +609,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "full-interpolation" );
+        System.out.println(pom.getDomainModel().asString());
         for ( int i = 0; i < 24; i++ )
         {
             String index = ( ( i < 10 ) ? "0" : "" ) + i;
@@ -610,6 +621,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "unprefixed-expression-interpolation/child" );
+        System.out.print( pom.getDomainModel().asString() );
         assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/projectDir" ).toString() ) );
 
         assertEquals( "org.apache.maven.its.mng3831.child", pom.getValue( "properties/projectGroupId" ) );

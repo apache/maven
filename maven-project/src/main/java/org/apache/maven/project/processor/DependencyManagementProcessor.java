@@ -5,43 +5,27 @@ import java.util.List;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 
-public class DependencyProcessor
-    extends BaseProcessor
+public class DependencyManagementProcessor extends BaseProcessor
 {
-    
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );
-
-        List<Dependency> t = (List<Dependency>) target;
-
-        if ( parent == null && child == null )
+        
+        List<Dependency> depManagement = (List<Dependency> ) child;
+        List<Dependency> targetDependencies = (List<Dependency>) target;
+        
+        for(Dependency depMng : depManagement)
         {
-            return;
-        }
-        else if ( parent == null && child != null )
-        {
-            Dependency targetDependency = new Dependency();
-            copy( (Dependency) child, targetDependency );
-            t.add( targetDependency );
-        }
-        else if ( parent != null && child == null )
-        {
-            Dependency targetDependency = new Dependency();
-            copy( (Dependency) parent, targetDependency );
-            t.add( targetDependency );
-        }
-        else
-        // JOIN
-        {
-           Dependency targetDependency = new Dependency();
-                copy( (Dependency) child, targetDependency );
-                copy( (Dependency) parent, targetDependency );
-                t.add( targetDependency );               
-
+            for(Dependency targetDep : targetDependencies)
+            {
+                if(match(depMng, targetDep))
+                {
+                    copy(depMng, targetDep );      
+                }                
+            }
         }
     }
-
+    
     private static void copy( Dependency dependency, Dependency targetDependency )
     {
         if ( targetDependency.getArtifactId() == null )
@@ -112,4 +96,16 @@ public class DependencyProcessor
         }
         return false;
     }
+    
+    private boolean match( Dependency d1, Dependency d2 )
+    {
+        return getId( d1 ).equals( getId( d2 ) );    
+    }
+
+    private String getId( Dependency d )
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( d.getGroupId() ).append( ":" ).append( d.getArtifactId() );        
+        return sb.toString();
+    }   
 }

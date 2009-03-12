@@ -8,6 +8,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 
 /*
  * hold original pom
@@ -59,6 +60,19 @@ public class ModelProcessor
         {
             t.setGroupId( c.getGroupId() );
         }
+        
+        // ArtifactId
+        if ( c.getArtifactId() == null )
+        {
+            if ( c.getParent() != null )
+            {
+                t.setArtifactId( c.getParent().getArtifactId() );
+            }
+        }
+        else
+        {
+            t.setArtifactId( c.getArtifactId() );
+        }        
 
         t.setModelVersion( c.getModelVersion() );
         t.setPackaging( c.getPackaging() );
@@ -78,6 +92,7 @@ public class ModelProcessor
             t.setInceptionYear( p.getInceptionYear() );
         }
         
+        //Dependencies
         List<Dependency> deps = new ArrayList<Dependency>();
         DependenciesProcessor dependenciesProcessor = new DependenciesProcessor();
         dependenciesProcessor.process( (p != null) ? p.getDependencies() : null, c.getDependencies(), deps, isChildMostSpecialized );
@@ -87,6 +102,7 @@ public class ModelProcessor
             t.getDependencies().addAll( deps );
         }  
         
+        //Dependency Management
         List<Dependency> mngDeps = new ArrayList<Dependency>();
         dependenciesProcessor.process( (p != null && p.getDependencyManagement() != null) ? p.getDependencyManagement().getDependencies(): null,
                         (c.getDependencyManagement() != null) ? c.getDependencyManagement().getDependencies(): null, mngDeps, isChildMostSpecialized );
@@ -98,5 +114,8 @@ public class ModelProcessor
             }
             t.getDependencyManagement().getDependencies().addAll( mngDeps );
         }
+        
+    
+        
     }
 }

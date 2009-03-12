@@ -59,11 +59,13 @@ import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
+import org.apache.maven.project.processor.ProcessorContext;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
 import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.ImportModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelContainer;
 import org.apache.maven.shared.model.ModelEventListener;
@@ -477,6 +479,7 @@ public class DefaultMavenProjectBuilder
         {
             for ( String s : (List<String>) validationResult.getMessages() )
             {
+                System.out.println(s);
                 logger.debug( s );
             }
             throw new InvalidProjectModelException( projectId, "Failed to validate POM", pomFile, validationResult );
@@ -518,6 +521,7 @@ public class DefaultMavenProjectBuilder
         return buildModel( pom, interpolatorProperties, null, null, localRepository, remoteRepositories );
     }
 
+    @SuppressWarnings("unchecked")
     private PomClassicDomainModel buildModel( File pom, Collection<InterpolatorProperty> interpolatorProperties, Collection<String> activeProfileIds, Collection<String> inactiveProfileIds,
                                               ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws IOException
@@ -590,7 +594,9 @@ public class DefaultMavenProjectBuilder
 
         ModelTransformerContext ctx = new ModelTransformerContext( PomTransformer.MODEL_CONTAINER_INFOS );
 
-        PomClassicDomainModel transformedDomainModel = ( (PomClassicDomainModel) ctx.transform( domainModels, transformer, transformer, Collections.EMPTY_LIST, properties, listeners ) );
+        //PomClassicDomainModel transformedDomainModel = ProcessorContext.build( domainModels );
+        
+        PomClassicDomainModel transformedDomainModel =  ( (PomClassicDomainModel) ctx.transform( domainModels, transformer, transformer, new ArrayList<ImportModel>(), properties, listeners ) );
         // Lineage count is inclusive to add the POM read in itself.
         transformedDomainModel.setLineageCount( lineageCount + 1 );
         transformedDomainModel.setParentFile( parentFile );
@@ -759,7 +765,7 @@ public class DefaultMavenProjectBuilder
                     transformed.add( new ModelProperty( mp.getUri().replace( ProjectUri.Profiles.Profile.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
                 }
             }
-
+            
             domainModels.add( new PomClassicDomainModel( transformed ) );
         }
         return domainModels;

@@ -163,6 +163,6 @@ public class DependenciesProcessorTest
         DependenciesProcessor processor = new DependenciesProcessor();
         processor.process( parent, child, target, false );
 
-        assertEquals( 2, target.size() );
+        assertEquals( 1, target.size() );
     }
 }

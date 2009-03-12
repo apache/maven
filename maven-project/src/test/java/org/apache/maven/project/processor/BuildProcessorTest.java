@@ -98,6 +98,26 @@ public class BuildProcessorTest extends TestCase
         assertEquals("filter1", target.getBuild().getFilters().get( 0 ));
         assertEquals("filter2", target.getBuild().getFilters().get( 1 ));      
     }   
+
+    public void testJoin_DuplicateFilters()
+    {
+        Model child = new Model();
+        child.setBuild( new Build() );
+        child.getBuild().getFilters().add( "filter" );
+        Model target = new Model();
+ 
+        Model parent = new Model();
+        parent.setBuild( new Build() );
+
+        parent.getBuild().getFilters().add( "filter" );        
+        
+        BuildProcessor proc = new BuildProcessor(new ArrayList());
+        proc.process( parent, child, target, false );
+        
+        assertEquals(1, target.getBuild().getFilters().size());
+       
+        assertEquals("filter", target.getBuild().getFilters().get( 0 ));
+    }      
     
     public void testDoNotInheritParentIfChildExists_Resources()
     {

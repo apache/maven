@@ -3,7 +3,7 @@ package org.apache.maven.project.processor;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class BaseProcessor
+public abstract class BaseProcessor implements Processor
 {
 
     Object parent;

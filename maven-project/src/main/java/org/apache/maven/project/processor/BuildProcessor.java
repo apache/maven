@@ -1,11 +1,18 @@
 package org.apache.maven.project.processor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Resource;
 
 public class BuildProcessor
@@ -28,19 +35,43 @@ public class BuildProcessor
             t.setBuild( new Build() );
         }
         
+        PluginsProcessor pluginsProcessor = new PluginsProcessor();
         if(c.getBuild() == null && !( p == null || p.getBuild() == null))
         {
-            copy(p.getBuild(), t.getBuild());     
+            copy(p.getBuild(), t.getBuild());   
+            pluginsProcessor.process( p.getBuild().getPlugins(), null, t.getBuild().getPlugins(), isChildMostSpecialized );  
+            inheritManagement(p.getBuild().getPluginManagement(), null, t.getBuild());
         }
         else if(c.getBuild() != null && !( p == null || p.getBuild() == null))
         {
             copy(c.getBuild(), t.getBuild());
             copy(p.getBuild(), t.getBuild()); 
+
+            pluginsProcessor.process( p.getBuild().getPlugins(), c.getBuild().getPlugins(), t.getBuild().getPlugins(), isChildMostSpecialized );  
+            inheritManagement(p.getBuild().getPluginManagement(), c.getBuild().getPluginManagement(), t.getBuild());
         } 
         else if(c.getBuild() != null )
         {
             copy(c.getBuild(), t.getBuild());
+            pluginsProcessor.process( null, c.getBuild().getPlugins(), t.getBuild().getPlugins(), isChildMostSpecialized ); 
+            inheritManagement(null, c.getBuild().getPluginManagement(), t.getBuild());
         }    
+    }
+    
+    private static void inheritManagement(PluginManagement parent, PluginManagement child, Build target)
+    {  
+        PluginsProcessor proc = new PluginsProcessor();
+        List<Plugin> p = (parent == null) ? new ArrayList<Plugin>() : parent.getPlugins();
+        List<Plugin> c = (child == null) ? new ArrayList<Plugin>() : child.getPlugins();
+        
+        if(c !=null || p!= null)
+        {
+            if(target.getPluginManagement() == null)
+            {
+                target.setPluginManagement( new PluginManagement() );
+            }
+        }
+        proc.process( p, c, target.getPluginManagement().getPlugins(), false );
     }
     
     private static void copy(Build source, Build target)
@@ -62,7 +93,7 @@ public class BuildProcessor
         
         if(target.getOutputDirectory() == null)
         {
-            target.setOutputDirectory( target.getOutputDirectory() );    
+            target.setOutputDirectory( source.getOutputDirectory() );    
         }
         
         if(target.getScriptSourceDirectory() == null)
@@ -82,10 +113,24 @@ public class BuildProcessor
         
         if(target.getTestSourceDirectory() == null)
         {
-            target.setTestSourceDirectory( source.getTestSourceDirectory() );   
-        }
+            target.setTestSourceDirectory( source.getTestSourceDirectory() );    
+        }        
         
-        target.getFilters().addAll( new ArrayList<String>(source.getFilters()) );
+
+        List<String> filters = new ArrayList<String>(target.getFilters());
+        for(String filter : source.getFilters())
+        {
+            if(!filters.contains( filter ))
+            {
+                filters.add( filter );
+            }
+        }
+
+       // SortedSet<String> s = new TreeSet<String>( new ArrayList<String>( target.getFilters() ) );
+       // s.addAll( source.getFilters() );
+       // List<String> l = Arrays.asList(s.toArray( new String[s.size()]) );
+        
+        target.setFilters( filters );
         
         for(Extension extension : source.getExtensions())
         {
@@ -124,6 +169,6 @@ public class BuildProcessor
                 r.setIncludes( new ArrayList<String>(resource.getIncludes()) );
                 target.getTestResources().add( r );
             }           
-        }        
+        }     
     }
 }
