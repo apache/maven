@@ -109,7 +109,6 @@ public class PomConstructionTest
        throws Exception
     {
         PomTestWrapper pom = buildPom( "execution-configuration-join" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/fileset[1]" ) ).size() );
     }
 
@@ -118,7 +117,6 @@ public class PomConstructionTest
        throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-config-properties" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( "my.property", pom.getValue( "build/plugins[1]/configuration[1]/systemProperties[1]/property[1]/name" ) );
     }
     
@@ -127,7 +125,6 @@ public class PomConstructionTest
     	throws Exception 
     {
     	PomTestWrapper pom = buildPomFromMavenProject( "profile-properties-interpolation", "interpolation-profile" );
-    	System.out.println(pom.getDomainModel().asString());
     	assertEquals("PASSED", pom.getValue("properties[1]/test"));
     	assertEquals("PASSED", pom.getValue("properties[1]/property"));
     }
@@ -166,7 +163,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "duplicate-exclusions-dependency/sub" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies[1]/exclusions" ) ).size() );
 
     }
@@ -202,7 +198,6 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPomFromMavenProject( "parent-interpolation/sub", null );
         pom = new PomTestWrapper(pom.getMavenProject().getParent());
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( "1.3.0-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
     }
 
@@ -212,7 +207,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "pluginmanagement-inherited/sub" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( "1.0-alpha-21", pom.getValue( "build/plugins[1]/version" ) );
     }
 
@@ -407,7 +401,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-merging-wo-version/sub" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( 4, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
     }
 
@@ -609,7 +602,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "full-interpolation" );
-        System.out.println(pom.getDomainModel().asString());
         for ( int i = 0; i < 24; i++ )
         {
             String index = ( ( i < 10 ) ? "0" : "" ) + i;
@@ -621,7 +613,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "unprefixed-expression-interpolation/child" );
-        System.out.print( pom.getDomainModel().asString() );
         assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/projectDir" ).toString() ) );
 
         assertEquals( "org.apache.maven.its.mng3831.child", pom.getValue( "properties/projectGroupId" ) );
@@ -846,7 +837,6 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "merged-filter-order/sub" );
 
-        System.out.println(pom.getValue( "build/filters" ));
         assertEquals( 7, ( (List<?>) pom.getValue( "build/filters" ) ).size() );
         assertTrue( pom.getValue( "build/filters[1]" ).toString().endsWith( "child-a.properties" ) );
         assertTrue( pom.getValue( "build/filters[2]" ).toString().endsWith( "child-c.properties" ) );
