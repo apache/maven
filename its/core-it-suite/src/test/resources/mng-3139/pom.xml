@@ -32,21 +32,6 @@ under the License.
     Test that locally cached metadata of blacklisted repositories is consulted to resolve metaversions.
   </description>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it</id>
-      <url>@baseurl@/repo</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-        <!-- NOTE: Enforce update check to trigger trip to repo. -->
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng3139</groupId>

@@ -48,21 +48,32 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3139" );
 
+        // phase 1: get the metadata into the local repo
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3139" );
 
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.setLogFileName( "log1.txt" );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
 
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", 
+        // phase 2: trigger blacklisting of repo (by invalid URL) and check previously downloaded metadata is stil used
+
+        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
             Collections.singletonMap( "@baseurl@", "http://localhost:63412" ) );
         verifier.setLogFileName( "log2.txt" );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-
         verifier.resetStreams();
     }
 
