@@ -37,6 +37,7 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
@@ -1805,7 +1806,30 @@ public class DefaultPluginManager
 
         String version = null;
 
+        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
+        try
+        {
+            repositoryMetadataManager.resolve( metadata, project.getRemoteArtifactRepositories(), localRepository );
+        }
+        catch ( RepositoryMetadataResolutionException e )
+        {
+            throw new PluginVersionResolutionException( groupId, artifactId, "Failed to resolve plugin version "
+                + metaVersionId + ": " + e.getMessage() );
+        }
+
         String artifactVersion = artifact.getVersion();
+
+        if ( metadata.getMetadata() != null && metadata.getMetadata().getVersioning() != null )
+        {
+            if ( Artifact.RELEASE_VERSION.equals( metaVersionId ) )
+            {
+                artifactVersion = metadata.getMetadata().getVersioning().getRelease();
+            }
+            else if ( Artifact.LATEST_VERSION.equals( metaVersionId ) )
+            {
+                artifactVersion = metadata.getMetadata().getVersioning().getLatest();
+            }
+        }
 
         // make sure this artifact was transformed to a real version, and actually resolved to a file in the repo...
         if ( !metaVersionId.equals( artifactVersion ) && ( artifact.getFile() != null ) )
