@@ -63,6 +63,8 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
 
         verifier.deleteArtifacts( "org.apache.maven.its.mng3372" );
 
+        verifier.getSystemProperties().setProperty( "updateReleaseInfo", "true" );
+
         verifier.executeGoals( Arrays.asList( new String[]{ "clean", "install" } ) );
 
         verifier = new Verifier( project.getAbsolutePath() );
