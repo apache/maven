@@ -79,8 +79,8 @@ public class MavenITmng3877BasedirAlignedModelTest
          * NOTE: The script source directory is deliberately excluded from the checks due to MNG-3741.
          */
 
-        // FIXME: MNG-3877
-        if ( matchesVersionRange( "(4,)" ) )
+        // MNG-3877
+        if ( matchesVersionRange( "[3.0-alpha-3,)" ) )
         {
             assertPathEquals( testDir, "target/site", modelProps.getProperty( "project.reporting.outputDirectory" ) );
         }
