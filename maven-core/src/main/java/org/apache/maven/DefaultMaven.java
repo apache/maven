@@ -368,11 +368,16 @@ public class DefaultMaven
             for ( Iterator i = projects.iterator(); i.hasNext(); )
             {
                 MavenProject project = (MavenProject) i.next();
-                
-                for ( Iterator j = project.getActiveProfiles().iterator(); j.hasNext(); )
+
+                do
                 {
-                    activeProfileIds.add( ( (Profile) j.next() ).getId() );
+                    for ( Iterator j = project.getActiveProfiles().iterator(); j.hasNext(); )
+                    {
+                        activeProfileIds.add( ( (Profile) j.next() ).getId() );
+                    }
+                    project = project.getParent();
                 }
+                while ( project != null );
             }
 
             for ( Iterator i = globalProfileManager.getExplicitlyActivatedIds().iterator(); i.hasNext(); )
