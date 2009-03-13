@@ -422,19 +422,34 @@ public class MavenProject
     // Test and compile sourceroots.
     // ----------------------------------------------------------------------
 
-    public void addCompileSourceRoot( String path )
+    private void addPath( List<String> paths, String path )
     {
         if ( path != null )
         {
             path = path.trim();
-            if ( path.length() != 0 )
+            if ( path.length() > 0 )
             {
-                if ( !getCompileSourceRoots().contains( path ) )
+                File file = new File( path );
+                if ( file.isAbsolute() )
                 {
-                    getCompileSourceRoots().add( path );
+                    path = file.getAbsolutePath();
+                }
+                else
+                {
+                    path = new File( getBasedir(), path ).getAbsolutePath();
+                }
+
+                if ( !paths.contains( path ) )
+                {
+                    paths.add( path );
                 }
             }
         }
+    }
+
+    public void addCompileSourceRoot( String path )
+    {
+        addPath( getCompileSourceRoots(), path );
     }
 
     public void addScriptSourceRoot( String path )
@@ -454,17 +469,7 @@ public class MavenProject
 
     public void addTestCompileSourceRoot( String path )
     {
-        if ( path != null )
-        {
-            path = path.trim();
-            if ( path.length() != 0 )
-            {
-                if ( !getTestCompileSourceRoots().contains( path ) )
-                {
-                    getTestCompileSourceRoots().add( path );
-                }
-            }
-        }
+        addPath( getTestCompileSourceRoots(), path );
     }
 
     public List<String> getCompileSourceRoots()
