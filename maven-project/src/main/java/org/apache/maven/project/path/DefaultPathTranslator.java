@@ -90,12 +90,13 @@ public class DefaultPathTranslator
             build.setOutputDirectory( alignToBaseDirectory( build.getOutputDirectory(), basedir ) );
 
             build.setTestOutputDirectory( alignToBaseDirectory( build.getTestOutputDirectory(), basedir ) );
+        }
 
-            Reporting reporting = model.getReporting();
-            if ( reporting != null )
-            {
-                reporting.setOutputDirectory( alignToBaseDirectory( reporting.getOutputDirectory(), basedir ) );
-            }
+        Reporting reporting = model.getReporting();
+
+        if ( reporting != null )
+        {
+            reporting.setOutputDirectory( alignToBaseDirectory( reporting.getOutputDirectory(), basedir ) );
         }
     }
 
@@ -241,12 +242,13 @@ public class DefaultPathTranslator
             build.setOutputDirectory( unalignFromBaseDirectory( build.getOutputDirectory(), basedir ) );
 
             build.setTestOutputDirectory( unalignFromBaseDirectory( build.getTestOutputDirectory(), basedir ) );
+        }
 
-            Reporting reporting = model.getReporting();
-            if ( reporting != null )
-            {
-                reporting.setOutputDirectory( unalignFromBaseDirectory( reporting.getOutputDirectory(), basedir ) );
-            }
+        Reporting reporting = model.getReporting();
+
+        if ( reporting != null )
+        {
+            reporting.setOutputDirectory( unalignFromBaseDirectory( reporting.getOutputDirectory(), basedir ) );
         }
     }
 
