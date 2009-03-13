@@ -49,7 +49,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         // Delete this artifact. Just in case.
         verifier.deleteArtifact( "org.apache.maven.its.mng3641", "parent", "1.0", "pom" );
 
-        // (1) First run: make sure the profile is found. Must not contain a warning.
+        // (1) make sure the profile is found. Must not contain a warning.
         verifier.setCliOptions( Collections.singletonList( "-P mng-3641-it-provided-profile" ) );
         verifier.setLogFileName( "log-1.txt" );
         verifier.executeGoal( "validate" );
@@ -59,7 +59,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         List logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
 
-        // (2) Second run: make sure the profile was not found and a warning was printed.
+        // (2) make sure the profile was not found and a warning was printed.
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setCliOptions( Collections.singletonList( "-P mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" ) );
         verifier.setLogFileName( "log-2.txt" );
@@ -70,7 +70,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertTrue( logFile.contains( "Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
 
-        // (3) Third run: make sure the first profile is found while the other is not and a warning was printed
+        // (3) make sure the first profile is found while the other is not and a warning was printed
         // accordingly.
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setCliOptions( Collections.singletonList( "-P mng-3641-it-provided-profile,mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" ) );
@@ -83,7 +83,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
         assertTrue( logFile.contains( "Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
 
-        // (4) Fourth run: make sure the warning is only printed when the profile is missing in all projects
+        // (4) make sure the warning is only printed when the profile is missing in all projects
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setCliOptions( Collections.singletonList( "-P mng-3641-it-provided-profile-child" ) );
         verifier.setLogFileName( "log-4.txt" );
@@ -93,5 +93,28 @@ public class MavenITmng3641ProfileActivationWarningTest
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile-child' has not been activated." ) );
+
+        // (5) make sure the profile is found in subproject. Must not contain a warning.
+        verifier = new Verifier( new File( testDir, "child1" ).getAbsolutePath() );
+        verifier.setCliOptions( Collections.singletonList( "-P mng-3641-it-provided-profile-child" ) );
+        verifier.setLogFileName( "log-5.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile-child' has not been activated." ) );
+
+        // (6) make sure the profile is found from parent in subproject. Must not contain a warning.
+        verifier = new Verifier( new File( testDir, "child1" ).getAbsolutePath() );
+        verifier.setCliOptions( Collections.singletonList( "-P mng-3641-it-provided-profile" ) );
+        verifier.setLogFileName( "log-6.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
+
     }
 }
