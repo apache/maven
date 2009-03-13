@@ -388,13 +388,12 @@ public class DefaultArtifactResolver
         // This is often an artifact like a POM that is taken from disk and we already have hold of the
         // file reference. But this may be a Maven Plugin that we need to resolve from a remote repository
         // as well as its dependencies.
-        
+                
         if ( request.isResolveRoot() && rootArtifact.getFile() == null )
-        {
+        {            
             try
             {
                 resolve( rootArtifact, remoteRepositories, localRepository );
-                result.addArtifact( rootArtifact );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -410,12 +409,16 @@ public class DefaultArtifactResolver
 
         if ( artifacts == null || artifacts.size() == 0 )
         {
+            result.addArtifact( rootArtifact );            
             return result;
         } 
         
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
 
+        // Add the root artifact
+        result.addArtifact( rootArtifact );            
+        
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
         // appropriately.
@@ -449,7 +452,7 @@ public class DefaultArtifactResolver
                 }
             }
         }
-
+        
         return result;
     }
 

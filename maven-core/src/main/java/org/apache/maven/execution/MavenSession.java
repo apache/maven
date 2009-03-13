@@ -35,7 +35,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
@@ -65,16 +64,13 @@ public class MavenSession
 
     //For testing
     private ArtifactRepository localRepository;
-    
-    private MavenRealmManager realmManager;
-    
+        
     private List<String> pluginGroups;
     
-    public MavenSession( ArtifactRepository localRepository, List<String> pluginGroups, MavenRealmManager realmManager )    
+    public MavenSession( ArtifactRepository localRepository, List<String> pluginGroups )    
     {        
         this.localRepository = localRepository;
         this.pluginGroups = pluginGroups;
-        this.realmManager = realmManager;
     }
     
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, EventDispatcher eventDispatcher, ReactorManager reactorManager )
@@ -83,16 +79,6 @@ public class MavenSession
         this.request = request;
         this.eventDispatcher = eventDispatcher;
         this.reactorManager = reactorManager;
-    }
-
-    public MavenRealmManager getRealmManager()
-    {
-        if ( realmManager != null )
-        {
-            return realmManager;
-        }
-        
-        return request.getRealmManager();
     }
 
     public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )

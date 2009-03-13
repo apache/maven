@@ -215,7 +215,6 @@ public class DefaultArtifactFactory
 
         ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
 
-        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
-            optional );
+        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler, optional );
     }
 }

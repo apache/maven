@@ -27,7 +27,6 @@ import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 
@@ -118,8 +117,6 @@ public class DefaultMavenExecutionRequest
      * @issue MNG-2681
      */
     private boolean noSnapshotUpdates;
-
-    private MavenRealmManager realmManager;
         
     public static MavenExecutionRequest copy( MavenExecutionRequest original )
     {
@@ -156,7 +153,6 @@ public class DefaultMavenExecutionRequest
         copy.setProfileManager( original.getProfileManager() );
         copy.setRemoteRepositories( original.getRemoteRepositories() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
-        copy.setRealmManager( original.getRealmManager() );
         return original;        
     }
    
@@ -690,24 +686,6 @@ public class DefaultMavenExecutionRequest
     public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
-    }
-
-    public MavenExecutionRequest setRealmManager( MavenRealmManager realmManager )
-    {
-        this.realmManager = realmManager;
-        return this;
-    }
-
-    public MavenRealmManager getRealmManager()
-    {
-        return realmManager;
-    }
-
-    public MavenExecutionRequest clearAccumulatedBuildState()
-    {
-        realmManager.clear();
-
-        return this;
     }
 
     public ProfileActivationContext getProfileActivationContext()

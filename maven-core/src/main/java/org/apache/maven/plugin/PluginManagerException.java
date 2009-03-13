@@ -5,7 +5,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
@@ -151,15 +150,6 @@ public class PluginManagerException
     }
 
     public PluginManagerException( Plugin plugin, String message, PlexusContainerException cause )
-    {
-        super( message, cause );
-
-        pluginGroupId = plugin.getGroupId();
-        pluginArtifactId = plugin.getArtifactId();
-        pluginVersion = plugin.getVersion();
-    }
-
-    public PluginManagerException( Plugin plugin, String message, RealmManagementException cause )
     {
         super( message, cause );
 

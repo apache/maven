@@ -2,7 +2,6 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.realm.RealmManagementException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
@@ -43,11 +42,6 @@ public class PluginContainerException
         super( plugin, message, e );
 
         this.pluginRealm = pluginRealm;
-    }
-
-    public PluginContainerException( Plugin plugin, String message, RealmManagementException e )
-    {
-        super( plugin, message, e );
     }
 
     public ClassRealm getPluginRealm()

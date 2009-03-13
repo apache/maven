@@ -38,7 +38,6 @@ import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
@@ -95,8 +94,6 @@ public class DefaultMavenExecutionRequestPopulator
 
         artifactTransferMechanism( request, configuration );
 
-        realmManager( request, configuration );
-
         profileManager( request, configuration );
 
         processSettings( request, configuration );
@@ -129,21 +126,6 @@ public class DefaultMavenExecutionRequestPopulator
                 {
                     requestProperties.setProperty( key, userProperties.getProperty( key ) );
                 }
-            }
-        }
-    }
-
-    private void realmManager( MavenExecutionRequest request, Configuration configuration )
-    {
-        if ( request.getRealmManager() == null )
-        {
-            if ( configuration.getRealmManager() == null )
-            {
-                request.setRealmManager( new DefaultMavenRealmManager( container, getLogger() ) );
-            }
-            else
-            {
-                request.setRealmManager( configuration.getRealmManager() );
             }
         }
     }

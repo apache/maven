@@ -30,7 +30,6 @@ import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
@@ -220,11 +219,6 @@ public interface MavenExecutionRequest
      */
     MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> repositories );
     List<ArtifactRepository> getRemoteRepositories();
-
-    MavenExecutionRequest setRealmManager( MavenRealmManager realmManager );
-    MavenRealmManager getRealmManager();
-
-    MavenExecutionRequest clearAccumulatedBuildState();
 
     ProjectBuilderConfiguration getProjectBuildingConfiguration();
 }

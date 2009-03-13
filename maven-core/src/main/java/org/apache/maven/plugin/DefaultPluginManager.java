@@ -18,6 +18,7 @@ package org.apache.maven.plugin;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,9 +74,6 @@ import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.realm.MavenRealmManager;
-import org.apache.maven.realm.RealmManagementException;
-import org.apache.maven.realm.RealmScanningUtils;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
@@ -160,8 +158,7 @@ public class DefaultPluginManager
     }
 
     public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
     {
         String pluginVersion = plugin.getVersion();
 
@@ -192,7 +189,7 @@ public class DefaultPluginManager
         try
         {
             Artifact pluginArtifact = resolvePluginArtifact( plugin, project, session );
-
+            
             addPlugin( plugin, pluginArtifact, project, session );
 
             project.addPlugin( plugin );
@@ -221,11 +218,17 @@ public class DefaultPluginManager
 
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
 
-        setDescriptorClassAndArtifactInfo( pluginDescriptor, project, session, new ArrayList() );
-
         return pluginDescriptor;
     }
 
+    // We need to load different 
+    private Map<String,ClassRealm> pluginRealms = new HashMap<String,ClassRealm>();
+    
+    private String pluginKey( Plugin plugin )
+    {
+        return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
+    }
+    
     protected void addPlugin( Plugin plugin, Artifact pluginArtifact, MavenProject project, MavenSession session )
         throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException
     {
@@ -242,37 +245,38 @@ public class DefaultPluginManager
         {
             projectPlugin = plugin;
         }
-        else if ( projectPlugin.getVersion() == null || Artifact.RELEASE_VERSION.equals( projectPlugin.getVersion() ) || Artifact.LATEST_VERSION.equals( projectPlugin.getVersion() ) )
+        else if ( projectPlugin.getVersion() == null || Artifact.RELEASE_VERSION.equals( projectPlugin.getVersion() ) )
         {
             projectPlugin.setVersion( plugin.getVersion() );
         }
-
-        Set<Artifact> artifactSet = getPluginArtifacts( pluginArtifact, projectPlugin, project, session.getLocalRepository() );
-
-        List<Artifact> artifacts = ( artifactSet == null || artifactSet.isEmpty() ) ? new ArrayList<Artifact>() : new ArrayList<Artifact>( artifactSet );
-
-        logger.debug( "Got plugin artifacts:\n\n" + artifacts );
-
-        MavenRealmManager realmManager = session.getRealmManager();
-        ClassRealm pluginRealm = realmManager.getPluginRealm( projectPlugin );
-        if ( pluginRealm == null )
-        {
-            try
-            {
-                pluginRealm = realmManager.createPluginRealm( projectPlugin, pluginArtifact, artifacts, coreArtifactFilterManager.getArtifactFilter() );
                 
-                logger.debug( "Created realm: " + pluginRealm + " for plugin: " + projectPlugin.getKey() );
-            }
-            catch ( RealmManagementException e )
-            {
-                throw new PluginContainerException( plugin, "Failed to create realm for plugin '" + projectPlugin, e );
-            }
+        // associate the realm with the descriptor
+        
+        ClassRealm pluginRealm = pluginRealms.get( pluginKey( plugin ) );
+        
+        if ( pluginRealm == null )
+        {                        
+            pluginRealm = container.createChildRealm( pluginKey( plugin ) );    
 
+            Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, projectPlugin, project, session.getLocalRepository() );
+
+            for( Artifact a : pluginArtifacts )
+            {
+                try
+                {
+                    pluginRealm.addURL( a.getFile().toURI().toURL() );
+                }
+                catch ( MalformedURLException e )
+                {
+                    // Not going to happen
+                }
+            }
+                        
             try
             {
                 logger.debug( "Discovering components in realm: " + pluginRealm );
 
-                container.discoverComponents( pluginRealm );
+                container.discoverComponents( pluginRealm );                
             }
             catch ( PlexusConfigurationException e )
             {
@@ -300,24 +304,16 @@ public class DefaultPluginManager
                 }
 
                 logger.debug( "Removing invalid plugin realm." );
-                realmManager.disposePluginRealm( projectPlugin );
 
                 throw new PluginManagerException( projectPlugin, "The plugin descriptor for the plugin " + projectPlugin.getKey() + " was not found. Should have been in realm: " + pluginRealm
                     + " Please verify that the plugin JAR " + pluginArtifact.getFile() + " is intact.", project );
             }
 
-            pluginDescriptor.setPluginArtifact( pluginArtifact );
-
-            logger.debug( "Realm for plugin: " + plugin.getKey() + ":\n" + pluginRealm );
-        }
-        else
-        {
-            List<Artifact> managedPluginArtifacts = realmManager.getPluginArtifacts( projectPlugin );
-
-            if ( ( managedPluginArtifacts == null ) || ( managedPluginArtifacts.isEmpty() && !artifacts.isEmpty() ) )
-            {
-                realmManager.setPluginArtifacts( projectPlugin, artifacts );
-            }
+            pluginDescriptor.setPluginArtifact( pluginArtifact );            
+                        
+            pluginDescriptor.setClassRealm( pluginRealm );
+            
+            pluginRealms.put( pluginKey( plugin ), pluginRealm );
         }
     }
 
@@ -387,7 +383,8 @@ public class DefaultPluginManager
             .setLocalRepository( localRepository )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( pluginManagedDependencies )
-            .setFilter( filter );
+            .setFilter( filter )
+            .setResolveRoot( false ); // We are setting this to false because the artifact itself has been resolved.
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
@@ -414,11 +411,8 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
     // Mojo execution
     // ----------------------------------------------------------------------
-
-    public void executeMojo( MavenProject project, MojoExecution mojoExecution )
-        throws MojoFailureException, PluginExecutionException, PluginConfigurationException
-    {
-    }    
+    
+    // We should assume that We've already loaded the plugin in question.
     
     public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws MojoFailureException, PluginExecutionException, PluginConfigurationException
@@ -574,8 +568,8 @@ public class DefaultPluginManager
 
             //dispatcher.dispatchStart( event, goalExecId );
 
-            pluginRealm = pluginDescriptor.getClassRealm();
-
+            pluginRealm = pluginDescriptor.getClassRealm();            
+            
             logger.debug( "Setting context classloader for plugin to: " + pluginRealm.getId() + " (instance is: " + pluginRealm + ")" );
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
@@ -655,16 +649,6 @@ public class DefaultPluginManager
         }
     }
 
-    private Plugin createDummyPlugin( PluginDescriptor pluginDescriptor )
-    {
-        Plugin plugin = new Plugin();
-        plugin.setGroupId( pluginDescriptor.getGroupId() );
-        plugin.setArtifactId( pluginDescriptor.getArtifactId() );
-        plugin.setVersion( pluginDescriptor.getVersion() );
-
-        return plugin;
-    }
-
     public MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException, ArtifactResolutionException
     {
@@ -708,24 +692,8 @@ public class DefaultPluginManager
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-        setDescriptorClassAndArtifactInfo( pluginDescriptor, project, session, realmActions );
-
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
-
-        if ( mojoDescriptor.isRequiresReports() )
-        {
-            Set reportDescriptors = session.getReportMojoDescriptors();
-
-            if ( ( reportDescriptors != null ) && !reportDescriptors.isEmpty() )
-            {
-                for ( Iterator it = reportDescriptors.iterator(); it.hasNext(); )
-                {
-                    MojoDescriptor reportDescriptor = (MojoDescriptor) it.next();
-                    setDescriptorClassAndArtifactInfo( reportDescriptor.getPluginDescriptor(), project, session, realmActions );
-                }
-            }
-        }
-
+        
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
@@ -735,10 +703,11 @@ public class DefaultPluginManager
         Thread.currentThread().setContextClassLoader( pluginRealm );
         try
         {
-
+            System.out.println( pluginDescriptor );
             logger.debug( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm " + pluginRealm.getId() + " - descRealmId=" + mojoDescriptor.getRealm() );
 
             Mojo mojo;
+            
             try
             {
                 mojo = container.lookup( Mojo.class, mojoDescriptor.getRoleHint() );
@@ -875,44 +844,6 @@ public class DefaultPluginManager
                 }
             }
         }
-    }
-
-    private void setDescriptorClassAndArtifactInfo( PluginDescriptor pluginDescriptor, MavenProject project, MavenSession session, List realmActions )
-    {
-        MavenRealmManager realmManager = session.getRealmManager();
-
-        ClassRealm projectRealm = realmManager.getProjectRealm( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-        if ( projectRealm == null )
-        {
-            logger.debug( "Realm for project: " + project.getId() + " not found. Using container realm instead." );
-
-            projectRealm = container.getContainerRealm();
-        }
-
-        Plugin plugin = project.getPlugin( pluginDescriptor.getPluginLookupKey() );
-        if ( plugin == null )
-        {
-            plugin = createDummyPlugin( pluginDescriptor );
-        }
-
-        ClassRealm pluginRealm = realmManager.getPluginRealm( plugin );
-
-        if ( pluginRealm == null )
-        {
-            logger.debug( "Realm for plugin: " + pluginDescriptor.getId() + " not found. Using project realm instead." );
-
-            pluginRealm = projectRealm;
-            realmActions.add( new PluginRealmAction( pluginDescriptor ) );
-        }
-        else
-        {
-            pluginRealm.setParentRealm( projectRealm );
-            realmActions.add( new PluginRealmAction( pluginDescriptor, pluginRealm ) );
-        }
-
-        logger.debug( "Setting realm for plugin descriptor: " + pluginDescriptor.getId() + " to: " + pluginRealm );
-        pluginDescriptor.setClassRealm( pluginRealm );
-        pluginDescriptor.setArtifacts( realmManager.getPluginArtifacts( plugin ) );
     }
 
     private PlexusConfiguration extractMojoConfiguration( PlexusConfiguration mergedConfiguration, MojoDescriptor mojoDescriptor )
@@ -1672,8 +1603,7 @@ public class DefaultPluginManager
         return version;
     }
 
-    // Plugin Manager Support
-
+    // We need to strip out the methods in here for a validation method.
     public Artifact resolvePluginArtifact( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginManagerException, InvalidPluginException, PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException
     {
@@ -1748,86 +1678,6 @@ public class DefaultPluginManager
         {
             throw new InvalidPluginException( "Plugin: " + plugin.getKey() + " has a dependency with an invalid version." );
         }
-    }
-
-    public PluginDescriptor loadIsolatedPluginDescriptor( Plugin plugin, MavenProject project, MavenSession session )
-    {
-        if ( plugin.getVersion() == null )
-        {
-            try
-            {
-                plugin.setVersion( resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, session ) );
-            }
-            catch ( PluginVersionResolutionException e )
-            {
-                logger.debug( "Failed to load plugin descriptor for: " + plugin.getKey(), e );
-            }
-            catch ( InvalidPluginException e )
-            {
-                logger.debug( "Failed to load plugin descriptor for: " + plugin.getKey(), e );
-            }
-            catch ( PluginVersionNotFoundException e )
-            {
-                logger.debug( "Failed to load plugin descriptor for: " + plugin.getKey(), e );
-            }
-        }
-
-        if ( plugin.getVersion() == null )
-        {
-            return null;
-        }
-
-        Artifact artifact = null;
-        try
-        {
-            artifact = resolvePluginArtifact( plugin, project, session );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            logger.debug( "Failed to load plugin descriptor for: " + plugin.getKey(), e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            logger.debug( "Failed to load plugin descriptor for: " + plugin.getKey(), e );
-        }
-        catch ( PluginManagerException e )
-        {
-            logger.debug( "Failed to load plugin descriptor for: " + plugin.getKey(), e );
-        }
-        catch ( InvalidPluginException e )
-        {
-            logger.debug( "Failed to load plugin descriptor for: " + plugin.getKey(), e );
-        }
-        catch ( PluginVersionResolutionException e )
-        {
-            logger.debug( "Failed to load plugin descriptor for: " + plugin.getKey(), e );
-        }
-
-        if ( artifact == null )
-        {
-            return null;
-        }
-
-        MavenPluginDiscoverer discoverer = new MavenPluginDiscoverer();
-        discoverer.setManager( RealmScanningUtils.getDummyComponentDiscovererManager() );
-
-        try
-        {
-            List componentSetDescriptors =
-                RealmScanningUtils.scanForComponentSetDescriptors( artifact, discoverer, container.getContext(),
-                                                                   "Plugin: " + plugin.getKey() );
-
-            if ( !componentSetDescriptors.isEmpty() )
-            {
-                return (PluginDescriptor) componentSetDescriptors.get( 0 );
-            }
-        }
-        catch ( RealmManagementException e )
-        {
-            logger.debug( "Failed to scan plugin artifact: " + artifact.getId() + " for descriptors.", e );
-        }
-
-        return null;
     }
     
     // Plugin Mapping Manager

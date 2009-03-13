@@ -19,13 +19,10 @@ import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.realm.DefaultMavenRealmManager;
-import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 
 public class LifecycleExecutorTest
@@ -87,17 +84,12 @@ public class LifecycleExecutorTest
         MavenProject project = projectBuilder.build( targetPom, configuration );              
         assertEquals( "maven", project.getArtifactId() );
         assertEquals( "3.0-SNAPSHOT", project.getVersion() );
-        
-        // We need a local repository and realm manager in the session in order to execute a mojo. This
-        // is not really a good situation.
-        MavenRealmManager realmManager = new DefaultMavenRealmManager( getContainer(), new ConsoleLogger( 0, "logger" ) );  
-        
+                
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setProjectPresent( true )
             .setPluginGroups( Arrays.asList( new String[]{ "org.apache.maven.plugins"} ) )
             .setLocalRepository( localRepository )
             .setRemoteRepositories( Arrays.asList( repositorySystem.buildArtifactRepository( repository ) ) )
-            .setRealmManager( realmManager )
             .setProperties( new Properties() );
                                       
         MavenSession session = new MavenSession( getContainer(), request, null, null );

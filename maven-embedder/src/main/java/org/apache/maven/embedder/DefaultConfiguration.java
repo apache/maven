@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.realm.MavenRealmManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -58,8 +57,6 @@ public class DefaultConfiguration
     private PlexusContainer parentContainer;
 
     private File localRepository;
-
-    private MavenRealmManager realmManager;
 
     private List<EventMonitor> eventMonitors;
 
@@ -222,17 +219,6 @@ public class DefaultConfiguration
     public File getLocalRepository()
     {
         return localRepository;
-    }
-
-    public MavenRealmManager getRealmManager()
-    {
-        return realmManager;
-    }
-
-    public Configuration setRealmManager( MavenRealmManager realmManager )
-    {
-        this.realmManager = realmManager;
-        return this;
     }
 
     public Configuration addEventMonitor( EventMonitor eventMonitor )
