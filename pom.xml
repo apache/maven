@@ -272,6 +272,7 @@ under the License.
   <properties>
     <mavenVersion>2.1.1-SNAPSHOT</mavenVersion>
     <wagonVersion>1.0-beta-5</wagonVersion>
+    <doxiaVersion>1.1</doxiaVersion>
   </properties>
 
   <!--start-->
@@ -388,12 +389,12 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.doxia</groupId>
         <artifactId>doxia-sink-api</artifactId>
-        <version>1.1</version>
+        <version>${doxiaVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.doxia</groupId>
         <artifactId>doxia-logging-api</artifactId>
-        <version>1.1</version>
+        <version>${doxiaVersion}</version>
       </dependency>
       <!-- Plexus -->
       <dependency>
