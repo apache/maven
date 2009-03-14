@@ -59,7 +59,6 @@ import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.profile.ProfileContext;
-import org.apache.maven.project.processor.ProcessorContext;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
@@ -751,6 +750,7 @@ public class DefaultMavenProjectBuilder
         throws IOException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
+
         Collection<ModelContainer> profileContainers = profileContext.getActiveProfiles();
 
         for ( ModelContainer mc : profileContainers )
@@ -759,15 +759,18 @@ public class DefaultMavenProjectBuilder
             transformed.add( new ModelProperty( ProjectUri.xUri, null ) );
             for ( ModelProperty mp : mc.getProperties() )
             {
-                if ( mp.getUri().startsWith( ProjectUri.Profiles.Profile.xUri ) && !mp.getUri().equals( ProjectUri.Profiles.Profile.id )
+                if ( mp.getUri().startsWith( ProjectUri.Profiles.Profile.xUri )
+                    && !mp.getUri().equals( ProjectUri.Profiles.Profile.id )
                     && !mp.getUri().startsWith( ProjectUri.Profiles.Profile.Activation.xUri ) )
                 {
-                    transformed.add( new ModelProperty( mp.getUri().replace( ProjectUri.Profiles.Profile.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
+                    transformed.add( new ModelProperty( mp.getUri().replace( ProjectUri.Profiles.Profile.xUri,
+                                                                             ProjectUri.xUri ), mp.getResolvedValue() ) );
                 }
             }
-            
+
             domainModels.add( new PomClassicDomainModel( transformed ) );
         }
+
         return domainModels;
     }
 
@@ -811,22 +814,7 @@ public class DefaultMavenProjectBuilder
         //Process Profiles
         ProfileContext profileContext = new ProfileContext( new DefaultModelDataSource( parentDomainModel.getModelProperties(), PomTransformer.MODEL_CONTAINER_FACTORIES ), activeProfileIds,
                                                             inactiveProfileIds, properties );
-        Collection<ModelContainer> profileContainers = profileContext.getActiveProfiles();
-
-        for ( ModelContainer mc : profileContainers )
-        {
-            List<ModelProperty> transformed = new ArrayList<ModelProperty>();
-            transformed.add( new ModelProperty( ProjectUri.xUri, null ) );
-            for ( ModelProperty mp : mc.getProperties() )
-            {
-                if ( mp.getUri().startsWith( ProjectUri.Profiles.Profile.xUri ) && !mp.getUri().equals( ProjectUri.Profiles.Profile.id )
-                    && !mp.getUri().startsWith( ProjectUri.Profiles.Profile.Activation.xUri ) )
-                {
-                    transformed.add( new ModelProperty( mp.getUri().replace( ProjectUri.Profiles.Profile.xUri, ProjectUri.xUri ), mp.getResolvedValue() ) );
-                }
-            }
-            domainModels.add( new PomClassicDomainModel( transformed ) );
-        }
+        domainModels.addAll( transformProfiles( profileContext ) );
 
         if ( !parentDomainModel.matchesParentOf( domainModel ) )
         {
