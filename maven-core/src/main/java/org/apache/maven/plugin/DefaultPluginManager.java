@@ -182,7 +182,7 @@ public class DefaultPluginManager
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
         logger.debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
-        if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
+        if ( pluginVersion == null )
         {
             logger.debug( "Resolving version for plugin: " + plugin.getKey() );
             pluginVersion = resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, session );
@@ -211,6 +211,8 @@ public class DefaultPluginManager
             if ( !RESERVED_GROUP_IDS.contains( plugin.getGroupId() ) )
             {
                 Artifact pluginArtifact = resolvePluginArtifact( plugin, project, session );
+
+                plugin.setVersion( pluginArtifact.getBaseVersion() );
 
                 addPlugin( plugin, pluginArtifact, project, session );
             }
