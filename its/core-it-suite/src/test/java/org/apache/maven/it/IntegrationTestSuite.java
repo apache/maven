@@ -92,6 +92,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4087PercentEncodedFileUrlTest.class );
         suite.addTestSuite( MavenITmng4086ExplicitPluginMetaversionTest.class );
         suite.addTestSuite( MavenITmng4072InactiveProfileReposTest.class );
         suite.addTestSuite( MavenITmng4070WhitespaceTrimmingTest.class );
