@@ -202,6 +202,8 @@ public class DefaultPluginManager
 
             artifactResolver.resolve( pluginArtifact, project.getPluginArtifactRepositories(), localRepository );
 
+            plugin.setVersion( pluginArtifact.getBaseVersion() );
+
             String pluginKey = PluginUtils.constructVersionedKey( plugin );
 
             PlexusContainer pluginContainer = container.getChildContainer( pluginKey );
