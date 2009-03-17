@@ -309,6 +309,7 @@ public class DefaultPluginManager
             // remove listeners for efficiency since they are only needed for the initial stage and
             // should not be applied to the plugin's dependencies
             child.removeComponentDiscoveryListener( validator );
+            child.removeComponentDiscoveryListener( pluginCollector );
 
             if ( validator.hasErrors() )
             {
