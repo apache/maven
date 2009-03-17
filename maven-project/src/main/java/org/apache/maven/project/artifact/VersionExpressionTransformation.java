@@ -108,13 +108,6 @@ public class VersionExpressionTransformation
         {
             throw new ArtifactDeploymentException( "Failed to read or write POM for version transformation.", e );
         }
-        catch ( XmlPullParserException e )
-        {
-            throw new ArtifactDeploymentException(
-                                                   "Failed to parse POM for version transformation. Error was in file: "
-                                                       + pomFile + ", at line: " + e.getLineNumber() + ", column: "
-                                                       + e.getColumnNumber(), e );
-        }
         catch ( ModelInterpolationException e )
         {
             throw new ArtifactDeploymentException( "Failed to interpolate POM versions.", e );
@@ -170,13 +163,6 @@ public class VersionExpressionTransformation
         {
             throw new ArtifactInstallationException( "Failed to read or write POM for version transformation.", e );
         }
-        catch ( XmlPullParserException e )
-        {
-            throw new ArtifactInstallationException(
-                                                     "Failed to parse POM for version transformation. Error was in file: "
-                                                         + pomFile + ", at line: " + e.getLineNumber() + ", column: "
-                                                         + e.getColumnNumber(), e );
-        }
         catch ( ModelInterpolationException e )
         {
             throw new ArtifactInstallationException( "Failed to interpolate POM versions.", e );
@@ -190,7 +176,7 @@ public class VersionExpressionTransformation
     }
 
     protected File transformVersions( File pomFile, Artifact artifact, ArtifactRepository localRepository )
-        throws IOException, XmlPullParserException, ModelInterpolationException
+        throws IOException, ModelInterpolationException
     {
         ProjectBuilderConfiguration pbConfig;
         File projectDir;
@@ -224,13 +210,32 @@ public class VersionExpressionTransformation
         {
             reader = ReaderFactory.newXmlReader( pomFile );
             model = new MavenXpp3Reader().read( reader );
+            
+            interpolateVersions( pomFile, outputFile, model, projectDir, pbConfig );
+        }
+        catch ( XmlPullParserException e )
+        {
+            String message =
+                "Failed to parse POM for version transformation. Proceeding with original (non-interpolated) POM file.";
+            
+            String detail = "\n\nNOTE: Error was in file: " + pomFile + ", at line: "
+                    + e.getLineNumber() + ", column: " + e.getColumnNumber();
+            
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( message + detail, e );
+            }
+            else
+            {
+                getLogger().warn( message + " See debug output for details." );
+            }
+            
+            outputFile = pomFile;
         }
         finally
         {
             IOUtil.close( reader );
         }
-        
-        interpolateVersions( pomFile, outputFile, model, projectDir, pbConfig );
         
         return outputFile;
     }

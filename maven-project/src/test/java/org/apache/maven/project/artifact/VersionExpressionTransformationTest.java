@@ -74,7 +74,7 @@ public class VersionExpressionTransformationTest
     private static final String VERSION = "blah";
 
     private VersionExpressionTransformation transformation;
-    
+
     private Set toDelete = new HashSet();
 
     public void setUp()
@@ -85,18 +85,18 @@ public class VersionExpressionTransformationTest
         transformation =
             (VersionExpressionTransformation) lookup( ArtifactTransformation.class.getName(), "version-expression" );
     }
-    
+
     public void tearDown()
         throws Exception
-        {
+    {
         super.tearDown();
-        
+
         if ( toDelete != null && !toDelete.isEmpty() )
         {
             for ( Iterator it = toDelete.iterator(); it.hasNext(); )
             {
                 File f = (File) it.next();
-                
+
                 try
                 {
                     FileUtils.forceDelete( f );
@@ -108,14 +108,60 @@ public class VersionExpressionTransformationTest
                 }
             }
         }
+    }
+
+    public void testTransformForInstall_AbortOnInvalidPOM()
+        throws URISyntaxException, IOException, XmlPullParserException, ModelInterpolationException
+    {
+        String pomResource = "version-expressions/invalid-pom.xml";
+        File pomFile = getPom( pomResource );
+        
+        File projectDir;
+        if ( pomFile != null )
+        {
+            projectDir = pomFile.getParentFile();
         }
-    
+        else
+        {
+            projectDir = File.createTempFile( "VersionExpressionTransformationTest.project.", ".tmp.dir" );
+            projectDir.delete();
+            projectDir.mkdirs();
+
+            toDelete.add( projectDir );
+
+            File newPomFile = new File( projectDir, "pom.xml" );
+            FileUtils.copyFile( pomFile, newPomFile );
+            
+            pomFile = newPomFile;
+        }
+
+        File repoDir = File.createTempFile( "VersionExpressionTransformationTest.repo.", ".tmp.dir" );
+        repoDir.delete();
+        repoDir.mkdirs();
+
+        toDelete.add( repoDir );
+
+        Artifact a =
+            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersion( "1" ),
+                                 null, "jar", null, new DefaultArtifactHandler( "jar" ) );
+
+        ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
+        a.addMetadata( pam );
+
+        ArtifactRepository localRepository =
+            new DefaultArtifactRepository( "local", repoDir.getAbsolutePath(), new DefaultRepositoryLayout() );
+
+        transformation.transformVersions( pomFile, a, localRepository );
+        
+        assertEquals( pomFile, pam.getFile() );
+    }
+
     public void testTransformForInstall_PreserveComments()
         throws URISyntaxException, IOException, XmlPullParserException, ModelInterpolationException
     {
         String pomResource = "version-expressions/pom-with-comments.xml";
         File pomFile = getPom( pomResource );
-        
+
         Model model;
         Reader reader = null;
         try
@@ -128,9 +174,9 @@ public class VersionExpressionTransformationTest
         {
             IOUtil.close( reader );
         }
-        
+
         File newPom = runTransformVersion_VanillaArtifact( model, pomFile );
-        
+
         StringWriter writer = new StringWriter();
         reader = null;
         try
@@ -142,9 +188,9 @@ public class VersionExpressionTransformationTest
         {
             IOUtil.close( reader );
         }
-        
+
         assertTrue( "XML comment not found.", writer.toString().indexOf( "This is a comment." ) > -1 );
-        
+
         reader = new StringReader( writer.toString() );
         try
         {
@@ -156,17 +202,17 @@ public class VersionExpressionTransformationTest
         }
 
         assertEquals( "1.0", model.getVersion() );
-        
+
         assertNotNull( model.getProperties() );
-        
+
         assertNotNull( model.getProperties().getProperty( "other.version" ) );
         assertEquals( "${testVersion}", model.getProperties().getProperty( "other.version" ) );
-        
+
         assertNotNull( model.getScm() );
-        
+
         assertNotNull( model.getScm().getConnection() );
         assertEquals( "${testVersion}", model.getScm().getConnection() );
-        
+
         assertNotNull( model.getScm().getUrl() );
         assertEquals( "${testVersion}", model.getScm().getUrl() );
     }
@@ -176,21 +222,21 @@ public class VersionExpressionTransformationTest
     {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         URL resource = cloader.getResource( pom );
-        
+
         if ( resource == null )
         {
             fail( "POM classpath resource not found: '" + pom + "'." );
         }
-        
+
         File tempDir = File.createTempFile( "VersionExpressionTransformationTest.", ".dir.tmp" );
         tempDir.delete();
         tempDir.mkdirs();
-        
+
         toDelete.add( tempDir );
-        
+
         File pomFile = new File( tempDir, "pom.xml" );
         FileUtils.copyFile( new File( new URI( resource.toExternalForm() ).normalize() ), pomFile );
-        
+
         return pomFile;
     }
 
@@ -202,9 +248,9 @@ public class VersionExpressionTransformationTest
         File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
-        
+
         toDelete.add( pomDir );
-        
+
         File pomFile = new File( pomDir, "pom.xml" );
 
         FileWriter writer = null;
@@ -254,9 +300,9 @@ public class VersionExpressionTransformationTest
         File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
-        
+
         toDelete.add( pomDir );
-        
+
         File pomFile = new File( pomDir, "pom.xml" );
 
         FileWriter writer = null;
@@ -291,10 +337,10 @@ public class VersionExpressionTransformationTest
             reader = new FileReader( pam.getFile() );
             StringWriter swriter = new StringWriter();
             IOUtil.copy( reader, swriter );
-            
-            System.out.println( "Transformed POM:\n\n\n" + swriter.toString() );
-            System.out.flush();
-            
+
+//            System.out.println( "Transformed POM:\n\n\n" + swriter.toString() );
+//            System.out.flush();
+
             model = new MavenXpp3Reader().read( new StringReader( swriter.toString() ) );
         }
         finally
@@ -313,9 +359,9 @@ public class VersionExpressionTransformationTest
         File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
-        
+
         toDelete.add( pomDir );
-        
+
         File pomFile = new File( pomDir, "pom.xml" );
 
         FileWriter writer = null;
@@ -358,123 +404,123 @@ public class VersionExpressionTransformationTest
         assertTransformedVersions( model );
     }
 
-    // FIXME: We can't be this smart (yet) since the deployment step transforms from the 
+    // FIXME: We can't be this smart (yet) since the deployment step transforms from the
     // original POM once again and re-installs over the top of the install step.
-//    public void testTransformForInstall_SkipIfProjectArtifactMetadataResolvedFlagIsSet()
-//        throws IOException, ArtifactInstallationException, XmlPullParserException
-//    {
-//        Model model = buildTestModel();
-//
-//        File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
-//        pomDir.delete();
-//        pomDir.mkdirs();
-//        try
-//        {
-//            File pomFile = new File( pomDir, "pom.xml" );
-//            pomFile.deleteOnExit();
-//
-//            FileWriter writer = null;
-//            try
-//            {
-//                writer = new FileWriter( pomFile );
-//                new MavenXpp3Writer().write( writer, model );
-//            }
-//            finally
-//            {
-//                IOUtil.close( writer );
-//            }
-//
-//            Artifact a =
-//                new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
-//                                     new DefaultArtifactHandler( "jar" ), false );
-//            ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
-//            pam.setVersionExpressionsResolved( true );
-//
-//            a.addMetadata( pam );
-//
-//            transformation.transformForInstall( a, null );
-//
-//            assertEquals( pomFile, pam.getFile() );
-//
-//            assertFalse( new File( pomDir, "target/pom-transformed.xml" ).exists() );
-//
-//            FileReader reader = null;
-//            try
-//            {
-//                reader = new FileReader( pomFile );
-//                model = new MavenXpp3Reader().read( reader );
-//            }
-//            finally
-//            {
-//                IOUtil.close( reader );
-//            }
-//
-//            assertEquals( "${testVersion}", model.getVersion() );
-//        }
-//        finally
-//        {
-//            FileUtils.forceDelete( pomDir );
-//        }
-//    }
+    // public void testTransformForInstall_SkipIfProjectArtifactMetadataResolvedFlagIsSet()
+    // throws IOException, ArtifactInstallationException, XmlPullParserException
+    // {
+    // Model model = buildTestModel();
+    //
+    // File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
+    // pomDir.delete();
+    // pomDir.mkdirs();
+    // try
+    // {
+    // File pomFile = new File( pomDir, "pom.xml" );
+    // pomFile.deleteOnExit();
+    //
+    // FileWriter writer = null;
+    // try
+    // {
+    // writer = new FileWriter( pomFile );
+    // new MavenXpp3Writer().write( writer, model );
+    // }
+    // finally
+    // {
+    // IOUtil.close( writer );
+    // }
+    //
+    // Artifact a =
+    // new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
+    // new DefaultArtifactHandler( "jar" ), false );
+    // ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
+    // pam.setVersionExpressionsResolved( true );
+    //
+    // a.addMetadata( pam );
+    //
+    // transformation.transformForInstall( a, null );
+    //
+    // assertEquals( pomFile, pam.getFile() );
+    //
+    // assertFalse( new File( pomDir, "target/pom-transformed.xml" ).exists() );
+    //
+    // FileReader reader = null;
+    // try
+    // {
+    // reader = new FileReader( pomFile );
+    // model = new MavenXpp3Reader().read( reader );
+    // }
+    // finally
+    // {
+    // IOUtil.close( reader );
+    // }
+    //
+    // assertEquals( "${testVersion}", model.getVersion() );
+    // }
+    // finally
+    // {
+    // FileUtils.forceDelete( pomDir );
+    // }
+    // }
 
-    // FIXME: We can't be this smart (yet) since the deployment step transforms from the 
+    // FIXME: We can't be this smart (yet) since the deployment step transforms from the
     // original POM once again and re-installs over the top of the install step.
-//    public void testTransformForDeploy_SkipIfProjectArtifactMetadataResolvedFlagIsSet()
-//        throws IOException, XmlPullParserException, ArtifactDeploymentException
-//    {
-//        Model model = buildTestModel();
-//
-//        File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
-//        pomDir.delete();
-//        pomDir.mkdirs();
-//        try
-//        {
-//            File pomFile = new File( pomDir, "pom.xml" );
-//            pomFile.deleteOnExit();
-//
-//            FileWriter writer = null;
-//            try
-//            {
-//                writer = new FileWriter( pomFile );
-//                new MavenXpp3Writer().write( writer, model );
-//            }
-//            finally
-//            {
-//                IOUtil.close( writer );
-//            }
-//
-//            Artifact a =
-//                new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
-//                                     new DefaultArtifactHandler( "jar" ), false );
-//            ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
-//            pam.setVersionExpressionsResolved( true );
-//
-//            a.addMetadata( pam );
-//
-//            transformation.transformForDeployment( a, null, null );
-//
-//            assertEquals( pomFile, pam.getFile() );
-//
-//            assertFalse( new File( pomDir, "target/pom-transformed.xml" ).exists() );
-//
-//            FileReader reader = null;
-//            try
-//            {
-//                reader = new FileReader( pomFile );
-//                model = new MavenXpp3Reader().read( reader );
-//            }
-//            finally
-//            {
-//                IOUtil.close( reader );
-//            }
-//
-//            assertEquals( "${testVersion}", model.getVersion() );
-//        }
-//        finally
-//        {
-//            FileUtils.forceDelete( pomDir );
-//        }
-//    }
+    // public void testTransformForDeploy_SkipIfProjectArtifactMetadataResolvedFlagIsSet()
+    // throws IOException, XmlPullParserException, ArtifactDeploymentException
+    // {
+    // Model model = buildTestModel();
+    //
+    // File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
+    // pomDir.delete();
+    // pomDir.mkdirs();
+    // try
+    // {
+    // File pomFile = new File( pomDir, "pom.xml" );
+    // pomFile.deleteOnExit();
+    //
+    // FileWriter writer = null;
+    // try
+    // {
+    // writer = new FileWriter( pomFile );
+    // new MavenXpp3Writer().write( writer, model );
+    // }
+    // finally
+    // {
+    // IOUtil.close( writer );
+    // }
+    //
+    // Artifact a =
+    // new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
+    // new DefaultArtifactHandler( "jar" ), false );
+    // ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
+    // pam.setVersionExpressionsResolved( true );
+    //
+    // a.addMetadata( pam );
+    //
+    // transformation.transformForDeployment( a, null, null );
+    //
+    // assertEquals( pomFile, pam.getFile() );
+    //
+    // assertFalse( new File( pomDir, "target/pom-transformed.xml" ).exists() );
+    //
+    // FileReader reader = null;
+    // try
+    // {
+    // reader = new FileReader( pomFile );
+    // model = new MavenXpp3Reader().read( reader );
+    // }
+    // finally
+    // {
+    // IOUtil.close( reader );
+    // }
+    //
+    // assertEquals( "${testVersion}", model.getVersion() );
+    // }
+    // finally
+    // {
+    // FileUtils.forceDelete( pomDir );
+    // }
+    // }
 
     public void testTransformVersion_ShouldInterpolate_VanillaArtifact_ModelProperties()
         throws IOException, XmlPullParserException, ModelInterpolationException
@@ -482,7 +528,7 @@ public class VersionExpressionTransformationTest
         Model model = buildTestModel();
 
         File newPom = runTransformVersion_VanillaArtifact( model, null );
-        
+
         FileReader reader = null;
         try
         {
@@ -504,7 +550,7 @@ public class VersionExpressionTransformationTest
         Model model = buildTestModel();
 
         File newPom = runTransformVersion_ArtifactWithProject( model, new DefaultProjectBuilderConfiguration(), null );
-        
+
         FileReader reader = null;
         try
         {
@@ -528,10 +574,12 @@ public class VersionExpressionTransformationTest
         Properties props = model.getProperties();
         model.setProperties( new Properties() );
 
-        File newPom = runTransformVersion_ArtifactWithProject(
+        File newPom =
+            runTransformVersion_ArtifactWithProject(
                                                      model,
-                                                     new DefaultProjectBuilderConfiguration().setExecutionProperties( props ), null );
-        
+                                                     new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
+                                                     null );
+
         FileReader reader = null;
         try
         {
@@ -560,11 +608,11 @@ public class VersionExpressionTransformationTest
             projectDir = File.createTempFile( "VersionExpressionTransformationTest.project.", ".tmp.dir" );
             projectDir.delete();
             projectDir.mkdirs();
-            
+
             toDelete.add( projectDir );
-            
+
             pomFile = new File( projectDir, "pom.xml" );
-            
+
             FileWriter writer = null;
             try
             {
@@ -580,23 +628,23 @@ public class VersionExpressionTransformationTest
         File repoDir = File.createTempFile( "VersionExpressionTransformationTest.repo.", ".tmp.dir" );
         repoDir.delete();
         repoDir.mkdirs();
-        
+
         toDelete.add( repoDir );
 
         File dir = new File( projectDir, "target" );
         dir.mkdirs();
-        
+
         if ( model.getBuild() == null )
         {
             model.setBuild( new Build() );
         }
-        
+
         model.getBuild().setDirectory( dir.getAbsolutePath() );
 
         Artifact a =
             new DefaultArtifact( model.getGroupId(), model.getArtifactId(), VersionRange.createFromVersion( "1" ),
                                  null, "jar", null, new DefaultArtifactHandler( "jar" ) );
-        
+
         a.addMetadata( new ProjectArtifactMetadata( a, pomFile ) );
 
         ArtifactRepository localRepository =
@@ -607,7 +655,8 @@ public class VersionExpressionTransformationTest
         return new File( projectDir, "target/pom-transformed.xml" );
     }
 
-    private File runTransformVersion_ArtifactWithProject( Model model, ProjectBuilderConfiguration pbConfig, File pomFile )
+    private File runTransformVersion_ArtifactWithProject( Model model, ProjectBuilderConfiguration pbConfig,
+                                                          File pomFile )
         throws IOException, XmlPullParserException, ModelInterpolationException
     {
         File projectDir;
@@ -620,11 +669,11 @@ public class VersionExpressionTransformationTest
             projectDir = File.createTempFile( "VersionExpressionTransformationTest.project.", ".tmp.dir" );
             projectDir.delete();
             projectDir.mkdirs();
-            
+
             toDelete.add( projectDir );
-            
+
             pomFile = new File( projectDir, "pom.xml" );
-            
+
             FileWriter writer = null;
             try
             {
@@ -640,17 +689,17 @@ public class VersionExpressionTransformationTest
         File repoDir = File.createTempFile( "VersionExpressionTransformationTest.repo.", ".tmp.dir" );
         repoDir.delete();
         repoDir.mkdirs();
-        
+
         toDelete.add( repoDir );
 
         File dir = new File( projectDir, "target" );
         dir.mkdirs();
-        
+
         if ( model.getBuild() == null )
         {
             model.setBuild( new Build() );
         }
-        
+
         model.getBuild().setDirectory( dir.getAbsolutePath() );
 
         MavenProject project = new MavenProject( model );
@@ -662,7 +711,7 @@ public class VersionExpressionTransformationTest
             new ArtifactWithProject( project, "jar", null, new DefaultArtifactHandler( "jar" ), false );
 
         a.addMetadata( new ProjectArtifactMetadata( a, pomFile ) );
-        
+
         ArtifactRepository localRepository =
             new DefaultArtifactRepository( "local", repoDir.getAbsolutePath(), new DefaultRepositoryLayout() );
 
@@ -684,10 +733,10 @@ public class VersionExpressionTransformationTest
         File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
-        
+
         toDelete.add( pomDir );
         File pomFile = new File( pomDir, "pom.xml" );
-        
+
         FileWriter writer = null;
         try
         {
@@ -700,9 +749,9 @@ public class VersionExpressionTransformationTest
         }
 
         File output = new File( pomDir, "output.xml" );
-        
+
         transformation.interpolateVersions( pomFile, output, model, pomDir, new DefaultProjectBuilderConfiguration() );
-        
+
         FileReader reader = null;
         try
         {
@@ -725,10 +774,10 @@ public class VersionExpressionTransformationTest
         File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
-        
+
         toDelete.add( pomDir );
         File pomFile = new File( pomDir, "pom.xml" );
-        
+
         FileWriter writer = null;
         try
         {
@@ -741,9 +790,9 @@ public class VersionExpressionTransformationTest
         }
 
         File output = new File( pomDir, "output.xml" );
-        
+
         transformation.interpolateVersions( pomFile, output, model, pomDir, new DefaultProjectBuilderConfiguration() );
-        
+
         FileReader reader = null;
         try
         {
@@ -799,11 +848,11 @@ public class VersionExpressionTransformationTest
         File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
-        
+
         toDelete.add( pomDir );
-        
+
         File pomFile = new File( pomDir, "pom.xml" );
-        
+
         FileWriter writer = null;
         try
         {
@@ -819,10 +868,10 @@ public class VersionExpressionTransformationTest
         model.setProperties( new Properties() );
 
         File output = new File( pomDir, "output.xml" );
-        
+
         transformation.interpolateVersions( pomFile, output, model, pomDir,
                                             new DefaultProjectBuilderConfiguration().setExecutionProperties( props ) );
-        
+
         FileReader reader = null;
         try
         {
