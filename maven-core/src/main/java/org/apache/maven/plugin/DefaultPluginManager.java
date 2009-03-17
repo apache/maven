@@ -69,6 +69,7 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -84,6 +85,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -296,10 +298,26 @@ public class DefaultPluginManager
 
         try
         {
-            child = container.createChildContainer( PluginUtils.constructVersionedKey( plugin ).intern(),
+            MavenPluginValidator validator = new MavenPluginValidator( pluginArtifact );
+
+            String key = PluginUtils.constructVersionedKey( plugin ).intern();
+            child = container.createChildContainer( key,
                                                     Collections.singletonList( pluginArtifact.getFile() ),
                                                     Collections.EMPTY_MAP,
-                                                    Collections.singletonList( pluginCollector ) );
+                                                    Arrays.asList( new ComponentDiscoveryListener[] { validator, pluginCollector } ) );
+
+            if ( validator.hasErrors() )
+            {
+                String msg = "Plugin '" + key + "' has an invalid descriptor:";
+                int count = 1;
+                for ( Iterator i = validator.getErrors().iterator(); i.hasNext(); )
+                {
+                    msg += "\n" + count + ") " + i.next();
+                    count++;
+                }
+                throw new PluginManagerException( msg );
+            }
+
             try
             {
                 child.getContainerRealm().importFrom( "plexus.core", "org.codehaus.plexus.util.xml.Xpp3Dom" );
