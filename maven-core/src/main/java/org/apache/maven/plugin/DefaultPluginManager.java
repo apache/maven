@@ -306,6 +306,10 @@ public class DefaultPluginManager
                                                     Collections.EMPTY_MAP,
                                                     Arrays.asList( new ComponentDiscoveryListener[] { validator, pluginCollector } ) );
 
+            // remove listeners for efficiency since they are only needed for the initial stage and
+            // should not be applied to the plugin's dependencies
+            child.removeComponentDiscoveryListener( validator );
+
             if ( validator.hasErrors() )
             {
                 String msg = "Plugin '" + key + "' has an invalid descriptor:";
