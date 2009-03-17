@@ -45,10 +45,17 @@ public class MojoExecutionExceptionDiagnoser
             message.append( ": " ).append( mee.getSource() ).append( "\n" );
         }
 
-        message.append( mee.getMessage() );
+        String shortMessage = mee.getMessage();
+        if ( shortMessage != null )
+        {
+            message.append( shortMessage );
+        }
 
         String longMessage = mee.getLongMessage();
-        if ( longMessage != null )
+        
+        // the indexOf bit is very strange, but the compiler output for 1.5 source compiled using JDK 1.4 presents this case!
+        // duplicating here for consistency, just in case there's another goofy plugin output I don't know of.
+        if ( longMessage != null && !longMessage.equals( shortMessage ) && shortMessage.indexOf( longMessage ) < 0 )
         {
             message.append( "\n\n" ).append( longMessage );
         }
