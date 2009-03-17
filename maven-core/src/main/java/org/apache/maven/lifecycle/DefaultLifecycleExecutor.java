@@ -184,6 +184,7 @@ public class DefaultLifecycleExecutor
     private void findExtensions( MavenSession session )
         throws LifecycleExecutionException
     {
+        // TODO: MNG-4081. What about extensions within the current reactor??
         for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
         {
             MavenProject project = (MavenProject) i.next();
@@ -1511,6 +1512,8 @@ public class DefaultLifecycleExecutor
         PluginDescriptor pluginDescriptor;
         try
         {
+            // TODO: MNG-4081...need to flush this plugin once we look at it, to avoid using an external
+            // version of a plugin when a newer version will be created in the current reactor...
             pluginDescriptor = pluginManager.verifyPlugin( plugin, project, settings, localRepository );
         }
         catch ( PluginManagerException e )

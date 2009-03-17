@@ -1875,20 +1875,27 @@ public class MavenProject
 
     private void logMissingSiblingProjectArtifact( Artifact artifact )
     {
-        if ( logger == null )
+        if ( logger == null || !logger.isDebugEnabled() )
         {
             return;
         }
         
-        StringBuffer message = new StringBuffer();
-        message.append( "A dependency of the current project (or of one the plugins used in its build) was found in the reactor, " );
-        message.append( "\nbut had not been built at the time it was requested. It will be resolved from the repository instead." );
-        message.append( "\n\nCurrent Project: " ).append( getName() );
-        message.append( "\nRequested Dependency: " ).append( artifact.getId() );
-        message.append( "\n\nNOTE: You may need to run this build to the 'compile' lifecycle phase, or farther, in order to build the dependency artifact." );
-        message.append( "\n" );
-        
-        logger.warn( message.toString() );
+        if ( logger.isDebugEnabled() )
+        {
+            StringBuffer message = new StringBuffer();
+            message.append( "WARNING: A dependency of the current project (or of one the plugins used in its build) was found in the reactor, " );
+            message.append( "\nbut had not been built at the time it was requested. It will be resolved from the repository instead." );
+            message.append( "\n\nCurrent Project: " ).append( getName() );
+            message.append( "\nRequested Dependency: " ).append( artifact.getId() );
+            message.append( "\n\nNOTE: You may need to run this build to the 'compile' lifecycle phase, or farther, in order to build the dependency artifact." );
+            message.append( "\n" );
+            
+            logger.debug( message.toString() );
+        }
+        else
+        {
+            logger.warn( "Requested project artifact: " + artifact.getId() + " is not available at this time. Resolving externally." );
+        }
     }
 
     private void addArtifactPath(Artifact a, List list) throws DependencyResolutionRequiredException

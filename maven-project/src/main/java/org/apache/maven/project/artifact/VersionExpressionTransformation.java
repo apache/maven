@@ -67,7 +67,10 @@ public class VersionExpressionTransformation
         boolean pomArtifact = false;
         if ( "pom".equals( artifact.getType() ) )
         {
-            getLogger().debug( "On Deploy: Using artifact file for POM: " + artifact );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "On Deploy: Using artifact file for POM: " + artifact );
+            }
             pomFile = artifact.getFile();
             pomArtifact = true;
         }
@@ -126,7 +129,10 @@ public class VersionExpressionTransformation
         boolean pomArtifact = false;
         if ( "pom".equals( artifact.getType() ) )
         {
-            getLogger().debug( "On Install: Using artifact file for POM: " + artifact );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "On Install: Using artifact file for POM: " + artifact );
+            }
             pomFile = artifact.getFile();
             pomArtifact = true;
         }
@@ -199,10 +205,13 @@ public class VersionExpressionTransformation
         }
         else
         {
-            getLogger().info(
-                              "Artifact: " + artifact
-                                  + " does not have project-builder metadata (ProjectBuilderConfiguration) associated with it.\n"
-                                  + "Cannot access CLI properties for version transformation." );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                                  "WARNING: Artifact: " + artifact
+                                      + " does not have project-builder metadata (ProjectBuilderConfiguration) associated with it.\n"
+                                      + "Cannot access CLI properties for version transformation." );
+            }
             
             pbConfig = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
             projectDir = pomFile.getAbsoluteFile().getParentFile();
