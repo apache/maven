@@ -26,7 +26,6 @@ import java.io.File;
 
 /**
  * @goal test
- *
  * @phase process-sources
  */
 public class DerivedItMojo
@@ -44,7 +43,10 @@ public class DerivedItMojo
     public void execute()
         throws MojoFailureException, MojoExecutionException
     {
-        super.setOutputFile( file );
+        if ( file != null )
+        {
+            super.setOutputFile( file );
+        }
 
         super.execute();
     }
