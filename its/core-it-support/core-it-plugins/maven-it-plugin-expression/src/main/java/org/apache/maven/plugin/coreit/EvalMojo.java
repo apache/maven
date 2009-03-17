@@ -184,4 +184,9 @@ public class EvalMojo
         getLog().info( "[MAVEN-CORE-IT-LOG] Created output file: " + outputFile );
     }
 
+    public void setOutputFile( File outputFile )
+    {
+        this.outputFile = outputFile;
+    }
 }
+

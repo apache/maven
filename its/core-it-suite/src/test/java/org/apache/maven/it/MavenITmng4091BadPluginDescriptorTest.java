@@ -22,6 +22,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -37,10 +38,10 @@ public class MavenITmng4091BadPluginDescriptorTest
         super( "[2.1.0,)" ); // only test in 2.1.0+
     }
 
-    public void testitMNG4091()
+    public void testitMNG4091_InvalidDescriptor()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4091" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4091/invalid" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -77,6 +78,22 @@ public class MavenITmng4091BadPluginDescriptorTest
         }
 
         assertTrue( "User-friendly message was not found in output.", foundMessage );
+    }
+
+    public void testitMNG4091_PluginDependency()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4091/plugin-dependency" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/plugin-dependency.properties" );
+        assertTrue( props.isEmpty() );
     }
 }
 
