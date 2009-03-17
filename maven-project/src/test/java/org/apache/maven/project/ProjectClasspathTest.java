@@ -59,6 +59,8 @@ public class ProjectClasspathTest
         assertNull( "Check no test dependencies are transitive", artifact );
 
         artifact = getArtifact( project, "maven-test-test", "scope-compile" );
+        assertNotNull(artifact);
+        
         System.out.println( "a = " + artifact );
         System.out.println( "b = " + artifact.getScope() );
         assertEquals( "Check scope", "test", artifact.getScope() );

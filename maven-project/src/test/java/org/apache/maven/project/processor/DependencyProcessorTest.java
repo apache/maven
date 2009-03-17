@@ -78,7 +78,7 @@ public class DependencyProcessorTest
         assertEquals( "gid", dependencies.get( 0 ).getGroupId() );
 
     }
-
+/*
     public void testExclusionJoin()
     {
         DependencyProcessor processor = new DependencyProcessor();
@@ -102,4 +102,5 @@ public class DependencyProcessorTest
         assertEquals( "aid", dependencies.get( 0 ).getExclusions().get( 0 ).getArtifactId() );
         assertEquals( "aid1", dependencies.get( 0 ).getExclusions().get( 1 ).getArtifactId() );
     }
+    */
 }

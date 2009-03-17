@@ -37,24 +37,27 @@ public class DependenciesProcessor
         {
             if ( !c.isEmpty() )
             {
-                List<Dependency> parentDependencies = new ArrayList<Dependency>();
-                for ( Dependency d1 : c)
+                List<Dependency> childDependencies = new ArrayList<Dependency>();
+                for ( Dependency childDependency : c)
                 {
-                    for ( Dependency d2 : p)
+                    for ( Dependency parentDependency : p)
                     {
-                        if ( match( d1, d2 ) )
+                        /*
+                        if ( match( childDependency, parentDependency ) )
                         {
-                            processor.process( d2, d1, dependencies, isChildMostSpecialized );// JOIN
+                            processor.process( null, childDependency, dependencies, isChildMostSpecialized );
+                            childDependencies.add( parentDependency );
                         }
                         else
                         {
-                            processor.process( null, d1, dependencies, isChildMostSpecialized );
-                            parentDependencies.add( d2 );
-                        }
+                        */
+                            processor.process( null, childDependency, dependencies, isChildMostSpecialized );
+                            childDependencies.add( parentDependency );
+    
                     }
                 }
 
-                for ( Dependency d2 : parentDependencies )
+                for ( Dependency d2 : childDependencies )
                 {
                     processor.process( d2, null, dependencies, isChildMostSpecialized );
                 }
@@ -69,9 +72,8 @@ public class DependenciesProcessor
         }
         
         //Cleanup duplicates
-       // List<Dependency> remove = new ArrayList<Dependency>();
         List<Dependency> ordered = new ArrayList<Dependency>(dependencies);
-        Collections.reverse( ordered );
+       // Collections.reverse( ordered );
         for(Dependency dependency : ordered)
         {
             for(int i = ordered.indexOf( dependency ) + 1; i < ordered.size(); i++)
@@ -79,16 +81,16 @@ public class DependenciesProcessor
                 Dependency d1 = ordered.get( i );
                 if(match1(d1, dependency))
                 {
-                    dependencies.remove( dependency );    
+                   // System.out.println("REMOVE:" + d1.getManagementKey() + ":" + d1.getVersion());
+                 //   dependencies.remove( d1 );    
                 }
             }
         }
-       // dependencies.removeAll( remove );
+        
     }
 
     private static boolean contains(Dependency dependency, List<Dependency> dependencies)
-    {
-        
+    {     
         return false;
     }
 

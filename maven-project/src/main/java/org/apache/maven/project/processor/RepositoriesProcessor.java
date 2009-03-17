@@ -13,12 +13,14 @@ public class RepositoriesProcessor extends BaseProcessor
         super.process( parent, child, target, isChildMostSpecialized );
         
         Model t = (Model) target, c = (Model) child, p = (Model) parent;
+        copy(c.getPluginRepositories(), t.getPluginRepositories());
+        
         copy( c.getRepositories(), t.getRepositories() );
         if(p != null)
         {
             copy( p.getRepositories(), t.getRepositories() );   
-        }
-        
+            copy( p.getPluginRepositories(), t.getPluginRepositories() );  
+        }     
     }
     
     private static void copy(List<Repository> sources, List<Repository> targets)

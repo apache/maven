@@ -75,7 +75,15 @@ public class ModelProcessor
         }        
 
         t.setModelVersion( c.getModelVersion() );
-        t.setPackaging( c.getPackaging() );
+        if(c.getPackaging() != null)
+        {
+            t.setPackaging( c.getPackaging() );    
+        }
+        else
+        {
+            t.setPackaging( "jar" );
+        }
+        
 
         if ( isChildMostSpecialized )
         {
@@ -90,6 +98,15 @@ public class ModelProcessor
         else if ( p != null )
         {
             t.setInceptionYear( p.getInceptionYear() );
+        }
+        
+        if(t.getUrl() != null)
+        {
+            t.setUrl(c.getUrl());         
+        }       
+        else if(p != null && p.getUrl() != null)
+        {
+            t.setUrl( p.getUrl() +  t.getArtifactId() );
         }
         
         //Dependencies
@@ -114,8 +131,6 @@ public class ModelProcessor
             }
             t.getDependencyManagement().getDependencies().addAll( mngDeps );
         }
-        
-    
-        
+  
     }
 }

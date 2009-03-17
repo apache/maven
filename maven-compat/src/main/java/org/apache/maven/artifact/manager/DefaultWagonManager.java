@@ -329,6 +329,11 @@ public class DefaultWagonManager
     public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
+    	if(remoteRepositories == null)
+    	{
+    		throw new IllegalArgumentException("remoteRepositories: null");
+    	}
+    	
         for (ArtifactRepository repository : remoteRepositories) {
             try
             {

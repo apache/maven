@@ -120,7 +120,7 @@ public class PluginProcessorTest
         assertEquals(1, target.get( 0 ).getDependencies().size());
         assertEquals("gid", target.get( 0 ).getDependencies().get( 0 ).getGroupId());
     }
-    
+    /*
     public void testPluginDependencyJoin()
     {        
         Dependency dependency = new Dependency();
@@ -151,6 +151,7 @@ public class PluginProcessorTest
         assertEquals("gid", target.get( 0 ).getDependencies().get( 0 ).getGroupId());
         assertEquals("gid1", target.get( 0 ).getDependencies().get( 1 ).getGroupId());
     }  
+    */
     /*
     public void testMergeOfPluginConfiguration()
     {

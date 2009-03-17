@@ -19,11 +19,14 @@ package org.apache.maven.project.builder;
  * under the License.
  */
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelMarshaller;
 import org.apache.maven.shared.model.InputStreamDomainModel;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -66,7 +69,33 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     private boolean isMostSpecialized = false;
 
     private String parentGroupId = null, parentArtifactId = null, parentVersion = null, parentId = null, parentRelativePath;
+    
+    private Model model;
 
+    public Model getModel() throws IOException
+    {
+        if(model == null)
+        {
+            InputStream is;
+			try {
+				is = getInputStream();
+			} catch (Exception e1) {
+				throw new IOException("inputStream not set");
+			}
+
+            MavenXpp3Reader reader = new MavenXpp3Reader();
+            try
+            {
+                model =  reader.read( is ) ;
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new IOException( e.getMessage() );
+            }            
+        }
+        return model;        
+    }   
+    
     public PomClassicDomainModel( List<ModelProperty> modelProperties )
     {
         this.modelProperties = modelProperties;
@@ -187,7 +216,16 @@ public class PomClassicDomainModel implements InputStreamDomainModel
         this.file = file;
     }
 
-    public File getParentFile()
+    public PomClassicDomainModel(Model model2) {
+    	this.model = model2;
+	}
+
+	public PomClassicDomainModel(Model model2, boolean b) {
+		this.model = model2;
+		this.isMostSpecialized = b;
+    }
+
+	public File getParentFile()
     {
         return parentFile;
     }
@@ -280,6 +318,7 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     {
         byte[] copy = new byte[inputBytes.length];
         System.arraycopy( inputBytes, 0, copy, 0, inputBytes.length );
+        //System.out.println(new String(copy));
         return new ByteArrayInputStream( copy );
     }
 

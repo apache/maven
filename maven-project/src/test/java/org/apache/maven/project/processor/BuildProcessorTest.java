@@ -4,12 +4,37 @@ import java.util.ArrayList;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Resource;
 
 import junit.framework.TestCase;
 
 public class BuildProcessorTest extends TestCase
 {
+    
+    public void testPluginManagementInheritance()
+    {
+        Model parent = new Model();
+        
+        PluginManagement pm = new PluginManagement();
+        Plugin p = new Plugin();
+        p.setArtifactId( "aid" );
+        pm.addPlugin( p );
+        Build b = new Build();
+        b.setPluginManagement( pm );
+        parent.setBuild( b );
+        
+        Model child = new Model();
+        Model target = new Model();
+        BuildProcessor proc = new BuildProcessor(new ArrayList());
+        proc.process( parent, child, target, true);   
+        
+        assertNotNull(target.getBuild());
+        assertNotNull(target.getBuild().getPluginManagement());
+        assertEquals(1, target.getBuild().getPluginManagement().getPlugins().size());
+    }
+    
     public void testChild_FinalName()
     {
         Model child = new Model();

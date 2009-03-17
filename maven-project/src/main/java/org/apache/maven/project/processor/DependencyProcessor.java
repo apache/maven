@@ -21,68 +21,120 @@ public class DependencyProcessor
         }
         else if ( parent == null && child != null )
         {
-            Dependency targetDependency = new Dependency();
-            copy( (Dependency) child, targetDependency );
-            t.add( targetDependency );
+            boolean isAdd = true;
+            Dependency targetDependency = contains((Dependency) child, t);
+            if(targetDependency == null)
+            {
+                targetDependency = new Dependency();    
+            }
+            else
+            {
+                isAdd = false;
+            }
+            //Dependency targetDependency = new Dependency();
+            copy( (Dependency) child, targetDependency, false );
+            if(isAdd) t.add( targetDependency );
         }
         else if ( parent != null && child == null )
         {
-            Dependency targetDependency = new Dependency();
-            copy( (Dependency) parent, targetDependency );
-            t.add( targetDependency );
+            boolean isAdd = true;
+            Dependency targetDependency = contains((Dependency) parent, t);
+            if(targetDependency == null)
+            {
+                targetDependency = new Dependency();    
+            }
+            else
+            {
+                isAdd = false;
+            }
+            //Dependency targetDependency = new Dependency();
+            copy( (Dependency) parent, targetDependency, true );
+            if(isAdd) t.add( targetDependency );
         }
         else
         // JOIN
         {
-           Dependency targetDependency = new Dependency();
-                copy( (Dependency) child, targetDependency );
-                copy( (Dependency) parent, targetDependency );
-                t.add( targetDependency );               
-
+            Dependency targetDependency = new Dependency();
+            copy( (Dependency) child, targetDependency, false );
+            copy( (Dependency) parent, targetDependency, true );
+            t.add( targetDependency );               
         }
     }
-
-    private static void copy( Dependency dependency, Dependency targetDependency )
+    
+    private Dependency contains(Dependency d1, List<Dependency> dependencies)
     {
-        if ( targetDependency.getArtifactId() == null )
+        for(Dependency d : dependencies)
         {
-            targetDependency.setArtifactId( dependency.getArtifactId() );
+            if( match(d, d1))
+            {
+                return d;
+            }
+        }
+        return null;
+    }
+    
+    private boolean match( Dependency d1, Dependency d2 )
+    {
+        // TODO: Version ranges ?
+        return getId( d1 ).equals( getId( d2 ) );
+   
+    }
+
+    private String getId( Dependency d )
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append( d.getGroupId() ).append( ":" ).append( d.getArtifactId() );
+        sb.append( ":" ).append(
+                                d.getType() == null ? "jar"
+                                                : d.getType() ).append(
+                                                               ":" ).append(
+                                                                             d.getClassifier() );
+        
+        return sb.toString();
+    }
+    private static void copy( Dependency source, Dependency targetDependency, boolean isParent )
+    {
+        //IF target exists and is parent, don't override
+        if ( source.getArtifactId() != null && (targetDependency.getArtifactId() == null || !isParent) )
+        {
+            targetDependency.setArtifactId( source.getArtifactId() );
         }
 
-        if ( targetDependency.getClassifier() == null )
+        if ( source.getClassifier() != null )
         {
-            targetDependency.setClassifier( dependency.getClassifier() );
+            targetDependency.setClassifier( source.getClassifier() );
         }
 
-        if ( targetDependency.getGroupId() == null )
+        if ( source.getGroupId() != null )
         {
-            targetDependency.setGroupId( dependency.getGroupId() );
+            targetDependency.setGroupId( source.getGroupId() );
         }
 
-        if ( targetDependency.getScope() == null )
+        if ( source.getScope() != null && (targetDependency.getScope() == null || !isParent) )
         {
-            targetDependency.setScope( dependency.getScope() );
+            targetDependency.setScope( source.getScope() );
         }
 
-        if ( targetDependency.getSystemPath() == null )
+        if ( source.getSystemPath() != null )
         {
-            targetDependency.setSystemPath( dependency.getSystemPath() );
+            targetDependency.setSystemPath( source.getSystemPath() );
         }
 
-        if ( targetDependency.getType() == null )
+        if ( source.getType() != null && (targetDependency.getScope() == null || !isParent))
         {
-            targetDependency.setType( dependency.getType() );
+            targetDependency.setType( source.getType() );
         }
 
-        if ( targetDependency.getVersion() == null )
+        if ( source.getVersion() != null && (targetDependency.getVersion() == null || !isParent)  )
         {
-            targetDependency.setVersion( dependency.getVersion() );
+            targetDependency.setVersion( source.getVersion() );
         }
 
-        if ( !dependency.getExclusions().isEmpty() )
+        if ( !source.getExclusions().isEmpty() )
         {
             List<Exclusion> targetExclusions = targetDependency.getExclusions();
-            for ( Exclusion e : dependency.getExclusions() )
+            for ( Exclusion e : source.getExclusions() )
             {
                 if ( !containsExclusion( e, targetExclusions ) )
                 {

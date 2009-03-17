@@ -145,6 +145,8 @@ under the License.
         <configuration>
           <excludes>
             <exclude>**/ProjectClasspathTest.java</exclude>
+            <exclude>**/t07/ProjectInheritanceTest.java</exclude>
+            <exclude>**/t10/ProjectInheritanceTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>

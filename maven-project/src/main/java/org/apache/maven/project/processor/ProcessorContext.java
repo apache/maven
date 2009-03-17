@@ -8,16 +8,19 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.model.Build;
+import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.builder.PomClassicDomainModel;
@@ -32,82 +35,154 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class ProcessorContext
 {
-    public static PomClassicDomainModel build( List<DomainModel> domainModels )
-        throws IOException
+    public static PomClassicDomainModel mergeProfileIntoModel(Collection<Profile> profiles, Model model, boolean isMostSpecialized) throws IOException
     {
+        List<Model> profileModels = new ArrayList<Model>();
+        profileModels.add( model );
+        for(Profile profile : profiles)
+        {
+            profileModels.add( attachProfileNodesToModel(profile) );
+        }
+        
         List<Processor> processors =
             Arrays.asList( (Processor) new BuildProcessor( new ArrayList<Processor>() ),
-                           (Processor) new ModuleProcessor(), new PropertiesProcessor(), new ParentProcessor(),
+                           (Processor) new ProfilesModuleProcessor(), new PropertiesProcessor(), new ParentProcessor(),
                            new OrganizationProcessor(), new MailingListProcessor(), new IssueManagementProcessor(),
-                           new CiManagementProcessor(), new ReportingProcessor(), new RepositoriesProcessor());
-
-        ModelProcessor modelProcessor = new ModelProcessor( processors );
-
-        List<Model> models = new ArrayList<Model>();
+                           new CiManagementProcessor(), new ReportingProcessor(), new RepositoriesProcessor(), 
+                           new DistributionManagementProcessor());
         
+        Model target = processModelsForInheritance(profileModels, processors, false);
+        
+        PomClassicDomainModel m = convertToDomainModel( target, true );
+        interpolateModelProperties(m.getModelProperties(), new ArrayList<InterpolatorProperty>(), m); 
+        
+        return new PomClassicDomainModel(m.getModelProperties(), isMostSpecialized);  
+    }
+    
+    private static Model attachProfileNodesToModel(Profile profile)
+    {
+        Model model = new Model();
+        model.setModules( new ArrayList<String>(profile.getModules()) );
+        model.setDependencies(profile.getDependencies());
+        model.setDependencyManagement( profile.getDependencyManagement());
+        model.setDistributionManagement( profile.getDistributionManagement() );
+        model.setProperties( profile.getProperties() );  
+        model.setModules( new ArrayList<String>(profile.getModules() ) );
+        BuildProcessor proc = new BuildProcessor( new ArrayList<Processor>());
+        proc.processWithProfile( profile.getBuild(), model);
+        return model;
+    }  
+
+    private static List<Model> convertDomainModelsToMavenModels(List<DomainModel> domainModels) throws IOException
+    {
+        List<Model> models = new ArrayList<Model>();
+        for(DomainModel domainModel : domainModels)
+        {
+            PomClassicDomainModel dm = (PomClassicDomainModel) domainModel;
+            if(dm.getModel() != null)
+            {
+                if(dm.isMostSpecialized())
+                {
+                    models.add(0, dm.getModel() );
+                }
+                else
+                {
+                    models.add( dm.getModel() );  
+                }
+                
+            }
+            else {
+                InputStream is = ( (PomClassicDomainModel) domainModel ).getInputStream();
+                MavenXpp3Reader reader = new MavenXpp3Reader();
+                try
+                {
+                    models.add( reader.read( is ) );
+                }
+                catch ( XmlPullParserException e )
+                {
+                    e.printStackTrace();
+                    throw new IOException( e.getMessage() );
+                }                  
+            }
+           
+        }
+
+        return models;
+    }
+    
+    /**
+     * Parent domain models on bottom.
+     * 
+     * @param domainModels
+     * @return
+     * @throws IOException
+     */
+    public static PomClassicDomainModel build( List<DomainModel> domainModels )
+        throws IOException
+    {  
         PomClassicDomainModel child = null;
         for ( DomainModel domainModel : domainModels )
-        {
-
-            //TODO: Getting some null profiles - work around to skip for now
-            boolean artifactId = false;
-            for(ModelProperty mp : domainModel.getModelProperties())
-            {
-                if(mp.getUri().equals(ProjectUri.artifactId))
-                {
-                    artifactId = true;
-                    break;
-                }
-            }
-            
-            if(!artifactId)
-            {
-                continue;
-            }
-            //TODO:END
-            
+        {   
             if(domainModel.isMostSpecialized())
             {
                 child = (PomClassicDomainModel) domainModel;
             }
-            
-            InputStream is = ( (PomClassicDomainModel) domainModel ).getInputStream();
-            MavenXpp3Reader reader = new MavenXpp3Reader();
-            try
-            {
-                models.add( reader.read( is ) );
-            }
-            catch ( XmlPullParserException e )
-            {
-                e.printStackTrace();
-                throw new IOException( e.getMessage() );
-            }
         }
-
-        Collections.reverse( models );
+        if(child == null)
+        {
+            throw new IOException("Could not find child model");
+        }
+        
+        List<Processor> processors =
+            Arrays.asList( (Processor) new BuildProcessor( new ArrayList<Processor>() ),
+                           (Processor) new ModuleProcessor(), new PropertiesProcessor(), new ParentProcessor(),
+                           new OrganizationProcessor(), new MailingListProcessor(), new IssueManagementProcessor(),
+                           new CiManagementProcessor(), new ReportingProcessor(), new RepositoriesProcessor(),
+                           new DistributionManagementProcessor(), new LicensesProcessor(), new ScmProcessor());        
+        Model target = processModelsForInheritance(convertDomainModelsToMavenModels(domainModels), processors, true);
+        
+        PomClassicDomainModel model = convertToDomainModel( target, false );
+        interpolateModelProperties(model.getModelProperties(), new ArrayList<InterpolatorProperty>(), child);
+        return new PomClassicDomainModel(model.getModelProperties());         
+    }
+    
+    private static Model processModelsForInheritance(List<Model> models, List<Processor> processors, boolean reverse)
+    {
+        ModelProcessor modelProcessor = new ModelProcessor( processors );
+       
+      //  if(!reverse)
+      //  {
+            Collections.reverse( models );    
+      //  }
 
         int length = models.size();
         Model target = new Model();
         if(length == 1)
         {
             modelProcessor.process( null, models.get( 0 ), target, true );    
-        }
-        else if( length == 2)
+
+        } else if( length == 2)
         {
             modelProcessor.process( models.get( 0 ), models.get( 1 ), target, true );    
         }
-        
-        for ( int i = 1; i < length - 1; i++ )
-        {
-            if ( i < length - 2 )
+        else {
+            for ( int i = 0; i < length - 1; i++ )
             {
-                modelProcessor.process( models.get( i ), models.get( i + 1 ), target, false );
-            }
-            else
-            {
-                modelProcessor.process( models.get( i ), models.get( i + 1 ), target, true );
-            }
+                if(i == 0)
+                {
+                    modelProcessor.process( null, models.get( 0 ), target, false );    
+                }
+                else if ( i < length - 2 )
+                {
+                    modelProcessor.process( models.get( i ), models.get( i + 1 ), target, false );
+                }
+                else
+                {
+                    modelProcessor.process( models.get( i ), models.get( i + 1 ), target, true );
+                }
+            }           
         }
+
 
 
         // Dependency Management
@@ -125,10 +200,8 @@ public class ProcessorContext
             procMng.process( null, new ArrayList<Plugin>( target.getBuild().getPluginManagement().getPlugins() ),
                               target.getBuild().getPlugins(), true );
         }
-
-        PomClassicDomainModel model = convertToDomainModel( target, false );
-        interpolateModelProperties(model.getModelProperties(), new ArrayList(), child);
-        return new PomClassicDomainModel(model.getModelProperties());
+        return target;
+      
     }
 
     private static PomClassicDomainModel convertToDomainModel( Model model, boolean isMostSpecialized )
@@ -191,13 +264,16 @@ public class ProcessorContext
                                                    List<InterpolatorProperty> interpolatorProperties, PomClassicDomainModel dm )
         throws IOException
     {
-        // PomClassicDomainModel dm = (PomClassicDomainModel) domainModel;
 
+        if(dm == null)
+        {
+            throw new IllegalArgumentException("dm: null");
+        }
         if ( !containsProjectVersion( interpolatorProperties ) )
         {
             aliases.put( "\\$\\{project.version\\}", "\\$\\{version\\}" );
         }
-       // System.out.println(aliases);    
+
         List<ModelProperty> firstPassModelProperties = new ArrayList<ModelProperty>();
         List<ModelProperty> secondPassModelProperties = new ArrayList<ModelProperty>();
 

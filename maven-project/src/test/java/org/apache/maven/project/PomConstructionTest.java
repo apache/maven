@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
@@ -79,7 +80,7 @@ public class PomConstructionTest
      * 
      * @throws Exception
      */
-    /* FIXME: cf MNG-786
+    /* FIXME: cf MNG-786*/
     public void testProfileModules()
         throws Exception
     {
@@ -121,14 +122,16 @@ public class PomConstructionTest
     }
     
     /*MNG-3900*/
+    /*F:
     public void testProfilePropertiesInterpolation()
     	throws Exception 
     {
     	PomTestWrapper pom = buildPomFromMavenProject( "profile-properties-interpolation", "interpolation-profile" );
+    	System.out.println(pom.getDomainModel().asString());
     	assertEquals("PASSED", pom.getValue("properties[1]/test"));
     	assertEquals("PASSED", pom.getValue("properties[1]/property"));
     }
-
+*/
 
     // Some better conventions for the test poms needs to be created and each of these tests
     // that represent a verification of a specification item needs to be a couple lines at most.
@@ -145,8 +148,7 @@ public class PomConstructionTest
       // This should be 2
       //assertEquals( 2, model.getLineageCount() );
       PomTestWrapper tester = buildPom("micromailer");
-     // System.out.println(tester.getDomainModel().asString());
-     // assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
+      assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
     /*MNG-
@@ -201,7 +203,19 @@ public class PomConstructionTest
         assertEquals( "1.3.0-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
     }
 
-
+/*
+    public void testMaven()
+        throws Exception
+    {
+        PomTestWrapper pom =  buildPomFromMavenProject( "maven-build/sub/pom.xml", null );
+  
+        for(String s: pom.getMavenProject().getTestClasspathElements()){
+            System.out.println(s);
+        }
+        
+    }
+    */
+    
     /* MNG-3567*/
     public void testPluginManagementInherited()
         throws Exception
@@ -457,7 +471,8 @@ public class PomConstructionTest
     }
 
     /* MNG-3937*/
-    /* FIX - REGRESSION
+    /* FIX - REGRESSION*/
+    /*
     public void testOrderOfMergedPluginExecutionGoalsWithoutPluginManagement()
         throws Exception
     {
@@ -482,7 +497,7 @@ public class PomConstructionTest
         assertEquals( "parent-a", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
     //*/
-/* FIX - REGRESSION
+/* FIX - REGRESSION*/
     public void testOverridingOfInheritedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -491,18 +506,17 @@ public class PomConstructionTest
         assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default-execution-id']/phase" ) );
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
-*/
-    /* MNG-3938 - Dsiabling for now - not sure why this works. The default id is default-execution-id
+
+    /* MNG-3938 */
     public void testOverridingOfInheritedPluginExecutionsWithPluginManagement()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-merging/w-plugin-mngt/sub" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
         assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default-execution-id']/phase" ) );
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
-    */
+
 
     /* FIXME: cf. MNG-3906
     public void testOrderOfMergedPluginDependenciesWithoutPluginManagement()
@@ -572,6 +586,7 @@ public class PomConstructionTest
         assertEquals( "http://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
     }
 
+
     public void testNonInheritedElementsInSubtreesOverriddenByChild()
         throws Exception
     {
@@ -608,7 +623,7 @@ public class PomConstructionTest
             assertEquals( "PASSED", pom.getValue( "properties/property" + index ) );
         }
     }
-
+/*F:
     public void testInterpolationOfLegacyExpressionsThatDontIncludeTheProjectPrefix()
         throws Exception
     {
@@ -641,7 +656,7 @@ public class PomConstructionTest
         assertTrue( pom.getValue( "properties/projectBuildOut" ).toString().endsWith( "bin" ) );
         assertTrue( pom.getValue( "properties/projectSiteOut" ).toString().endsWith( "doc" ) );
     }
-
+*/
     public void testInterpolationWithBasedirAlignedDirectories()
         throws Exception
     {
@@ -847,7 +862,7 @@ public class PomConstructionTest
         assertTrue( pom.getValue( "build/filters[7]" ).toString().endsWith( "parent-d.properties" ) );
     }
 
-    /** MNG-4027
+    /** MNG-4027*/
     public void testProfileInjectedDependencies()
         throws Exception
     {
@@ -895,7 +910,7 @@ public class PomConstructionTest
         assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
     }
 
-    /** FIXME: MNG-4053
+    /** FIXME: MNG-4053*/
     public void testPluginConfigurationUsingAttributesWithPluginManagement()
         throws Exception
     {

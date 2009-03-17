@@ -21,42 +21,113 @@ public class PluginProcessor
             return;
         }
         else if ( parent == null && child != null )
-        {
-            Plugin targetPlugin = new Plugin();
-            copy( (Plugin) child, targetPlugin );
-            t.add( targetPlugin );
+        {//Plugin targetPlugin = new Plugin();
+            
+            boolean isAdd = true;
+            Plugin targetPlugin = find((Plugin) child, t);
+            if(targetPlugin == null) 
+            {
+                targetPlugin = new Plugin();
+            }
+            else
+            {
+                isAdd = false;
+            }
+            
+            copy( (Plugin) child, targetPlugin, isChildMostSpecialized );
+            if(isAdd) t.add( targetPlugin );
         }
         else if ( parent != null && child == null )
         {
-            Plugin targetPlugin = new Plugin();
-            copy( (Plugin) parent, targetPlugin );
-            t.add( targetPlugin );
+            //Plugin targetPlugin = new Plugin();
+            
+            boolean isAdd = true;
+            Plugin targetPlugin = find((Plugin) parent, t);
+            if(targetPlugin == null) 
+            {
+                targetPlugin = new Plugin();
+            }
+            else
+            {
+                isAdd = false;
+            }
+            
+            copy( (Plugin) parent, targetPlugin, false );
+            if(isAdd) t.add( targetPlugin );
         }
         else
         // JOIN
-        {
-            Plugin  targetDependency = new Plugin();
-            copy( (Plugin) child, targetDependency );
-            copy( (Plugin) parent, targetDependency );
-            t.add( targetDependency );
+        {          
+            if( match( (Plugin) parent, (Plugin) child) )
+            {
+                boolean isAdd = true;
+                Plugin targetPlugin = find((Plugin) parent, t);
+                if(targetPlugin == null) 
+                {
+                    targetPlugin = new Plugin();
+                }
+                else
+                {
+                    isAdd = false;
+                }                 
+                copy( (Plugin) parent, targetPlugin, false );
+                copy( (Plugin) child, targetPlugin, isChildMostSpecialized );
+                if(isAdd) t.add( targetPlugin ); 
+            } 
+            else
+            {
+                Plugin targetPlugin = new Plugin();
+                copy( (Plugin) parent, targetPlugin, false );
+                copy( (Plugin) child, targetPlugin, isChildMostSpecialized );
+                t.add( targetPlugin );    
+            }  
         }       
     }
     
-    private static void copy(Plugin source, Plugin target)
+    private static Plugin find(Plugin p1, List<Plugin> plugins)
     {
-        if(target.getArtifactId() == null)
+        for(Plugin t : plugins)
+        {
+            if(match(p1, t)){
+                return t;
+            }
+        }
+        
+        return null;
+    }
+    
+    private static boolean match( Plugin d1, Plugin d2 )
+    {
+        return getId( d1 ).equals( getId( d2 ));
+    }   
+    
+    private static String getId( Plugin d )
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( d.getGroupId() ).append( ":" ).append( d.getArtifactId() ).append( ":" );
+        return sb.toString();
+    }       
+    
+    private static void copy(Plugin source, Plugin target, boolean isChild)
+    {
+        if(!isChild && source.getInherited() != null && !source.getInherited().equalsIgnoreCase( "true" ))
+        {
+            return;
+        }
+        
+        if(source.getArtifactId() != null)
         {
             target.setArtifactId( source.getArtifactId() );   
         }
         
         target.setGroupId( source.getGroupId() );    
         
-        if(target.getInherited() == null)
+        if(source.getInherited() != null)
         {
             target.setInherited( source.getInherited() );    
         }
         
-        if(target.getVersion() == null)
+        if(source.getVersion() != null)
         {
             target.setVersion( source.getVersion() );    
         }
@@ -67,12 +138,12 @@ public class PluginProcessor
             PluginExecution idMatch = contains(pe, target.getExecutions());
             if(idMatch != null)//Join
             {
-               copyPluginExecution(pe, idMatch);    
+               copyPluginExecution(pe, idMatch, isChild);    
             }
             else 
             {
                 PluginExecution targetPe = new PluginExecution();
-                copyPluginExecution(pe, targetPe); 
+                copyPluginExecution(pe, targetPe, isChild); 
                 target.addExecution( targetPe );
             }
             
@@ -123,17 +194,20 @@ public class PluginProcessor
         return null;
     }
     
-    private static void copyPluginExecution(PluginExecution source, PluginExecution target)
+    private static void copyPluginExecution(PluginExecution source, PluginExecution target, boolean isChild)
     {
-        
+        if(!isChild && source.getInherited() != null && !source.getInherited().equalsIgnoreCase( "true" ))
+        {
+            return;
+        }            
         target.setId( source.getId() );
         
-        if(target.getInherited() == null)
+        if(isChild && source.getInherited() != null)
         {
             target.setInherited( source.getInherited() );
         }
-        
-        if(target.getPhase() == null)
+           
+        if(source.getPhase() != null)
         {
             target.setPhase( source.getPhase() );
         }
@@ -149,13 +223,17 @@ public class PluginProcessor
         }    
         target.setGoals( goals );
         
-        if(target.getConfiguration() != null)
+        if(source.getConfiguration() != null)
         {
-            target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() ));     
+            if(target.getConfiguration() != null)
+            {
+                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() ));     
+            }
+            else
+            {
+                target.setConfiguration( source.getConfiguration() );
+            }            
         }
-        else
-        {
-            target.setConfiguration( source.getConfiguration() );
-        }       
+      
     }
 }

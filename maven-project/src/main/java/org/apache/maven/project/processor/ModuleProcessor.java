@@ -7,7 +7,6 @@ import org.apache.maven.model.Model;
 public class ModuleProcessor
     extends BaseProcessor
 {
-
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );
@@ -19,5 +18,4 @@ public class ModuleProcessor
             t.setModules( new ArrayList<String>( c.getModules() ) );
         }
     }
-
 }
