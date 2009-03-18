@@ -19,6 +19,7 @@ import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.model.DomainModel;
+import org.apache.maven.shared.model.InterpolatorProperty;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class ProcessorContextTest extends PlexusTestCase
@@ -57,7 +58,7 @@ public class ProcessorContextTest extends PlexusTestCase
         DomainModel pdmParent = new PomClassicDomainModel(parent);
         
         DomainModel pdmChild = new PomClassicDomainModel(child, true);    	
-        ProcessorContext.build( Arrays.asList(pdmChild, pdmParent));    
+        ProcessorContext.build( Arrays.asList( pdmChild, pdmParent ), new ArrayList<InterpolatorProperty>() );    
         
         assertEquals("pom", child.getPackaging());
     }
@@ -89,7 +90,8 @@ public class ProcessorContextTest extends PlexusTestCase
         
         DomainModel child = new PomClassicDomainModel(new Model(), true);
      
-        PomClassicDomainModel m = ProcessorContext.build( Arrays.asList(child, pdm)) ;
+        PomClassicDomainModel m =
+            ProcessorContext.build( Arrays.asList( child, pdm ), new ArrayList<InterpolatorProperty>() );
         
         assertEquals(1, m.getModel().getBuild().getPluginManagement().getPlugins().size());
     }       
@@ -151,8 +153,8 @@ public class ProcessorContextTest extends PlexusTestCase
             }
         }
 
-        ProcessorContext.build( domainModels );
+        ProcessorContext.build( domainModels, new ArrayList<InterpolatorProperty>() );
         
-        return new PomTestWrapper( ProcessorContext.build( domainModels ) );
+        return new PomTestWrapper( ProcessorContext.build( domainModels, new ArrayList<InterpolatorProperty>() ) );
     }
 }

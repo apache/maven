@@ -134,7 +134,8 @@ public class ProcessorContext
      * @return
      * @throws IOException
      */
-    public static PomClassicDomainModel build( List<DomainModel> domainModels )
+    public static PomClassicDomainModel build( List<DomainModel> domainModels,
+                                               List<InterpolatorProperty> interpolationProperties )
         throws IOException
     {  
         PomClassicDomainModel child = null;
@@ -159,7 +160,7 @@ public class ProcessorContext
         Model target = processModelsForInheritance(convertDomainModelsToMavenModels(domainModels), processors, true);
         
         PomClassicDomainModel model = convertToDomainModel( target, false );
-        interpolateModelProperties( model.getModelProperties(), new ArrayList<InterpolatorProperty>(), child );
+        interpolateModelProperties( model.getModelProperties(), interpolationProperties, child );
         List<ModelProperty> modelProperties;
         if ( child.getProjectDirectory() != null )
         {

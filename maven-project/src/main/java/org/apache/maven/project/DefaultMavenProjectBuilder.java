@@ -459,7 +459,6 @@ public class DefaultMavenProjectBuilder
         return buildModel( pom, interpolatorProperties, null, null, localRepository, remoteRepositories );
     }
 
-    @SuppressWarnings("unchecked")
     private PomClassicDomainModel buildModel( File pom, Collection<InterpolatorProperty> interpolatorProperties, Collection<String> activeProfileIds, Collection<String> inactiveProfileIds,
                                               ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws IOException
@@ -541,7 +540,7 @@ public class DefaultMavenProjectBuilder
             }       
         }
 
-        PomClassicDomainModel transformedDomainModel = ProcessorContext.build( profileModels );
+        PomClassicDomainModel transformedDomainModel = ProcessorContext.build( profileModels, properties );
         // Lineage count is inclusive to add the POM read in itself.
         transformedDomainModel.setLineageCount( lineageCount + 1 );
         transformedDomainModel.setParentFile( parentFile );
