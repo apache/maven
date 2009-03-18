@@ -305,6 +305,12 @@ public class ProcessorContext
                                                                           PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
             standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.basedir}", basedir,
                                                                           PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+
+            String baseuri = dm.getProjectDirectory().toURI().toString();
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${project.baseUri}", baseuri,
+                                                                          PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.baseUri}", baseuri,
+                                                                          PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
         }
          
         for ( ModelProperty mp : modelProperties )

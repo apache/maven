@@ -677,7 +677,7 @@ public class PomConstructionTest
                       new File( pom.getValue( "properties/siteOut" ).toString() ) );
     }
 
-    /* FIXME: cf. MNG-3944*/
+    /* MNG-3944*/
     public void testInterpolationOfBasedirInPomWithUnusualName()
         throws Exception
     {
@@ -949,6 +949,14 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "xml-whitespace/sub" );
         assertEquals( "org.apache.maven.its.mng4070", pom.getValue( "groupId" ) );
+    }
+
+    /* MNG-3760*/
+    public void testInterpolationOfBaseUrl()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "baseurl-interpolation/pom.xml" );
+        assertEquals( pom.getBasedir().toURI().toString(), pom.getValue( "properties/prop1" ).toString() );
     }
 
 
