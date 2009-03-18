@@ -12,11 +12,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -35,6 +34,24 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class ProcessorContext
 {
+
+    /**
+     * The URIs that denote file/directory paths and need their basedir alignment or normalization.
+     */
+    private static final Collection<String> PATH_URIS =
+        Collections.unmodifiableSet( new HashSet<String>(
+                                                          Arrays.asList(
+                                                                         ProjectUri.Build.directory,
+                                                                         ProjectUri.Build.outputDirectory,
+                                                                         ProjectUri.Build.testOutputDirectory,
+                                                                         ProjectUri.Build.sourceDirectory,
+                                                                         ProjectUri.Build.testSourceDirectory,
+                                                                         ProjectUri.Build.scriptSourceDirectory,
+                                                                         ProjectUri.Build.Resources.Resource.directory,
+                                                                         ProjectUri.Build.TestResources.TestResource.directory,
+                                                                         ProjectUri.Build.Filters.filter,
+                                                                         ProjectUri.Reporting.outputDirectory ) ) );   
+
     public static PomClassicDomainModel mergeProfileIntoModel(Collection<Profile> profiles, Model model, boolean isMostSpecialized) throws IOException
     {
         List<Model> profileModels = new ArrayList<Model>();
@@ -142,8 +159,17 @@ public class ProcessorContext
         Model target = processModelsForInheritance(convertDomainModelsToMavenModels(domainModels), processors, true);
         
         PomClassicDomainModel model = convertToDomainModel( target, false );
-        interpolateModelProperties(model.getModelProperties(), new ArrayList<InterpolatorProperty>(), child);
-        return new PomClassicDomainModel(model.getModelProperties());         
+        interpolateModelProperties( model.getModelProperties(), new ArrayList<InterpolatorProperty>(), child );
+        List<ModelProperty> modelProperties;
+        if ( child.getProjectDirectory() != null )
+        {
+            modelProperties = alignPaths( model.getModelProperties(), child.getProjectDirectory() );
+        }
+        else
+        {
+            modelProperties = model.getModelProperties();
+        }
+        return new PomClassicDomainModel( modelProperties );
     }
     
     private static Model processModelsForInheritance(List<Model> models, List<Processor> processors, boolean reverse)
@@ -417,6 +443,47 @@ public class ProcessorContext
             }
         }
         return false;
+    }
+
+    /**
+     * Post-processes the paths of build directories by aligning relative paths to the project directory and normalizing
+     * file separators to the platform-specific separator.
+     * 
+     * @param modelProperties The model properties to process, must not be {@code null}.
+     * @param basedir The project directory, must not be {@code null}.
+     * @return The updated model properties, never {@code null}.
+     */
+    private static List<ModelProperty> alignPaths( Collection<ModelProperty> modelProperties, File basedir )
+    {
+        List<ModelProperty> mps = new ArrayList<ModelProperty>( modelProperties.size() );
+
+        for ( ModelProperty mp : modelProperties )
+        {
+            String value = mp.getResolvedValue();
+            if ( value != null && PATH_URIS.contains( mp.getUri() ) )
+            {
+                File file = new File( value );
+                if ( file.isAbsolute() )
+                {
+                    // path was already absolute, just normalize file separator and we're done
+                    value = file.getPath();
+                }
+                else if ( file.getPath().startsWith( File.separator ) )
+                {
+                    // drive-relative Windows path, don't align with project directory but with drive root
+                    value = file.getAbsolutePath();
+                }
+                else
+                {
+                    // an ordinary relative path, align with project directory
+                    value = new File( new File( basedir, value ).toURI().normalize() ).getAbsolutePath();
+                }
+                mp = new ModelProperty( mp.getUri(), value );
+            }
+            mps.add( mp );
+        }
+
+        return mps;
     }
 
 }
