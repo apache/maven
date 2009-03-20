@@ -68,6 +68,8 @@ END SNIPPET: ant-bootstrap -->
 <!--
     <property name="maven.repo.central" value="http://repo1.maven.org/maven2"/>
 -->
+    <property name="maven.repo.update.policy" value="daily"/>
+  	
     <condition property="do.not.clean.local.repo">
       <not>
         <isset property="clean.local.repo"/>
@@ -95,7 +97,7 @@ END SNIPPET: ant-bootstrap -->
     <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
 
     <mercury:local-repository location="${maven.repo.local}"/>
-    <mercury:remote-repository id="central" location="${maven.repo.central}" updatePolicy="always"/>
+    <mercury:remote-repository id="central" location="${maven.repo.central}" updatePolicy="${maven.repo.update.policy}"/>
 
     <property name="tsFormat" value="HH:mm:ss"/>
     <tstamp><format property="start.time" pattern="${tsFormat}"/></tstamp>
