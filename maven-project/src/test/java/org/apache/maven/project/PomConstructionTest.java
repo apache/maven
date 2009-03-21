@@ -1046,6 +1046,36 @@ public class PomConstructionTest
         assertEquals( "reloc-aid", pom.getValue( "distributionManagement/relocation/artifactId" ) );
         assertEquals( "reloc-version", pom.getValue( "distributionManagement/relocation/version" ) );
         assertEquals( "project-reloc-msg", pom.getValue( "distributionManagement/relocation/message" ) );
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "modules" ) ).size() );
+        assertEquals( "sub", pom.getValue( "modules[1]" ) );
+
+        assertEquals( 1, ( (Map<?, ?>) pom.getValue( "properties" ) ).size() );
+        assertEquals( "project-property", pom.getValue( "properties[1]/itProperty" ) );
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencyManagement/dependencies" ) ).size() );
+        assertEquals( "org.apache.maven.its", pom.getValue( "dependencyManagement/dependencies[1]/groupId" ) );
+        assertEquals( "managed-dep", pom.getValue( "dependencyManagement/dependencies[1]/artifactId" ) );
+        assertEquals( "0.1", pom.getValue( "dependencyManagement/dependencies[1]/version" ) );
+        assertEquals( "war", pom.getValue( "dependencyManagement/dependencies[1]/type" ) );
+        assertEquals( "runtime", pom.getValue( "dependencyManagement/dependencies[1]/scope" ) );
+        assertEquals( Boolean.FALSE, pom.getValue( "dependencyManagement/dependencies[1]/optional" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencyManagement/dependencies[1]/exclusions" ) ).size() );
+        assertEquals( "org.apache.maven.its",
+                      pom.getValue( "dependencyManagement/dependencies[1]/exclusions[1]/groupId" ) );
+        assertEquals( "excluded-managed-dep",
+                      pom.getValue( "dependencyManagement/dependencies[1]/exclusions[1]/artifactId" ) );
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+        assertEquals( "org.apache.maven.its", pom.getValue( "dependencies[1]/groupId" ) );
+        assertEquals( "dep", pom.getValue( "dependencies[1]/artifactId" ) );
+        assertEquals( "0.2", pom.getValue( "dependencies[1]/version" ) );
+        assertEquals( "ejb", pom.getValue( "dependencies[1]/type" ) );
+        assertEquals( "test", pom.getValue( "dependencies[1]/scope" ) );
+        assertEquals( Boolean.TRUE, pom.getValue( "dependencies[1]/optional" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies[1]/exclusions" ) ).size() );
+        assertEquals( "org.apache.maven.its", pom.getValue( "dependencies[1]/exclusions[1]/groupId" ) );
+        assertEquals( "excluded-dep", pom.getValue( "dependencies[1]/exclusions[1]/artifactId" ) );
     }
 
 

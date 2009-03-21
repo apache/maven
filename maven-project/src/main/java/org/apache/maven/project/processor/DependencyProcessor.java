@@ -164,6 +164,8 @@ public class DependencyProcessor
                 }
             }
         }
+
+        targetDependency.setOptional( source.isOptional() );
     }
 
     private static boolean containsExclusion( Exclusion exclusion, List<Exclusion> exclusions )

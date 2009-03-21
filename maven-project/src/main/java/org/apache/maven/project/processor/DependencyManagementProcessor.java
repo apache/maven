@@ -96,6 +96,8 @@ public class DependencyManagementProcessor extends BaseProcessor
                 }
             }
         }
+
+        targetDependency.setOptional( dependency.isOptional() );
     }
 
     private static boolean containsExclusion( Exclusion exclusion, List<Exclusion> exclusions )
