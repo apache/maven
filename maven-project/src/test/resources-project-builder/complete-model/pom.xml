@@ -99,7 +99,7 @@ under the License.
     <url>http://project.url/trunk</url>
     <connection>http://project.url/scm</connection>
     <developerConnection>https://project.url/scm</developerConnection>
-    <tag>HEAD</tag>
+    <tag>TAG</tag>
   </scm>
   <issueManagement>
     <system>issues</system>

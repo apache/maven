@@ -985,11 +985,35 @@ public class PomConstructionTest
         assertEquals( "project-org", pom.getValue( "organization/name" ) );
         assertEquals( "http://project-org.url/", pom.getValue( "organization/url" ) );
 
-        assertEquals( 1, ((List<?>)pom.getValue( "licenses" )).size() );
+        assertEquals( 1, ( (List<?>) pom.getValue( "licenses" ) ).size() );
         assertEquals( "project-license", pom.getValue( "licenses[1]/name" ) );
         assertEquals( "http://project.url/license", pom.getValue( "licenses[1]/url" ) );
         assertEquals( "repo", pom.getValue( "licenses[1]/distribution" ) );
         assertEquals( "free", pom.getValue( "licenses[1]/comments" ) );
+
+        /* FIXME
+        assertEquals( 1, ((List<?>)pom.getValue( "developers" )).size() );
+
+        assertEquals( 1, ((List<?>)pom.getValue( "contributors" )).size() );
+        //*/
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "mailingLists" ) ).size() );
+        assertEquals( "project-mailing-list", pom.getValue( "mailingLists[1]/name" ) );
+        assertEquals( "subscribe@", pom.getValue( "mailingLists[1]/subscribe" ) );
+        assertEquals( "unsubscribe@", pom.getValue( "mailingLists[1]/unsubscribe" ) );
+        assertEquals( "post@", pom.getValue( "mailingLists[1]/post" ) );
+        assertEquals( "mail-archive", pom.getValue( "mailingLists[1]/archive" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "mailingLists[1]/otherArchives" ) ).size() );
+        assertEquals( "other-archive", pom.getValue( "mailingLists[1]/otherArchives[1]" ) );
+
+        /* FIXME
+        assertEquals( "2.0.1", pom.getValue( "prerequisites/maven" ) );
+        //*/
+
+        assertEquals( "http://project.url/trunk", pom.getValue( "scm/url" ) );
+        assertEquals( "http://project.url/scm", pom.getValue( "scm/connection" ) );
+        assertEquals( "https://project.url/scm", pom.getValue( "scm/developerConnection" ) );
+        assertEquals( "TAG", pom.getValue( "scm/tag" ) );
     }
 
 

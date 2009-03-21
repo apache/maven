@@ -35,9 +35,10 @@ public class ScmProcessor extends BaseProcessor
             t.setScm( new Scm() );    
         }
         
-        copy( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
+        copyUrl( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
         copyConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
         copyDeveloperConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
+        copyTag( ( ( p != null ) ? p.getScm() : null ), c.getScm(), t.getScm() );
         /*
         if(c.getLicenses().isEmpty() && p != null)
         {
@@ -66,7 +67,7 @@ public class ScmProcessor extends BaseProcessor
         */
     }
     
-    private static void copy(Scm p, Scm c, Scm t, String artifactId )
+    private static void copyUrl(Scm p, Scm c, Scm t, String artifactId )
     {
         if(c != null && c.getUrl() != null)
         {
@@ -110,4 +111,17 @@ public class ScmProcessor extends BaseProcessor
             t.setDeveloperConnection( t.getDeveloperConnection() + "/" + artifactId );
         }           
     }    
+    
+    private static void copyTag( Scm p, Scm c, Scm t )
+    {
+        if ( c != null && c.getTag() != null )
+        {
+            t.setTag( c.getTag() );
+        }
+        else if ( p != null && p.getTag() != null )
+        {
+            t.setTag( p.getTag() );
+        }
+    }
+
 }
