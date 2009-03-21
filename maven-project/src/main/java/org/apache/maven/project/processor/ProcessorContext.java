@@ -171,12 +171,13 @@ public class ProcessorContext
         }
         
         List<Processor> processors =
-            Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ),
-                           new ModuleProcessor(), new PropertiesProcessor(), new ParentProcessor(),
-                           new OrganizationProcessor(), new MailingListProcessor(), new IssueManagementProcessor(),
-                           new CiManagementProcessor(), new ReportingProcessor(), new RepositoriesProcessor(),
-                           new DistributionManagementProcessor(), new LicensesProcessor(), new ScmProcessor());        
-        Model target = processModelsForInheritance(convertDomainModelsToMavenModels(domainModels), processors, true);
+            Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ), new ModuleProcessor(),
+                                       new PropertiesProcessor(), new ParentProcessor(), new OrganizationProcessor(),
+                                       new MailingListProcessor(), new IssueManagementProcessor(),
+                                       new CiManagementProcessor(), new ReportingProcessor(),
+                                       new RepositoriesProcessor(), new DistributionManagementProcessor(),
+                                       new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor() );
+        Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors, true );
         
         PomClassicDomainModel model = convertToDomainModel( target, false );
         interpolateModelProperties( model.getModelProperties(), interpolationProperties, child );

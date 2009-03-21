@@ -1006,9 +1006,7 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "mailingLists[1]/otherArchives" ) ).size() );
         assertEquals( "other-archive", pom.getValue( "mailingLists[1]/otherArchives[1]" ) );
 
-        /* FIXME
         assertEquals( "2.0.1", pom.getValue( "prerequisites/maven" ) );
-        //*/
 
         assertEquals( "http://project.url/trunk", pom.getValue( "scm/url" ) );
         assertEquals( "http://project.url/scm", pom.getValue( "scm/connection" ) );
