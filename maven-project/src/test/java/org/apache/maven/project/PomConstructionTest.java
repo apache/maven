@@ -983,11 +983,28 @@ public class PomConstructionTest
         assertEquals( "repo", pom.getValue( "licenses[1]/distribution" ) );
         assertEquals( "free", pom.getValue( "licenses[1]/comments" ) );
 
-        /* FIXME
-        assertEquals( 1, ((List<?>)pom.getValue( "developers" )).size() );
+        assertEquals( 1, ( (List<?>) pom.getValue( "developers" ) ).size() );
+        assertEquals( "dev", pom.getValue( "developers[1]/id" ) );
+        assertEquals( "project-developer", pom.getValue( "developers[1]/name" ) );
+        assertEquals( "developer@", pom.getValue( "developers[1]/email" ) );
+        assertEquals( "http://developer", pom.getValue( "developers[1]/url" ) );
+        assertEquals( "developer", pom.getValue( "developers[1]/organization" ) );
+        assertEquals( "http://devel.org", pom.getValue( "developers[1]/organizationUrl" ) );
+        assertEquals( "-1", pom.getValue( "developers[1]/timezone" ) );
+        assertEquals( "yes", pom.getValue( "developers[1]/properties/developer" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "developers[1]/roles" ) ).size() );
+        assertEquals( "devel", pom.getValue( "developers[1]/roles[1]" ) );
 
-        assertEquals( 1, ((List<?>)pom.getValue( "contributors" )).size() );
-        //*/
+        assertEquals( 1, ( (List<?>) pom.getValue( "contributors" ) ).size() );
+        assertEquals( "project-contributor", pom.getValue( "contributors[1]/name" ) );
+        assertEquals( "contributor@", pom.getValue( "contributors[1]/email" ) );
+        assertEquals( "http://contributor", pom.getValue( "contributors[1]/url" ) );
+        assertEquals( "contributor", pom.getValue( "contributors[1]/organization" ) );
+        assertEquals( "http://contrib.org", pom.getValue( "contributors[1]/organizationUrl" ) );
+        assertEquals( "+1", pom.getValue( "contributors[1]/timezone" ) );
+        assertEquals( "yes", pom.getValue( "contributors[1]/properties/contributor" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "contributors[1]/roles" ) ).size() );
+        assertEquals( "contrib", pom.getValue( "contributors[1]/roles[1]" ) );
 
         assertEquals( 1, ( (List<?>) pom.getValue( "mailingLists" ) ).size() );
         assertEquals( "project-mailing-list", pom.getValue( "mailingLists[1]/name" ) );

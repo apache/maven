@@ -176,7 +176,8 @@ public class ProcessorContext
                                        new MailingListProcessor(), new IssueManagementProcessor(),
                                        new CiManagementProcessor(), new ReportingProcessor(),
                                        new RepositoriesProcessor(), new DistributionManagementProcessor(),
-                                       new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor() );
+                                       new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor(),
+                                       new ContributorsProcessor(), new DevelopersProcessor() );
         Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors, true );
         
         PomClassicDomainModel model = convertToDomainModel( target, false );
