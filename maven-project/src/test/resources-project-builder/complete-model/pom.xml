@@ -244,7 +244,7 @@ under the License.
         <artifactId>maven-it-plugin-build</artifactId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
-          <outputFile>target/test.properties</outputFile>
+          <outputFile>test.properties</outputFile>
         </configuration>
         <executions>
           <execution>
@@ -254,7 +254,7 @@ under the License.
               <goal>eval</goal>
             </goals>
             <configuration>
-              <outputFile>target/pom.properties</outputFile>
+              <outputFile>pom.properties</outputFile>
             </configuration>
           </execution>
         </executions>
@@ -286,7 +286,7 @@ under the License.
         <artifactId>maven-it-plugin-reporting</artifactId>
         <version>2.0-SNAPSHOT</version>
         <configuration>
-          <outputFile>target/test.html</outputFile>
+          <outputFile>test.html</outputFile>
         </configuration>
         <reportSets>
           <reportSet>
@@ -295,7 +295,7 @@ under the License.
               <report>run</report>
             </reports>
             <configuration>
-              <outputFile>target/index.html</outputFile>
+              <outputFile>index.html</outputFile>
             </configuration>
           </reportSet>
         </reportSets>

@@ -1076,8 +1076,81 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies[1]/exclusions" ) ).size() );
         assertEquals( "org.apache.maven.its", pom.getValue( "dependencies[1]/exclusions[1]/groupId" ) );
         assertEquals( "excluded-dep", pom.getValue( "dependencies[1]/exclusions[1]/artifactId" ) );
+
+        assertEquals( "test", pom.getValue( "build/defaultGoal" ) );
+        assertEquals( "coreit", pom.getValue( "build/finalName" ) );
+
+        assertPathSuffixEquals( "build", pom.getValue( "build/directory" ) );
+        assertPathSuffixEquals( "build/main", pom.getValue( "build/outputDirectory" ) );
+        assertPathSuffixEquals( "build/test", pom.getValue( "build/testOutputDirectory" ) );
+        assertPathSuffixEquals( "sources/main", pom.getValue( "build/sourceDirectory" ) );
+        assertPathSuffixEquals( "sources/test", pom.getValue( "build/testSourceDirectory" ) );
+        assertPathSuffixEquals( "sources/scripts", pom.getValue( "build/scriptSourceDirectory" ) );
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/filters" ) ).size() );
+        assertPathSuffixEquals( "src/main/filter/it.properties", pom.getValue( "build/filters[1]" ) );
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/resources" ) ).size() );
+        assertPathSuffixEquals( "res/main", pom.getValue( "build/resources[1]/directory" ) );
+        assertPathSuffixEquals( "main", pom.getValue( "build/resources[1]/targetPath" ) );
+        assertEquals( Boolean.TRUE, pom.getValue( "build/resources[1]/filtering" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/resources[1]/includes" ) ).size() );
+        assertPathSuffixEquals( "main.included", pom.getValue( "build/resources[1]/includes[1]" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/resources[1]/excludes" ) ).size() );
+        assertPathSuffixEquals( "main.excluded", pom.getValue( "build/resources[1]/excludes[1]" ) );
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/testResources" ) ).size() );
+        assertPathSuffixEquals( "res/test", pom.getValue( "build/testResources[1]/directory" ) );
+        assertPathSuffixEquals( "test", pom.getValue( "build/testResources[1]/targetPath" ) );
+        assertEquals( Boolean.TRUE, pom.getValue( "build/testResources[1]/filtering" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/testResources[1]/includes" ) ).size() );
+        assertPathSuffixEquals( "test.included", pom.getValue( "build/testResources[1]/includes[1]" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/testResources[1]/excludes" ) ).size() );
+        assertPathSuffixEquals( "test.excluded", pom.getValue( "build/testResources[1]/excludes[1]" ) );
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
+        assertEquals( "org.apache.maven.its.plugins", pom.getValue( "build/plugins[1]/groupId" ) );
+        assertEquals( "maven-it-plugin-build", pom.getValue( "build/plugins[1]/artifactId" ) );
+        assertEquals( "2.1-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
+        assertEquals( "test.properties", pom.getValue( "build/plugins[1]/configuration/outputFile" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
+        assertEquals( "test", pom.getValue( "build/plugins[1]/executions[1]/id" ) );
+        assertEquals( "validate", pom.getValue( "build/plugins[1]/executions[1]/phase" ) );
+        assertEquals( "pom.properties", pom.getValue( "build/plugins[1]/executions[1]/configuration/outputFile" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/goals" ) ).size() );
+        assertEquals( "eval", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
+        assertEquals( "org.apache.maven.its", pom.getValue( "build/plugins[1]/dependencies[1]/groupId" ) );
+        assertEquals( "build-plugin-dep", pom.getValue( "build/plugins[1]/dependencies[1]/artifactId" ) );
+        assertEquals( "0.3", pom.getValue( "build/plugins[1]/dependencies[1]/version" ) );
+        assertEquals( "zip", pom.getValue( "build/plugins[1]/dependencies[1]/type" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies[1]/exclusions" ) ).size() );
+        assertEquals( "org.apache.maven.its", pom.getValue( "build/plugins[1]/dependencies[1]/exclusions[1]/groupId" ) );
+        assertEquals( "excluded-build-plugin-dep",
+                      pom.getValue( "build/plugins[1]/dependencies[1]/exclusions[1]/artifactId" ) );
+
+        assertEquals( Boolean.FALSE, pom.getValue( "reporting/excludeDefaults" ) );
+        assertPathSuffixEquals( "docs", pom.getValue( "reporting/outputDirectory" ) );
+
+        assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins" ) ).size() );
+        assertEquals( "org.apache.maven.its.plugins", pom.getValue( "reporting/plugins[1]/groupId" ) );
+        assertEquals( "maven-it-plugin-reporting", pom.getValue( "reporting/plugins[1]/artifactId" ) );
+        assertEquals( "2.0-SNAPSHOT", pom.getValue( "reporting/plugins[1]/version" ) );
+        assertEquals( "test.html", pom.getValue( "reporting/plugins[1]/configuration/outputFile" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets" ) ).size() );
+        assertEquals( "it", pom.getValue( "reporting/plugins[1]/reportSets[1]/id" ) );
+        assertEquals( "index.html", pom.getValue( "reporting/plugins[1]/reportSets[1]/configuration/outputFile" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins[1]/reportSets[1]/reports" ) ).size() );
+        assertEquals( "run", pom.getValue( "reporting/plugins[1]/reportSets[1]/reports[1]" ) );
     }
 
+
+    private void assertPathSuffixEquals( String expected, Object actual )
+    {
+        String a = actual.toString();
+        a = a.substring( a.length() - expected.length() ).replace( '\\', '/' );
+        assertEquals( expected, a );
+    }
 
     private void assertPathWithNormalizedFileSeparators( Object value )
     {
