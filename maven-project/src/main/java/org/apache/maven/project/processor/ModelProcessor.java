@@ -119,7 +119,7 @@ public class ModelProcessor
             t.setInceptionYear( p.getInceptionYear() );
         }
         
-        if(t.getUrl() != null)
+        if ( c.getUrl() != null )
         {
             t.setUrl(c.getUrl());         
         }       

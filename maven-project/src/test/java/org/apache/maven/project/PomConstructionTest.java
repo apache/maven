@@ -965,6 +965,33 @@ public class PomConstructionTest
         assertEquals( pom.getBasedir().toURI().toString(), pom.getValue( "properties/prop1" ).toString() );
     }
 
+    public void testCompleteModel()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "complete-model" );
+
+        assertEquals( "4.0.0", pom.getValue( "modelVersion" ) );
+
+        assertEquals( "org.apache.maven.its.mng", pom.getValue( "groupId" ) );
+        assertEquals( "test", pom.getValue( "artifactId" ) );
+        assertEquals( "0.2", pom.getValue( "version" ) );
+        assertEquals( "pom", pom.getValue( "packaging" ) );
+
+        assertEquals( "project-name", pom.getValue( "name" ) );
+        assertEquals( "project-description", pom.getValue( "description" ) );
+        assertEquals( "http://project.url/", pom.getValue( "url" ) );
+        assertEquals( "2009", pom.getValue( "inceptionYear" ) );
+
+        assertEquals( "project-org", pom.getValue( "organization/name" ) );
+        assertEquals( "http://project-org.url/", pom.getValue( "organization/url" ) );
+
+        assertEquals( 1, ((List<?>)pom.getValue( "licenses" )).size() );
+        assertEquals( "project-license", pom.getValue( "licenses[1]/name" ) );
+        assertEquals( "http://project.url/license", pom.getValue( "licenses[1]/url" ) );
+        assertEquals( "repo", pom.getValue( "licenses[1]/distribution" ) );
+        assertEquals( "free", pom.getValue( "licenses[1]/comments" ) );
+    }
+
 
     private void assertPathWithNormalizedFileSeparators( Object value )
     {
