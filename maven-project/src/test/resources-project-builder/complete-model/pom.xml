@@ -277,7 +277,7 @@ under the License.
   </build>
 
   <reporting>
-    <excludeDefaults>false</excludeDefaults>
+    <excludeDefaults>true</excludeDefaults>
     <outputDirectory>docs</outputDirectory>
 
     <plugins>

@@ -1129,7 +1129,7 @@ public class PomConstructionTest
         assertEquals( "excluded-build-plugin-dep",
                       pom.getValue( "build/plugins[1]/dependencies[1]/exclusions[1]/artifactId" ) );
 
-        assertEquals( Boolean.FALSE, pom.getValue( "reporting/excludeDefaults" ) );
+        assertEquals( Boolean.TRUE, pom.getValue( "reporting/excludeDefaults" ) );
         assertPathSuffixEquals( "docs", pom.getValue( "reporting/outputDirectory" ) );
 
         assertEquals( 1, ( (List<?>) pom.getValue( "reporting/plugins" ) ).size() );
