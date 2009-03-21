@@ -56,15 +56,23 @@ public class MavenITmng3845LimitedPomInheritanceTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
+        assertEquals( "child-org", props.getProperty( "project.organization.name", "" ) );
         assertEquals( "", props.getProperty( "project.organization.url", "" ) );
+        assertEquals( "http://child.url/issues", props.getProperty( "project.issueManagement.url", "" ) );
         assertEquals( "", props.getProperty( "project.issueManagement.system", "" ) );
         assertEquals( "0", props.getProperty( "project.ciManagement.notifiers", "0" ) );
+        assertEquals( "child-distros", props.getProperty( "project.distributionManagement.repository.id", "" ) );
+        assertEquals( "ssh://child.url/distros", props.getProperty( "project.distributionManagement.repository.url", "" ) );
         assertEquals( "", props.getProperty( "project.distributionManagement.repository.name", "" ) );
         assertEquals( "true", props.getProperty( "project.distributionManagement.repository.uniqueVersion", "true" ) );
         assertEquals( "default", props.getProperty( "project.distributionManagement.repository.layout", "default" ) );
+        assertEquals( "child-snaps", props.getProperty( "project.distributionManagement.snapshotRepository.id", "" ) );
+        assertEquals( "ssh://child.url/snaps", props.getProperty( "project.distributionManagement.snapshotRepository.url", "" ) );
         assertEquals( "", props.getProperty( "project.distributionManagement.snapshotRepository.name", "" ) );
         assertEquals( "true", props.getProperty( "project.distributionManagement.snapshotRepository.uniqueVersion", "true" ) );
         assertEquals( "default", props.getProperty( "project.distributionManagement.snapshotRepository.layout", "default" ) );
+        assertEquals( "child-site", props.getProperty( "project.distributionManagement.site.id", "" ) );
+        assertEquals( "scp://child.url/site", props.getProperty( "project.distributionManagement.site.url", "" ) );
         assertEquals( "", props.getProperty( "project.distributionManagement.site.name", "" ) );
     }
 
