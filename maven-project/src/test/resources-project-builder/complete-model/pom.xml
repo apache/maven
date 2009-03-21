@@ -110,7 +110,7 @@ under the License.
     <url>http://project.url/ci</url>
     <notifiers>
       <notifier>
-        <type>email</type>
+        <type>irc</type>
         <address>ci@</address>
         <sendOnError>true</sendOnError>
         <sendOnFailure>false</sendOnFailure>

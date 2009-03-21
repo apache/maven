@@ -87,6 +87,7 @@ public class DistributionManagementProcessor
             target.setRepository( new DeploymentRepository() );
             copyRepository( source.getRepository(), target.getRepository() );
         }
+
         if ( target.getSnapshotRepository() == null && source.getSnapshotRepository() != null )
         {
             target.setSnapshotRepository( new DeploymentRepository() );
@@ -112,10 +113,17 @@ public class DistributionManagementProcessor
             target.setLayout( source.getLayout() );
         }
 
-        if ( target.getName() == null )
+        if ( target.getUrl() == null )
         {
             target.setUrl( source.getUrl() );
         }
+
+        if ( target.getName() == null )
+        {
+            target.setName( source.getName() );
+        }
+
+        target.setUniqueVersion( source.isUniqueVersion() );
     }
 
     private static void copySite( Site source, Site target, boolean isChild, String artifactId )

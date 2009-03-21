@@ -1014,6 +1014,40 @@ public class PomConstructionTest
         assertEquals( "http://project.url/scm", pom.getValue( "scm/connection" ) );
         assertEquals( "https://project.url/scm", pom.getValue( "scm/developerConnection" ) );
         assertEquals( "TAG", pom.getValue( "scm/tag" ) );
+
+        assertEquals( "issues", pom.getValue( "issueManagement/system" ) );
+        assertEquals( "http://project.url/issues", pom.getValue( "issueManagement/url" ) );
+
+        assertEquals( "ci", pom.getValue( "ciManagement/system" ) );
+        assertEquals( "http://project.url/ci", pom.getValue( "ciManagement/url" ) );
+        assertEquals( 1, ( (List<?>) pom.getValue( "ciManagement/notifiers" ) ).size() );
+        assertEquals( "irc", pom.getValue( "ciManagement/notifiers[1]/type" ) );
+        assertEquals( "ci@", pom.getValue( "ciManagement/notifiers[1]/address" ) );
+        assertEquals( Boolean.TRUE, pom.getValue( "ciManagement/notifiers[1]/sendOnError" ) );
+        assertEquals( Boolean.FALSE, pom.getValue( "ciManagement/notifiers[1]/sendOnFailure" ) );
+        assertEquals( Boolean.FALSE, pom.getValue( "ciManagement/notifiers[1]/sendOnWarning" ) );
+        assertEquals( Boolean.FALSE, pom.getValue( "ciManagement/notifiers[1]/sendOnSuccess" ) );
+        assertEquals( "ci", pom.getValue( "ciManagement/notifiers[1]/configuration/ciProp" ) );
+
+        assertEquals( "project.distros", pom.getValue( "distributionManagement/repository/id" ) );
+        assertEquals( "distros", pom.getValue( "distributionManagement/repository/name" ) );
+        assertEquals( "http://project.url/dist", pom.getValue( "distributionManagement/repository/url" ) );
+        assertEquals( Boolean.TRUE, pom.getValue( "distributionManagement/repository/uniqueVersion" ) );
+
+        assertEquals( "project.snaps", pom.getValue( "distributionManagement/snapshotRepository/id" ) );
+        assertEquals( "snaps", pom.getValue( "distributionManagement/snapshotRepository/name" ) );
+        assertEquals( "http://project.url/snaps", pom.getValue( "distributionManagement/snapshotRepository/url" ) );
+        assertEquals( Boolean.FALSE, pom.getValue( "distributionManagement/snapshotRepository/uniqueVersion" ) );
+
+        assertEquals( "project.site", pom.getValue( "distributionManagement/site/id" ) );
+        assertEquals( "docs", pom.getValue( "distributionManagement/site/name" ) );
+        assertEquals( "http://project.url/site", pom.getValue( "distributionManagement/site/url" ) );
+
+        assertEquals( "http://project.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
+        assertEquals( "reloc-gid", pom.getValue( "distributionManagement/relocation/groupId" ) );
+        assertEquals( "reloc-aid", pom.getValue( "distributionManagement/relocation/artifactId" ) );
+        assertEquals( "reloc-version", pom.getValue( "distributionManagement/relocation/version" ) );
+        assertEquals( "project-reloc-msg", pom.getValue( "distributionManagement/relocation/message" ) );
     }
 
 
