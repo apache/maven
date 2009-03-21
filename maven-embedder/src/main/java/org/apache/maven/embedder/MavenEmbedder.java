@@ -285,7 +285,7 @@ public class MavenEmbedder
     protected void verifyPlugin( Plugin plugin, MavenProject project )
         throws ComponentLookupException, PluginLoaderException
     {
-        MavenSession session = new MavenSession( container, request, null, null );
+        MavenSession session = new MavenSession( container, request, null );
         pluginManager.loadPlugin( plugin, project, session );
     }
 

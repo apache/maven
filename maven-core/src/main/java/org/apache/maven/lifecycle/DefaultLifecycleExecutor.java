@@ -1225,8 +1225,6 @@ public class DefaultLifecycleExecutor
         String goal;
         Plugin plugin;
 
-        PluginDescriptor pluginDescriptor = null;
-
         StringTokenizer tok = new StringTokenizer( task, ":" );
         int numTokens = tok.countTokens();
 
@@ -1245,15 +1243,7 @@ public class DefaultLifecycleExecutor
             // repository.
 
             plugin = pluginManager.findPluginForPrefix( prefix, project, session );
-
-            if ( plugin == null )
-            {
-                plugin = new Plugin();
-                plugin.setGroupId( pluginDescriptor.getGroupId() );
-                plugin.setArtifactId( pluginDescriptor.getArtifactId() );
-                plugin.setVersion( pluginDescriptor.getVersion() );
-            }
-
+            
             // Search plugin in the current POM
             if ( plugin == null )
             {
@@ -1268,14 +1258,6 @@ public class DefaultLifecycleExecutor
                         plugin = buildPlugin;
                     }
                 }
-            }
-
-            // Default to o.a.m.plugins and maven-<prefix>-plugin
-            if ( plugin == null )
-            {
-                plugin = new Plugin();
-                plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
-                plugin.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( prefix ) );
             }
         }
         else if ( numTokens == 3 || numTokens == 4 )
@@ -1298,32 +1280,29 @@ public class DefaultLifecycleExecutor
         }
 
         if ( plugin.getVersion() == null )
-        {
+        {            
             for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
             {
                 Plugin buildPlugin = (Plugin) i.next();
-
+                
                 if ( buildPlugin.getKey().equals( plugin.getKey() ) )
                 {
                     plugin = buildPlugin;
                     break;
                 }
             }
-
-            project.injectPluginManagementInfo( plugin );
+            
+            project.injectPluginManagementInfo( plugin );            
         }
 
-        if ( pluginDescriptor == null )
-        {
-            pluginDescriptor = loadPlugin( plugin, project, session );
-        }
-
+        PluginDescriptor pluginDescriptor = loadPlugin( plugin, project, session );
+        
         // this has been simplified from the old code that injected the plugin management stuff, since
         // pluginManagement injection is now handled by the project method.
         project.addPlugin( plugin );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
-
+        
         return mojoDescriptor;
     }
 

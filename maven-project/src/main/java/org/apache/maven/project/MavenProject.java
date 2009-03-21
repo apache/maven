@@ -1318,7 +1318,7 @@ public class MavenProject
         }
     }
 
-    //TODO: remove ModelUtils
+    //!!jvz remove ModelUtils
     public void injectPluginManagementInfo( Plugin plugin )
     {
         PluginManagement pm = getModelBuild().getPluginManagement();

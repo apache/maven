@@ -382,11 +382,9 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request,
-                                          ReactorManager reactorManager,
-                                          EventDispatcher dispatcher )
+    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager reactorManager, EventDispatcher dispatcher )
     {
-        MavenSession session = new MavenSession( container, request, dispatcher, reactorManager );
+        MavenSession session = new MavenSession( container, request, reactorManager, dispatcher );
 
         return session;
     }

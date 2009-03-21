@@ -20,33 +20,6 @@ package org.apache.maven.plugin;
  */
 
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.execution.*;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.execution.DuplicateProjectException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.path.PathTranslator;
-import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.easymock.MockControl;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,6 +27,35 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DuplicateProjectException;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ReactorManager;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.path.PathTranslator;
+import org.codehaus.plexus.MutablePlexusContainer;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.easymock.MockControl;
 
 
 /**
@@ -350,7 +352,7 @@ public class PluginParameterExpressionEvaluatorTest
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
-        return new MavenSession( container, request, new DefaultEventDispatcher(), new ReactorManager( Collections.EMPTY_LIST, ReactorManager.FAIL_FAST ) );
+        return new MavenSession( container, request, null );
     }
 
     public void testLocalRepositoryExtraction()
@@ -470,7 +472,7 @@ public class PluginParameterExpressionEvaluatorTest
         ReactorManager rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
         MockControl mockMavenExecutionRequest = MockControl.createControl( MavenExecutionRequest.class );
         MavenExecutionRequest req = (MavenExecutionRequest) mockMavenExecutionRequest.getMock();
-        MavenSession session = new MavenSession( getContainer(), req, new DefaultEventDispatcher(), rm );
+        MavenSession session = new MavenSession( getContainer(), req, rm );
 
         return session;
     }

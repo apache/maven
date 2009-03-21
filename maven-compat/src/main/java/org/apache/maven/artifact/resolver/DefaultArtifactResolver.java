@@ -347,6 +347,11 @@ public class DefaultArtifactResolver
     //
     // ------------------------------------------------------------------------
 
+    private boolean isDummy( ArtifactResolutionRequest request )
+    {
+        return request.getArtifact().getArtifactId().equals( "dummy" ) && request.getArtifact().getGroupId().equals( "dummy" );        
+    }
+    
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
         Artifact rootArtifact = request.getArtifact();
@@ -356,7 +361,15 @@ public class DefaultArtifactResolver
         List<ArtifactRepository> remoteRepositories = request.getRemoteRepostories();
         ArtifactMetadataSource source = request.getMetadataSource();
         List<ResolutionListener> listeners = request.getListeners();
-        ArtifactFilter filter = request.getFilter();
+        ArtifactFilter filter = request.getFilter();                       
+        
+        // This is an extreme hack because of the ridiculous APIs we have a root that is disconnected and
+        // useless. The SureFire plugin passes in a dummy root artifact that is actually used in the production
+        // plugin ... We have no choice but to put this hack in the core.
+        if ( isDummy( request ) )
+        {
+            request.setResolveRoot( false );
+        }
         
         if ( source == null )
         {
@@ -388,7 +401,7 @@ public class DefaultArtifactResolver
         // This is often an artifact like a POM that is taken from disk and we already have hold of the
         // file reference. But this may be a Maven Plugin that we need to resolve from a remote repository
         // as well as its dependencies.
-                
+                        
         if ( request.isResolveRoot() && rootArtifact.getFile() == null )
         {            
             try
@@ -406,18 +419,21 @@ public class DefaultArtifactResolver
                 return result;
             }
         }
-
+        
         if ( artifacts == null || artifacts.size() == 0 )
         {
             result.addArtifact( rootArtifact );            
             return result;
         } 
-        
+                                
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
-
-        // Add the root artifact
-        result.addArtifact( rootArtifact );            
+        
+        if ( !isDummy( request ) )
+        {
+            // Add the root artifact
+            result.addArtifact( rootArtifact );                        
+        }                
         
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
@@ -427,7 +443,7 @@ public class DefaultArtifactResolver
         {
             return result;
         }
-
+                
         if ( result.getArtifacts() != null )
         {
             for ( Artifact artifact : result.getArtifacts() )
@@ -452,7 +468,7 @@ public class DefaultArtifactResolver
                 }
             }
         }
-        
+                
         return result;
     }
 

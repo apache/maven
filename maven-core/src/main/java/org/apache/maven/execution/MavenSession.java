@@ -73,12 +73,17 @@ public class MavenSession
         this.pluginGroups = pluginGroups;
     }
     
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, EventDispatcher eventDispatcher, ReactorManager reactorManager )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, ReactorManager reactorManager )
     {
         this.container = container;
         this.request = request;
-        this.eventDispatcher = eventDispatcher;
         this.reactorManager = reactorManager;
+    }
+    
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, ReactorManager reactorManager, EventDispatcher Eventdispatcher )
+    {
+        this( container, request, reactorManager );
+        this.eventDispatcher = Eventdispatcher;
     }
 
     public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )

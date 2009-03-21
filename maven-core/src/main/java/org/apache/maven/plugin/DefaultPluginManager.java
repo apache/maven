@@ -165,6 +165,7 @@ public class DefaultPluginManager
         // TODO: this should be possibly outside
         // All version-resolution logic has been moved to DefaultPluginVersionManager.
         logger.debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
+        
         if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
         {
             logger.debug( "Resolving version for plugin: " + plugin.getKey() );
@@ -173,7 +174,7 @@ public class DefaultPluginManager
 
             logger.debug( "Resolved to version: " + pluginVersion );
         }
-
+        
         return verifyVersionedPlugin( plugin, project, session );
     }
 
@@ -309,8 +310,9 @@ public class DefaultPluginManager
                     + " Please verify that the plugin JAR " + pluginArtifact.getFile() + " is intact.", project );
             }
 
-            pluginDescriptor.setPluginArtifact( pluginArtifact );            
-                        
+            pluginDescriptor.setPluginArtifact( pluginArtifact ); 
+            // Make sure it's just the plugin artifacts
+            pluginDescriptor.setArtifacts( new ArrayList( pluginArtifacts ) );
             pluginDescriptor.setClassRealm( pluginRealm );
             
             pluginRealms.put( pluginKey( plugin ), pluginRealm );
@@ -561,10 +563,9 @@ public class DefaultPluginManager
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
-        List realmActions = new ArrayList();
         try
         {
-            mojo = getConfiguredMojo( session, dom, project, false, mojoExecution, realmActions );
+            mojo = getConfiguredMojo( session, dom, project, false, mojoExecution );
 
             //dispatcher.dispatchStart( event, goalExecId );
 
@@ -630,18 +631,8 @@ public class DefaultPluginManager
                 }
             }
 
-            pluginDescriptor.setClassRealm( null );
-            pluginDescriptor.setArtifacts( null );
-
-            for ( Iterator it = realmActions.iterator(); it.hasNext(); )
-            {
-                PluginRealmAction action = (PluginRealmAction) it.next();
-                action.undo();
-            }
-
             if ( oldLookupRealm != null )
             {
-                //container.setLookupRealm( oldLookupRealm );
                 container.setLookupRealm( null );
             }
 
@@ -660,7 +651,7 @@ public class DefaultPluginManager
             dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
         }
 
-        return (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution, new ArrayList() );
+        return (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution );
     }
 
     public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
@@ -685,7 +676,7 @@ public class DefaultPluginManager
         return verifyVersionedPlugin( forLookup, project, session );
     }
 
-    private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report, MojoExecution mojoExecution, List realmActions )
+    private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report, MojoExecution mojoExecution )
         throws PluginConfigurationException, PluginManagerException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -703,7 +694,6 @@ public class DefaultPluginManager
         Thread.currentThread().setContextClassLoader( pluginRealm );
         try
         {
-            System.out.println( pluginDescriptor );
             logger.debug( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm " + pluginRealm.getId() + " - descRealmId=" + mojoDescriptor.getRealm() );
 
             Mojo mojo;
@@ -1426,35 +1416,6 @@ public class DefaultPluginManager
             // as this is what's implicitly happening in 2.0.6.
 
             resolutionGroup.getArtifacts().add( artifactFactory.createArtifact( "org.codehaus.plexus", "plexus-utils", "1.1", Artifact.SCOPE_RUNTIME, "jar" ) );
-        }
-    }
-
-    private static final class PluginRealmAction
-    {
-        private final PluginDescriptor pluginDescriptor;
-        private final ClassRealm realmWithTransientParent;
-
-        PluginRealmAction( PluginDescriptor pluginDescriptor )
-        {
-            this.pluginDescriptor = pluginDescriptor;
-            realmWithTransientParent = null;
-        }
-
-        PluginRealmAction( PluginDescriptor pluginDescriptor, ClassRealm realmWithTransientParent )
-        {
-            this.pluginDescriptor = pluginDescriptor;
-            this.realmWithTransientParent = realmWithTransientParent;
-        }
-
-        void undo()
-        {
-            pluginDescriptor.setArtifacts( null );
-            pluginDescriptor.setClassRealm( null );
-
-            if ( realmWithTransientParent != null )
-            {
-                realmWithTransientParent.setParentRealm( null );
-            }
         }
     }
 
