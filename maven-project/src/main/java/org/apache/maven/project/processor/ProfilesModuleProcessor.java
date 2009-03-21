@@ -1,4 +1,4 @@
-package org.apache.maven.project.processor;
+ package org.apache.maven.project.processor;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -34,8 +34,6 @@ public class ProfilesModuleProcessor
         Model c = (Model) child;
         Model p = (Model) parent;
         List<String> modules = new ArrayList<String>();
-
-
 
         for ( String module : c.getModules() )
         {

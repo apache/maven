@@ -32,16 +32,18 @@ public class PropertiesProcessor
         Model t = (Model) target, c = (Model) child, p = (Model) parent;
 
         Properties properties = new Properties();
-        if ( p != null && p.getProperties() != null )
-        {
-            properties.putAll( p.getProperties() );
-        }
+
 
         if ( c.getProperties() != null )
         {
             properties.putAll( c.getProperties() );
         }
-
+        
+        if ( p != null && p.getProperties() != null )
+        {
+            properties.putAll( p.getProperties() );
+        }
+        
         if ( !properties.isEmpty() )
         {
             t.setProperties( properties );

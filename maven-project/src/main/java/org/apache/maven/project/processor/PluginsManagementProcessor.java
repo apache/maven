@@ -43,7 +43,7 @@ public class PluginsManagementProcessor extends BaseProcessor
         for(Plugin depMng : pluginManagement)
         {
             for(Plugin targetDep : targetPlugin)
-            {
+            {   //PluginManagement is first in ordering
                 if(match(depMng, targetDep))
                 {
                     copy(depMng, targetDep );      
@@ -82,23 +82,27 @@ public class PluginsManagementProcessor extends BaseProcessor
         {
             target.setVersion( source.getVersion() );    
         }
-        
-        
+          
+        List<PluginExecution> executions = new ArrayList<PluginExecution>();
         for( PluginExecution pe : source.getExecutions())
         {
             PluginExecution idMatch = contains(pe, target.getExecutions());
             if(idMatch != null)//Join
             {
-               copyPluginExecution(pe, idMatch);    
+               copyPluginExecution(pe, idMatch);   
+               target.getExecutions().remove( idMatch );
+               executions.add( idMatch );
             }
             else 
             {
                 PluginExecution targetPe = new PluginExecution();
                 copyPluginExecution(pe, targetPe); 
-                target.addExecution( targetPe );
-            }
-            
+                executions.add( targetPe );
+            }      
         }
+        
+        executions.addAll( target.getExecutions() );
+        target.setExecutions( executions );
      
         DependenciesProcessor proc = new DependenciesProcessor();
         if(target.getDependencies().isEmpty())
@@ -116,17 +120,14 @@ public class PluginsManagementProcessor extends BaseProcessor
             //TODO: Not copying
             if(target.getConfiguration() != null)
             {
-                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() ));     
+                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) target.getConfiguration(), (Xpp3Dom) source.getConfiguration() ));     
             }
             else
             {
                 target.setConfiguration( source.getConfiguration() );
-            }
-                
+            }             
         }
-       
-       // p2.setConfiguration( configuration ) merge nodes
-        //Goals
+
         target.setExtensions(source.isExtensions()); 
         
     }
@@ -172,76 +173,17 @@ public class PluginsManagementProcessor extends BaseProcessor
             
         }    
         target.setGoals( goals );
-        if(target.getConfiguration() != null)
+        if(source.getConfiguration() != null)
         {
-            target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() ));     
-        }
-        else
-        {
-            target.setConfiguration( source.getConfiguration() );
-        }           
-    }
-    
-    /*
-    private static void copy(Plugin p1, Plugin p2)
-    {
-        if(p2.getArtifactId() == null)
-        {
-            p2.setArtifactId( p1.getArtifactId() );   
-        }
-        
-        if(p2.getGroupId() == null)
-        {
-            p2.setGroupId( p1.getGroupId() );    
-        }
-        
-        if(p2.getInherited() == null)
-        {
-            p2.setInherited( p1.getInherited() );    
-        }
-        
-        if(p2.getVersion() == null)
-        {
-            p2.setVersion( p1.getVersion() );    
-        }
-        
-        for( PluginExecution pe : p1.getExecutions())
-        {
-            PluginExecution p = new PluginExecution();
-            p.setId( pe.getId() );
-            p.setInherited( pe.getInherited() );
-            p.setPhase( pe.getPhase() );
-            p.setGoals( new ArrayList<String>(pe.getGoals()) );
-            p2.addExecution( p );
-        }
-    
-     //   if(p2.getDependencies().isEmpty())
-     //   {
-            DependenciesProcessor proc = new DependenciesProcessor();
-            proc.process( new ArrayList<Dependency>(), new ArrayList<Dependency>(p1.getDependencies()), p2.getDependencies(), false );            
-    //    }
-    //    else
-    //    {
-    //        DependenciesProcessor proc = new DependenciesProcessor();
-    //        proc.process( new ArrayList<Dependency>(p1.getDependencies()), new ArrayList<Dependency>(), p2.getDependencies(), false );            
-    //    }
-
-        if(p1.getConfiguration() != null)
-        {
-            //TODO: Not copying
-            if(p2.getConfiguration() != null)
+            if(target.getConfiguration() != null)
             {
-                p2.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) p1.getConfiguration(), (Xpp3Dom) p2.getConfiguration() ));     
+                //Target is dominant
+                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) target.getConfiguration(), (Xpp3Dom) source.getConfiguration() ));     
             }
             else
             {
-                p2.setConfiguration( p1.getConfiguration() );
+                target.setConfiguration( source.getConfiguration() );
             }            
-        }
-       
-       // p2.setConfiguration( configuration ) merge nodes
-        //Goals
-        p2.setExtensions(p1.isExtensions());
+        }        
     }
-    */
 }

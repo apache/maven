@@ -26,6 +26,9 @@ import org.apache.maven.model.Model;
 public class ModuleProcessor
     extends BaseProcessor
 {
+    /**
+     * No parent
+     */
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );

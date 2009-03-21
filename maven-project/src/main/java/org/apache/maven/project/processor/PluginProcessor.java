@@ -40,7 +40,7 @@ public class PluginProcessor
             return;
         }
         else if ( parent == null && child != null )
-        {//Plugin targetPlugin = new Plugin();
+        {
             
             boolean isAdd = true;
             Plugin targetPlugin = find((Plugin) child, t);
@@ -57,9 +57,7 @@ public class PluginProcessor
             if(isAdd) t.add( targetPlugin );
         }
         else if ( parent != null && child == null )
-        {
-            //Plugin targetPlugin = new Plugin();
-            
+        {            
             boolean isAdd = true;
             Plugin targetPlugin = find((Plugin) parent, t);
             if(targetPlugin == null) 
@@ -231,17 +229,19 @@ public class PluginProcessor
             target.setPhase( source.getPhase() );
         }
         
-        List<String> goals = new ArrayList<String>(target.getGoals());
+        List<String> targetGoals = new ArrayList<String>(target.getGoals());
+        List<String> setGoals = new ArrayList<String>();
         for(String goal : source.getGoals())
         {
-            if(!goals.contains( goal ))
+            if(targetGoals.contains( goal ))
             {
-                goals.add( goal );    
-            }
-            
-        }    
-        target.setGoals( goals );
-        
+                targetGoals.remove( goal );   
+            }          
+        }   
+        setGoals.addAll( source.getGoals() );
+        setGoals.addAll( targetGoals );
+        target.setGoals( setGoals );
+              
         if(source.getConfiguration() != null)
         {
             if(target.getConfiguration() != null)

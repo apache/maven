@@ -122,7 +122,6 @@ public class PomConstructionTest
     }
     
     /*MNG-3900*/
-    /*F:
     public void testProfilePropertiesInterpolation()
     	throws Exception 
     {
@@ -131,7 +130,7 @@ public class PomConstructionTest
     	assertEquals("PASSED", pom.getValue("properties[1]/test"));
     	assertEquals("PASSED", pom.getValue("properties[1]/property"));
     }
-*/
+
 
     // Some better conventions for the test poms needs to be created and each of these tests
     // that represent a verification of a specification item needs to be a couple lines at most.
@@ -303,6 +302,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "single-configuration-inheritance" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules" ) ).size() );
         assertEquals("2.0.6", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/requireMavenVersion[1]/version" ) );
         assertEquals("[2.0.6,)", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[2]/requireMavenVersion[1]/version" ) );
@@ -324,15 +324,6 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "execution-configuration-subcollections" );
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/bannedDependencies" ) ).size() );
     }
-
-    /** MNG-
-    public void testFoo()
-        throws Exception
-    {
-        PomTestWrapper pom = buildPom( "foo/sub" );
-        //System.out.println(pom.getDomainModel().asString());
-    }
-    */
 
     /** MNG-3985 */
     public void testMultipleRepositories()
@@ -434,7 +425,7 @@ public class PomConstructionTest
         assertEquals( "<?xml version='1.0'?>Tom&Jerry", pom.getValue( "properties/xmlTest" ) );
     }
 
-    /* FIXME: cf. MNG-3925 
+    /* FIXME: cf. MNG-3925 */
     public void testOrderOfMergedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -452,6 +443,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-plugin-exec-order/w-plugin-mngt/sub" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
         assertEquals( "parent-1", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
         assertEquals( "parent-2", pom.getValue( "build/plugins[1]/executions[2]/goals[1]" ) );
@@ -471,12 +463,11 @@ public class PomConstructionTest
     }
 
     /* MNG-3937*/
-    /* FIX - REGRESSION*/
-    /*
     public void testOrderOfMergedPluginExecutionGoalsWithoutPluginManagement()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-plugin-exec-goals-order/wo-plugin-mngt/sub" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/goals" ) ).size() );
         assertEquals( "child-a", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
         assertEquals( "merged", pom.getValue( "build/plugins[1]/executions[1]/goals[2]" ) );
@@ -484,7 +475,7 @@ public class PomConstructionTest
         assertEquals( "parent-b", pom.getValue( "build/plugins[1]/executions[1]/goals[4]" ) );
         assertEquals( "parent-a", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
-*/
+
     public void testOrderOfMergedPluginExecutionGoalsWithPluginManagement()
         throws Exception
     {
@@ -497,7 +488,7 @@ public class PomConstructionTest
         assertEquals( "parent-a", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
     //*/
-/* FIX - REGRESSION*/
+
     public void testOverridingOfInheritedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -629,7 +620,7 @@ public class PomConstructionTest
             assertEquals( "PASSED", pom.getValue( "properties/property" + index ) );
         }
     }
-/*F:
+/*
     public void testInterpolationOfLegacyExpressionsThatDontIncludeTheProjectPrefix()
         throws Exception
     {
@@ -751,26 +742,27 @@ public class PomConstructionTest
     }
     //*/
 
-    /* FIXME: cf. MNG-3836
+    /* FIXME: cf. MNG-3836*/
     public void testMergeOfInheritedPluginConfiguration()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-config-merging/child" );
+        System.out.println(pom.getDomainModel().asString());
         String prefix = "build/plugins[1]/configuration/";
         assertEquals( "PASSED", pom.getValue( prefix + "propertiesFile" ) );
         assertEquals( "PASSED", pom.getValue( prefix + "parent" ) );
         assertEquals( "PASSED-1", pom.getValue( prefix + "stringParams/stringParam[1]" ) );
-        assertEquals( "PASSED-2", pom.getValue( prefix + "stringParams/stringParam[2]" ) );
-        assertEquals( "PASSED-3", pom.getValue( prefix + "stringParams/stringParam[3]" ) );
+        assertEquals( "PASSED-3", pom.getValue( prefix + "stringParams/stringParam[2]" ) );
+        assertEquals( "PASSED-2", pom.getValue( prefix + "stringParams/stringParam[3]" ) );
         assertEquals( "PASSED-4", pom.getValue( prefix + "stringParams/stringParam[4]" ) );
         assertEquals( "PASSED-1", pom.getValue( prefix + "listParam/listParam[1]" ) );
-        assertEquals( "PASSED-2", pom.getValue( prefix + "listParam/listParam[2]" ) );
-        assertEquals( "PASSED-3", pom.getValue( prefix + "listParam/listParam[3]" ) );
+        assertEquals( "PASSED-3", pom.getValue( prefix + "listParam/listParam[2]" ) );
+        assertEquals( "PASSED-2", pom.getValue( prefix + "listParam/listParam[3]" ) );
         assertEquals( "PASSED-4", pom.getValue( prefix + "listParam/listParam[4]" ) );
     }
     //*/
 
-    /* FIXME: cf. MNG-2591
+    /* FIXME: cf. MNG-2591*/
     public void testAppendOfInheritedPluginConfiguration()
         throws Exception
     {

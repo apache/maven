@@ -39,8 +39,7 @@ public class PluginsProcessor
         {
             p = (List<Plugin>) parent;
         }
-             
-       // Model t = (Model) target;
+
         List<Plugin> plugins = (List<Plugin>) target;    
         
         PluginProcessor processor = new PluginProcessor();
@@ -92,18 +91,6 @@ public class PluginsProcessor
     private static boolean match( Plugin d1, Plugin d2 )
     {
         return getId( d1 ).equals( getId( d2 ));
-        /*
-        if ( getId( d1 ).equals( getId( d2 ) ) )
-        {
-            if(d1.getVersion() == null || d2.getVersion() == null)
-            {
-                return true;
-            }
-            return ( d1.getVersion() == null ? "" : d1.getVersion() ).equals( d2.getVersion() == null ? ""
-                            : d2.getVersion() );
-        }
-        return false;
-        */
     }
 
     private static String getId( Plugin d )
