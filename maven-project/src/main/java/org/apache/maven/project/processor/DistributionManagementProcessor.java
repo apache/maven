@@ -132,7 +132,14 @@ public class DistributionManagementProcessor
 
         if ( target.getUrl() == null )
         {
-            target.setUrl( source.getUrl() + "/" + artifactId );
+            if ( isChild )
+            {
+                target.setUrl( source.getUrl() );
+            }
+            else
+            {
+                target.setUrl( source.getUrl() + "/" + artifactId );
+            }
         }
     }
 

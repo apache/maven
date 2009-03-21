@@ -171,8 +171,8 @@ public class ProcessorContext
         }
         
         List<Processor> processors =
-            Arrays.asList( (Processor) new BuildProcessor( new ArrayList<Processor>() ),
-                           (Processor) new ModuleProcessor(), new PropertiesProcessor(), new ParentProcessor(),
+            Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ),
+                           new ModuleProcessor(), new PropertiesProcessor(), new ParentProcessor(),
                            new OrganizationProcessor(), new MailingListProcessor(), new IssueManagementProcessor(),
                            new CiManagementProcessor(), new ReportingProcessor(), new RepositoriesProcessor(),
                            new DistributionManagementProcessor(), new LicensesProcessor(), new ScmProcessor());        
