@@ -200,6 +200,14 @@ under the License.
   </repositories>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its.ext</groupId>
+        <artifactId>ext</artifactId>
+        <version>3.0</version>
+      </extension>
+    </extensions>
+
     <defaultGoal>test</defaultGoal>
     <directory>build</directory>
     <sourceDirectory>sources/main</sourceDirectory>

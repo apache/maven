@@ -1117,6 +1117,11 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "build/testResources[1]/excludes" ) ).size() );
         assertPathSuffixEquals( "test.excluded", pom.getValue( "build/testResources[1]/excludes[1]" ) );
 
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/extensions" ) ).size() );
+        assertEquals( "org.apache.maven.its.ext", pom.getValue( "build/extensions[1]/groupId" ) );
+        assertEquals( "ext", pom.getValue( "build/extensions[1]/artifactId" ) );
+        assertEquals( "3.0", pom.getValue( "build/extensions[1]/version" ) );
+
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
         assertEquals( "org.apache.maven.its.plugins", pom.getValue( "build/plugins[1]/groupId" ) );
         assertEquals( "maven-it-plugin-build", pom.getValue( "build/plugins[1]/artifactId" ) );
