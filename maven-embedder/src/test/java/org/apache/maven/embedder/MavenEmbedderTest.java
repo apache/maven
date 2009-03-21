@@ -55,7 +55,7 @@ public class MavenEmbedderTest
 {
     protected String basedir;
 
-    protected MavenEmbedder maven;
+    protected MavenEmbedder mavenEmbedder;
 
 
     protected void setUp()
@@ -77,13 +77,13 @@ public class MavenEmbedderTest
             .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
         configuration.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
 
-        maven = new MavenEmbedder( configuration );
+        mavenEmbedder = new MavenEmbedder( configuration );
     }
 
     protected void tearDown()
         throws Exception
     {
-        maven.stop();
+        mavenEmbedder.stop();
     }
 
     protected void assertNoExceptions( MavenExecutionResult result )
@@ -119,10 +119,12 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( targetDirectory )
-            .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"package"} ) );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setBaseDirectory( targetDirectory )
+            .setShowErrors( true )
+            .setGoals( Arrays.asList( new String[]{"package"} ) );
 
-        MavenExecutionResult result = maven.execute( request );
+        MavenExecutionResult result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );
 
@@ -148,7 +150,7 @@ public class MavenEmbedderTest
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( targetDirectory )
             .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"validate"} ) );
 
-        MavenExecutionResult result = maven.execute( request );
+        MavenExecutionResult result = mavenEmbedder.execute( request );
         List exceptions = result.getExceptions();
         assertEquals("Incorrect number of exceptions", 1, exceptions.size());
 
@@ -172,7 +174,7 @@ public class MavenEmbedderTest
             .setPom( new File( targetDirectory, "pom.xml" ) ).setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "package" } ) );
 
-        MavenExecutionResult result = maven.execute( request );
+        MavenExecutionResult result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );
         
@@ -200,7 +202,7 @@ public class MavenEmbedderTest
             .setPom( new File( targetDirectory, "pom.xml" ) ).setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "validate" } ) );
 
-        MavenExecutionResult r0 = maven.execute( requestWithoutProfile );
+        MavenExecutionResult r0 = mavenEmbedder.execute( requestWithoutProfile );
 
         assertNoExceptions( r0 );
 
@@ -220,7 +222,7 @@ public class MavenEmbedderTest
             .setGoals( Arrays.asList( new String[] { "validate" } ) )
             .addActiveProfile( "embedderProfile" );
 
-        MavenExecutionResult r1 = maven.execute( request );
+        MavenExecutionResult r1 = mavenEmbedder.execute( request );
 
         MavenProject p1 = r1.getProject();
 
@@ -248,7 +250,7 @@ public class MavenEmbedderTest
         File pom = new File( targetDirectory, "pom.xml" );
 
         /* Add the surefire plugin 2.2 to the pom */
-        Model model = maven.readModel( pom );
+        Model model = mavenEmbedder.readModel( pom );
 
         Plugin plugin = new Plugin();
         plugin.setArtifactId( "maven-surefire-plugin" );
@@ -257,14 +259,14 @@ public class MavenEmbedderTest
         model.getBuild().addPlugin( plugin );
 
         Writer writer = WriterFactory.newXmlWriter( pom );
-        maven.writeModel( writer, model );
+        mavenEmbedder.writeModel( writer, model );
         writer.close();
 
         /* execute maven */
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPom( pom ).setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "package" } ) );
 
-        MavenExecutionResult result = maven.execute( request );
+        MavenExecutionResult result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );
 
@@ -276,13 +278,13 @@ public class MavenEmbedderTest
         /* Add the surefire plugin 2.3 to the pom */
         plugin.setVersion( "2.3" );
         writer = WriterFactory.newXmlWriter( pom );
-        maven.writeModel( writer, model );
+        mavenEmbedder.writeModel( writer, model );
         writer.close();
 
         /* execute Maven */
         request = new DefaultMavenExecutionRequest().setPom( pom ).setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "package" } ) );
-        result = maven.execute( request );
+        result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );
 
@@ -299,7 +301,7 @@ public class MavenEmbedderTest
     public void testRetrievingLifecyclePhases()
         throws Exception
     {
-        List phases = maven.getLifecyclePhases();
+        List phases = mavenEmbedder.getLifecyclePhases();
                 
         assertEquals( "validate", (String) phases.get( 0 ) );
 
@@ -315,7 +317,7 @@ public class MavenEmbedderTest
     public void testLocalRepositoryRetrieval()
         throws Exception
     {
-        assertNotNull( maven.getLocalRepository().getBasedir() );
+        assertNotNull( mavenEmbedder.getLocalRepository().getBasedir() );
     }
 
     // ----------------------------------------------------------------------
@@ -329,7 +331,7 @@ public class MavenEmbedderTest
         // Test model reading
         // ----------------------------------------------------------------------
 
-        Model model = maven.readModel( getPomFile() );
+        Model model = mavenEmbedder.readModel( getPomFile() );
 
         assertEquals( "org.apache.maven", model.getGroupId() );
     }
@@ -339,7 +341,7 @@ public class MavenEmbedderTest
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true ).setPom( getPomFile() );
 
-        MavenExecutionResult result = maven.readProjectWithDependencies( request );
+        MavenExecutionResult result = mavenEmbedder.readProjectWithDependencies( request );
 
         assertNoExceptions( result );
 
@@ -347,7 +349,7 @@ public class MavenEmbedderTest
 
         Set artifacts = result.getProject().getArtifacts();
 
-        assertEquals( 1, artifacts.size() );
+        assertEquals( 2, artifacts.size() );
 
         artifacts.iterator().next();
     }
@@ -357,7 +359,7 @@ public class MavenEmbedderTest
     {
         File pomFile = new File( basedir, "src/test/projects/readProject-withScmInheritance/modules/child1/pom.xml" );
 
-        MavenProject project = maven.readProject( pomFile );
+        MavenProject project = mavenEmbedder.readProject( pomFile );
 
         assertEquals( "http://host/viewer?path=/trunk/parent/child1", project.getScm().getUrl() );
         assertEquals( "scm:svn:http://host/trunk/parent/child1", project.getScm().getConnection() );
@@ -370,7 +372,7 @@ public class MavenEmbedderTest
         File pomFile = new File( basedir,
                                  "src/test/projects/readProject-missingModuleIgnored/pom.xml" );
 
-        maven.readProject( pomFile );
+        mavenEmbedder.readProject( pomFile );
     }
 
     /*
@@ -402,7 +404,7 @@ public class MavenEmbedderTest
     public void testModelWriting()
         throws Exception
     {
-        Model model = maven.readModel( getPomFile() );
+        Model model = mavenEmbedder.readModel( getPomFile() );
 
         model.setGroupId( "org.apache.maven.new" );
 
@@ -410,11 +412,11 @@ public class MavenEmbedderTest
 
         Writer writer = WriterFactory.newXmlWriter( file );
 
-        maven.writeModel( writer, model );
+        mavenEmbedder.writeModel( writer, model );
 
         writer.close();
 
-        model = maven.readModel( file );
+        model = mavenEmbedder.readModel( file );
 
         assertEquals( "org.apache.maven.new", model.getGroupId() );
     }

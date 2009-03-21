@@ -46,6 +46,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -169,7 +170,9 @@ public class DefaultPluginManager
         if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
         {
             logger.debug( "Resolving version for plugin: " + plugin.getKey() );
+            
             pluginVersion = resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, session );
+            
             plugin.setVersion( pluginVersion );
 
             logger.debug( "Resolved to version: " + pluginVersion );
@@ -188,10 +191,8 @@ public class DefaultPluginManager
         // and no ChildContainer exists. The check for that below fixes
         // the 'Can't find plexus container for plugin: xxx' error.
         try
-        {
-            Artifact pluginArtifact = resolvePluginArtifact( plugin, project, session );
-            
-            addPlugin( plugin, pluginArtifact, project, session );
+        {            
+            addPlugin( plugin, project, session );
 
             project.addPlugin( plugin );
         }
@@ -230,9 +231,29 @@ public class DefaultPluginManager
         return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
     }
     
-    protected void addPlugin( Plugin plugin, Artifact pluginArtifact, MavenProject project, MavenSession session )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException
-    {
+    protected void addPlugin( Plugin plugin, MavenProject project, MavenSession session )
+        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException, PluginVersionResolutionException
+    {                
+        logger.debug( "Resolving plugin artifact " + plugin.getKey() + " from " + project.getRemoteArtifactRepositories() );
+
+        ArtifactRepository localRepository = session.getLocalRepository();
+
+        MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
+
+        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
+
+        checkRequiredMavenVersion( plugin, pluginProject, localRepository, project.getRemoteArtifactRepositories() );
+
+        checkPluginDependencySpec( plugin, pluginProject );
+
+        pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
+
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+
+        resolutionErrorHandler.throwErrors( request, result );        
+        
         // ----------------------------------------------------------------------------
         // Get the dependencies for the Plugin
         // ----------------------------------------------------------------------------
@@ -240,6 +261,8 @@ public class DefaultPluginManager
         // the only Plugin instance which will have dependencies is the one specified in the project.
         // We need to look for a Plugin instance there, in case the instance we're using didn't come from
         // the project.
+        
+        // Trying to cache the version of the plugin for a project?
         Plugin projectPlugin = project.getPlugin( plugin.getKey() );
 
         if ( projectPlugin == null )
@@ -272,7 +295,7 @@ public class DefaultPluginManager
                     // Not going to happen
                 }
             }
-                        
+                              
             try
             {
                 logger.debug( "Discovering components in realm: " + pluginRealm );
@@ -319,11 +342,18 @@ public class DefaultPluginManager
         }
     }
 
+    // plugin artifact
+    //   its dependencies while filtering out what's in the core
+    //   layering on the project level plugin dependencies
+    
+    
     private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin plugin, MavenProject project, ArtifactRepository localRepository )
         throws InvalidPluginException, ArtifactNotFoundException, ArtifactResolutionException
     {
-        ArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
-
+        AndArtifactFilter filter = new AndArtifactFilter();
+        filter.add( coreArtifactFilterManager.getCoreArtifactFilter() );
+        filter.add( new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM ) );
+        
         Set<Artifact> projectPluginDependencies;
 
         // The case where we have a plugin that can host multiple versions of a particular tool. Say the 
@@ -333,7 +363,7 @@ public class DefaultPluginManager
 
         try
         {
-            projectPluginDependencies = repositorySystem.createArtifacts( plugin.getDependencies(), null, coreArtifactFilterManager.getCoreArtifactFilter(), project );
+            projectPluginDependencies = repositorySystem.createArtifacts( plugin.getDependencies(), null, filter, project );
         }
         catch ( VersionNotFoundException e )
         {
@@ -1305,6 +1335,7 @@ public class DefaultPluginManager
                 result.setUnresolvedArtifacts( null );
             }
         }
+        
         resolutionErrorHandler.throwErrors( request, result );
 
         project.setArtifacts( result.getArtifacts() );
@@ -1365,9 +1396,9 @@ public class DefaultPluginManager
         List<ArtifactRepository> remoteArtifactRepositories = project.getRemoteArtifactRepositories();
 
         for ( Iterator<Artifact> it = project.getArtifacts().iterator(); it.hasNext(); )
-        {
+        {            
             Artifact artifact = (Artifact) it.next();
-
+            
             repositorySystem.resolve( new ArtifactResolutionRequest( artifact, localRepository, remoteArtifactRepositories ) );
         }
     }
@@ -1446,27 +1477,27 @@ public class DefaultPluginManager
     public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
-        return resolvePluginVersion( groupId, artifactId, project, session.getLocalRepository(), false );
-    }
+        String version = null;
+        
+        if ( project.getBuildPlugins() != null )
+        {
+            for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext() && ( version == null ); )
+            {
+                Plugin plugin = (Plugin) it.next();
 
-    public String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
-    {
-        return resolvePluginVersion( groupId, artifactId, project, session.getLocalRepository(), true );
-    }
-
-    private String resolvePluginVersion( String groupId, String artifactId, MavenProject project, ArtifactRepository localRepository, boolean resolveAsReportPlugin )
-        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
-    {
-        // first pass...if the plugin is specified in the pom, try to retrieve the version from there.
-        String version = getVersionFromPluginConfig( groupId, artifactId, project, resolveAsReportPlugin );
-
+                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                {
+                    version = plugin.getVersion();
+                }
+            }
+        }
+        
         // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
         // in settings.xml.
         if ( StringUtils.isEmpty( version ) || Artifact.RELEASE_VERSION.equals( version ) )
         {
             // 1. resolve the version to be used
-            version = resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.RELEASE_VERSION );
+            version = resolveMetaVersion( groupId, artifactId, project, session.getLocalRepository(), Artifact.RELEASE_VERSION );
             logger.debug( "Version from RELEASE metadata: " + version );
         }
 
@@ -1476,42 +1507,40 @@ public class DefaultPluginManager
             throw new PluginVersionNotFoundException( groupId, artifactId );
         }
 
-        return version;
+        return version;        
     }
 
-    private String getVersionFromPluginConfig( String groupId, String artifactId, MavenProject project, boolean resolveAsReportPlugin )
+    public String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
+        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {
         String version = null;
-
-        if ( resolveAsReportPlugin )
+        
+        if ( project.getReportPlugins() != null )
         {
-            if ( project.getReportPlugins() != null )
+            for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext() && ( version == null ); )
             {
-                for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext() && ( version == null ); )
-                {
-                    ReportPlugin plugin = (ReportPlugin) it.next();
+                ReportPlugin plugin = (ReportPlugin) it.next();
 
-                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-                    {
-                        version = plugin.getVersion();
-                    }
+                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                {
+                    version = plugin.getVersion();
                 }
             }
         }
-        else
+        
+        // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
+        // in settings.xml.
+        if ( StringUtils.isEmpty( version ) || Artifact.RELEASE_VERSION.equals( version ) )
         {
-            if ( project.getBuildPlugins() != null )
-            {
-                for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext() && ( version == null ); )
-                {
-                    Plugin plugin = (Plugin) it.next();
+            // 1. resolve the version to be used
+            version = resolveMetaVersion( groupId, artifactId, project, session.getLocalRepository(), Artifact.RELEASE_VERSION );
+            logger.debug( "Version from RELEASE metadata: " + version );
+        }
 
-                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-                    {
-                        version = plugin.getVersion();
-                    }
-                }
-            }
+        // if we still haven't found a version, then fail early before we get into the update goop.
+        if ( StringUtils.isEmpty( version ) )
+        {
+            throw new PluginVersionNotFoundException( groupId, artifactId );
         }
 
         return version;

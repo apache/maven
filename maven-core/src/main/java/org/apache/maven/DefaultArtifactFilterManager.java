@@ -59,6 +59,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "maven-plugin-api" );
         artifacts.add( "maven-plugin-descriptor" );
         artifacts.add( "maven-plugin-parameter-documenter" );
+        artifacts.add( "maven-plugin-registry" );
         artifacts.add( "maven-profile" );
         artifacts.add( "maven-project" );
         artifacts.add( "maven-reporting-api" );
@@ -70,6 +71,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "plexus-component-api" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-interactivity-api" );
+        artifacts.add( "plexus-interpolation" );        
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );

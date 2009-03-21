@@ -428,13 +428,7 @@ public class DefaultArtifactResolver
                                 
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
-        
-        if ( !isDummy( request ) )
-        {
-            // Add the root artifact
-            result.addArtifact( rootArtifact );                        
-        }                
-        
+                
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
         // appropriately.
@@ -469,6 +463,14 @@ public class DefaultArtifactResolver
             }
         }
                 
+        // We want to send the root artifact back in the result but we need to do this after the other dependencies
+        // have been resolved.
+        if ( !isDummy( request ) )
+        {
+            // Add the root artifact
+            result.addArtifact( rootArtifact );                        
+        }                        
+        
         return result;
     }
 

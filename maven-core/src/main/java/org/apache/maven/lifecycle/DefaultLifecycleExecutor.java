@@ -54,11 +54,9 @@ import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -1302,7 +1300,6 @@ public class DefaultLifecycleExecutor
         project.addPlugin( plugin );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
-        
         return mojoDescriptor;
     }
 
