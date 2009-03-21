@@ -33,7 +33,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.project.harness.PomTestWrapper;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -48,8 +47,6 @@ public class PomConstructionTest
 
     private DefaultMavenProjectBuilder mavenProjectBuilder;
 
-    private RepositorySystem mavenTools;
-
     private File testDirectory;
 
     private File testMixinDirectory;
@@ -60,7 +57,6 @@ public class PomConstructionTest
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
-        mavenTools = lookup( RepositorySystem.class );
     }
 
     /**
@@ -80,7 +76,7 @@ public class PomConstructionTest
      * 
      * @throws Exception
      */
-    /* FIXME: cf MNG-786*/
+    /* MNG-786*/
     public void testProfileModules()
         throws Exception
     {
@@ -92,7 +88,6 @@ public class PomConstructionTest
         assertEquals( "module-3", pom.getValue( "modules[3]" ) );
         assertEquals( "module-4", pom.getValue( "modules[4]" ) );
     }
-    //*/
 
     /**
      * Will throw exception if doesn't find parent(s) in build
@@ -138,15 +133,11 @@ public class PomConstructionTest
     // them into a resolver, create the expression to extract the data to validate the Model, and the URI
     // to validate the properties. We also need a way to navigate from the Tex specification documents to
     // the test in question and vice versa. A little Eclipse plugin would do the trick.
-    /*
-    TODO: Not sure why this test is failing after removing resolver. Logic is the same.
-     */
     public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins()
         throws Exception
     {
-      // This should be 2
-      //assertEquals( 2, model.getLineageCount() );
       PomTestWrapper tester = buildPom("micromailer");
+      assertEquals( 2, tester.getDomainModel().getLineageCount() );
       assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
@@ -349,7 +340,6 @@ public class PomConstructionTest
         pom.getDomainModel().asString();
     }
 
-    //*/
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
         throws Exception
     {
@@ -362,7 +352,7 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
 
-    /* FIXME: cf. MNG-3886*/
+    /* MNG-3886*/
     public void testOrderOfGoalsFromPluginExecutionWithPluginManagement()
         throws Exception
     {
@@ -374,7 +364,6 @@ public class PomConstructionTest
         assertEquals( "c", pom.getValue( "build/plugins[1]/executions[1]/goals[4]" ) );
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
-    //*/
 
     public void testOrderOfPluginExecutionsWithoutPluginManagement()
         throws Exception
@@ -388,7 +377,7 @@ public class PomConstructionTest
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
     }
 
-    /* FIXME: cf. MNG-3887 */
+    /* MNG-3887 */
     public void testOrderOfPluginExecutionsWithPluginManagement()
         throws Exception
     {
@@ -400,7 +389,6 @@ public class PomConstructionTest
         assertEquals( "c", pom.getValue( "build/plugins[1]/executions[4]/id" ) );
         assertEquals( "e", pom.getValue( "build/plugins[1]/executions[5]/id" ) );
     }
-    //*/
 
     public void testMergeOfPluginExecutionsWhenChildInheritsPluginVersion()
         throws Exception
@@ -425,7 +413,7 @@ public class PomConstructionTest
         assertEquals( "<?xml version='1.0'?>Tom&Jerry", pom.getValue( "properties/xmlTest" ) );
     }
 
-    /* FIXME: cf. MNG-3925 */
+    /* MNG-3925 */
     public void testOrderOfMergedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
@@ -451,7 +439,6 @@ public class PomConstructionTest
         assertEquals( "child-1", pom.getValue( "build/plugins[1]/executions[4]/goals[1]" ) );
         assertEquals( "child-2", pom.getValue( "build/plugins[1]/executions[5]/goals[1]" ) );
     }
-    //*/
 
     /* MNG-3984*/
     public void testDifferentContainersWithSameId()
@@ -487,7 +474,6 @@ public class PomConstructionTest
         assertEquals( "parent-b", pom.getValue( "build/plugins[1]/executions[1]/goals[4]" ) );
         assertEquals( "parent-a", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
-    //*/
 
     public void testOverridingOfInheritedPluginExecutionsWithoutPluginManagement()
         throws Exception
@@ -620,7 +606,7 @@ public class PomConstructionTest
             assertEquals( "PASSED", pom.getValue( "properties/property" + index ) );
         }
     }
-/*
+/* FIXME
     public void testInterpolationOfLegacyExpressionsThatDontIncludeTheProjectPrefix()
         throws Exception
     {
@@ -653,7 +639,7 @@ public class PomConstructionTest
         assertTrue( pom.getValue( "properties/projectBuildOut" ).toString().endsWith( "bin" ) );
         assertTrue( pom.getValue( "properties/projectSiteOut" ).toString().endsWith( "doc" ) );
     }
-*/
+//*/
     public void testInterpolationWithBasedirAlignedDirectories()
         throws Exception
     {
@@ -690,7 +676,6 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "id-container-joining-with-empty-elements/sub" );
         assertNotNull( pom );
     }
-    //*/
 
     public void testOrderOfPluginConfigurationElementsWithoutPluginManagement()
         throws Exception
@@ -702,7 +687,7 @@ public class PomConstructionTest
         assertEquals( "four", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[4]" ) );
     }
 
-    /* FIXME: cf. MNG-3827*/
+    /* MNG-3827*/
     public void testOrderOfPluginConfigurationElementsWithPluginManagement()
         throws Exception
     {
@@ -712,7 +697,6 @@ public class PomConstructionTest
         assertEquals( "three", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[3]" ) );
         assertEquals( "four", pom.getValue( "build/plugins[1]/configuration/stringParams/stringParam[4]" ) );
     }
-    //*/
 
     public void testOrderOfPluginExecutionConfigurationElementsWithoutPluginManagement()
         throws Exception
@@ -727,7 +711,7 @@ public class PomConstructionTest
         assertEquals( "key2", pom.getValue( prefix + "propertiesParam/property[2]/name" ) );
     }
 
-    /* FIXME: cf. MNG-3864*/
+    /* MNG-3864*/
     public void testOrderOfPluginExecutionConfigurationElementsWithPluginManagement()
         throws Exception
     {
@@ -740,9 +724,8 @@ public class PomConstructionTest
         assertEquals( "key1", pom.getValue( prefix + "propertiesParam/property[1]/name" ) );
         assertEquals( "key2", pom.getValue( prefix + "propertiesParam/property[2]/name" ) );
     }
-    //*/
 
-    /* FIXME: cf. MNG-3836*/
+    /* MNG-3836*/
     public void testMergeOfInheritedPluginConfiguration()
         throws Exception
     {
@@ -760,9 +743,8 @@ public class PomConstructionTest
         assertEquals( "PASSED-2", pom.getValue( prefix + "listParam/listParam[3]" ) );
         assertEquals( "PASSED-4", pom.getValue( prefix + "listParam/listParam[4]" ) );
     }
-    //*/
 
-    /* FIXME: cf. MNG-2591*/
+    /* MNG-2591*/
     public void testAppendOfInheritedPluginConfiguration()
         throws Exception
     {
@@ -785,9 +767,8 @@ public class PomConstructionTest
         assertEquals( "CHILD-2", pom.getValue( prefix + "listParam/listParam[7]" ) );
         assertEquals( "CHILD-4", pom.getValue( prefix + "listParam/listParam[8]" ) );
     }
-    //*/
 
-    /* FIXME: cf. MNG-4000 */
+    /* MNG-4000 */
     public void testMultiplePluginExecutionsWithAndWithoutIdsWithoutPluginManagement()
         throws Exception
     {
@@ -796,7 +777,6 @@ public class PomConstructionTest
         assertEquals( "log-string", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
         assertEquals( "log-string", pom.getValue( "build/plugins[1]/executions[2]/goals[1]" ) );
     }
-    //*/
 
     public void testMultiplePluginExecutionsWithAndWithoutIdsWithPluginManagement()
         throws Exception
@@ -871,7 +851,6 @@ public class PomConstructionTest
         assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
         assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
     }
-    //*/
 
     /** MNG-4034 */
     public void testManagedProfileDependency()
@@ -886,7 +865,6 @@ public class PomConstructionTest
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies[1]/exclusions" ) ).size() );
         assertEquals( "commons-lang", pom.getValue( "dependencies[1]/exclusions[1]/groupId" ) );
     }
-    //*/
 
     /** MNG-4040 */
     public void testProfileModuleInheritance()
@@ -908,7 +886,7 @@ public class PomConstructionTest
         assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
     }
 
-    /** FIXME: MNG-4053*/
+    /** MNG-4053*/
     public void testPluginConfigurationUsingAttributesWithPluginManagement()
         throws Exception
     {
@@ -930,7 +908,6 @@ public class PomConstructionTest
         assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@todir" ) );
         assertEquals( null, pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@overwrite" ) );
     }
-    //*/
 
     public void testPomEncoding()
         throws Exception
@@ -957,11 +934,27 @@ public class PomConstructionTest
         assertEquals( pom.getBasedir().toURI().toString(), pom.getValue( "properties/prop1" ).toString() );
     }
 
-    public void testCompleteModel()
+    public void testCompleteModelWithoutParent()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "complete-model" );
+        PomTestWrapper pom = buildPom( "complete-model/wo-parent" );
 
+        testCompleteModel( pom );
+    }
+
+    /* FIXME
+    public void testCompleteModelWithParent()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "complete-model/w-parent/sub" );
+
+        testCompleteModel( pom );
+    }
+    //*/
+
+    private void testCompleteModel( PomTestWrapper pom )
+        throws Exception
+    {
         assertEquals( "4.0.0", pom.getValue( "modelVersion" ) );
 
         assertEquals( "org.apache.maven.its.mng", pom.getValue( "groupId" ) );
