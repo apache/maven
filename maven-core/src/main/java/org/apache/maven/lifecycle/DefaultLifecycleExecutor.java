@@ -15,14 +15,12 @@ package org.apache.maven.lifecycle;
  * the License.
  */
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 import org.apache.maven.BuildFailureException;
@@ -48,23 +46,19 @@ import org.apache.maven.plugin.PluginVersionNotFoundException;
 import org.apache.maven.plugin.PluginVersionResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.lifecycle.Execution;
-import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
 /**
  * @author Jason van Zyl
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class DefaultLifecycleExecutor
     extends AbstractLogEnabled
-    implements LifecycleExecutor
+    implements LifecycleExecutor, Initializable
 {
     //@Requirement
     //private getLogger() getLogger();
@@ -76,18 +70,52 @@ public class DefaultLifecycleExecutor
 
     private List defaultReports;
 
-    private Map phaseToLifecycleMap;
+    private Map<String, Lifecycle> phaseToLifecycleMap;
 
     @Requirement
-    private Map<String,LifecycleMapping> lifecycleMappings;
-    
+    private Map<String, LifecycleMapping> lifecycleMappings;
+
+    /**
+     * Execute a task. Each task may be a phase in the lifecycle or the execution of a mojo.
+     * 
+     * @param session
+     * @param rm
+     * @param dispatcher
+     */
+    public void execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
+        throws BuildFailureException, LifecycleExecutionException
+    {
+        // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
+        // within the same reactor (using an inclusion pattern to gather them up)...
+        MavenProject rootProject = rm.getTopLevelProject();
+
+        List goals = session.getGoals();
+
+        if ( goals.isEmpty() && rootProject != null )
+        {
+            String goal = rootProject.getDefaultGoal();
+
+            if ( goal != null )
+            {
+                goals = Collections.singletonList( goal );
+            }
+        }
+
+        if ( goals.isEmpty() )
+        {
+            throw new BuildFailureException( "\n\nYou must specify at least one goal. Try 'mvn install' to build or 'mvn --help' for options \nSee http://maven.apache.org for more information.\n\n" );
+        }
+
+        executeTaskSegments( goals, rm, session, rootProject, dispatcher );
+    }
+
     public List<String> getLifecyclePhases()
     {
         for ( Lifecycle lifecycle : lifecycles )
         {
             if ( lifecycle.getId().equals( "default" ) )
             {
-                return lifecycle.getPhases();
+                return (List<String>) lifecycle.getPhases().values();
             }
         }
 
@@ -163,176 +191,48 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( "Cannot find the specified goal.", e );
         }
 
-        if ( descriptor == null )
-        {
-            throw new InvalidPluginException( "Plugin: " + descriptor.getId() + " does not contain referenced mojo: " + descriptor.getGoal() );
-        }
-
         return descriptor;
     }
 
-    /**
-     * Execute a task. Each task may be a phase in the lifecycle or the execution of a mojo.
-     * 
-     * @param session
-     * @param rm
-     * @param dispatcher
-     */
-    public void execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
-        throws BuildFailureException, LifecycleExecutionException
-    {
-        // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
-        // within the same reactor (using an inclusion pattern to gather them up)...
-        MavenProject rootProject = rm.getTopLevelProject();
-
-        List goals = session.getGoals();
-
-        if ( goals.isEmpty() && rootProject != null )
-        {
-            String goal = rootProject.getDefaultGoal();
-
-            if ( goal != null )
-            {
-                goals = Collections.singletonList( goal );
-            }
-        }
-
-        if ( goals.isEmpty() )
-        {
-            throw new BuildFailureException( "\n\nYou must specify at least one goal. Try 'mvn install' to build or 'mvn --help' for options \nSee http://maven.apache.org for more information.\n\n" );
-        }
-
-        List taskSegments = segmentTaskListByAggregationNeeds( goals, session, rootProject );
-
-        executeTaskSegments( taskSegments, rm, session, rootProject, dispatcher );
-    }
-
-    private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session, MavenProject rootProject, EventDispatcher dispatcher )
+    private void executeTaskSegments( List<String> goals, ReactorManager rm, MavenSession session, MavenProject rootProject, EventDispatcher dispatcher )
         throws LifecycleExecutionException, BuildFailureException
     {
-        for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
+        List<MavenProject> sortedProjects = session.getSortedProjects();
+
+        for ( MavenProject currentProject : sortedProjects )
         {
-            TaskSegment segment = (TaskSegment) it.next();
-
-            if ( segment.aggregate() )
+            if ( !rm.isBlackListed( currentProject ) )
             {
-                if ( !rm.isBlackListed( rootProject ) )
+                line();
+
+                getLogger().info( "Building " + currentProject.getName() );
+
+                line();
+
+                // !! This is ripe for refactoring to an aspect.
+                // Event monitoring.
+                String event = MavenEvents.PROJECT_EXECUTION;
+
+                long buildStartTime = System.currentTimeMillis();
+
+                try
                 {
-                    line();
+                    session.setCurrentProject( currentProject );
 
-                    getLogger().info( "Building " + rootProject.getName() );
-
-                    getLogger().info( "  " + segment );
-
-                    line();
-
-                    // !! This is ripe for refactoring to an aspect.
-                    // Event monitoring.
-                    String event = MavenEvents.PROJECT_EXECUTION;
-
-                    long buildStartTime = System.currentTimeMillis();
-
-                    String target = rootProject.getId() + " ( " + segment + " )";
-
-                    dispatcher.dispatchStart( event, target );
-
-                    try
+                    for ( String goal : goals )
                     {
-                        session.setCurrentProject( rootProject );
-
-                        // only call once, with the top-level project (assumed to be provided as a parameter)...
-                        for ( Iterator<String> goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
-                        {
-                            String task = (String) goalIterator.next();
-
-                            executeGoalAndHandleFailures( task, session, rootProject, dispatcher, event, rm, buildStartTime, target );
-                        }
-
-                        rm.registerBuildSuccess( rootProject, System.currentTimeMillis() - buildStartTime );
-
-                    }
-                    finally
-                    {
-                        session.setCurrentProject( null );
-                    }
-
-                    dispatcher.dispatchEnd( event, target );
-                }
-                else
-                {
-                    line();
-
-                    getLogger().info( "SKIPPING " + rootProject.getName() );
-
-                    getLogger().info( "  " + segment );
-
-                    getLogger().info( "This project has been banned from further executions due to previous failures." );
-
-                    line();
-                }
-            }
-            else
-            {
-                List sortedProjects = session.getSortedProjects();
-
-                // iterate over projects, and execute on each...
-                for ( Iterator projectIterator = sortedProjects.iterator(); projectIterator.hasNext(); )
-                {
-                    MavenProject currentProject = (MavenProject) projectIterator.next();
-
-                    if ( !rm.isBlackListed( currentProject ) )
-                    {
-                        line();
-
-                        getLogger().info( "Building " + currentProject.getName() );
-
-                        getLogger().info( "  " + segment );
-
-                        line();
-
-                        // !! This is ripe for refactoring to an aspect.
-                        // Event monitoring.
-                        String event = MavenEvents.PROJECT_EXECUTION;
-
-                        long buildStartTime = System.currentTimeMillis();
-
-                        String target = currentProject.getId() + " ( " + segment + " )";
+                        String target = currentProject.getId() + " ( " + goal + " )";
                         dispatcher.dispatchStart( event, target );
-
-                        try
-                        {
-                            session.setCurrentProject( currentProject );
-
-                            for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
-                            {
-                                String task = (String) goalIterator.next();
-
-                                executeGoalAndHandleFailures( task, session, currentProject, dispatcher, event, rm, buildStartTime, target );
-                            }
-
-                        }
-                        finally
-                        {
-                            session.setCurrentProject( null );
-                        }
-
-                        rm.registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
-
+                        executeGoalAndHandleFailures( goal, session, currentProject, dispatcher, event, rm, buildStartTime, target );
                         dispatcher.dispatchEnd( event, target );
                     }
-                    else
-                    {
-                        line();
-
-                        getLogger().info( "SKIPPING " + currentProject.getName() );
-
-                        getLogger().info( "  " + segment );
-
-                        getLogger().info( "This project has been banned from further executions due to previous failures." );
-
-                        line();
-                    }
                 }
+                finally
+                {
+                    session.setCurrentProject( null );
+                }
+
+                rm.registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
             }
         }
     }
@@ -380,179 +280,99 @@ public class DefaultLifecycleExecutor
         return false;
     }
 
-    private List segmentTaskListByAggregationNeeds( List tasks, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException, BuildFailureException
-    {
-        List segments = new ArrayList();
-
-        if ( project != null )
-        {
-
-            TaskSegment currentSegment = null;
-            for ( Iterator it = tasks.iterator(); it.hasNext(); )
-            {
-                String task = (String) it.next();
-
-                // if it's a phase, then we don't need to check whether it's an aggregator.
-                // simply add it to the current task partition.
-                if ( getPhaseToLifecycleMap().containsKey( task ) )
-                {
-                    if ( currentSegment != null && currentSegment.aggregate() )
-                    {
-                        segments.add( currentSegment );
-                        currentSegment = null;
-                    }
-
-                    if ( currentSegment == null )
-                    {
-                        currentSegment = new TaskSegment();
-                    }
-
-                    currentSegment.add( task );
-                }
-                else
-                {
-                    MojoDescriptor mojo = getMojoDescriptor( task, session, project );
-
-                    // if the mojo descriptor was found, determine aggregator status according to:
-                    // 1. whether the mojo declares itself an aggregator
-                    // 2. whether the mojo DOES NOT require a project to function (implicitly avoid reactor)
-                    if ( mojo != null && ( mojo.isAggregator() || !mojo.isProjectRequired() ) )
-                    {
-                        if ( currentSegment != null && !currentSegment.aggregate() )
-                        {
-                            segments.add( currentSegment );
-                            currentSegment = null;
-                        }
-
-                        if ( currentSegment == null )
-                        {
-                            currentSegment = new TaskSegment( true );
-                        }
-
-                        currentSegment.add( task );
-                    }
-                    else
-                    {
-                        if ( currentSegment != null && currentSegment.aggregate() )
-                        {
-                            segments.add( currentSegment );
-                            currentSegment = null;
-                        }
-
-                        if ( currentSegment == null )
-                        {
-                            currentSegment = new TaskSegment();
-                        }
-
-                        currentSegment.add( task );
-                    }
-                }
-            }
-
-            segments.add( currentSegment );
-        }
-        else
-        {
-            TaskSegment segment = new TaskSegment( false );
-            for ( Iterator i = tasks.iterator(); i.hasNext(); )
-            {
-                segment.add( (String) i.next() );
-            }
-            segments.add( segment );
-        }
-
-        return segments;
-    }
-
+    // 1. Find the lifecycle given the phase (default lifecycle when given install)
+    // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
+    // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
     private void executeGoal( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, BuildFailureException
     {
-        try
+        // 1. 
+        Lifecycle lifecycle = phaseToLifecycleMap.get( task );
+        
+        // 2. 
+        LifecycleMapping mapping = lifecycleMappings.get( project.getPackaging() );
+        
+        // 3.
+        Map<String,String> lifecyclePhases = mapping.getLifecycles().get( "default" ).getPhases();
+        
+        for( String phase : lifecycle.getPhases().values() )
         {
-            Stack forkEntryPoints = new Stack();
-            if ( getPhaseToLifecycleMap().containsKey( task ) )
+            System.out.println( ">> " + phase );
+        }
+                
+        /*
+        try
+        {            
+            if ( lifecycle != null )
             {
-                Lifecycle lifecycle = getLifecycleForPhase( task );
-
-                // we have a lifecycle phase, so lets bind all the necessary goals
-
                 Map lifecycleMappings = constructLifecycleMappings( session, task, project, lifecycle );
 
-                executeGoalWithLifecycle( task, forkEntryPoints, session, lifecycleMappings, project, lifecycle );
+                executeGoalWithLifecycle( task, session, lifecycleMappings, project, lifecycle );
             }
             else
             {
-                executeStandaloneGoal( task, forkEntryPoints, session, project );
+                executeStandaloneGoal( task, session, project );
             }
         }
         catch ( PluginNotFoundException e )
         {
             throw new BuildFailureException( "A required plugin was not found: " + e.getMessage(), e );
         }
+        */
     }
 
-    private void executeGoalWithLifecycle( String task, Stack forkEntryPoints, MavenSession session, Map lifecycleMappings, MavenProject project, Lifecycle lifecycle )
+    /*
+    private void executeGoalWithLifecycle( String task, MavenSession session, Map lifecycleMappings, MavenProject project, Lifecycle lifecycle )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
-        List goals = processGoalChain( task, lifecycleMappings, lifecycle );
+        List goals = new ArrayList();
+
+        // only execute up to the given phase
+        int index = lifecycle.getPhases().indexOf( task );
+
+        for ( int i = 0; i <= index; i++ )
+        {
+            String p = (String) lifecycle.getPhases().get( i );
+
+            List phaseGoals = (List) lifecycleMappings.get( p );
+
+            if ( phaseGoals != null )
+            {
+                goals.addAll( phaseGoals );
+            }
+        }
 
         if ( !goals.isEmpty() )
         {
-            executeGoals( goals, forkEntryPoints, session, project );
+            executeGoals( goals, session, project );
         }
         else
         {
             getLogger().info( "No goals needed for project - skipping" );
         }
     }
+    */
 
-    private void executeStandaloneGoal( String task, Stack forkEntryPoints, MavenSession session, MavenProject project )
+    private void executeStandaloneGoal( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         // guaranteed to come from the CLI and not be part of a phase
         MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project );
-        executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), forkEntryPoints, session, project );
+        executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), session, project );
     }
 
-    private void executeGoals( List goals, Stack forkEntryPoints, MavenSession session, MavenProject project )
+    private void executeGoals( List<MojoExecution> goals, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
-        for ( Iterator i = goals.iterator(); i.hasNext(); )
+        for ( MojoExecution mojoExecution : goals )
         {
-            MojoExecution mojoExecution = (MojoExecution) i.next();
-
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
-            if ( mojoDescriptor.getExecutePhase() != null || mojoDescriptor.getExecuteGoal() != null )
-            {
-                forkEntryPoints.push( mojoDescriptor );
-
-                forkLifecycle( mojoDescriptor, forkEntryPoints, session, project );
-
-                forkEntryPoints.pop();
-            }
 
             if ( mojoDescriptor.isRequiresReports() )
             {
-                List reports = getReports( project, forkEntryPoints, mojoExecution, session );
+                List reports = getReports( project, mojoExecution, session );
 
                 mojoExecution.setReports( reports );
-
-                for ( Iterator j = mojoExecution.getForkedExecutions().iterator(); j.hasNext(); )
-                {
-                    MojoExecution forkedExecution = (MojoExecution) j.next();
-                    MojoDescriptor descriptor = forkedExecution.getMojoDescriptor();
-
-                    if ( descriptor.getExecutePhase() != null )
-                    {
-                        forkEntryPoints.push( descriptor );
-
-                        forkLifecycle( descriptor, forkEntryPoints, session, project );
-
-                        forkEntryPoints.pop();
-                    }
-                }
             }
 
             try
@@ -574,7 +394,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private List getReports( MavenProject project, Stack forkEntryPoints, MojoExecution mojoExecution, MavenSession session )
+    private List getReports( MavenProject project, MojoExecution mojoExecution, MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         List reportPlugins = project.getReportPlugins();
@@ -644,7 +464,7 @@ public class DefaultLifecycleExecutor
 
                 if ( reportSets == null || reportSets.isEmpty() )
                 {
-                    reports.addAll( getReports( reportPlugin, forkEntryPoints, null, project, session, mojoExecution ) );
+                    reports.addAll( getReports( reportPlugin, null, project, session, mojoExecution ) );
                 }
                 else
                 {
@@ -652,7 +472,7 @@ public class DefaultLifecycleExecutor
                     {
                         ReportSet reportSet = (ReportSet) j.next();
 
-                        reports.addAll( getReports( reportPlugin, forkEntryPoints, reportSet, project, session, mojoExecution ) );
+                        reports.addAll( getReports( reportPlugin, reportSet, project, session, mojoExecution ) );
                     }
                 }
             }
@@ -660,7 +480,7 @@ public class DefaultLifecycleExecutor
         return reports;
     }
 
-    private List getReports( ReportPlugin reportPlugin, Stack forkEntryPoints, ReportSet reportSet, MavenProject project, MavenSession session, MojoExecution mojoExecution )
+    private List getReports( ReportPlugin reportPlugin, ReportSet reportSet, MavenProject project, MavenSession session, MojoExecution mojoExecution )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = loadReport( reportPlugin, project, session );
@@ -670,12 +490,6 @@ public class DefaultLifecycleExecutor
         for ( Iterator i = pluginDescriptor.getMojos().iterator(); i.hasNext(); )
         {
             MojoDescriptor mojoDescriptor = (MojoDescriptor) i.next();
-
-            if ( forkEntryPoints.contains( mojoDescriptor ) )
-            {
-                getLogger().debug( "Omitting report: " + mojoDescriptor.getFullGoalName() + " from reports list. It initiated part of the fork currently executing." );
-                continue;
-            }
 
             // TODO: check ID is correct for reports
             // if the POM configured no reports, give all from plugin
@@ -722,239 +536,7 @@ public class DefaultLifecycleExecutor
         return reports;
     }
 
-    private void forkLifecycle( MojoDescriptor mojoDescriptor, Stack ancestorLifecycleForkers, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
-    {
-        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-        getLogger().info( "Preparing " + pluginDescriptor.getGoalPrefix() + ":" + mojoDescriptor.getGoal() );
-
-        if ( mojoDescriptor.isAggregator() )
-        {
-            for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
-            {
-                MavenProject reactorProject = (MavenProject) i.next();
-
-                line();
-
-                getLogger().info( "Building " + reactorProject.getName() );
-
-                line();
-
-                forkProjectLifecycle( mojoDescriptor, ancestorLifecycleForkers, session, reactorProject );
-            }
-        }
-        else
-        {
-            forkProjectLifecycle( mojoDescriptor, ancestorLifecycleForkers, session, project );
-        }
-    }
-
-    private void forkProjectLifecycle( MojoDescriptor mojoDescriptor, Stack forkEntryPoints, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
-    {
-        forkEntryPoints.push( mojoDescriptor );
-
-        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-
-        String targetPhase = mojoDescriptor.getExecutePhase();
-
-        Map lifecycleMappings = null;
-        if ( targetPhase != null )
-        {
-            Lifecycle lifecycle = getLifecycleForPhase( targetPhase );
-
-            // Create new lifecycle
-            lifecycleMappings = constructLifecycleMappings( session, targetPhase, project, lifecycle );
-
-            String executeLifecycle = mojoDescriptor.getExecuteLifecycle();
-            if ( executeLifecycle != null )
-            {
-                org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
-                try
-                {
-                    lifecycleOverlay = pluginDescriptor.getLifecycleMapping( executeLifecycle );
-                }
-                catch ( IOException e )
-                {
-                    throw new LifecycleExecutionException( "Unable to read lifecycle mapping file: " + e.getMessage(), e );
-                }
-                catch ( XmlPullParserException e )
-                {
-                    throw new LifecycleExecutionException( "Unable to parse lifecycle mapping file: " + e.getMessage(), e );
-                }
-
-                if ( lifecycleOverlay == null )
-                {
-                    throw new LifecycleExecutionException( "Lifecycle '" + executeLifecycle + "' not found in plugin" );
-                }
-
-                for ( Iterator i = lifecycleOverlay.getPhases().iterator(); i.hasNext(); )
-                {
-                    Phase phase = (Phase) i.next();
-                    for ( Iterator j = phase.getExecutions().iterator(); j.hasNext(); )
-                    {
-                        Execution exec = (Execution) j.next();
-
-                        for ( Iterator k = exec.getGoals().iterator(); k.hasNext(); )
-                        {
-                            String goal = (String) k.next();
-
-                            PluginDescriptor lifecyclePluginDescriptor;
-                            String lifecycleGoal;
-
-                            // Here we are looking to see if we have a mojo from an external plugin.
-                            // If we do then we need to lookup the plugin descriptor for the externally
-                            // referenced plugin so that we can overly the execution into the lifecycle.
-                            // An example of this is the corbertura plugin that needs to call the surefire
-                            // plugin in forking mode.
-                            //
-                            //<phase>
-                            //  <id>test</id>
-                            //  <executions>
-                            //    <execution>
-                            //      <goals>
-                            //        <goal>org.apache.maven.plugins:maven-surefire-plugin:test</goal>
-                            //      </goals>
-                            //      <configuration>
-                            //        <classesDirectory>${project.build.directory}/generated-classes/cobertura</classesDirectory>
-                            //        <ignoreFailures>true</ignoreFailures>
-                            //        <forkMode>once</forkMode>
-                            //      </configuration>
-                            //    </execution>
-                            //  </executions>
-                            //</phase>
-
-                            // ----------------------------------------------------------------------
-                            //
-                            // ----------------------------------------------------------------------
-
-                            if ( goal.indexOf( ":" ) > 0 )
-                            {
-                                String[] s = StringUtils.split( goal, ":" );
-
-                                String groupId = s[0];
-                                String artifactId = s[1];
-                                lifecycleGoal = s[2];
-
-                                Plugin plugin = new Plugin();
-                                plugin.setGroupId( groupId );
-                                plugin.setArtifactId( artifactId );
-
-                                lifecyclePluginDescriptor = loadPlugin( plugin, project, session );
-                            }
-                            else
-                            {
-                                lifecyclePluginDescriptor = pluginDescriptor;
-                                lifecycleGoal = goal;
-                            }
-
-                            Xpp3Dom configuration = (Xpp3Dom) exec.getConfiguration();
-                            if ( phase.getConfiguration() != null )
-                            {
-                                configuration = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( (Xpp3Dom) phase.getConfiguration() ), configuration );
-                            }
-
-                            MojoDescriptor desc = getMojoDescriptor( lifecyclePluginDescriptor, lifecycleGoal );
-                            MojoExecution mojoExecution = new MojoExecution( desc, configuration );
-                            addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution, session );
-                        }
-                    }
-
-                    if ( phase.getConfiguration() != null )
-                    {
-                        // Merge in general configuration for a phase.
-                        // TODO: this is all kind of backwards from the POMM. Let's align it all under 2.1.
-                        //   We should create a new lifecycle executor for modelVersion >5.0.0
-                        for ( Iterator j = lifecycleMappings.values().iterator(); j.hasNext(); )
-                        {
-                            List tasks = (List) j.next();
-
-                            for ( Iterator k = tasks.iterator(); k.hasNext(); )
-                            {
-                                MojoExecution exec = (MojoExecution) k.next();
-
-                                Xpp3Dom configuration = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( (Xpp3Dom) phase.getConfiguration() ), exec.getConfiguration() );
-
-                                exec.setConfiguration( configuration );
-                            }
-                        }
-                    }
-
-                }
-            }
-
-            removeFromLifecycle( forkEntryPoints, lifecycleMappings );
-        }
-
-        MavenProject executionProject = new MavenProject( project );
-        if ( targetPhase != null )
-        {
-            Lifecycle lifecycle = getLifecycleForPhase( targetPhase );
-
-            executeGoalWithLifecycle( targetPhase, forkEntryPoints, session, lifecycleMappings, executionProject, lifecycle );
-        }
-        else
-        {
-            String goal = mojoDescriptor.getExecuteGoal();
-            MojoDescriptor desc = getMojoDescriptor( pluginDescriptor, goal );
-            executeGoals( Collections.singletonList( new MojoExecution( desc ) ), forkEntryPoints, session, executionProject );
-        }
-        project.setExecutionProject( executionProject );
-    }
-
-    private Lifecycle getLifecycleForPhase( String phase )
-        throws BuildFailureException, LifecycleExecutionException
-    {
-        Lifecycle lifecycle = (Lifecycle) getPhaseToLifecycleMap().get( phase );
-
-        if ( lifecycle == null )
-        {
-            throw new BuildFailureException( "Unable to find lifecycle for phase '" + phase + "'" );
-        }
-        return lifecycle;
-    }
-
-    MojoDescriptor getMojoDescriptor( PluginDescriptor pluginDescriptor, String goal )
-        throws LifecycleExecutionException
-    {
-        MojoDescriptor desc = pluginDescriptor.getMojo( goal );
-
-        if ( desc == null )
-        {
-            String message = "Required goal '" + goal + "' not found in plugin '" + pluginDescriptor.getGoalPrefix() + "'";
-            int index = goal.indexOf( ':' );
-            if ( index >= 0 )
-            {
-                String prefix = goal.substring( index + 1 );
-                if ( prefix.equals( pluginDescriptor.getGoalPrefix() ) )
-                {
-                    message = message + " (goals should not be prefixed - try '" + prefix + "')";
-                }
-            }
-            throw new LifecycleExecutionException( message );
-        }
-        return desc;
-    }
-
-    private void removeFromLifecycle( Stack lifecycleForkers, Map lifecycleMappings )
-    {
-        for ( Iterator lifecycleIterator = lifecycleMappings.values().iterator(); lifecycleIterator.hasNext(); )
-        {
-            List tasks = (List) lifecycleIterator.next();
-
-            for ( Iterator taskIterator = tasks.iterator(); taskIterator.hasNext(); )
-            {
-                MojoExecution execution = (MojoExecution) taskIterator.next();
-
-                if ( lifecycleForkers.contains( execution.getMojoDescriptor() ) )
-                {
-                    taskIterator.remove();
-                    getLogger().warn( "Removing: " + execution.getMojoDescriptor().getGoal() + " from forked lifecycle, to prevent recursive invocation." );
-                }
-            }
-        }
-    }
-
+    /*
     private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project, Lifecycle lifecycle )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
@@ -971,7 +553,9 @@ public class DefaultLifecycleExecutor
 
         return lifecycleMappings;
     }
+    */
 
+    /*
     private Map bindLifecycleForPackaging( MavenSession session, String selectedPhase, MavenProject project, Lifecycle lifecycle )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
@@ -1016,6 +600,7 @@ public class DefaultLifecycleExecutor
 
         return lifecycleMappings;
     }
+    */
 
     private Map findMappingsForLifecycle( MavenSession session, MavenProject project, Lifecycle lifecycle )
         throws LifecycleExecutionException, PluginNotFoundException
@@ -1030,8 +615,8 @@ public class DefaultLifecycleExecutor
         if ( mappings == null )
         {
             m = lifecycleMappings.get( packaging );
-                        
-            mappings = m.getPhases( lifecycle.getId() );                    
+
+            mappings = null; //m.getLifecycles().get( lifecycle.getId() );                    
         }
 
         if ( mappings == null )
@@ -1154,29 +739,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private List processGoalChain( String task, Map phaseMap, Lifecycle lifecycle )
-    {
-        List goals = new ArrayList();
-
-        // only execute up to the given phase
-        int index = lifecycle.getPhases().indexOf( task );
-
-        for ( int i = 0; i <= index; i++ )
-        {
-            String p = (String) lifecycle.getPhases().get( i );
-
-            List phaseGoals = (List) phaseMap.get( p );
-
-            if ( phaseGoals != null )
-            {
-                goals.addAll( phaseGoals );
-            }
-        }
-        return goals;
-    }
-
     // all this logic should go to the plugin manager
-    
+
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException
     {
@@ -1201,7 +765,7 @@ public class DefaultLifecycleExecutor
             // repository.
 
             plugin = pluginManager.findPluginForPrefix( prefix, project, session );
-            
+
             // Search plugin in the current POM
             if ( plugin == null )
             {
@@ -1238,23 +802,23 @@ public class DefaultLifecycleExecutor
         }
 
         if ( plugin.getVersion() == null )
-        {            
+        {
             for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
             {
                 Plugin buildPlugin = (Plugin) i.next();
-                
+
                 if ( buildPlugin.getKey().equals( plugin.getKey() ) )
                 {
                     plugin = buildPlugin;
                     break;
                 }
             }
-            
-            project.injectPluginManagementInfo( plugin );            
+
+            project.injectPluginManagementInfo( plugin );
         }
 
         PluginDescriptor pluginDescriptor = loadPlugin( plugin, project, session );
-        
+
         // this has been simplified from the old code that injected the plugin management stuff, since
         // pluginManagement injection is now handled by the project method.
         project.addPlugin( plugin );
@@ -1266,96 +830,6 @@ public class DefaultLifecycleExecutor
     protected void line()
     {
         getLogger().info( "------------------------------------------------------------------------" );
-    }
-
-    public Map getPhaseToLifecycleMap()
-        throws LifecycleExecutionException
-    {
-        if ( phaseToLifecycleMap == null )
-        {
-            phaseToLifecycleMap = new HashMap();
-
-            for ( Iterator i = lifecycles.iterator(); i.hasNext(); )
-            {
-                Lifecycle lifecycle = (Lifecycle) i.next();
-
-                for ( Iterator p = lifecycle.getPhases().iterator(); p.hasNext(); )
-                {
-                    String phase = (String) p.next();
-
-                    if ( phaseToLifecycleMap.containsKey( phase ) )
-                    {
-                        Lifecycle prevLifecycle = (Lifecycle) phaseToLifecycleMap.get( phase );
-                        throw new LifecycleExecutionException( "Phase '" + phase + "' is defined in more than one lifecycle: '" + lifecycle.getId() + "' and '" + prevLifecycle.getId() + "'" );
-                    }
-                    else
-                    {
-                        phaseToLifecycleMap.put( phase, lifecycle );
-                    }
-                }
-            }
-        }
-        return phaseToLifecycleMap;
-    }
-
-    private static class TaskSegment
-    {
-        private boolean aggregate;
-
-        private List tasks = new ArrayList();
-
-        TaskSegment()
-        {
-
-        }
-
-        TaskSegment( boolean aggregate )
-        {
-            this.aggregate = aggregate;
-        }
-
-        public String toString()
-        {
-            StringBuffer message = new StringBuffer();
-
-            message.append( " task-segment: [" );
-
-            for ( Iterator it = tasks.iterator(); it.hasNext(); )
-            {
-                String task = (String) it.next();
-
-                message.append( task );
-
-                if ( it.hasNext() )
-                {
-                    message.append( ", " );
-                }
-            }
-
-            message.append( "]" );
-
-            if ( aggregate )
-            {
-                message.append( " (aggregator-style)" );
-            }
-
-            return message.toString();
-        }
-
-        boolean aggregate()
-        {
-            return aggregate;
-        }
-
-        void add( String task )
-        {
-            tasks.add( task );
-        }
-
-        List<String> getTasks()
-        {
-            return tasks;
-        }
     }
 
     private PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
@@ -1381,6 +855,31 @@ public class DefaultLifecycleExecutor
         catch ( PluginLoaderException e )
         {
             throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly so
+        // that they don't interfere with internally defined lifecycles.
+
+        phaseToLifecycleMap = new HashMap();
+
+        for ( Iterator i = lifecycles.iterator(); i.hasNext(); )
+        {
+            Lifecycle lifecycle = (Lifecycle) i.next();
+
+            for ( Iterator p = lifecycle.getPhases().values().iterator(); p.hasNext(); )
+            {
+                String phase = (String) p.next();
+
+                // The first definition wins.
+                if ( !phaseToLifecycleMap.containsKey( phase ) )
+                {
+                    phaseToLifecycleMap.put( phase, lifecycle );
+                }
+            }
         }
     }
 }

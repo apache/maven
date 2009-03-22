@@ -19,8 +19,6 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,7 +34,7 @@ public class Lifecycle
     /**
      * Field phases
      */
-    private List<String> phases;
+    private Map<String,String> phases;
 
     /**
      * default phases.
@@ -44,35 +42,20 @@ public class Lifecycle
     private Map defaultPhases;
     
     /**
-     * Method addPhase
-     *
-     * @param phase
-     */
-    public void addPhase( String phase )
-    {
-        getPhases().add( phase );
-    } //-- void addPhase(Phase)
-
-    /**
      * Method getId
      */
     public String getId()
     {
         return this.id;
-    } //-- String getId() 
+    }
 
     /**
      * Method getPhases
      */
-    public List<String> getPhases()
+    public Map<String,String> getPhases()
     {
-        if ( this.phases == null )
-        {
-            this.phases = new ArrayList<String>();
-        }
-
         return this.phases;
-    } //-- java.util.List getPhases() 
+    }
 
     /**
      * Method setId
@@ -82,14 +65,14 @@ public class Lifecycle
     public void setId( String id )
     {
         this.id = id;
-    } //-- void setId(String) 
+    } 
 
     /**
      * Method setPhases
      *
      * @param phases
      */
-    public void setPhases( List phases )
+    public void setPhases( Map<String,String> phases )
     {
         this.phases = phases;
     } //-- void setPhases(java.util.List) 

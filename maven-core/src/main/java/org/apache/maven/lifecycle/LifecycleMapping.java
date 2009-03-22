@@ -21,13 +21,9 @@ package org.apache.maven.lifecycle;
 
 import java.util.Map;
 
-/**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- */
+import org.apache.maven.lifecycle.Lifecycle;
+
 public interface LifecycleMapping
-{
-    String ROLE = LifecycleMapping.class.getName();
-        
-    Map getPhases( String lifecycle );
+{        
+    Map<String,Lifecycle> getLifecycles();
 }

@@ -76,16 +76,12 @@ public class LifecycleExecutorTest
     public void testStandardLifecycle()
         throws Exception
     {
-        // - find the plugin [extension point: any client may wish to do whatever they choose]
-        // - load the plugin into a classloader [extension point: we want to take them from a repository, some may take from disk or whatever]
-        // - configure the plugin [extension point]
-        // - execute the plugin    
-
-        if ( !targetPom.getParentFile().exists() )
-        {
-            targetPom.getParentFile().mkdirs();
-        }
-
+        String base = "projects/lifecycle-executor/project-with-additional-lifecycle-elements";
+        File sourceDirectory = new File( getBasedir(), "src/test/" + base );
+        File targetDirectory = new File( getBasedir(), "target/" + base );
+        FileUtils.copyDirectoryStructure( sourceDirectory, targetDirectory );
+        File targetPom = new File( targetDirectory, "pom.xml" );        
+        
         ArtifactRepository localRepository = getLocalRepository();
 
         Repository repository = new Repository();
@@ -97,8 +93,8 @@ public class LifecycleExecutorTest
             .setRemoteRepositories( Arrays.asList( repositorySystem.buildArtifactRepository( repository ) ) );
 
         MavenProject project = projectBuilder.build( targetPom, configuration );
-        assertEquals( "maven", project.getArtifactId() );
-        assertEquals( "3.0-SNAPSHOT", project.getVersion() );
+        assertEquals( "project-with-additional-lifecycle-elements", project.getArtifactId() );
+        assertEquals( "1.0-SNAPSHOT", project.getVersion() );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setProjectPresent( true )

@@ -120,7 +120,6 @@ use a configuration source to pull in the lifecycle information.
       <configuration>
         <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
       </configuration>
-    </component>          
-     
-  </components>
+    </component>               
+  </components>  
 </component-set>
