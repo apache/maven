@@ -262,6 +262,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2362DeployedPomEncodingTest.class );
         suite.addTestSuite( MavenITmng2339BadProjectInterpolationTest.class );
         suite.addTestSuite( MavenITmng2318LocalParentResolutionTest.class );
+        suite.addTestSuite( MavenITmng2309ProfileInjectionOrderTest.class );
         suite.addTestSuite( MavenITmng2293CustomPluginParamImplTest.class );
         suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
