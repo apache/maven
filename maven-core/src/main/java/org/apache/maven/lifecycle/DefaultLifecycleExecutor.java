@@ -53,7 +53,6 @@ import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
-import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -856,7 +855,7 @@ public class DefaultLifecycleExecutor
 
                             MojoDescriptor desc = getMojoDescriptor( lifecyclePluginDescriptor, lifecycleGoal );
                             MojoExecution mojoExecution = new MojoExecution( desc, configuration );
-                            addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution, session.getSettings() );
+                            addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution, session );
                         }
                     }
 
@@ -1006,7 +1005,7 @@ public class DefaultLifecycleExecutor
                         throw new LifecycleExecutionException( "Mojo: \'" + goal + "\' requires direct invocation. It cannot be used as part of lifecycle: \'" + project.getPackaging() + "\'." );
                     }
 
-                    addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ), session.getSettings() );
+                    addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ), session );
                 }
             }
 
@@ -1106,8 +1105,6 @@ public class DefaultLifecycleExecutor
     private void bindPluginToLifecycle( Plugin plugin, MavenSession session, Map phaseMap, MavenProject project )
         throws LifecycleExecutionException
     {
-        Settings settings = session.getSettings();
-
         PluginDescriptor pluginDescriptor = loadPlugin( plugin, project, session );
 
         if ( pluginDescriptor.getMojos() != null && !pluginDescriptor.getMojos().isEmpty() )
@@ -1128,14 +1125,14 @@ public class DefaultLifecycleExecutor
                     {
                         PluginExecution execution = (PluginExecution) it.next();
 
-                        bindExecutionToLifecycle( pluginDescriptor, phaseMap, execution, settings );
+                        bindExecutionToLifecycle( pluginDescriptor, phaseMap, execution, session );
                     }
                 }
             }
         }
     }
 
-    private void bindExecutionToLifecycle( PluginDescriptor pluginDescriptor, Map phaseMap, PluginExecution execution, Settings settings )
+    private void bindExecutionToLifecycle( PluginDescriptor pluginDescriptor, Map phaseMap, PluginExecution execution, MavenSession session )
         throws LifecycleExecutionException
     {
         for ( Iterator i = execution.getGoals().iterator(); i.hasNext(); )
@@ -1168,13 +1165,13 @@ public class DefaultLifecycleExecutor
                         throw new LifecycleExecutionException( "Mojo: \'" + goal + "\' requires direct invocation. It cannot be used as part of the lifecycle (it was included via the POM)." );
                     }
 
-                    addToLifecycleMappings( phaseMap, phase, mojoExecution, settings );
+                    addToLifecycleMappings( phaseMap, phase, mojoExecution, session );
                 }
             }
         }
     }
 
-    private void addToLifecycleMappings( Map lifecycleMappings, String phase, MojoExecution mojoExecution, Settings settings )
+    private void addToLifecycleMappings( Map lifecycleMappings, String phase, MojoExecution mojoExecution, MavenSession session )
     {
         List goals = (List) lifecycleMappings.get( phase );
 
@@ -1185,7 +1182,7 @@ public class DefaultLifecycleExecutor
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-        if ( settings.isOffline() && mojoDescriptor.isOnlineRequired() )
+        if ( session.isOffline() && mojoDescriptor.isOnlineRequired() )
         {
             String goal = mojoDescriptor.getGoal();
             getLogger().warn( goal + " requires online mode, but maven is currently offline. Disabling " + goal + "." );
