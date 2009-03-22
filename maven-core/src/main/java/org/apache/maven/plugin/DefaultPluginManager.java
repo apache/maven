@@ -140,35 +140,24 @@ public class DefaultPluginManager
     @Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;    
     
-    private Map pluginDefinitionsByPrefix = new HashMap();
+    private Map<String,org.apache.maven.model.Plugin> pluginDefinitionsByPrefix = new HashMap<String,org.apache.maven.model.Plugin>();
     
     public DefaultPluginManager()
     {
         pluginDescriptorBuilder = new PluginDescriptorBuilder();
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
+    // This should be template method code for allowing subclasses to assist in contributing search/hint information
     public Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
     {
-        // TODO: since this is only used in the lifecycle executor, maybe it should be moved there? There is no other
-        // use for the mapping manager in here
         return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
     }
 
     public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException
-    {
-        if ( plugin.getGroupId() == null )
-        {
-            plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
-        }
-
+    {        
         try
-        {
-            
+        {            
             String pluginVersion = plugin.getVersion();
 
             logger.debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
@@ -183,14 +172,11 @@ public class DefaultPluginManager
 
                 logger.debug( "Resolved to version: " + pluginVersion );
             }
-             
-            System.out.println( "XXXXXXXXXXXXXXXXXXXXXXX " + plugin.getArtifactId() + ":" + plugin.getVersion() );
-            
+                         
             addPlugin( plugin, project, session );
             
             PluginDescriptor result = pluginCollector.getPluginDescriptor( plugin );
-            
-            
+                        
             project.addPlugin( plugin );
 
             return result;
@@ -335,7 +321,7 @@ public class DefaultPluginManager
 
             pluginDescriptor.setPluginArtifact( pluginArtifact ); 
             // Make sure it's just the plugin artifacts
-            pluginDescriptor.setArtifacts( new ArrayList( pluginArtifacts ) );
+            pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
             pluginDescriptor.setClassRealm( pluginRealm );
             
             pluginRealms.put( pluginKey( plugin ), pluginRealm );
@@ -842,13 +828,12 @@ public class DefaultPluginManager
             return;
         }
 
-        List parameters = mojoDescriptor.getParameters();
+        List<Parameter> parameters = mojoDescriptor.getParameters();
+        
         if ( ( parameters != null ) && !parameters.isEmpty() )
         {
-            for ( Iterator it = parameters.iterator(); it.hasNext(); )
+            for ( Parameter param : parameters )
             {
-                Parameter param = (Parameter) it.next();
-
                 if ( param.getDeprecated() != null )
                 {
                     boolean warnOfDeprecation = false;
@@ -926,14 +911,14 @@ public class DefaultPluginManager
     {
         // TODO: this should be built in to the configurator, as we presently double process the expressions
 
-        List parameters = goal.getParameters();
+        List<Parameter> parameters = goal.getParameters();
 
         if ( parameters == null )
         {
             return;
         }
 
-        List invalidParameters = new ArrayList();
+        List<Parameter> invalidParameters = new ArrayList<Parameter>();
 
         for ( int i = 0; i < parameters.size(); i++ )
         {
@@ -998,7 +983,7 @@ public class DefaultPluginManager
     private void validatePomConfiguration( MojoDescriptor goal, PlexusConfiguration pomConfiguration )
         throws PluginConfigurationException
     {
-        List parameters = goal.getParameters();
+        List<Parameter> parameters = goal.getParameters();
 
         if ( parameters == null )
         {
@@ -1050,10 +1035,8 @@ public class DefaultPluginManager
         {
             PlexusConfiguration fromMojo = mojoDescriptor.getMojoConfiguration();
 
-            for ( Iterator it = mojoDescriptor.getParameters().iterator(); it.hasNext(); )
+            for ( Parameter parameter : mojoDescriptor.getParameters() )
             {
-                Parameter parameter = (Parameter) it.next();
-
                 String paramName = parameter.getName();
                 String alias = parameter.getAlias();
                 String implementation = parameter.getImplementation();

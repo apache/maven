@@ -233,6 +233,7 @@ public class MavenEmbedderTest
         assertEquals( "somnambulance", p1.getProperties().getProperty( "occupation" ) );
     }
 
+    //TODO: This needs to be a separate test and we can't use production plugins for the test.
     /**
      * Test that two executions of the embedder don't share data that has changed, see MNG-3013
      *
@@ -249,12 +250,11 @@ public class MavenEmbedderTest
 
         File pom = new File( targetDirectory, "pom.xml" );
 
-        /* Add the surefire plugin 2.2 to the pom */
         Model model = mavenEmbedder.readModel( pom );
 
         Plugin plugin = new Plugin();
         plugin.setArtifactId( "maven-surefire-plugin" );
-        plugin.setVersion( "2.2" );
+        plugin.setVersion( "2.4.2" );
         model.setBuild( new Build() );
         model.getBuild().addPlugin( plugin );
 
@@ -273,10 +273,10 @@ public class MavenEmbedderTest
         MavenProject project = result.getProject();
 
         Artifact p = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
-        assertEquals( "2.2", p.getVersion() );
+        assertEquals( "2.4.2", p.getVersion() );
 
         /* Add the surefire plugin 2.3 to the pom */
-        plugin.setVersion( "2.3" );
+        plugin.setVersion( "2.4.3" );
         writer = WriterFactory.newXmlWriter( pom );
         mavenEmbedder.writeModel( writer, model );
         writer.close();
@@ -291,7 +291,7 @@ public class MavenEmbedderTest
         project = result.getProject();
 
         p = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
-        assertEquals( "2.3", p.getVersion() );
+        assertEquals( "2.4.3", p.getVersion() );
     }
 
     // ----------------------------------------------------------------------

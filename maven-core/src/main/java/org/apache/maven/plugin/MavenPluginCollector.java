@@ -29,19 +29,13 @@ import java.util.Set;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 
 public class MavenPluginCollector
     implements ComponentDiscoveryListener
 {
-    @Requirement
-    private Logger logger;
-    
     private Set pluginsInProcess = new HashSet();
 
     private Map<String, PluginDescriptor> pluginDescriptors = new HashMap();
