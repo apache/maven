@@ -30,7 +30,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
@@ -54,7 +53,6 @@ import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReport;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -80,6 +78,9 @@ public class DefaultLifecycleExecutor
 
     private Map phaseToLifecycleMap;
 
+    @Requirement
+    private Map<String,LifecycleMapping> lifecycleMappings;
+    
     public List<String> getLifecyclePhases()
     {
         for ( Lifecycle lifecycle : lifecycles )
@@ -976,8 +977,6 @@ public class DefaultLifecycleExecutor
     {
         Map mappings = findMappingsForLifecycle( session, project, lifecycle );
 
-        List optionalMojos = findOptionalMojosForLifecycle( session, project, lifecycle );
-
         Map lifecycleMappings = new HashMap();
 
         for ( Iterator i = lifecycle.getPhases().iterator(); i.hasNext(); )
@@ -1030,18 +1029,9 @@ public class DefaultLifecycleExecutor
 
         if ( mappings == null )
         {
-            try
-            {
-                m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
-                mappings = m.getPhases( lifecycle.getId() );
-            }
-            catch ( ComponentLookupException e )
-            {
-                if ( defaultMappings == null )
-                {
-                    throw new LifecycleExecutionException( "Cannot find lifecycle mapping for packaging: \'" + packaging + "\'.", e );
-                }
-            }
+            m = lifecycleMappings.get( packaging );
+                        
+            mappings = m.getPhases( lifecycle.getId() );                    
         }
 
         if ( mappings == null )
@@ -1057,35 +1047,6 @@ public class DefaultLifecycleExecutor
         }
 
         return mappings;
-    }
-
-    private List findOptionalMojosForLifecycle( MavenSession session, MavenProject project, Lifecycle lifecycle )
-        throws LifecycleExecutionException, PluginNotFoundException
-    {
-        String packaging = project.getPackaging();
-        List optionalMojos = null;
-
-        LifecycleMapping m;
-
-        if ( optionalMojos == null )
-        {
-            try
-            {
-                m = (LifecycleMapping) session.lookup( LifecycleMapping.ROLE, packaging );
-                optionalMojos = m.getOptionalMojos( lifecycle.getId() );
-            }
-            catch ( ComponentLookupException e )
-            {
-                getLogger().debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " + lifecycle.getId() + ". Error: " + e.getMessage(), e );
-            }
-        }
-
-        if ( optionalMojos == null )
-        {
-            optionalMojos = Collections.EMPTY_LIST;
-        }
-
-        return optionalMojos;
     }
 
     /**

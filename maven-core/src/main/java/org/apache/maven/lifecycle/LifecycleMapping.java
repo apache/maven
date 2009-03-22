@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.mapping;
+package org.apache.maven.lifecycle;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,7 +19,6 @@ package org.apache.maven.lifecycle.mapping;
  * under the License.
  */
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,8 +28,6 @@ import java.util.Map;
 public interface LifecycleMapping
 {
     String ROLE = LifecycleMapping.class.getName();
-
-    List getOptionalMojos( String lifecycle );
-    
+        
     Map getPhases( String lifecycle );
 }

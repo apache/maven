@@ -162,30 +162,19 @@ public class DefaultPluginManager
         {
             return pluginDescriptor;
         }
-                
+                        
         try
         {            
-            String pluginVersion = plugin.getVersion();
-
-            logger.debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
-            
-            if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
-            {
-                logger.debug( "Resolving version for plugin: " + plugin.getKey() );
-                
-                pluginVersion = resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, session );
-                
-                plugin.setVersion( pluginVersion );
-
-                logger.debug( "Resolved to version: " + pluginVersion );
-            }
-                         
+            resolvePluginVersion( plugin, project, session );
+                                     
             addPlugin( plugin, project, session );
             
-            // This does not appear to be caching anything really.
             pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
                         
             project.addPlugin( plugin );
+           
+            System.out.println( "AAA loading plugin " + pluginDescriptor.getArtifactId() + ":" + pluginDescriptor.getVersion() );        
+            System.out.println( "BBB realm: " + pluginDescriptor.getClassRealm() );
             
             return pluginDescriptor;
         }
@@ -732,6 +721,7 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
+        System.out.println( "XXX Looking for class realm " + pluginDescriptor.getArtifactId() + ":" + pluginDescriptor.getVersion() );
         
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
@@ -1489,20 +1479,29 @@ public class DefaultPluginManager
         return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
     }
 
-    public String resolvePluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
+    public void resolvePluginVersion( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
-    {
-        String version = null;
+    {        
+        String version = plugin.getVersion();
         
+        if ( version != null && !Artifact.RELEASE_VERSION.equals( version ) )
+        {
+            return;
+        }
+        
+        String groupId = plugin.getGroupId();
+        
+        String artifactId = plugin.getArtifactId();        
+                
         if ( project.getBuildPlugins() != null )
         {
             for ( Iterator it = project.getBuildPlugins().iterator(); it.hasNext() && ( version == null ); )
             {
-                Plugin plugin = (Plugin) it.next();
+                Plugin p = (Plugin) it.next();
 
-                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
+                if ( groupId.equals( p.getGroupId() ) && artifactId.equals( p.getArtifactId() ) )
                 {
-                    version = plugin.getVersion();
+                    version = p.getVersion();
                 }
             }
         }
@@ -1522,7 +1521,7 @@ public class DefaultPluginManager
             throw new PluginVersionNotFoundException( groupId, artifactId );
         }
 
-        return version;        
+        plugin.setVersion( version );
     }
 
     public String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
@@ -1616,6 +1615,7 @@ public class DefaultPluginManager
 
         ArtifactRepository localRepository = session.getLocalRepository();
 
+        // We need the POM for the actually plugin project so we can look at the prerequisite element.
         MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
 
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
@@ -1819,5 +1819,5 @@ public class DefaultPluginManager
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
-    }    
+    }
 }

@@ -124,8 +124,6 @@ public class MavenProject
 
     private List<String> scriptSourceRoots = new ArrayList<String>();
 
-    private List<ArtifactRepository> pluginArtifactRepositories;
-
     private ArtifactRepository releaseArtifactRepository;
 
     private ArtifactRepository snapshotArtifactRepository;
@@ -166,7 +164,6 @@ public class MavenProject
     private ProjectBuilderConfiguration projectBuilderConfiguration;
 
     private RepositorySystem repositorySystem;
-    //
 
     private File parentFile;
 
@@ -1350,7 +1347,6 @@ public class MavenProject
 
     public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
-        this.pluginArtifactRepositories = pluginArtifactRepositories;
     }
 
     /**

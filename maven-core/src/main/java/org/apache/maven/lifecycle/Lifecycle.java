@@ -36,13 +36,13 @@ public class Lifecycle
     /**
      * Field phases
      */
-    private List phases;
+    private List<String> phases;
 
     /**
      * default phases.
      */
     private Map defaultPhases;
-
+    
     /**
      * Method addPhase
      *
@@ -64,11 +64,11 @@ public class Lifecycle
     /**
      * Method getPhases
      */
-    public List getPhases()
+    public List<String> getPhases()
     {
         if ( this.phases == null )
         {
-            this.phases = new ArrayList();
+            this.phases = new ArrayList<String>();
         }
 
         return this.phases;
@@ -97,5 +97,5 @@ public class Lifecycle
     public Map getDefaultPhases()
     {
         return defaultPhases;
-    }
+    }    
 }
