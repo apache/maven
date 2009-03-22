@@ -1170,6 +1170,16 @@ public class PomConstructionTest
         assertEquals( "run", pom.getValue( "reporting/plugins[1]/reportSets[1]/reports[1]" ) );
     }
 
+    /* FIXME: MNG-2309
+    public void testProfileInjectionOrder()
+        throws Exception
+    {
+        PomTestWrapper pom =
+            buildPomFromMavenProject( "profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d" );
+        assertEquals( "e", pom.getValue( "properties[1]/pomProperty" ) );
+    }
+    //*/
+
 
     private void assertPathSuffixEquals( String expected, Object actual )
     {
@@ -1194,7 +1204,7 @@ public class PomConstructionTest
         return new PomTestWrapper( pomFile, mavenProjectBuilder.buildModel( pomFile, null, null, null ) );
     }
 
-    private PomTestWrapper buildPomFromMavenProject( String pomPath, String profileId )
+    private PomTestWrapper buildPomFromMavenProject( String pomPath, String... profileIds )
         throws IOException
     {
         File pomFile = new File( testDirectory , pomPath );
@@ -1205,9 +1215,9 @@ public class PomConstructionTest
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
         config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
         ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
-        if(profileId != null)
+        if ( profileIds != null )
         {
-            pCtx.setExplicitlyActiveProfileIds(Arrays.asList(profileId));
+            pCtx.setExplicitlyActiveProfileIds( Arrays.asList( profileIds ) );
         }
 
         config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
