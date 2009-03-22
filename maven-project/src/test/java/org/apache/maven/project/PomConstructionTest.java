@@ -1192,6 +1192,17 @@ public class PomConstructionTest
     }
     //*/
 
+    /* FIXME: MNG-4102
+    public void testInheritedPropertiesInterpolatedWithValuesFromChild()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "inherited-properties-interpolation/sub" );
+
+        assertEquals( "CHILD", pom.getValue( "properties/overridden" ) );
+        assertEquals( "CHILD", pom.getValue( "properties/interpolated" ) );
+    }
+    //*/
+
 
     private void assertPathSuffixEquals( String expected, Object actual )
     {
