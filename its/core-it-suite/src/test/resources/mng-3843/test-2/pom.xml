@@ -105,6 +105,7 @@ under the License.
 
   <properties>
     <parentProperty>parent-property</parentProperty>
+    <overriddenProperty>parent-property</overriddenProperty>
   </properties>
 
   <dependencyManagement>

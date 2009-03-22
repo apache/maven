@@ -186,6 +186,7 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "validate", props.getProperty( "project.build.defaultGoal" ) );
         assertEquals( "parent-property", props.getProperty( "project.properties.parentProperty" ) );
         assertEquals( "child-property", props.getProperty( "project.properties.childProperty" ) );
+        assertEquals( "child-override", props.getProperty( "project.properties.overriddenProperty" ) );
         assertEquals( "2.0.1", props.getProperty( "project.prerequisites.maven" ) );
         assertMissing( props, "project.modules." );
         assertEquals( "1", props.getProperty( "project.licenses" ) );

@@ -106,6 +106,7 @@ under the License.
 
   <properties>
     <childProperty>child-property</childProperty>
+    <overriddenProperty>child-override</overriddenProperty>
   </properties>
 
   <dependencyManagement>
