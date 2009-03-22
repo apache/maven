@@ -158,70 +158,68 @@ public class DefaultPluginManager
         return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
     }
 
-    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException, PluginVersionNotFoundException
+    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
+        throws PluginLoaderException
     {
-        String pluginVersion = plugin.getVersion();
-
-        // TODO: this should be possibly outside
-        // All version-resolution logic has been moved to DefaultPluginVersionManager.
-        logger.debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
-        
-        if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
+        if ( plugin.getGroupId() == null )
         {
-            logger.debug( "Resolving version for plugin: " + plugin.getKey() );
-            
-            pluginVersion = resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, session );
-            
-            plugin.setVersion( pluginVersion );
-
-            logger.debug( "Resolved to version: " + pluginVersion );
+            plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
         }
-        
-        return verifyVersionedPlugin( plugin, project, session );
-    }
 
-    private PluginDescriptor verifyVersionedPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, ArtifactNotFoundException, ArtifactResolutionException, InvalidPluginException, PluginManagerException, PluginNotFoundException
-    {
-        logger.debug( "In verifyVersionedPlugin for: " + plugin.getKey() );
-
-        // TODO: this might result in an artifact "RELEASE" being resolved continuously
-        // FIXME: need to find out how a plugin gets marked as 'installed'
-        // and no ChildContainer exists. The check for that below fixes
-        // the 'Can't find plexus container for plugin: xxx' error.
         try
-        {            
-            addPlugin( plugin, project, session );
+        {
+            
+            String pluginVersion = plugin.getVersion();
 
+            logger.debug( "Resolving plugin: " + plugin.getKey() + " with version: " + pluginVersion );
+            
+            if ( ( pluginVersion == null ) || Artifact.LATEST_VERSION.equals( pluginVersion ) || Artifact.RELEASE_VERSION.equals( pluginVersion ) )
+            {
+                logger.debug( "Resolving version for plugin: " + plugin.getKey() );
+                
+                pluginVersion = resolvePluginVersion( plugin.getGroupId(), plugin.getArtifactId(), project, session );
+                
+                plugin.setVersion( pluginVersion );
+
+                logger.debug( "Resolved to version: " + pluginVersion );
+            }
+             
+            System.out.println( "XXXXXXXXXXXXXXXXXXXXXXX " + plugin.getArtifactId() + ":" + plugin.getVersion() );
+            
+            addPlugin( plugin, project, session );
+            
+            PluginDescriptor result = pluginCollector.getPluginDescriptor( plugin );
+            
+            
             project.addPlugin( plugin );
+
+            return result;
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
         catch ( ArtifactNotFoundException e )
         {
-            String groupId = plugin.getGroupId();
-
-            String artifactId = plugin.getArtifactId();
-
-            String version = plugin.getVersion();
-
-            if ( ( groupId == null ) || ( artifactId == null ) || ( version == null ) )
-            {
-                throw new PluginNotFoundException( plugin, e );
-            }
-            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) && version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
-            {
-                throw new PluginNotFoundException( plugin, e );
-            }
-            else
-            {
-                throw e;
-            }
+            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
-
-        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
-
-        return pluginDescriptor;
-    }
+        catch ( PluginVersionResolutionException e )
+        {
+            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
+        }
+        catch ( InvalidPluginException e )
+        {
+            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
+        }
+        catch ( PluginManagerException e )
+        {
+            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
+        }
+        catch ( PluginVersionNotFoundException e )
+        {
+            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
+        }
+    }        
 
     // We need to load different 
     private Map<String,ClassRealm> pluginRealms = new HashMap<String,ClassRealm>();
@@ -295,7 +293,9 @@ public class DefaultPluginManager
                     // Not going to happen
                 }
             }
-                              
+             
+            pluginRealm.display();
+            
             try
             {
                 logger.debug( "Discovering components in realm: " + pluginRealm );
@@ -490,10 +490,8 @@ public class DefaultPluginManager
             
             try
             {
-                for ( Iterator i = projects.iterator(); i.hasNext(); )
+                for ( MavenProject p : projects )
                 {
-                    MavenProject p = (MavenProject) i.next();
-
                     resolveTransitiveDependencies( session, repositorySystem, mojoDescriptor.isDependencyResolutionRequired(), p, mojoDescriptor.isAggregator() );
                 }
 
@@ -697,13 +695,41 @@ public class DefaultPluginManager
             reportPlugin.setVersion( version );
         }
 
-        Plugin forLookup = new Plugin();
+        Plugin plugin = new Plugin();
 
-        forLookup.setGroupId( reportPlugin.getGroupId() );
-        forLookup.setArtifactId( reportPlugin.getArtifactId() );
-        forLookup.setVersion( version );
+        plugin.setGroupId( reportPlugin.getGroupId() );
+        plugin.setArtifactId( reportPlugin.getArtifactId() );
+        plugin.setVersion( version );
+        
+        try
+        {            
+            addPlugin( plugin, project, session );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            String groupId = plugin.getGroupId();
 
-        return verifyVersionedPlugin( forLookup, project, session );
+            String artifactId = plugin.getArtifactId();
+
+            String pluginVersion = plugin.getVersion();
+
+            if ( ( groupId == null ) || ( artifactId == null ) || ( pluginVersion == null ) )
+            {
+                throw new PluginNotFoundException( plugin, e );
+            }
+            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) && pluginVersion.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
+            {
+                throw new PluginNotFoundException( plugin, e );
+            }
+            else
+            {
+                throw e;
+            }
+        }
+
+        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
+
+        return pluginDescriptor;        
     }
 
     private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report, MojoExecution mojoExecution )
@@ -755,7 +781,7 @@ public class DefaultPluginManager
 
             if ( mojo instanceof ContextEnabled )
             {
-                Map pluginContext = session.getPluginContext( pluginDescriptor, project );
+                Map<String,Object> pluginContext = session.getPluginContext( pluginDescriptor, project );
 
                 if ( pluginContext != null )
                 {
@@ -1761,61 +1787,7 @@ public class DefaultPluginManager
                 }
             }
         }
-    }   
-    
-    // Plugin Loader
-    
-    /**
-     * Load the {@link PluginDescriptor} instance for the specified plugin, using the project for
-     * the {@link ArtifactRepository} and other supplemental plugin information as necessary.
-     */
-    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {               
-        if ( plugin.getGroupId() == null )
-        {
-            plugin.setGroupId( PluginDescriptor.getDefaultPluginGroupId() );
-        }
-
-        try
-        {
-            PluginDescriptor result = verifyPlugin( plugin, project, session );
-
-            // this has been simplified from the old code that injected the plugin management stuff, since
-            // pluginManagement injection is now handled by the project method.
-            project.addPlugin( plugin );
-
-            return result;
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginNotFoundException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginVersionResolutionException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( InvalidPluginException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginManagerException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginVersionNotFoundException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-    }
+    }           
 
     /**
      * Load the {@link PluginDescriptor} instance for the specified report plugin, using the project for

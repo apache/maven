@@ -69,7 +69,7 @@ public class ReactorManager
         }
     }
 
-    public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
+    public Map<String,Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
         Map pluginContextsByKey = (Map) pluginContextsByProjectAndPluginKey.get( project.getId() );
 

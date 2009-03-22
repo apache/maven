@@ -86,7 +86,7 @@ public class MavenSession
         this.eventDispatcher = Eventdispatcher;
     }
 
-    public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
+    public Map<String,Object> getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
     {
         if ( reactorManager == null )
         {

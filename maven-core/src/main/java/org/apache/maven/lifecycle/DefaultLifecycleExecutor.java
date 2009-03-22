@@ -241,7 +241,7 @@ public class DefaultLifecycleExecutor
                         session.setCurrentProject( rootProject );
 
                         // only call once, with the top-level project (assumed to be provided as a parameter)...
-                        for ( Iterator goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
+                        for ( Iterator<String> goalIterator = segment.getTasks().iterator(); goalIterator.hasNext(); )
                         {
                             String task = (String) goalIterator.next();
 
@@ -1217,6 +1217,8 @@ public class DefaultLifecycleExecutor
         return goals;
     }
 
+    // all this logic should go to the plugin manager
+    
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException
     {
@@ -1392,7 +1394,7 @@ public class DefaultLifecycleExecutor
             tasks.add( task );
         }
 
-        List getTasks()
+        List<String> getTasks()
         {
             return tasks;
         }
