@@ -152,10 +152,17 @@ public class DefaultPluginManager
     {
         return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
     }
-
+    
     public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {        
+        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
+                
+        if ( pluginDescriptor != null )
+        {
+            return pluginDescriptor;
+        }
+                
         try
         {            
             String pluginVersion = plugin.getVersion();
@@ -175,11 +182,12 @@ public class DefaultPluginManager
                          
             addPlugin( plugin, project, session );
             
-            PluginDescriptor result = pluginCollector.getPluginDescriptor( plugin );
+            // This does not appear to be caching anything really.
+            pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
                         
             project.addPlugin( plugin );
-
-            return result;
+            
+            return pluginDescriptor;
         }
         catch ( ArtifactResolutionException e )
         {
@@ -279,9 +287,7 @@ public class DefaultPluginManager
                     // Not going to happen
                 }
             }
-             
-            pluginRealm.display();
-            
+                         
             try
             {
                 logger.debug( "Discovering components in realm: " + pluginRealm );
