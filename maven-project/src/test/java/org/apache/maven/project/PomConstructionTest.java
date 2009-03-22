@@ -1180,6 +1180,18 @@ public class PomConstructionTest
     }
     //*/
 
+    /* FIXME
+    public void testPropertiesInheritance()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "properties-inheritance/sub" );
+
+        assertEquals( "parent-property", pom.getValue( "properties/parentProperty" ) );
+        assertEquals( "child-property", pom.getValue( "properties/childProperty" ) );
+        assertEquals( "child-override", pom.getValue( "properties/overriddenProperty" ) );
+    }
+    //*/
+
 
     private void assertPathSuffixEquals( String expected, Object actual )
     {

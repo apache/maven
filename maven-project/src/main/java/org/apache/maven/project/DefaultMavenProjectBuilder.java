@@ -373,7 +373,7 @@ public class DefaultMavenProjectBuilder
 
     private Model inject( Profile profile, Model model ) throws IOException
     {
-        return ProcessorContext.mergeProfileIntoModel( Arrays.asList(profile), model, false ).getModel();
+        return ProcessorContext.mergeProfilesIntoModel( Arrays.asList(profile), model, false ).getModel();
     }
 
     private MavenProject readModelFromLocalPath( String projectId, File pomFile, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, ProjectBuilderConfiguration config )
@@ -531,7 +531,7 @@ public class DefaultMavenProjectBuilder
             {
                  ProfileContext profileContext1 = new ProfileContext( dm.getModel().getProfiles(), activeProfileIds,
                                                                      inactiveProfileIds, properties );
-                 profileModels.add(ProcessorContext.mergeProfileIntoModel( profileContext1.getActiveProfiles(), dm.getModel(), 
+                 profileModels.add(ProcessorContext.mergeProfilesIntoModel( profileContext1.getActiveProfiles(), dm.getModel(), 
                                                                            dm.isMostSpecialized() ));               
             }
             else

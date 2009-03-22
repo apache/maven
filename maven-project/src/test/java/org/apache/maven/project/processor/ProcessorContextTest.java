@@ -43,7 +43,7 @@ public class ProcessorContextTest extends PlexusTestCase
         Profile profile = new Profile();
         profile.setModules( Arrays.asList( "m1", "m2" ) );
         
-        PomClassicDomainModel m = ProcessorContext.mergeProfileIntoModel( Arrays.asList( profile ), model, false );
+        PomClassicDomainModel m = ProcessorContext.mergeProfilesIntoModel( Arrays.asList( profile ), model, false );
         
         assertEquals(2, m.getModel().getModules().size());
     }
@@ -77,7 +77,7 @@ public class ProcessorContextTest extends PlexusTestCase
         profile.setBuild( b);
         
         
-        PomClassicDomainModel m = ProcessorContext.mergeProfileIntoModel( Arrays.asList( profile ), model, false );
+        PomClassicDomainModel m = ProcessorContext.mergeProfilesIntoModel( Arrays.asList( profile ), model, false );
         
         assertEquals(1, m.getModel().getBuild().getPluginManagement().getPlugins().size());
     }    

@@ -71,7 +71,7 @@ public class ProcessorContext
                                                                          ProjectUri.Build.Filters.filter,
                                                                          ProjectUri.Reporting.outputDirectory ) ) );   
 
-    public static PomClassicDomainModel mergeProfileIntoModel(Collection<Profile> profiles, Model model, boolean isMostSpecialized) throws IOException
+    public static PomClassicDomainModel mergeProfilesIntoModel(Collection<Profile> profiles, Model model, boolean isMostSpecialized) throws IOException
     {
         List<Model> profileModels = new ArrayList<Model>();
         profileModels.add( model );
