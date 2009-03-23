@@ -1189,16 +1189,25 @@ public class PomConstructionTest
     }
     //*/
 
-    /* FIXME: MNG-4102*/
-    public void testInheritedPropertiesInterpolatedWithValuesFromChild()
+    /* MNG-4102*/
+    public void testInheritedPropertiesInterpolatedWithValuesFromChildWithoutProfiles()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "inherited-properties-interpolation/sub" );
+        PomTestWrapper pom = buildPom( "inherited-properties-interpolation/no-profile/sub" );
 
         assertEquals( "CHILD", pom.getValue( "properties/overridden" ) );
         assertEquals( "CHILD", pom.getValue( "properties/interpolated" ) );
     }
-    //*/
+
+    /* MNG-4102 */
+    public void testInheritedPropertiesInterpolatedWithValuesFromChildWithActiveProfiles()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "inherited-properties-interpolation/active-profile/sub" );
+        buildPomFromMavenProject( "inherited-properties-interpolation/active-profile/sub", "it-parent", "it-child" );
+        assertEquals( "CHILD", pom.getValue( "properties/overridden" ) );
+        assertEquals( "CHILD", pom.getValue( "properties/interpolated" ) );
+    }
 
 
     private void assertPathSuffixEquals( String expected, Object actual )

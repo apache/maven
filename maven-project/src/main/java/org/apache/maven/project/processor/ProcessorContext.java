@@ -90,10 +90,7 @@ public class ProcessorContext
         
         Model target = processModelsForInheritance(profileModels, processors, false);
         
-        PomClassicDomainModel m = convertToDomainModel( target, true );
-        interpolateModelProperties(m.getModelProperties(), new ArrayList<InterpolatorProperty>(), m); 
-        
-        return new PomClassicDomainModel(m.getModelProperties(), isMostSpecialized);  
+        return convertToDomainModel( target, isMostSpecialized );
     }
     
     private static Model attachProfileNodesToModel(Profile profile)
