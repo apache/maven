@@ -127,6 +127,10 @@ public class ModelProcessor
         {
             t.setUrl( p.getUrl() +  t.getArtifactId() );
         }
+        else if (t.getUrl() != null)
+        {
+            t.setUrl( t.getUrl() + "/" + t.getArtifactId() );
+        }
         
         //Dependencies
         List<Dependency> deps = new ArrayList<Dependency>();

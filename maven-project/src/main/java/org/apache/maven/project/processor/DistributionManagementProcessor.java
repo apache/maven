@@ -56,6 +56,11 @@ public class DistributionManagementProcessor
         {
             copy( p.getDistributionManagement(), t.getDistributionManagement(), false, c.getArtifactId() );
         }
+        else if(t.getDistributionManagement() != null &&  t.getDistributionManagement().getSite() != null)
+        {
+            copySite( t.getDistributionManagement().getSite(), t.getDistributionManagement().getSite(), false, c.getArtifactId() );
+           // copy( t.getDistributionManagement(), t.getDistributionManagement(), isChildMostSpecialized, c.getArtifactId() );    
+        }
     }
 
     private static void copy( DistributionManagement source, DistributionManagement target, boolean isChild,
@@ -98,7 +103,7 @@ public class DistributionManagementProcessor
         {
             target.setSite( new Site() );
             copySite( source.getSite(), target.getSite(), isChild, artifactId );
-        }
+        } 
     }
 
     private static void copyRepository( DeploymentRepository source, DeploymentRepository target )
@@ -144,10 +149,15 @@ public class DistributionManagementProcessor
             {
                 target.setUrl( source.getUrl() );
             }
+
             else
             {
                 target.setUrl( source.getUrl() + "/" + artifactId );
             }
+        }
+        else 
+        {
+            target.setUrl( target.getUrl() + "/" + artifactId );
         }
     }
 

@@ -560,7 +560,7 @@ public class PomConstructionTest
         assertEquals( "http://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
     }
 
-    /* FIXME: MNG-3846
+    /* FIXME: MNG-3846*/
     public void testAppendArtifactIdOfParentAndChildToInheritedUrls()
         throws Exception
     {
