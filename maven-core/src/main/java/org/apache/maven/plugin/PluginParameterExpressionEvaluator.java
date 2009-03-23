@@ -19,6 +19,9 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Properties;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -29,11 +32,6 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 /**
  * @author Jason van Zyl
  * @version $Id$
@@ -42,24 +40,6 @@ import java.util.Properties;
 public class PluginParameterExpressionEvaluator
     implements ExpressionEvaluator
 {
-    private static final Map BANNED_EXPRESSIONS;
-
-    private static final Map DEPRECATED_EXPRESSIONS;
-
-    static
-    {
-        Map deprecated = new HashMap();
-
-        deprecated.put( "project.build.resources", "project.resources" );
-        deprecated.put( "project.build.testResources", "project.testResources" );
-
-        DEPRECATED_EXPRESSIONS = deprecated;
-
-        Map banned = new HashMap();
-
-        BANNED_EXPRESSIONS = banned;
-    }
-
     private final PathTranslator pathTranslator;
 
     private final MavenSession context;
@@ -210,18 +190,6 @@ public class PluginParameterExpressionEvaluator
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-        if ( BANNED_EXPRESSIONS.containsKey( expression ) )
-        {
-            throw new ExpressionEvaluationException( "The parameter expression: \'" + expression +
-                "\' used in mojo: \'" + mojoDescriptor.getGoal() + "\' is banned. Use \'" +
-                BANNED_EXPRESSIONS.get( expression ) + "\' instead." );
-        }
-        else if ( DEPRECATED_EXPRESSIONS.containsKey( expression ) )
-        {
-            logger.warn( "The parameter expression: \'" + expression + "\' used in mojo: \'" +
-                mojoDescriptor.getGoal() + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression ) +
-                "\' instead." );
-        }
 
         if ( "localRepository".equals( expression ) )
         {
