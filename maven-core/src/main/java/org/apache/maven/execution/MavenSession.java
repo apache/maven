@@ -52,13 +52,9 @@ public class MavenSession
 
     private ReactorManager reactorManager;
 
-    private boolean usingPOMsFromFilesystem = true;
-
     private MavenExecutionRequest request;
 
     private MavenProject currentProject;
-
-    private Stack forkedProjectStack = new Stack();
 
     private Map reports = new LinkedHashMap();
 
@@ -197,33 +193,6 @@ public class MavenSession
         return request;
     }
 
-    /**
-     * Push the existing currentProject onto the forked-project stack, and set the specified project
-     * as the new current project. This signifies the beginning of a new forked-execution context.
-     */
-    public void addForkedProject( MavenProject project )
-    {
-        forkedProjectStack.push( currentProject );
-        currentProject = project;
-    }
-
-    /**
-     * Peel off the last forked project from the stack, and restore it as the currentProject. This
-     * signifies the cleanup of a completed forked-execution context.
-     */
-    public MavenProject removeForkedProject()
-    {
-        if ( !forkedProjectStack.isEmpty() )
-        {
-            MavenProject lastCurrent = currentProject;
-            currentProject = (MavenProject) forkedProjectStack.pop();
-
-            return lastCurrent;
-        }
-
-        return null;
-    }
-
     public void setCurrentProject( MavenProject currentProject )
     {
         this.currentProject = currentProject;
@@ -296,5 +265,10 @@ public class MavenSession
     public boolean isOffline()
     {
         return request.isOffline();
+    }
+    
+    public ReactorManager getReactorManager()
+    {
+        return reactorManager;
     }
 }

@@ -33,9 +33,7 @@ import org.apache.maven.project.MavenProject;
 public interface LifecycleExecutor
 {    
     List<String> getLifecyclePhases();
-    
-    TaskValidationResult isTaskValid( String task, MavenSession session, MavenProject rootProject );
-    
-    void execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
+        
+    void execute( MavenSession session )
         throws LifecycleExecutionException, BuildFailureException;
 }

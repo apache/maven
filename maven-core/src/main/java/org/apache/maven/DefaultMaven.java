@@ -39,7 +39,6 @@ import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.lifecycle.TaskValidationResult;
 import org.apache.maven.monitor.event.DeprecationEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -115,48 +114,21 @@ public class DefaultMaven
 
         MavenSession session = createSession( request, reactorManager, dispatcher );
 
-        if ( request.getGoals() != null )
-        {
-            for ( Iterator i = request.getGoals().iterator(); i.hasNext(); )
-            {
-                String goal = (String) i.next();
-
-                if ( goal == null )
-                {
-                    i.remove();
-                    continue;
-                }
-
-                TaskValidationResult tvr = lifecycleExecutor.isTaskValid( goal, session, reactorManager.getTopLevelProject() );
-
-                if ( !tvr.isTaskValid() )
-                {
-                    Exception e = tvr.generateInvalidTaskException();
-                    result.addException( e );
-                    dispatcher.dispatchError( event, request.getBaseDirectory(), e );
-
-                    return result;
-                }
-            }
-        }
-
         logger.info( "Scanning for projects..." );
 
         if ( reactorManager.hasMultipleProjects() )
         {
             logger.info( "Reactor build order: " );
 
-            for ( Iterator i = reactorManager.getSortedProjects().iterator(); i.hasNext(); )
+            for( MavenProject project : reactorManager.getSortedProjects() )
             {
-                MavenProject project = (MavenProject) i.next();
-
                 logger.info( "  " + project.getName() );
             }
         }
 
         try
         {
-            lifecycleExecutor.execute( session, reactorManager, dispatcher );
+            lifecycleExecutor.execute( session );
         }
         catch ( LifecycleExecutionException e )
         {

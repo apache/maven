@@ -110,13 +110,14 @@ public class LifecycleExecutorTest
         
         ReactorManager reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
         
-        MavenSession session = new MavenSession( getContainer(), request, reactorManager );
+        EventDispatcher dispatcher = new DeprecationEventDispatcher( MavenEvents.DEPRECATIONS, request.getEventMonitors() );        
+        
+        MavenSession session = new MavenSession( getContainer(), request, reactorManager, dispatcher );
         //!!jvz This is not really quite right, take a look at how this actually works.
         session.setCurrentProject( project );
                 
-        EventDispatcher dispatcher = new DeprecationEventDispatcher( MavenEvents.DEPRECATIONS, request.getEventMonitors() );
                 
-        lifecycleExecutor.execute( session, reactorManager, dispatcher );
+        lifecycleExecutor.execute( session );
     }
     
     public void testRemoteResourcesPlugin()

@@ -29,9 +29,7 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -61,19 +59,12 @@ public class DefaultLifecycleExecutor
     @Requirement
     private Map<String, LifecycleMapping> lifecycleMappings;
 
-    /**
-     * Execute a task. Each task may be a phase in the lifecycle or the execution of a mojo.
-     * 
-     * @param session
-     * @param rm
-     * @param dispatcher
-     */
-    public void execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
+    public void execute( MavenSession session )
         throws BuildFailureException, LifecycleExecutionException
     {
         // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
         // within the same reactor (using an inclusion pattern to gather them up)...
-        MavenProject rootProject = rm.getTopLevelProject();
+        MavenProject rootProject = session.getReactorManager().getTopLevelProject();
 
         List<String> goals = session.getGoals();
 
@@ -92,7 +83,7 @@ public class DefaultLifecycleExecutor
             throw new BuildFailureException( "\n\nYou must specify at least one goal. Try 'mvn install' to build or 'mvn --help' for options \nSee http://maven.apache.org for more information.\n\n" );
         }
 
-        executeTaskSegments( goals, rm, session, rootProject, dispatcher );
+        executeTaskSegments( goals, session, rootProject );
     }
 
     public List<String> getLifecyclePhases()
@@ -108,86 +99,14 @@ public class DefaultLifecycleExecutor
         return null;
     }
 
-    public static boolean isValidPhaseName( final String phaseName )
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public TaskValidationResult isTaskValid( String task, MavenSession session, MavenProject rootProject )
-    {
-        //jvz: have to investigate plugins that are run without a root project or using Maven in reactor mode. Looks like we
-        // were never validating these anyway if you look in the execution code.
-
-        if ( rootProject != null )
-        {
-            if ( !isValidPhaseName( task ) )
-            {
-                // definitely a CLI goal, can use prefix
-                try
-                {
-                    getMojoDescriptorForDirectInvocation( task, session, rootProject );
-
-                    return new TaskValidationResult();
-                }
-                catch ( PluginLoaderException e )
-                {
-                    // TODO: shouldn't hit this, investigate using the same resolution logic as
-                    // others for plugins in the reactor
-
-                    return new TaskValidationResult( task, "Cannot find mojo descriptor for: \'" + task + "\' - Treating as non-aggregator.", e );
-                }
-                catch ( LifecycleExecutionException e )
-                {
-                    String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or"
-                        + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
-
-                    return new TaskValidationResult( task, message, e );
-                }
-                catch ( InvalidPluginException e )
-                {
-                    return new TaskValidationResult( task, e.getMessage(), e );
-                }
-            }
-        }
-
-        return new TaskValidationResult();
-    }
-
-    /**
-     * Retrieve the {@link MojoDescriptor} that corresponds to a given direct mojo invocation. This
-     * is used during the fail-fast method isTaskValid(..), and also during task-segmentation, to
-     * allow the lifecycle executor to determine whether the mojo is an aggregator.
-     * 
-     * @throws PluginLoaderException
-     */
-    private MojoDescriptor getMojoDescriptorForDirectInvocation( String task, MavenSession session, MavenProject project )
-        throws InvalidPluginException, PluginLoaderException, LifecycleExecutionException
-    {
-        MojoDescriptor descriptor;
-
-        try
-        {
-            descriptor = getMojoDescriptor( task, session, project );
-        }
-        catch ( LifecycleExecutionException e )
-        {
-            throw new LifecycleExecutionException( "Cannot find the specified goal.", e );
-        }
-
-        return descriptor;
-    }
-
-    private void executeTaskSegments( List<String> goals, ReactorManager rm, MavenSession session, MavenProject rootProject, EventDispatcher dispatcher )
+    private void executeTaskSegments( List<String> goals, MavenSession session, MavenProject rootProject )
         throws LifecycleExecutionException, BuildFailureException
     {
         List<MavenProject> sortedProjects = session.getSortedProjects();
 
         for ( MavenProject currentProject : sortedProjects )
         {
-            if ( !rm.isBlackListed( currentProject ) )
+            if ( !session.getReactorManager().isBlackListed( currentProject ) )
             {
                 line();
 
@@ -208,9 +127,9 @@ public class DefaultLifecycleExecutor
                     for ( String goal : goals )
                     {
                         String target = currentProject.getId() + " ( " + goal + " )";
-                        dispatcher.dispatchStart( event, target );
-                        executeGoalAndHandleFailures( goal, session, currentProject, dispatcher, event, rm, buildStartTime, target );
-                        dispatcher.dispatchEnd( event, target );
+                        session.getEventDispatcher().dispatchStart( event, target );
+                        executeGoalAndHandleFailures( goal, session, currentProject, event, session.getReactorManager(), buildStartTime, target );
+                        session.getEventDispatcher().dispatchEnd( event, target );
                     }
                 }
                 finally
@@ -218,12 +137,12 @@ public class DefaultLifecycleExecutor
                     session.setCurrentProject( null );
                 }
 
-                rm.registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
+                session.getReactorManager().registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
             }
         }
     }
 
-    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, EventDispatcher dispatcher, String event, ReactorManager rm, long buildStartTime, String target )
+    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, String event, ReactorManager rm, long buildStartTime, String target )
         throws BuildFailureException, LifecycleExecutionException
     {
         try
@@ -232,7 +151,7 @@ public class DefaultLifecycleExecutor
         }
         catch ( LifecycleExecutionException e )
         {
-            dispatcher.dispatchError( event, target, e );
+            session.getEventDispatcher().dispatchError( event, target, e );
 
             if ( handleExecutionFailure( rm, project, e, task, buildStartTime ) )
             {
@@ -241,7 +160,7 @@ public class DefaultLifecycleExecutor
         }
         catch ( BuildFailureException e )
         {
-            dispatcher.dispatchError( event, target, e );
+            session.getEventDispatcher().dispatchError( event, target, e );
 
             if ( handleExecutionFailure( rm, project, e, task, buildStartTime ) )
             {
