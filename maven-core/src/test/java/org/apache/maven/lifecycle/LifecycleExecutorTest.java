@@ -100,6 +100,13 @@ public class LifecycleExecutorTest
     // Tests which exercise the lifecycle executor when it is dealing with individual goals.
     // -----------------------------------------------------------------------------------------------
     
+    //TODO: These two tests display a lack of symmetry with respect to the input which is a free form string and the
+    //      mojo descriptor which comes back. All the free form parsing needs to be done somewhere else, this is
+    //      really the function of the CLI, and then the pre-processing of that output still needs to be fed into
+    //      a hinting process which helps flesh out the full specification of the plugin. The plugin manager should
+    //      only deal in concrete terms -- all version finding mumbo jumbo is a customization to base functionality
+    //      the plugin manager provides.
+    
     public void testRemoteResourcesPlugin()
         throws Exception
     {
@@ -153,6 +160,8 @@ public class LifecycleExecutorTest
         containerConfiguration.addComponentDiscoveryListener( new MavenPluginCollector() );
     }
     
+    //TODO: this is still a narly mess and shows it's still not layered properly. Once these tests look
+    //      a little better i'll be ready for the next round of refactoring in the plugin manager.
     protected MavenSession createMavenSession( File pom )
         throws Exception
     {
