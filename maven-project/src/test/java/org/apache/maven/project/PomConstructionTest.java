@@ -1176,23 +1176,23 @@ public class PomConstructionTest
     {
         PomTestWrapper pom =
             buildPomFromMavenProject( "profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d" );
+        
         assertEquals( "e", pom.getValue( "properties[1]/pomProperty" ) );
     }
     //*/
 
-    /* FIXME
+    /* FIXME*/
     public void testPropertiesInheritance()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "properties-inheritance/sub" );
-
         assertEquals( "parent-property", pom.getValue( "properties/parentProperty" ) );
         assertEquals( "child-property", pom.getValue( "properties/childProperty" ) );
         assertEquals( "child-override", pom.getValue( "properties/overriddenProperty" ) );
     }
     //*/
 
-    /* FIXME: MNG-4102
+    /* FIXME: MNG-4102*/
     public void testInheritedPropertiesInterpolatedWithValuesFromChild()
         throws Exception
     {

@@ -82,7 +82,7 @@ public class ProcessorContext
         
         List<Processor> processors =
             Arrays.asList( (Processor) new BuildProcessor( new ArrayList<Processor>() ),
-                           (Processor) new ProfilesModuleProcessor(), new PropertiesProcessor(), new ParentProcessor(),
+                           (Processor) new ProfilesModuleProcessor(), new ProfilePropertiesProcessor(), new ParentProcessor(),
                            new OrganizationProcessor(), new MailingListProcessor(), new IssueManagementProcessor(),
                            new CiManagementProcessor(), new ReportingProcessor(), new RepositoriesProcessor(), 
                            new DistributionManagementProcessor());
