@@ -98,11 +98,6 @@ use a configuration source to pull in the lifecycle information.
             </default-phases>
           </lifecycle>
         </lifecycles>
-        <!-- START SNIPPET: default-reports -->
-        <defaultReports>
-          <report>org.apache.maven.plugins:maven-project-info-reports-plugin:2.1</report>
-        </defaultReports>
-        <!-- END SNIPPET: default-reports -->
       </configuration>
     </component>
 
