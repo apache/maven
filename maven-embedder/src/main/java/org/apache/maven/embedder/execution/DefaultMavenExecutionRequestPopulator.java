@@ -192,22 +192,14 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         if ( !definedRepositories.contains( "central" ) )
-        {
-            Repository repo = new Repository();
-            repo.setId( "central" );
-            repo.setUrl( "http://repo1.maven.org/maven2" );
-            repo.setName( "Maven Repository Switchboard" );
-            RepositoryPolicy snapshotPolicy = new RepositoryPolicy();
-            snapshotPolicy.setEnabled( false );
-            repo.setSnapshots( snapshotPolicy );
+        {            
             try
             {
-                ArtifactRepository ar = repositorySystem.buildArtifactRepository( repo );
-                request.addRemoteRepository( ar );
+                request.addRemoteRepository( repositorySystem.createDefaultRemoteRepository() );
             }
             catch ( InvalidRepositoryException e )
             {
-                throw new MavenEmbedderException( "Cannot create remote repository " + repo.getId(), e );
+                throw new MavenEmbedderException( "Cannot create default remote repository.", e );
             }
         }
     }

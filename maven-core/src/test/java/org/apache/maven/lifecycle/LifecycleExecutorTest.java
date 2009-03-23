@@ -166,26 +166,23 @@ public class LifecycleExecutorTest
         throws Exception
     {
         ArtifactRepository localRepository = repositorySystem.createDefaultLocalRepository();
-
-        Repository repository = new Repository();
-        repository.setUrl( "http://repo1.maven.org/maven2" );
-        repository.setId( "central" );
-
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
-            .setLocalRepository( localRepository )
-            .setRemoteRepositories( Arrays.asList( repositorySystem.buildArtifactRepository( repository ) ) );
-
-        MavenProject project = projectBuilder.build( pom, configuration );
-
+        ArtifactRepository remoteRepository = repositorySystem.createDefaultRemoteRepository();
+        
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setProjectPresent( true )
             .setPluginGroups( Arrays.asList( new String[] { "org.apache.maven.plugins" } ) )
             .setLocalRepository( localRepository )
-            .setRemoteRepositories( Arrays.asList( repositorySystem.buildArtifactRepository( repository ) ) )
+            .setRemoteRepositories( Arrays.asList( remoteRepository ) )
             .setGoals( Arrays.asList( new String[] { "package" } ) )    
             .addEventMonitor( new DefaultEventMonitor( new ConsoleLogger( 0, "" ) ) )
             .setProperties( new Properties() );
 
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
+            .setLocalRepository( localRepository )
+            .setRemoteRepositories( Arrays.asList( remoteRepository ) );
+
+        MavenProject project = projectBuilder.build( pom, configuration );        
+        
         List projects = new ArrayList();
         projects.add( project );
         

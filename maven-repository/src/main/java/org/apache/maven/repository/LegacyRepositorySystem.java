@@ -314,9 +314,7 @@ public class LegacyRepositorySystem
 
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
     }
-
-    // From MavenExecutionRequestPopulator
-
+    
     public ArtifactRepository createDefaultLocalRepository()
         throws InvalidRepositoryException
     {
@@ -328,14 +326,20 @@ public class LegacyRepositorySystem
     {
         try
         {
-            return createRepository( localRepository.toURI().toURL().toString(), "maven.repo.local" );
+            return createRepository( localRepository.toURI().toURL().toString(), RepositorySystem.DEFAULT_LOCAL_REPO_ID );
         }
         catch ( MalformedURLException e )
         {
-            throw new InvalidRepositoryException( "Error creating local repository.", "maven.repo.local", e );
+            throw new InvalidRepositoryException( "Error creating local repository.", RepositorySystem.DEFAULT_LOCAL_REPO_ID, e );
         }
     }
 
+    public ArtifactRepository createDefaultRemoteRepository()
+        throws InvalidRepositoryException
+    {
+        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID );
+    }
+    
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException
     {
