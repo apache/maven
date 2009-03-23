@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import java.util.List;
 import java.util.Map;
@@ -334,17 +335,27 @@ public class DefaultMavenProjectBuilder
             }
         }
 
-        for ( Profile profile : projectProfiles )
+        try
         {
-            try
+            // TODO: Review why this blows up the tests when we inject all the profiles in one go
+            for ( Iterator<Profile> it = projectProfiles.iterator(); it.hasNext(); )
             {
-                model = inject( profile, model );
+                Profile profile = it.next();
+                PomClassicDomainModel dm =
+                    ProcessorContext.mergeProfilesIntoModel( Arrays.asList( profile ), model, false );
+                if ( !it.hasNext() )
+                {
+                    ProcessorContext.interpolateModelProperties( dm.getModelProperties(),
+                                                                 new ArrayList<InterpolatorProperty>(), dm );
+                    dm = new PomClassicDomainModel( dm.getModelProperties(), false );
+                }
+                model = dm.getModel();
             }
-            catch ( IOException e )
-            {
+        }
+        catch ( IOException e )
+        {
 
-                throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
-            }
+            throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
         }
 
         MavenProject project;
@@ -369,11 +380,6 @@ public class DefaultMavenProjectBuilder
         project.setActiveProfiles( projectProfiles );
 
         return project;
-    }
-
-    private Model inject( Profile profile, Model model ) throws IOException
-    {
-        return ProcessorContext.mergeProfilesIntoModel( Arrays.asList(profile), model, false ).getModel();
     }
 
     private MavenProject readModelFromLocalPath( String projectId, File pomFile, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, ProjectBuilderConfiguration config )
