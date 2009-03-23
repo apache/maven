@@ -74,12 +74,13 @@ public class ProcessorContext
     public static PomClassicDomainModel mergeProfilesIntoModel(Collection<Profile> profiles, Model model, boolean isMostSpecialized) throws IOException
     {
         List<Model> profileModels = new ArrayList<Model>();
-        profileModels.add( model );
+
         for(Profile profile : profiles)
         {
             profileModels.add( attachProfileNodesToModel(profile) );
         }
-        
+        Collections.reverse( profileModels );
+        profileModels.add( 0, model );
         List<Processor> processors =
             Arrays.asList( (Processor) new BuildProcessor( new ArrayList<Processor>() ),
                            (Processor) new ProfilesModuleProcessor(), new ProfilePropertiesProcessor(), new ParentProcessor(),

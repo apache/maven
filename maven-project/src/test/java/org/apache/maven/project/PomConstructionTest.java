@@ -121,7 +121,6 @@ public class PomConstructionTest
     	throws Exception 
     {
     	PomTestWrapper pom = buildPomFromMavenProject( "profile-properties-interpolation", "interpolation-profile" );
-    	System.out.println(pom.getDomainModel().asString());
     	assertEquals("PASSED", pom.getValue("properties[1]/test"));
     	assertEquals("PASSED", pom.getValue("properties[1]/property"));
     }
@@ -418,7 +417,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-plugin-exec-order/wo-plugin-mngt/sub" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
         assertEquals( "parent-1", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
         assertEquals( "parent-2", pom.getValue( "build/plugins[1]/executions[2]/goals[1]" ) );
@@ -431,7 +429,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-plugin-exec-order/w-plugin-mngt/sub" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
         assertEquals( "parent-1", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
         assertEquals( "parent-2", pom.getValue( "build/plugins[1]/executions[2]/goals[1]" ) );
@@ -454,7 +451,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-plugin-exec-goals-order/wo-plugin-mngt/sub" );
-        System.out.println(pom.getDomainModel().asString());
+
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/goals" ) ).size() );
         assertEquals( "child-a", pom.getValue( "build/plugins[1]/executions[1]/goals[1]" ) );
         assertEquals( "merged", pom.getValue( "build/plugins[1]/executions[1]/goals[2]" ) );
@@ -749,7 +746,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-config-merging/child" );
-        System.out.println(pom.getDomainModel().asString());
+
         String prefix = "build/plugins[1]/configuration/";
         assertEquals( "PASSED", pom.getValue( prefix + "propertiesFile" ) );
         assertEquals( "PASSED", pom.getValue( prefix + "parent" ) );
@@ -1170,13 +1167,13 @@ public class PomConstructionTest
         assertEquals( "run", pom.getValue( "reporting/plugins[1]/reportSets[1]/reports[1]" ) );
     }
 
-    /* FIXME: MNG-2309
+    /* FIXME: MNG-2309*/
     public void testProfileInjectionOrder()
         throws Exception
     {
         PomTestWrapper pom =
             buildPomFromMavenProject( "profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d" );
-        
+
         assertEquals( "e", pom.getValue( "properties[1]/pomProperty" ) );
     }
     //*/
