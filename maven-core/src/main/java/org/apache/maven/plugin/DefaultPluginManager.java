@@ -59,7 +59,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -353,7 +352,7 @@ public class DefaultPluginManager
         }
         
         /* get plugin managed versions */
-        Map pluginManagedDependencies = new HashMap();
+        Map<String,Artifact> pluginManagedDependencies = new HashMap<String,Artifact>();
         
         // This is really crappy that we have to do this. The repository system should deal with this. The retrieval of the transitive dependencies.
         
@@ -559,8 +558,6 @@ public class DefaultPluginManager
 
         // Event monitoring.
         String event = MavenEvents.MOJO_EXECUTION;
-        EventDispatcher dispatcher = session.getEventDispatcher();
-
         String goalExecId = goalName;
         if ( mojoExecution.getExecutionId() != null )
         {

@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.monitor.event.EventDispatcher;
@@ -127,8 +126,7 @@ public class MavenSession
         return container.lookup( role );
     }
 
-    public Object lookup( String role,
-                          String roleHint )
+    public Object lookup( String role, String roleHint )
         throws ComponentLookupException
     {
         return container.lookup( role, roleHint );
@@ -146,13 +144,13 @@ public class MavenSession
         return container.lookup( type, roleHint );
     }
 
-    public List lookupList( String role )
+    public List<Object> lookupList( String role )
         throws ComponentLookupException
     {
         return container.lookupList( role );
     }
 
-    public Map lookupMap( String role )
+    public Map<String,Object> lookupMap( String role )
         throws ComponentLookupException
     {
         return container.lookupMap( role );
