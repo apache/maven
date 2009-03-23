@@ -81,13 +81,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  */
 public class MavenEmbedder
 {
-    public static final String DEFAULT_LOCAL_REPO_ID = "local";
-
     public static final String userHome = System.getProperty( "user.home" );
 
     public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
-
-    public static final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
 
@@ -110,8 +106,6 @@ public class MavenEmbedder
 
     private MavenProjectBuilder mavenProjectBuilder;
 
-    private RepositorySystem repositorySystem;
-    
     private MavenXpp3Reader modelReader;
 
     private MavenXpp3Writer modelWriter;
@@ -458,7 +452,7 @@ public class MavenEmbedder
 
             populator = container.lookup( MavenExecutionRequestPopulator.class );
 
-            repositorySystem = container.lookup( RepositorySystem.class );
+            container.lookup( RepositorySystem.class );
             
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.

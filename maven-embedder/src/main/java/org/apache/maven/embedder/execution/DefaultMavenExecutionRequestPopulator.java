@@ -27,7 +27,6 @@ import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.embedder.Configuration;
-import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
@@ -412,12 +411,12 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( StringUtils.isEmpty( localRepositoryPath ) )
         {
-            localRepositoryPath = MavenEmbedder.defaultUserLocalRepository.getAbsolutePath();
+            localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
         }
 
         try
         {
-            return repositorySystem.createLocalRepository( localRepositoryPath, MavenEmbedder.DEFAULT_LOCAL_REPO_ID );
+            return repositorySystem.createLocalRepository( localRepositoryPath, RepositorySystem.DEFAULT_LOCAL_REPO_ID );
         }
         catch ( IOException e )
         {

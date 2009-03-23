@@ -64,7 +64,6 @@ import org.codehaus.plexus.util.StringUtils;
 public class LegacyRepositorySystem
     implements RepositorySystem
 {
-
     @Requirement
     private WagonManager wagonManager;
 
@@ -318,6 +317,12 @@ public class LegacyRepositorySystem
 
     // From MavenExecutionRequestPopulator
 
+    public ArtifactRepository createDefaultLocalRepository()
+        throws InvalidRepositoryException
+    {
+        return createLocalRepository( RepositorySystem.defaultUserLocalRepository );
+    }
+    
     public ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException
     {

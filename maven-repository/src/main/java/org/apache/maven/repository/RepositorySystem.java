@@ -42,6 +42,14 @@ import org.apache.maven.wagon.events.TransferListener;
  */
 public interface RepositorySystem
 {
+    static final String DEFAULT_LOCAL_REPO_ID = "local";
+    
+    static final String userHome = System.getProperty( "user.home" );
+    
+    static final File userMavenConfigurationHome = new File( userHome, ".m2" );
+    
+    static final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
+    
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
 
     Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId );
@@ -66,6 +74,9 @@ public interface RepositorySystem
     ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException;
 
+    ArtifactRepository createDefaultLocalRepository()
+        throws InvalidRepositoryException;
+    
     ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException;
     

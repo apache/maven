@@ -163,17 +163,10 @@ public class LifecycleExecutorTest
         containerConfiguration.addComponentDiscoveryListener( new MavenPluginCollector() );
     }
     
-    //!!jvz The repository system needs to know about the defaults for Maven, it's tied up in the embedder right now.
-    protected ArtifactRepository getLocalRepository()
-        throws InvalidRepositoryException
-    {
-        return repositorySystem.createLocalRepository( new File( "/Users/jvanzyl/.m2/repository" ) );
-    }
-
     protected MavenSession createMavenSession( File pom )
         throws Exception
     {
-        ArtifactRepository localRepository = getLocalRepository();
+        ArtifactRepository localRepository = repositorySystem.createDefaultLocalRepository();
 
         Repository repository = new Repository();
         repository.setUrl( "http://repo1.maven.org/maven2" );
