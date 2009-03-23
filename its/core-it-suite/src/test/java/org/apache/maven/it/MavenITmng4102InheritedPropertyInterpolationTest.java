@@ -43,11 +43,30 @@ public class MavenITmng4102InheritedPropertyInterpolationTest
     /**
      * Verify that the effective value of an inherited property reflects the values of any nested property
      * as defined by the child. This boils down to the order of inheritance and (parent) interpolation.
+     * This variation of the test has no profiles.
      */
-    public void testitMNG4102()
+    public void testitNoProfiles()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4102" );
+        testit( "no-profile" );
+    }
+
+    /**
+     * Verify that the effective value of an inherited property reflects the values of any nested property
+     * as defined by the child. This boils down to the order of inheritance and (parent) interpolation.
+     * This variation of the test has active profiles in parent and child (which should make no difference
+     * to the result).
+     */
+    public void testitActiveProfiles()
+        throws Exception
+    {
+        testit( "active-profile" );
+    }
+
+    private void testit( String project )
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4102/" + project );
 
         Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
