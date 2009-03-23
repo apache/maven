@@ -89,13 +89,10 @@ public class LifecycleExecutorTest
         File sourceDirectory = new File( getBasedir(), "src/test/" + base );
         File targetDirectory = new File( getBasedir(), "target/" + base );
         FileUtils.copyDirectoryStructure( sourceDirectory, targetDirectory );
-        File targetPom = new File( targetDirectory, "pom.xml" );        
-        
-        MavenSession session = createMavenSession( targetPom );
-        
+        File targetPom = new File( targetDirectory, "pom.xml" );                
+        MavenSession session = createMavenSession( targetPom );        
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
-        assertEquals( "1.0-SNAPSHOT", session.getCurrentProject().getVersion() );                
-                
+        assertEquals( "1.0-SNAPSHOT", session.getCurrentProject().getVersion() );                                
         lifecycleExecutor.execute( session );
     }
     
@@ -107,19 +104,11 @@ public class LifecycleExecutorTest
         throws Exception
     {
         MavenSession session = createMavenSession( targetPom );       
-
         String pluginArtifactId = "remote-resources";
         String goal = "process";
         MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( pluginArtifactId + ":" + goal, session, session.getCurrentProject() );
-
-        PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
-        assertNotNull( pd );
-        assertEquals( "org.apache.maven.plugins", pd.getGroupId() );
-        assertEquals( "maven-remote-resources-plugin", pd.getArtifactId() );
-        assertEquals( "1.0", pd.getVersion() );
-
+        assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-remote-resources-plugin", "1.0" );
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-
         pluginManager.executeMojo( session.getCurrentProject(), mojoExecution, session );
     }
 
@@ -127,20 +116,11 @@ public class LifecycleExecutorTest
         throws Exception
     {
         MavenSession session = createMavenSession( targetPom );       
-
         String pluginArtifactId = "surefire";
         String goal = "test";
         MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( pluginArtifactId + ":" + goal, session, session.getCurrentProject() );
-        assertNotNull( mojoDescriptor );
-        
-        PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
-        assertNotNull( pd );
-        assertEquals( "org.apache.maven.plugins", pd.getGroupId() );
-        assertEquals( "maven-surefire-plugin", pd.getArtifactId() );
-        assertEquals( "2.4.2", pd.getVersion() );
-
+        assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-surefire-plugin", "2.4.2" );
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-
         pluginManager.executeMojo( session.getCurrentProject(), mojoExecution, session );
     }
     
@@ -148,6 +128,16 @@ public class LifecycleExecutorTest
     // Testing help
     // -----------------------------------------------------------------------------------------------
 
+    protected void assertPluginDescriptor( MojoDescriptor mojoDescriptor, String groupId, String artifactId, String version )
+    {
+        assertNotNull( mojoDescriptor );        
+        PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
+        assertNotNull( pd );
+        assertEquals( groupId, pd.getGroupId() );
+        assertEquals( artifactId, pd.getArtifactId() );
+        assertEquals( version, pd.getVersion() );        
+    }
+    
     /**
      * We need to customize the standard Plexus container with the plugin discovery listener which
      * is what looks for the META-INF/maven/plugin.xml resources that enter the system when a

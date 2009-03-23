@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.maven.BuildFailureException;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
@@ -40,6 +41,11 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
+//TODO: The configuration for the lifecycle needs to be externalized so that I can use the annotations
+//      properly for the wiring and reference and external source for the lifecycle configuration.
+//TODO: Inside an IDE we are replacing the notion of our reactor with a workspace. In both of these cases
+//      we need to layer these as local repositories.
+
 /**
  * @author Jason van Zyl
  */
@@ -52,12 +58,13 @@ public class DefaultLifecycleExecutor
     @Requirement
     private PluginManager pluginManager;
 
+    @Requirement
+    private Map<String, LifecycleMapping> lifecycleMappings;
+    
+    // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")    
     private List<Lifecycle> lifecycles;
 
     private Map<String, Lifecycle> phaseToLifecycleMap;
-
-    @Requirement
-    private Map<String, LifecycleMapping> lifecycleMappings;
 
     public void execute( MavenSession session )
         throws BuildFailureException, LifecycleExecutionException
@@ -108,11 +115,7 @@ public class DefaultLifecycleExecutor
         {
             if ( !session.getReactorManager().isBlackListed( currentProject ) )
             {
-                line();
-
                 logger.info( "Building " + currentProject.getName() );
-
-                line();
 
                 // !! This is ripe for refactoring to an aspect.
                 // Event monitoring.
@@ -294,6 +297,22 @@ public class DefaultLifecycleExecutor
          */
     }
 
+    //TODO: which form is most useful. passing in string to parse is not really good.
+    
+    MojoDescriptor getMojoDescriptor( Artifact pluginArtifact, String goal, MavenSession session, MavenProject project )
+        throws LifecycleExecutionException
+    {
+        return null;
+    }    
+    
+    
+    MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, MavenSession session, MavenProject project )
+        throws LifecycleExecutionException
+    {
+        return null;
+    }    
+    
+    // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException
     {
@@ -374,11 +393,6 @@ public class DefaultLifecycleExecutor
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
         return mojoDescriptor;
-    }
-
-    protected void line()
-    {
-        logger.info( "------------------------------------------------------------------------" );
     }
 
     private PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
