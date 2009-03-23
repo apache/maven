@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.mapping;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -18,8 +18,6 @@ package org.apache.maven.lifecycle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.lifecycle.Lifecycle;
 
 public class DefaultLifecycleMapping
     implements LifecycleMapping

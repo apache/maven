@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.mapping;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,31 +19,66 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Class Lifecycle.
  */
 public class Lifecycle
 {
+    /**
+     * Field id
+     */
     private String id;
 
-    private List<String> phases;
+    /**
+     * Field phases
+     */
+    private Map<String,String> phases;
+
+    /**
+     * default phases.
+     */
+    private Map defaultPhases;
     
-    private List<String> defaultPhases;
-    
+    /**
+     * Method getId
+     */
     public String getId()
     {
         return this.id;
     }
 
-    public List<String> getPhases()
+    /**
+     * Method getPhases
+     */
+    public Map<String,String> getPhases()
     {
         return this.phases;
     }
-    
-    public List<String> getDefaultPhases()
+
+    /**
+     * Method setId
+     *
+     * @param id
+     */
+    public void setId( String id )
+    {
+        this.id = id;
+    } 
+
+    /**
+     * Method setPhases
+     *
+     * @param phases
+     */
+    public void setPhases( Map<String,String> phases )
+    {
+        this.phases = phases;
+    } //-- void setPhases(java.util.List) 
+
+    public Map getDefaultPhases()
     {
         return defaultPhases;
-    }
+    }    
 }

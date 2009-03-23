@@ -25,9 +25,9 @@ problem.
       </configuration>
     </component>     
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping</role>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>pom</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping</implementation>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <lifecycles>
           <lifecycle>
@@ -58,9 +58,9 @@ problem.
       </configuration>
     </component>
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping</role>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>jar</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping</implementation>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <lifecycles>
           <lifecycle>
@@ -98,10 +98,10 @@ problem.
       </configuration>
     </component>
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping
       </role>
       <role-hint>ejb</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
       </implementation>
       <configuration>
         <lifecycles>
@@ -160,9 +160,9 @@ problem.
       </configuration>
     </component>   
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping</role>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>ejb3</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping</implementation>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <!-- START SNIPPET: ejb3-lifecycle -->
         <phases>
@@ -215,9 +215,9 @@ problem.
       </configuration>
     </component>
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping</role>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>maven-plugin</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping</implementation>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <lifecycles>
           <lifecycle>
@@ -300,9 +300,9 @@ problem.
       </configuration>
     </component>
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping</role>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>war</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping</implementation>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <lifecycles>
           <lifecycle>
@@ -342,9 +342,9 @@ problem.
       </configuration>
     </component>
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping</role>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>ear</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping</implementation>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <lifecycles>
           <lifecycle>
@@ -381,9 +381,9 @@ problem.
       </configuration>
     </component>
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping</role>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>rar</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping</implementation>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <lifecycles>
           <lifecycle>
@@ -423,9 +423,9 @@ problem.
       </configuration>
     </component>
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleMapping</role>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>par</role-hint>
-      <implementation>org.apache.maven.lifecycle.DefaultLifecycleMapping</implementation>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <!-- START SNIPPET: par-lifecycle -->
         <phases>

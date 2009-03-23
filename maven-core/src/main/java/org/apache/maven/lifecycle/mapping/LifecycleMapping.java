@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle.mapping;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,8 +20,6 @@ package org.apache.maven.lifecycle;
  */
 
 import java.util.Map;
-
-import org.apache.maven.lifecycle.Lifecycle;
 
 public interface LifecycleMapping
 {        

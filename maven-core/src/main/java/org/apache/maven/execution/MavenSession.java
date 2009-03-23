@@ -111,7 +111,7 @@ public class MavenSession
         return request.getLocalRepository();
     }
 
-    public List getGoals()
+    public List<String> getGoals()
     {
         return request.getGoals();
     }
