@@ -50,7 +50,6 @@ public class DependencyProcessor
             {
                 isAdd = false;
             }
-            //Dependency targetDependency = new Dependency();
             copy( (Dependency) child, targetDependency, false );
             if(isAdd) t.add( targetDependency );
         }

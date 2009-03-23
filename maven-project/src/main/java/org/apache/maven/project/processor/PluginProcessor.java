@@ -53,7 +53,8 @@ public class PluginProcessor
                 isAdd = false;
             }
             
-            copy( (Plugin) child, targetPlugin, isChildMostSpecialized );
+            copy( (Plugin) child, targetPlugin, true );
+            copyDependencies( (Plugin) child, targetPlugin, true );
             if(isAdd) t.add( targetPlugin );
         }
         else if ( parent != null && child == null )
@@ -70,6 +71,7 @@ public class PluginProcessor
             }
             
             copy( (Plugin) parent, targetPlugin, false );
+            copyDependencies( (Plugin) parent, targetPlugin, false );
             if(isAdd) t.add( targetPlugin );
         }
         else
@@ -88,14 +90,20 @@ public class PluginProcessor
                     isAdd = false;
                 }                 
                 copy( (Plugin) parent, targetPlugin, false );
-                copy( (Plugin) child, targetPlugin, isChildMostSpecialized );
+                copy( (Plugin) child, targetPlugin, true );
+                
+                copyDependencies( (Plugin) child, targetPlugin, true );
+                copyDependencies( (Plugin) parent, targetPlugin, false );
                 if(isAdd) t.add( targetPlugin ); 
             } 
             else
             {
                 Plugin targetPlugin = new Plugin();
                 copy( (Plugin) parent, targetPlugin, false );
-                copy( (Plugin) child, targetPlugin, isChildMostSpecialized );
+                copy( (Plugin) child, targetPlugin, true );
+                
+                copyDependencies( (Plugin) child, targetPlugin, true );
+                copyDependencies( (Plugin) parent, targetPlugin, false );
                 t.add( targetPlugin );    
             }  
         }       
@@ -123,7 +131,15 @@ public class PluginProcessor
         StringBuilder sb = new StringBuilder();
         sb.append( d.getGroupId() ).append( ":" ).append( d.getArtifactId() ).append( ":" );
         return sb.toString();
-    }       
+    }    
+    
+    
+    private static void copyDependencies(Plugin source, Plugin target, boolean isChild)
+    {
+        DependenciesProcessor proc = new DependenciesProcessor();
+        proc.process( new ArrayList<Dependency>(), new ArrayList<Dependency>(source.getDependencies()), target.getDependencies(), isChild );            
+    }
+    
     
     private static void copy(Plugin source, Plugin target, boolean isChild)
     {
@@ -166,16 +182,7 @@ public class PluginProcessor
             
         }
      
-        DependenciesProcessor proc = new DependenciesProcessor();
-        if(target.getDependencies().isEmpty())
-        {
-            
-            proc.process( new ArrayList<Dependency>(), new ArrayList<Dependency>(source.getDependencies()), target.getDependencies(), false );            
-        }
-        else
-        {
-            proc.process( new ArrayList<Dependency>(source.getDependencies()), new ArrayList<Dependency>(), target.getDependencies(), false );            
-        }
+
 
         if(source.getConfiguration() != null)
         {
