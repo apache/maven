@@ -38,7 +38,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
@@ -46,11 +46,10 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
  * @author Jason van Zyl
  */
 public class DefaultLifecycleExecutor
-    extends AbstractLogEnabled
     implements LifecycleExecutor, Initializable
 {
-    //@Requirement
-    //private getLogger() getLogger();
+    @Requirement
+    private Logger logger;
 
     @Requirement
     private PluginManager pluginManager;
@@ -192,7 +191,7 @@ public class DefaultLifecycleExecutor
             {
                 line();
 
-                getLogger().info( "Building " + currentProject.getName() );
+                logger.info( "Building " + currentProject.getName() );
 
                 line();
 
@@ -460,7 +459,7 @@ public class DefaultLifecycleExecutor
 
     protected void line()
     {
-        getLogger().info( "------------------------------------------------------------------------" );
+        logger.info( "------------------------------------------------------------------------" );
     }
 
     private PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
