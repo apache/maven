@@ -334,6 +334,10 @@ public class MavenProject
     {
         if ( parent == null )
         {
+            /*
+             * TODO: This is suboptimal. Without a cache in the project builder, rebuilding the parent chain currently
+             * causes O(n^2) parser invocations for an inheritance hierarchy of depth n.
+             */
             if ( parentFile != null )
             {
                 try
