@@ -82,11 +82,14 @@ public class ProcessorContext
         Collections.reverse( profileModels );
         profileModels.add( 0, model );
         List<Processor> processors =
-            Arrays.asList( (Processor) new BuildProcessor( new ArrayList<Processor>() ),
-                           (Processor) new ProfilesModuleProcessor(), new ProfilePropertiesProcessor(), new ParentProcessor(),
-                           new OrganizationProcessor(), new MailingListProcessor(), new IssueManagementProcessor(),
-                           new CiManagementProcessor(), new ReportingProcessor(), new RepositoriesProcessor(), 
-                           new DistributionManagementProcessor());
+            Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ), new ProfilesModuleProcessor(),
+                                       new ProfilePropertiesProcessor(), new ParentProcessor(),
+                                       new OrganizationProcessor(), new MailingListProcessor(),
+                                       new IssueManagementProcessor(), new CiManagementProcessor(),
+                                       new ReportingProcessor(), new RepositoriesProcessor(),
+                                       new DistributionManagementProcessor(), new LicensesProcessor(),
+                                       new ScmProcessor(), new PrerequisitesProcessor(), new ContributorsProcessor(),
+                                       new DevelopersProcessor() );
         
         Model target = processModelsForInheritance(profileModels, processors, false);
         

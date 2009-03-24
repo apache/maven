@@ -337,20 +337,11 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            // TODO: Review why this blows up the tests when we inject all the profiles in one go
-            for ( Iterator<Profile> it = projectProfiles.iterator(); it.hasNext(); )
-            {
-                Profile profile = it.next();
-                PomClassicDomainModel dm =
-                    ProcessorContext.mergeProfilesIntoModel( Arrays.asList( profile ), model, false );
-                if ( !it.hasNext() )
-                {
-                    ProcessorContext.interpolateModelProperties( dm.getModelProperties(),
-                                                                 new ArrayList<InterpolatorProperty>(), dm );
-                    dm = new PomClassicDomainModel( dm.getModelProperties(), false );
-                }
-                model = dm.getModel();
-            }
+            PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, model, false );
+            ProcessorContext.interpolateModelProperties( dm.getModelProperties(),
+                                                         new ArrayList<InterpolatorProperty>(), dm );
+            dm = new PomClassicDomainModel( dm.getModelProperties(), false );
+            model = dm.getModel();
         }
         catch ( IOException e )
         {
