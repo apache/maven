@@ -229,7 +229,15 @@ public final class MavenDomainModel
             }
             else if ( mp.getUri().equals( ProjectUri.Dependencies.Dependency.type ) )
             {
-                metadata.setType( mp.getResolvedValue() );
+                String val = mp.getResolvedValue();
+                // 2009-03-23 Oleg: TODO ask Shane where this really belongs?
+                if( "test-jar".equals( val ) )
+                {
+                    metadata.setType( "jar" );
+                    metadata.setClassifier( "tests" );
+                }
+                else
+                    metadata.setType( val );
             }
             else if ( mp.getUri().equals( ProjectUri.Dependencies.Dependency.optional ) )
             {
