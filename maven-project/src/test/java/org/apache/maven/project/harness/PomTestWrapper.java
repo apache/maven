@@ -121,11 +121,20 @@ public class PomTestWrapper
 
     public PomClassicDomainModel getDomainModel()
     {
-        if(domainModel == null && mavenProject != null)
+        if ( domainModel == null && mavenProject != null )
         {
-            try {
-                return convertToDomainModel(mavenProject.getModel());
-            } catch (IOException e) {
+            try
+            {
+                domainModel = convertToDomainModel( mavenProject.getModel() );
+                int lineageCount = 1;
+                for ( MavenProject parent = mavenProject.getParent(); parent != null; parent = parent.getParent() )
+                {
+                    lineageCount++;
+                }
+                domainModel.setLineageCount( lineageCount );
+            }
+            catch ( IOException e )
+            {
 
             }
         }

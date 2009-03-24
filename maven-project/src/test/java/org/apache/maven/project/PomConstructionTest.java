@@ -68,7 +68,7 @@ public class PomConstructionTest
     public void testEmptyUrl()
         throws Exception
     {
-        buildPomFromMavenProject( "empty-distMng-repo-url", null );
+        buildPom( "empty-distMng-repo-url", null );
     }
 
     /**
@@ -80,7 +80,7 @@ public class PomConstructionTest
     public void testProfileModules()
         throws Exception
     {
-        PomTestWrapper pom = buildPomFromMavenProject( "profile-module", "a" );
+        PomTestWrapper pom = buildPom( "profile-module", "a" );
         assertEquals( "test-prop", pom.getValue( "properties[1]/b" ) );// verifies profile applied
         assertEquals( 4, ( (List<?>) pom.getValue( "modules" ) ).size() );
         assertEquals( "module-2", pom.getValue( "modules[1]" ) );
@@ -120,7 +120,7 @@ public class PomConstructionTest
     public void testProfilePropertiesInterpolation()
     	throws Exception 
     {
-    	PomTestWrapper pom = buildPomFromMavenProject( "profile-properties-interpolation", "interpolation-profile" );
+    	PomTestWrapper pom = buildPom( "profile-properties-interpolation", "interpolation-profile" );
     	assertEquals("PASSED", pom.getValue("properties[1]/test"));
     	assertEquals("PASSED", pom.getValue("properties[1]/property"));
     }
@@ -187,7 +187,7 @@ public class PomConstructionTest
     public void testParentInterpolation()
         throws Exception
     {
-        PomTestWrapper pom = buildPomFromMavenProject( "parent-interpolation/sub", null );
+        PomTestWrapper pom = buildPom( "parent-interpolation/sub", null );
         pom = new PomTestWrapper(pom.getMavenProject().getParent());
         assertEquals( "1.3.0-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
     }
@@ -217,7 +217,7 @@ public class PomConstructionTest
     public void testPluginManagementDependencies()
         throws Exception
     {
-        PomTestWrapper pom = buildPomFromMavenProject( "plugin-management-dependencies/sub", "test" );
+        PomTestWrapper pom = buildPom( "plugin-management-dependencies/sub", "test" );
         assertEquals( "1.0-alpha-21", pom.getValue( "build/plugins[1]/version" ) );
         assertEquals( "1.0", pom.getValue( "build/plugins[1]/dependencies[1]/version" ) );
     }
@@ -227,7 +227,7 @@ public class PomConstructionTest
     public void testReportingInterpolation()
         throws Exception
     {
-        PomTestWrapper pom = buildPomFromMavenProject( "reporting-interpolation", null );
+        PomTestWrapper pom = buildPom( "reporting-interpolation", null );
         pom = new PomTestWrapper(pom.getMavenProject());
         assertEquals( createPath(Arrays.asList(System.getProperty("user.dir"),
                 "src", "test", "resources-project-builder", "reporting-interpolation", "target", "site")),
@@ -493,7 +493,7 @@ public class PomConstructionTest
     }
 
 
-    /* FIXME: cf. MNG-3906*/
+    /* MNG-3906*/
     public void testOrderOfMergedPluginDependenciesWithoutPluginManagement()
         throws Exception
     {
@@ -512,7 +512,6 @@ public class PomConstructionTest
         assertEquals( "d", pom.getValue( "build/plugins[1]/dependencies[5]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependencies[5]/version" ) );
     }
-    //*/
 
     public void testOrderOfMergedPluginDependenciesWithPluginManagement()
         throws Exception
@@ -561,7 +560,7 @@ public class PomConstructionTest
         assertEquals( "http://parent.url/download", pom.getValue( "distributionManagement/downloadUrl" ) );
     }
 
-    /* FIXME: MNG-3846*/
+    /* MNG-3846*/
     public void testAppendArtifactIdOfParentAndChildToInheritedUrls()
         throws Exception
     {
@@ -623,7 +622,7 @@ public class PomConstructionTest
             assertEquals( "PASSED", pom.getValue( "properties/property" + index ) );
         }
     }
-/* FIXME*/
+
     public void testInterpolationOfLegacyExpressionsThatDontIncludeTheProjectPrefix()
         throws Exception
     {
@@ -657,7 +656,7 @@ public class PomConstructionTest
         assertTrue( pom.getValue( "properties/projectBuildOut" ).toString().endsWith( "bin" ) );
         assertTrue( pom.getValue( "properties/projectSiteOut" ).toString().endsWith( "doc" ) );
     }
-//*/
+
     public void testInterpolationWithBasedirAlignedDirectories()
         throws Exception
     {
@@ -762,7 +761,7 @@ public class PomConstructionTest
         assertEquals( "PASSED-4", pom.getValue( prefix + "listParam/listParam[4]" ) );
     }
 
-    /* MNG-2591*/
+    /* FIXME: MNG-2591
     public void testAppendOfInheritedPluginConfiguration()
         throws Exception
     {
@@ -785,6 +784,7 @@ public class PomConstructionTest
         assertEquals( "CHILD-2", pom.getValue( prefix + "listParam/listParam[7]" ) );
         assertEquals( "CHILD-4", pom.getValue( prefix + "listParam/listParam[8]" ) );
     }
+    //*/
 
     /* MNG-4000 */
     public void testMultiplePluginExecutionsWithAndWithoutIdsWithoutPluginManagement()
@@ -874,7 +874,7 @@ public class PomConstructionTest
     public void testManagedProfileDependency()
         throws Exception
     {
-        PomTestWrapper pom = this.buildPomFromMavenProject( "managed-profile-dependency/sub", "maven-core-it" );
+        PomTestWrapper pom = this.buildPom( "managed-profile-dependency/sub", "maven-core-it" );
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
         assertEquals( "org.apache.maven.its", pom.getValue( "dependencies[1]/groupId" ) );
         assertEquals( "maven-core-it-support", pom.getValue( "dependencies[1]/artifactId" ) );
@@ -888,7 +888,7 @@ public class PomConstructionTest
     public void testProfileModuleInheritance()
         throws Exception
     {
-        PomTestWrapper pom = this.buildPomFromMavenProject( "profile-module-inheritance/sub", "dist" );
+        PomTestWrapper pom = this.buildPom( "profile-module-inheritance/sub", "dist" );
         assertEquals(0, ( (List<?>) pom.getValue( "modules" ) ).size());
 
     }
@@ -919,7 +919,7 @@ public class PomConstructionTest
     public void testPluginConfigurationUsingAttributesWithPluginManagementAndProfile()
         throws Exception
     {
-        PomTestWrapper pom = buildPomFromMavenProject( "plugin-config-attributes/w-profile", "maven-core-it" );
+        PomTestWrapper pom = buildPom( "plugin-config-attributes/w-profile", "maven-core-it" );
         assertEquals( "src", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@todir" ) );
         assertEquals( "true", pom.getValue( "build/plugins[1]/configuration/domParam/copy/@overwrite" ) );
         assertEquals( "target", pom.getValue( "build/plugins[1]/configuration/domParam/copy/fileset/@dir" ) );
@@ -960,7 +960,6 @@ public class PomConstructionTest
         testCompleteModel( pom );
     }
 
-    /* FIXME*/
     public void testCompleteModelWithParent()
         throws Exception
     {
@@ -968,7 +967,6 @@ public class PomConstructionTest
 
         testCompleteModel( pom );
     }
-    //*/
 
     private void testCompleteModel( PomTestWrapper pom )
         throws Exception
@@ -1169,18 +1167,16 @@ public class PomConstructionTest
         assertEquals( "run", pom.getValue( "reporting/plugins[1]/reportSets[1]/reports[1]" ) );
     }
 
-    /* FIXME: MNG-2309*/
+    /* MNG-2309*/
     public void testProfileInjectionOrder()
         throws Exception
     {
         PomTestWrapper pom =
-            buildPomFromMavenProject( "profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d" );
+            buildPom( "profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d" );
 
         assertEquals( "e", pom.getValue( "properties[1]/pomProperty" ) );
     }
-    //*/
 
-    /* FIXME*/
     public void testPropertiesInheritance()
         throws Exception
     {
@@ -1189,7 +1185,6 @@ public class PomConstructionTest
         assertEquals( "child-property", pom.getValue( "properties/childProperty" ) );
         assertEquals( "child-override", pom.getValue( "properties/overriddenProperty" ) );
     }
-    //*/
 
     /* MNG-4102*/
     public void testInheritedPropertiesInterpolatedWithValuesFromChildWithoutProfiles()
@@ -1206,7 +1201,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "inherited-properties-interpolation/active-profile/sub" );
-        buildPomFromMavenProject( "inherited-properties-interpolation/active-profile/sub", "it-parent", "it-child" );
+        buildPom( "inherited-properties-interpolation/active-profile/sub", "it-parent", "it-child" );
         assertEquals( "CHILD", pom.getValue( "properties/overridden" ) );
         assertEquals( "CHILD", pom.getValue( "properties/interpolated" ) );
     }
@@ -1224,18 +1219,7 @@ public class PomConstructionTest
         assertEquals( new File( value.toString() ).getPath(), value.toString() );
     }
 
-    private PomTestWrapper buildPom( String pomPath )
-        throws IOException
-    {
-        File pomFile = new File( testDirectory , pomPath );
-        if ( pomFile.isDirectory() )
-        {
-            pomFile = new File( pomFile, "pom.xml" );
-        }
-        return new PomTestWrapper( pomFile, mavenProjectBuilder.buildModel( pomFile, null, null, null ) );
-    }
-
-    private PomTestWrapper buildPomFromMavenProject( String pomPath, String... profileIds )
+    private PomTestWrapper buildPom( String pomPath, String... profileIds )
         throws Exception
     {
         File pomFile = new File( testDirectory , pomPath );
