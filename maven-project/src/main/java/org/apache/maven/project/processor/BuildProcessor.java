@@ -20,12 +20,8 @@ package org.apache.maven.project.processor;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
@@ -60,20 +56,26 @@ public class BuildProcessor
         if(build == null && !( p == null || p.getBuild() == null))
         {
             copy(p.getBuild(), t.getBuild(), isProfile);   
+            copyResources(p.getBuild(), t.getBuild());
             pluginsProcessor.process( p.getBuild().getPlugins(), null, t.getBuild().getPlugins(), isChildMostSpecialized );  
             inheritManagement(p.getBuild().getPluginManagement(), null, t.getBuild());
         }
         else if(build != null && !( p == null || p.getBuild() == null))
         {
-            copy(build, t.getBuild(), isProfile);
+            
             copy(p.getBuild(), t.getBuild(), isProfile); 
-
+            copy(build, t.getBuild(), isProfile);
+                    
+            copyResources(build, t.getBuild());
+            copyResources(p.getBuild(), t.getBuild());
+            
             pluginsProcessor.process( p.getBuild().getPlugins(), build.getPlugins(), t.getBuild().getPlugins(), isChildMostSpecialized );  
             inheritManagement(p.getBuild().getPluginManagement(), build.getPluginManagement(), t.getBuild());
         } 
         else if(build != null )
         {
             copy(build, t.getBuild(), isProfile);
+            copyResources(build, t.getBuild());
             pluginsProcessor.process( null, build.getPlugins(), t.getBuild().getPlugins(), isChildMostSpecialized ); 
             inheritManagement(null, build.getPluginManagement(), t.getBuild());
         }           
@@ -102,42 +104,11 @@ public class BuildProcessor
                 target.setPluginManagement( new PluginManagement() );
             }
             proc.process( p, c, target.getPluginManagement().getPlugins(), false );
-        } 
-        
+        }       
     }
-
-    private static void copy(BuildBase source, Build target, boolean isProfile)    
+    
+    private static void copyResources(BuildBase source, Build target)
     {
-        if(target.getFinalName() == null)
-        {
-            target.setFinalName( source.getFinalName() );    
-        }
-        
-        if(target.getDefaultGoal() == null)
-        {
-            target.setDefaultGoal( source.getDefaultGoal() );   
-        }
-        
-        if(target.getDirectory() == null)
-        {
-            target.setDirectory( source.getDirectory() );    
-        }    
-        
-        List<String> filters = new ArrayList<String>(target.getFilters());
-        for(String filter : source.getFilters())
-        {
-            if(!filters.contains( filter ))
-            {
-                filters.add( filter );
-            }
-        }
-
-       // SortedSet<String> s = new TreeSet<String>( new ArrayList<String>( target.getFilters() ) );
-       // s.addAll( source.getFilters() );
-       // List<String> l = Arrays.asList(s.toArray( new String[s.size()]) );
-        
-        target.setFilters( filters );
-             
         if(target.getResources().isEmpty())
         {
             for(Resource resource : source.getResources())
@@ -166,7 +137,41 @@ public class BuildProcessor
                 r.setIncludes( new ArrayList<String>(resource.getIncludes()) );
                 target.getTestResources().add( r );
             }           
+        } 
+        
+        List<String> filters = new ArrayList<String>(target.getFilters());
+        for(String filter : source.getFilters())
+        {
+            if(!filters.contains( filter ))
+            {
+                filters.add( filter );
+            }
+        }
+
+       // SortedSet<String> s = new TreeSet<String>( new ArrayList<String>( target.getFilters() ) );
+       // s.addAll( source.getFilters() );
+       // List<String> l = Arrays.asList(s.toArray( new String[s.size()]) );
+        
+        target.setFilters( filters );        
+    }
+
+    private static void copy(BuildBase source, Build target, boolean isProfile)    
+    {
+        if(source.getFinalName() != null)
+        {
+            target.setFinalName( source.getFinalName() );    
+        }
+        
+        if(source.getDefaultGoal() != null)
+        {
+            target.setDefaultGoal( source.getDefaultGoal() );   
+        }
+        
+        if(source.getDirectory() != null)
+        {
+            target.setDirectory( source.getDirectory() );    
         }    
+
         if(!isProfile)
         {
             copyBuild((Build) source, target);
@@ -175,27 +180,27 @@ public class BuildProcessor
     
     private static void copyBuild(Build source, Build target)
     {
-        if(target.getOutputDirectory() == null)
+        if(source.getOutputDirectory() != null)
         {
             target.setOutputDirectory( source.getOutputDirectory() );    
         }
         
-        if(target.getScriptSourceDirectory() == null)
+        if(source.getScriptSourceDirectory() != null)
         {
             target.setScriptSourceDirectory( source.getScriptSourceDirectory() );    
         }
         
-        if(target.getSourceDirectory() == null)
+        if(source.getSourceDirectory() != null)
         {
             target.setSourceDirectory( source.getSourceDirectory() );    
         }
         
-        if(target.getTestOutputDirectory() == null)
+        if(source.getTestOutputDirectory() != null)
         {
             target.setTestOutputDirectory( source.getTestOutputDirectory() );    
         }
         
-        if(target.getTestSourceDirectory() == null)
+        if(source.getTestSourceDirectory() != null)
         {
             target.setTestSourceDirectory( source.getTestSourceDirectory() );    
         }        

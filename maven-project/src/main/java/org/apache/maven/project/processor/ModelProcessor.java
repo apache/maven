@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 
 /*
  * hold original pom
@@ -103,7 +101,6 @@ public class ModelProcessor
             t.setPackaging( "jar" );
         }
         
-
         if ( isChildMostSpecialized )
         {
             t.setName( c.getName() );

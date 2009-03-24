@@ -29,6 +29,13 @@ import org.apache.maven.model.Dependency;
 public class DependenciesProcessor
     extends BaseProcessor
 {   
+    private boolean isDependencyManagement;
+    
+    public DependenciesProcessor() {}
+    
+    public DependenciesProcessor(boolean isDependencyManagement) {
+        this.isDependencyManagement = isDependencyManagement;
+    }
     
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
@@ -42,7 +49,7 @@ public class DependenciesProcessor
         }
         List<Dependency> dependencies = (List<Dependency>) target;
 
-        DependencyProcessor processor = new DependencyProcessor();
+        DependencyProcessor processor = new DependencyProcessor(isDependencyManagement);
         if ( ( p == null || p.isEmpty() ) && !c.isEmpty()  )
         {
             for ( Dependency dependency : c )
@@ -54,20 +61,24 @@ public class DependenciesProcessor
         {
             if ( !c.isEmpty() )
             {
-                List<Dependency> childDependencies = new ArrayList<Dependency>();
-                for ( Dependency childDependency : c)
+
+                for ( Dependency parentDependency : p )
                 {
-                    for ( Dependency parentDependency : p)
-                    {
-                        processor.process( null, childDependency, dependencies, isChildMostSpecialized );
-                        childDependencies.add( parentDependency );
-                    }
+                    processor.process( parentDependency, null, dependencies, isChildMostSpecialized );
+                }
+                
+                int length = dependencies.size();
+                
+                for ( Dependency childDependency : c )
+                {
+                    processor.process( null, childDependency, dependencies, isChildMostSpecialized );
                 }
 
-                for ( Dependency d2 : childDependencies )
-                {
-                    processor.process( d2, null, dependencies, isChildMostSpecialized );
-                }
+                //Move elements so child dependencies are first
+                List<Dependency> childDependencies = 
+                    new ArrayList<Dependency>(dependencies.subList( length - 1 , dependencies.size() ) );
+                dependencies.removeAll( childDependencies );
+                dependencies.addAll( 0, childDependencies );
             }
             else if( p != null)
             {

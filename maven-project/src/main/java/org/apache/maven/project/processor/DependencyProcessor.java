@@ -27,7 +27,17 @@ import org.apache.maven.model.Exclusion;
 public class DependencyProcessor
     extends BaseProcessor
 {
+    private boolean isDependencyManagement;
     
+    public DependencyProcessor(){ }
+    
+    public DependencyProcessor(boolean isDependencyManagement)
+    {
+        this.isDependencyManagement = isDependencyManagement;
+    }
+    /*
+     * Process children first
+     */
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );
@@ -50,8 +60,13 @@ public class DependencyProcessor
             {
                 isAdd = false;
             }
-            copy( (Dependency) child, targetDependency, false );
-            if(isAdd) t.add( targetDependency );
+            copy( (Dependency) child, targetDependency);
+            if(!isAdd)
+            {
+                t.remove( targetDependency );               
+            }
+           
+            t.add( targetDependency );
         }
         else if ( parent != null && child == null )
         {
@@ -65,16 +80,16 @@ public class DependencyProcessor
             {
                 isAdd = false;
             }
-            //Dependency targetDependency = new Dependency();
-            copy( (Dependency) parent, targetDependency, true );
+            copy( (Dependency) parent, targetDependency);
             if(isAdd) t.add( targetDependency );
         }
         else
         // JOIN
         {
-            Dependency targetDependency = new Dependency();
-            copy( (Dependency) child, targetDependency, false );
-            copy( (Dependency) parent, targetDependency, true );
+            Dependency targetDependency = new Dependency();          
+            
+            copy( (Dependency) child, targetDependency);
+            copy( (Dependency) parent, targetDependency );
             t.add( targetDependency );               
         }
     }
@@ -111,40 +126,45 @@ public class DependencyProcessor
         
         return sb.toString();
     }
-    private static void copy( Dependency source, Dependency targetDependency, boolean isParent )
+    
+    private boolean isMatch(Object source, Object target, boolean isDependencyManagement)
     {
-        //IF target exists and is parent, don't override
-        if ( source.getArtifactId() != null && (targetDependency.getArtifactId() == null || !isParent) )
+        return (source != null && !isDependencyManagement) || target == null;
+    }
+    
+    private void copy( Dependency source, Dependency targetDependency)
+    {
+        if ( isMatch(source.getArtifactId(), targetDependency.getArtifactId(), isDependencyManagement) )
         {
             targetDependency.setArtifactId( source.getArtifactId() );
         }
 
-        if ( source.getClassifier() != null )
+        if ( isMatch(source.getClassifier(), targetDependency.getClassifier(), isDependencyManagement)  )
         {
             targetDependency.setClassifier( source.getClassifier() );
         }
 
-        if ( source.getGroupId() != null )
+        if ( isMatch(source.getGroupId(), targetDependency.getGroupId(), isDependencyManagement) )
         {
             targetDependency.setGroupId( source.getGroupId() );
         }
 
-        if ( source.getScope() != null && (targetDependency.getScope() == null || !isParent) )
+        if (isMatch(source.getScope(), targetDependency.getScope(), isDependencyManagement) )
         {
             targetDependency.setScope( source.getScope() );
         }
 
-        if ( source.getSystemPath() != null )
+        if ( isMatch(source.getSystemPath(), targetDependency.getSystemPath(), isDependencyManagement) )
         {
             targetDependency.setSystemPath( source.getSystemPath() );
         }
 
-        if ( source.getType() != null && (targetDependency.getScope() == null || !isParent))
+        if ( isMatch(source.getType(), targetDependency.getType(), isDependencyManagement))
         {
             targetDependency.setType( source.getType() );
         }
 
-        if ( source.getVersion() != null && (targetDependency.getVersion() == null || !isParent)  )
+        if ( isMatch(source.getVersion(), targetDependency.getVersion(), isDependencyManagement) )
         {
             targetDependency.setVersion( source.getVersion() );
         }

@@ -104,7 +104,7 @@ public class PluginsManagementProcessor extends BaseProcessor
         executions.addAll( target.getExecutions() );
         target.setExecutions( executions );
      
-        DependenciesProcessor proc = new DependenciesProcessor();
+        DependenciesProcessor proc = new DependenciesProcessor(true);
         if(target.getDependencies().isEmpty())
         {
             

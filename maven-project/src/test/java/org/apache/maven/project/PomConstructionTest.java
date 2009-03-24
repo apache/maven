@@ -258,6 +258,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "equal-plugin-exec-ids" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( "maven-it-plugin-a", pom.getValue( "build/plugins[1]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
         assertEquals( "maven-it-plugin-b", pom.getValue( "build/plugins[2]/artifactId" ) );
@@ -492,7 +493,7 @@ public class PomConstructionTest
     }
 
 
-    /* FIXME: cf. MNG-3906
+    /* FIXME: cf. MNG-3906*/
     public void testOrderOfMergedPluginDependenciesWithoutPluginManagement()
         throws Exception
     {
@@ -622,11 +623,12 @@ public class PomConstructionTest
             assertEquals( "PASSED", pom.getValue( "properties/property" + index ) );
         }
     }
-/* FIXME
+/* FIXME*/
     public void testInterpolationOfLegacyExpressionsThatDontIncludeTheProjectPrefix()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "unprefixed-expression-interpolation/child" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/projectDir" ).toString() ) );
 
         assertEquals( "org.apache.maven.its.mng3831.child", pom.getValue( "properties/projectGroupId" ) );

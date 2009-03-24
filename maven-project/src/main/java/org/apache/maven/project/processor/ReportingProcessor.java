@@ -33,6 +33,16 @@ public class ReportingProcessor extends BaseProcessor
         super.process( parent, child, target, isChildMostSpecialized );
         
         Model t = (Model) target, c = (Model) child, p = (Model) parent;
+        if(p != null && p.getReporting() != null)
+        {
+            if(t.getReporting() == null)
+            {
+                t.setReporting( new Reporting() );
+            }
+            
+            copy(p.getReporting(), t.getReporting());
+        } 
+        
         if(c.getReporting() != null)
         {
             if(t.getReporting() == null)
@@ -43,28 +53,22 @@ public class ReportingProcessor extends BaseProcessor
             copy(c.getReporting(), t.getReporting());
         }
         
-        if(p != null && p.getReporting() != null)
-        {
-            if(t.getReporting() == null)
-            {
-                t.setReporting( new Reporting() );
-            }
-            
-            copy(p.getReporting(), t.getReporting());
-        }        
+       
     }
     
     private static void copy(Reporting source, Reporting target)
     {
-        if(target.getOutputDirectory() == null)
+        if(source.getOutputDirectory() != null)
         {
             target.setOutputDirectory( source.getOutputDirectory() );
-            target.setExcludeDefaults( source.isExcludeDefaults() );
-            
-            for(ReportPlugin plugin : source.getPlugins())
-            {
-                target.addPlugin( copyPlugin(plugin ) );
-            }
+
+        } 
+        
+        target.setExcludeDefaults( source.isExcludeDefaults() );
+        
+        for ( ReportPlugin plugin : source.getPlugins() )
+        {
+            target.addPlugin( copyPlugin( plugin ) );
         }
     }
     

@@ -54,7 +54,8 @@ public class PluginProcessor
             }
             
             copy( (Plugin) child, targetPlugin, true );
-            copyDependencies( (Plugin) child, targetPlugin, true );
+            copyDependencies( new ArrayList<Dependency>(), 
+                              new ArrayList<Dependency>(( (Plugin) child).getDependencies() ), targetPlugin, true );
             if(isAdd) t.add( targetPlugin );
         }
         else if ( parent != null && child == null )
@@ -71,7 +72,9 @@ public class PluginProcessor
             }
             
             copy( (Plugin) parent, targetPlugin, false );
-            copyDependencies( (Plugin) parent, targetPlugin, false );
+            copyDependencies( new ArrayList<Dependency>(( (Plugin) parent).getDependencies() ), new ArrayList<Dependency>(), 
+                      targetPlugin, true );            
+           // copyDependencies( (Plugin) parent, targetPlugin, false );
             if(isAdd) t.add( targetPlugin );
         }
         else
@@ -91,9 +94,8 @@ public class PluginProcessor
                 }                 
                 copy( (Plugin) parent, targetPlugin, false );
                 copy( (Plugin) child, targetPlugin, true );
-                
-                copyDependencies( (Plugin) child, targetPlugin, true );
-                copyDependencies( (Plugin) parent, targetPlugin, false );
+                copyDependencies( new ArrayList<Dependency>(( (Plugin) parent).getDependencies() ),
+                                  new ArrayList<Dependency>(( (Plugin) child).getDependencies() ), targetPlugin, true );
                 if(isAdd) t.add( targetPlugin ); 
             } 
             else
@@ -102,8 +104,9 @@ public class PluginProcessor
                 copy( (Plugin) parent, targetPlugin, false );
                 copy( (Plugin) child, targetPlugin, true );
                 
-                copyDependencies( (Plugin) child, targetPlugin, true );
-                copyDependencies( (Plugin) parent, targetPlugin, false );
+                copyDependencies( new ArrayList<Dependency>(( (Plugin) parent).getDependencies() ),
+                                  new ArrayList<Dependency>(( (Plugin) child).getDependencies() ), targetPlugin, true );
+              //  copyDependencies( (Plugin) parent, targetPlugin, false );
                 t.add( targetPlugin );    
             }  
         }       
@@ -134,10 +137,10 @@ public class PluginProcessor
     }    
     
     
-    private static void copyDependencies(Plugin source, Plugin target, boolean isChild)
+    private static void copyDependencies(List<Dependency> parent, List<Dependency> child, Plugin target, boolean isChild)
     {
         DependenciesProcessor proc = new DependenciesProcessor();
-        proc.process( new ArrayList<Dependency>(), new ArrayList<Dependency>(source.getDependencies()), target.getDependencies(), isChild );            
+        proc.process( parent, child, target.getDependencies(), isChild );            
     }
     
     
@@ -164,8 +167,7 @@ public class PluginProcessor
         {
             target.setVersion( source.getVersion() );    
         }
-        
-        
+               
         for( PluginExecution pe : source.getExecutions())
         {
             PluginExecution idMatch = contains(pe, target.getExecutions());
@@ -181,9 +183,7 @@ public class PluginProcessor
             }
             
         }
-     
-
-
+        
         if(source.getConfiguration() != null)
         {
             //TODO: Not copying

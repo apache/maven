@@ -182,7 +182,15 @@ public class ProcessorContext
         Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors, true );
         
         PomClassicDomainModel model = convertToDomainModel( target, false );
-        interpolateModelProperties( model.getModelProperties(), interpolationProperties, child );
+        List<ModelProperty> props = new ArrayList<ModelProperty>( model.getModelProperties());
+        
+        //Seem to lose packaging here if it is a default jar value
+        if("jar".equals( target.getPackaging() ) )
+        {
+            props.add( new ModelProperty(ProjectUri.packaging, "jar") );
+        }
+        
+        interpolateModelProperties( props, interpolationProperties, child );
         List<ModelProperty> modelProperties;
         if ( child.getProjectDirectory() != null )
         {
@@ -260,6 +268,7 @@ public class ProcessorContext
         {
             throw new IllegalArgumentException( "model: null" );
         }
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer out = null;
         MavenXpp3Writer writer = new MavenXpp3Writer();
