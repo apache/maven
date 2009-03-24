@@ -92,6 +92,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4107InterpolationUsesDominantProfileSourceTest.class );
         suite.addTestSuite( MavenITmng4106InterpolationUsesDominantProfileTest.class );
         suite.addTestSuite( MavenITmng4102InheritedPropertyInterpolationTest.class );
         suite.addTestSuite( MavenITmng4091BadPluginDescriptorTest.class );
