@@ -6,17 +6,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.model.Repository;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
-import org.apache.maven.monitor.event.DeprecationEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.plugin.MojoExecution;
@@ -173,7 +170,8 @@ public class LifecycleExecutorTest
             .setPluginGroups( Arrays.asList( new String[] { "org.apache.maven.plugins" } ) )
             .setLocalRepository( localRepository )
             .setRemoteRepositories( Arrays.asList( remoteRepository ) )
-            .setGoals( Arrays.asList( new String[] { "package" } ) )    
+            .setGoals( Arrays.asList( new String[] { "package" } ) )   
+            // This is wrong
             .addEventMonitor( new DefaultEventMonitor( new ConsoleLogger( 0, "" ) ) )
             .setProperties( new Properties() );
 
@@ -188,7 +186,7 @@ public class LifecycleExecutorTest
         
         ReactorManager reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
         
-        EventDispatcher dispatcher = new DeprecationEventDispatcher( MavenEvents.DEPRECATIONS, request.getEventMonitors() );        
+        EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );        
         
         MavenSession session = new MavenSession( getContainer(), request, reactorManager, dispatcher );
         //!!jvz This is not really quite right, take a look at how this actually works.

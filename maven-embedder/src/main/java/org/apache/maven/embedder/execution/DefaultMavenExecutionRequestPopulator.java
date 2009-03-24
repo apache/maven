@@ -31,7 +31,6 @@ import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.DefaultProfileManager;

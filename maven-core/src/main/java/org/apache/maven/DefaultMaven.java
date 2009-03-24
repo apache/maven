@@ -39,6 +39,7 @@ import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DeprecationEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -106,7 +107,7 @@ public class DefaultMaven
             return result;
         }
 
-        EventDispatcher dispatcher = new DeprecationEventDispatcher( MavenEvents.DEPRECATIONS, request.getEventMonitors() );
+        EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
 
         String event = MavenEvents.MAVEN_EXECUTION;
 
