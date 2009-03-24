@@ -352,7 +352,7 @@ public class PluginParameterExpressionEvaluatorTest
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
-        return new MavenSession( container, request, null );
+        return new MavenSession( container, request, (List)null );
     }
 
     public void testLocalRepositoryExtraction()

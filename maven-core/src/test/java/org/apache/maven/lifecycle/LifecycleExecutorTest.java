@@ -10,10 +10,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.DefaultEventMonitor;
-import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.plugin.MojoExecution;
@@ -157,8 +154,10 @@ public class LifecycleExecutorTest
         containerConfiguration.addComponentDiscoveryListener( new MavenPluginCollector() );
     }
     
-    //TODO: this is still a narly mess and shows it's still not layered properly. Once these tests look
-    //      a little better i'll be ready for the next round of refactoring in the plugin manager.
+    // - remove the event monitor, just default or get rid of it
+    // layer the creation of a project builder configuration with a request, but this will need to be
+    // a Maven subclass because we don't want to couple maven to the project builder which we need to
+    // separate.
     protected MavenSession createMavenSession( File pom )
         throws Exception
     {
@@ -180,17 +179,8 @@ public class LifecycleExecutorTest
             .setRemoteRepositories( Arrays.asList( remoteRepository ) );
 
         MavenProject project = projectBuilder.build( pom, configuration );        
-        
-        List projects = new ArrayList();
-        projects.add( project );
-        
-        ReactorManager reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
-        
-        EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );        
-        
-        MavenSession session = new MavenSession( getContainer(), request, reactorManager, dispatcher );
-        //!!jvz This is not really quite right, take a look at how this actually works.
-        session.setCurrentProject( project );
+                        
+        MavenSession session = new MavenSession( getContainer(), request, project );
         
         return session;
     }

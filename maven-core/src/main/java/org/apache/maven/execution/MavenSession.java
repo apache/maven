@@ -20,6 +20,7 @@ package org.apache.maven.execution;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -29,6 +30,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -37,7 +39,7 @@ import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * @author Jason van Zyl
@@ -61,13 +63,35 @@ public class MavenSession
     private ArtifactRepository localRepository;
         
     private List<String> pluginGroups;
-    
-    public MavenSession( ArtifactRepository localRepository, List<String> pluginGroups )    
-    {        
-        this.localRepository = localRepository;
-        this.pluginGroups = pluginGroups;
+
+    // Used by the embedder to verifyPlugin
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request )
+    {
+        this.container = container;
+        this.request = request;
     }
+
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenProject project )
+        throws CycleDetectedException, DuplicateProjectException
+    {
+        this.container = container;
+        this.request = request;
+        this.reactorManager = new ReactorManager( Arrays.asList( new MavenProject[]{ project } ), request.getReactorFailureBehavior() );
+        this.eventDispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
+        // When we pass in one project we'll just set the current project.
+        this.currentProject = project;
+    }    
+
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, List<MavenProject> projects )
+        throws CycleDetectedException, DuplicateProjectException
+    {
+        this.container = container;
+        this.request = request;
+        this.reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
+        this.eventDispatcher = new DefaultEventDispatcher( request.getEventMonitors() );        
+    }    
     
+    //TODO: get rid of this
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, ReactorManager reactorManager )
     {
         this.container = container;
@@ -75,10 +99,11 @@ public class MavenSession
         this.reactorManager = reactorManager;
     }
     
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, ReactorManager reactorManager, EventDispatcher Eventdispatcher )
+    //TODO: get rid of this
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, ReactorManager reactorManager, EventDispatcher eventdispatcher )
     {
         this( container, request, reactorManager );
-        this.eventDispatcher = Eventdispatcher;
+        this.eventDispatcher = eventdispatcher;
     }
 
     public Map<String,Object> getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
@@ -119,42 +144,6 @@ public class MavenSession
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
-
-    public Object lookup( String role )
-        throws ComponentLookupException
-    {
-        return container.lookup( role );
-    }
-
-    public Object lookup( String role, String roleHint )
-        throws ComponentLookupException
-    {
-        return container.lookup( role, roleHint );
-    }
-
-    public <T> T lookup( Class<T> type )
-        throws ComponentLookupException
-    {
-        return container.lookup( type );
-    }
-
-    public <T> T lookup( Class<T> type, String roleHint )
-        throws ComponentLookupException
-    {
-        return container.lookup( type, roleHint );
-    }
-
-    public List<Object> lookupList( String role )
-        throws ComponentLookupException
-    {
-        return container.lookupList( role );
-    }
-
-    public Map<String,Object> lookupMap( String role )
-        throws ComponentLookupException
-    {
-        return container.lookupMap( role );
-    }
 
     public EventDispatcher getEventDispatcher()
     {
