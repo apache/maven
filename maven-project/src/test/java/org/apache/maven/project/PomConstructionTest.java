@@ -960,7 +960,7 @@ public class PomConstructionTest
         testCompleteModel( pom );
     }
 
-    /* FIXME
+    /* FIXME*/
     public void testCompleteModelWithParent()
         throws Exception
     {

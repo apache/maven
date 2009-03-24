@@ -145,18 +145,7 @@ public class DefaultMavenProjectBuilder
         setBuildOutputDirectoryOnParent( project );
 
         hm.put( ArtifactUtils.artifactId( project.getGroupId(), project.getArtifactId(), "pom", project.getVersion() ), project );
-        try
-        {
-            if("maven-project-builder".equals( project.getModel().getArtifactId())){
-                System.out.println(convertToDomainModel(project.getModel(), true).asString());   
-        }
-            
-        }
-        catch ( IOException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+   
         return project;
     }
 

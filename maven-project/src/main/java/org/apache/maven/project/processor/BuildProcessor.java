@@ -65,10 +65,11 @@ public class BuildProcessor
             
             copy(p.getBuild(), t.getBuild(), isProfile); 
             copy(build, t.getBuild(), isProfile);
-                    
-            copyResources(build, t.getBuild());
-            copyResources(p.getBuild(), t.getBuild());
             
+            copyResources(build, t.getBuild());           
+            copyResources(p.getBuild(), t.getBuild());                   
+
+     
             pluginsProcessor.process( p.getBuild().getPlugins(), build.getPlugins(), t.getBuild().getPlugins(), isChildMostSpecialized );  
             inheritManagement(p.getBuild().getPluginManagement(), build.getPluginManagement(), t.getBuild());
         } 
@@ -109,35 +110,7 @@ public class BuildProcessor
     
     private static void copyResources(BuildBase source, Build target)
     {
-        if(target.getResources().isEmpty())
-        {
-            for(Resource resource : source.getResources())
-            {
-                Resource r = new Resource();
-                r.setDirectory( resource.getDirectory());
-                r.setFiltering( resource.isFiltering() );
-                r.setMergeId( resource.getMergeId() );
-                r.setTargetPath( resource.getTargetPath() );
-                r.setExcludes( new ArrayList<String>(resource.getExcludes()) );
-                r.setIncludes( new ArrayList<String>(resource.getIncludes()) );
-                target.getResources().add( r );
-            }           
-        }
-        
-        if(target.getTestResources().isEmpty())
-        {
-            for(Resource resource : source.getTestResources())
-            {
-                Resource r = new Resource();
-                r.setDirectory( resource.getDirectory());
-                r.setFiltering( resource.isFiltering() );
-                r.setMergeId( resource.getMergeId() );
-                r.setTargetPath( resource.getTargetPath() );
-                r.setExcludes( new ArrayList<String>(resource.getExcludes()) );
-                r.setIncludes( new ArrayList<String>(resource.getIncludes()) );
-                target.getTestResources().add( r );
-            }           
-        } 
+
         
         List<String> filters = new ArrayList<String>(target.getFilters());
         for(String filter : source.getFilters())
@@ -170,8 +143,41 @@ public class BuildProcessor
         if(source.getDirectory() != null)
         {
             target.setDirectory( source.getDirectory() );    
-        }    
-
+        }  
+        
+        if(!source.getResources().isEmpty())
+        {
+            List<Resource> resources = new ArrayList<Resource>();
+            for(Resource resource : source.getResources())
+            {
+                Resource r = new Resource();
+                r.setDirectory( resource.getDirectory());
+                r.setFiltering( resource.isFiltering() );
+                r.setMergeId( resource.getMergeId() );
+                r.setTargetPath( resource.getTargetPath() );
+                r.setExcludes( new ArrayList<String>(resource.getExcludes()) );
+                r.setIncludes( new ArrayList<String>(resource.getIncludes()) );
+                resources.add( r );
+            }           
+            target.setResources( resources );
+        }
+        
+        if(!source.getTestResources().isEmpty())
+        {
+            List<Resource> resources = new ArrayList<Resource>();
+            for(Resource resource : source.getTestResources())
+            {
+                Resource r = new Resource();
+                r.setDirectory( resource.getDirectory());
+                r.setFiltering( resource.isFiltering() );
+                r.setMergeId( resource.getMergeId() );
+                r.setTargetPath( resource.getTargetPath() );
+                r.setExcludes( new ArrayList<String>(resource.getExcludes()) );
+                r.setIncludes( new ArrayList<String>(resource.getIncludes()) );
+                resources.add( r );
+            }   
+            target.setTestResources( resources );
+        } 
         if(!isProfile)
         {
             copyBuild((Build) source, target);
