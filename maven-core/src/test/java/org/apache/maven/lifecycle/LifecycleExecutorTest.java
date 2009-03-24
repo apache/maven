@@ -1,7 +1,6 @@
 package org.apache.maven.lifecycle;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -73,7 +72,38 @@ public class LifecycleExecutorTest
     
     public void testLifecycleQueryingUsingADefaultLifecyclePhase()
         throws Exception
-    {        
+    {   
+        // This stuff all needs to be reduced, reduced, reduced
+        String base = "projects/lifecycle-executor/project-with-additional-lifecycle-elements";
+        File sourceDirectory = new File( getBasedir(), "src/test/" + base );
+        File targetDirectory = new File( getBasedir(), "target/" + base );
+        FileUtils.copyDirectoryStructure( sourceDirectory, targetDirectory );
+        File targetPom = new File( targetDirectory, "pom.xml" );
+        MavenSession session = createMavenSession( targetPom );
+        assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
+        assertEquals( "1.0-SNAPSHOT", session.getCurrentProject().getVersion() );
+        // So this is wrong if we already have the session, which contains a request, which in turn contains
+        // the goals we are trying to run
+        
+        List<MojoDescriptor> lifecyclePlan = lifecycleExecutor.calculateLifecyclePlan( "package", session );
+        
+        // resources:resources
+        // compiler:compile
+        // plexus-component-metadata:generate-metadata
+        // resources:testResources
+        // compiler:testCompile
+        // plexus-component-metadata:generate-test-metadata
+        // surefire:test
+        // jar:jar
+        
+        assertEquals( "resources:resources", lifecyclePlan.get( 0 ).getFullGoalName() );
+        assertEquals( "compiler:compile", lifecyclePlan.get( 1 ).getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 2 ).getFullGoalName() );
+        assertEquals( "resources:testResources", lifecyclePlan.get( 3 ).getFullGoalName() );
+        assertEquals( "compiler:testCompile", lifecyclePlan.get( 4 ).getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-test-metadata", lifecyclePlan.get( 5 ).getFullGoalName() );
+        assertEquals( "surefire:test", lifecyclePlan.get( 6 ).getFullGoalName() );
+        assertEquals( "jar:jar", lifecyclePlan.get( 7 ).getFullGoalName() );        
     }    
     
     public void testLifecycleExecutionUsingADefaultLifecyclePhase()

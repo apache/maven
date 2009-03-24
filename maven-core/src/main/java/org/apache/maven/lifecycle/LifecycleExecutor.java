@@ -25,6 +25,7 @@ import org.apache.maven.BuildFailureException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -33,6 +34,9 @@ import org.apache.maven.project.MavenProject;
 public interface LifecycleExecutor
 {    
     List<String> getLifecyclePhases();
+        
+    List<MojoDescriptor> calculateLifecyclePlan( String task, MavenSession session )
+        throws LifecycleExecutionException;
         
     void execute( MavenSession session )
         throws LifecycleExecutionException, BuildFailureException;

@@ -187,15 +187,54 @@ public class DefaultLifecycleExecutor
         // if NEVER, don't blacklist
         return false;
     }
+    
+    private void executeGoal( String task, MavenSession session, MavenProject project )
+        throws LifecycleExecutionException, BuildFailureException
+    {
+        List<MojoDescriptor> lifecyclePlan = calculateLifecyclePlan( task, session );        
+        
+        for( MojoDescriptor md : lifecyclePlan )
+        {
+            System.out.println( md.getFullGoalName() );
+        }        
+        
+        /*
+        for ( MojoExecution mojoExecution : goals )
+         {
+             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+             try
+             {
+                 pluginManager.executeMojo( project, mojoExecution, session );
+             }
+             catch ( PluginManagerException e )
+             {
+                 throw new LifecycleExecutionException( "Internal error in the plugin manager executing goal '" + mojoDescriptor.getId() + "': " + e.getMessage(), e );
+             }
+             catch ( MojoFailureException e )
+             {
+                 throw new BuildFailureException( e.getMessage(), e );
+             }
+             catch ( PluginConfigurationException e )
+             {
+                 throw new LifecycleExecutionException( e.getMessage(), e );
+             }
+         }         
+          */
+
+    }
 
     // 1. Find the lifecycle given the phase (default lifecycle when given install)
     // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
     // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
     // 5. Bind mojos specified in the project itself to the lifecycle
-    private void executeGoal( String task, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException, BuildFailureException
+    public List<MojoDescriptor> calculateLifecyclePlan( String task, MavenSession session )
+        throws LifecycleExecutionException
     {
+        // Extract the project from the session
+        MavenProject project = session.getCurrentProject();
+        
         // 1. 
         Lifecycle lifecycle = phaseToLifecycleMap.get( task );
         
@@ -262,39 +301,23 @@ public class DefaultLifecycleExecutor
                 }
             }
         }
-                       
+               
+        List<MojoDescriptor> lifecyclePlan = new ArrayList<MojoDescriptor>(); 
+        
         // We need to turn this into a set of MojoExecutions
         for( List<String> mojos : phaseToMojoMapping.values() )
         {
             for( String mojo : mojos )
             {
-                System.out.println( ">> " + mojo );
+                // These are bits that look like this:
+                //
+                // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
+                //
+                lifecyclePlan.add( getMojoDescriptor( mojo, session, project ) );
             }
-        }       
+        }  
         
-        /*
-       for ( MojoExecution mojoExecution : goals )
-        {
-            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
-            try
-            {
-                pluginManager.executeMojo( project, mojoExecution, session );
-            }
-            catch ( PluginManagerException e )
-            {
-                throw new LifecycleExecutionException( "Internal error in the plugin manager executing goal '" + mojoDescriptor.getId() + "': " + e.getMessage(), e );
-            }
-            catch ( MojoFailureException e )
-            {
-                throw new BuildFailureException( e.getMessage(), e );
-            }
-            catch ( PluginConfigurationException e )
-            {
-                throw new LifecycleExecutionException( e.getMessage(), e );
-            }
-        }         
-         */
+        return lifecyclePlan;
     }
 
     //TODO: which form is most useful. passing in string to parse is not really good.
@@ -392,6 +415,7 @@ public class DefaultLifecycleExecutor
         project.addPlugin( plugin );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
+        
         return mojoDescriptor;
     }
 

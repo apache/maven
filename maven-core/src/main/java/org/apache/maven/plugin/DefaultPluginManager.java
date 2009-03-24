@@ -172,9 +172,6 @@ public class DefaultPluginManager
                         
             project.addPlugin( plugin );
            
-            System.out.println( "AAA loading plugin " + pluginDescriptor.getArtifactId() + ":" + pluginDescriptor.getVersion() );        
-            System.out.println( "BBB realm: " + pluginDescriptor.getClassRealm() );
-            
             return pluginDescriptor;
         }
         catch ( ArtifactResolutionException e )
