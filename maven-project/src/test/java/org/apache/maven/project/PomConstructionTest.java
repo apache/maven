@@ -1236,7 +1236,7 @@ public class PomConstructionTest
     }
 
     private PomTestWrapper buildPomFromMavenProject( String pomPath, String... profileIds )
-        throws IOException
+        throws Exception
     {
         File pomFile = new File( testDirectory , pomPath );
         if ( pomFile.isDirectory() )
@@ -1252,8 +1252,7 @@ public class PomConstructionTest
         }
 
         config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
-        return new PomTestWrapper( pomFile, mavenProjectBuilder.buildFromLocalPath( pomFile, null, null, null,
-                config, mavenProjectBuilder ) );
+        return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
     }
 
     private Model buildMixin( String mixinPath )
