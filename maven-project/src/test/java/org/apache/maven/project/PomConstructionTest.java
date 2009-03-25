@@ -953,6 +953,18 @@ public class PomConstructionTest
         assertEquals( pom.getBasedir().toURI().toString(), pom.getValue( "properties/prop1" ).toString() );
     }
 
+    /* MNG-3811*/
+    public void testReportingPluginConfig()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "reporting-plugin-config/sub" );
+
+        assertEquals(2,  ( (List<?>) pom.getValue( "reporting/plugins[1]/configuration/stringParams" ) ).size());
+        assertEquals("parentParam",  pom.getValue( "reporting/plugins[1]/configuration/stringParams[1]/stringParam[1]"));
+        assertEquals("childParam",  pom.getValue( "reporting/plugins[1]/configuration/stringParams[1]/stringParam[2]"));
+        assertEquals("true",  pom.getValue( "reporting/plugins[1]/configuration/booleanParam"));
+    }    
+    
     public void testCompleteModelWithoutParent()
         throws Exception
     {
