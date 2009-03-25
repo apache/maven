@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.AbstractCoreMavenComponentTest;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -28,14 +29,8 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 
 public class LifecycleExecutorTest
-    extends PlexusTestCase
+    extends AbstractCoreMavenComponentTest
 {
-    @Requirement
-    private MavenProjectBuilder projectBuilder;
-
-    @Requirement
-    private RepositorySystem repositorySystem;
-
     @Requirement
     private PluginManager pluginManager;
 
@@ -45,9 +40,7 @@ public class LifecycleExecutorTest
     protected void setUp()
         throws Exception
     {
-        // Components 
-        projectBuilder = lookup( MavenProjectBuilder.class );
-        repositorySystem = lookup( RepositorySystem.class );
+        super.setUp();
         pluginManager = lookup( PluginManager.class );
         lifecycleExecutor = (DefaultLifecycleExecutor) lookup( LifecycleExecutor.class );
     }
@@ -56,19 +49,7 @@ public class LifecycleExecutorTest
     {
         return "src/test/projects/lifecycle-executor";
     }
-    
-    protected File getProject( String name )
-        throws Exception
-    {
-        File source = new File( new File( getBasedir(), getProjectsDirectory() ), name );
-        File target = new File( new File ( getBasedir(), "target" ), name );
-        if ( !target.exists() )
-        {
-            FileUtils.copyDirectoryStructure( source, target );
-        }
-        return new File( target, "pom.xml" );
-    }
-    
+        
     // -----------------------------------------------------------------------------------------------
     // 
     // -----------------------------------------------------------------------------------------------    
