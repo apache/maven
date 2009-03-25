@@ -21,7 +21,9 @@ package org.apache.maven.project.processor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -43,7 +45,7 @@ public class ModelProcessor
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );
-
+        
         Model c = (Model) child;
         Model t = (Model) target;
         Model p = null;
@@ -151,6 +153,5 @@ public class ModelProcessor
             }
             t.getDependencyManagement().getDependencies().addAll( mngDeps );
         }
-  
     }
 }

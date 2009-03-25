@@ -189,7 +189,7 @@ public class PluginProcessor
             //TODO: Not copying
             if(target.getConfiguration() != null)
             {
-                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() ));     
+                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() )); 
             }
             else
             {

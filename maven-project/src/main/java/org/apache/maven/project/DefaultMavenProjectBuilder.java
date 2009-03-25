@@ -257,20 +257,7 @@ public class DefaultMavenProjectBuilder
         {
             request.setRemoteRepostories( new ArrayList<ArtifactRepository>() );
         }
-        /*
-        if(project.getRemoteArtifactRepositories() == null)
-        {
-            try
-            {
-                System.out.println(convertToDomainModel(project.getModel(), true).asString());
-            }
-            catch ( IOException e )
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        */
+
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         if ( result.hasExceptions() )
@@ -323,19 +310,21 @@ public class DefaultMavenProjectBuilder
                 throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor, e );
             }
         }
-
-        try
+        if(!projectProfiles.isEmpty())
         {
-            PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, model, false );
-            ProcessorContext.interpolateModelProperties( dm.getModelProperties(),
-                                                         new ArrayList<InterpolatorProperty>(), dm );
-            dm = new PomClassicDomainModel( dm.getModelProperties(), false );
-            model = dm.getModel();
-        }
-        catch ( IOException e )
-        {
+            try
+            {
+                PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, model, false );
+                ProcessorContext.interpolateModelProperties( dm.getModelProperties(),
+                                                             new ArrayList<InterpolatorProperty>(), dm );
+                dm = new PomClassicDomainModel( dm.getModelProperties(), false );
+                model = dm.getModel();
+            }
+            catch ( IOException e )
+            {
 
-            throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
+                throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
+            }            
         }
 
         MavenProject project;

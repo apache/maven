@@ -258,7 +258,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "equal-plugin-exec-ids" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( "maven-it-plugin-a", pom.getValue( "build/plugins[1]/artifactId" ) );
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
         assertEquals( "maven-it-plugin-b", pom.getValue( "build/plugins[2]/artifactId" ) );
@@ -498,7 +497,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "merged-plugin-class-path-order/wo-plugin-mngt/sub" );
-        System.out.println(pom.getDomainModel().asString());
+
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
         assertNotNull( pom.getValue( "build/plugins[1]/dependencies[1]" ));
         assertEquals( "c", pom.getValue( "build/plugins[1]/dependencies[1]/artifactId" ) );
@@ -627,7 +626,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "unprefixed-expression-interpolation/child" );
-        System.out.println(pom.getDomainModel().asString());
+
         assertEquals( pom.getBasedir(), new File( pom.getValue( "properties/projectDir" ).toString() ) );
 
         assertEquals( "org.apache.maven.its.mng3831.child", pom.getValue( "properties/projectGroupId" ) );
@@ -761,11 +760,12 @@ public class PomConstructionTest
         assertEquals( "PASSED-4", pom.getValue( prefix + "listParam/listParam[4]" ) );
     }
 
-    /* FIXME: MNG-2591
+    /* FIXME: MNG-2591*/
     public void testAppendOfInheritedPluginConfiguration()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-config-append/subproject" );
+
         String prefix = "build/plugins[1]/configuration/";
         assertEquals( "PARENT-1", pom.getValue( prefix + "stringParams/stringParam[1]" ) );
         assertEquals( "PARENT-3", pom.getValue( prefix + "stringParams/stringParam[2]" ) );

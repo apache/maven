@@ -251,12 +251,14 @@ public class ProcessorContext
         }
         
         // Plugin Management      
+
         PluginsManagementProcessor procMng = new PluginsManagementProcessor();
         if ( target.getBuild() != null && target.getBuild().getPluginManagement() != null)
         {
             procMng.process( null, new ArrayList<Plugin>( target.getBuild().getPluginManagement().getPlugins() ),
                               target.getBuild().getPlugins(), true );
         }
+        
         return target;
       
     }

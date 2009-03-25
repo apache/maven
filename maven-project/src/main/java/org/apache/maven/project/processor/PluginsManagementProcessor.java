@@ -44,7 +44,7 @@ public class PluginsManagementProcessor extends BaseProcessor
         {
             for(Plugin targetDep : targetPlugin)
             {   //PluginManagement is first in ordering
-                if(match(depMng, targetDep))
+                if(match(depMng, targetDep) )
                 {
                     copy(depMng, targetDep );      
                 }                
