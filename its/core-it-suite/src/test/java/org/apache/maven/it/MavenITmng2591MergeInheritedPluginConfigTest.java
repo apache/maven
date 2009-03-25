@@ -41,13 +41,29 @@ public class MavenITmng2591MergeInheritedPluginConfigTest
     }
 
     /**
-     * Test aggregation of list configuration items for build plugins when using
-     * 'combine.children=append' attribute.
+     * Test aggregation of list configuration items for build plugins when using 'combine.children=append' attribute.
+     * This variation of the test does not employ profiles.
      */
-    public void testitMNG2591()
+    public void testitNoProfile()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2591" );
+        testit( "no-profile" );
+    }
+
+    /**
+     * Test aggregation of list configuration items for build plugins when using 'combine.children=append' attribute.
+     * This variation of the test employs active profiles which however are empty and should not change the result.
+     */
+    public void testitWithProfile()
+        throws Exception
+    {
+        testit( "with-profile" );
+    }
+
+    private void testit( String project )
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2591/" + project );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "subproject/target" );
