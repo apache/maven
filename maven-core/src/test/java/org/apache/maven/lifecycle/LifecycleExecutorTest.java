@@ -41,26 +41,38 @@ public class LifecycleExecutorTest
 
     @Requirement
     private DefaultLifecycleExecutor lifecycleExecutor;
-
-    File pom;
-    File targetPom;
     
     protected void setUp()
         throws Exception
     {
+        // Components 
         projectBuilder = lookup( MavenProjectBuilder.class );
         repositorySystem = lookup( RepositorySystem.class );
         pluginManager = lookup( PluginManager.class );
         lifecycleExecutor = (DefaultLifecycleExecutor) lookup( LifecycleExecutor.class );
-        targetPom = new File( getBasedir(), "target/lifecycle-executor/pom-plugin.xml" );
-
-        if ( !targetPom.exists() )
-        {
-            pom = new File( getBasedir(), "src/test/pom.xml" );
-            FileUtils.copyFile( pom, targetPom );
-        }
     }
 
+    protected String getProjectsDirectory()
+    {
+        return "src/test/projects/lifecycle-executor";
+    }
+    
+    protected File getProject( String name )
+        throws Exception
+    {
+        File source = new File( new File( getBasedir(), getProjectsDirectory() ), name );
+        File target = new File( new File ( getBasedir(), "target" ), name );
+        if ( !target.exists() )
+        {
+            FileUtils.copyDirectoryStructure( source, target );
+        }
+        return new File( target, "pom.xml" );
+    }
+    
+    // -----------------------------------------------------------------------------------------------
+    // 
+    // -----------------------------------------------------------------------------------------------    
+    
     public void testLifecyclePhases()
     {
         assertNotNull( lifecycleExecutor.getLifecyclePhases() );
@@ -73,18 +85,10 @@ public class LifecycleExecutorTest
     public void testLifecycleQueryingUsingADefaultLifecyclePhase()
         throws Exception
     {   
-        // This stuff all needs to be reduced, reduced, reduced
-        String base = "projects/lifecycle-executor/project-with-additional-lifecycle-elements";
-        File sourceDirectory = new File( getBasedir(), "src/test/" + base );
-        File targetDirectory = new File( getBasedir(), "target/" + base );
-        FileUtils.copyDirectoryStructure( sourceDirectory, targetDirectory );
-        File targetPom = new File( targetDirectory, "pom.xml" );
-        MavenSession session = createMavenSession( targetPom );
+        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0-SNAPSHOT", session.getCurrentProject().getVersion() );
-        // So this is wrong if we already have the session, which contains a request, which in turn contains
-        // the goals we are trying to run
-        
         List<MojoDescriptor> lifecyclePlan = lifecycleExecutor.calculateLifecyclePlan( "package", session );
         
         // resources:resources
@@ -109,12 +113,8 @@ public class LifecycleExecutorTest
     public void testLifecycleExecutionUsingADefaultLifecyclePhase()
         throws Exception
     {
-        String base = "projects/lifecycle-executor/project-with-additional-lifecycle-elements";
-        File sourceDirectory = new File( getBasedir(), "src/test/" + base );
-        File targetDirectory = new File( getBasedir(), "target/" + base );
-        FileUtils.copyDirectoryStructure( sourceDirectory, targetDirectory );
-        File targetPom = new File( targetDirectory, "pom.xml" );                
-        MavenSession session = createMavenSession( targetPom );        
+        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        MavenSession session = createMavenSession( pom );        
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0-SNAPSHOT", session.getCurrentProject().getVersion() );                                
         lifecycleExecutor.execute( session );
@@ -134,7 +134,7 @@ public class LifecycleExecutorTest
     public void testRemoteResourcesPlugin()
         throws Exception
     {
-        MavenSession session = createMavenSession( targetPom );       
+        MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
         String pluginArtifactId = "remote-resources";
         String goal = "process";
         MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( pluginArtifactId + ":" + goal, session, session.getCurrentProject() );
@@ -146,7 +146,7 @@ public class LifecycleExecutorTest
     public void testSurefirePlugin()
         throws Exception
     {
-        MavenSession session = createMavenSession( targetPom );       
+        MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
         String pluginArtifactId = "surefire";
         String goal = "test";
         MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( pluginArtifactId + ":" + goal, session, session.getCurrentProject() );
