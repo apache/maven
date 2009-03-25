@@ -82,7 +82,8 @@ public class ProjectInheritanceTest
         assertNotNull( c );
 
         // inherited from depMgmt
-        assertTrue("Incorrect scope for " + a.getDependencyConflictId(), a.getScope().equals("compile"));
+        System.out.println(a.getScope());
+        assertTrue("Incorrect scope for " + a.getDependencyConflictId(), a.getScope().equals("test"));
 
         // transitive dep, overridden b depMgmt
         assertTrue("Incorrect scope for " + b.getDependencyConflictId(), b.getScope().equals("runtime"));
