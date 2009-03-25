@@ -45,7 +45,7 @@ under the License.
         <executions>
           <execution>
             <!-- NOTE: Explicitly reference "default" id here -->
-            <id>default-execution-id</id>
+            <id>default</id>
             <phase>child-default</phase>
           </execution>
           <execution>

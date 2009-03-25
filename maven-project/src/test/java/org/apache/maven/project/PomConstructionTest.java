@@ -472,12 +472,13 @@ public class PomConstructionTest
         assertEquals( "parent-a", pom.getValue( "build/plugins[1]/executions[1]/goals[5]" ) );
     }
 
+    /*MNG-3938*/
     public void testOverridingOfInheritedPluginExecutionsWithoutPluginManagement()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-merging/wo-plugin-mngt/sub" );
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
-        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default-execution-id']/phase" ) );
+        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default']/phase" ) );
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
 
@@ -487,7 +488,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "plugin-exec-merging/w-plugin-mngt/sub" );
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
-        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default-execution-id']/phase" ) );
+        assertEquals( "child-default", pom.getValue( "build/plugins[1]/executions[@id='default']/phase" ) );
         assertEquals( "child-non-default", pom.getValue( "build/plugins[1]/executions[@id='non-default']/phase" ) );
     }
 
@@ -1205,8 +1206,7 @@ public class PomConstructionTest
         assertEquals( "CHILD", pom.getValue( "properties/overridden" ) );
         assertEquals( "CHILD", pom.getValue( "properties/interpolated" ) );
     }
-
-
+    
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
