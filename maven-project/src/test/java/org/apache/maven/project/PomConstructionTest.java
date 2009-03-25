@@ -761,11 +761,25 @@ public class PomConstructionTest
         assertEquals( "PASSED-4", pom.getValue( prefix + "listParam/listParam[4]" ) );
     }
 
-    /* FIXME: MNG-2591*/
-    public void testAppendOfInheritedPluginConfiguration()
+    /* MNG-2591 */
+    public void testAppendOfInheritedPluginConfigurationWithNoProfile()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "plugin-config-append/subproject" );
+        testAppendOfInheritedPluginConfiguration( "no-profile" );
+    }
+
+    /* FIXME: MNG-2591
+    public void testAppendOfInheritedPluginConfigurationWithActiveProfile()
+        throws Exception
+    {
+        testAppendOfInheritedPluginConfiguration( "with-profile" );
+    }
+    //*/
+
+    private void testAppendOfInheritedPluginConfiguration( String test )
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-config-append/" + test + "/subproject" );
 
         String prefix = "build/plugins[1]/configuration/";
         assertEquals( "PARENT-1", pom.getValue( prefix + "stringParams/stringParam[1]" ) );
@@ -776,6 +790,7 @@ public class PomConstructionTest
         assertEquals( "CHILD-3", pom.getValue( prefix + "stringParams/stringParam[6]" ) );
         assertEquals( "CHILD-2", pom.getValue( prefix + "stringParams/stringParam[7]" ) );
         assertEquals( "CHILD-4", pom.getValue( prefix + "stringParams/stringParam[8]" ) );
+        assertEquals( null, pom.getValue( prefix + "stringParams/stringParam[9]" ) );
         assertEquals( "PARENT-1", pom.getValue( prefix + "listParam/listParam[1]" ) );
         assertEquals( "PARENT-3", pom.getValue( prefix + "listParam/listParam[2]" ) );
         assertEquals( "PARENT-2", pom.getValue( prefix + "listParam/listParam[3]" ) );
@@ -784,8 +799,8 @@ public class PomConstructionTest
         assertEquals( "CHILD-3", pom.getValue( prefix + "listParam/listParam[6]" ) );
         assertEquals( "CHILD-2", pom.getValue( prefix + "listParam/listParam[7]" ) );
         assertEquals( "CHILD-4", pom.getValue( prefix + "listParam/listParam[8]" ) );
+        assertEquals( null, pom.getValue( prefix + "listParam/listParam[9]" ) );
     }
-    //*/
 
     /* MNG-4000 */
     public void testMultiplePluginExecutionsWithAndWithoutIdsWithoutPluginManagement()
