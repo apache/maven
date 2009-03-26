@@ -1243,14 +1243,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "boolean-interpolation" );
     }    
-    */
-
-    public void testBuildConfigDominant()
-        throws Exception
-    {
-        PomTestWrapper pom = buildPom( "build-config-dominant" );
-        System.out.println(pom.getDomainModel().asString());
-    }    
+    */ 
  
     private void assertPathSuffixEquals( String expected, Object actual )
     {
