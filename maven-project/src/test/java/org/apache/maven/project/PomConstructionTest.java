@@ -1244,6 +1244,19 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "boolean-interpolation" );
     }    
     */ 
+    
+    /* MNG-3899 */
+    public void testBuildExtensionInheritance()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "build-extension-inheritance/sub" ); 
+        System.out.println(pom.getDomainModel().asString());
+        assertEquals(3, ( (List<?>) pom.getValue( "build/extensions" )).size() );
+        assertEquals("b", pom.getValue( "build/extensions[1]/artifactId" ) );
+        assertEquals("a", pom.getValue( "build/extensions[2]/artifactId" ) );
+        assertEquals("0.2", pom.getValue( "build/extensions[2]/version" ) );
+        assertEquals("c", pom.getValue( "build/extensions[3]/artifactId" ) );
+    }
  
     private void assertPathSuffixEquals( String expected, Object actual )
     {

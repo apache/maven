@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -205,15 +206,50 @@ public class BuildProcessor
         if(source.getTestSourceDirectory() != null)
         {
             target.setTestSourceDirectory( source.getTestSourceDirectory() );    
-        }        
-          
+        }   
+        /*
+        List<Dependency> childDependencies = 
+            new ArrayList<Dependency>(dependencies.subList( length - 1 , dependencies.size() ) );
+        dependencies.removeAll( childDependencies );
+        dependencies.addAll( 0, childDependencies );   
+        */
+        int i = target.getExtensions().size();
+        
+        List<Extension> m = new ArrayList<Extension>();
         for(Extension extension : source.getExtensions())
         {
-            Extension e = new Extension();
-            e.setArtifactId( extension.getArtifactId() );
-            e.setGroupId( extension.getGroupId() );
-            e.setVersion( extension.getVersion() );
-            target.addExtension( e );
-        }
+            Extension match = isMatch(extension, target.getExtensions());
+            if(match != null)
+            {
+                match.setArtifactId( extension.getArtifactId() );
+                match.setGroupId( extension.getGroupId() );
+                match.setVersion( extension.getVersion() );  
+                m.add( match );
+            }
+            else
+            {
+                Extension e = new Extension();
+                e.setArtifactId( extension.getArtifactId() );
+                e.setGroupId( extension.getGroupId() );
+                e.setVersion( extension.getVersion() );
+                m.add( e );
+               // target.addExtension( e );               
+            }
+        } 
+        target.getExtensions().removeAll( m );
+        target.getExtensions().addAll( 0, m );
     }
+
+    private static Extension isMatch(Extension extension, List<Extension> extensions)
+    {
+        for(Extension e : extensions)
+        {
+            if(e.getGroupId().equals( extension.getGroupId() ) && e.getArtifactId().equals( extension.getArtifactId() ))
+            {
+                return e;
+            }
+        }
+        return null;
+    }
+
 }
