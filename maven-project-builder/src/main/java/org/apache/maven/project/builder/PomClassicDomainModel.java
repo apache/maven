@@ -86,7 +86,7 @@ public class PomClassicDomainModel implements InputStreamDomainModel
             MavenXpp3Reader reader = new MavenXpp3Reader();
             try
             {
-                model =  reader.read( is ) ;
+                model =  reader.read( is, false ) ;
             }
             catch ( XmlPullParserException e )
             {

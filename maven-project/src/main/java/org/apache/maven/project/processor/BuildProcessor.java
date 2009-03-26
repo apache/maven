@@ -232,8 +232,7 @@ public class BuildProcessor
                 e.setArtifactId( extension.getArtifactId() );
                 e.setGroupId( extension.getGroupId() );
                 e.setVersion( extension.getVersion() );
-                m.add( e );
-               // target.addExtension( e );               
+                m.add( e );            
             }
         } 
         target.getExtensions().removeAll( m );
