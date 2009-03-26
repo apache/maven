@@ -56,27 +56,25 @@ public class BuildProcessor
         if(build == null && !( p == null || p.getBuild() == null))
         {
             copy(p.getBuild(), t.getBuild(), isProfile);   
-            copyResources(p.getBuild(), t.getBuild());
+            copyFilters(p.getBuild(), t.getBuild());
             pluginsProcessor.process( p.getBuild().getPlugins(), null, t.getBuild().getPlugins(), isChildMostSpecialized );  
             inheritManagement(p.getBuild().getPluginManagement(), null, t.getBuild());
         }
         else if(build != null && !( p == null || p.getBuild() == null))
-        {
-            
+        {            
             copy(p.getBuild(), t.getBuild(), isProfile); 
             copy(build, t.getBuild(), isProfile);
             
-            copyResources(build, t.getBuild());           
-            copyResources(p.getBuild(), t.getBuild());                   
-
-     
+            copyFilters(build, t.getBuild());           
+            copyFilters(p.getBuild(), t.getBuild());                   
+    
             pluginsProcessor.process( p.getBuild().getPlugins(), build.getPlugins(), t.getBuild().getPlugins(), isChildMostSpecialized );  
             inheritManagement(p.getBuild().getPluginManagement(), build.getPluginManagement(), t.getBuild());
         } 
         else if(build != null )
         {
             copy(build, t.getBuild(), isProfile);
-            copyResources(build, t.getBuild());
+            copyFilters(build, t.getBuild());
             pluginsProcessor.process( null, build.getPlugins(), t.getBuild().getPlugins(), isChildMostSpecialized ); 
             inheritManagement(null, build.getPluginManagement(), t.getBuild());
         }           
@@ -108,10 +106,8 @@ public class BuildProcessor
         }       
     }
     
-    private static void copyResources(BuildBase source, Build target)
-    {
-
-        
+    private static void copyFilters(BuildBase source, Build target)
+    {     
         List<String> filters = new ArrayList<String>(target.getFilters());
         for(String filter : source.getFilters())
         {

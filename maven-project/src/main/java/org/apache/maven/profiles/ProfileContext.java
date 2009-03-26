@@ -45,7 +45,7 @@ public class ProfileContext
     private ProfileMatcher defaultMatcher = new DefaultMatcher();
 
     private List<ProfileMatcher> matchers =
-        Collections.unmodifiableList( Arrays.asList( (ProfileMatcher) new PropertyMatcher() ) );
+        Collections.unmodifiableList( Arrays.asList( new DefaultMatcher(), new PropertyMatcher() ) );
 
     public ProfileContext( List<Profile> profiles, Collection<String> activeProfileIds,
                            Collection<String> inactiveProfileIds, List<InterpolatorProperty> properties )

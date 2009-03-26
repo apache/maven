@@ -35,10 +35,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.builder.PomClassicDomainModel;
@@ -49,6 +54,7 @@ import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelTransformerContext;
 import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class ProcessorContext
@@ -80,6 +86,7 @@ public class ProcessorContext
             profileModels.add( attachProfileNodesToModel(profile) );
         }
         Collections.reverse( profileModels );
+        
         profileModels.add( 0, model );
         List<Processor> processors =
             Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ), new ProfilesModuleProcessor(),
@@ -89,24 +96,40 @@ public class ProcessorContext
                                        new ReportingProcessor(), new RepositoriesProcessor(),
                                        new DistributionManagementProcessor(), new LicensesProcessor(),
                                        new ScmProcessor(), new PrerequisitesProcessor(), new ContributorsProcessor(),
-                                       new DevelopersProcessor() );
+                                       new DevelopersProcessor(), new ProfilesProcessor() );
+        
+        //Remove the plugin management and dependency management so they aren't applied again with the profile processing
+        PluginManagement mng = null;
+        if( model.getBuild() != null)
+        {
+            mng = model.getBuild().getPluginManagement();
+            model.getBuild().setPluginManagement( null );           
+        }
+     
+        DependencyManagement depMng = model.getDependencyManagement();
+        model.setDependencyManagement( depMng );
         
         Model target = processModelsForInheritance(profileModels, processors, false);
+        //TODO: Merge
+        target.getBuild().setPluginManagement( mng );
+        target.setDependencyManagement( depMng );
         
         return convertToDomainModel( target, isMostSpecialized );
     }
     
     private static Model attachProfileNodesToModel(Profile profile)
     {
+        Profile p = copyOfProfile(profile);
+        
         Model model = new Model();
-        model.setModules( new ArrayList<String>(profile.getModules()) );
-        model.setDependencies(profile.getDependencies());
-        model.setDependencyManagement( profile.getDependencyManagement());
-        model.setDistributionManagement( profile.getDistributionManagement() );
-        model.setProperties( profile.getProperties() );  
-        model.setModules( new ArrayList<String>(profile.getModules() ) );
+        model.setModules( p.getModules() );
+        model.setDependencies(p.getDependencies());
+        model.setDependencyManagement( p.getDependencyManagement());
+        model.setDistributionManagement( p.getDistributionManagement() );
+        model.setProperties( p.getProperties() );  
+        model.setModules( new ArrayList<String>(p.getModules() ) );
         BuildProcessor proc = new BuildProcessor( new ArrayList<Processor>());
-        proc.processWithProfile( profile.getBuild(), model);
+        proc.processWithProfile( p.getBuild(), model);
         return model;
     }  
 
@@ -178,7 +201,7 @@ public class ProcessorContext
                                        new CiManagementProcessor(), new ReportingProcessor(),
                                        new RepositoriesProcessor(), new DistributionManagementProcessor(),
                                        new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor(),
-                                       new ContributorsProcessor(), new DevelopersProcessor() );
+                                       new ContributorsProcessor(), new DevelopersProcessor(), new ProfilesProcessor() );
         Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors, true );
         
         PomClassicDomainModel model = convertToDomainModel( target, false );
@@ -206,11 +229,7 @@ public class ProcessorContext
     private static Model processModelsForInheritance(List<Model> models, List<Processor> processors, boolean reverse)
     {
         ModelProcessor modelProcessor = new ModelProcessor( processors );
-       
-      //  if(!reverse)
-      //  {
-            Collections.reverse( models );    
-      //  }
+        Collections.reverse( models );    
 
         int length = models.size();
         Model target = new Model();
@@ -239,8 +258,6 @@ public class ProcessorContext
                 }
             }           
         }
-
-
 
         // Dependency Management
         DependencyManagementProcessor depProc = new DependencyManagementProcessor();
@@ -520,4 +537,64 @@ public class ProcessorContext
         return mps;
     }
 
+    public static Profile copyOfProfile(Profile profile)
+    {  
+        Profile p = new Profile();
+        p.setModules( new ArrayList<String>(profile.getModules()) );
+        p.setDependencies(new ArrayList<Dependency>(profile.getDependencies()));
+        p.setDependencyManagement( profile.getDependencyManagement());
+        p.setDistributionManagement( profile.getDistributionManagement() );
+        p.setProperties( profile.getProperties() );  
+        p.setBuild( copyBuild(profile.getBuild()) );
+
+        return p;
+    }
+    
+    private static BuildBase copyBuild(BuildBase base)
+    {
+        if(base == null)
+        {
+            return null;
+        }
+        
+        BuildBase b = new BuildBase();
+        b.setDefaultGoal( base.getDefaultGoal() );
+        b.setDirectory( base.getDirectory() );
+        b.setFilters( new ArrayList<String>(base.getFilters()) );
+        b.setFinalName( base.getFinalName() );
+        b.setPluginManagement( base.getPluginManagement() );
+        b.setPlugins( copyPlugins(base.getPlugins()) );
+        b.setResources( new ArrayList<Resource>(base.getResources()) );
+        b.setTestResources( new ArrayList<Resource>(base.getTestResources()) );    
+        return b;
+    }
+    
+    private static List<Plugin> copyPlugins(List<Plugin> plugins)
+    {
+        List<Plugin> ps = new ArrayList<Plugin>();
+        for(Plugin p : plugins)
+        {
+            ps.add( copyPlugin(p) );
+        }
+        return ps;
+    }
+    
+    private static Plugin copyPlugin(Plugin plugin)
+    {
+        Plugin p = new Plugin();
+        p.setArtifactId( plugin.getArtifactId() );
+        if(plugin.getConfiguration() != null) 
+        {
+            p.setConfiguration( new Xpp3Dom((Xpp3Dom) plugin.getConfiguration()) );           
+        }
+
+        p.setDependencies( new ArrayList<Dependency>(plugin.getDependencies()) );
+        p.setExecutions( new ArrayList<PluginExecution>(plugin.getExecutions()) );
+        p.setGoals( plugin.getGoals() );
+        p.setGroupId( plugin.getGroupId() );
+        p.setInherited( plugin.getInherited() );
+        p.setVersion( plugin.getVersion() );
+        return p;
+        
+    }
 }

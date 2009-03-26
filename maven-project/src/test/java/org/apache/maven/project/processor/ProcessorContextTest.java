@@ -62,7 +62,7 @@ public class ProcessorContextTest extends PlexusTestCase
         
         assertEquals("pom", child.getPackaging());
     }
-    
+    /*
     public void testProfilePluginManagement() throws IOException
     {
         Model model = new Model();
@@ -81,7 +81,7 @@ public class ProcessorContextTest extends PlexusTestCase
         
         assertEquals(1, m.getModel().getBuild().getPluginManagement().getPlugins().size());
     }    
-    
+    */
     public void testInheritancePluginManagement() throws IOException
     {
         Model model = new Model();

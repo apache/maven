@@ -39,32 +39,6 @@ public class ScmProcessor extends BaseProcessor
         copyConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
         copyDeveloperConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
         copyTag( ( ( p != null ) ? p.getScm() : null ), c.getScm(), t.getScm() );
-        /*
-        if(c.getLicenses().isEmpty() && p != null)
-        {
-            for(License license : p.getLicenses())
-            {
-                License l = new License();
-                l.setUrl( license.getUrl());
-                l.setDistribution( license.getDistribution() );
-                l.setComments( license.getComments() );
-                l.setName( license.getName() );
-                t.addLicense( l );
-            }
-        }
-        else if(isChildMostSpecialized )
-        {
-            for(License license : c.getLicenses())
-            {
-                License l = new License();
-                l.setUrl( license.getUrl());
-                l.setDistribution( license.getDistribution() );
-                l.setComments( license.getComments() );
-                l.setName( license.getName() );
-                t.addLicense( l );
-            }           
-        }
-        */
     }
     
     private static void copyUrl(Scm p, Scm c, Scm t, String artifactId )

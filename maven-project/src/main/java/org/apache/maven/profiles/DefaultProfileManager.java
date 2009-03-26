@@ -23,29 +23,19 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Parent;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.shared.model.ModelContainer;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.ModelMarshaller;
+import org.apache.maven.profiles.matchers.DefaultMatcher;
+import org.apache.maven.profiles.matchers.ProfileMatcher;
+import org.apache.maven.profiles.matchers.PropertyMatcher;
 import org.apache.maven.shared.model.InterpolatorProperty;
-import org.apache.maven.project.builder.factories.IdModelContainerFactory;
-import org.apache.maven.project.builder.ProjectUri;
-import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.project.builder.profile.*;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.util.xml.pull.XmlSerializer;
-import org.codehaus.plexus.util.xml.pull.MXSerializer;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.io.*;
-import java.lang.reflect.Method;
-
 
 public class DefaultProfileManager
     implements ProfileManager
@@ -193,16 +183,33 @@ public class DefaultProfileManager
 
         allActive.addAll( activeExternal );
         allActive.addAll( activeFromPom );
-
+        List<Profile> defaults = getDefaultProfiles(allActive);
+        if(defaults.size() < allActive.size())
+        {
+            allActive.removeAll( defaults );
+        }
         return allActive;
     }
+    
+    private static List<Profile> getDefaultProfiles(List<Profile> profiles)
+    {
+        List<Profile> defaults = new ArrayList<Profile>();
+        for(Profile p : profiles)
+        {
+            if(p.getActivation() != null && p.getActivation().isActiveByDefault() )
+            {
+                defaults.add( p );
+            }
+        }
+        return defaults;
+    }
 
-    private static List<ActiveProfileMatcher> matchers = Arrays.asList(new FileMatcher(),
-        new JdkMatcher(), new OperatingSystemMatcher(), new PropertyMatcher());
+    private static List<ProfileMatcher> matchers = Arrays.asList( (ProfileMatcher) new DefaultMatcher(),
+        (ProfileMatcher) new PropertyMatcher());
 
     private boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
-    {
+    {/*
         //TODO: Using reflection now. Need to replace with custom mapper
         StringWriter writer = new StringWriter();
         XmlSerializer serializer = new MXSerializer();
@@ -259,6 +266,23 @@ public class DefaultProfileManager
         for(ActiveProfileMatcher matcher : matchers)
         {
             if(matcher.isMatch(mc, interpolatorProperties))
+            {
+                return true;
+            }
+        }
+        return false;
+        */
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        if(context.getExecutionProperties() != null)
+        {
+            interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(
+                                                                                        context.getExecutionProperties(),
+                                                                                        PomInterpolatorTag.EXECUTION_PROPERTIES.name()));              
+        }
+     
+        for(ProfileMatcher matcher : matchers)
+        {
+            if(matcher.isMatch(profile, interpolatorProperties))
             {
                 return true;
             }

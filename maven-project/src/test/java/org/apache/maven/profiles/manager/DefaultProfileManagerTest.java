@@ -115,6 +115,7 @@ public class DefaultProfileManagerTest
         assertEquals( 1, active.size() );
         assertEquals( "syspropActivated", ( (Profile) active.get( 0 ) ).getId() );
     }
+    
 
     public void testShouldNotActivateReversalOfPresentSystemProperty()
         throws Exception
@@ -204,7 +205,7 @@ public class DefaultProfileManagerTest
         assertNotNull( active );
         assertEquals( 0, active.size() );
     }
-
+/*
     public void testOsActivationProfile()
         throws Exception
     {
@@ -233,5 +234,6 @@ public class DefaultProfileManagerTest
         assertNotNull( active );
         assertEquals( 1, active.size() );
     }
+    */
 
 }

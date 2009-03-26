@@ -20,25 +20,57 @@ package org.apache.maven.project.processor;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
-import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.model.Resource;
+
 
 public class ProfilesProcessor extends BaseProcessor
 {
+    private static List<Processor> processors =
+        Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ), new ModuleProcessor(),
+                                   new PropertiesProcessor(), new ParentProcessor(), new OrganizationProcessor(),
+                                   new MailingListProcessor(), new IssueManagementProcessor(),
+                                   new CiManagementProcessor(), new ReportingProcessor(),
+                                   new RepositoriesProcessor(), new DistributionManagementProcessor(),
+                                   new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor(),
+                                   new ContributorsProcessor(), new DevelopersProcessor());
+    
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
     {
         super.process( parent, child, target, isChildMostSpecialized );
         Model t = (Model) target;
-        List<Profile> c = (List<Profile>) child;
-        List<PomClassicDomainModel> models = new ArrayList<PomClassicDomainModel>();
-        for(Profile profile : c)
+        List<Profile> profiles = ((Model) child).getProfiles();
+        List<Profile> copies = new ArrayList<Profile>();
+        for(Profile p : profiles)
         {
-           // models.add( new PomClassicDomainModel )
-            //copy(profile, t);
-        }   
-    }
+            copies.add( ProcessorContext.copyOfProfile(p) );
+        }
+        t.setProfiles( copies );
+   
+        //TODO - copy
+    }  
     
+
+    
+    private static Model attachProfileNodesToModel(Profile profile)
+    {
+        Model model = new Model();
+        model.setModules( new ArrayList<String>(profile.getModules()) );
+        model.setDependencies(new ArrayList<Dependency>(profile.getDependencies()));
+        model.setDependencyManagement( profile.getDependencyManagement());
+        model.setDistributionManagement( profile.getDistributionManagement() );
+        model.setProperties( profile.getProperties() );  
+        model.setModules( new ArrayList<String>(profile.getModules() ) );
+        BuildProcessor proc = new BuildProcessor( new ArrayList<Processor>());
+        proc.processWithProfile( profile.getBuild(), model);
+        return model;
+    }     
 }

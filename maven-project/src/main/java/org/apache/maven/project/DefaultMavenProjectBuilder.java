@@ -141,7 +141,7 @@ public class DefaultMavenProjectBuilder
         project.addCompileSourceRoot( build.getSourceDirectory() );
         project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
         project.setFile( pomFile );
-
+        
         setBuildOutputDirectoryOnParent( project );
 
         hm.put( ArtifactUtils.artifactId( project.getGroupId(), project.getArtifactId(), "pom", project.getVersion() ), project );
@@ -278,12 +278,13 @@ public class DefaultMavenProjectBuilder
     {
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
-        ProfileActivationContext profileActivationContext;
-
         List<Profile> projectProfiles = new ArrayList<Profile>();
         ProfileManager externalProfileManager = config.getGlobalProfileManager();
-
-        if ( externalProfileManager != null )
+        
+        ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( config.getExecutionProperties(), false ):
+            externalProfileManager.getProfileActivationContext();
+     
+        if(externalProfileManager != null)
         {
             try
             {
@@ -291,27 +292,32 @@ public class DefaultMavenProjectBuilder
             }
             catch ( ProfileActivationException e )
             {
-                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor, e );
-            }
-            profileActivationContext = externalProfileManager.getProfileActivationContext();
+                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor,
+                                                    e );
+            }         
         }
-        else
-        {
-            profileActivationContext = new ProfileActivationContext( config.getExecutionProperties(), false );
 
-            ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
-            profileManager.addProfiles( model.getProfiles() );
-            try
-            {
-                projectProfiles.addAll( profileManager.getActiveProfiles( model ) );
-            }
-            catch ( ProfileActivationException e )
-            {
-                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor, e );
-            }
+        ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
+        profileManager.addProfiles( model.getProfiles() );
+        
+        try
+        {
+            projectProfiles.addAll( profileManager.getActiveProfiles( model ) );
         }
+        catch ( ProfileActivationException e )
+        {
+            throw new ProjectBuildingException( projectId, "Failed to activate pom profiles.", projectDescriptor,
+                                                e );
+        }
+
         if(!projectProfiles.isEmpty())
         {
+            /*
+            for(Profile p : projectProfiles)
+            {
+                System.out.print( "Profile ID  = " + p.getId() );
+            }
+            */
             try
             {
                 PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, model, false );
@@ -506,8 +512,16 @@ public class DefaultMavenProjectBuilder
             {
                  ProfileContext profileContext1 = new ProfileContext( dm.getModel().getProfiles(), activeProfileIds,
                                                                      inactiveProfileIds, properties );
-                 profileModels.add(ProcessorContext.mergeProfilesIntoModel( profileContext1.getActiveProfiles(), dm.getModel(), 
-                                                                           dm.isMostSpecialized() ));               
+                 Collection<Profile> profiles = profileContext1.getActiveProfiles();
+                 if(!profiles.isEmpty())
+                 {
+                    profileModels.add(ProcessorContext.mergeProfilesIntoModel( profileContext1.getActiveProfiles(), dm.getModel(), 
+                                                                                dm.isMostSpecialized() ));  
+                 }
+                 else
+                 {
+                     profileModels.add( dm );   
+                 }
             }
             else
             {
@@ -652,7 +666,7 @@ public class DefaultMavenProjectBuilder
             //shane: what does this mean exactly and why does it occur
             logger.debug( "Parent pom ids do not match: Parent File = " + artifactParent.getFile().getAbsolutePath() + ": Child ID = " + domainModel.getId() );
 
-            return domainModels;
+           // return domainModels;
         }
 
         domainModels.add( parentDomainModel );

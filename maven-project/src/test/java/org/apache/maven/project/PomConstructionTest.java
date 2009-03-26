@@ -767,20 +767,19 @@ public class PomConstructionTest
     {
         testAppendOfInheritedPluginConfiguration( "no-profile" );
     }
-
-    /* FIXME: MNG-2591
+    
+    /* FIXME: MNG-2591*/
     public void testAppendOfInheritedPluginConfigurationWithActiveProfile()
         throws Exception
     {
         testAppendOfInheritedPluginConfiguration( "with-profile" );
     }
-    //*/
-
+ 
     private void testAppendOfInheritedPluginConfiguration( String test )
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-config-append/" + test + "/subproject" );
-
+        System.out.println(pom.getDomainModel().asString());
         String prefix = "build/plugins[1]/configuration/";
         assertEquals( "PARENT-1", pom.getValue( prefix + "stringParams/stringParam[1]" ) );
         assertEquals( "PARENT-3", pom.getValue( prefix + "stringParams/stringParam[2]" ) );
@@ -879,6 +878,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "profile-injected-dependencies" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( 4, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
         assertEquals( "a", pom.getValue( "dependencies[1]/artifactId" ) );
         assertEquals( "c", pom.getValue( "dependencies[2]/artifactId" ) );
@@ -1229,11 +1229,29 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "inherited-properties-interpolation/active-profile/sub" );
+
+        assertEquals(1, pom.getDomainModel().getModel().getProfiles().size());
+
         buildPom( "inherited-properties-interpolation/active-profile/sub", "it-parent", "it-child" );
         assertEquals( "CHILD", pom.getValue( "properties/overridden" ) );
         assertEquals( "CHILD", pom.getValue( "properties/interpolated" ) );
     }
     
+    /* MNG-1995 
+    public void testBooleanInterpolation()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "boolean-interpolation" );
+    }    
+    */
+
+    public void testBuildConfigDominant()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "build-config-dominant" );
+        System.out.println(pom.getDomainModel().asString());
+    }    
+ 
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
