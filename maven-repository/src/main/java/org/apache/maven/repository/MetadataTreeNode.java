@@ -38,38 +38,27 @@ public class MetadataTreeNode
     /**
      * this node's artifact MD
      */
-    Artifact metadata;
-
-    /**
-     * fail resolution if it could not be found?
-     */
-    boolean optional = false;
+    private Artifact metadata;
 
     /**
      * is there a real artifact behind this node, or it's just a helper ?
      */
-    boolean real = true;
+    private boolean real = true;
 
     /**
      * parent node
      */
-    MetadataTreeNode parent;
+    private MetadataTreeNode parent;
 
     /**
      * node unique id, used to identify this node in external tree manipulations, such as
      */
-    int id;
-
-    /**
-     * query node - the one that originated this actual node
-     */
-    Artifact query;
-
+    private int id;
 
     /**
      * actual found versions
      */
-    List<MetadataTreeNode> children;
+    private List<MetadataTreeNode> children;
     
     // ------------------------------------------------------------------------
     public int countNodes()
@@ -189,11 +178,6 @@ public class MetadataTreeNode
         return children;
     }
 
-    public boolean isOptional()
-    {
-        return optional;
-    }
-
     public boolean isReal()
     {
         return real;
@@ -202,11 +186,6 @@ public class MetadataTreeNode
     public void setReal( boolean real)
     {
         this.real = real;
-    }
-
-    public Artifact getQuery()
-    {
-        return query;
     }
 
     // ------------------------------------------------------------------------
