@@ -132,26 +132,25 @@ public class DefaultProfileManager
 
             String profileId = (String) entry.getKey();
             Profile profile = (Profile) entry.getValue();
-            System.out.println("Profile = " + profileId);
+
             boolean shouldAdd = false;
             if ( profileActivationContext.isExplicitlyActive( profileId ) )
             {
-                System.out.println("AAA: " + profileId);
                 shouldAdd = true;
             }
             else if ( isActive( profile, profileActivationContext ) )
-            {System.out.println("BBB: " + profileId);
+            {
                 shouldAdd = true;
             }
 
             if ( !profileActivationContext.isExplicitlyInactive( profileId ) && shouldAdd )
             {
                 if ( "pom".equals( profile.getSource() ) )
-                {System.out.println("CCCC: " + profileId);
+                {
                     activeFromPom.add( profile );
                 }
                 else
-                {System.out.println("DDDDD: " + profileId);
+                {
                     activeExternal.add( profile );
                 }
             }
@@ -159,7 +158,6 @@ public class DefaultProfileManager
 
         if ( activeFromPom.isEmpty() )
         {
-            System.out.println("activeFromPom.isEmpty()");
             List<String> defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
 
             List<String> deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
@@ -182,15 +180,13 @@ public class DefaultProfileManager
         }
 
         List<Profile> allActive = new ArrayList<Profile>( activeFromPom.size() + activeExternal.size() );
-        System.out.println("Active From POM: " + activeFromPom.size() + ": EXTERNAL:" + activeExternal.size());
+       // System.out.println("Active From POM: " + activeFromPom.size() + ": EXTERNAL:" + activeExternal.size());
         allActive.addAll( activeExternal );
         allActive.addAll( activeFromPom );
-        System.out.println("All active size: " + allActive.size());
-        
+     
         List<Profile> defaults = getDefaultProfiles(allActive);
         if(defaults.size() < allActive.size())
         {
-            System.out.println("Removing: " + defaults.size());
             allActive.removeAll( defaults );
         }
         return allActive;

@@ -152,12 +152,12 @@ public class DistributionManagementProcessor
 
             else
             {
-                target.setUrl( source.getUrl() + "/" + artifactId );
+                target.setUrl( source.getUrl() + (source.getUrl().endsWith("/")  ? "" : "/") + artifactId );
             }
         }
         else 
         {
-            target.setUrl( target.getUrl() + "/" + artifactId );
+            target.setUrl( target.getUrl() + (target.getUrl().endsWith("/")  ? "" : "/")+ artifactId );
         }
     }
 

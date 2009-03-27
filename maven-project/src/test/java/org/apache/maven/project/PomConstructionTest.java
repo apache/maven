@@ -907,7 +907,14 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = this.buildPom( "profile-module-inheritance/sub", "dist" );
         assertEquals(0, ( (List<?>) pom.getValue( "modules" ) ).size());
-
+    }
+    
+    /** MNG-3621 */
+    public void testUncPath()
+        throws Exception
+    {
+        PomTestWrapper pom = this.buildPom( "unc-path/sub" );
+        assertEquals("file:////host/site/test-child", pom.getValue( "distributionManagement/site/url" ));
     }
 
     public void testPluginConfigurationUsingAttributesWithoutPluginManagement()
