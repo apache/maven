@@ -19,15 +19,22 @@ package org.apache.maven.project.processor;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.shared.model.ModelProperty;
 
 /*
  * hold original pom
@@ -123,8 +130,8 @@ public class ModelProcessor
             t.setUrl(c.getUrl());         
         }       
         else if(p != null && p.getUrl() != null)
-        {
-            t.setUrl( p.getUrl() +  t.getArtifactId() );
+        {        	
+        	t.setUrl(  normalizeUri(p.getUrl(), t.getArtifactId(), p) );
         }
         else if (t.getUrl() != null)
         {
@@ -153,5 +160,16 @@ public class ModelProcessor
             }
             t.getDependencyManagement().getDependencies().addAll( mngDeps );
         }
+    }
+    
+    private static List<String> getParentNames(List<Model> models)
+    {
+    	List<String> names = new ArrayList<String>();
+    	for(Model m : models)
+    	{
+    		names.add(m.getArtifactId());
+    	}
+    	Collections.reverse(names);
+    	return names;    	
     }
 }

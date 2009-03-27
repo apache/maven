@@ -19,6 +19,9 @@ package org.apache.maven.project.processor;
  * under the License.
  */
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Scm;
 
@@ -35,13 +38,13 @@ public class ScmProcessor extends BaseProcessor
             t.setScm( new Scm() );    
         }
         
-        copyUrl( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
-        copyConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
-        copyDeveloperConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId());
+        copyUrl( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId(), p);
+        copyConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId(), p);
+        copyDeveloperConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId(), p);
         copyTag( ( ( p != null ) ? p.getScm() : null ), c.getScm(), t.getScm() );
     }
     
-    private static void copyUrl(Scm p, Scm c, Scm t, String artifactId )
+    private void copyUrl(Scm p, Scm c, Scm t, String artifactId, Model parent )
     {
         if(c != null && c.getUrl() != null)
         {
@@ -49,37 +52,37 @@ public class ScmProcessor extends BaseProcessor
         }   
         else if(p != null && p.getUrl() != null)
         {
-            t.setUrl( p.getUrl() + "/" + artifactId );
+        	t.setUrl( normalizeUri(p.getUrl(), artifactId, parent));
         }      
         else if(t.getUrl() != null) {
             t.setUrl( t.getUrl() + "/" + artifactId );
         }
     }
     
-    private static void copyConnection(Scm p, Scm c, Scm t, String artifactId )
+    private void copyConnection(Scm p, Scm c, Scm t, String artifactId, Model parent )
     {
         if(c!= null && c.getConnection() != null)
         {
             t.setConnection(c.getConnection());         
         }       
         else if(p != null && p.getConnection() != null)
-        {
-            t.setConnection( p.getConnection() + "/" + artifactId );
+        {       	
+            t.setConnection(  normalizeUri(p.getConnection(), artifactId, parent));
         } 
         else if(t.getConnection() != null) {
             t.setConnection( t.getConnection() + "/" + artifactId );
         }        
     }
     
-    private static void copyDeveloperConnection(Scm p, Scm c, Scm t, String artifactId )
+    private void copyDeveloperConnection(Scm p, Scm c, Scm t, String artifactId, Model parent )
     {
         if(c!= null && c.getDeveloperConnection() != null)
         {
             t.setDeveloperConnection(c.getDeveloperConnection());         
         }       
         else if(p != null && p.getDeveloperConnection() != null)
-        {
-            t.setDeveloperConnection( p.getDeveloperConnection() + "/" + artifactId );
+        {     	
+            t.setDeveloperConnection( normalizeUri(p.getDeveloperConnection(), artifactId, parent) );
         }    
         else if(t.getDeveloperConnection() != null){
             t.setDeveloperConnection( t.getDeveloperConnection() + "/" + artifactId );

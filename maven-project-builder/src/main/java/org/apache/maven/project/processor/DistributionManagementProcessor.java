@@ -19,6 +19,9 @@ package org.apache.maven.project.processor;
  * under the License.
  */
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
@@ -46,25 +49,25 @@ public class DistributionManagementProcessor
         if ( c.getDistributionManagement() != null )
         {
             copy( c.getDistributionManagement(), t.getDistributionManagement(), isChildMostSpecialized,
-                  c.getArtifactId() );
+                  c.getArtifactId(), p );
             if ( p != null && p.getDistributionManagement() != null )
             {
-                copy( p.getDistributionManagement(), t.getDistributionManagement(), false, c.getArtifactId() );
+                copy( p.getDistributionManagement(), t.getDistributionManagement(), false, c.getArtifactId(), p );
             }
         }
         else if ( p != null && p.getDistributionManagement() != null )
         {
-            copy( p.getDistributionManagement(), t.getDistributionManagement(), false, c.getArtifactId() );
+            copy( p.getDistributionManagement(), t.getDistributionManagement(), false, c.getArtifactId(), p );
         }
         else if(t.getDistributionManagement() != null &&  t.getDistributionManagement().getSite() != null)
         {
-            copySite( t.getDistributionManagement().getSite(), t.getDistributionManagement().getSite(), false, c.getArtifactId() );
+            copySite( t.getDistributionManagement().getSite(), t.getDistributionManagement().getSite(), false, c.getArtifactId(), p );
            // copy( t.getDistributionManagement(), t.getDistributionManagement(), isChildMostSpecialized, c.getArtifactId() );    
         }
     }
 
-    private static void copy( DistributionManagement source, DistributionManagement target, boolean isChild,
-                              String artifactId )
+    private void copy( DistributionManagement source, DistributionManagement target, boolean isChild,
+                              String artifactId, Model parent )
     {
         if ( target.getDownloadUrl() == null )
         {
@@ -102,7 +105,7 @@ public class DistributionManagementProcessor
         if ( target.getSite() == null && source.getSite() != null )
         {
             target.setSite( new Site() );
-            copySite( source.getSite(), target.getSite(), isChild, artifactId );
+            copySite( source.getSite(), target.getSite(), isChild, artifactId, parent );
         } 
     }
 
@@ -131,7 +134,7 @@ public class DistributionManagementProcessor
         target.setUniqueVersion( source.isUniqueVersion() );
     }
 
-    private static void copySite( Site source, Site target, boolean isChild, String artifactId )
+    private void copySite( Site source, Site target, boolean isChild, String artifactId, Model parent )
     {
         if ( target.getId() == null )
         {
@@ -148,11 +151,10 @@ public class DistributionManagementProcessor
             if ( isChild )
             {
                 target.setUrl( source.getUrl() );
-            }
-
+            }         
             else
-            {
-                target.setUrl( source.getUrl() + (source.getUrl().endsWith("/")  ? "" : "/") + artifactId );
+            {          	
+            	target.setUrl(normalizeUri(source.getUrl(), artifactId, parent));
             }
         }
         else 

@@ -916,6 +916,19 @@ public class PomConstructionTest
         PomTestWrapper pom = this.buildPom( "unc-path/sub" );
         assertEquals("file:////host/site/test-child", pom.getValue( "distributionManagement/site/url" ));
     }
+    
+    /** MNG-2006 */
+    public void testUrlAppend()
+        throws Exception
+    {
+        PomTestWrapper pom = this.buildPom( "url-append/child" );
+        System.out.println(pom.getDomainModel().asString());
+        assertEquals("http://project.url/child", pom.getValue( "url" ));
+        assertEquals("http://viewvc.project.url/child", pom.getValue( "scm/url" ));
+        assertEquals("http://scm.project.url/child", pom.getValue( "scm/connection" ));
+        assertEquals("https://scm.project.url/child", pom.getValue( "scm/developerConnection" ));
+        assertEquals("http://site.project.url/child", pom.getValue( "distributionManagement/site/url" ));
+    }    
 
     public void testPluginConfigurationUsingAttributesWithoutPluginManagement()
         throws Exception

@@ -109,7 +109,7 @@ public class ProcessorContext
         DependencyManagement depMng = model.getDependencyManagement();
         model.setDependencyManagement( depMng );
         
-        Model target = processModelsForInheritance(profileModels, processors, false);
+        Model target = processModelsForInheritance(profileModels, processors);
         //TODO: Merge
         target.getBuild().setPluginManagement( mng );
         target.setDependencyManagement( depMng );
@@ -202,7 +202,7 @@ public class ProcessorContext
                                        new RepositoriesProcessor(), new DistributionManagementProcessor(),
                                        new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor(),
                                        new ContributorsProcessor(), new DevelopersProcessor(), new ProfilesProcessor() );
-        Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors, true );
+        Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors );
         
         PomClassicDomainModel model = convertToDomainModel( target, false );
         List<ModelProperty> props = new ArrayList<ModelProperty>( model.getModelProperties());
@@ -226,7 +226,7 @@ public class ProcessorContext
         return new PomClassicDomainModel( modelProperties );
     }
     
-    private static Model processModelsForInheritance(List<Model> models, List<Processor> processors, boolean reverse)
+    private static Model processModelsForInheritance(List<Model> models, List<Processor> processors)
     {
         ModelProcessor modelProcessor = new ModelProcessor( processors );
         Collections.reverse( models );    

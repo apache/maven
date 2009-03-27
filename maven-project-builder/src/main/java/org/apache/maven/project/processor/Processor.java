@@ -1,5 +1,9 @@
 package org.apache.maven.project.processor;
 
+import java.util.List;
+
+import org.apache.maven.model.Model;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,4 +30,7 @@ public interface Processor
     Object getParent();
 
     Object getChild();
+    
+    List<Model> getParentModels();
+
 }

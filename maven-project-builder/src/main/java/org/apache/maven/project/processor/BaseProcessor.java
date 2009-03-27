@@ -19,8 +19,17 @@ package org.apache.maven.project.processor;
  * under the License.
  */
 
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.maven.model.Model;
 
 public abstract class BaseProcessor implements Processor
 {
@@ -30,6 +39,9 @@ public abstract class BaseProcessor implements Processor
     Object child;
 
     Collection<Processor> processors;
+    
+    private List<Model> parentModels;
+
 
     public BaseProcessor( Collection<Processor> processors )
     {
@@ -39,11 +51,20 @@ public abstract class BaseProcessor implements Processor
         }
 
         this.processors = processors;
+        parentModels = new ArrayList<Model>();
+    }
+    
+    /**
+     * Ordered from least specialized to most specialized.
+     */
+    public List<Model> getParentModels()
+    {
+    	return parentModels;
     }
 
     public BaseProcessor()
     {
-        this.processors = new ArrayList<Processor>();
+        this(new ArrayList<Processor>());
     }
 
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
@@ -55,7 +76,10 @@ public abstract class BaseProcessor implements Processor
 
         this.parent = parent;
         this.child = child;
-
+        if(parent instanceof Model)
+        {
+        	parentModels.add( (Model) parent );
+        }
         for ( Processor processor : processors )
         {
             processor.process( parent, child, target, isChildMostSpecialized );
@@ -72,4 +96,81 @@ public abstract class BaseProcessor implements Processor
     {
         return parent;
     }
+    
+    protected String normalizeUri(String u, String artifactId, Model parent)
+    {
+    	if(u == null)
+    	{
+    		return null;
+    	}
+		try 
+		{
+			String slashes = getSlashes(new URI(u).getRawSchemeSpecificPart());
+			URI uri = new URI(u + "/"
+					+ getModulePathAdjustment(parent, artifactId));
+
+			String normalized = uri.normalize().toString();
+			if("file".equals(uri.getScheme()))//UNC Paths
+			{
+				normalized = normalized.replaceFirst("/", slashes);
+			}
+			return normalized;   
+		} 
+		catch (URISyntaxException e) {
+
+		}  
+		return null;
+    }
+    
+    private static String getSlashes(String uri)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	for(byte b : uri.getBytes())
+    	{
+    		if(b == 47)
+    		{
+    			sb.append("/");
+    		}
+        	else
+        	{
+        		break;
+        	}
+    	}
+    	return sb.toString();
+    }    
+    
+    private String getModulePathAdjustment(Model moduleProject,
+			String artifactId) {
+
+		Map<String, String> moduleAdjustments = new HashMap<String, String>();
+		List<String> modules = moduleProject.getModules();
+		if (modules != null) {
+			for (Iterator<String> it = modules.iterator(); it.hasNext();) {
+				String modulePath = (String) it.next();
+				String moduleName = modulePath;
+
+				if (moduleName.endsWith("/") || moduleName.endsWith("\\")) {
+					moduleName = moduleName.substring(0,
+							moduleName.length() - 1);
+				}
+
+				int lastSlash = moduleName.lastIndexOf('/');
+
+				if (lastSlash < 0) {
+					lastSlash = moduleName.lastIndexOf('\\');
+				}
+
+				String adjustment = null;
+
+				if (lastSlash > -1) {
+					moduleName = moduleName.substring(lastSlash + 1);
+					adjustment = modulePath.substring(0, lastSlash);
+				}
+
+				moduleAdjustments.put(moduleName, adjustment);
+			}
+		}
+		String adjust = moduleAdjustments.get(artifactId);
+		return (adjust != null) ? adjust + "/" + artifactId :  "/" + artifactId;
+	}      
 }
