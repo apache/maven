@@ -19,22 +19,15 @@ package org.apache.maven.project.processor;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
-import org.apache.maven.shared.model.ModelProperty;
 
 /*
  * hold original pom
@@ -127,15 +120,15 @@ public class ModelProcessor
         
         if ( c.getUrl() != null )
         {
-            t.setUrl(c.getUrl());         
+            t.setUrl(decodeUrl(c.getUrl()));         
         }       
         else if(p != null && p.getUrl() != null)
         {        	
-        	t.setUrl(  normalizeUri(p.getUrl(), t.getArtifactId(), p) );
+        	t.setUrl(  normalizeUriWithRelativePath(p.getUrl(), t.getArtifactId(), p) );
         }
         else if (t.getUrl() != null)
         {
-            t.setUrl( t.getUrl() + "/" + t.getArtifactId() );
+            t.setUrl( decodeUrl(t.getUrl() + "/" + t.getArtifactId()) );
         }
         
         //Dependencies

@@ -20,8 +20,11 @@ package org.apache.maven.project.processor;
  */
 
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -97,7 +100,22 @@ public abstract class BaseProcessor implements Processor
         return parent;
     }
     
-    protected String normalizeUri(String u, String artifactId, Model parent)
+    protected String decodeUrl(String uri)
+    {
+    	if(uri == null)
+    	{
+    		return null;
+    	}
+    	
+    	try {
+			return URLDecoder.decode(uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
+
+    }
+    
+    protected String normalizeUriWithRelativePath(String u, String artifactId, Model parent)
     {
     	if(u == null)
     	{
@@ -109,12 +127,12 @@ public abstract class BaseProcessor implements Processor
 			URI uri = new URI(u + "/"
 					+ getModulePathAdjustment(parent, artifactId));
 
-			String normalized = uri.normalize().toString();
+			String normalized = uri.normalize().toASCIIString();
 			if("file".equals(uri.getScheme()))//UNC Paths
 			{
 				normalized = normalized.replaceFirst("/", slashes);
 			}
-			return normalized;   
+			return decodeUrl(normalized);   
 		} 
 		catch (URISyntaxException e) {
 

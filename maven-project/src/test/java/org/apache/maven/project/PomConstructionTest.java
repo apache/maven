@@ -922,13 +922,20 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "url-append/child" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals("http://project.url/child", pom.getValue( "url" ));
         assertEquals("http://viewvc.project.url/child", pom.getValue( "scm/url" ));
         assertEquals("http://scm.project.url/child", pom.getValue( "scm/connection" ));
         assertEquals("https://scm.project.url/child", pom.getValue( "scm/developerConnection" ));
         assertEquals("http://site.project.url/child", pom.getValue( "distributionManagement/site/url" ));
-    }    
+    } 
+    
+    /** MNG-4087 */
+    public void testPercentEncodedUrl()
+        throws Exception
+    {
+        PomTestWrapper pom = this.buildPom( "percent-encoded-url" );
+        assertEquals("@baseurl@/target/repo", pom.getValue( "distributionManagement/repository/url" ));
+    }        
 
     public void testPluginConfigurationUsingAttributesWithoutPluginManagement()
         throws Exception
