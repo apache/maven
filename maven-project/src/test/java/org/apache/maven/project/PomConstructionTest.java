@@ -874,6 +874,7 @@ public class PomConstructionTest
     }
 
     /** MNG-4027*/
+    /*
     public void testProfileInjectedDependencies()
         throws Exception
     {
@@ -885,7 +886,7 @@ public class PomConstructionTest
         assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
         assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
     }
-
+*/
     /** MNG-4034 */
     public void testManagedProfileDependency()
         throws Exception

@@ -95,6 +95,12 @@ public final class MavenDomainModel
         this.modelProperties = new ArrayList<ModelProperty>( modelProperties );
     }
 
+    public MavenDomainModel(PomClassicDomainModel model) 
+    	throws IOException
+    {
+    	this(model.getInputStream());
+    }    
+    
     public boolean hasParent()
     {
         // TODO: Expensive call if no parent

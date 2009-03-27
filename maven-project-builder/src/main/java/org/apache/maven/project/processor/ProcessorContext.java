@@ -546,7 +546,8 @@ public class ProcessorContext
         p.setDistributionManagement( profile.getDistributionManagement() );
         p.setProperties( profile.getProperties() );  
         p.setBuild( copyBuild(profile.getBuild()) );
-
+        p.setId( profile.getId() );
+        p.setActivation( profile.getActivation() );
         return p;
     }
     

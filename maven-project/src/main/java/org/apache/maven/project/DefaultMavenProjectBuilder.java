@@ -131,7 +131,6 @@ public class DefaultMavenProjectBuilder
         MavenProject project = readModelFromLocalPath( "unknown", pomFile, configuration.getLocalRepository(), configuration.getRemoteRepositories(), configuration );
 
         project.setFile( pomFile );
-
         project = buildWithProfiles( project.getModel(), configuration, pomFile, project.getParentFile() );
 
         Build build = project.getBuild();
@@ -184,7 +183,7 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
-        
+        //Won't know anything about settings profiles in this path
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration()   
             .setLocalRepository( localRepository )
             .setRemoteRepositories( remoteRepositories );
@@ -285,7 +284,7 @@ public class DefaultMavenProjectBuilder
             externalProfileManager.getProfileActivationContext();
      
         if(externalProfileManager != null)
-        {
+        {           
             try
             {
                 projectProfiles.addAll( externalProfileManager.getActiveProfiles( model ) );
@@ -299,9 +298,10 @@ public class DefaultMavenProjectBuilder
 
         ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
         profileManager.addProfiles( model.getProfiles() );
-        
+        //System.out.println("PROFILE POM: COUNT = " + model.getProfiles().size());
         try
         {
+            //System.out.println("PROFILE POM - ACTIVE: COUNT = " + profileManager.getActiveProfiles( model ).size());
             projectProfiles.addAll( profileManager.getActiveProfiles( model ) );
         }
         catch ( ProfileActivationException e )
@@ -311,13 +311,7 @@ public class DefaultMavenProjectBuilder
         }
 
         if(!projectProfiles.isEmpty())
-        {
-            /*
-            for(Profile p : projectProfiles)
-            {
-                System.out.print( "Profile ID  = " + p.getId() );
-            }
-            */
+        {         
             try
             {
                 PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, model, false );

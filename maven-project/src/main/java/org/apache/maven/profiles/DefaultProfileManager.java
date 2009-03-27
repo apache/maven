@@ -132,25 +132,26 @@ public class DefaultProfileManager
 
             String profileId = (String) entry.getKey();
             Profile profile = (Profile) entry.getValue();
-
+            System.out.println("Profile = " + profileId);
             boolean shouldAdd = false;
             if ( profileActivationContext.isExplicitlyActive( profileId ) )
             {
+                System.out.println("AAA: " + profileId);
                 shouldAdd = true;
             }
             else if ( isActive( profile, profileActivationContext ) )
-            {
+            {System.out.println("BBB: " + profileId);
                 shouldAdd = true;
             }
 
             if ( !profileActivationContext.isExplicitlyInactive( profileId ) && shouldAdd )
             {
                 if ( "pom".equals( profile.getSource() ) )
-                {
+                {System.out.println("CCCC: " + profileId);
                     activeFromPom.add( profile );
                 }
                 else
-                {
+                {System.out.println("DDDDD: " + profileId);
                     activeExternal.add( profile );
                 }
             }
@@ -158,6 +159,7 @@ public class DefaultProfileManager
 
         if ( activeFromPom.isEmpty() )
         {
+            System.out.println("activeFromPom.isEmpty()");
             List<String> defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
 
             List<String> deactivatedIds = profileActivationContext.getExplicitlyInactiveProfileIds();
@@ -180,12 +182,15 @@ public class DefaultProfileManager
         }
 
         List<Profile> allActive = new ArrayList<Profile>( activeFromPom.size() + activeExternal.size() );
-
+        System.out.println("Active From POM: " + activeFromPom.size() + ": EXTERNAL:" + activeExternal.size());
         allActive.addAll( activeExternal );
         allActive.addAll( activeFromPom );
+        System.out.println("All active size: " + allActive.size());
+        
         List<Profile> defaults = getDefaultProfiles(allActive);
         if(defaults.size() < allActive.size())
         {
+            System.out.println("Removing: " + defaults.size());
             allActive.removeAll( defaults );
         }
         return allActive;
@@ -196,7 +201,7 @@ public class DefaultProfileManager
         List<Profile> defaults = new ArrayList<Profile>();
         for(Profile p : profiles)
         {
-            if(p.getActivation() != null && p.getActivation().isActiveByDefault() )
+            if( (p.getActivation() != null && p.getActivation().isActiveByDefault()) || p.getActivation() == null )
             {
                 defaults.add( p );
             }
@@ -209,69 +214,7 @@ public class DefaultProfileManager
 
     private boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
-    {/*
-        //TODO: Using reflection now. Need to replace with custom mapper
-        StringWriter writer = new StringWriter();
-        XmlSerializer serializer = new MXSerializer();
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
-        serializer.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-        try
-        {
-            serializer.setOutput( writer );
-            serializer.startDocument("UTF-8", null );
-        } catch (IOException e) {
-            
-        }
-
-        try {
-            MavenXpp3Writer w = new MavenXpp3Writer();
-            Class c = Class.forName("org.apache.maven.model.io.xpp3.MavenXpp3Writer");
-
-            Class partypes[] = new Class[3];
-            partypes[0] = Profile.class;
-            partypes[1] = String.class;
-            partypes[2] = XmlSerializer.class;
-
-            Method meth = c.getDeclaredMethod(
-                         "writeProfile", partypes);
-            meth.setAccessible(true);
-            
-            Object arglist[] = new Object[3];
-            arglist[0] = profile;
-            arglist[1] = "profile";
-            arglist[2] = serializer;
-
-            meth.invoke(w, arglist);
-            serializer.endDocument();
-        } catch (Exception e)
-        {
-            throw new ProfileActivationException(e.getMessage(), e);
-        }
-
-        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-        interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(
-                context.getExecutionProperties(),
-                PomInterpolatorTag.EXECUTION_PROPERTIES.name()));
-
-        List<ModelProperty> p;
-        try
-        {                                                                   
-            p = ModelMarshaller.marshallXmlToModelProperties(new ByteArrayInputStream(writer.toString().getBytes( "UTF-8" )),
-                    ProjectUri.Profiles.xUri, PomTransformer.URIS);
-        } catch (IOException e) {
-            throw new ProfileActivationException(e.getMessage());
-        }
-        
-        ModelContainer mc = new IdModelContainerFactory(ProjectUri.Profiles.Profile.xUri).create(p);
-        for(ActiveProfileMatcher matcher : matchers)
-        {
-            if(matcher.isMatch(mc, interpolatorProperties))
-            {
-                return true;
-            }
-        }
-        return false;
-        */
+    {
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         if(context.getExecutionProperties() != null)
         {

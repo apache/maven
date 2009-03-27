@@ -49,9 +49,12 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  */
 @Component( role=DependencyProcessor.class, hint="maven" )
-public final class MavenDependencyProcessor
+public class MavenDependencyProcessor
     implements DependencyProcessor
 {
+	/**
+	 * Over-ride this method to change how dependencies are obtained
+	 */
     public List<ArtifactMetadata> getDependencies( ArtifactMetadata bmd, MetadataReader mdReader, Map system,
                                                         Map user )
         throws MetadataReaderException, DependencyProcessorException
@@ -66,20 +69,7 @@ public final class MavenDependencyProcessor
             throw new IllegalArgumentException( "mdReader: null" );
         }
 
-        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-        interpolatorProperties.add( new InterpolatorProperty( "${mavenVersion}", "3.0-SNAPSHOT",
-                                                              PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
-
-        if ( system != null )
-        {
-            interpolatorProperties.addAll(
-                InterpolatorProperty.toInterpolatorProperties( system, PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
-        }
-        if ( user != null )
-        {
-            interpolatorProperties.addAll(
-                InterpolatorProperty.toInterpolatorProperties( user, PomInterpolatorTag.USER_PROPERTIES.name() ) );
-        }
+        List<InterpolatorProperty> interpolatorProperties = createInterpolatorProperties(system, user);
 
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
         try
@@ -136,8 +126,27 @@ public final class MavenDependencyProcessor
             throw new MetadataReaderException( "Unable to transform model", e );
         }
     }
+    
+    protected final List<InterpolatorProperty> createInterpolatorProperties(Map system, Map user)
+    {
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        interpolatorProperties.add( new InterpolatorProperty( "${mavenVersion}", "3.0-SNAPSHOT",
+                                                              PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
 
-    private static List<DomainModel> getParentsOfDomainModel( MavenDomainModel domainModel, MetadataReader mdReader )
+        if ( system != null )
+        {
+            interpolatorProperties.addAll(
+                InterpolatorProperty.toInterpolatorProperties( system, PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
+        }
+        if ( user != null )
+        {
+            interpolatorProperties.addAll(
+                InterpolatorProperty.toInterpolatorProperties( user, PomInterpolatorTag.USER_PROPERTIES.name() ) );
+        }
+        return interpolatorProperties;
+    }
+
+    protected final List<DomainModel> getParentsOfDomainModel( MavenDomainModel domainModel, MetadataReader mdReader )
         throws IOException, MetadataReaderException, DependencyProcessorException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
