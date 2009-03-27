@@ -32,21 +32,30 @@ public class RepositoriesProcessor extends BaseProcessor
         super.process( parent, child, target, isChildMostSpecialized );
         
         Model t = (Model) target, c = (Model) child, p = (Model) parent;
-        copy(c.getPluginRepositories(), t.getPluginRepositories());
-        
-        copy( c.getRepositories(), t.getRepositories() );
         if(p != null)
         {
             copy( p.getRepositories(), t.getRepositories() );   
             copy( p.getPluginRepositories(), t.getPluginRepositories() );  
-        }     
+        }    
+        copy(c.getPluginRepositories(), t.getPluginRepositories());    
+        copy( c.getRepositories(), t.getRepositories() );
     }
     
     private static void copy(List<Repository> sources, List<Repository> targets)
     {
         for(Repository repository : sources)
         {
-            Repository r = new Repository();
+            Repository match = matches(repository, targets);
+            Repository r = null;
+            if(match != null)
+            {
+            	r = match;
+            }
+            else
+            {
+            	r = new Repository();	
+            }
+            
             r.setId( repository.getId() );
             r.setLayout( repository.getLayout() );
             r.setName( repository.getName() );
@@ -59,9 +68,23 @@ public class RepositoriesProcessor extends BaseProcessor
             {
                 r.setSnapshots( copy(repository.getSnapshots()) );
             }  
-            
-            targets.add( r );
+            if (match == null)
+            {
+            	targets.add( r );	
+            }          
         }
+    }
+    
+    private static Repository matches(Repository repository, List<Repository> targets)
+    {
+    	for(Repository r : targets)
+    	{
+    		if(r.getId() != null && r.getId().equals(repository.getId()))
+    		{
+    			return r;
+    		}
+    	}
+    	return null;
     }
     
     private static RepositoryPolicy copy(RepositoryPolicy policy)

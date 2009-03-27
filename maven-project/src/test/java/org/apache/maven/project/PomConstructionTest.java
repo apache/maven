@@ -935,7 +935,16 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = this.buildPom( "percent-encoded-url" );
         assertEquals("@baseurl@/target/repo", pom.getValue( "distributionManagement/repository/url" ));
-    }        
+    }    
+    
+    /** MNG-0479 */
+    public void testRepoInheritance()
+        throws Exception
+    {
+        PomTestWrapper pom = this.buildPom( "repo-inheritance" );
+        assertEquals(1, ( (List<?>) pom.getValue( "repositories" ) ).size());
+        assertEquals( "it0043", pom.getValue( "repositories[1]/name" ) );
+    }      
 
     public void testPluginConfigurationUsingAttributesWithoutPluginManagement()
         throws Exception
