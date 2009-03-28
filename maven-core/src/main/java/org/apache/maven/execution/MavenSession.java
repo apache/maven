@@ -58,12 +58,7 @@ public class MavenSession
     private MavenProject currentProject;
 
     private Map reports = new LinkedHashMap();
-
-    //For testing
-    private ArtifactRepository localRepository;
         
-    private List<String> pluginGroups;
-
     // Used by the embedder to verifyPlugin
     public MavenSession( PlexusContainer container, MavenExecutionRequest request )
     {
@@ -74,12 +69,7 @@ public class MavenSession
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenProject project )
         throws CycleDetectedException, DuplicateProjectException
     {
-        this.container = container;
-        this.request = request;
-        this.reactorManager = new ReactorManager( Arrays.asList( new MavenProject[]{ project } ), request.getReactorFailureBehavior() );
-        this.eventDispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
-        // When we pass in one project we'll just set the current project.
-        this.currentProject = project;
+        this( container, request, Arrays.asList( new MavenProject[]{ project } ) );        
     }    
 
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, List<MavenProject> projects )
@@ -89,6 +79,7 @@ public class MavenSession
         this.request = request;
         this.reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
         this.eventDispatcher = new DefaultEventDispatcher( request.getEventMonitors() );        
+        this.currentProject = projects.get( 0 );
     }    
     
     public Map<String,Object> getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
@@ -108,11 +99,6 @@ public class MavenSession
     
     public ArtifactRepository getLocalRepository()
     {
-        if ( localRepository != null )
-        {
-            return localRepository;            
-        }
-        
         return request.getLocalRepository();
     }
 
@@ -226,11 +212,6 @@ public class MavenSession
     
     public List<String> getPluginGroups()
     {
-        if ( pluginGroups != null )
-        {
-            return pluginGroups;            
-        }
-        
         return request.getPluginGroups();
     }
     
