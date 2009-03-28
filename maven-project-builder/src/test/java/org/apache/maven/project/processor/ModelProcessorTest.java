@@ -117,17 +117,6 @@ public class ModelProcessorTest
         assertEquals( "description", targetModel.getDescription() );
     }
 
-    public void testDescriptionNotSpecialized()
-    {
-        Model targetModel = new Model();
-        Model childModel = new Model();
-        childModel.setDescription( "description" );
-
-        ModelProcessor mp = new ModelProcessor( new ArrayList<Processor>() );
-        mp.process( null, childModel, targetModel, false );
-        assertNull( targetModel.getDescription() );
-    }
-
     public void testInceptionYearFromChild()
     {
         Model targetModel = new Model();

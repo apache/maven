@@ -25,20 +25,29 @@ import java.util.List;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Resource;
+import org.apache.maven.shared.model.ModelEventListener;
 
 public class BuildProcessor
     extends BaseProcessor
 {
+	private List<ModelEventListener> listeners;
+	
     public BuildProcessor( Collection<Processor> processors )
     {
         super( processors );
-    }
+        listeners = new ArrayList<ModelEventListener>();
+    }    
+    
+    public BuildProcessor( Collection<Processor> processors, List<ModelEventListener> listeners)
+    {
+        super( processors );
+        listeners = (listeners == null) ? new ArrayList<ModelEventListener>() : new ArrayList<ModelEventListener>(listeners);
+    }     
     
     public void processWithProfile( BuildBase build, Model target )    
     {

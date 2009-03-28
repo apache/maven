@@ -51,6 +51,7 @@ import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.shared.model.ModelEventListener;
 import org.apache.maven.shared.model.ModelProperty;
 import org.apache.maven.shared.model.ModelTransformerContext;
 import org.codehaus.plexus.util.WriterFactory;
@@ -169,18 +170,11 @@ public class ProcessorContext
 
         return models;
     }
-    
-    /**
-     * Parent domain models on bottom.
-     * 
-     * @param domainModels
-     * @return
-     * @throws IOException
-     */
+
     public static PomClassicDomainModel build( List<DomainModel> domainModels,
-                                               List<InterpolatorProperty> interpolationProperties )
-        throws IOException
-    {  
+            List<InterpolatorProperty> interpolationProperties, List<ModelEventListener> listeners)
+	throws IOException
+	{  
         PomClassicDomainModel child = null;
         for ( DomainModel domainModel : domainModels )
         {   
@@ -223,7 +217,20 @@ public class ProcessorContext
         {
             modelProperties = model.getModelProperties();
         }
-        return new PomClassicDomainModel( modelProperties );
+        return new PomClassicDomainModel( modelProperties );	    	
+	}
+    /**
+     * Parent domain models on bottom.
+     * 
+     * @param domainModels
+     * @return
+     * @throws IOException
+     */
+    public static PomClassicDomainModel build( List<DomainModel> domainModels,
+                                               List<InterpolatorProperty> interpolationProperties )
+        throws IOException
+    {  
+    	return build(domainModels, interpolationProperties, null);
     }
     
     private static Model processModelsForInheritance(List<Model> models, List<Processor> processors)

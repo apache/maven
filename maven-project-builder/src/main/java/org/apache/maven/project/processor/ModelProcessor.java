@@ -106,9 +106,13 @@ public class ModelProcessor
         if ( isChildMostSpecialized )
         {
             t.setName( c.getName() );
-            t.setDescription( c.getDescription() );
         }
-
+        
+        if(c.getDescription() != null)
+        {
+        	t.setDescription( c.getDescription() );	
+        }
+                
         if ( c.getInceptionYear() != null )
         {
             t.setInceptionYear( c.getInceptionYear() );
