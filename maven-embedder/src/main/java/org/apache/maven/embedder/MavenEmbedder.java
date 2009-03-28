@@ -39,8 +39,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.plugin.PluginLoaderException;
@@ -129,6 +127,8 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private Configuration configuration;
+
+    private MavenExecutionRequest request;
 
     // ----------------------------------------------------------------------------
     // Constructors
@@ -377,10 +377,6 @@ public class MavenEmbedder
     //  Lifecycle
     // ----------------------------------------------------------------------
 
-    private MavenExecutionRequest request;
-
-    private EventDispatcher dispatcher;
-
     private void start( Configuration configuration )
         throws MavenEmbedderException
     {
@@ -459,8 +455,6 @@ public class MavenEmbedder
             request = new DefaultMavenExecutionRequest();
 
             populator.populateDefaults( request, configuration );
-
-            dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
         }
         catch ( ComponentLookupException e )
         {

@@ -30,8 +30,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -48,8 +46,6 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 public class MavenSession
 {
     private PlexusContainer container;
-
-    private EventDispatcher eventDispatcher;
 
     private ReactorManager reactorManager;
 
@@ -78,7 +74,6 @@ public class MavenSession
         this.container = container;
         this.request = request;
         this.reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
-        this.eventDispatcher = new DefaultEventDispatcher( request.getEventMonitors() );        
         this.currentProject = projects.get( 0 );
     }    
     
@@ -110,15 +105,6 @@ public class MavenSession
     public Properties getExecutionProperties()
     {
         return request.getProperties();
-    }
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    public EventDispatcher getEventDispatcher()
-    {
-        return eventDispatcher;
     }
 
     public Settings getSettings()

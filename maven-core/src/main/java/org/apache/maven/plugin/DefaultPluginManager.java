@@ -59,7 +59,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -553,8 +552,6 @@ public class DefaultPluginManager
             }
         }
 
-        // Event monitoring.
-        String event = MavenEvents.MOJO_EXECUTION;
         String goalExecId = goalName;
         if ( mojoExecution.getExecutionId() != null )
         {
@@ -587,8 +584,6 @@ public class DefaultPluginManager
             }
             catch ( DuplicateArtifactAttachmentException e )
             {
-                session.getEventDispatcher().dispatchError( event, goalExecId, e );
-
                 throw new PluginExecutionException( mojoExecution, project, e );
             }
 
@@ -603,21 +598,15 @@ public class DefaultPluginManager
         }
         catch ( MojoExecutionException e )
         {
-            session.getEventDispatcher().dispatchError( event, goalExecId, e );
-
             throw new PluginExecutionException( mojoExecution, project, e );
         }
         catch ( MojoFailureException e )
         {
-            session.getEventDispatcher().dispatchError( event, goalExecId, e );
-
             throw e;
         }
 
         catch ( PluginManagerException e )
         {
-            session.getEventDispatcher().dispatchError( event, goalExecId, e );
-
             throw new PluginExecutionException( mojoExecution, project, e.getMessage() );            
         }
         finally

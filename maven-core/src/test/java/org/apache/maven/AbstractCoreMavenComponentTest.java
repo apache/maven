@@ -2,20 +2,14 @@ package org.apache.maven;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.monitor.event.DefaultEventMonitor;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -24,7 +18,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 
 public abstract class AbstractCoreMavenComponentTest
@@ -89,8 +82,6 @@ public abstract class AbstractCoreMavenComponentTest
             .setLocalRepository( localRepository )
             .setRemoteRepositories( Arrays.asList( remoteRepository ) )
             .setGoals( Arrays.asList( new String[] { "package" } ) )   
-            // This is wrong
-            .addEventMonitor( new DefaultEventMonitor( new ConsoleLogger( 0, "" ) ) )
             .setProperties( new Properties() );
 
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()

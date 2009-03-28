@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
@@ -93,8 +92,6 @@ public class DefaultMavenExecutionRequest
 
     private boolean showErrors = false;
 
-    private List<EventMonitor> eventMonitors;
-
     private List<String> activeProfiles;
 
     private List<String> inactiveProfiles;
@@ -143,7 +140,6 @@ public class DefaultMavenExecutionRequest
         copy.setProperties( original.getProperties() );
         copy.setStartTime( original.getStartTime() );
         copy.setShowErrors( original.isShowErrors() );
-        copy.setEventMonitors( original.getEventMonitors());
         copy.setActiveProfiles( original.getActiveProfiles());
         copy.setInactiveProfiles(  original.getInactiveProfiles());
         copy.setTransferListener( original.getTransferListener());
@@ -215,21 +211,6 @@ public class DefaultMavenExecutionRequest
     public boolean isInteractiveMode()
     {
         return interactiveMode;
-    }
-
-    public List<EventMonitor> getEventMonitors()
-    {
-        return eventMonitors;
-    }
-
-    public void setBasedir( File basedir )
-    {
-        this.basedir = basedir;
-    }
-
-    public void setEventMonitors( List<EventMonitor> eventMonitors )
-    {
-        this.eventMonitors = eventMonitors;
     }
 
     public void setActiveProfiles( List<String> activeProfiles )
@@ -424,18 +405,6 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest addInactiveProfiles( List<String> profiles )
     {
         getInactiveProfiles().addAll( profiles );
-
-        return this;
-    }
-
-    public MavenExecutionRequest addEventMonitor( EventMonitor monitor )
-    {
-        if ( eventMonitors == null )
-        {
-            eventMonitors = new ArrayList<EventMonitor>();
-        }
-
-        eventMonitors.add( monitor );
 
         return this;
     }

@@ -31,8 +31,6 @@ import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
-import org.apache.maven.monitor.event.DefaultEventMonitor;
-import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
@@ -80,8 +78,6 @@ public class DefaultMavenExecutionRequestPopulator
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
     {
-        eventing( request, configuration );
-
         executionProperties( request, configuration );
 
         pom( request, configuration );
@@ -407,35 +403,6 @@ public class DefaultMavenExecutionRequestPopulator
         catch ( IOException e )
         {
             throw new MavenEmbedderException( "Cannot create local repository.", e );
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // Eventing
-    // ------------------------------------------------------------------------
-
-    private void eventing( MavenExecutionRequest request, Configuration configuration )
-    {
-        // ------------------------------------------------------------------------
-        // Event Monitor/Logging
-        //
-        //
-        // ------------------------------------------------------------------------
-
-        if ( ( request.getEventMonitors() == null ) || request.getEventMonitors().isEmpty() )
-        {
-            request.addEventMonitor( new DefaultEventMonitor( getLogger() ) );
-        }
-
-        // Now, add in any event monitors from the Configuration instance.
-        List<EventMonitor> configEventMonitors = configuration.getEventMonitors();
-
-        if ( ( configEventMonitors != null ) && !configEventMonitors.isEmpty() )
-        {
-            for ( EventMonitor monitor : configEventMonitors )
-            {
-                request.addEventMonitor( monitor );
-            }
         }
     }
 

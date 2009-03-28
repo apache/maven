@@ -47,7 +47,7 @@ public class ReactorManager
 
     private String failureBehavior = FAIL_FAST;
 
-    private final ProjectSorter sorter;
+    private ProjectSorter sorter;
 
     private Map buildSuccessesByProject = new HashMap();
 

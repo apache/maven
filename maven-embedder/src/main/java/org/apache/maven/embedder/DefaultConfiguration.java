@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.monitor.event.EventMonitor;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -57,8 +56,6 @@ public class DefaultConfiguration
     private PlexusContainer parentContainer;
 
     private File localRepository;
-
-    private List<EventMonitor> eventMonitors;
 
     /** Creates a new instance of DefaultConfiguration */
     public DefaultConfiguration()
@@ -219,28 +216,5 @@ public class DefaultConfiguration
     public File getLocalRepository()
     {
         return localRepository;
-    }
-
-    public Configuration addEventMonitor( EventMonitor eventMonitor )
-    {
-        if ( eventMonitors == null )
-        {
-            eventMonitors = new ArrayList<EventMonitor>();
-        }
-
-        eventMonitors.add( eventMonitor );
-
-        return this;
-    }
-
-    public List<EventMonitor> getEventMonitors()
-    {
-        return eventMonitors;
-    }
-
-    public Configuration setEventMonitors( List<EventMonitor> eventMonitors )
-    {
-        this.eventMonitors = eventMonitors;
-        return this;
     }
 }

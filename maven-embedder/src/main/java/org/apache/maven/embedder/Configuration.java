@@ -23,7 +23,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.monitor.event.EventMonitor;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -127,14 +126,4 @@ public interface Configuration
     void addExtension( URL url );
 
     List<URL> getExtensions();
-
-    // ----------------------------------------------------------------------------
-    // Event Monitors
-    // ----------------------------------------------------------------------------
-
-    Configuration addEventMonitor( EventMonitor eventMonitor );
-
-    Configuration setEventMonitors( List<EventMonitor> eventMonitors );
-
-    List<EventMonitor> getEventMonitors();
 }

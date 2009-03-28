@@ -23,10 +23,7 @@ import java.util.List;
 
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.project.MavenProject;
 
 /**
  * @author Jason van  Zyl

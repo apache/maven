@@ -26,7 +26,6 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.monitor.event.EventMonitor;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.ProjectBuilderConfiguration;
@@ -108,10 +107,6 @@ public interface MavenExecutionRequest
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );
     boolean isRecursive();
-
-    // Event monitors
-    MavenExecutionRequest addEventMonitor( EventMonitor monitor );
-    List<EventMonitor> getEventMonitors();
 
     // Pom
     MavenExecutionRequest setPomFile( String pomFilename );

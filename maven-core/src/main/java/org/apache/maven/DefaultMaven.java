@@ -39,9 +39,6 @@ import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -106,13 +103,7 @@ public class DefaultMaven
             return result;
         }
 
-        EventDispatcher dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
-
-        String event = MavenEvents.MAVEN_EXECUTION;
-
-        dispatcher.dispatchStart( event, request.getBaseDirectory() );
-
-        MavenSession session = createSession( request, reactorManager, dispatcher );
+        MavenSession session = createSession( request, reactorManager );
 
         logger.info( "Scanning for projects..." );
 
@@ -133,14 +124,12 @@ public class DefaultMaven
         catch ( LifecycleExecutionException e )
         {
             result.addException( e );
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
 
             return result;
         }
         catch ( BuildFailureException e )
         {
             result.addException( e );
-            dispatcher.dispatchError( event, request.getBaseDirectory(), e );
 
             return result;
         }
@@ -148,8 +137,6 @@ public class DefaultMaven
         result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
 
         result.setProject( reactorManager.getTopLevelProject() );
-
-        dispatcher.dispatchEnd( event, request.getBaseDirectory() );
 
         return result;
     }    
@@ -339,7 +326,7 @@ public class DefaultMaven
     // the session type would be specific to the request i.e. having a project
     // or not.
 
-    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager reactorManager, EventDispatcher dispatcher )
+    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager reactorManager )
     {
         MavenSession session = new MavenSession( container, request );
 

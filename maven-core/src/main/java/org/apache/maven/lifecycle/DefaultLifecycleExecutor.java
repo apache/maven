@@ -29,7 +29,6 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.monitor.event.MavenEvents;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -116,10 +115,6 @@ public class DefaultLifecycleExecutor
             {
                 logger.info( "Building " + currentProject.getName() );
 
-                // !! This is ripe for refactoring to an aspect.
-                // Event monitoring.
-                String event = MavenEvents.PROJECT_EXECUTION;
-
                 long buildStartTime = System.currentTimeMillis();
 
                 try
@@ -129,9 +124,7 @@ public class DefaultLifecycleExecutor
                     for ( String goal : goals )
                     {
                         String target = currentProject.getId() + " ( " + goal + " )";
-                        session.getEventDispatcher().dispatchStart( event, target );
-                        executeGoalAndHandleFailures( goal, session, currentProject, event, session.getReactorManager(), buildStartTime, target );
-                        session.getEventDispatcher().dispatchEnd( event, target );
+                        executeGoalAndHandleFailures( goal, session, currentProject, session.getReactorManager(), buildStartTime, target );
                     }
                 }
                 finally
@@ -144,7 +137,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, String event, ReactorManager rm, long buildStartTime, String target )
+    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, ReactorManager rm, long buildStartTime, String target )
         throws BuildFailureException, LifecycleExecutionException
     {
         try
@@ -153,8 +146,6 @@ public class DefaultLifecycleExecutor
         }
         catch ( LifecycleExecutionException e )
         {
-            session.getEventDispatcher().dispatchError( event, target, e );
-
             if ( handleExecutionFailure( rm, project, e, task, buildStartTime ) )
             {
                 throw e;
@@ -162,8 +153,6 @@ public class DefaultLifecycleExecutor
         }
         catch ( BuildFailureException e )
         {
-            session.getEventDispatcher().dispatchError( event, target, e );
-
             if ( handleExecutionFailure( rm, project, e, task, buildStartTime ) )
             {
                 throw e;
