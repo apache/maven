@@ -238,16 +238,8 @@ public class DefaultMaven
             {
                 File file = (File) iterator.next();
 
-                boolean usingReleasePom = false;
-
-                if ( RELEASE_POMv4.equals( file.getName() ) )
-                {
-                    logger.info( "NOTE: Using release-pom: " + file + " in reactor build." );
-
-                    usingReleasePom = true;
-                }
-
                 MavenProject project;
+                
                 try
                 {
                     project = projectBuilder.build( file, request.getProjectBuildingConfiguration() );
@@ -302,14 +294,7 @@ public class DefaultMaven
                         }
                         else if ( moduleFile.isDirectory() )
                         {
-                            if ( usingReleasePom )
-                            {
-                                moduleFile = new File( basedir, name + "/" + Maven.RELEASE_POMv4 );
-                            }
-                            else
-                            {
-                                moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
-                            }
+                            moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
                         }
 
                         if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
@@ -370,13 +355,11 @@ public class DefaultMaven
 
         if ( request.useReactor() )
         {
-            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 + ",**/" + RELEASE_POMv4 );
+            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
 
-            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 + "," + RELEASE_POMv4 );
+            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
 
             files = FileUtils.getFiles( userDir, includes, excludes );
-
-            filterOneProjectFilePerDirectory( files );
 
             // make sure there is consistent ordering on all platforms, rather than using the filesystem ordering
             Collections.sort( files );
@@ -392,13 +375,8 @@ public class DefaultMaven
         }
         else
         {
-            File projectFile = new File( userDir, RELEASE_POMv4 );
-
-            if ( !projectFile.exists() )
-            {
-                projectFile = new File( userDir, POMv4 );
-            }
-
+            File projectFile = new File( userDir, POMv4 );
+            
             if ( projectFile.exists() )
             {
                 files = Collections.singletonList( projectFile );
@@ -407,33 +385,7 @@ public class DefaultMaven
 
         return files;
     }
-
-    private void filterOneProjectFilePerDirectory( List files )
-    {
-        List releaseDirs = new ArrayList();
-
-        for ( Iterator it = files.iterator(); it.hasNext(); )
-        {
-            File projectFile = (File) it.next();
-
-            if ( RELEASE_POMv4.equals( projectFile.getName() ) )
-            {
-                releaseDirs.add( projectFile.getParentFile() );
-            }
-        }
-
-        for ( Iterator it = files.iterator(); it.hasNext(); )
-        {
-            File projectFile = (File) it.next();
-
-            // remove pom.xml files where there is a sibling release-pom.xml file...
-            if ( !RELEASE_POMv4.equals( projectFile.getName() ) && releaseDirs.contains( projectFile.getParentFile() ) )
-            {
-                it.remove();
-            }
-        }
-    }
-
+ 
     // Lifecycle phases
     
     public List<Lifecycle> getBuildLifecyclePhases()

@@ -277,12 +277,7 @@ public class DefaultMavenExecutionRequestPopulator
         else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
         {
             // Look for a release POM
-            File pom = new File( request.getBaseDirectory(), Maven.RELEASE_POMv4 );
-
-            if ( !pom.exists() )
-            {
-                pom = new File( request.getBaseDirectory(), Maven.POMv4 );
-            }
+            File pom = new File( request.getBaseDirectory(), Maven.POMv4 );
 
             request.setPom( pom );
         }

@@ -31,13 +31,8 @@ import org.apache.maven.execution.ReactorManager;
  */
 public interface Maven
 {
-    static String ROLE = Maven.class.getName();
-
     //jvz!! CLI pollution
     String POMv4 = "pom.xml";
-
-    //!!jvz release plugin pollution
-    String RELEASE_POMv4 = "release-pom.xml";
 
     MavenExecutionResult execute( MavenExecutionRequest request );
 
