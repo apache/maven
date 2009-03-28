@@ -124,7 +124,7 @@ public class DefaultLifecycleExecutor
                     for ( String goal : goals )
                     {
                         String target = currentProject.getId() + " ( " + goal + " )";
-                        executeGoalAndHandleFailures( goal, session, currentProject, session.getReactorManager(), buildStartTime, target );
+                        executeGoalAndHandleFailures( goal, session, currentProject, buildStartTime, target );
                     }
                 }
                 finally
@@ -137,7 +137,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, ReactorManager rm, long buildStartTime, String target )
+    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, long buildStartTime, String target )
         throws BuildFailureException, LifecycleExecutionException
     {
         try
@@ -146,22 +146,25 @@ public class DefaultLifecycleExecutor
         }
         catch ( LifecycleExecutionException e )
         {
-            if ( handleExecutionFailure( rm, project, e, task, buildStartTime ) )
+            if ( handleExecutionFailure( session, project, e, task, buildStartTime ) )
             {
                 throw e;
             }
         }
         catch ( BuildFailureException e )
         {
-            if ( handleExecutionFailure( rm, project, e, task, buildStartTime ) )
+            if ( handleExecutionFailure( session, project, e, task, buildStartTime ) )
             {
                 throw e;
             }
         }
     }
 
-    private boolean handleExecutionFailure( ReactorManager rm, MavenProject project, Exception e, String task, long buildStartTime )
+    private boolean handleExecutionFailure( MavenSession session, MavenProject project, Exception e, String task, long buildStartTime )
     {
+        //TODO: we shouldn't be registering build failures with the reactor manager, it should be in the session.
+        ReactorManager rm = session.getReactorManager();
+        
         rm.registerBuildFailure( project, e, task, System.currentTimeMillis() - buildStartTime );
 
         if ( ReactorManager.FAIL_FAST.equals( rm.getFailureBehavior() ) )
