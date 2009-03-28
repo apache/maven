@@ -88,4 +88,6 @@ public interface WagonManager
 
     void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );
 
+    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
+
 }

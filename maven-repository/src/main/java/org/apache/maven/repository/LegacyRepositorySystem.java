@@ -398,6 +398,8 @@ public class LegacyRepositorySystem
         proxyInfo.setPassword( password );
 
         proxies.put( protocol, proxyInfo );
+
+        wagonManager.addProxy( protocol, host, port, username, password, nonProxyHosts );
     }
 
     public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
