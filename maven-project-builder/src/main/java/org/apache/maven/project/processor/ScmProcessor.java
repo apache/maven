@@ -34,15 +34,21 @@ public class ScmProcessor extends BaseProcessor
         Model t = (Model) target;
         Model c = (Model) child;
         Model p = (Model) parent;
-        if(t.getScm() == null)
+        if((p == null || p.getScm() == null) && (c == null || c.getScm() == null))
         {
-            t.setScm( new Scm() );    
+        	//return;
         }
+        Scm targetScm = (t.getScm() == null) ? new Scm() : t.getScm();
+    
+        copyUrl( ((p != null) ? p.getScm() : null), c.getScm(), targetScm, c.getArtifactId(), p);
+        copyConnection( ((p != null) ? p.getScm() : null), c.getScm(), targetScm, c.getArtifactId(), p);
+        copyDeveloperConnection( ((p != null) ? p.getScm() : null), c.getScm(), targetScm, c.getArtifactId(), p);
+        copyTag( ( ( p != null ) ? p.getScm() : null ), c.getScm(), targetScm );
         
-        copyUrl( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId(), p);
-        copyConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId(), p);
-        copyDeveloperConnection( ((p != null) ? p.getScm() : null), c.getScm(), t.getScm(), c.getArtifactId(), p);
-        copyTag( ( ( p != null ) ? p.getScm() : null ), c.getScm(), t.getScm() );
+        if(t.getScm() ==null && (targetScm.getConnection() !=null || targetScm.getDeveloperConnection() != null || targetScm.getUrl() != null))
+        {
+        	t.setScm(targetScm);
+        }     
     }
     
     private void copyUrl(Scm p, Scm c, Scm t, String artifactId, Model parent )

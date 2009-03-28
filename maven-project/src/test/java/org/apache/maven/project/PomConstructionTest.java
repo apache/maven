@@ -944,8 +944,15 @@ public class PomConstructionTest
         PomTestWrapper pom = this.buildPom( "repo-inheritance" );
         assertEquals(1, ( (List<?>) pom.getValue( "repositories" ) ).size());
         assertEquals( "it0043", pom.getValue( "repositories[1]/name" ) );
-    }      
-
+    }   
+    
+    public void testEmptyScm()
+        throws Exception
+    {
+        PomTestWrapper pom = this.buildPom( "empty-scm" );
+        assertNull(pom.getValue( "scm" ));
+    }       
+    
     public void testPluginConfigurationUsingAttributesWithoutPluginManagement()
         throws Exception
     {
