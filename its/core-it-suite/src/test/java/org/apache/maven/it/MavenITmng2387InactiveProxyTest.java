@@ -43,6 +43,10 @@ public class MavenITmng2387InactiveProxyTest
 
     private int port;
 
+    private Server proxyServer;
+
+    private int proxyPort;
+
     private File testDir;
 
     public MavenITmng2387InactiveProxyTest()
@@ -55,17 +59,29 @@ public class MavenITmng2387InactiveProxyTest
     {
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2387" );
 
-        ResourceHandler resource_handler = new ResourceHandler();
-        resource_handler.setResourceBase( new File( testDir, "repo" ).getAbsolutePath() );
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setResourceBase( new File( testDir, "repo" ).getAbsolutePath() );
 
         HandlerList handlers = new HandlerList();
-        handlers.setHandlers( new Handler[] { resource_handler, new DefaultHandler() } );
+        handlers.setHandlers( new Handler[] { resourceHandler, new DefaultHandler() } );
 
         server = new Server( 0 );
         server.setHandler( handlers );
         server.start();
 
         port = server.getConnectors()[0].getLocalPort();
+
+        resourceHandler = new ResourceHandler();
+        resourceHandler.setResourceBase( new File( testDir, "proxy" ).getAbsolutePath() );
+
+        handlers = new HandlerList();
+        handlers.setHandlers( new Handler[] { resourceHandler, new DefaultHandler() } );
+
+        proxyServer = new Server( 0 );
+        proxyServer.setHandler( handlers );
+        proxyServer.start();
+
+        proxyPort = proxyServer.getConnectors()[0].getLocalPort();
     }
 
     protected void tearDown()
@@ -74,6 +90,7 @@ public class MavenITmng2387InactiveProxyTest
         super.tearDown();
 
         server.stop();
+        proxyServer.stop();
     }
 
     /**
@@ -87,6 +104,7 @@ public class MavenITmng2387InactiveProxyTest
         Properties properties = verifier.newDefaultFilterProperties();        
         properties.setProperty( "@host@", InetAddress.getLocalHost().getCanonicalHostName() );
         properties.setProperty( "@port@", Integer.toString( port ) );
+        properties.setProperty( "@proxyPort@", Integer.toString( proxyPort ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
 
         verifier.setAutoclean( false );
