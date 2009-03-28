@@ -15,16 +15,11 @@ package org.apache.maven.plugin;
  * the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.reporting.MavenReport;
 
 /**
  * @author Jason van Zyl
@@ -46,18 +41,5 @@ public interface PluginManager
     
     //!!jvz The current project is contained in the session
     void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
-        throws MojoFailureException, PluginExecutionException, PluginConfigurationException;
-        
-    //!!jvz 
-    // Reporting    
-    // As a function inside Maven is wrong. This needs to be entirely delegated to an external system. We need to provide an extension
-    // point for any tools that want to hook into the lifecycle but burning reporting into the core is extremely bad coupling. We need
-    // an aliasing mechanism for the POM as not to break backward compat. During 3.0 we can support this and at 3.1 with changes to the
-    // model we turf it.
-    
-    MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException, ArtifactResolutionException;
-    
-    PluginDescriptor loadReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
-        throws PluginLoaderException;    
+        throws MojoFailureException, PluginExecutionException, PluginConfigurationException;       
 }

@@ -52,8 +52,6 @@ public class MavenSession
     private MavenExecutionRequest request;
 
     private MavenProject currentProject;
-
-    private Map reports = new LinkedHashMap();
         
     // Used by the embedder to verifyPlugin
     public MavenSession( PlexusContainer container, MavenExecutionRequest request )
@@ -148,47 +146,6 @@ public class MavenSession
     public MavenProject getCurrentProject()
     {
         return currentProject;
-    }
-
-    /**
-     * Retrieve the list of reports ({@link MavenReport} instances) that have been executed against
-     * this project, for use in another mojo's execution.
-     */
-    public List getReports()
-    {
-        if ( reports == null )
-        {
-            return Collections.EMPTY_LIST;
-        }
-
-        return new ArrayList( reports.values() );
-    }
-
-    /**
-     * Clear the reports for this project
-     */
-    public void clearReports()
-    {
-        reports.clear();
-    }
-
-    /**
-     * Add a newly-executed report ({@link MavenReport} instance) to the reports collection, for
-     * future reference.
-     */
-    public void addReport( MojoDescriptor mojoDescriptor, MavenReport report )
-    {
-        reports.put( mojoDescriptor, report );
-    }
-
-    public Set getReportMojoDescriptors()
-    {
-        if ( reports == null )
-        {
-            return Collections.EMPTY_SET;
-        }
-
-        return reports.keySet();
     }
 
     public ProjectBuilderConfiguration getProjectBuilderConfiguration()

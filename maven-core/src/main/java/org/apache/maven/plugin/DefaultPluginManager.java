@@ -55,7 +55,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -583,15 +582,6 @@ public class DefaultPluginManager
             {
                 throw new PluginExecutionException( mojoExecution, project, e );
             }
-
-            // NEW: If the mojo that just executed is a report, store it in the LifecycleExecutionContext
-            // for reference by future mojos.
-            if ( mojo instanceof MavenReport )
-            {
-                session.addReport( mojoDescriptor, (MavenReport) mojo );
-            }
-
-            //dispatcher.dispatchEnd( event, goalExecId );
         }
         catch ( MojoExecutionException e )
         {
@@ -627,70 +617,6 @@ public class DefaultPluginManager
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
         }
-    }
-
-    public MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException, ArtifactResolutionException
-    {
-        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-        PluginDescriptor descriptor = mojoDescriptor.getPluginDescriptor();
-        Xpp3Dom dom = project.getReportConfiguration( descriptor.getGroupId(), descriptor.getArtifactId(), mojoExecution.getExecutionId() );
-        if ( mojoExecution.getConfiguration() != null )
-        {
-            dom = Xpp3Dom.mergeXpp3Dom( dom, mojoExecution.getConfiguration() );
-        }
-
-        return (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution );
-    }
-
-    public PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
-    {
-        String version = reportPlugin.getVersion();
-
-        if ( version == null )
-        {
-            version = resolveReportPluginVersion( reportPlugin.getGroupId(), reportPlugin.getArtifactId(), project, session );
-
-            reportPlugin.setVersion( version );
-        }
-
-        Plugin plugin = new Plugin();
-
-        plugin.setGroupId( reportPlugin.getGroupId() );
-        plugin.setArtifactId( reportPlugin.getArtifactId() );
-        plugin.setVersion( version );
-        
-        try
-        {            
-            addPlugin( plugin, project, session );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            String groupId = plugin.getGroupId();
-
-            String artifactId = plugin.getArtifactId();
-
-            String pluginVersion = plugin.getVersion();
-
-            if ( ( groupId == null ) || ( artifactId == null ) || ( pluginVersion == null ) )
-            {
-                throw new PluginNotFoundException( plugin, e );
-            }
-            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) && pluginVersion.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
-            {
-                throw new PluginNotFoundException( plugin, e );
-            }
-            else
-            {
-                throw e;
-            }
-        }
-
-        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
-
-        return pluginDescriptor;        
     }
 
     private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report, MojoExecution mojoExecution )
@@ -733,12 +659,6 @@ public class DefaultPluginManager
             else
             {
                 logger.warn( "No luck." );
-            }
-
-            if ( report && !( mojo instanceof MavenReport ) )
-            {
-                // TODO: the mojoDescriptor should actually capture this information so we don't get this far
-                return null;
             }
 
             if ( mojo instanceof ContextEnabled )
@@ -1397,42 +1317,6 @@ public class DefaultPluginManager
         plugin.setVersion( version );
     }
 
-    public String resolveReportPluginVersion( String groupId, String artifactId, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
-    {
-        String version = null;
-        
-        if ( project.getReportPlugins() != null )
-        {
-            for ( Iterator it = project.getReportPlugins().iterator(); it.hasNext() && ( version == null ); )
-            {
-                ReportPlugin plugin = (ReportPlugin) it.next();
-
-                if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-                {
-                    version = plugin.getVersion();
-                }
-            }
-        }
-        
-        // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
-        // in settings.xml.
-        if ( StringUtils.isEmpty( version ) || Artifact.RELEASE_VERSION.equals( version ) )
-        {
-            // 1. resolve the version to be used
-            version = resolveMetaVersion( groupId, artifactId, project, session.getLocalRepository(), Artifact.RELEASE_VERSION );
-            logger.debug( "Version from RELEASE metadata: " + version );
-        }
-
-        // if we still haven't found a version, then fail early before we get into the update goop.
-        if ( StringUtils.isEmpty( version ) )
-        {
-            throw new PluginVersionNotFoundException( groupId, artifactId );
-        }
-
-        return version;
-    }
-
     private String resolveMetaVersion( String groupId, String artifactId, MavenProject project, ArtifactRepository localRepository, String metaVersionId )
         throws PluginVersionResolutionException, InvalidPluginException
     {
@@ -1650,49 +1534,6 @@ public class DefaultPluginManager
             }
         }
     }           
-
-    /**
-     * Load the {@link PluginDescriptor} instance for the specified report plugin, using the project for
-     * the {@link ArtifactRepository} and other supplemental report/plugin information as necessary.
-     */
-    public PluginDescriptor loadReportPlugin( ReportPlugin plugin, MavenProject project, MavenSession session )
-        throws PluginLoaderException
-    {
-        // TODO: Shouldn't we be injecting pluginManagement info here??
-
-        try
-        {
-            return verifyReportPlugin( plugin, project, session );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginNotFoundException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginVersionResolutionException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( InvalidPluginException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginManagerException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginVersionNotFoundException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-    }
     
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
         throws PluginLoaderException

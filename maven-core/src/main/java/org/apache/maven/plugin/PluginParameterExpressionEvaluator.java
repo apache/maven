@@ -203,10 +203,6 @@ public class PluginParameterExpressionEvaluator
         {
             value = context.getSortedProjects();
         }
-        else if ( "reports".equals( expression ) )
-        {
-            value = context.getReports();
-        }
         else if ("mojoExecution".equals(expression))
         {
         	value = mojoExecution;
