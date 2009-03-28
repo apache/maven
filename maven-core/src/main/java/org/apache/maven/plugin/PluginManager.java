@@ -20,6 +20,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
@@ -40,6 +41,10 @@ public interface PluginManager
     PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException;
     
+    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
+        throws PluginLoaderException;
+    
+    //!!jvz The current project is contained in the session
     void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
         throws MojoFailureException, PluginExecutionException, PluginConfigurationException;
         

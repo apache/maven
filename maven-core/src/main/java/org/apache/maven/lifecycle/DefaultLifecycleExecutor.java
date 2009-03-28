@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.maven.BuildFailureException;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
@@ -318,28 +317,14 @@ public class DefaultLifecycleExecutor
         }  
         
         return lifecyclePlan;
-    }
-
-    //TODO: which form is most useful. passing in string to parse is not really good.
-    
-    MojoDescriptor getMojoDescriptor( Artifact pluginArtifact, String goal, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException
-    {
-        return null;
-    }    
-    
-    
-    MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException
-    {
-        return null;
-    }    
-    
+    }  
+           
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException
     {
         String goal;
+        
         Plugin plugin;
 
         StringTokenizer tok = new StringTokenizer( task, ":" );
@@ -366,7 +351,16 @@ public class DefaultLifecycleExecutor
             {
                 for ( Plugin buildPlugin : project.getBuildPlugins() )
                 {
-                    PluginDescriptor desc = loadPlugin( buildPlugin, project, session );
+                    PluginDescriptor desc;
+                    
+                    try
+                    {
+                        desc = pluginManager.loadPlugin( buildPlugin, project, session );
+                    }
+                    catch ( PluginLoaderException e )
+                    {
+                        throw new LifecycleExecutionException( "Error loading PluginDescriptor.", e );                        
+                    }
 
                     if ( prefix.equals( desc.getGoalPrefix() ) )
                     {
@@ -408,28 +402,22 @@ public class DefaultLifecycleExecutor
             project.injectPluginManagementInfo( plugin );
         }
 
-        PluginDescriptor pluginDescriptor = loadPlugin( plugin, project, session );
-
-        // this has been simplified from the old code that injected the plugin management stuff, since
-        // pluginManagement injection is now handled by the project method.
-        project.addPlugin( plugin );
-
-        MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
+        MojoDescriptor mojoDescriptor;
         
-        return mojoDescriptor;
-    }
-
-    private PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws LifecycleExecutionException
-    {
         try
         {
-            return pluginManager.loadPlugin( plugin, project, session );
+            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );
         }
         catch ( PluginLoaderException e )
         {
-            throw new LifecycleExecutionException( e.getMessage(), e );
-        }
+            throw new LifecycleExecutionException( "Error loading MojoDescriptor.", e );
+        }        
+        
+        // this has been simplified from the old code that injected the plugin management stuff, since
+        // pluginManagement injection is now handled by the project method.
+        project.addPlugin( plugin );        
+        
+        return mojoDescriptor;
     }
 
     public void initialize()

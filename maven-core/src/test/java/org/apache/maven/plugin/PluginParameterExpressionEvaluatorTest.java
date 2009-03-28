@@ -42,7 +42,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -341,8 +340,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "value", value );
     }
 
-    private static MavenSession createSession( PlexusContainer container,
-                                               ArtifactRepository repo )
+    private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo )
         throws CycleDetectedException, DuplicateProjectException
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
@@ -352,7 +350,7 @@ public class PluginParameterExpressionEvaluatorTest
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
-        return new MavenSession( container, request, (List)null );
+        return new MavenSession( container, request );
     }
 
     public void testLocalRepositoryExtraction()
@@ -412,9 +410,7 @@ public class PluginParameterExpressionEvaluatorTest
         return new MavenProject( new Model() );
     }
 
-    private ExpressionEvaluator createExpressionEvaluator( MavenProject project,
-                                                           PluginDescriptor pluginDescriptor,
-                                                           Properties executionProperties )
+    private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties )
         throws Exception
     {
         ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
@@ -430,8 +426,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         MojoExecution mojoExecution = new MojoExecution( mojo );
 
-        return new PluginParameterExpressionEvaluator( session, mojoExecution, null, container.getLogger(), project,
-                                                       executionProperties );
+        return new PluginParameterExpressionEvaluator( session, mojoExecution, null, container.getLogger(), project, executionProperties );
     }
 
     protected Artifact createArtifact( String groupId,
@@ -472,7 +467,7 @@ public class PluginParameterExpressionEvaluatorTest
         ReactorManager rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
         MockControl mockMavenExecutionRequest = MockControl.createControl( MavenExecutionRequest.class );
         MavenExecutionRequest req = (MavenExecutionRequest) mockMavenExecutionRequest.getMock();
-        MavenSession session = new MavenSession( getContainer(), req, rm );
+        MavenSession session = new MavenSession( getContainer(), req );
 
         return session;
     }

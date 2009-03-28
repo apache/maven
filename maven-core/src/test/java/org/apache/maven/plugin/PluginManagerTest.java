@@ -1,12 +1,8 @@
 package org.apache.maven.plugin;
 
-import java.io.File;
-import java.util.List;
-
 import org.apache.maven.AbstractCoreMavenComponentTest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -26,7 +22,7 @@ public class PluginManagerTest
 
     protected String getProjectsDirectory()
     {
-        return "src/test/projects/plugin-manager";
+        return "src/test/projects/lifecycle-executor";
     }
                 
     // -----------------------------------------------------------------------------------------------
@@ -44,9 +40,14 @@ public class PluginManagerTest
         throws Exception
     {
         MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
-        String pluginArtifactId = "remote-resources";
         String goal = "process";
-        MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( pluginArtifactId + ":" + goal, session, session.getCurrentProject() );
+        
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( "org.apache.maven.plugins" );
+        plugin.setArtifactId( "maven-remote-resources-plugin" );
+        plugin.setVersion( "1.0" );
+        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-remote-resources-plugin", "1.0" );
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
         pluginManager.executeMojo( session.getCurrentProject(), mojoExecution, session );
@@ -56,9 +57,14 @@ public class PluginManagerTest
         throws Exception
     {
         MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
-        String pluginArtifactId = "surefire";
         String goal = "test";
-        MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( pluginArtifactId + ":" + goal, session, session.getCurrentProject() );
+
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( "org.apache.maven.plugins" );
+        plugin.setArtifactId( "maven-surefire-plugin" );
+        plugin.setVersion( "2.4.2" );
+        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );                
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-surefire-plugin", "2.4.2" );
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
         pluginManager.executeMojo( session.getCurrentProject(), mojoExecution, session );

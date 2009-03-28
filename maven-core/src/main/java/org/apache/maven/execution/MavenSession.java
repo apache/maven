@@ -91,21 +91,6 @@ public class MavenSession
         this.eventDispatcher = new DefaultEventDispatcher( request.getEventMonitors() );        
     }    
     
-    //TODO: get rid of this
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, ReactorManager reactorManager )
-    {
-        this.container = container;
-        this.request = request;
-        this.reactorManager = reactorManager;
-    }
-    
-    //TODO: get rid of this
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, ReactorManager reactorManager, EventDispatcher eventdispatcher )
-    {
-        this( container, request, reactorManager );
-        this.eventDispatcher = eventdispatcher;
-    }
-
     public Map<String,Object> getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
     {
         if ( reactorManager == null )

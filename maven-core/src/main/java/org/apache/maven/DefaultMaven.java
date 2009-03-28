@@ -341,7 +341,7 @@ public class DefaultMaven
 
     protected MavenSession createSession( MavenExecutionRequest request, ReactorManager reactorManager, EventDispatcher dispatcher )
     {
-        MavenSession session = new MavenSession( container, request, reactorManager, dispatcher );
+        MavenSession session = new MavenSession( container, request );
 
         return session;
     }

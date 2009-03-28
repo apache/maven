@@ -22,6 +22,7 @@ import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
+//TODO: use the AbstractCoreMavenComponentTest
 public class BuildExtensionListenerTest
     extends PlexusTestCase
 {
@@ -70,7 +71,7 @@ public class BuildExtensionListenerTest
         ReactorManager rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepositoryPath( new File( System.getProperty( "user.home" ), ".m2/repository" ) );        
-        MavenSession session = new MavenSession( getContainer(), request, rm );
+        MavenSession session = new MavenSession( getContainer(), request );
 
         return session;
     }

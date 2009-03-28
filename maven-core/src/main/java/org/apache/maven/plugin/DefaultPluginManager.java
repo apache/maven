@@ -1814,4 +1814,10 @@ public class DefaultPluginManager
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
     }
+    
+    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
+        throws PluginLoaderException
+    {
+        return loadPlugin( plugin, session.getCurrentProject(), session ).getMojo( goal );
+    }
 }
