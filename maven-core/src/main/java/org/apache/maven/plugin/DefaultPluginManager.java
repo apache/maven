@@ -23,18 +23,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+//TODO: all of this needs to be translated into the RepositorySystem or removed. 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -50,8 +48,7 @@ import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
+// end
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Dependency;
@@ -1307,70 +1304,10 @@ public class DefaultPluginManager
             .setFilter( filter );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
-
-        if ( result.hasMissingArtifacts() )
-        {
-            /*
-             
-            only do this if we are an aggregating plugin: MNG-2277
-            if the dependency doesn't yet exist but is in the reactor, then
-            all we can do is warn and skip it. A better fix can be inserted into 2.1
-            
-            */
-            if ( isAggregator && checkMissingArtifactsInReactor( context.getSortedProjects(), result.getMissingArtifacts() ) )
-            {
-                // all found, so clear up the result state to prevent the error handler from blowing up
-                result.setUnresolvedArtifacts( null );
-            }
-        }
         
         resolutionErrorHandler.throwErrors( request, result );
 
         project.setArtifacts( result.getArtifacts() );
-    }
-
-    /**
-     * This method is checking to see if the artifacts that can't be resolved are all part of this
-     * reactor. This is done to prevent a chicken or egg scenario with fresh projects that have a
-     * plugin that is an aggregator and requires dependencies. See MNG-2277 for more info.
-     * 
-     * NOTE: If this happens, it most likely means the project-artifact for an interproject
-     * dependency doesn't have a file yet (it hasn't been built yet).
-     * 
-     * @param projects the sibling projects in the reactor
-     * @param missing the artifacts that can't be found
-     * @return true if ALL missing artifacts are found in the reactor.
-     */
-    private boolean checkMissingArtifactsInReactor( Collection projects, Collection missing )
-    {
-        Collection foundInReactor = new HashSet();
-        Iterator iter = missing.iterator();
-        while ( iter.hasNext() )
-        {
-            Artifact mArtifact = (Artifact) iter.next();
-            Iterator pIter = projects.iterator();
-            while ( pIter.hasNext() )
-            {
-                MavenProject p = (MavenProject) pIter.next();
-                if ( p.getArtifactId().equals( mArtifact.getArtifactId() ) && p.getGroupId().equals( mArtifact.getGroupId() ) && p.getVersion().equals( mArtifact.getVersion() ) )
-                {
-                    //TODO: the packaging could be different, but the exception doesn't contain that info
-                    //most likely it would be produced by the project we just found in the reactor since all
-                    //the other info matches. Assume it's ok.
-                    logger
-                        .warn( "The dependency: "
-                            + p.getId()
-                            + " can't be resolved but has been found in the reactor.\nThis dependency has been excluded from the plugin execution. You should rerun this mojo after executing mvn install.\n" );
-
-                    //found it, move on.
-                    foundInReactor.add( p );
-                    break;
-                }
-            }
-        }
-
-        //if all of them have been found, we can continue.
-        return foundInReactor.size() == missing.size();
     }
 
     // ----------------------------------------------------------------------
@@ -1388,53 +1325,6 @@ public class DefaultPluginManager
             Artifact artifact = (Artifact) it.next();
             
             repositorySystem.resolve( new ArtifactResolutionRequest( artifact, localRepository, remoteArtifactRepositories ) );
-        }
-    }
-
-    public static void checkPlexusUtils( ResolutionGroup resolutionGroup, ArtifactFactory artifactFactory )
-    {
-        // ----------------------------------------------------------------------------
-        // If the plugin already declares a dependency on plexus-utils then we're all
-        // set as the plugin author is aware of its use. If we don't have a dependency
-        // on plexus-utils then we must protect users from stupid plugin authors who
-        // did not declare a direct dependency on plexus-utils because the version
-        // Maven uses is hidden from downstream use. We will also bump up any
-        // anything below 1.1 to 1.1 as this mimics the behaviour in 2.0.5 where
-        // plexus-utils 1.1 was being forced into use.
-        // ----------------------------------------------------------------------------
-
-        VersionRange vr = null;
-
-        try
-        {
-            vr = VersionRange.createFromVersionSpec( "[1.1,)" );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            // Won't happen
-        }
-
-        boolean plexusUtilsPresent = false;
-
-        for ( Iterator i = resolutionGroup.getArtifacts().iterator(); i.hasNext(); )
-        {
-            Artifact a = (Artifact) i.next();
-
-            if ( a.getArtifactId().equals( "plexus-utils" ) && vr.containsVersion( new DefaultArtifactVersion( a.getVersion() ) ) )
-            {
-                plexusUtilsPresent = true;
-
-                break;
-            }
-        }
-
-        if ( !plexusUtilsPresent )
-        {
-            // We will add plexus-utils as every plugin was getting this anyway from Maven itself. We will set the
-            // version to the latest version we know that works as of the 2.0.6 release. We set the scope to runtime
-            // as this is what's implicitly happening in 2.0.6.
-
-            resolutionGroup.getArtifacts().add( artifactFactory.createArtifact( "org.codehaus.plexus", "plexus-utils", "1.1", Artifact.SCOPE_RUNTIME, "jar" ) );
         }
     }
 
