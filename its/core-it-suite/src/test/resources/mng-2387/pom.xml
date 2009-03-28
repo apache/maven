@@ -28,31 +28,16 @@ under the License.
 
   <name>Maven Integration Test :: MNG-2387</name> 
   <description>
-    Test that mirror definitions are properly evaluated. In particular, the first matching mirror definition
-    from the settings should win, i.e. ordering of mirror definitions matters.
+    Test that no proxy is used if none of the configured proxies is actually set as active.
   </description>
 
   <dependencies>
     <dependency>
-      <!-- Provided by repo maven-core-it-a and only this repo -->
       <groupId>org.apache.maven.its.mng2387</groupId>
       <artifactId>a</artifactId>
       <version>0.1</version>
     </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <id>central</id>
-      <url>http://@host@:@port@/</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <build>
     <plugins>

@@ -47,7 +47,6 @@ public class MavenITmng2387InactiveProxyTest
 
     public MavenITmng2387InactiveProxyTest()
     {
-        // TODO: re-instate feature in 3.0
         super( "[2.0.11,2.1.0-M1),[2.1.0,)" ); // 2.0.11+, 2.1.0+
     }
 
@@ -78,10 +77,9 @@ public class MavenITmng2387InactiveProxyTest
     }
 
     /**
-     * Test that mirror definitions are properly evaluated. In particular, the first matching mirror definition
-     * from the settings should win, i.e. ordering of mirror definitions matters.
+     * Test that no proxy is used if none of the configured proxies is actually set as active.
      */
-    public void testitFirstMatchWins()
+    public void testit()
         throws Exception
     {
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
@@ -89,7 +87,7 @@ public class MavenITmng2387InactiveProxyTest
         Properties properties = verifier.newDefaultFilterProperties();        
         properties.setProperty( "@host@", InetAddress.getLocalHost().getCanonicalHostName() );
         properties.setProperty( "@port@", Integer.toString( port ) );
-        verifier.filterFile( "pom-unfiltered.xml", "pom.xml", "UTF-8", properties );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
 
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2387" );

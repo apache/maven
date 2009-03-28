@@ -22,10 +22,31 @@ under the License.
 <settings>
   <proxies>
     <proxy>
+      <!-- NOTE: Set as inactive so should not be used, even if the one and only proxy configured -->
       <active>false</active>
       <protocol>http</protocol>
       <host>localhost</host>
       <port>0</port>
     </proxy>
   </proxies>
+  <profiles>
+    <profile>
+      <id>maven-core-it</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://@host@:@port@/</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
 </settings>
