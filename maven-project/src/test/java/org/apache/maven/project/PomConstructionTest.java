@@ -768,7 +768,7 @@ public class PomConstructionTest
         testAppendOfInheritedPluginConfiguration( "no-profile" );
     }
     
-    /* FIXME: MNG-2591*/
+    /* MNG-2591*/
     public void testAppendOfInheritedPluginConfigurationWithActiveProfile()
         throws Exception
     {
@@ -928,15 +928,7 @@ public class PomConstructionTest
         assertEquals("https://scm.project.url/child", pom.getValue( "scm/developerConnection" ));
         assertEquals("http://site.project.url/child", pom.getValue( "distributionManagement/site/url" ));
     } 
-    
-    /** MNG-4087 */
-    public void testPercentEncodedUrl()
-        throws Exception
-    {
-        PomTestWrapper pom = this.buildPom( "percent-encoded-url" );
-        assertEquals("@baseurl@/target/repo", pom.getValue( "distributionManagement/repository/url" ));
-    }    
-    
+
     /** MNG-0479 */
     public void testRepoInheritance()
         throws Exception
@@ -1301,7 +1293,26 @@ public class PomConstructionTest
         assertEquals("0.2", pom.getValue( "build/extensions[2]/version" ) );
         assertEquals("c", pom.getValue( "build/extensions[3]/artifactId" ) );
     }
- 
+    
+    /** MNG-4116 */
+    public void testPercentEncodedUrlsMustNotBeDecoded()
+        throws Exception
+    {
+        PomTestWrapper pom = this.buildPom( "url-no-decoding" );
+        assertEquals( "http://maven.apache.org/spacy%20path", pom.getValue( "url" ) );
+        assertEquals( "http://svn.apache.org/viewvc/spacy%20path", pom.getValue( "scm/url" ) );
+        assertEquals( "scm:svn:svn+ssh://svn.apache.org/spacy%20path", pom.getValue( "scm/connection" ) );
+        assertEquals( "scm:svn:svn+ssh://svn.apache.org/spacy%20path", pom.getValue( "scm/developerConnection" ) );
+        assertEquals( "http://issues.apache.org/spacy%20path", pom.getValue( "issueManagement/url" ) );
+        assertEquals( "http://ci.apache.org/spacy%20path", pom.getValue( "ciManagement/url" ) );
+        assertEquals( "scm:svn:svn+ssh://dist.apache.org/spacy%20path",
+                      pom.getValue( "distributionManagement/repository/url" ) );
+        assertEquals( "scm:svn:svn+ssh://snap.apache.org/spacy%20path",
+                      pom.getValue( "distributionManagement/snapshotRepository/url" ) );
+        assertEquals( "scm:svn:svn+ssh://site.apache.org/spacy%20path",
+                      pom.getValue( "distributionManagement/site/url" ) );
+    }    
+
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();

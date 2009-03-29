@@ -19,10 +19,6 @@ package org.apache.maven.project.processor;
  * under the License.
  */
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
@@ -124,7 +120,7 @@ public class DistributionManagementProcessor
 
         if ( target.getUrl() == null )
         {
-        	target.setUrl( decodeUrl(source.getUrl()) );
+        	target.setUrl( source.getUrl() );
         }
 
         if ( target.getName() == null )
@@ -151,7 +147,7 @@ public class DistributionManagementProcessor
         {
             if ( isChild )
             {
-                target.setUrl( decodeUrl(source.getUrl()) );
+                target.setUrl( source.getUrl() );
             }         
             else
             {          	
@@ -160,7 +156,7 @@ public class DistributionManagementProcessor
         }
         else 
         {
-            target.setUrl( decodeUrl(target.getUrl() + (target.getUrl().endsWith("/")  ? "" : "/")+ artifactId) );
+            target.setUrl( target.getUrl() + (target.getUrl().endsWith("/")  ? "" : "/")+ artifactId );
         }
     }
 

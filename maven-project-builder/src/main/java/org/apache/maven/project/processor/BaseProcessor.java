@@ -20,11 +20,8 @@ package org.apache.maven.project.processor;
  */
 
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -100,21 +97,6 @@ public abstract class BaseProcessor implements Processor
         return parent;
     }
     
-    protected String decodeUrl(String uri)
-    {
-    	if(uri == null)
-    	{
-    		return null;
-    	}
-    	
-    	try {
-			return URLDecoder.decode(uri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			return null;
-		}
-
-    }
-    
     protected String normalizeUriWithRelativePath(String u, String artifactId, Model parent)
     {
     	if(u == null)
@@ -132,7 +114,7 @@ public abstract class BaseProcessor implements Processor
 			{
 				normalized = normalized.replaceFirst("/", slashes);
 			}
-			return decodeUrl(normalized);   
+			return normalized;   
 		} 
 		catch (URISyntaxException e) {
 
@@ -164,7 +146,7 @@ public abstract class BaseProcessor implements Processor
 		List<String> modules = moduleProject.getModules();
 		if (modules != null) {
 			for (Iterator<String> it = modules.iterator(); it.hasNext();) {
-				String modulePath = (String) it.next();
+				String modulePath = it.next();
 				String moduleName = modulePath;
 
 				if (moduleName.endsWith("/") || moduleName.endsWith("\\")) {

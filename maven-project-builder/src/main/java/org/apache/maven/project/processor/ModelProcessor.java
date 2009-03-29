@@ -19,7 +19,6 @@ package org.apache.maven.project.processor;
  * under the License.
  */
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -124,7 +123,7 @@ public class ModelProcessor
         
         if ( c.getUrl() != null )
         {
-            t.setUrl(decodeUrl(c.getUrl()));         
+            t.setUrl( c.getUrl() );         
         }       
         else if(p != null && p.getUrl() != null)
         {        	
@@ -132,7 +131,7 @@ public class ModelProcessor
         }
         else if (t.getUrl() != null)
         {
-            t.setUrl( decodeUrl(t.getUrl() + "/" + t.getArtifactId()) );
+            t.setUrl( t.getUrl() + "/" + t.getArtifactId() );
         }
         
         //Dependencies

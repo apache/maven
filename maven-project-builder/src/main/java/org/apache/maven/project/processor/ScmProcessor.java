@@ -19,10 +19,6 @@ package org.apache.maven.project.processor;
  * under the License.
  */
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Scm;
 
@@ -55,14 +51,14 @@ public class ScmProcessor extends BaseProcessor
     {
         if(c != null && c.getUrl() != null)
         {
-            t.setUrl(decodeUrl(c.getUrl()) );                       
+            t.setUrl( c.getUrl() );                       
         }   
         else if(p != null && p.getUrl() != null)
         {
         	t.setUrl( normalizeUriWithRelativePath(p.getUrl(), artifactId, parent));
         }      
         else if(t.getUrl() != null) {
-            t.setUrl( decodeUrl(t.getUrl() + "/" + artifactId) );
+            t.setUrl( t.getUrl() + "/" + artifactId );
         }
     }
     
@@ -70,14 +66,14 @@ public class ScmProcessor extends BaseProcessor
     {
         if(c!= null && c.getConnection() != null)
         {
-            t.setConnection(decodeUrl(c.getConnection()));         
+            t.setConnection( c.getConnection() );         
         }       
         else if(p != null && p.getConnection() != null)
         {       	
             t.setConnection(  normalizeUriWithRelativePath(p.getConnection(), artifactId, parent));
         } 
         else if(t.getConnection() != null) {
-            t.setConnection( decodeUrl(t.getConnection() + "/" + artifactId) );
+            t.setConnection( t.getConnection() + "/" + artifactId );
         }        
     }
     
@@ -85,14 +81,14 @@ public class ScmProcessor extends BaseProcessor
     {
         if(c!= null && c.getDeveloperConnection() != null)
         {
-            t.setDeveloperConnection(decodeUrl(c.getDeveloperConnection()));         
+            t.setDeveloperConnection( c.getDeveloperConnection() );         
         }       
         else if(p != null && p.getDeveloperConnection() != null)
         {     	
             t.setDeveloperConnection( normalizeUriWithRelativePath(p.getDeveloperConnection(), artifactId, parent) );
         }    
         else if(t.getDeveloperConnection() != null){
-            t.setDeveloperConnection( decodeUrl(t.getDeveloperConnection() + "/" + artifactId) );
+            t.setDeveloperConnection( t.getDeveloperConnection() + "/" + artifactId );
         }           
     }    
     
