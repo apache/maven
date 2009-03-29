@@ -26,7 +26,7 @@ under the License.
       <active>false</active>
       <protocol>http</protocol>
       <host>localhost</host>
-      <!-- NOTE: We need to point at a reachable server here or Java simply fails back to a non-proxied connection -->
+      <!-- NOTE: We need to point at a reachable server here or Java simply falls back to a non-proxied connection -->
       <port>@proxyPort@</port>
     </proxy>
   </proxies>
