@@ -31,7 +31,6 @@ import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
@@ -133,12 +132,10 @@ public class DefaultMavenExecutionRequest
         copy.setGlobalSettingsFile( original.getGlobalSettingsFile() );
         copy.setBaseDirectory( new File( original.getBaseDirectory() ) );
         copy.setGoals( original.getGoals() );
-        copy.setUseReactor( original.useReactor() );
         copy.setRecursive( original.isRecursive() );
         copy.setPom( original.getPom() );
         copy.setReactorFailureBehavior( original.getReactorFailureBehavior() );
         copy.setProperties( original.getProperties() );
-        copy.setStartTime( original.getStartTime() );
         copy.setShowErrors( original.isShowErrors() );
         copy.setActiveProfiles( original.getActiveProfiles());
         copy.setInactiveProfiles(  original.getInactiveProfiles());

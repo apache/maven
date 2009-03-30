@@ -1,6 +1,5 @@
 package org.apache.maven.lifecycle;
 
-import org.apache.maven.InvalidTaskException;
 import org.apache.maven.plugin.InvalidPluginException;
 import org.apache.maven.plugin.PluginLoaderException;
 

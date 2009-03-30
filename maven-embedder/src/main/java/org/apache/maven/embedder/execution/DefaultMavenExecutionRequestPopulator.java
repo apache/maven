@@ -80,8 +80,6 @@ public class DefaultMavenExecutionRequestPopulator
     {
         executionProperties( request, configuration );
 
-        pom( request, configuration );
-
         settings( request, configuration );
 
         localRepository( request, configuration );
@@ -250,38 +248,6 @@ public class DefaultMavenExecutionRequestPopulator
         // </mirrors>        
 
         request.setRemoteRepositories( repositorySystem.getMirrors( request.getRemoteRepositories() ) );
-    }
-
-    // ------------------------------------------------------------------------
-    // POM
-    // ------------------------------------------------------------------------
-
-    private void pom( MavenExecutionRequest request, Configuration configuration )
-    {
-        // ------------------------------------------------------------------------
-        // POM
-        //
-        // If we are not given a specific POM file, but passed a base directory
-        // then we will use a release POM in the directory provide, or and then
-        // look for the standard POM.
-        // ------------------------------------------------------------------------
-
-        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
-        {
-            request.setBaseDirectory( request.getPom().getParentFile() );
-        }
-        else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
-        {
-            // Look for a release POM
-            File pom = new File( request.getBaseDirectory(), Maven.POMv4 );
-
-            request.setPom( pom );
-        }
-        // TODO: Is this correct?
-        else if ( request.getBaseDirectory() == null )
-        {
-            request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
-        }
     }
 
     // ------------------------------------------------------------------------

@@ -25,6 +25,43 @@ public class PluginManagerTest
         return "src/test/projects/lifecycle-executor";
     }
                 
+    public void testPluginLoading()
+        throws Exception
+    {
+        MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( "org.codehaus.plexus" );
+        plugin.setArtifactId( "plexus-component-metadata" );
+        plugin.setVersion( "1.0-beta-3.0.6" );
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, session.getCurrentProject(), session );
+        assertNotNull( pluginDescriptor );
+        assertNotNull( pluginDescriptor.getClassRealm() );
+    }
+    
+    public void testMojoDescriptorRetrieval()
+        throws Exception
+    {
+        MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
+        String goal = "generate-metadata";
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( "org.codehaus.plexus" );
+        plugin.setArtifactId( "plexus-component-metadata" );
+        plugin.setVersion( "1.0-beta-3.0.6" );
+        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );        
+        assertNotNull( mojoDescriptor );
+        assertEquals( "generate-metadata", mojoDescriptor.getGoal() );
+        assertNotNull( mojoDescriptor.getRealm() );
+        mojoDescriptor.getRealm().display();
+        
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+        assertNotNull( pluginDescriptor );
+        assertEquals( "org.codehaus.plexus", pluginDescriptor.getGroupId() );
+        assertEquals( "plexus-component-metadata", pluginDescriptor.getArtifactId() );
+        assertEquals( "1.0-beta-3.0.6", pluginDescriptor.getVersion() );
+        assertNotNull( pluginDescriptor.getClassRealm() );
+    }
+    
     // -----------------------------------------------------------------------------------------------
     // Tests which exercise the lifecycle executor when it is dealing with individual goals.
     // -----------------------------------------------------------------------------------------------

@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.Maven;
@@ -34,7 +33,6 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -64,7 +62,6 @@ import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
@@ -115,8 +112,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private ClassWorld classWorld;
-
-    private ClassRealm realm;
 
     private MavenEmbedderLogger logger;
 
@@ -329,12 +324,16 @@ public class MavenEmbedder
             return result.addException( e );
         }
 
+        //TODO: need to check for circularity problems here even though this is purely downloading and for IDEs they will take care of circularity problems.
+        
+        /*
         ReactorManager reactorManager = maven.createReactorManager( request, result );
 
         if ( result.hasExceptions() )
         {
             return result;
         }
+        */
 
         MavenProjectBuildingResult projectBuildingResult;
 
@@ -347,6 +346,7 @@ public class MavenEmbedder
             return result.addException( e );
         }
 
+        /*
         if ( reactorManager.hasMultipleProjects() )
         {
             result.setProject( projectBuildingResult.getProject() );
@@ -359,6 +359,7 @@ public class MavenEmbedder
 
             result.setTopologicallySortedProjects( Arrays.asList( new MavenProject[]{ projectBuildingResult.getProject()} ) );
         }
+        */
 
         result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
 
@@ -605,7 +606,7 @@ public class MavenEmbedder
         return container;
     }
 
-    public List getLifecyclePhases()
+    public List<String> getLifecyclePhases()
     {       
         return maven.getLifecyclePhases();
     }

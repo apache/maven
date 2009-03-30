@@ -1,31 +1,24 @@
 package org.apache.maven;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
-
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -34,9 +27,7 @@ import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.project.MavenProject;
@@ -47,16 +38,12 @@ import org.apache.maven.reactor.MissingModuleException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
- * @todo EventDispatcher should be a component as it is internal to maven.
  */
 @Component(role = Maven.class)
 public class DefaultMaven
@@ -64,7 +51,7 @@ public class DefaultMaven
 {
     @Requirement
     protected MavenProjectBuilder projectBuilder;
-    
+
     @Requirement
     protected LifecycleExecutor lifecycleExecutor;
 
@@ -74,14 +61,11 @@ public class DefaultMaven
     @Requirement
     protected RuntimeInformation runtimeInformation;
 
-    @Requirement
-    private Logger logger;
-
     public List<String> getLifecyclePhases()
     {
         return lifecycleExecutor.getLifecyclePhases();
     }
-    
+
     // ----------------------------------------------------------------------
     // Project execution
     // ----------------------------------------------------------------------
@@ -92,28 +76,17 @@ public class DefaultMaven
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
-        request.setStartTime( new Date() );
-
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-        ReactorManager reactorManager = createReactorManager( request, result );
+        MavenSession session = createMavenSession( request, result );        
 
-        if ( result.hasExceptions() )
+        if ( session.getReactorManager().hasMultipleProjects() )
         {
-            return result;
-        }
+            //logger.info( "Reactor build order: " );
 
-        MavenSession session = createSession( request, reactorManager );
-
-        logger.info( "Scanning for projects..." );
-
-        if ( reactorManager.hasMultipleProjects() )
-        {
-            logger.info( "Reactor build order: " );
-
-            for( MavenProject project : reactorManager.getSortedProjects() )
+            for ( MavenProject project : session.getReactorManager().getSortedProjects() )
             {
-                logger.info( "  " + project.getName() );
+                //logger.info( "  " + project.getName() );
             }
         }
 
@@ -134,18 +107,21 @@ public class DefaultMaven
             return result;
         }
 
-        result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
+        result.setTopologicallySortedProjects( session.getReactorManager().getSortedProjects() );
 
-        result.setProject( reactorManager.getTopLevelProject() );
+        result.setProject( session.getReactorManager().getTopLevelProject() );
 
         return result;
-    }    
-    
-    public ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result )
+    }
+
+    public MavenSession createMavenSession( MavenExecutionRequest request, MavenExecutionResult result )
     {
-        List projects;
+        MavenSession session;
+        
+        List<MavenProject> projects;
+
         try
-        {            
+        {
             projects = getProjects( request );
 
             if ( projects.isEmpty() )
@@ -166,13 +142,11 @@ public class DefaultMaven
             return null;
         }
 
-        ReactorManager reactorManager;
-
         try
-        {
-            reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
-
-            result.setReactorManager( reactorManager );
+        {                        
+            session = new MavenSession( container, request, projects );
+            
+            result.setReactorManager( session.getReactorManager() );            
         }
         catch ( CycleDetectedException e )
         {
@@ -191,205 +165,101 @@ public class DefaultMaven
             return null;
         }
 
-        return reactorManager;
-    }
-
-    protected List getProjects( MavenExecutionRequest request )
-        throws MavenExecutionException
-    {
-        List projects;
-
-        List files;
-        try
-        {
-            files = getProjectFiles( request );
-        }
-        catch ( IOException e )
-        {
-            throw new MavenExecutionException( "Error selecting project files for the reactor: " + e.getMessage(), e );
-        }
-
-        projects = collectProjects( files, request, !request.useReactor() );
-
-        return projects;
-    }
-
-    private List collectProjects( List files, MavenExecutionRequest request, boolean isRoot )
-        throws MavenExecutionException
-    {
-        List projects = new ArrayList( files.size() );
-
-        if ( !files.isEmpty() )
-        {
-            for ( Iterator iterator = files.iterator(); iterator.hasNext(); )
-            {
-                File file = (File) iterator.next();
-
-                MavenProject project;
-                
-                try
-                {
-                    project = projectBuilder.build( file, request.getProjectBuildingConfiguration() );
-                }
-                catch ( ProjectBuildingException e )
-                {
-                    throw new MavenExecutionException( "Failed to build MavenProject instance for: " + file, file, e );
-                }
-
-                if ( isRoot )
-                {
-                    project.setExecutionRoot( true );
-                }
-
-                if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
-                {
-                    DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
-
-                    if ( runtimeInformation.getApplicationInformation().getVersion().compareTo( version ) < 0 )
-                    {
-                        throw new MavenExecutionException(
-                            "Unable to build project '" + file +
-                                "; it requires Maven version " + version.toString(), file );
-                    }
-                }
-
-                if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && request.isRecursive() )
-                {
-                    // TODO: Really should fail if it was not? What if it is aggregating - eg "ear"?
-                    project.setPackaging( "pom" );
-
-                    File basedir = file.getParentFile();
-
-                    // Initial ordering is as declared in the modules section
-                    List moduleFiles = new ArrayList( project.getModules().size() );
-
-                    for ( Iterator i = project.getModules().iterator(); i.hasNext(); )
-                    {
-                        String name = (String) i.next();
-
-                        if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
-                        {
-                            logger.warn( "Empty module detected. Please check you don't have any empty module definitions in your POM." );
-
-                            continue;
-                        }
-
-                        File moduleFile = new File( basedir, name );
-                        if ( !moduleFile.exists() )
-                        {
-                            throw new MissingModuleException( name, moduleFile, file );
-                        }
-                        else if ( moduleFile.isDirectory() )
-                        {
-                            moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
-                        }
-
-                        if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
-                        {
-                            // we don't canonicalize on unix to avoid interfering with symlinks
-
-                            try
-                            {
-                                moduleFile = moduleFile.getCanonicalFile();
-                            }
-                            catch ( IOException e )
-                            {
-                                throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
-                            }
-                        }
-                        else
-                        {
-                            moduleFile = new File( moduleFile.toURI().normalize() );
-                        }
-
-                        moduleFiles.add( moduleFile );
-                    }
-
-                    List collectedProjects = collectProjects( moduleFiles, request, false );
-
-                    projects.addAll( collectedProjects );
-                    project.setCollectedProjects( collectedProjects );
-                }
-                projects.add( project );
-            }
-        }
-
-        return projects;
-    }
-
-    // ----------------------------------------------------------------------
-    // Methods used by all execution request handlers
-    // ----------------------------------------------------------------------
-
-    //!! We should probably have the execution request handler create the
-    // session as
-    // the session type would be specific to the request i.e. having a project
-    // or not.
-
-    protected MavenSession createSession( MavenExecutionRequest request, ReactorManager reactorManager )
-    {
-        MavenSession session = new MavenSession( container, request );
-
         return session;
     }
 
-    private List getProjectFiles( MavenExecutionRequest request )
-        throws IOException
+    protected List<MavenProject> getProjects( MavenExecutionRequest request )
+        throws MavenExecutionException
     {
-        List files = Collections.EMPTY_LIST;
+        List<File> files = Arrays.asList( new File[] { new File( request.getPomFile() ) } );
 
-        File userDir = new File( request.getBaseDirectory() );
+        List<MavenProject> projects = collectProjects( files, request );
 
-        if ( request.useReactor() )
+        return projects;
+    }
+
+    private List<MavenProject> collectProjects( List<File> files, MavenExecutionRequest request )
+        throws MavenExecutionException
+    {
+        List<MavenProject> projects = new ArrayList<MavenProject>();
+
+        for ( File file : files )
         {
-            String includes = System.getProperty( "maven.reactor.includes", "**/" + POMv4 );
+            MavenProject project;
 
-            String excludes = System.getProperty( "maven.reactor.excludes", POMv4 );
-
-            files = FileUtils.getFiles( userDir, includes, excludes );
-
-            // make sure there is consistent ordering on all platforms, rather than using the filesystem ordering
-            Collections.sort( files );
-        }
-        else if ( request.getPom() != null )
-        {
-            File projectFile = request.getPom().getAbsoluteFile();
-
-            if ( projectFile.exists() )
+            try
             {
-                files = Collections.singletonList( projectFile );
+                project = projectBuilder.build( file, request.getProjectBuildingConfiguration() );
             }
-        }
-        else
-        {
-            File projectFile = new File( userDir, POMv4 );
+            catch ( ProjectBuildingException e )
+            {
+                throw new MavenExecutionException( "Failed to build MavenProject instance for: " + file, file, e );
+            }
+
+            if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
+            {
+                DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
+
+                if ( runtimeInformation.getApplicationInformation().getVersion().compareTo( version ) < 0 )
+                {
+                    throw new MavenExecutionException( "Unable to build project '" + file + "; it requires Maven version " + version.toString(), file );
+                }
+            }
+
+            if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && request.isRecursive() )
+            {
+                File basedir = file.getParentFile();
+
+                List<File> moduleFiles = new ArrayList<File>();
+
+                for ( String name : project.getModules() )
+                {
+                    if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
+                    {
+                        continue;
+                    }
+
+                    File moduleFile = new File( basedir, name );
+                    
+                    if ( !moduleFile.exists() )
+                    {
+                        throw new MissingModuleException( name, moduleFile, file );
+                    }
+                    else if ( moduleFile.isDirectory() )
+                    {
+                        moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
+                    }
+
+                    if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+                    {
+                        // we don't canonicalize on unix to avoid interfering with symlinks
+                        try
+                        {
+                            moduleFile = moduleFile.getCanonicalFile();
+                        }
+                        catch ( IOException e )
+                        {
+                            throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
+                        }
+                    }
+                    else
+                    {
+                        moduleFile = new File( moduleFile.toURI().normalize() );
+                    }
+
+                    moduleFiles.add( moduleFile );
+                }
+
+                List<MavenProject> collectedProjects = collectProjects( moduleFiles, request );
+
+                projects.addAll( collectedProjects );
+                
+                project.setCollectedProjects( collectedProjects );
+            }
             
-            if ( projectFile.exists() )
-            {
-                files = Collections.singletonList( projectFile );
-            }
+            projects.add( project );
         }
 
-        return files;
-    }
- 
-    // Lifecycle phases
-    
-    public List<Lifecycle> getBuildLifecyclePhases()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Lifecycle> getCleanLifecyclePhases()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public List<Lifecycle> getSiteLifecyclePhases()
-    {
-        // TODO Auto-generated method stub
-        return null;
+        return projects;
     }
 }

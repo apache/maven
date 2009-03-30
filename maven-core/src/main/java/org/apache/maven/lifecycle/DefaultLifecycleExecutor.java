@@ -29,6 +29,10 @@ import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.PluginConfigurationException;
+import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -184,35 +188,30 @@ public class DefaultLifecycleExecutor
     {
         List<MojoDescriptor> lifecyclePlan = calculateLifecyclePlan( task, session );        
         
-        for( MojoDescriptor md : lifecyclePlan )
+        for ( MojoDescriptor mojoDescriptor : lifecyclePlan )
         {
-            System.out.println( md.getFullGoalName() );
-        }        
-        
-        /*
-        for ( MojoExecution mojoExecution : goals )
-         {
-             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor ); 
 
-             try
-             {
-                 pluginManager.executeMojo( project, mojoExecution, session );
-             }
-             catch ( PluginManagerException e )
-             {
-                 throw new LifecycleExecutionException( "Internal error in the plugin manager executing goal '" + mojoDescriptor.getId() + "': " + e.getMessage(), e );
-             }
-             catch ( MojoFailureException e )
-             {
-                 throw new BuildFailureException( e.getMessage(), e );
-             }
-             catch ( PluginConfigurationException e )
-             {
-                 throw new LifecycleExecutionException( e.getMessage(), e );
-             }
-         }         
-          */
-
+            try
+            {
+                pluginManager.executeMojo( project, mojoExecution, session );
+            }
+            catch ( MojoFailureException e )
+            {
+                // If the mojo actually screws up, like a compilation error
+                throw new LifecycleExecutionException( "Error executing goal.", e );                                        
+            }
+            catch ( PluginExecutionException e )
+            {
+                // This looks like a duplicate
+                throw new LifecycleExecutionException( "Error executing goal.", e );                                        
+            }
+            catch ( PluginConfigurationException e )
+            {
+                // If the mojo can't actually be configured
+                throw new LifecycleExecutionException( "Error executing goal.", e );                                        
+            }
+        }         
     }
 
     // 1. Find the lifecycle given the phase (default lifecycle when given install)

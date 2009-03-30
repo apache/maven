@@ -1,6 +1,6 @@
-package org.apache.maven;
+package org.apache.maven.lifecycle;
 
-import org.apache.maven.lifecycle.TaskValidationResult;
+import org.apache.maven.BuildFailureException;
 
 /**
  * Exception which occurs when a task or goal is specified on the command line

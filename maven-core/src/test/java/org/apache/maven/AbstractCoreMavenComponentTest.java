@@ -66,28 +66,37 @@ public abstract class AbstractCoreMavenComponentTest
         containerConfiguration.addComponentDiscoveryListener( new MavenPluginCollector() );
     }
     
-    // - remove the event monitor, just default or get rid of it
-    // layer the creation of a project builder configuration with a request, but this will need to be
-    // a Maven subclass because we don't want to couple maven to the project builder which we need to
-    // separate.
-    protected MavenSession createMavenSession( File pom )
+    protected MavenExecutionRequest createMavenExecutionRequest( File pom )
         throws Exception
     {
         ArtifactRepository localRepository = repositorySystem.createDefaultLocalRepository();
         ArtifactRepository remoteRepository = repositorySystem.createDefaultRemoteRepository();
         
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setPom( pom )
             .setProjectPresent( true )
             .setPluginGroups( Arrays.asList( new String[] { "org.apache.maven.plugins" } ) )
             .setLocalRepository( localRepository )
             .setRemoteRepositories( Arrays.asList( remoteRepository ) )
             .setGoals( Arrays.asList( new String[] { "package" } ) )   
-            .setProperties( new Properties() );
+            .setProperties( new Properties() );        
+        
+        return request;
+    }
+    
+    // layer the creation of a project builder configuration with a request, but this will need to be
+    // a Maven subclass because we don't want to couple maven to the project builder which we need to
+    // separate.
+    protected MavenSession createMavenSession( File pom )
+        throws Exception
+    {
+        MavenExecutionRequest request = createMavenExecutionRequest( pom );
 
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
-            .setLocalRepository( localRepository )
-            .setRemoteRepositories( Arrays.asList( remoteRepository ) );
+            .setLocalRepository( request.getLocalRepository() )
+            .setRemoteRepositories( request.getRemoteRepositories() );
 
+        // We just need to use the configuration, and get the POM from that.
         MavenProject project = projectBuilder.build( pom, configuration );        
                         
         MavenSession session = new MavenSession( getContainer(), request, project );

@@ -39,10 +39,6 @@ public class MojoExecution
 
     private Xpp3Dom configuration;
 
-    private List forkedExecutions = new ArrayList();
-
-    private List reports;
-
     public MojoExecution( MojoDescriptor mojoDescriptor )
     {
         this.mojoDescriptor = mojoDescriptor;
@@ -77,26 +73,6 @@ public class MojoExecution
     public Xpp3Dom getConfiguration()
     {
         return configuration;
-    }
-
-    public void addMojoExecution( MojoExecution execution )
-    {
-        forkedExecutions.add( execution );
-    }
-
-    public void setReports( List reports )
-    {
-        this.reports = reports;
-    }
-
-    public List getReports()
-    {
-        return reports;
-    }
-
-    public List getForkedExecutions()
-    {
-        return forkedExecutions;
     }
 
     public void setConfiguration( Xpp3Dom configuration )

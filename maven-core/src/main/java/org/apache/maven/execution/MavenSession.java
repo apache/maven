@@ -19,22 +19,15 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -125,11 +118,6 @@ public class MavenSession
         return request.isProjectPresent();
     }
 
-    public Date getStartTime()
-    {
-        return request.getStartTime();
-    }
-
     public MavenExecutionRequest getRequest()
     {
         return request;
@@ -140,9 +128,6 @@ public class MavenSession
         this.currentProject = currentProject;
     }
 
-    /**
-     * Return the current project for use in a mojo execution.
-     */
     public MavenProject getCurrentProject()
     {
         return currentProject;

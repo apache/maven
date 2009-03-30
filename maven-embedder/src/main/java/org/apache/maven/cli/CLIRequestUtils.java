@@ -229,7 +229,6 @@ public final class CLIRequestUtils
             .setUserProperties( userProperties ) // optional
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
-            .setUseReactor( useReactor ) // default: false
             .setShowErrors( showErrors ) // default: false
             .setInteractiveMode( interactive ) // default: true
             .setOffline( offline ) // default: false

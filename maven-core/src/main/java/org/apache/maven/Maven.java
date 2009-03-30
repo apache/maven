@@ -31,13 +31,9 @@ import org.apache.maven.execution.ReactorManager;
  */
 public interface Maven
 {
-    //jvz!! CLI pollution
     String POMv4 = "pom.xml";
 
     MavenExecutionResult execute( MavenExecutionRequest request );
-
-    //!!jvz This should not be exposed but is as a result of the buildProjectWithDependencies 
-    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result );    
     
-    List getLifecyclePhases();
+    List<String> getLifecyclePhases();
 }

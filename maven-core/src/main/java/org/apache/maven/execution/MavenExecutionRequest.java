@@ -101,9 +101,6 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setReactorFailureBehavior( String failureBehavior );
     String getReactorFailureBehavior();
 
-    MavenExecutionRequest setUseReactor( boolean useReactor );
-    boolean useReactor();
-
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );
     boolean isRecursive();

@@ -23,7 +23,6 @@ package org.apache.maven.plugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -345,7 +344,6 @@ public class PluginParameterExpressionEvaluatorTest
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setProperties( new Properties() )
-            .setStartTime( new Date() )
             .setGoals( Collections.EMPTY_LIST )
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );

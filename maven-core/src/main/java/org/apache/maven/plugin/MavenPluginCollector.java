@@ -54,11 +54,11 @@ public class MavenPluginCollector
             PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
 
             String key = constructPluginKey( pluginDescriptor );
-
+            
             if ( !pluginsInProcess.contains( key ) )
             {
                 pluginsInProcess.add( key );
-
+                
                 pluginDescriptors.put( key, pluginDescriptor );
             }
         }
