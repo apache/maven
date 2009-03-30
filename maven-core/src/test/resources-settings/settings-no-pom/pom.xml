@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>org.apache.maven.its.mng3099</groupId>
+	<artifactId>maven-mng3099-plugin</artifactId>
+	<version>1</version>
+	<packaging>maven-plugin</packaging>
+	
+	<name>maven-mng3099-plugin</name>
+	<description>Tests properties injected as a result of active profiles in the user settings file.</description>
+</project>
