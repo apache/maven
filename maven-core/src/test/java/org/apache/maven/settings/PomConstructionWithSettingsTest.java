@@ -3,6 +3,7 @@ package org.apache.maven.settings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.List;
 
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
@@ -39,10 +40,10 @@ public class PomConstructionWithSettingsTest
         mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
     }
     
-    public void testA() throws Exception
+    public void testSettingsNoPom() throws Exception
     {
     	PomTestWrapper pom = buildPom( "settings-no-pom" );
-    	System.out.println(pom.getDomainModel().asString());
+    	assertEquals( "local-profile-prop-value", pom.getValue( "properties/local-profile-prop" ) );
     }
 
     private PomTestWrapper buildPom( String pomPath )
@@ -62,6 +63,16 @@ public class PomConstructionWithSettingsTest
 	
 	        profileManager.addProfile( profile );
 	    }    
+
+        List<String> settingsActiveProfileIds = settings.getActiveProfiles();
+
+        if ( settingsActiveProfileIds != null )
+        {
+            for ( String profileId : settingsActiveProfileIds )
+            {
+                profileManager.getProfileActivationContext().setActive( profileId );
+            }
+        }	    
 	    
 	    ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
 	    config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
