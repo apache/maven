@@ -59,7 +59,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author Jason van Zyl
  */
-@Component(role = RepositorySystem.class, hint = "default" )
+@Component( role = RepositorySystem.class, hint = "default" )
 public class LegacyRepositorySystem
     implements RepositorySystem
 {
@@ -450,5 +450,10 @@ public class LegacyRepositorySystem
     public List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories )
     {
         return mirrorBuilder.getMirrors( repositories );
+    }
+
+    public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
+    {
+        return null;
     }
 }

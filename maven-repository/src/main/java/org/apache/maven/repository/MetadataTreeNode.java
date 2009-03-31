@@ -38,7 +38,7 @@ public class MetadataTreeNode
     /**
      * this node's artifact MD
      */
-    private Artifact metadata;
+    private MavenArtifactMetadata metadata;
 
     /**
      * is there a real artifact behind this node, or it's just a helper ?
@@ -88,7 +88,7 @@ public class MetadataTreeNode
     }
 
     // ------------------------------------------------------------------------
-    public MetadataTreeNode( Artifact md, MetadataTreeNode parent )
+    public MetadataTreeNode( MavenArtifactMetadata md, MetadataTreeNode parent )
     {
 
         this.metadata = md;
@@ -131,7 +131,7 @@ public class MetadataTreeNode
     }
 
     // ------------------------------------------------------------------------
-    public Artifact getMetadata()
+    public MavenArtifactMetadata getMetadata()
     {
         return metadata;
     }

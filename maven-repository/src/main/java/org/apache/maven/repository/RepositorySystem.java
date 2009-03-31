@@ -66,7 +66,7 @@ public interface RepositorySystem
 
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
-    //MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
+    MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
        
     //REMOVE
     // Network enablement: this needs to go as we will know at a higher level from the embedder if the system is offline or not, we should not have to
