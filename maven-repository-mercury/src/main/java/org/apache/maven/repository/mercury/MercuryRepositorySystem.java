@@ -31,6 +31,8 @@ import org.apache.maven.mercury.plexus.PlexusMercury;
 import org.apache.maven.mercury.repository.api.Repository;
 import org.apache.maven.mercury.repository.api.RepositoryException;
 import org.apache.maven.mercury.util.Util;
+import org.apache.maven.repository.MetadataResolutionRequest;
+import org.apache.maven.repository.MetadataResolutionResult;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.LegacyRepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
@@ -95,6 +97,8 @@ public class MercuryRepositorySystem
 
         return result;
     }
+    
+    
 
 //    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
 //                                                            List<ArtifactRepository> remoteRepositories )
@@ -123,5 +127,13 @@ public class MercuryRepositorySystem
 //            throw new ArtifactMetadataRetrievalException(e);
 //        }
 //    }
+    
+
+    public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
+    {
+        MetadataResolutionResult res = null;
+        
+        return res;
+    }
 
 }
