@@ -66,7 +66,7 @@ public class MetadataResolutionResult
 
     private Set<Artifact> artifacts;
     
-    private MetadataTreeNode resolvedTree;
+    private MetadataGraph resolvedTree;
 
     public Artifact getOriginatingArtifact()
     {
@@ -343,12 +343,12 @@ public class MetadataResolutionResult
         return sb.toString();
     }
 
-    public MetadataTreeNode getResolvedTree()
+    public MetadataGraph getResolvedTree()
     {
         return resolvedTree;
     }
 
-    public void setResolvedTree( MetadataTreeNode resolvedTree )
+    public void setResolvedTree( MetadataGraph resolvedTree )
     {
         this.resolvedTree = resolvedTree;
     }
