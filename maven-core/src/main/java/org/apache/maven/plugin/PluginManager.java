@@ -39,6 +39,6 @@ public interface PluginManager
     MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
         throws PluginLoaderException;
     
-    void executeMojo( MojoExecution execution, MavenSession session )
+    void executeMojo( MavenSession session, MojoExecution execution )
         throws MojoFailureException, PluginExecutionException, PluginConfigurationException;       
 }

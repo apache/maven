@@ -87,7 +87,7 @@ public class PluginManagerTest
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-remote-resources-plugin", "1.1" );
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-        pluginManager.executeMojo( mojoExecution, session );
+        pluginManager.executeMojo( session, mojoExecution );
     }
 
     public void testSurefirePlugin()
@@ -104,7 +104,7 @@ public class PluginManagerTest
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );                
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-surefire-plugin", "2.4.2" );
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-        pluginManager.executeMojo( mojoExecution, session );
+        pluginManager.executeMojo( session, mojoExecution );
     }
     
     // -----------------------------------------------------------------------------------------------

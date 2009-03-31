@@ -353,7 +353,7 @@ public class DefaultPluginManager
     
     // We should assume that We've already loaded the plugin in question.
     
-    public void executeMojo( MojoExecution mojoExecution, MavenSession session )
+    public void executeMojo( MavenSession session, MojoExecution mojoExecution )
         throws MojoFailureException, PluginExecutionException, PluginConfigurationException
     {
         MavenProject project = session.getCurrentProject();

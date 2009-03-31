@@ -194,7 +194,7 @@ public class DefaultLifecycleExecutor
 
             try
             {
-                pluginManager.executeMojo( project, mojoExecution, session );
+                pluginManager.executeMojo( session, mojoExecution );
             }
             catch ( MojoFailureException e )
             {
