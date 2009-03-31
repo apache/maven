@@ -62,12 +62,8 @@ public class DefaultArtifactFilterManager
         artifacts.add( "maven-plugin-registry" );
         artifacts.add( "maven-profile" );
         artifacts.add( "maven-project" );
-        artifacts.add( "maven-reporting-api" );
         artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-settings" );
-        //adding shared/maven-toolchain project here, even though not part of the default
-        //distro yet.
-        artifacts.add( "maven-toolchain" );
         artifacts.add( "plexus-component-api" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-interactivity-api" );
