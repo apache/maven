@@ -82,10 +82,10 @@ public class PluginManagerTest
         Plugin plugin = new Plugin();
         plugin.setGroupId( "org.apache.maven.plugins" );
         plugin.setArtifactId( "maven-remote-resources-plugin" );
-        plugin.setVersion( "1.0" );
+        plugin.setVersion( "1.1" );
         
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );
-        assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-remote-resources-plugin", "1.0" );
+        assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-remote-resources-plugin", "1.1" );
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
         pluginManager.executeMojo( session.getCurrentProject(), mojoExecution, session );
     }
