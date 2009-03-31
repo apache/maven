@@ -27,7 +27,6 @@ import org.apache.maven.execution.ReactorManager;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface Maven
 {

@@ -353,9 +353,11 @@ public class DefaultPluginManager
     
     // We should assume that We've already loaded the plugin in question.
     
-    public void executeMojo( MavenProject project, MojoExecution mojoExecution, MavenSession session )
+    public void executeMojo( MojoExecution mojoExecution, MavenSession session )
         throws MojoFailureException, PluginExecutionException, PluginConfigurationException
     {
+        MavenProject project = session.getCurrentProject();
+        
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )

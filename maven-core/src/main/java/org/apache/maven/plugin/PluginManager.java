@@ -39,7 +39,6 @@ public interface PluginManager
     MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
         throws PluginLoaderException;
     
-    //!!jvz The current project is contained in the session
-    void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
+    void executeMojo( MojoExecution execution, MavenSession session )
         throws MojoFailureException, PluginExecutionException, PluginConfigurationException;       
 }

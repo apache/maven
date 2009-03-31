@@ -28,10 +28,11 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 import java.io.Reader;
 
+//TODO: collapse this into the plugin manager
+
 /**
  * @author Jason van Zyl
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 @Component( role=ComponentDiscoverer.class)
 public class MavenPluginDiscoverer
