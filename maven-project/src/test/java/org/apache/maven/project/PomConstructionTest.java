@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
@@ -218,6 +219,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-management-dependencies/sub", "test" );
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( "1.0-alpha-21", pom.getValue( "build/plugins[1]/version" ) );
         assertEquals( "1.0", pom.getValue( "build/plugins[1]/dependencies[1]/version" ) );
     }
@@ -1016,6 +1018,14 @@ public class PomConstructionTest
         assertEquals("true",  pom.getValue( "reporting/plugins[1]/configuration/booleanParam"));
     }    
     
+    public void testPropertiesNoDuplication()
+    	throws Exception
+    {
+    	PomTestWrapper pom = buildPom( "properties-no-duplication/sub" );	
+    	assertEquals(1, ( (Properties) pom.getValue( "properties" ) ).size());
+    	assertEquals("child",  pom.getValue( "properties/pomProfile" ) );
+    }
+    
     public void testCompleteModelWithoutParent()
         throws Exception
     {
@@ -1237,7 +1247,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom =
             buildPom( "profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d" );
-
+        System.out.println(pom.getDomainModel().asString());
         assertEquals( "e", pom.getValue( "properties[1]/pomProperty" ) );
     }
 

@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -128,7 +129,12 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-        MavenProject project = readModelFromLocalPath( "unknown", pomFile, configuration.getLocalRepository(), configuration.getRemoteRepositories(), configuration );
+        MavenProject project;
+		try {
+			project = buildWithoutProfiles( "unknown", pomFile, configuration.getLocalRepository(), configuration.getRemoteRepositories(), configuration );
+		} catch (IOException e) {
+			throw new ProjectBuildingException("", "", e);
+		}
 
         project.setFile( pomFile );
         project = buildWithProfiles( project.getModel(), configuration, pomFile, project.getParentFile() );
@@ -161,10 +167,11 @@ public class DefaultMavenProjectBuilder
         
         return buildFromRepository( pomArtifact, remoteArtifactRepositories, localRepository );
     }
-
-    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
-        throws ProjectBuildingException
+    
+    public MavenProject buildFromRepository(Artifact artifact, ProjectBuilderConfiguration configuration )
+    	throws ProjectBuildingException
     {
+     
         MavenProject project = hm.get( artifact.getId() );
 
         if ( project != null )
@@ -172,7 +179,7 @@ public class DefaultMavenProjectBuilder
             return project;
         }
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, localRepository, remoteRepositories );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, configuration.getLocalRepository(), configuration.getRemoteRepositories() );
         ArtifactResolutionResult result = repositorySystem.resolve( request );
                 
         try
@@ -183,19 +190,30 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
-        //Won't know anything about settings profiles in this path
-        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration()   
-            .setLocalRepository( localRepository )
-            .setRemoteRepositories( remoteRepositories );
 
-        project = readModelFromLocalPath( "unknown", artifact.getFile(), config.getLocalRepository(), remoteRepositories, config );
-        project = buildWithProfiles( project.getModel(), config, artifact.getFile(), project.getParentFile() );
+        try {
+			project = buildWithoutProfiles( "unknown", artifact.getFile(), configuration.getLocalRepository(), 
+					configuration.getRemoteRepositories(), configuration );
+		} catch (IOException e) {
+			throw new ProjectBuildingException(artifact.getId(), "Error reading project artifact.", e);
+		}
+        project = buildWithProfiles( project.getModel(), configuration, artifact.getFile(), project.getParentFile() );
+        
         artifact.setFile( artifact.getFile() );
         project.setVersion( artifact.getVersion() );
 
         hm.put( artifact.getId(), project );
 
-        return project;
+        return project;   	
+    }
+    
+    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()        
+        .setLocalRepository( localRepository )
+        .setRemoteRepositories(remoteRepositories);
+        return buildFromRepository(artifact, configuration);
     }
 
     /**
@@ -252,6 +270,7 @@ public class DefaultMavenProjectBuilder
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() );
         
+        
         if(request.getRemoteRepostories() == null)
         {
             request.setRemoteRepostories( new ArrayList<ArtifactRepository>() );
@@ -285,9 +304,11 @@ public class DefaultMavenProjectBuilder
      
         if(externalProfileManager != null)
         {           
+        	//System.out.println("PROFILES = " + externalProfileManager.getProfilesById().toString());
+        
             try
             {
-                projectProfiles.addAll( externalProfileManager.getActiveProfiles( model ) );
+                projectProfiles.addAll( externalProfileManager.getActiveProfiles( null ) );
             }
             catch ( ProfileActivationException e )
             {
@@ -301,7 +322,7 @@ public class DefaultMavenProjectBuilder
         //System.out.println("PROFILE POM: COUNT = " + model.getProfiles().size());
         try
         {
-            //System.out.println("PROFILE POM - ACTIVE: COUNT = " + profileManager.getActiveProfiles( model ).size());
+            //System.out.println("PROFILE POM - ACTIVE: COUNT = " + profileManager.getActiveProfiles( model ).size() +"," + projectProfiles.size());
             projectProfiles.addAll( profileManager.getActiveProfiles( model ) );
         }
         catch ( ProfileActivationException e )
@@ -309,14 +330,21 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( projectId, "Failed to activate pom profiles.", projectDescriptor,
                                                 e );
         }
+        
+        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
+        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
 
-        if(!projectProfiles.isEmpty())
-        {         
+        if ( config.getBuildStartTime() != null )
+        {
+            interpolatorProperties.add( new InterpolatorProperty( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ),
+                                                                  PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+        }      
             try
             {
                 PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, model, false );
                 ProcessorContext.interpolateModelProperties( dm.getModelProperties(),
-                                                             new ArrayList<InterpolatorProperty>(), dm );
+                                                             interpolatorProperties, dm );
                 dm = new PomClassicDomainModel( dm.getModelProperties(), false );
                 model = dm.getModel();
             }
@@ -324,9 +352,11 @@ public class DefaultMavenProjectBuilder
             {
 
                 throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
-            }            
-        }
-
+            }   
+                     
+      //  }
+     
+        
         MavenProject project;
 
         try
@@ -351,33 +381,32 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private MavenProject readModelFromLocalPath( String projectId, File pomFile, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, ProjectBuilderConfiguration config )
-        throws ProjectBuildingException
-    {
-        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-
-        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
-
-        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
-
-        if ( config.getBuildStartTime() != null )
+    private MavenProject buildWithoutProfiles( String projectId, File pomFile, ArtifactRepository localRepository, 
+    		List<ArtifactRepository> remoteRepositories, ProjectBuilderConfiguration projectBuilderConfiguration )
+        throws ProjectBuildingException, IOException
         {
-            interpolatorProperties.add( new InterpolatorProperty( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ),
-                                                                  PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        }
 
-        MavenProject mavenProject;
+        List<String> activeProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration.getGlobalProfileManager()
+            .getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyActiveProfileIds() : new ArrayList<String>();
+
+        List<String> inactiveProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration
+            .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
+                                                                              : new ArrayList<String>();
+
+        PomClassicDomainModel domainModel = buildModel( pomFile, new ArrayList<InterpolatorProperty>(), activeProfileIds, inactiveProfileIds, localRepository, remoteRepositories );
 
         try
         {
-            mavenProject = buildFromLocalPath( pomFile, interpolatorProperties, localRepository, remoteRepositories, config, this );
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( projectId, "File = " + pomFile.getAbsolutePath(), e );
-        }
+            MavenProject mavenProject = new MavenProject( convertFromInputStreamToModel( domainModel.getInputStream() ), repositorySystem, this, projectBuilderConfiguration );
 
-        return mavenProject;
+            mavenProject.setParentFile( domainModel.getParentFile() );
+
+            return mavenProject;
+        }
+        catch ( InvalidRepositoryException e )
+        {
+            throw new IOException( e.getMessage() );
+        }
 
     }
 
@@ -520,7 +549,8 @@ public class DefaultMavenProjectBuilder
             else
             {
                 profileModels.add( dm );
-            }       
+            }    
+               
         }
 
         PomClassicDomainModel transformedDomainModel = ProcessorContext.build( profileModels, properties );
@@ -554,34 +584,6 @@ public class DefaultMavenProjectBuilder
             }
         }
         return new PomClassicDomainModel( new ByteArrayInputStream( baos.toByteArray() ), isMostSpecialized );
-    }
-
-    protected MavenProject buildFromLocalPath( File pom, Collection<InterpolatorProperty> interpolatorProperties, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                               ProjectBuilderConfiguration projectBuilderConfiguration, MavenProjectBuilder mavenProjectBuilder )
-        throws IOException
-    {
-
-        List<String> activeProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration.getGlobalProfileManager()
-            .getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyActiveProfileIds() : new ArrayList<String>();
-
-        List<String> inactiveProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration
-            .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
-                                                                              : new ArrayList<String>();
-
-        PomClassicDomainModel domainModel = buildModel( pom, interpolatorProperties, activeProfileIds, inactiveProfileIds, localRepository, remoteRepositories );
-
-        try
-        {
-            MavenProject mavenProject = new MavenProject( convertFromInputStreamToModel( domainModel.getInputStream() ), repositorySystem, mavenProjectBuilder, projectBuilderConfiguration );
-
-            mavenProject.setParentFile( domainModel.getParentFile() );
-
-            return mavenProject;
-        }
-        catch ( InvalidRepositoryException e )
-        {
-            throw new IOException( e.getMessage() );
-        }
     }
 
     private static Model convertFromInputStreamToModel( InputStream inputStream )

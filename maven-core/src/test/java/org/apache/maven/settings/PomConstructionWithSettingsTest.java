@@ -45,7 +45,19 @@ public class PomConstructionWithSettingsTest
     	PomTestWrapper pom = buildPom( "settings-no-pom" );
     	assertEquals( "local-profile-prop-value", pom.getValue( "properties/local-profile-prop" ) );
     }
-
+    
+    /**MNG-4107 */
+   /* 
+    public void testPomAndSettingsInterpolation() throws Exception
+    {
+    	PomTestWrapper pom = buildPom( "test-pom-and-settings-interpolation" );
+    	System.out.println(pom.getDomainModel().asString());
+    	assertEquals("applied", pom.getValue( "properties/settingsProfile" ) );
+    	assertEquals("applied", pom.getValue( "properties/pomProfile" ) );
+    	assertEquals("settings", pom.getValue( "properties/pomVsSettings" ) );
+    	assertEquals("settings", pom.getValue( "properties/pomVsSettingsInterpolated" ) );
+    }    
+*/
     private PomTestWrapper buildPom( String pomPath )
     throws Exception
 	{

@@ -13,7 +13,7 @@ public class ProfilePropertiesProcessor
         Model t = (Model) target, c = (Model) child, p = (Model) parent;
 
         Properties properties = new Properties();
-               
+            
         if ( c.getProperties() != null )
         {
             properties.putAll( c.getProperties() );
@@ -32,9 +32,21 @@ public class ProfilePropertiesProcessor
             }
             else
             {
+            	//add(properties, t.getProperties());
                 t.getProperties().putAll( properties );
             }       
         }
+    }
+    
+    private static void add(Properties source, Properties target)
+    {
+    	for(Object key : source.keySet())
+    	{
+    		if(!target.containsKey(key))
+    		{  			
+    			target.put(key, source.get(key));
+    		}
+    	}
     }
 
 }
