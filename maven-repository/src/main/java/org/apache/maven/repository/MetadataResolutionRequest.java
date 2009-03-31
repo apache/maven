@@ -64,6 +64,18 @@ public class MetadataResolutionRequest
     private ArtifactMetadataSource metadataSource;
 
     private boolean resolveRoot = true;
+
+    /** result type - flat list */
+    private boolean asList = true;
+    
+    /** result type - dirty tree */
+    private boolean asDirtyTree = false;
+    
+    /** result type - resolved tree */
+    private boolean asResolvedTree = false;
+    
+    /** result type - graph */
+    private boolean asGraph = false;
     
     public MetadataResolutionRequest()
     {  
@@ -206,5 +218,49 @@ public class MetadataResolutionRequest
                 .append( "metadataSource: " ).append(  metadataSource ).append(  "\n" );
         
         return sb.toString();
+    }
+
+    public boolean isAsList()
+    {
+        return asList;
+    }
+
+    public MetadataResolutionRequest setAsList( boolean asList )
+    {
+        this.asList = asList;
+        return this;
+    }
+
+    public boolean isAsDirtyTree()
+    {
+        return asDirtyTree;
+    }
+
+    public MetadataResolutionRequest setAsDirtyTree( boolean asDirtyTree )
+    {
+        this.asDirtyTree = asDirtyTree;
+        return this;
+    }
+
+    public boolean isAsResolvedTree()
+    {
+        return asResolvedTree;
+    }
+
+    public MetadataResolutionRequest setAsResolvedTree( boolean asResolvedTree )
+    {
+        this.asResolvedTree = asResolvedTree;
+        return this;
+    }
+
+    public boolean isAsGraph()
+    {
+        return asGraph;
+    }
+
+    public MetadataResolutionRequest setAsGraph( boolean asGraph )
+    {
+        this.asGraph = asGraph;
+        return this;
     }
 }
