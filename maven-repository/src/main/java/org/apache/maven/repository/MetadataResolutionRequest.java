@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ResolutionListener;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
@@ -65,7 +64,7 @@ public class MetadataResolutionRequest
 
     private boolean resolveRoot = true;
 
-    /** result type - flat list */
+    /** result type - flat list; the default */
     private boolean asList = true;
     
     /** result type - dirty tree */
