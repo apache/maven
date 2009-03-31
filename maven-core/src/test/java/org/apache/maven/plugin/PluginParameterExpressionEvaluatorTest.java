@@ -348,7 +348,7 @@ public class PluginParameterExpressionEvaluatorTest
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
-        return new MavenSession( container, request );
+        return new MavenSession( request );
     }
 
     public void testLocalRepositoryExtraction()
@@ -465,7 +465,7 @@ public class PluginParameterExpressionEvaluatorTest
         ReactorManager rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
         MockControl mockMavenExecutionRequest = MockControl.createControl( MavenExecutionRequest.class );
         MavenExecutionRequest req = (MavenExecutionRequest) mockMavenExecutionRequest.getMock();
-        MavenSession session = new MavenSession( getContainer(), req );
+        MavenSession session = new MavenSession( req );
 
         return session;
     }

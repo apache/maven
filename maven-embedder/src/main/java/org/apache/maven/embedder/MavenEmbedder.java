@@ -89,6 +89,7 @@ public class MavenEmbedder
     //
     // ----------------------------------------------------------------------------
 
+    //TODO: this needs to be the standard container
     private MutablePlexusContainer container;
 
     // ----------------------------------------------------------------------
@@ -274,7 +275,7 @@ public class MavenEmbedder
     protected void verifyPlugin( Plugin plugin, MavenProject project )
         throws ComponentLookupException, PluginLoaderException
     {
-        MavenSession session = new MavenSession( container, request );
+        MavenSession session = new MavenSession( request );
         pluginManager.loadPlugin( plugin, project, session );
     }
 

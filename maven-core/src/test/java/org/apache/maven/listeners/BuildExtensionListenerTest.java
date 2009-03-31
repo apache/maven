@@ -70,7 +70,7 @@ public class BuildExtensionListenerTest
         ReactorManager rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepositoryPath( new File( System.getProperty( "user.home" ), ".m2/repository" ) );        
-        MavenSession session = new MavenSession( getContainer(), request );
+        MavenSession session = new MavenSession( request );
 
         return session;
     }

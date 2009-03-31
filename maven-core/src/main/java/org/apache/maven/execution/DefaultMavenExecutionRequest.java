@@ -676,6 +676,7 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
+    //TODO: this does not belong here.
     public ProjectBuilderConfiguration getProjectBuildingConfiguration()
     {
         if ( projectBuildingConfiguration == null )

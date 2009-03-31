@@ -36,7 +36,7 @@ public class DefaultArtifactFilterManager
     implements ArtifactFilterManager
 {
 
-    private static final Set DEFAULT_EXCLUSIONS;
+    private static final Set<String> DEFAULT_EXCLUSIONS;
 
     static
     {
@@ -78,7 +78,7 @@ public class DefaultArtifactFilterManager
         DEFAULT_EXCLUSIONS = artifacts;
     }
 
-    protected Set excludedArtifacts = new HashSet( DEFAULT_EXCLUSIONS );
+    protected Set<String> excludedArtifacts = new HashSet<String>( DEFAULT_EXCLUSIONS );
 
     /**
      * @deprecated Use this class as a component instead, and then use getArtifactFilter().

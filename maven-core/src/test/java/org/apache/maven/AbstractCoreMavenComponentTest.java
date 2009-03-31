@@ -99,7 +99,7 @@ public abstract class AbstractCoreMavenComponentTest
         // We just need to use the configuration, and get the POM from that.
         MavenProject project = projectBuilder.build( pom, configuration );        
                         
-        MavenSession session = new MavenSession( getContainer(), request, project );
+        MavenSession session = new MavenSession( request, project );
         
         return session;
     }
