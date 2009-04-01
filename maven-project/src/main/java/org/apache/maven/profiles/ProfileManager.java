@@ -35,6 +35,10 @@ public interface ProfileManager
 
     Map<String, Profile> getProfilesById();
 
+    @Deprecated
     List<Profile> getActiveProfiles( Model model )
         throws ProfileActivationException;
+    
+    List<Profile> getActiveProfiles( )
+    throws ProfileActivationException;    
 }

@@ -70,7 +70,7 @@ public class DefaultProfileManagerTest
         profileManager.addProfile( notActivated );
         profileManager.addProfile( defaultActivated );
 
-        List active = profileManager.getActiveProfiles( null );
+        List active = profileManager.getActiveProfiles();
 
         assertNotNull( active );
         assertEquals( 1, active.size() );
@@ -109,7 +109,7 @@ public class DefaultProfileManagerTest
         profileManager.addProfile( syspropActivated );
         profileManager.addProfile( defaultActivated );
 
-        List active = profileManager.getActiveProfiles( null );
+        List active = profileManager.getActiveProfiles();
 
         assertNotNull( active );
         assertEquals( 1, active.size() );
@@ -139,7 +139,7 @@ public class DefaultProfileManagerTest
 
         profileManager.addProfile( syspropActivated );
 
-        List active = profileManager.getActiveProfiles( null );
+        List active = profileManager.getActiveProfiles();
 
         assertNotNull( active );
         assertEquals( 0, active.size() );
@@ -169,7 +169,7 @@ public class DefaultProfileManagerTest
 
         ctx.setActive( "syspropActivated" );
 
-        List active = profileManager.getActiveProfiles( null );
+        List active = profileManager.getActiveProfiles();
 
         assertNotNull( active );
         assertEquals( 1, active.size() );
@@ -200,7 +200,7 @@ public class DefaultProfileManagerTest
 
         ctx.setInactive( "syspropActivated" );
 
-        List active = profileManager.getActiveProfiles( null );
+        List active = profileManager.getActiveProfiles();
 
         assertNotNull( active );
         assertEquals( 0, active.size() );

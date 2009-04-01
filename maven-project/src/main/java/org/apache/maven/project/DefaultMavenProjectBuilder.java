@@ -19,16 +19,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import java.util.List;
 import java.util.Map;
@@ -44,7 +40,6 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.DefaultProfileManager;
@@ -57,7 +52,6 @@ import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.profiles.ProfileContext;
 import org.apache.maven.project.processor.ProcessorContext;
-import org.apache.maven.project.processor.ProfilesProcessor;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
@@ -65,7 +59,6 @@ import org.apache.maven.repository.VersionNotFoundException;
 import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelEventListener;
-import org.apache.maven.shared.model.ModelProperty;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -74,7 +67,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * @version $Id$
@@ -318,7 +310,7 @@ public class DefaultMavenProjectBuilder
         
             try
             {
-                projectProfiles.addAll( externalProfileManager.getActiveProfiles( null ) );
+                projectProfiles.addAll( externalProfileManager.getActiveProfiles() );
             }
             catch ( ProfileActivationException e )
             {
@@ -333,7 +325,7 @@ public class DefaultMavenProjectBuilder
         try
         {
             //System.out.println("PROFILE POM - ACTIVE: COUNT = " + profileManager.getActiveProfiles( model ).size() +"," + projectProfiles.size());
-            projectProfiles.addAll( profileManager.getActiveProfiles( model ) );
+            projectProfiles.addAll( profileManager.getActiveProfiles() );
         }
         catch ( ProfileActivationException e )
         {
@@ -363,10 +355,7 @@ public class DefaultMavenProjectBuilder
 
                 throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
             }   
-                     
-      //  }
-     
-        
+
         MavenProject project;
 
         try
@@ -405,20 +394,6 @@ public class DefaultMavenProjectBuilder
                                                                               : new ArrayList<String>();
 
         return buildModel( pomFile, new ProfileContextInfo(null, activeProfileIds, inactiveProfileIds), localRepository, remoteRepositories );
-/*
-        try
-        {
-            MavenProject mavenProject = new MavenProject( convertFromInputStreamToModel( domainModel.getInputStream() ), repositorySystem, this, projectBuilderConfiguration );
-
-            mavenProject.setParentFile( domainModel.getParentFile() );
-
-            return mavenProject;
-        }
-        catch ( InvalidRepositoryException e )
-        {
-            throw new IOException( e.getMessage() );
-        }
-*/
     }
 
     private void validateModel( Model model, File pomFile )
@@ -536,8 +511,7 @@ public class DefaultMavenProjectBuilder
         }
 
         PomClassicDomainModel transformedDomainModel = ProcessorContext.build( profileModels, null );
-        //ProcessorContext.interpolateModelProperties(transformedDomainModel.getModelProperties(),
-        //		null, transformedDomainModel); 
+
         // Lineage count is inclusive to add the POM read in itself.
         transformedDomainModel.setLineageCount( lineageCount + 1 );
         transformedDomainModel.setParentFile( parentFile );
@@ -568,19 +542,6 @@ public class DefaultMavenProjectBuilder
             }
         }
         return new PomClassicDomainModel( new ByteArrayInputStream( baos.toByteArray() ), isMostSpecialized );
-    }
-
-    private static Model convertFromInputStreamToModel( InputStream inputStream )
-        throws IOException
-    {
-        try
-        {
-            return new MavenXpp3Reader().read( ReaderFactory.newXmlReader( inputStream ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new IOException( e.getMessage() );
-        }
     }
 
     /**

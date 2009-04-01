@@ -119,7 +119,10 @@ public class DefaultProfileManager
         }
     }
 
-    // TODO: Portions of this logic are duplicated in o.a.m.p.b.p.ProfileContext, something is wrong here
+	public List<Profile> getActiveProfiles() throws ProfileActivationException {
+		return getActiveProfiles(null);
+	}
+	
     public List<Profile> getActiveProfiles( Model model )
         throws ProfileActivationException
     {
@@ -250,19 +253,5 @@ public class DefaultProfileManager
         {
             profileActivationContext.setActiveByDefault( profileId );
         }
-    }
-
-
-    public static String getGroupId( Model model )
-    {
-        Parent parent = model.getParent();
-
-        String groupId = model.getGroupId();
-        if ( ( parent != null ) && ( groupId == null ) )
-        {
-            groupId = parent.getGroupId();
-        }
-
-        return groupId;
     }
 }

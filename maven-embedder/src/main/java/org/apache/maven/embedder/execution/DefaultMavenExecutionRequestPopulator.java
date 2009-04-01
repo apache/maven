@@ -202,7 +202,7 @@ public class DefaultMavenExecutionRequestPopulator
             // We need to convert profile repositories to artifact repositories
             try
             {
-                for ( Profile profile : profileManager.getActiveProfiles( new Model() ) )
+                for ( Profile profile : profileManager.getActiveProfiles() )
                 {
                     for ( Repository r : profile.getRepositories() )
                     {
