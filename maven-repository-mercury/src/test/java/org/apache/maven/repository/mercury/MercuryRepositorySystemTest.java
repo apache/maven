@@ -59,12 +59,13 @@ public class MercuryRepositorySystemTest
     {
         MavenArtifactMetadata mad = MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm-xml:3.0" ) );
         
-        MetadataResolutionRequest request = new MetadataResolutionRequest();
-        request.setLocalRepository( _localRepo );
-        request.setRemoteRepostories( _remoteRepos );
-        request.setArtifactMetadata( mad );
-        request.setAsResolvedTree( true );
-        request.setScope( "compile" );
+        MetadataResolutionRequest request = new MetadataResolutionRequest()
+            .setLocalRepository( _localRepo )
+            .setRemoteRepostories( _remoteRepos )
+            .setArtifactMetadata( mad )
+            .setAsResolvedTree( true )
+            .setScope( "compile" )
+        ;
         
         MetadataResolutionResult res = _mrs.resolveMetadata( request );
         
