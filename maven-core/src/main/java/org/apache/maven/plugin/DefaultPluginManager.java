@@ -44,7 +44,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -56,7 +55,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.PlexusContainer;
@@ -91,8 +89,8 @@ public class DefaultPluginManager
     @Requirement
     protected ArtifactFilterManager coreArtifactFilterManager;
 
-    @Requirement
-    protected PathTranslator pathTranslator;
+    //@Requirement
+    //protected PathTranslator pathTranslator;
 
     @Requirement
     protected MavenPluginCollector pluginCollector;
@@ -351,16 +349,18 @@ public class DefaultPluginManager
             logger.warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
         }
 
+        /*
         Model model = project.getModel();
         pathTranslator.alignToBaseDirectory( model, project.getBasedir() );
         project.setBuild( model.getBuild() );
+        */
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {            
             try
             {
                 // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
-                downloadDependencies( session, mojoDescriptor.isDependencyResolutionRequired() );
+                downloadProjectDependencies( session, mojoDescriptor.isDependencyResolutionRequired() );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -550,11 +550,7 @@ public class DefaultPluginManager
 
             PlexusConfiguration mergedConfiguration = mergeMojoConfiguration( pomConfiguration, mojoDescriptor );
 
-            // TODO: plexus changes to make this more like the component descriptor so this can be used instead
-            //            PlexusConfiguration mergedConfiguration = mergeConfiguration( pomConfiguration,
-            //                                                                          mojoDescriptor.getConfiguration() );
-
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution, pathTranslator, logger, session.getExecutionProperties() );
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
 
             PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration( mergedConfiguration, mojoDescriptor );
 
@@ -1092,17 +1088,54 @@ public class DefaultPluginManager
     // Artifact downloading
     // ----------------------------------------------------------------------
 
-    private void downloadDependencies( MavenSession session, String scope )
+    //TODO: This needs to be moved out of here, and there needs to be some interplay between the lifecycle executor and the plugin manager.   
+    private void downloadProjectDependencies( MavenSession session, String scope )
         throws ArtifactResolutionException, ArtifactNotFoundException, InvalidDependencyVersionException
-    {        
-        resolveTransitiveDependencies( session, scope );
+    {                
+        MavenProject project = session.getCurrentProject();
+        
+        // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
+        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
+
+        // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
+        // check this with yourkit as a hot spot.
+        // Don't recreate if already created - for effeciency, and because clover plugin adds to it
+        if ( project.getDependencyArtifacts() == null )
+        {
+            // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
+            try
+            {
+                project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
+            }
+            catch ( VersionNotFoundException e )
+            {
+                throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
+            }
+        }
+
+        ArtifactFilter filter = new ScopeArtifactFilter( scope );
+
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( artifact )
+            .setResolveRoot( false )
+            .setArtifactDependencies( project.getDependencyArtifacts() )
+            .setLocalRepository( session.getLocalRepository() )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( project.getManagedVersionMap() )
+            .setFilter( filter );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        
+        resolutionErrorHandler.throwErrors( request, result );
+
+        project.setArtifacts( result.getArtifacts() );                
         
         ArtifactRepository localRepository = session.getLocalRepository();
         List<ArtifactRepository> remoteArtifactRepositories = session.getCurrentProject().getRemoteArtifactRepositories();
 
-        for ( Artifact artifact : session.getCurrentProject().getArtifacts() )
+        for ( Artifact projectArtifact : session.getCurrentProject().getArtifacts() )
         {            
-            repositorySystem.resolve( new ArtifactResolutionRequest( artifact, localRepository, remoteArtifactRepositories ) );
+            repositorySystem.resolve( new ArtifactResolutionRequest( projectArtifact, localRepository, remoteArtifactRepositories ) );
         }
     }
    

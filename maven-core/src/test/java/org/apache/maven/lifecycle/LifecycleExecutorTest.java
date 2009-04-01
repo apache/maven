@@ -3,7 +3,7 @@ package org.apache.maven.lifecycle;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.AbstractCoreMavenComponentTest;
+import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginManager;
@@ -12,7 +12,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 public class LifecycleExecutorTest
-    extends AbstractCoreMavenComponentTest
+    extends AbstractCoreMavenComponentTestCase
 {
     @Requirement
     private DefaultLifecycleExecutor lifecycleExecutor;

@@ -8,6 +8,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MavenPluginCollector;
 import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
@@ -20,7 +21,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 
-public abstract class AbstractCoreMavenComponentTest
+public abstract class AbstractCoreMavenComponentTestCase
     extends PlexusTestCase
 {
     @Requirement
@@ -34,11 +35,11 @@ public abstract class AbstractCoreMavenComponentTest
     {
         super.setUp();
         repositorySystem = lookup( RepositorySystem.class );
-        projectBuilder = lookup( MavenProjectBuilder.class );        
+        projectBuilder = lookup( MavenProjectBuilder.class );                
     }
 
     abstract protected String getProjectsDirectory();
-    
+        
     protected File getProject( String name )
         throws Exception
     {
@@ -96,11 +97,28 @@ public abstract class AbstractCoreMavenComponentTest
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( request.getRemoteRepositories() );
 
-        // We just need to use the configuration, and get the POM from that.
-        MavenProject project = projectBuilder.build( pom, configuration );        
+        MavenProject project = null;
+        
+        if ( pom != null )
+        {
+            project = projectBuilder.build( pom, configuration );
+        }
+        else
+        {
+            project = createStubMavenProject();
+        }
                         
         MavenSession session = new MavenSession( getContainer(), request, project );
         
         return session;
+    }      
+    
+    protected MavenProject createStubMavenProject()
+    {
+        Model model = new Model();
+        model.setGroupId( "org.apache.maven.test" );
+        model.setArtifactId( "maven-test" );
+        model.setVersion( "1.0" );
+        return new MavenProject( model );        
     }
 }

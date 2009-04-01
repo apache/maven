@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -38,22 +39,15 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.easymock.MockControl;
 
 
 /**
@@ -62,33 +56,27 @@ import org.easymock.MockControl;
  *          06:06:21 jdcasey Exp $
  */
 public class PluginParameterExpressionEvaluatorTest
-    extends PlexusTestCase
+    extends AbstractCoreMavenComponentTestCase
 {
     private static final String FS = System.getProperty( "file.separator" );
 
     private ArtifactFactory factory;
 
-    private PathTranslator pathTranslator;
-
     public void setUp()
         throws Exception
     {
         super.setUp();
-        factory = lookup( ArtifactFactory.class );
-        pathTranslator = lookup( PathTranslator.class );
+        factory = lookup( ArtifactFactory.class );        
     }
-
+    
     public void testPluginDescriptorExpressionReference()
-        throws ExpressionEvaluationException, CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         MojoExecution exec = newMojoExecution();
 
         MavenSession session = newMavenSession();
 
-        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
-
-        Object result = new PluginParameterExpressionEvaluator( session, exec, pathTranslator,
-                                                                logger, new Properties() ).evaluate( "${plugin}" );
+        Object result = new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin}" );
 
         System.out.println( "Result: " + result );
 
@@ -98,7 +86,7 @@ public class PluginParameterExpressionEvaluatorTest
     }
 
     public void testPluginArtifactsExpressionReference()
-        throws ExpressionEvaluationException, CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         MojoExecution exec = newMojoExecution();
 
@@ -116,10 +104,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         MavenSession session = newMavenSession();
 
-        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
-
-        List depResults = (List) new PluginParameterExpressionEvaluator( session, exec, pathTranslator,
-                                                                logger, new Properties() ).evaluate( "${plugin.artifacts}" );
+        List depResults = (List) new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin.artifacts}" );
 
         System.out.println( "Result: " + depResults );
 
@@ -129,7 +114,7 @@ public class PluginParameterExpressionEvaluatorTest
     }
 
     public void testPluginArtifactMapExpressionReference()
-        throws ExpressionEvaluationException, CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         MojoExecution exec = newMojoExecution();
 
@@ -147,11 +132,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         MavenSession session = newMavenSession();
 
-        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
-
-        Map depResults = (Map) new PluginParameterExpressionEvaluator( session, exec,
-                                                                         pathTranslator, logger,
-                                                                         new Properties() ).evaluate( "${plugin.artifactMap}" );
+        Map depResults = (Map) new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin.artifactMap}" );
 
         System.out.println( "Result: " + depResults );
 
@@ -163,16 +144,13 @@ public class PluginParameterExpressionEvaluatorTest
     }
 
     public void testPluginArtifactIdExpressionReference()
-        throws ExpressionEvaluationException, CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
         MojoExecution exec = newMojoExecution();
 
         MavenSession session = newMavenSession();
 
-        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
-
-        Object result = new PluginParameterExpressionEvaluator( session, exec, pathTranslator,
-                                                                logger, new Properties() ).evaluate( "${plugin.artifactId}" );
+        Object result = new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin.artifactId}" );
 
         System.out.println( "Result: " + result );
 
@@ -339,11 +317,11 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "value", value );
     }
 
-    private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo )
+    private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo, Properties properties )
         throws CycleDetectedException, DuplicateProjectException
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setProperties( new Properties() )
+            .setProperties( properties )
             .setGoals( Collections.EMPTY_LIST )
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
@@ -416,7 +394,8 @@ public class PluginParameterExpressionEvaluatorTest
         ArtifactRepository repo = new DefaultArtifactRepository( "local", "target/repo", repoLayout );
 
         MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
-        MavenSession session = createSession( container, repo );
+        MavenSession session = createSession( container, repo, executionProperties );
+        session.setCurrentProject( project );
 
         MojoDescriptor mojo = new MojoDescriptor();
         mojo.setPluginDescriptor( pluginDescriptor );
@@ -424,7 +403,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         MojoExecution mojoExecution = new MojoExecution( mojo );
 
-        return new PluginParameterExpressionEvaluator( session, mojoExecution, null, container.getLogger(), project, executionProperties );
+        return new PluginParameterExpressionEvaluator( session, mojoExecution );
     }
 
     protected Artifact createArtifact( String groupId,
@@ -454,19 +433,15 @@ public class PluginParameterExpressionEvaluatorTest
     }
 
     private MavenSession newMavenSession()
-        throws CycleDetectedException, DuplicateProjectException
+        throws Exception
     {
-        Model model = new Model();
-        model.setGroupId( "group" );
-        model.setArtifactId( "artifact" );
-        model.setVersion( "1" );
+        return createMavenSession( null );        
+    }
 
-        MavenProject project = new MavenProject( model );
-        ReactorManager rm = new ReactorManager( Collections.singletonList( project ), ReactorManager.FAIL_FAST );
-        MockControl mockMavenExecutionRequest = MockControl.createControl( MavenExecutionRequest.class );
-        MavenExecutionRequest req = (MavenExecutionRequest) mockMavenExecutionRequest.getMock();
-        MavenSession session = new MavenSession( req );
-
-        return session;
+    @Override
+    protected String getProjectsDirectory()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

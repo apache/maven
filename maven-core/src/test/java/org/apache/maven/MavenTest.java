@@ -7,7 +7,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 public class MavenTest
-    extends AbstractCoreMavenComponentTest
+    extends AbstractCoreMavenComponentTestCase
 {
     @Requirement
     private Maven maven;

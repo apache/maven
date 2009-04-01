@@ -1,6 +1,6 @@
 package org.apache.maven.plugin;
 
-import org.apache.maven.AbstractCoreMavenComponentTest;
+import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -8,7 +8,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 public class PluginManagerTest
-    extends AbstractCoreMavenComponentTest
+    extends AbstractCoreMavenComponentTestCase
 {
     @Requirement
     private PluginManager pluginManager;
@@ -152,6 +152,8 @@ public class PluginManagerTest
     // test that mojo which does not require dependency resolution trigger no downloading of dependencies
     
     // test interpolation of basedir values in mojo configuration
+    
+    // test a build where projects use different versions of the same plugin
     
     // -----------------------------------------------------------------------------------------------
     // Testing help
