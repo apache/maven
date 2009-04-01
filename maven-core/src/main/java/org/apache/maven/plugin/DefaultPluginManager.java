@@ -15,9 +15,6 @@ package org.apache.maven.plugin;
  * the License.
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,16 +56,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.project.builder.PomTransformer;
-import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
-import org.apache.maven.shared.model.InterpolatorProperty;
-import org.apache.maven.shared.model.ModelMarshaller;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.ModelTransformerContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -87,8 +77,6 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
@@ -428,30 +416,7 @@ public class DefaultPluginManager
                     mojoExecution.setConfiguration( dom );                    
                 }
             }
-        }
-        
-        Xpp3Dom dom = mojoExecution.getConfiguration();
-        
-        if ( dom != null )
-        {
-            try
-            {
-                List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties(
-                session.getProjectBuilderConfiguration().getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
-                interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
-                String interpolatedDom = interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
-                dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new PluginExecutionException( mojoExecution, project, "Failed to calculate concrete state for configuration of: " + mojoDescriptor.getHumanReadableKey() );
-            }
-            catch ( IOException e )
-            {
-                throw new PluginExecutionException( mojoExecution, project, "Failed to calculate concrete state for configuration of: " + mojoDescriptor.getHumanReadableKey() );
-            }
-        }
+        }       
 
         String goalExecId = goalName;
         if ( mojoExecution.getExecutionId() != null )
@@ -466,7 +431,7 @@ public class DefaultPluginManager
 
         try
         {
-            mojo = getConfiguredMojo( session, dom, project, false, mojoExecution );
+            mojo = getConfiguredMojo( session, mojoExecution.getConfiguration(), project, false, mojoExecution );
 
             pluginRealm = pluginDescriptor.getClassRealm();            
             
@@ -1141,30 +1106,6 @@ public class DefaultPluginManager
         }
     }
    
-    private static String interpolateXmlString( String xml, List<InterpolatorProperty> interpolatorProperties )
-        throws IOException
-    {
-        List<ModelProperty> modelProperties = ModelMarshaller.marshallXmlToModelProperties( new ByteArrayInputStream( xml.getBytes() ), ProjectUri.baseUri, PomTransformer.URIS );
-
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.put( "project.", "pom." );
-
-        List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>( interpolatorProperties );
-        ips.addAll( ModelTransformerContext.createInterpolatorProperties( modelProperties, ProjectUri.baseUri, aliases, PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false ) );
-
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.properties ) && mp.getValue() != null )
-            {
-                String uri = mp.getUri();
-                ips.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1, uri.length() ) + "}", mp.getValue() ) );
-            }
-        }
-
-        ModelTransformerContext.interpolateModelProperties( modelProperties, ips );
-        return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-    }
-
     public void resolvePluginVersion( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
     {        

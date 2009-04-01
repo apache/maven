@@ -151,6 +151,8 @@ public class PluginManagerTest
     
     // test that mojo which does not require dependency resolution trigger no downloading of dependencies
     
+    // test interpolation of basedir values in mojo configuration
+    
     // -----------------------------------------------------------------------------------------------
     // Testing help
     // -----------------------------------------------------------------------------------------------
