@@ -78,7 +78,7 @@ public class ProcessorContext
                                                                          ProjectUri.Build.Filters.filter,
                                                                          ProjectUri.Reporting.outputDirectory ) ) );   
 
-    public static PomClassicDomainModel mergeProfilesIntoModel(Collection<Profile> profiles, Model model, boolean isMostSpecialized) throws IOException
+    public static PomClassicDomainModel mergeProfilesIntoModel(Collection<Profile> profiles, PomClassicDomainModel domainModel) throws IOException
     {
         List<Model> profileModels = new ArrayList<Model>();
 
@@ -88,6 +88,7 @@ public class ProcessorContext
         }
         Collections.reverse( profileModels );
         
+        Model model = domainModel.getModel();
         profileModels.add( 0, model );
         List<Processor> processors =
             Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ), new ProfilesModuleProcessor(),
@@ -115,7 +116,10 @@ public class ProcessorContext
         target.getBuild().setPluginManagement( mng );
         target.setDependencyManagement( depMng );
         
-        return convertToDomainModel( target, isMostSpecialized );
+        PomClassicDomainModel targetModel = convertToDomainModel( target, domainModel.isMostSpecialized());
+        targetModel.setParentFile(domainModel.getParentFile());
+        targetModel.setProjectDirectory(domainModel.getProjectDirectory());
+        return targetModel;
     }
     
     private static Model attachProfileNodesToModel(Profile profile)
@@ -198,26 +202,10 @@ public class ProcessorContext
                                        new ContributorsProcessor(), new DevelopersProcessor(), new ProfilesProcessor() );
         Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors );
         
-        PomClassicDomainModel model = convertToDomainModel( target, false );
-        List<ModelProperty> props = new ArrayList<ModelProperty>( model.getModelProperties());
-        
-        //Seem to lose packaging here if it is a default jar value
-        if("jar".equals( target.getPackaging() ) )
-        {
-            props.add( new ModelProperty(ProjectUri.packaging, "jar") );
-        }
-        
-        interpolateModelProperties( props, interpolationProperties, child );
-        List<ModelProperty> modelProperties;
-        if ( child.getProjectDirectory() != null )
-        {
-            modelProperties = alignPaths( model.getModelProperties(), child.getProjectDirectory() );
-        }
-        else
-        {
-            modelProperties = model.getModelProperties();
-        }
-        return new PomClassicDomainModel( modelProperties );	    	
+        PomClassicDomainModel domainModel = new PomClassicDomainModel( convertToDomainModel( target, child.isMostSpecialized() ).getModelProperties(), child.isMostSpecialized() );
+        domainModel.setProjectDirectory(child.getProjectDirectory());
+        domainModel.setParentFile(child.getParentFile());
+        return domainModel;
 	}
     /**
      * Parent domain models on bottom.
@@ -357,7 +345,12 @@ public class ProcessorContext
         {
             aliases.put( "\\$\\{project.version\\}", "\\$\\{version\\}" );
         }
-
+        
+        if("jar".equals( dm.getModel().getPackaging() ) )
+        {
+            modelProperties.add( new ModelProperty(ProjectUri.packaging, "jar") );
+        }  
+        
         List<ModelProperty> firstPassModelProperties = new ArrayList<ModelProperty>();
         List<ModelProperty> secondPassModelProperties = new ArrayList<ModelProperty>();
 
@@ -485,8 +478,14 @@ public class ProcessorContext
                 return PomInterpolatorTag.valueOf( o.getTag() ).compareTo( PomInterpolatorTag.valueOf( o1.getTag() ) );
             }
         } );
-
+        
         ModelTransformerContext.interpolateModelProperties( modelProperties, ips2 );
+            
+        if ( dm.getProjectDirectory() != null )
+        {
+            modelProperties = alignPaths( modelProperties, dm.getProjectDirectory() );
+        }
+        
     }
 
     private static boolean containsProjectVersion( List<InterpolatorProperty> interpolatorProperties )

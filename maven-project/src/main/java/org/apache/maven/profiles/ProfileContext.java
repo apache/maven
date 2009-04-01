@@ -47,13 +47,12 @@ public class ProfileContext
     private List<ProfileMatcher> matchers =
         Collections.unmodifiableList( Arrays.asList( new DefaultMatcher(), new PropertyMatcher() ) );
 
-    public ProfileContext( List<Profile> profiles, Collection<String> activeProfileIds,
-                           Collection<String> inactiveProfileIds, List<InterpolatorProperty> properties )
+    public ProfileContext( List<Profile> profiles, ProfileContextInfo profileContextInfo )
     {
         this.profiles = new ArrayList<Profile>( profiles );
-        this.properties = new ArrayList<InterpolatorProperty>( properties );
-        this.activeProfileIds = ( activeProfileIds != null ) ? activeProfileIds : new ArrayList<String>();
-        this.inactiveProfileIds = ( inactiveProfileIds != null ) ? inactiveProfileIds : new ArrayList<String>();
+        this.properties = profileContextInfo.getInterpolatorProperties();
+        this.activeProfileIds = profileContextInfo.getActiveProfileIds();
+        this.inactiveProfileIds = profileContextInfo.getInactiveProfileIds();
     }
 
     public Collection<Profile> getActiveProfiles()

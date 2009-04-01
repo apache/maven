@@ -13,7 +13,7 @@ public class ProfilePropertiesProcessor
         Model t = (Model) target, c = (Model) child, p = (Model) parent;
 
         Properties properties = new Properties();
-            
+                        
         if ( c.getProperties() != null )
         {
             properties.putAll( c.getProperties() );
@@ -32,12 +32,18 @@ public class ProfilePropertiesProcessor
             }
             else
             {
-            	//add(properties, t.getProperties());
-                t.getProperties().putAll( properties );
+            	add(properties, t.getProperties());
+                //t.getProperties().putAll( properties );
             }       
         }
     }
     
+    /**
+     * Add source properties to target if the property does not exist: parent over child
+     * 
+     * @param source
+     * @param target
+     */
     private static void add(Properties source, Properties target)
     {
     	for(Object key : source.keySet())

@@ -47,7 +47,6 @@ public class PomConstructionWithSettingsTest
     }
     
     /**MNG-4107 */
-   /* 
     public void testPomAndSettingsInterpolation() throws Exception
     {
     	PomTestWrapper pom = buildPom( "test-pom-and-settings-interpolation" );
@@ -57,7 +56,7 @@ public class PomConstructionWithSettingsTest
     	assertEquals("settings", pom.getValue( "properties/pomVsSettings" ) );
     	assertEquals("settings", pom.getValue( "properties/pomVsSettingsInterpolated" ) );
     }    
-*/
+
     private PomTestWrapper buildPom( String pomPath )
     throws Exception
 	{

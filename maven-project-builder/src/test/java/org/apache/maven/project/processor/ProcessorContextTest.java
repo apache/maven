@@ -23,7 +23,7 @@ public class ProcessorContextTest extends TestCase
         Profile profile = new Profile();
         profile.setModules( Arrays.asList( "m1", "m2" ) );
         
-        PomClassicDomainModel m = ProcessorContext.mergeProfilesIntoModel( Arrays.asList( profile ), model, false );
+        PomClassicDomainModel m = ProcessorContext.mergeProfilesIntoModel( Arrays.asList( profile ), new PomClassicDomainModel(model) );
         
         assertEquals(2, m.getModel().getModules().size());
     }
