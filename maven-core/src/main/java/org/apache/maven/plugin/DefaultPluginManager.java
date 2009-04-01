@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -195,8 +193,6 @@ public class DefaultPluginManager
 
         checkRequiredMavenVersion( plugin, pluginProject, localRepository, project.getRemoteArtifactRepositories() );
 
-        checkPluginDependencySpec( plugin, pluginProject );
-
         pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
@@ -273,11 +269,8 @@ public class DefaultPluginManager
             throw new InvalidPluginException( "Plugin '" + plugin + "' is invalid: " + e.getMessage(), ee );
         }
         
-        /* get plugin managed versions */
         Map<String,Artifact> pluginManagedDependencies = new HashMap<String,Artifact>();
-        
-        // This is really crappy that we have to do this. The repository system should deal with this. The retrieval of the transitive dependencies.
-        
+                
         List<Artifact> pluginArtifacts = new ArrayList<Artifact>();
         
         try
@@ -345,9 +338,7 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
     // Mojo execution
     // ----------------------------------------------------------------------
-    
-    // We should assume that We've already loaded the plugin in question.
-    
+        
     public void executeMojo( MavenSession session, MojoExecution mojoExecution )
         throws MojoFailureException, PluginExecutionException, PluginConfigurationException
     {
@@ -377,29 +368,11 @@ public class DefaultPluginManager
         project.setBuild( model.getBuild() );
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
-        {
-            Collection<MavenProject> projects;
-
-            if ( mojoDescriptor.isAggregator() )
-            {
-                projects = session.getSortedProjects();
-            }
-            else
-            {
-                projects = Collections.singleton( project );
-            }
-
-            //!!jvz What is this? We resolveTransitiveDependencies() and then a line later downDependencies()? That can't be right. We should also already
-            // know at this point that what we need to execute can't be found. This is the wrong time to find this out.
-            
+        {            
             try
             {
-                for ( MavenProject p : projects )
-                {
-                    resolveTransitiveDependencies( session, repositorySystem, mojoDescriptor.isDependencyResolutionRequired(), p, mojoDescriptor.isAggregator() );
-                }
-
-                downloadDependencies( project, session, repositorySystem );
+                // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
+                downloadDependencies( session, mojoDescriptor.isDependencyResolutionRequired() );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -736,7 +709,7 @@ public class DefaultPluginManager
 
         for ( int i = 0; i < parameters.size(); i++ )
         {
-            Parameter parameter = (Parameter) parameters.get( i );
+            Parameter parameter = parameters.get( i );
 
             if ( parameter.isRequired() )
             {
@@ -806,7 +779,7 @@ public class DefaultPluginManager
 
         for ( int i = 0; i < parameters.size(); i++ )
         {
-            Parameter parameter = (Parameter) parameters.get( i );
+            Parameter parameter = parameters.get( i );
 
             // the key for the configuration map we're building.
             String key = parameter.getName();
@@ -1108,9 +1081,11 @@ public class DefaultPluginManager
     // Artifact resolution
     // ----------------------------------------------------------------------
 
-    protected void resolveTransitiveDependencies( MavenSession context, RepositorySystem repositorySystem, String scope, MavenProject project, boolean isAggregator )
+    protected void resolveTransitiveDependencies( MavenSession session, String scope )
         throws ArtifactResolutionException, ArtifactNotFoundException, InvalidDependencyVersionException
     {
+        MavenProject project = session.getCurrentProject();
+        
         // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
         Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
 
@@ -1136,7 +1111,7 @@ public class DefaultPluginManager
             .setArtifact( artifact )
             .setResolveRoot( false )
             .setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( context.getLocalRepository() )
+            .setLocalRepository( session.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() )
             .setFilter( filter );
@@ -1152,20 +1127,20 @@ public class DefaultPluginManager
     // Artifact downloading
     // ----------------------------------------------------------------------
 
-    private void downloadDependencies( MavenProject project, MavenSession context, RepositorySystem repositorySystem )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        ArtifactRepository localRepository = context.getLocalRepository();
-        List<ArtifactRepository> remoteArtifactRepositories = project.getRemoteArtifactRepositories();
+    private void downloadDependencies( MavenSession session, String scope )
+        throws ArtifactResolutionException, ArtifactNotFoundException, InvalidDependencyVersionException
+    {        
+        resolveTransitiveDependencies( session, scope );
+        
+        ArtifactRepository localRepository = session.getLocalRepository();
+        List<ArtifactRepository> remoteArtifactRepositories = session.getCurrentProject().getRemoteArtifactRepositories();
 
-        for ( Iterator<Artifact> it = project.getArtifacts().iterator(); it.hasNext(); )
+        for ( Artifact artifact : session.getCurrentProject().getArtifacts() )
         {            
-            Artifact artifact = (Artifact) it.next();
-            
             repositorySystem.resolve( new ArtifactResolutionRequest( artifact, localRepository, remoteArtifactRepositories ) );
         }
     }
-
+   
     private static String interpolateXmlString( String xml, List<InterpolatorProperty> interpolatorProperties )
         throws IOException
     {
@@ -1254,34 +1229,6 @@ public class DefaultPluginManager
         plugin.setVersion( version );
     }
 
-    // We need to strip out the methods in here for a validation method.
-    public Artifact resolvePluginArtifact( Plugin plugin, MavenProject project, MavenSession session )
-        throws PluginManagerException, InvalidPluginException, PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException
-    {
-        logger.debug( "Resolving plugin artifact " + plugin.getKey() + " from " + project.getRemoteArtifactRepositories() );
-
-        ArtifactRepository localRepository = session.getLocalRepository();
-
-        // We need the POM for the actually plugin project so we can look at the prerequisite element.
-        MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
-
-        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
-
-        checkRequiredMavenVersion( plugin, pluginProject, localRepository, project.getRemoteArtifactRepositories() );
-
-        checkPluginDependencySpec( plugin, pluginProject );
-
-        pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
-
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-
-        resolutionErrorHandler.throwErrors( request, result );
-
-        return pluginArtifact;
-    }
-
     public MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws InvalidPluginException
     {
@@ -1298,12 +1245,7 @@ public class DefaultPluginManager
         }
     }
 
-    /**
-     * @param pluginProject
-     * @todo would be better to store this in the plugin descriptor, but then it won't be available
-     *       to the version manager which executes before the plugin is instantiated
-     */
-    public void checkRequiredMavenVersion( Plugin plugin, MavenProject pluginProject, ArtifactRepository localRepository, List remoteRepositories )
+    public void checkRequiredMavenVersion( Plugin plugin, MavenProject pluginProject, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginVersionResolutionException, InvalidPluginException
     {
         // if we don't have the required Maven version, then ignore an update
@@ -1317,24 +1259,8 @@ public class DefaultPluginManager
             }
         }
     }
-
-    public void checkPluginDependencySpec( Plugin plugin, MavenProject pluginProject )
-        throws InvalidPluginException
-    {
-        ArtifactFilter filter = new ScopeArtifactFilter( "runtime" );
-        try
-        {
-            repositorySystem.createArtifacts( pluginProject.getDependencies(), null, filter, pluginProject );
-        }
-        catch ( VersionNotFoundException e )
-        {
-            throw new InvalidPluginException( "Plugin: " + plugin.getKey() + " has a dependency with an invalid version." );
-        }
-    }
     
-    // Plugin Mapping Manager
-    
-    public org.apache.maven.model.Plugin getByPrefix( String pluginPrefix, List groupIds, List pluginRepositories, ArtifactRepository localRepository )
+    public org.apache.maven.model.Plugin getByPrefix( String pluginPrefix, List<String> groupIds, List<ArtifactRepository> pluginRepositories, ArtifactRepository localRepository )
     {
         // if not found, try from the remote repository
         if ( !pluginDefinitionsByPrefix.containsKey( pluginPrefix ) )
@@ -1344,7 +1270,7 @@ public class DefaultPluginManager
             loadPluginMappings( groupIds, pluginRepositories, localRepository );
         }
 
-        org.apache.maven.model.Plugin result = (org.apache.maven.model.Plugin) pluginDefinitionsByPrefix.get( pluginPrefix );
+        org.apache.maven.model.Plugin result = pluginDefinitionsByPrefix.get( pluginPrefix );
 
         if ( result == null )
         {
@@ -1354,27 +1280,42 @@ public class DefaultPluginManager
         return result;
     }
 
-    private void loadPluginMappings( List groupIds, List pluginRepositories, ArtifactRepository localRepository )
+    private void loadPluginMappings( List<String> groupIds, List<ArtifactRepository> pluginRepositories, ArtifactRepository localRepository )
     {
-        List pluginGroupIds = new ArrayList( groupIds );
+        List<String> pluginGroupIds = new ArrayList<String>( groupIds );
 
-        // TODO: use constant
-        if ( !pluginGroupIds.contains( "org.apache.maven.plugins" ) )
+        for ( String groupId : pluginGroupIds )
         {
-            pluginGroupIds.add( "org.apache.maven.plugins" );
-        }
-        if ( !pluginGroupIds.contains( "org.codehaus.mojo" ) )
-        {
-            pluginGroupIds.add( "org.codehaus.mojo" );
-        }
-
-        for ( Iterator it = pluginGroupIds.iterator(); it.hasNext(); )
-        {
-            String groupId = (String) it.next();
-            logger.debug( "Loading plugin prefixes from group: " + groupId );
             try
             {
-                loadPluginMappings( groupId, pluginRepositories, localRepository );
+                RepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
+                
+                repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
+
+                Metadata repoMetadata = metadata.getMetadata();
+                
+                if ( repoMetadata != null )
+                {
+                    for ( org.apache.maven.artifact.repository.metadata.Plugin mapping : repoMetadata.getPlugins() )
+                    {
+                        String prefix = mapping.getPrefix();
+
+                        //if the prefix has already been found, don't add it again.
+                        //this is to preserve the correct ordering of prefix searching (MNG-2926)
+                        if ( !pluginDefinitionsByPrefix.containsKey( prefix ) )
+                        {
+                            String artifactId = mapping.getArtifactId();
+
+                            Plugin plugin = new Plugin();
+
+                            plugin.setGroupId( metadata.getGroupId() );
+
+                            plugin.setArtifactId( artifactId );
+
+                            pluginDefinitionsByPrefix.put( prefix, plugin );
+                        }
+                    }
+                }
             }
             catch ( RepositoryMetadataResolutionException e )
             {
@@ -1384,46 +1325,6 @@ public class DefaultPluginManager
             }
         }
     }
-
-    //!!jvz This should not be here, it's part of pre-processing.
-    private void loadPluginMappings( String groupId, List pluginRepositories, ArtifactRepository localRepository )
-        throws RepositoryMetadataResolutionException
-    {
-        RepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
-
-        logger.debug( "Checking repositories:\n" + pluginRepositories + "\n\nfor plugin prefix metadata: " + groupId );
-        
-        repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
-
-        Metadata repoMetadata = metadata.getMetadata();
-        
-        if ( repoMetadata != null )
-        {
-            for ( Iterator pluginIterator = repoMetadata.getPlugins().iterator(); pluginIterator.hasNext(); )
-            {
-                org.apache.maven.artifact.repository.metadata.Plugin mapping = (org.apache.maven.artifact.repository.metadata.Plugin) pluginIterator.next();
-                
-                logger.debug( "Found plugin: " + mapping.getName() + " with prefix: " + mapping.getPrefix() );
-
-                String prefix = mapping.getPrefix();
-
-                //if the prefix has already been found, don't add it again.
-                //this is to preserve the correct ordering of prefix searching (MNG-2926)
-                if ( !pluginDefinitionsByPrefix.containsKey( prefix ) )
-                {
-                    String artifactId = mapping.getArtifactId();
-
-                    org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
-
-                    plugin.setGroupId( metadata.getGroupId() );
-
-                    plugin.setArtifactId( artifactId );
-
-                    pluginDefinitionsByPrefix.put( prefix, plugin );
-                }
-            }
-        }
-    }           
     
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
         throws PluginLoaderException

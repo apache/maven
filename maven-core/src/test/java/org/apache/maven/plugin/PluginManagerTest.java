@@ -107,6 +107,50 @@ public class PluginManagerTest
         pluginManager.executeMojo( session, mojoExecution );
     }
     
+    public void testMojoConfigurationIsMergedCorrectly()
+        throws Exception
+    {
+    }
+    
+    /**
+     * The case where the user wants to specify an alternate version of the underlying tool. Common case
+     * is in the Antlr plugin which comes bundled with a version of Antlr but the user often times needs
+     * to use a specific version. We need to make sure the version that they specify takes precedence.
+     */
+    public void testMojoWhereInternallyStatedDependencyIsOverriddenByProject()
+        throws Exception
+    {
+    }
+
+    /** 
+     * The case where you have a plugin in the current build that you want to be used on projects in
+     * the current build.
+     */
+    public void testMojoThatIsPresentInTheCurrentBuild()
+        throws Exception
+    {
+    }
+
+    /**
+     * This is the case where the Mojo wants to execute on every project and then do something at the end
+     * with the results of each project.
+     */
+    public void testAggregatorMojo()
+        throws Exception
+    {
+    }
+
+    /**
+     * This is the case where a Mojo needs the lifecycle run to a certain phase before it can do
+     * anything useful.
+     */
+    public void testMojoThatRequiresExecutionToAGivenPhaseBeforeExecutingItself()
+        throws Exception
+    {
+    }
+    
+    // test that mojo which does not require dependency resolution trigger no downloading of dependencies
+    
     // -----------------------------------------------------------------------------------------------
     // Testing help
     // -----------------------------------------------------------------------------------------------
