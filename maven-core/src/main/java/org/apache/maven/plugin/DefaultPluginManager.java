@@ -27,11 +27,6 @@ import java.util.Set;
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
-import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -80,6 +75,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 //TODO: template method plugin validation as its framework specific
 //TODO: provide a method to get default configuraiton for a given plugin
 //TODO: get rid of all the custom configuration merging here, that's domain specific but needs to incorporate defaults the plugin manager can provide
+//TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
@@ -108,17 +104,14 @@ public class DefaultPluginManager
 
     @Requirement
     protected MavenProjectBuilder mavenProjectBuilder;
-
-    //!!jvz This is one of the last components to remove the legacy system.
-    @Requirement
-    protected RepositoryMetadataManager repositoryMetadataManager;    
     
-    private Map<String,org.apache.maven.model.Plugin> pluginDefinitionsByPrefix = new HashMap<String,org.apache.maven.model.Plugin>();
+    private Map<String,Plugin> pluginDefinitionsByPrefix = new HashMap<String,Plugin>();
     
     // This should be template method code for allowing subclasses to assist in contributing search/hint information
     public Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
     {
-        return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
+        return null;
+        //return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
     }
     
     public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
@@ -1182,73 +1175,7 @@ public class DefaultPluginManager
                 throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(), "Plugin requires Maven version " + requiredVersion );
             }
         }
-    }
-    
-    public org.apache.maven.model.Plugin getByPrefix( String pluginPrefix, List<String> groupIds, List<ArtifactRepository> pluginRepositories, ArtifactRepository localRepository )
-    {
-        // if not found, try from the remote repository
-        if ( !pluginDefinitionsByPrefix.containsKey( pluginPrefix ) )
-        {
-            logger.info( "Searching repository for plugin with prefix: \'" + pluginPrefix + "\'." );
-
-            loadPluginMappings( groupIds, pluginRepositories, localRepository );
-        }
-
-        org.apache.maven.model.Plugin result = pluginDefinitionsByPrefix.get( pluginPrefix );
-
-        if ( result == null )
-        {
-            logger.debug( "Failed to resolve plugin from prefix: " + pluginPrefix, new Throwable() );
-        }
-
-        return result;
-    }
-
-    private void loadPluginMappings( List<String> groupIds, List<ArtifactRepository> pluginRepositories, ArtifactRepository localRepository )
-    {
-        List<String> pluginGroupIds = new ArrayList<String>( groupIds );
-
-        for ( String groupId : pluginGroupIds )
-        {
-            try
-            {
-                RepositoryMetadata metadata = new GroupRepositoryMetadata( groupId );
-                
-                repositoryMetadataManager.resolve( metadata, pluginRepositories, localRepository );
-
-                Metadata repoMetadata = metadata.getMetadata();
-                
-                if ( repoMetadata != null )
-                {
-                    for ( org.apache.maven.artifact.repository.metadata.Plugin mapping : repoMetadata.getPlugins() )
-                    {
-                        String prefix = mapping.getPrefix();
-
-                        //if the prefix has already been found, don't add it again.
-                        //this is to preserve the correct ordering of prefix searching (MNG-2926)
-                        if ( !pluginDefinitionsByPrefix.containsKey( prefix ) )
-                        {
-                            String artifactId = mapping.getArtifactId();
-
-                            Plugin plugin = new Plugin();
-
-                            plugin.setGroupId( metadata.getGroupId() );
-
-                            plugin.setArtifactId( artifactId );
-
-                            pluginDefinitionsByPrefix.put( prefix, plugin );
-                        }
-                    }
-                }
-            }
-            catch ( RepositoryMetadataResolutionException e )
-            {
-                logger.warn( "Cannot resolve plugin-mapping metadata for groupId: " + groupId + " - IGNORING." );
-
-                logger.debug( "Error resolving plugin-mapping metadata for groupId: " + groupId + ".", e );
-            }
-        }
-    }
+    }    
     
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
         throws PluginLoaderException
