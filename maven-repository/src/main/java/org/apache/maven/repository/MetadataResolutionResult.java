@@ -233,13 +233,10 @@ public class MetadataResolutionResult
         return errorArtifactExceptions != null;
     }
 
-    public MetadataResolutionResult addErrorArtifactException( ArtifactResolutionException e )
+    public MetadataResolutionResult addError( Exception e )
     {
-        errorArtifactExceptions = initList( errorArtifactExceptions );
-
-        errorArtifactExceptions.add( e );
-
-        exceptions = initList( exceptions );
+        if( exceptions == null )
+            initList( exceptions );
 
         exceptions.add( e );
 

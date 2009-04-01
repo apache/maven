@@ -62,4 +62,14 @@ public class MetadataGraph
         
         return node;
     }
+    
+    public MetadataGraphNode getEntry()
+    {
+        return entry;
+    }
+    
+    public Collection<MetadataGraphNode> getNodes()
+    {
+        return nodes;
+    }
 }

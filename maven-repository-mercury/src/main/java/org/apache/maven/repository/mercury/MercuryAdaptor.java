@@ -141,7 +141,31 @@ public class MercuryAdaptor
         return toMavenArtifact( af, new ArtifactMetadata(name) );
     }
     
+    public static ArtifactMetadata toMercuryArtifactMetadata( MavenArtifactMetadata md )
+    {
+        ArtifactMetadata mmd = new ArtifactMetadata();
+        mmd.setGroupId( md.getGroupId() );
+        mmd.setArtifactId( md.getArtifactId() );
+        mmd.setVersion( md.getVersion() );
+        mmd.setClassifier( md.getClassifier() );
+        mmd.setType( md.getType() );
+
+        return mmd;
+    }
+    
     public static MavenArtifactMetadata toMavenArtifactMetadata( ArtifactMetadata md )
+    {
+        MavenArtifactMetadata mmd = new MavenArtifactMetadata();
+        mmd.setGroupId( md.getGroupId() );
+        mmd.setArtifactId( md.getArtifactId() );
+        mmd.setVersion( md.getVersion() );
+        mmd.setClassifier( md.getClassifier() );
+        mmd.setType( md.getType() );
+
+        return mmd;
+    }
+    
+    public static MavenArtifactMetadata toMavenArtifactMetadata( Artifact md )
     {
         MavenArtifactMetadata mmd = new MavenArtifactMetadata();
         mmd.setGroupId( md.getGroupId() );
@@ -161,6 +185,8 @@ public class MercuryAdaptor
         MetadataGraphNode entry = new MetadataGraphNode( toMavenArtifactMetadata( root.getMd() ) );
         
         MetadataGraph graph = new MetadataGraph(entry);
+        
+        graph.addNode( entry );
         
         addKids( root, entry, graph );
         

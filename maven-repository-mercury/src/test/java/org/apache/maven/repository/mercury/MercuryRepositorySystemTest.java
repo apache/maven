@@ -28,6 +28,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.repository.AbstractMavenRepositorySystemTest;
 import org.apache.maven.repository.MavenArtifactMetadata;
+import org.apache.maven.repository.MetadataGraph;
 import org.apache.maven.repository.MetadataResolutionRequest;
 import org.apache.maven.repository.MetadataResolutionResult;
 import org.apache.maven.repository.RepositorySystem;
@@ -51,7 +52,8 @@ public class MercuryRepositorySystemTest
     }
     
     
-    public void testRetrieve() throws IOException
+    public void testResolveTree()
+    throws IOException
     {
         MavenArtifactMetadata mad = MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm-xml:3.0" ) );
         
@@ -60,16 +62,19 @@ public class MercuryRepositorySystemTest
         request.setRemoteRepostories( _remoteRepos );
         request.setArtifactMetadata( mad );
         request.setAsResolvedTree( true );
+        request.setScope( "compile" );
         
         MetadataResolutionResult res = _mrs.resolveMetadata( request );
         
-//        assertNotNull( res );
-//        
-//        Set<Artifact> as = res.getArtifacts();
-//        
-//        assertNotNull( as );
-//        
-//        assertEquals( 4, as.size() );
+        assertNotNull( res );
+        
+        MetadataGraph resGraph = res.getResolvedTree();
+        
+        assertNotNull( resGraph );
+        
+        assertNotNull( resGraph.getNodes() );
+        
+        assertEquals( 4, resGraph.getNodes().size() );
 //        
 //        assertTrue( checkExists( as, "asm:asm-xml:3.0" ) );
 //        

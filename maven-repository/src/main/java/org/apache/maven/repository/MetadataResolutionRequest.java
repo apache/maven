@@ -41,6 +41,8 @@ public class MetadataResolutionRequest
 {
     private MavenArtifactMetadata mad;
 
+    private String scope;
+
     // Needs to go away
     private Set<Artifact> artifactDependencies;
 
@@ -48,21 +50,8 @@ public class MetadataResolutionRequest
 
     private List<ArtifactRepository> remoteRepositories;
 
-    // Not sure what to do with this?
-    // Scope
-    // Lock down lists
-    private ArtifactFilter filter;
-
-    // Needs to go away
-    private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
-
     // This is like a filter but overrides all transitive versions 
     private Map managedVersionMap;
-
-    // This should not be in here, it's a component
-    private ArtifactMetadataSource metadataSource;
-
-    private boolean resolveRoot = true;
 
     /** result type - flat list; the default */
     private boolean asList = true;
@@ -87,7 +76,7 @@ public class MetadataResolutionRequest
         this.remoteRepositories = remoteRepositories;
     }
     
-    public MavenArtifactMetadata getArtifact()
+    public MavenArtifactMetadata getArtifactMetadata()
     {
         return mad;
     }
@@ -135,53 +124,6 @@ public class MetadataResolutionRequest
         return this;
     }
 
-    public ArtifactFilter getFilter()
-    {
-        return filter;
-    }
-
-    public MetadataResolutionRequest setFilter( ArtifactFilter filter )
-    {
-        this.filter = filter;
-
-        return this;
-    }
-
-    public List<ResolutionListener> getListeners()
-    {
-        return listeners;
-    }
-
-    public MetadataResolutionRequest setListeners( List<ResolutionListener> listeners )
-    {        
-        this.listeners = listeners;
-        
-        return this;
-    }
-    
-    public MetadataResolutionRequest addListener( ResolutionListener listener )
-    {
-        listeners.add( listener );
-
-        return this;
-    }
-
-    // ------------------------------------------------------------------------
-    //
-    // ------------------------------------------------------------------------
-
-    public ArtifactMetadataSource getMetadataSource()
-    {
-        return metadataSource;
-    }
-
-    public MetadataResolutionRequest setMetadataSource( ArtifactMetadataSource metadataSource )
-    {
-        this.metadataSource = metadataSource;
-
-        return this;
-    }
-
     public Map getManagedVersionMap()
     {
         return managedVersionMap;
@@ -194,18 +136,6 @@ public class MetadataResolutionRequest
         return this;
     }
 
-    public MetadataResolutionRequest setResolveRoot( boolean resolveRoot )
-    {
-        this.resolveRoot = resolveRoot;
-        
-        return this;
-    }
-    
-    public boolean isResolveRoot()
-    {
-        return resolveRoot;
-    }
-    
     public String toString()
     {
         StringBuffer sb = new StringBuffer()
@@ -214,7 +144,7 @@ public class MetadataResolutionRequest
                 .append( artifactDependencies ).append(  "\n" )
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
                 .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
-                .append( "metadataSource: " ).append(  metadataSource ).append(  "\n" );
+                ;
         
         return sb.toString();
     }
@@ -261,5 +191,16 @@ public class MetadataResolutionRequest
     {
         this.asGraph = asGraph;
         return this;
+    }
+
+    public MetadataResolutionRequest setScope( String scope )
+    {
+        this.scope = scope;
+        return this;
+    }
+
+    public String getScope()
+    {
+        return scope;
     }
 }
