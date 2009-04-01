@@ -90,12 +90,5 @@ public class MercuryRepositorySystemTest
         
         assertFalse( nodes.contains( new MetadataGraphNode( MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm-parent:3.0" ) ) ) ) );
         
-//        for( Artifact a : as )
-//        {
-//            assertTrue( a.getFile().exists() );
-//            
-//            System.out.println( a.getFile().getCanonicalPath()+ " : "+ a.getFile().length()+" bytes");
-//        }
-
     }
 }
