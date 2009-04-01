@@ -20,6 +20,7 @@ under the License.
 package org.apache.maven.repository.mercury;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -29,6 +30,7 @@ import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.repository.AbstractMavenRepositorySystemTest;
 import org.apache.maven.repository.MavenArtifactMetadata;
 import org.apache.maven.repository.MetadataGraph;
+import org.apache.maven.repository.MetadataGraphNode;
 import org.apache.maven.repository.MetadataResolutionRequest;
 import org.apache.maven.repository.MetadataResolutionResult;
 import org.apache.maven.repository.RepositorySystem;
@@ -72,20 +74,22 @@ public class MercuryRepositorySystemTest
         
         assertNotNull( resGraph );
         
-        assertNotNull( resGraph.getNodes() );
+        Collection<MetadataGraphNode> nodes = resGraph.getNodes();
         
-        assertEquals( 4, resGraph.getNodes().size() );
-//        
-//        assertTrue( checkExists( as, "asm:asm-xml:3.0" ) );
-//        
-//        assertTrue( checkExists( as, "asm:asm-util:3.0" ) );
-//        
-//        assertTrue( checkExists( as, "asm:asm-tree:3.0" ) );
-//        
-//        assertTrue( checkExists( as, "asm:asm:3.0" ) );
-//        
-//        assertFalse( checkExists( as, "asm:asm-parent:3.0" ) );
-//        
+        assertNotNull( nodes );
+        
+        assertEquals( 4, nodes.size() );
+        
+        assertTrue( nodes.contains( new MetadataGraphNode( MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm-xml:3.0" ) ) ) ) );
+        
+        assertTrue( nodes.contains( new MetadataGraphNode( MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm-util:3.0" ) ) ) ) );
+        
+        assertTrue( nodes.contains( new MetadataGraphNode( MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm-tree:3.0" ) ) ) ) );
+        
+        assertTrue( nodes.contains( new MetadataGraphNode( MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm:3.0" ) ) ) ) );
+        
+        assertFalse( nodes.contains( new MetadataGraphNode( MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm-parent:3.0" ) ) ) ) );
+        
 //        for( Artifact a : as )
 //        {
 //            assertTrue( a.getFile().exists() );
