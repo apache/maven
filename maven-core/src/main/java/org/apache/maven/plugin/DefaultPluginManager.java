@@ -1039,52 +1039,6 @@ public class DefaultPluginManager
     }
 
     // ----------------------------------------------------------------------
-    // Artifact resolution
-    // ----------------------------------------------------------------------
-
-    protected void resolveTransitiveDependencies( MavenSession session, String scope )
-        throws ArtifactResolutionException, ArtifactNotFoundException, InvalidDependencyVersionException
-    {
-        MavenProject project = session.getCurrentProject();
-        
-        // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
-        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
-
-        // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
-        // check this with yourkit as a hot spot.
-        // Don't recreate if already created - for effeciency, and because clover plugin adds to it
-        if ( project.getDependencyArtifacts() == null )
-        {
-            // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
-            try
-            {
-                project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
-            }
-            catch ( VersionNotFoundException e )
-            {
-                throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
-            }
-        }
-
-        ArtifactFilter filter = new ScopeArtifactFilter( scope );
-
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setResolveRoot( false )
-            .setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( session.getLocalRepository() )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
-            .setManagedVersionMap( project.getManagedVersionMap() )
-            .setFilter( filter );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-        
-        resolutionErrorHandler.throwErrors( request, result );
-
-        project.setArtifacts( result.getArtifacts() );
-    }
-
-    // ----------------------------------------------------------------------
     // Artifact downloading
     // ----------------------------------------------------------------------
 
@@ -1309,4 +1263,9 @@ public class DefaultPluginManager
         
         return mojoDescriptor;
     }
+    
+    // ----------------------------------------------------------------------
+    // Validate plugin 
+    // ----------------------------------------------------------------------
+    
 }
