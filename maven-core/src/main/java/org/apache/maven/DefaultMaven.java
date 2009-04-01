@@ -144,7 +144,7 @@ public class DefaultMaven
 
         try
         {                        
-            session = new MavenSession( request, projects );
+            session = new MavenSession( container, request, projects );
             
             result.setReactorManager( session.getReactorManager() );            
         }

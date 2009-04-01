@@ -29,6 +29,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
@@ -37,6 +38,8 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
  */
 public class MavenSession
 {
+    private PlexusContainer container;
+    
     private ReactorManager reactorManager;
 
     private MavenExecutionRequest request;
@@ -49,15 +52,16 @@ public class MavenSession
         this.request = request;
     }
 
-    public MavenSession( MavenExecutionRequest request, MavenProject project )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenProject project )
         throws CycleDetectedException, DuplicateProjectException
     {
-        this( request, Arrays.asList( new MavenProject[]{ project } ) );        
+        this( container, request, Arrays.asList( new MavenProject[]{ project } ) );        
     }    
 
-    public MavenSession( MavenExecutionRequest request, List<MavenProject> projects )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, List<MavenProject> projects )
         throws CycleDetectedException, DuplicateProjectException
     {
+        this.container = container;
         this.request = request;
         this.reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
         this.currentProject = projects.get( 0 );
@@ -73,6 +77,11 @@ public class MavenSession
         return reactorManager.getPluginContext( pluginDescriptor, project );
     }
     
+    public PlexusContainer getContainer()
+    {
+        return container;
+    }
+
     public ArtifactRepository getLocalRepository()
     {
         return request.getLocalRepository();

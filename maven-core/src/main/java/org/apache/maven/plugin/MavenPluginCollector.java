@@ -33,6 +33,7 @@ import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 
+//TODO: collapse this into the plugin manager
 public class MavenPluginCollector
     implements ComponentDiscoveryListener
 {

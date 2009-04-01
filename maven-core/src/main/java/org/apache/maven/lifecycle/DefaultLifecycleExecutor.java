@@ -403,11 +403,7 @@ public class DefaultLifecycleExecutor
         {
             throw new LifecycleExecutionException( "Error loading MojoDescriptor.", e );
         }        
-        
-        // this has been simplified from the old code that injected the plugin management stuff, since
-        // pluginManagement injection is now handled by the project method.
-        project.addPlugin( plugin );        
-        
+                
         return mojoDescriptor;
     }
 

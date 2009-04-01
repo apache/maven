@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.GroupRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -152,13 +151,7 @@ public class DefaultPluginManager
         {         
             resolvePluginVersion( plugin, project, session );
                                      
-            addPlugin( plugin, project, session );
-
-            pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
-                        
-            project.addPlugin( plugin );
-           
-            return pluginDescriptor;
+            return addPlugin( plugin, project, session );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -191,7 +184,7 @@ public class DefaultPluginManager
         return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
     }
     
-    protected void addPlugin( Plugin plugin, MavenProject project, MavenSession session )
+    protected PluginDescriptor addPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException, PluginVersionResolutionException
     {
         ArtifactRepository localRepository = session.getLocalRepository();
@@ -247,6 +240,8 @@ public class DefaultPluginManager
         pluginDescriptor.setPluginArtifact( pluginArtifact );
         pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
         pluginDescriptor.setClassRealm( pluginRealm );
+        
+        return pluginDescriptor;
     }
 
     // plugin artifact
@@ -1224,9 +1219,30 @@ public class DefaultPluginManager
         // in settings.xml.
         if ( StringUtils.isEmpty( version ) || Artifact.RELEASE_VERSION.equals( version ) )
         {
-            // 1. resolve the version to be used
-            version = resolveMetaVersion( groupId, artifactId, project, session.getLocalRepository(), Artifact.RELEASE_VERSION );
-            logger.debug( "Version from RELEASE metadata: " + version );
+            // 1. resolve the version to be used            
+            Artifact artifact = repositorySystem.createProjectArtifact( groupId, artifactId, Artifact.RELEASE_VERSION );
+
+            String artifactVersion = artifact.getVersion();
+
+            // make sure this artifact was transformed to a real version, and actually resolved to a file in the repo...
+            if ( !Artifact.RELEASE_VERSION.equals( artifactVersion ) && ( artifact.getFile() != null ) )
+            {
+                boolean pluginValid = false;
+
+                while ( !pluginValid && ( artifactVersion != null ) )
+                {
+                    pluginValid = true;
+                    
+                    artifact = repositorySystem.createProjectArtifact( groupId, artifactId, artifactVersion );
+                }
+
+                version = artifactVersion;
+            }
+
+            if ( version == null )
+            {
+                version = artifactVersion;
+            }
         }
 
         // if we still haven't found a version, then fail early before we get into the update goop.
@@ -1236,53 +1252,6 @@ public class DefaultPluginManager
         }
 
         plugin.setVersion( version );
-    }
-
-    private String resolveMetaVersion( String groupId, String artifactId, MavenProject project, ArtifactRepository localRepository, String metaVersionId )
-        throws PluginVersionResolutionException, InvalidPluginException
-    {
-        logger.info( "Attempting to resolve a version for plugin: " + groupId + ":" + artifactId + " using meta-version: " + metaVersionId );
-
-        Artifact artifact = repositorySystem.createProjectArtifact( groupId, artifactId, metaVersionId );
-
-        String version = null;
-
-        String artifactVersion = artifact.getVersion();
-
-        // make sure this artifact was transformed to a real version, and actually resolved to a file in the repo...
-        if ( !metaVersionId.equals( artifactVersion ) && ( artifact.getFile() != null ) )
-        {
-            boolean pluginValid = false;
-
-            while ( !pluginValid && ( artifactVersion != null ) )
-            {
-                pluginValid = true;
-                
-                MavenProject pluginProject;
-                
-                try
-                {
-                    artifact = repositorySystem.createProjectArtifact( groupId, artifactId, artifactVersion );
-
-                    pluginProject = mavenProjectBuilder.buildFromRepository( artifact, project.getRemoteArtifactRepositories(), localRepository );
-                }
-                catch ( ProjectBuildingException e )
-                {
-                    throw new InvalidPluginException( "Unable to build project information for plugin '" + ArtifactUtils.versionlessKey( groupId, artifactId ) + "': " + e.getMessage(), e );
-                }
-            }
-
-            version = artifactVersion;
-        }
-
-        if ( version == null )
-        {
-            version = artifactVersion;
-        }
-
-        logger.info( "Using version: " + version + " of plugin: " + groupId + ":" + artifactId );
-
-        return version;
     }
 
     // We need to strip out the methods in here for a validation method.

@@ -1301,20 +1301,6 @@ public class MavenProject
         return build;
     }
 
-    public void addPlugin( Plugin plugin )
-    {
-        Build build = getModelBuild();
-
-        if ( !build.getPluginsAsMap().containsKey( plugin.getKey() ) )
-        {
-            injectPluginManagementInfo( plugin );
-
-            build.addPlugin( plugin );
-
-            build.flushPluginMap();
-        }
-    }
-
     //!!jvz remove ModelUtils
     public void injectPluginManagementInfo( Plugin plugin )
     {
