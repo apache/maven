@@ -76,6 +76,11 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+//TODO: separate out project downloading
+//TODO: template method plugin validation as its framework specific
+//TODO: provide a method to get default configuraiton for a given plugin
+//TODO: get rid of all the custom configuration merging here, that's domain specific but needs to incorporate defaults the plugin manager can provide
+
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
     implements PluginManager
@@ -88,9 +93,6 @@ public class DefaultPluginManager
 
     @Requirement
     protected ArtifactFilterManager coreArtifactFilterManager;
-
-    //@Requirement
-    //protected PathTranslator pathTranslator;
 
     @Requirement
     protected MavenPluginCollector pluginCollector;
@@ -348,12 +350,6 @@ public class DefaultPluginManager
         {
             logger.warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
         }
-
-        /*
-        Model model = project.getModel();
-        pathTranslator.alignToBaseDirectory( model, project.getBasedir() );
-        project.setBuild( model.getBuild() );
-        */
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
         {            
