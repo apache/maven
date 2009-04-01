@@ -19,6 +19,7 @@ under the License.
 
 package org.apache.maven.repository;
 
+
 /**
  *
  *
@@ -28,6 +29,8 @@ package org.apache.maven.repository;
  */
 public class MavenArtifactMetadata
 {
+    public static final String DEFAULT_TYPE = "jar";
+
     String groupId;
     String artifactId;
     String version;
@@ -105,6 +108,15 @@ public class MavenArtifactMetadata
     public void setScope( String scope )
     {
         this.scope = scope;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return getGroupId()+":"+getArtifactId()+":"+getVersion()
+        +":" + (getClassifier() == null ? "" : getClassifier() )
+        +":" + (getType() == null ? DEFAULT_TYPE : getType() )
+        ;
     }
     
 }

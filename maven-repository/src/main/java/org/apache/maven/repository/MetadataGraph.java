@@ -19,6 +19,9 @@ under the License.
 
 package org.apache.maven.repository;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  *
  *
@@ -28,5 +31,23 @@ package org.apache.maven.repository;
  */
 public class MetadataGraph
 {
+    Collection<MetadataGraphNode> nodes;
+    MetadataGraphNode             entry;
+    
+    public MetadataGraph( MetadataGraphNode entry )
+    {
+        this();
+        
+        this.entry = entry;
+    }
+    
+    public MetadataGraph()
+    {
+        nodes = new ArrayList<MetadataGraphNode>( 64 );
+    }
 
+    public void addNode( MetadataGraphNode node )
+    {
+        nodes.add( node );
+    }
 }

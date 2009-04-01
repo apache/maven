@@ -66,7 +66,11 @@ public class MetadataResolutionResult
 
     private Set<Artifact> artifacts;
     
+    private MetadataGraph dirtyTree;
+    
     private MetadataGraph resolvedTree;
+    
+    private MetadataGraph resolvedGraph;
 
     public Artifact getOriginatingArtifact()
     {
