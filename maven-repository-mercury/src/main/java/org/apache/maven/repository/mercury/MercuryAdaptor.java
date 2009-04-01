@@ -29,12 +29,16 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
+import org.apache.maven.mercury.artifact.MetadataTreeNode;
 import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.repository.api.Repository;
 import org.apache.maven.mercury.repository.local.m2.LocalRepositoryM2;
 import org.apache.maven.mercury.repository.remote.m2.RemoteRepositoryM2;
 import org.apache.maven.mercury.transport.api.Server;
 import org.apache.maven.mercury.util.Util;
+import org.apache.maven.repository.MavenArtifactMetadata;
+import org.apache.maven.repository.MetadataGraph;
+import org.apache.maven.repository.MetadataGraphNode;
 
 /**
  * @author Oleg Gusakov
@@ -135,6 +139,51 @@ public class MercuryAdaptor
     public static Artifact toMavenArtifact( ArtifactFactory af, String name )
     {
         return toMavenArtifact( af, new ArtifactMetadata(name) );
+    }
+    
+    public static MavenArtifactMetadata toMavenArtifactMetadata( ArtifactMetadata md )
+    {
+        MavenArtifactMetadata mmd = new MavenArtifactMetadata();
+        mmd.setGroupId( md.getGroupId() );
+        mmd.setArtifactId( md.getArtifactId() );
+        mmd.setVersion( md.getVersion() );
+        mmd.setClassifier( md.getClassifier() );
+        mmd.setType( md.getType() );
+
+        return mmd;
+    }
+    
+    public static MetadataGraph resolvedTreeToGraph( MetadataTreeNode root )
+    {
+        if( root == null )
+            return null;
+        
+        MetadataGraphNode entry = new MetadataGraphNode( toMavenArtifactMetadata( root.getMd() ) );
+        
+        MetadataGraph graph = new MetadataGraph(entry);
+        
+        addKids( root, entry, graph );
+        
+        return graph;
+    }
+    
+    private static final void addKids( MetadataTreeNode tParent, MetadataGraphNode gParent, MetadataGraph graph )
+    {
+        if( !tParent.hasChildren() )
+            return;
+        
+        for( MetadataTreeNode kid : tParent.getChildren() )
+        {
+            MavenArtifactMetadata mmd = toMavenArtifactMetadata( kid.getMd() );
+            
+            MetadataGraphNode node = graph.findNode( mmd );
+            
+            node.addIncident( gParent );
+            
+            gParent.addIncident( node );
+            
+            addKids( kid, node, graph );
+        }
     }
 
 }

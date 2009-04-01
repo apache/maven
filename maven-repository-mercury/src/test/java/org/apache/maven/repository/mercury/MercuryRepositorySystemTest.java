@@ -19,7 +19,17 @@ under the License.
 
 package org.apache.maven.repository.mercury;
 
+import java.io.IOException;
+import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.repository.AbstractMavenRepositorySystemTest;
+import org.apache.maven.repository.MavenArtifactMetadata;
+import org.apache.maven.repository.MetadataResolutionRequest;
+import org.apache.maven.repository.MetadataResolutionResult;
 import org.apache.maven.repository.RepositorySystem;
 
 /**
@@ -38,5 +48,45 @@ public class MercuryRepositorySystemTest
         super.setUp();
         
         _mrs = getContainer().lookup( RepositorySystem.class, "mercury" );
+    }
+    
+    
+    public void testRetrieve() throws IOException
+    {
+        MavenArtifactMetadata mad = MercuryAdaptor.toMavenArtifactMetadata( new ArtifactMetadata( "asm:asm-xml:3.0" ) );
+        
+        MetadataResolutionRequest request = new MetadataResolutionRequest();
+        request.setLocalRepository( _localRepo );
+        request.setRemoteRepostories( _remoteRepos );
+        request.setArtifactMetadata( mad );
+        request.setAsResolvedTree( true );
+        
+        MetadataResolutionResult res = _mrs.resolveMetadata( request );
+        
+//        assertNotNull( res );
+//        
+//        Set<Artifact> as = res.getArtifacts();
+//        
+//        assertNotNull( as );
+//        
+//        assertEquals( 4, as.size() );
+//        
+//        assertTrue( checkExists( as, "asm:asm-xml:3.0" ) );
+//        
+//        assertTrue( checkExists( as, "asm:asm-util:3.0" ) );
+//        
+//        assertTrue( checkExists( as, "asm:asm-tree:3.0" ) );
+//        
+//        assertTrue( checkExists( as, "asm:asm:3.0" ) );
+//        
+//        assertFalse( checkExists( as, "asm:asm-parent:3.0" ) );
+//        
+//        for( Artifact a : as )
+//        {
+//            assertTrue( a.getFile().exists() );
+//            
+//            System.out.println( a.getFile().getCanonicalPath()+ " : "+ a.getFile().length()+" bytes");
+//        }
+
     }
 }

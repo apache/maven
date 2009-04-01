@@ -114,8 +114,8 @@ public class MavenArtifactMetadata
     public String toString()
     {
         return getGroupId()+":"+getArtifactId()+":"+getVersion()
-        +":" + (getClassifier() == null ? "" : getClassifier() )
-        +":" + (getType() == null ? DEFAULT_TYPE : getType() )
+                +":" + (getClassifier() == null ? "" : getClassifier() )
+                +":" + (getType() == null ? DEFAULT_TYPE : getType() )
         ;
     }
     

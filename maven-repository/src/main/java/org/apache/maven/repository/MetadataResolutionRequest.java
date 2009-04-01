@@ -39,7 +39,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
  */
 public class MetadataResolutionRequest
 {
-    private Artifact artifact;
+    private MavenArtifactMetadata mad;
 
     // Needs to go away
     private Set<Artifact> artifactDependencies;
@@ -80,21 +80,21 @@ public class MetadataResolutionRequest
     {  
     }
     
-    public MetadataResolutionRequest( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
+    public MetadataResolutionRequest( MavenArtifactMetadata md, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
     {        
-        this.artifact = artifact;
+        this.mad = md;
         this.localRepository = localRepository;
         this.remoteRepositories = remoteRepositories;
     }
     
-    public Artifact getArtifact()
+    public MavenArtifactMetadata getArtifact()
     {
-        return artifact;
+        return mad;
     }
 
-    public MetadataResolutionRequest setArtifact( Artifact artifact )
+    public MetadataResolutionRequest setArtifactMetadata( MavenArtifactMetadata md )
     {
-        this.artifact = artifact;
+        this.mad = md;
 
         return this;
     }
@@ -210,7 +210,7 @@ public class MetadataResolutionRequest
     {
         StringBuffer sb = new StringBuffer()
                 .append( "REQUEST: " ).append(  "\n" )
-                .append( "artifact: " ).append( artifact ).append(  "\n" )
+                .append( "artifact: " ).append( mad ).append(  "\n" )
                 .append( artifactDependencies ).append(  "\n" )
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
                 .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
