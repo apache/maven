@@ -48,8 +48,12 @@ public class MavenITmng3714ToolchainsCliOptionTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3714" );
+
         File javaHome = new File( testDir, "javaHome" );
         javaHome.mkdirs();
+        new File( javaHome, "bin" ).mkdirs();
+        new File( javaHome, "bin/javac").createNewFile();
+        new File( javaHome, "bin/javac.exe").createNewFile();
         
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         Properties properties = verifier.newDefaultFilterProperties();
@@ -68,7 +72,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
 
         verifier.assertFilePresent( "target/toolchains.properties" );
         Properties results = verifier.loadProperties( "target/toolchains.properties" );
-        String tool = results.getProperty( "tool.1" );
+        String tool = results.getProperty( "tool.1", "" );
         if ( tool.endsWith( ".exe" ) )
         {
             tool = tool.substring( 0, tool.length() - 4 );
