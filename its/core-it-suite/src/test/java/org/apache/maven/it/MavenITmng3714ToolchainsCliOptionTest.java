@@ -66,7 +66,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
         List cliOptions = new ArrayList();
         cliOptions.add( "--toolchains toolchains.xml" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "validate" );
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
@@ -78,6 +78,11 @@ public class MavenITmng3714ToolchainsCliOptionTest
             tool = tool.substring( 0, tool.length() - 4 );
         }
         assertEquals( new File( javaHome, "bin/javac" ).getAbsolutePath(), tool );
+
+        verifier.assertFilePresent( "target/tool.properties" );
+        Properties toolProps = verifier.loadProperties( "target/tool.properties" );
+        String path = toolProps.getProperty( "tool.javac", "" );
+        assertEquals( results.getProperty( "tool.1", "" ), path );
     }
 
 }
