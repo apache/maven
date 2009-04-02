@@ -59,6 +59,7 @@ import org.apache.maven.repository.VersionNotFoundException;
 import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelEventListener;
+import org.apache.maven.shared.model.ModelProperty;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -325,20 +326,25 @@ public class DefaultMavenProjectBuilder
         {
             interpolatorProperties.add( new InterpolatorProperty( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ),
                                                                   PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        }      
-            try
-            {
-                PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
-                ProcessorContext.interpolateModelProperties( dm.getModelProperties(),
-                                                             interpolatorProperties, dm );
-                dm = new PomClassicDomainModel( dm.getModelProperties(), false );
-                model = dm.getModel();
-            }
-            catch ( IOException e )
-            {
+        }
 
-                throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
-            }   
+        try
+        {
+            PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
+            List<ModelProperty> mps = dm.getModelProperties();
+            ProcessorContext.interpolateModelProperties( mps, interpolatorProperties, dm );
+            if ( dm.getProjectDirectory() != null )
+            {
+                mps = ProcessorContext.alignPaths( mps, dm.getProjectDirectory() );
+            }
+            dm = new PomClassicDomainModel( mps, false );
+            model = dm.getModel();
+        }
+        catch ( IOException e )
+        {
+
+            throw new ProjectBuildingException( projectId, "", projectDescriptor, e );
+        }   
 
         MavenProject project;
 

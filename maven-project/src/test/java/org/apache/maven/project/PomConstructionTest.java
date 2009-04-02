@@ -69,7 +69,7 @@ public class PomConstructionTest
     public void testEmptyUrl()
         throws Exception
     {
-        buildPom( "empty-distMng-repo-url", null );
+        buildPom( "empty-distMng-repo-url" );
     }
 
     /**
@@ -188,7 +188,7 @@ public class PomConstructionTest
     public void testParentInterpolation()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "parent-interpolation/sub", null );
+        PomTestWrapper pom = buildPom( "parent-interpolation/sub" );
         pom = new PomTestWrapper(pom.getMavenProject().getParent());
         assertEquals( "1.3.0-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
     }
@@ -229,7 +229,7 @@ public class PomConstructionTest
     public void testReportingInterpolation()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "reporting-interpolation", null );
+        PomTestWrapper pom = buildPom( "reporting-interpolation" );
         pom = new PomTestWrapper(pom.getMavenProject());
         assertEquals( createPath(Arrays.asList(System.getProperty("user.dir"),
                 "src", "test", "resources-project-builder", "reporting-interpolation", "target", "site")),
@@ -876,7 +876,7 @@ public class PomConstructionTest
     }
 
     /** MNG-4027*/
-    /*
+    /* FIXME
     public void testProfileInjectedDependencies()
         throws Exception
     {
@@ -888,7 +888,7 @@ public class PomConstructionTest
         assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
         assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
     }
-*/
+//*/
     /** MNG-4034 */
     public void testManagedProfileDependency()
         throws Exception
@@ -1284,7 +1284,7 @@ public class PomConstructionTest
         assertEquals( "CHILD", pom.getValue( "properties/interpolated" ) );
     }
     
-    /* MNG-1995 
+    /* FIXME: MNG-1995 
     public void testBooleanInterpolation()
         throws Exception
     {

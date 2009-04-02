@@ -480,12 +480,6 @@ public class ProcessorContext
         } );
         
         ModelTransformerContext.interpolateModelProperties( modelProperties, ips2 );
-            
-        if ( dm.getProjectDirectory() != null )
-        {
-            modelProperties = alignPaths( modelProperties, dm.getProjectDirectory() );
-        }
-        
     }
 
     private static boolean containsProjectVersion( List<InterpolatorProperty> interpolatorProperties )
@@ -510,7 +504,7 @@ public class ProcessorContext
      * @param basedir The project directory, must not be {@code null}.
      * @return The updated model properties, never {@code null}.
      */
-    private static List<ModelProperty> alignPaths( Collection<ModelProperty> modelProperties, File basedir )
+    public static List<ModelProperty> alignPaths( Collection<ModelProperty> modelProperties, File basedir )
     {
         List<ModelProperty> mps = new ArrayList<ModelProperty>( modelProperties.size() );
 
