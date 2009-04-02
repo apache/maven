@@ -54,6 +54,8 @@ public class ProfileContext
         this.activeProfileIds = profileContextInfo.getActiveProfileIds();
         this.inactiveProfileIds = profileContextInfo.getInactiveProfileIds();
     }
+    
+   // public Collection<Profile> getActiveProfilesFrom(ProfileManager manaa)
 
     public Collection<Profile> getActiveProfiles()
     {

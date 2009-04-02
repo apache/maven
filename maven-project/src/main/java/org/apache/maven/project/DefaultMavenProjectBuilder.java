@@ -123,15 +123,17 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         PomClassicDomainModel domainModel;
-		try {
-			domainModel = buildWithoutProfiles( "unknown", pomFile, configuration.getLocalRepository(), configuration.getRemoteRepositories(), configuration );
-		} catch (IOException e) {
+		try 
+		{
+			domainModel = buildWithoutProfiles( "unknown", pomFile, configuration );
+		} 
+		catch (IOException e) 
+		{
 			throw new ProjectBuildingException("", "", e);
 		}
+     
+        MavenProject project = buildWithProfiles( domainModel, configuration, pomFile );
 
-        
-        MavenProject project = buildWithProfiles( domainModel, configuration, pomFile, domainModel.getParentFile() );
-        project.setFile( pomFile );
         Build build = project.getBuild();
         // NOTE: setting this script-source root before path translation, because
         // the plugin tools compose basedir and scriptSourceRoot into a single file.
@@ -184,13 +186,16 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
         PomClassicDomainModel domainModel;
-        try {
-			domainModel = buildWithoutProfiles( "unknown", artifact.getFile(), configuration.getLocalRepository(), 
-					configuration.getRemoteRepositories(), configuration );
-		} catch (IOException e) {
+        try 
+        {
+			domainModel = buildWithoutProfiles( "unknown", artifact.getFile(), configuration );
+		} 
+        catch (IOException e) 
+        {
 			throw new ProjectBuildingException(artifact.getId(), "Error reading project artifact.", e);
 		}
-        project = buildWithProfiles( domainModel, configuration, artifact.getFile(), domainModel.getParentFile() );
+
+        project = buildWithProfiles( domainModel, configuration, artifact.getFile() );
         
         artifact.setFile( artifact.getFile() );
         project.setVersion( artifact.getVersion() );
@@ -200,6 +205,7 @@ public class DefaultMavenProjectBuilder
         return project;   	
     }
     
+    //TODO: Get rid of this after merge of new PluginManager code
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
@@ -284,7 +290,7 @@ public class DefaultMavenProjectBuilder
         return new MavenProjectBuildingResult( project, result );
     }
 
-    private MavenProject buildWithProfiles( PomClassicDomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor, File parentDescriptor )
+    private MavenProject buildWithProfiles( PomClassicDomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
         throws ProjectBuildingException
     {
     	Model model;
@@ -296,6 +302,8 @@ public class DefaultMavenProjectBuilder
 		{
 			throw new ProjectBuildingException("", e.getMessage());
 		}
+		File parentDescriptor = domainModel.getParentFile();
+		
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
         List<Profile> projectProfiles = new ArrayList<Profile>();
@@ -381,8 +389,7 @@ public class DefaultMavenProjectBuilder
     }
     
 
-    private PomClassicDomainModel buildWithoutProfiles( String projectId, File pomFile, ArtifactRepository localRepository, 
-    		List<ArtifactRepository> remoteRepositories, ProjectBuilderConfiguration projectBuilderConfiguration )
+    private PomClassicDomainModel buildWithoutProfiles( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
         {
 
@@ -392,8 +399,8 @@ public class DefaultMavenProjectBuilder
         List<String> inactiveProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration
             .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
                                                                               : new ArrayList<String>();
-
-        return buildModel( pomFile, new ProfileContextInfo(null, activeProfileIds, inactiveProfileIds), localRepository, remoteRepositories );
+            
+        return buildModel( pomFile, new ProfileContextInfo(null, activeProfileIds, inactiveProfileIds), projectBuilderConfiguration );
     }
 
     private void validateModel( Model model, File pomFile )
@@ -443,7 +450,7 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private PomClassicDomainModel buildModel( File pom, ProfileContextInfo profileInfo, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    private PomClassicDomainModel buildModel( File pom, ProfileContextInfo profileInfo, ProjectBuilderConfiguration config )
         throws IOException
     {
         if ( pom == null )
@@ -458,7 +465,9 @@ public class DefaultMavenProjectBuilder
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
 
         domainModels.add( domainModel );
-
+        ArtifactRepository localRepository = config.getLocalRepository();
+        List<ArtifactRepository> remoteRepositories = config.getRemoteRepositories();
+        
         File parentFile = null;
         int lineageCount = 0;
         if ( domainModel.getParentId() != null )
