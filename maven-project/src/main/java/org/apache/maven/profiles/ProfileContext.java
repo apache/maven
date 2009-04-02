@@ -28,9 +28,13 @@ import java.util.List;
 import org.apache.maven.profiles.matchers.DefaultMatcher;
 import org.apache.maven.profiles.matchers.ProfileMatcher;
 import org.apache.maven.profiles.matchers.PropertyMatcher;
+import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.shared.model.InterpolatorProperty;
 
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.codehaus.plexus.PlexusContainer;
 
 public class ProfileContext
 {
@@ -55,7 +59,26 @@ public class ProfileContext
         this.inactiveProfileIds = profileContextInfo.getInactiveProfileIds();
     }
     
-   // public Collection<Profile> getActiveProfilesFrom(ProfileManager manaa)
+    
+    public static List<Profile> getActiveProfilesFrom(ProjectBuilderConfiguration config, Model model, PlexusContainer container)
+    	throws ProfileActivationException
+    {
+        List<Profile> projectProfiles = new ArrayList<Profile>();
+        ProfileManager externalProfileManager = config.getGlobalProfileManager();
+        
+        ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( config.getExecutionProperties(), false ):
+            externalProfileManager.getProfileActivationContext();
+     
+        if(externalProfileManager != null)
+        {           
+        	projectProfiles.addAll( externalProfileManager.getActiveProfiles() );    
+        }
+
+        ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
+        profileManager.addProfiles( model.getProfiles() );
+        projectProfiles.addAll( profileManager.getActiveProfiles() ); 
+        return projectProfiles;
+    }
 
     public Collection<Profile> getActiveProfiles()
     {

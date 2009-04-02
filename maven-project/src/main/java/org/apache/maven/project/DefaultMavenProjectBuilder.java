@@ -306,34 +306,10 @@ public class DefaultMavenProjectBuilder
 		
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
-        List<Profile> projectProfiles = new ArrayList<Profile>();
-        ProfileManager externalProfileManager = config.getGlobalProfileManager();
-        
-        ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( config.getExecutionProperties(), false ):
-            externalProfileManager.getProfileActivationContext();
-     
-        if(externalProfileManager != null)
-        {           
-        	//System.out.println("PROFILES = " + externalProfileManager.getProfilesById().toString());
-        
-            try
-            {
-                projectProfiles.addAll( externalProfileManager.getActiveProfiles() );
-            }
-            catch ( ProfileActivationException e )
-            {
-                throw new ProjectBuildingException( projectId, "Failed to activate external profiles.", projectDescriptor,
-                                                    e );
-            }         
-        }
-
-        ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
-        profileManager.addProfiles( model.getProfiles() );
-        //System.out.println("PROFILE POM: COUNT = " + model.getProfiles().size());
+        List<Profile> projectProfiles;
         try
         {
-            //System.out.println("PROFILE POM - ACTIVE: COUNT = " + profileManager.getActiveProfiles( model ).size() +"," + projectProfiles.size());
-            projectProfiles.addAll( profileManager.getActiveProfiles() );
+        	projectProfiles = ProfileContext.getActiveProfilesFrom(config, model, container);
         }
         catch ( ProfileActivationException e )
         {
@@ -388,19 +364,85 @@ public class DefaultMavenProjectBuilder
         return project;
     }
     
-
     private PomClassicDomainModel buildWithoutProfiles( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
-        {
-
+    {
         List<String> activeProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration.getGlobalProfileManager()
             .getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyActiveProfileIds() : new ArrayList<String>();
 
         List<String> inactiveProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration
             .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
                                                                               : new ArrayList<String>();
-            
-        return buildModel( pomFile, new ProfileContextInfo(null, activeProfileIds, inactiveProfileIds), projectBuilderConfiguration );
+
+            ProfileContextInfo profileInfo = new ProfileContextInfo(null, activeProfileIds, inactiveProfileIds);
+            PomClassicDomainModel domainModel = new PomClassicDomainModel( pomFile );
+            domainModel.setProjectDirectory( pomFile.getParentFile() );
+            domainModel.setMostSpecialized( true );
+
+            List<DomainModel> domainModels = new ArrayList<DomainModel>();
+
+            domainModels.add( domainModel );
+            ArtifactRepository localRepository = projectBuilderConfiguration.getLocalRepository();
+            List<ArtifactRepository> remoteRepositories = projectBuilderConfiguration.getRemoteRepositories();
+
+            File parentFile = null;
+            int lineageCount = 0;
+            if ( domainModel.getParentId() != null )
+            {
+            	List<DomainModel> mavenParents;
+            	if ( isParentLocal( domainModel.getRelativePathOfParent(), pomFile.getParentFile() ) )
+            	{
+            		mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, pomFile.getParentFile() );
+            	}
+            	else
+            	{
+            		mavenParents = getDomainModelParentsFromRepository( domainModel, localRepository, remoteRepositories );
+            	}
+
+            	if ( mavenParents.size() > 0 )
+            	{
+            		PomClassicDomainModel dm = (PomClassicDomainModel) mavenParents.get( 0 );
+            		parentFile = dm.getFile();
+            		domainModel.setParentFile( parentFile );
+            		lineageCount = mavenParents.size();
+            	}
+
+            	domainModels.addAll( mavenParents );
+            }
+
+            domainModels.add( convertToDomainModel( getSuperModel(), false ) );
+            List<DomainModel> profileModels = new ArrayList<DomainModel>();
+            //Process Profiles
+            for(DomainModel domain : domainModels)
+            {
+            	PomClassicDomainModel dm = (PomClassicDomainModel) domain;
+
+            	if(!dm.getModel().getProfiles().isEmpty())
+            	{
+            		ProfileContext profileContext1 = new ProfileContext( dm.getModel().getProfiles(), profileInfo );
+            		Collection<Profile> profiles = profileContext1.getActiveProfiles();
+            		if(!profiles.isEmpty())
+            		{
+            			profileModels.add(ProcessorContext.mergeProfilesIntoModel( profileContext1.getActiveProfiles(), dm ));  
+            		}
+            		else
+            		{
+            			profileModels.add( dm );   
+            		}
+            	}
+            	else
+            	{
+            		profileModels.add( dm );
+            	}                
+            }
+
+            PomClassicDomainModel transformedDomainModel = ProcessorContext.build( profileModels, null );
+
+            // Lineage count is inclusive to add the POM read in itself.
+            transformedDomainModel.setLineageCount( lineageCount + 1 );
+            transformedDomainModel.setParentFile( parentFile );
+
+            return transformedDomainModel;
     }
 
     private void validateModel( Model model, File pomFile )
@@ -450,85 +492,7 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private PomClassicDomainModel buildModel( File pom, ProfileContextInfo profileInfo, ProjectBuilderConfiguration config )
-        throws IOException
-    {
-        if ( pom == null )
-        {
-            throw new IllegalArgumentException( "pom: null" );
-        }
-
-        PomClassicDomainModel domainModel = new PomClassicDomainModel( pom );
-        domainModel.setProjectDirectory( pom.getParentFile() );
-        domainModel.setMostSpecialized( true );
-
-        List<DomainModel> domainModels = new ArrayList<DomainModel>();
-
-        domainModels.add( domainModel );
-        ArtifactRepository localRepository = config.getLocalRepository();
-        List<ArtifactRepository> remoteRepositories = config.getRemoteRepositories();
-        
-        File parentFile = null;
-        int lineageCount = 0;
-        if ( domainModel.getParentId() != null )
-        {
-            List<DomainModel> mavenParents;
-            if ( isParentLocal( domainModel.getRelativePathOfParent(), pom.getParentFile() ) )
-            {
-                mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, pom.getParentFile() );
-            }
-            else
-            {
-                mavenParents = getDomainModelParentsFromRepository( domainModel, localRepository, remoteRepositories );
-            }
-
-            if ( mavenParents.size() > 0 )
-            {
-                PomClassicDomainModel dm = (PomClassicDomainModel) mavenParents.get( 0 );
-                parentFile = dm.getFile();
-                domainModel.setParentFile( parentFile );
-                lineageCount = mavenParents.size();
-            }
-
-            domainModels.addAll( mavenParents );
-        }
-
-        domainModels.add( convertToDomainModel( getSuperModel(), false ) );
-        List<DomainModel> profileModels = new ArrayList<DomainModel>();
-        //Process Profiles
-        for(DomainModel domain : domainModels)
-        {
-            PomClassicDomainModel dm = (PomClassicDomainModel) domain;
-            
-            if(!dm.getModel().getProfiles().isEmpty())
-            {
-                 ProfileContext profileContext1 = new ProfileContext( dm.getModel().getProfiles(), profileInfo );
-                 Collection<Profile> profiles = profileContext1.getActiveProfiles();
-                 if(!profiles.isEmpty())
-                 {
-                    profileModels.add(ProcessorContext.mergeProfilesIntoModel( profileContext1.getActiveProfiles(), dm ));  
-                 }
-                 else
-                 {
-                     profileModels.add( dm );   
-                 }
-            }
-            else
-            {
-                profileModels.add( dm );
-            }                
-        }
-
-        PomClassicDomainModel transformedDomainModel = ProcessorContext.build( profileModels, null );
-
-        // Lineage count is inclusive to add the POM read in itself.
-        transformedDomainModel.setLineageCount( lineageCount + 1 );
-        transformedDomainModel.setParentFile( parentFile );
-
-        return transformedDomainModel;
-    }
-
-    private PomClassicDomainModel convertToDomainModel( Model model, boolean isMostSpecialized )
+    private static PomClassicDomainModel convertToDomainModel( Model model, boolean isMostSpecialized )
         throws IOException
     {
         if ( model == null )
@@ -562,7 +526,7 @@ public class DefaultMavenProjectBuilder
      * @return true if the relative path of the specified parent references a pom, otherwise returns
      *         fals
      */
-    private boolean isParentLocal( String relativePath, File projectDirectory )
+    private static boolean isParentLocal( String relativePath, File projectDirectory )
     {
         try
         {
