@@ -230,5 +230,8 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setErrorReporter( CoreErrorReporter reporter );
     CoreErrorReporter getErrorReporter();
 
+    File getUserToolchainsFile();
+    MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
+
     ProjectBuilderConfiguration getProjectBuildingConfiguration();
 }

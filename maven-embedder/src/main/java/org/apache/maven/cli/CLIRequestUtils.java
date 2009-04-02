@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.MavenTransferListener;
+import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -222,6 +223,16 @@ public final class CLIRequestUtils
         Properties userProperties = new Properties();
         populateProperties( commandLine, executionProperties, userProperties );
 
+        File userToolchainsFile;
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
+        {
+            userToolchainsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_TOOLCHAINS ) );
+        }
+        else
+        {
+            userToolchainsFile = MavenEmbedder.DEFAULT_USER_TOOLCHAINS_FILE;
+        }
+
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( baseDirectory )
             .setGoals( goals )
@@ -240,7 +251,9 @@ public final class CLIRequestUtils
             .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
-            .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
+            .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
+            .setUserToolchainsFile( userToolchainsFile );
+        
 
         if ( alternatePomFile != null )
         {

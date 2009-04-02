@@ -35,7 +35,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  *
  * @author mkleint
  */
-@Component(role=ToolchainFactory.class)
+@Component( role = ToolchainFactory.class, hint = "jdk" )
 public class DefaultJavaToolchainFactory
     implements ToolchainFactory, LogEnabled
 {
