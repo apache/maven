@@ -9,7 +9,7 @@ package org.apache.maven.plugin.coreit;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -23,29 +23,29 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.toolchain.MisconfiguredToolchainException;
-import org.apache.maven.toolchain.ToolchainManagerPrivate;
-import org.apache.maven.toolchain.ToolchainPrivate;
+import org.apache.maven.toolchain.Toolchain;
+import org.apache.maven.toolchain.ToolchainManager;
 
 /**
- * @goal toolchain
+ * Finds a tool from a previously selected toolchain. This tests the public API just like toolchain-enabled plugins
+ * would do.
+ * 
+ * @goal find-tool
  * @phase validate
  */
-public class CoreItMojo
+public class FindToolMojo
     extends AbstractMojo
 {
 
     /**
      * @component
      */
-    private ToolchainManagerPrivate toolchainManager;
+    private ToolchainManager toolchainManager;
 
     /**
      * The current Maven session holding the selected toolchain.
@@ -59,7 +59,7 @@ public class CoreItMojo
     /**
      * The path to the output file for the properties.
      * 
-     * @parameter expression="${toolchain.outputFile}" default-value="${project.build.directory}/toolchains.properties"
+     * @parameter expression="${toolchain.outputFile}" default-value="${project.build.directory}/tool.properties"
      */
     private File outputFile;
 
@@ -77,45 +77,23 @@ public class CoreItMojo
      */
     private String tool;
 
-    /**
-     * The zero-based index of the toolchain to select and store in the build context.
-     * 
-     * @parameter expression="${toolchain.selected}"
-     */
-    private int selected;
-
     public void execute()
         throws MojoExecutionException
     {
-        ToolchainPrivate[] tcs;
-        try
-        {
-            tcs = toolchainManager.getToolchainsForType( type );
-        }
-        catch ( MisconfiguredToolchainException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
+        Toolchain toolchain = toolchainManager.getToolchainFromBuildContext( type, session );
 
-        getLog().info( "[MAVEN-CORE-IT-LOG] Toolchains in plugin: " + Arrays.asList( tcs ) );
-
-        if ( selected >= 0 )
-        {
-            ToolchainPrivate toolchain = tcs[selected];
-            toolchainManager.storeToolchainToBuildContext( toolchain, session );
-        }
+        getLog().info( "[MAVEN-CORE-IT-LOG] Toolchain in session: " + toolchain );
 
         Properties properties = new Properties();
 
-        int count = 1;
-        for ( Iterator i = Arrays.asList( tcs ).iterator(); i.hasNext(); count++ )
+        if ( toolchain != null )
         {
-            ToolchainPrivate toolchain = (ToolchainPrivate) i.next();
+            properties.setProperty( "toolchain.type", toolchain.getType() );
 
-            String foundTool = toolchain.findTool( tool );
-            if ( foundTool != null )
+            String path = toolchain.findTool( tool );
+            if ( path != null )
             {
-                properties.setProperty( "tool." + count, foundTool );
+                properties.setProperty( "tool." + tool, path );
             }
         }
 
