@@ -32,7 +32,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.ToolchainManagerPrivate;
 import org.apache.maven.toolchain.ToolchainPrivate;
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * @goal toolchain
@@ -76,7 +75,7 @@ public class CoreItMojo
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
-        getLog().info( "Toolchain in compiler-plugin: " + Arrays.asList( tcs ) );
+        getLog().info( "[MAVEN-CORE-IT-LOG] Toolchains in plugin: " + Arrays.asList( tcs ) );
 
         Properties properties = new Properties();
 
@@ -105,7 +104,16 @@ public class CoreItMojo
         }
         finally
         {
-            IOUtil.close( out );
+            if ( out != null )
+            {
+                try
+                {
+                    out.close();
+                }
+                catch ( IOException e )
+                {
+                }
+            }
         }
     }
 }
