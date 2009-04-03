@@ -34,16 +34,15 @@ import org.apache.maven.mercury.plexus.PlexusMercury;
 import org.apache.maven.mercury.repository.api.Repository;
 import org.apache.maven.mercury.repository.api.RepositoryException;
 import org.apache.maven.mercury.util.Util;
+import org.apache.maven.repository.LegacyRepositorySystem;
 import org.apache.maven.repository.MetadataGraph;
 import org.apache.maven.repository.MetadataResolutionRequest;
 import org.apache.maven.repository.MetadataResolutionResult;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.LegacyRepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.lang.DefaultLanguage;
 import org.codehaus.plexus.lang.Language;
-import org.omg.CORBA._PolicyStub;
 
 /**
  * @author Oleg Gusakov
