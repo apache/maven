@@ -66,6 +66,15 @@ public interface RepositorySystem
 
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
+    /**
+     * this is the new metadata-based entry point into repository system. By default - it will transitively resolve metadata
+     * for the supplied root GAV and return a flat set of dependency metadatas. Tweaking the request allows user to ask for 
+     * various formats of the response - resolved tree, resolved graph or dirty tree. Only the resolved tree is implemented now
+     * in MercuryRepositorySystem, LegacyRepositorySystem ignores this call for now.  
+     * 
+     * @param request - supplies all necessary details for the resolution configuration
+     * @return
+     */
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
        
     //REMOVE

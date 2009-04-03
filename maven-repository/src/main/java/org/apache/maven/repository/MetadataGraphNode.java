@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * MetadataGraph node - as it's a directed graph - holds adjacency lists for incident and exident nodes
  *
  * @author Oleg Gusakov
  * @version $Id$
@@ -31,9 +31,13 @@ import java.util.List;
  */
 public class MetadataGraphNode
 {
+    /** node payload */
     MavenArtifactMetadata   metadata;
 
+    /** nodes, incident to this (depend on me) */
     List<MetadataGraphNode> inNodes;
+    
+    /** nodes, exident to this (I depend on) */
     List<MetadataGraphNode> exNodes;
     
     public MetadataGraphNode()
