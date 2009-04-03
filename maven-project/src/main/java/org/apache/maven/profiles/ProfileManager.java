@@ -40,5 +40,5 @@ public interface ProfileManager
         throws ProfileActivationException;
     
     List<Profile> getActiveProfiles( )
-    throws ProfileActivationException;    
+    	throws ProfileActivationException;    
 }

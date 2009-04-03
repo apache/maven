@@ -45,12 +45,11 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileActivationException;
-import org.apache.maven.profiles.ProfileContextInfo;
+import org.apache.maven.profiles.ProfileManagerInfo;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.profiles.ProfileContext;
 import org.apache.maven.project.processor.ProcessorContext;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
@@ -127,7 +126,7 @@ public class DefaultMavenProjectBuilder
         PomClassicDomainModel domainModel;
 		try 
 		{
-			domainModel = buildWithoutProfiles( "unknown", pomFile, configuration );
+			domainModel = build( "unknown", pomFile, configuration );
 		} 
 		catch (IOException e) 
 		{
@@ -138,7 +137,7 @@ public class DefaultMavenProjectBuilder
         List<Profile> projectProfiles;
         try
         {
-        	projectProfiles = ProfileContext.getActiveProfilesFrom(configuration, domainModel.getModel(), container);
+        	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration, domainModel.getModel(), container);
         }
         catch ( ProfileActivationException e )
         {
@@ -220,7 +219,7 @@ public class DefaultMavenProjectBuilder
         PomClassicDomainModel domainModel;
         try 
         {
-			domainModel = buildWithoutProfiles( "unknown", artifact.getFile(), configuration );
+			domainModel = build( "unknown", artifact.getFile(), configuration );
 		} 
         catch (IOException e) 
         {
@@ -230,7 +229,7 @@ public class DefaultMavenProjectBuilder
         List<Profile> projectProfiles;
         try
         {
-        	projectProfiles = ProfileContext.getActiveProfilesFrom(configuration, domainModel.getModel(), container);
+        	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration, domainModel.getModel(), container);
         }
         catch ( ProfileActivationException e )
         {
@@ -414,7 +413,7 @@ public class DefaultMavenProjectBuilder
         return project;
     }
     
-    private PomClassicDomainModel buildWithoutProfiles( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
+    private PomClassicDomainModel build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
     {
         List<String> activeProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration.getGlobalProfileManager()
@@ -424,7 +423,7 @@ public class DefaultMavenProjectBuilder
             .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
                                                                               : new ArrayList<String>();
 
-            ProfileContextInfo profileInfo = new ProfileContextInfo(null, activeProfileIds, inactiveProfileIds);
+            ProfileManagerInfo profileInfo = new ProfileManagerInfo(null, activeProfileIds, inactiveProfileIds);
             PomClassicDomainModel domainModel = new PomClassicDomainModel( pomFile );
             domainModel.setProjectDirectory( pomFile.getParentFile() );
             domainModel.setMostSpecialized( true );
@@ -469,8 +468,7 @@ public class DefaultMavenProjectBuilder
 
             	if(!dm.getModel().getProfiles().isEmpty())
             	{
-            		ProfileContext profileContext1 = new ProfileContext( dm.getModel().getProfiles(), profileInfo );
-            		Collection<Profile> profiles = profileContext1.getActiveProfiles();
+            		Collection<Profile> profiles = DefaultProfileManager.getActiveProfiles(dm.getModel().getProfiles(), profileInfo);
             		if(!profiles.isEmpty())
             		{
             			profileModels.add(ProcessorContext.mergeProfilesIntoModel( profiles, dm ));  

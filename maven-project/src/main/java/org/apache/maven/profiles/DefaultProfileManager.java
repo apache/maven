@@ -30,6 +30,7 @@ import org.apache.maven.profiles.matchers.DefaultMatcher;
 import org.apache.maven.profiles.matchers.ProfileMatcher;
 import org.apache.maven.profiles.matchers.PropertyMatcher;
 import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
@@ -45,6 +46,11 @@ public class DefaultProfileManager
     private Map<String, Profile> profilesById = new LinkedHashMap<String, Profile>();
 
     private ProfileActivationContext profileActivationContext;
+    
+    private static final ProfileMatcher defaultMatcher = new DefaultMatcher();
+
+    private static final List<ProfileMatcher> matchers =
+        Collections.unmodifiableList( Arrays.asList( new DefaultMatcher(), new PropertyMatcher() ) );    
 
     /**
      * the properties passed to the profile manager are the props that
@@ -195,6 +201,83 @@ public class DefaultProfileManager
         return allActive;
     }
     
+    public static List<Profile> getActiveProfilesFrom(ProjectBuilderConfiguration config, Model model, PlexusContainer container)
+		throws ProfileActivationException
+	{
+	    List<Profile> projectProfiles = new ArrayList<Profile>();
+	    ProfileManager externalProfileManager = config.getGlobalProfileManager();
+	    
+	    ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( config.getExecutionProperties(), false ):
+	        externalProfileManager.getProfileActivationContext();
+	 
+	    if(externalProfileManager != null)
+	    {           
+	    	projectProfiles.addAll( externalProfileManager.getActiveProfiles() );    
+	    }
+	
+	    ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
+	    profileManager.addProfiles( model.getProfiles() );
+	    projectProfiles.addAll( profileManager.getActiveProfiles() ); 
+	    return projectProfiles;
+	}   
+ 
+    public static Collection<Profile> getActiveProfiles(List<Profile> profiles, ProfileManagerInfo profileContextInfo)
+    {
+        List<InterpolatorProperty> properties = profileContextInfo.getInterpolatorProperties();
+        Collection<String> activeProfileIds = profileContextInfo.getActiveProfileIds();
+        Collection<String> inactiveProfileIds = profileContextInfo.getInactiveProfileIds();
+        
+        List<Profile> matchedProfiles = new ArrayList<Profile>();
+        List<Profile> defaultProfiles = new ArrayList<Profile>();
+        for ( Profile profile : profiles )
+        {
+            String profileId = profile.getId();
+
+            if ( !inactiveProfileIds.contains( profileId ) )
+            {
+                if ( activeProfileIds.contains( profileId ) )
+                {
+                    matchedProfiles.add( profile );
+                }
+                else if ( defaultMatcher.isMatch( profile, properties ) )
+                {
+                    defaultProfiles.add( profile );
+                }
+                else
+                {
+                    for ( ProfileMatcher matcher : matchers )
+                    {
+                        if ( matcher.isMatch( profile, properties ) )
+                        {
+                            matchedProfiles.add( profile );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( matchedProfiles.isEmpty() )
+        {
+            matchedProfiles = defaultProfiles;
+        }
+
+        return matchedProfiles;
+    }    
+
+    /* (non-Javadoc)
+     * @see org.apache.maven.project.ProfileManager#addProfiles(java.util.List)
+     */
+    public void addProfiles( List<Profile> profiles )
+    {
+        for ( Iterator it = profiles.iterator(); it.hasNext(); )
+        {
+            Profile profile = (Profile) it.next();
+
+            addProfile( profile );
+        }
+    }   
+    
     private static List<Profile> getDefaultProfiles(List<Profile> profiles)
     {
         List<Profile> defaults = new ArrayList<Profile>();
@@ -207,9 +290,6 @@ public class DefaultProfileManager
         }
         return defaults;
     }
-
-    private static List<ProfileMatcher> matchers = Arrays.asList( (ProfileMatcher) new DefaultMatcher(),
-        (ProfileMatcher) new PropertyMatcher());
 
     private boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
@@ -230,19 +310,6 @@ public class DefaultProfileManager
             }
         }
         return false;
-    }
-
-    /* (non-Javadoc)
-     * @see org.apache.maven.project.ProfileManager#addProfiles(java.util.List)
-     */
-    public void addProfiles( List<Profile> profiles )
-    {
-        for ( Iterator it = profiles.iterator(); it.hasNext(); )
-        {
-            Profile profile = (Profile) it.next();
-
-            addProfile( profile );
-        }
     }
 
     private void activateAsDefault( String profileId )

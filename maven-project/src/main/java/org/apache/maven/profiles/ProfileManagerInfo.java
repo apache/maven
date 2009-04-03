@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.maven.shared.model.InterpolatorProperty;
 
-public class ProfileContextInfo
+public class ProfileManagerInfo
 {
 	private List<InterpolatorProperty> interpolatorProperties;
 	
@@ -14,7 +14,7 @@ public class ProfileContextInfo
 	
 	private Collection<String> inactiveProfileIds;
 	
-	public ProfileContextInfo(List<InterpolatorProperty> interpolatorProperties, Collection<String> activeProfileIds, Collection<String> inactiveProfileIds)
+	public ProfileManagerInfo(List<InterpolatorProperty> interpolatorProperties, Collection<String> activeProfileIds, Collection<String> inactiveProfileIds)
 	{
 		this.interpolatorProperties = (interpolatorProperties != null) ? interpolatorProperties : new ArrayList<InterpolatorProperty>();
 		this.activeProfileIds = (activeProfileIds != null) ? activeProfileIds : new ArrayList<String>();
