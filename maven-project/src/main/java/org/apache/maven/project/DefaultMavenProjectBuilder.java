@@ -123,6 +123,7 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
+    	//Do inheritance
         PomClassicDomainModel domainModel;
 		try 
 		{
@@ -132,8 +133,33 @@ public class DefaultMavenProjectBuilder
 		{
 			throw new ProjectBuildingException("", "", e);
 		}
-     
-        MavenProject project = buildWithProfiles( domainModel, configuration, pomFile );
+
+		//Profiles
+        List<Profile> projectProfiles;
+        try
+        {
+        	projectProfiles = ProfileContext.getActiveProfilesFrom(configuration, domainModel.getModel(), container);
+        }
+        catch ( ProfileActivationException e )
+        {
+            throw new ProjectBuildingException( "", "Failed to activate pom profiles.");
+        }   
+        catch(IOException e)
+        {
+        	throw new ProjectBuildingException( "", "Failed to activate pom profiles.");	
+        }
+        
+        try
+        {
+            domainModel = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException("", "");
+        }  		
+		//Interpolation
+        MavenProject project = interpolateDomainModel( domainModel, configuration, pomFile );
+        project.setActiveProfiles( projectProfiles );
 
         Build build = project.getBuild();
         // NOTE: setting this script-source root before path translation, because
@@ -174,6 +200,11 @@ public class DefaultMavenProjectBuilder
         {
             return project;
         }
+        
+        if(configuration.getRemoteRepositories() == null)
+        {
+        	throw new IllegalArgumentException("configuration.getRemoteRepositories(): null");
+        }
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, configuration.getLocalRepository(), configuration.getRemoteRepositories() );
         ArtifactResolutionResult result = repositorySystem.resolve( request );
@@ -195,9 +226,31 @@ public class DefaultMavenProjectBuilder
         {
 			throw new ProjectBuildingException(artifact.getId(), "Error reading project artifact.", e);
 		}
-
-        project = buildWithProfiles( domainModel, configuration, artifact.getFile() );
         
+        List<Profile> projectProfiles;
+        try
+        {
+        	projectProfiles = ProfileContext.getActiveProfilesFrom(configuration, domainModel.getModel(), container);
+        }
+        catch ( ProfileActivationException e )
+        {
+            throw new ProjectBuildingException( "", "Failed to activate pom profiles.");
+        }   
+        catch(IOException e)
+        {
+        	throw new ProjectBuildingException( "", "Failed to activate pom profiles.");	
+        }
+        
+        try
+        {
+            domainModel = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException("", "");
+        }
+        project = interpolateDomainModel( domainModel, configuration, artifact.getFile() );
+        project.setActiveProfiles( projectProfiles );
         artifact.setFile( artifact.getFile() );
         project.setVersion( artifact.getVersion() );
 
@@ -210,6 +263,10 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
+    	if(remoteRepositories == null)
+    	{
+    		throw new IllegalArgumentException("repositories: null");
+    	}
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()        
         .setLocalRepository( localRepository )
         .setRemoteRepositories(remoteRepositories);
@@ -290,8 +347,8 @@ public class DefaultMavenProjectBuilder
 
         return new MavenProjectBuildingResult( project, result );
     }
-
-    private MavenProject buildWithProfiles( PomClassicDomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
+    
+    private MavenProject interpolateDomainModel( PomClassicDomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
         throws ProjectBuildingException
     {
     	Model model;
@@ -303,20 +360,8 @@ public class DefaultMavenProjectBuilder
 		{
 			throw new ProjectBuildingException("", e.getMessage());
 		}
-		File parentDescriptor = domainModel.getParentFile();
 		
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-
-        List<Profile> projectProfiles;
-        try
-        {
-        	projectProfiles = ProfileContext.getActiveProfilesFrom(config, model, container);
-        }
-        catch ( ProfileActivationException e )
-        {
-            throw new ProjectBuildingException( projectId, "Failed to activate pom profiles.", projectDescriptor,
-                                                e );
-        }
         
         List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
         interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
@@ -326,25 +371,26 @@ public class DefaultMavenProjectBuilder
         {
             interpolatorProperties.add( new InterpolatorProperty( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ),
                                                                   PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        }
-
-        try
-        {
-            PomClassicDomainModel dm = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
-            List<ModelProperty> mps = dm.getModelProperties();
-            ProcessorContext.interpolateModelProperties( mps, interpolatorProperties, dm );
-            if ( dm.getProjectDirectory() != null )
+        }      
+            try
             {
-                mps = ProcessorContext.alignPaths( mps, dm.getProjectDirectory() );
-            }
-            dm = new PomClassicDomainModel( mps, false );
-            model = dm.getModel();
-        }
-        catch ( IOException e )
-        {
+            	List<ModelProperty> mps = domainModel.getModelProperties();
+            	ProcessorContext.interpolateModelProperties( mps, interpolatorProperties, domainModel );
+            	if ( domainModel.getProjectDirectory() != null )
+            	{
+            		mps = ProcessorContext.alignPaths( mps, domainModel.getProjectDirectory() );
+            	}
+            	File f = domainModel.getParentFile();
+            	domainModel = new PomClassicDomainModel( mps, false );
+            	domainModel.setParentFile(f);
+            	model = domainModel.getModel();
 
-            throw new ProjectBuildingException( projectId, "", projectDescriptor, e );
-        }   
+            }
+            catch ( IOException e )
+            {
+
+                throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
+            }   
 
         MavenProject project;
 
@@ -357,15 +403,13 @@ public class DefaultMavenProjectBuilder
             Artifact projectArtifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
             project.setArtifact( projectArtifact );
 
-            project.setParentFile( parentDescriptor );
+            project.setParentFile( domainModel.getParentFile() );
 
         }
         catch ( InvalidRepositoryException e )
         {
             throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
         }
-
-        project.setActiveProfiles( projectProfiles );
 
         return project;
     }
@@ -429,7 +473,7 @@ public class DefaultMavenProjectBuilder
             		Collection<Profile> profiles = profileContext1.getActiveProfiles();
             		if(!profiles.isEmpty())
             		{
-            			profileModels.add(ProcessorContext.mergeProfilesIntoModel( profileContext1.getActiveProfiles(), dm ));  
+            			profileModels.add(ProcessorContext.mergeProfilesIntoModel( profiles, dm ));  
             		}
             		else
             		{

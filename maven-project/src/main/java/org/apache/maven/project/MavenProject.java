@@ -240,7 +240,7 @@ public class MavenProject
         }
         */
 
-        setRemoteArtifactRepositories( projectBuilderConfiguration.getRemoteRepositories() );       
+        setRemoteArtifactRepositories( (projectBuilderConfiguration.getRemoteRepositories() != null) ? projectBuilderConfiguration.getRemoteRepositories() : new ArrayList<ArtifactRepository>());       
     }
 
     /**
