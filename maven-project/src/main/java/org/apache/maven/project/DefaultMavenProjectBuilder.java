@@ -43,7 +43,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManagerInfo;
 import org.apache.maven.profiles.ProfileManager;
@@ -147,9 +146,14 @@ public class DefaultMavenProjectBuilder
         {
         	throw new ProjectBuildingException( "", "Failed to activate pom profiles.");	
         }
-        
+		
         try
         {
+            for(Profile p : projectProfiles)
+    		{
+    			logger.debug("Merging profile into model (build): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
+    		}
+    		        	
             domainModel = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
         }
         catch ( IOException e )
@@ -159,7 +163,7 @@ public class DefaultMavenProjectBuilder
 		//Interpolation
         MavenProject project = interpolateDomainModel( domainModel, configuration, pomFile );
         project.setActiveProfiles( projectProfiles );
-
+         
         Build build = project.getBuild();
         // NOTE: setting this script-source root before path translation, because
         // the plugin tools compose basedir and scriptSourceRoot into a single file.
@@ -174,6 +178,8 @@ public class DefaultMavenProjectBuilder
    
         return project;
     }
+    
+  //  private static void setRepositoriesOn(MavenProject project, )
 
     //!! This is used by the RR plugin
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteArtifactRepositories, ArtifactRepository localRepository, boolean allowStubs )
@@ -242,6 +248,11 @@ public class DefaultMavenProjectBuilder
         
         try
         {
+            for(Profile p : projectProfiles)
+    		{
+    			logger.debug("Merging profile into model (buildFromRepository): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
+    		}
+    		           	
             domainModel = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
         }
         catch ( IOException e )
@@ -471,6 +482,10 @@ public class DefaultMavenProjectBuilder
             		Collection<Profile> profiles = DefaultProfileManager.getActiveProfiles(dm.getModel().getProfiles(), profileInfo);
             		if(!profiles.isEmpty())
             		{
+            			for(Profile p : profiles)
+            			{
+            				logger.debug("Merging profile into model: Model = " + dm.getId() + ", Profile = " + p.getId() );
+            			}
             			profileModels.add(ProcessorContext.mergeProfilesIntoModel( profiles, dm ));  
             		}
             		else

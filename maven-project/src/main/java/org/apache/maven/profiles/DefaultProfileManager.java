@@ -22,11 +22,11 @@ package org.apache.maven.profiles;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.Parent;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.matchers.DefaultMatcher;
+import org.apache.maven.profiles.matchers.FileMatcher;
 import org.apache.maven.profiles.matchers.ProfileMatcher;
 import org.apache.maven.profiles.matchers.PropertyMatcher;
 import org.apache.maven.shared.model.InterpolatorProperty;
@@ -50,7 +50,7 @@ public class DefaultProfileManager
     private static final ProfileMatcher defaultMatcher = new DefaultMatcher();
 
     private static final List<ProfileMatcher> matchers =
-        Collections.unmodifiableList( Arrays.asList( new DefaultMatcher(), new PropertyMatcher() ) );    
+        (List<ProfileMatcher>) Collections.unmodifiableList( Arrays.asList( new DefaultMatcher(), new PropertyMatcher(), new FileMatcher() ) );    
 
     /**
      * the properties passed to the profile manager are the props that
@@ -134,7 +134,6 @@ public class DefaultProfileManager
     {
         List<Profile> activeFromPom = new ArrayList<Profile>();
         List<Profile> activeExternal = new ArrayList<Profile>();
-
         for ( Iterator it = profilesById.entrySet().iterator(); it.hasNext(); )
         {
             Map.Entry entry = (Entry) it.next();
@@ -142,17 +141,8 @@ public class DefaultProfileManager
             String profileId = (String) entry.getKey();
             Profile profile = (Profile) entry.getValue();
 
-            boolean shouldAdd = false;
-            if ( profileActivationContext.isExplicitlyActive( profileId ) )
-            {
-                shouldAdd = true;
-            }
-            else if ( isActive( profile, profileActivationContext ) )
-            {
-                shouldAdd = true;
-            }
-
-            if ( !profileActivationContext.isExplicitlyInactive( profileId ) && shouldAdd )
+            if ( !profileActivationContext.isExplicitlyInactive( profileId )
+            		&& (profileActivationContext.isExplicitlyActive( profileId ) || isActive( profile, profileActivationContext ) ) )
             {
                 if ( "pom".equals( profile.getSource() ) )
                 {
@@ -207,9 +197,12 @@ public class DefaultProfileManager
 	    List<Profile> projectProfiles = new ArrayList<Profile>();
 	    ProfileManager externalProfileManager = config.getGlobalProfileManager();
 	    
-	    ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( config.getExecutionProperties(), false ):
+	    Properties props = new Properties(config.getExecutionProperties());
+	    props.putAll(config.getUserProperties());
+	    
+	    ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( props, false ):
 	        externalProfileManager.getProfileActivationContext();
-	 
+	    
 	    if(externalProfileManager != null)
 	    {           
 	    	projectProfiles.addAll( externalProfileManager.getActiveProfiles() );    

@@ -133,6 +133,9 @@ public class ProcessorContext
         model.setDistributionManagement( p.getDistributionManagement() );
         model.setProperties( p.getProperties() );  
         model.setModules( new ArrayList<String>(p.getModules() ) );
+        model.setRepositories(p.getRepositories());
+        model.setPluginRepositories(p.getPluginRepositories());
+        model.setReporting(p.getReporting());
         BuildProcessor proc = new BuildProcessor( new ArrayList<Processor>());
         proc.processWithProfile( p.getBuild(), model);
         return model;
@@ -548,6 +551,9 @@ public class ProcessorContext
         p.setBuild( copyBuild(profile.getBuild()) );
         p.setId( profile.getId() );
         p.setActivation( profile.getActivation() );
+        p.setRepositories(profile.getRepositories());
+        p.setPluginRepositories(profile.getPluginRepositories());
+        p.setReporting(profile.getReporting());        
         return p;
     }
     

@@ -31,7 +31,7 @@ public class PropertyMatcher implements ProfileMatcher
         if (profile == null) {
             throw new IllegalArgumentException("profile: null");
         }
-
+        
         if(profile.getActivation() == null || profile.getActivation().getProperty() == null)
         {
             return false;

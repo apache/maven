@@ -240,7 +240,15 @@ public class MavenProject
         }
         */
 
-        setRemoteArtifactRepositories( (projectBuilderConfiguration.getRemoteRepositories() != null) ? projectBuilderConfiguration.getRemoteRepositories() : new ArrayList<ArtifactRepository>());       
+        setRemoteArtifactRepositories( (projectBuilderConfiguration.getRemoteRepositories() != null) ? projectBuilderConfiguration.getRemoteRepositories() : new ArrayList<ArtifactRepository>());
+		for(Repository r: model.getPluginRepositories())
+		{
+			try {
+				remoteArtifactRepositories.add(repositorySystem.buildArtifactRepository( r ));
+			} catch (InvalidRepositoryException e) {
+
+			}
+		}        
     }
 
     /**
@@ -378,7 +386,7 @@ public class MavenProject
     {
         return remoteArtifactRepositories;
     }
-
+    
     public boolean hasParent()
     {
         return getParent() != null;
