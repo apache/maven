@@ -265,6 +265,8 @@ public class DefaultLifecycleExecutor
         
         for( Plugin plugin : project.getBuild().getPlugins() )
         {
+            System.out.println( "plugin --> " + plugin );
+            
             for( PluginExecution execution : plugin.getExecutions() )
             {
                 // if the phase is specified then I don't have to go fetch the plugin yet and pull it down

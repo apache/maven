@@ -9,8 +9,8 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
-import org.apache.maven.plugin.MavenPluginCollector;
-import org.apache.maven.plugin.MavenPluginDiscoverer;
+import org.apache.maven.plugin.DefaultPluginManager;
+import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -19,6 +19,8 @@ import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.util.FileUtils;
 
 public abstract class AbstractCoreMavenComponentTestCase
@@ -33,7 +35,6 @@ public abstract class AbstractCoreMavenComponentTestCase
     protected void setUp()
         throws Exception
     {
-        super.setUp();
         repositorySystem = lookup( RepositorySystem.class );
         projectBuilder = lookup( MavenProjectBuilder.class );                
     }
@@ -63,8 +64,8 @@ public abstract class AbstractCoreMavenComponentTestCase
      */
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
-        containerConfiguration.addComponentDiscoverer( new MavenPluginDiscoverer() );
-        containerConfiguration.addComponentDiscoveryListener( new MavenPluginCollector() );
+        containerConfiguration.addComponentDiscoverer( PluginManager.class );
+        containerConfiguration.addComponentDiscoveryListener( PluginManager.class );
     }
     
     protected MavenExecutionRequest createMavenExecutionRequest( File pom )

@@ -15,9 +15,17 @@ package org.apache.maven.plugin;
  * the License.
  */
 
+import java.io.IOException;
+import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,6 +34,7 @@ import java.util.Set;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -45,6 +54,7 @@ import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -61,25 +71,39 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
+import org.codehaus.plexus.component.discovery.ComponentDiscovererManager;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextMapAdapter;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.InterpolationFilterReader;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+//TODO: get plugin groups
 //TODO: separate out project downloading
 //TODO: template method plugin validation as its framework specific
 //TODO: provide a method to get default configuraiton for a given plugin
 //TODO: get rid of all the custom configuration merging here, that's domain specific but needs to incorporate defaults the plugin manager can provide
 //TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
+//TODO: merge the plugin collector into the plugin manager
+//TODO: merge the plugin discovery listener into the plugin manager
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
-    implements PluginManager
+    implements PluginManager, ComponentDiscoverer, ComponentDiscoveryListener
 {
     @Requirement
     private Logger logger;
@@ -89,9 +113,6 @@ public class DefaultPluginManager
 
     @Requirement
     protected ArtifactFilterManager coreArtifactFilterManager;
-
-    @Requirement
-    protected MavenPluginCollector pluginCollector;
 
     @Requirement
     protected RepositorySystem repositorySystem;
@@ -107,9 +128,19 @@ public class DefaultPluginManager
     
     private Map<String,Plugin> pluginDefinitionsByPrefix = new HashMap<String,Plugin>();
     
+    private Map<String, PluginDescriptor> pluginDescriptors;    
+    
+    public DefaultPluginManager()
+    {
+        System.out.println( "hello!!!!");
+        pluginDescriptors = new HashMap<String,PluginDescriptor>();        
+    }
+
     // This should be template method code for allowing subclasses to assist in contributing search/hint information
     public Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
     {
+        //Use the plugin managers capabilities to get information to augement the request
+        
         return null;
         //return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
     }
@@ -117,8 +148,10 @@ public class DefaultPluginManager
     public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws PluginLoaderException
     {        
-        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
+        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
             
+        System.out.println( "XXX plugin: " + plugin );
+        
         // There are cases where plugins are discovered but not actually populated. These are edge cases where you are working in the IDE on
         // Maven itself so this speaks to a problem we have with the system not starting entirely clean.
         if ( pluginDescriptor != null && pluginDescriptor.getClassRealm() != null )
@@ -127,9 +160,7 @@ public class DefaultPluginManager
         }
                         
         try
-        {         
-            resolvePluginVersion( plugin, project, session );
-                                     
+        {                                              
             return addPlugin( plugin, project, session );
         }
         catch ( ArtifactResolutionException e )
@@ -140,15 +171,15 @@ public class DefaultPluginManager
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
-        catch ( PluginVersionResolutionException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
         catch ( InvalidPluginException e )
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
-        catch ( PluginManagerException e )
+        catch ( PluginVersionResolutionException e )
+        {
+            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
+        }
+        catch ( PluginContainerException e )
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
@@ -164,8 +195,10 @@ public class DefaultPluginManager
     }
     
     protected PluginDescriptor addPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginManagerException, InvalidPluginException, PluginVersionResolutionException
+        throws ArtifactNotFoundException, ArtifactResolutionException, InvalidPluginException, PluginVersionResolutionException, PluginContainerException, PluginVersionNotFoundException
     {
+        resolvePluginVersion( plugin, project, session );
+        
         ArtifactRepository localRepository = session.getLocalRepository();
 
         MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
@@ -184,6 +217,8 @@ public class DefaultPluginManager
 
         ClassRealm pluginRealm = container.createChildRealm( pluginKey( plugin ) );
 
+        System.out.println( "plugin: " + pluginArtifact );
+        
         Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, project, session.getLocalRepository() );
 
         for ( Artifact a : pluginArtifacts )
@@ -213,7 +248,9 @@ public class DefaultPluginManager
             throw new PluginContainerException( plugin, pluginRealm, "Error scanning plugin realm for components.", e );
         }
 
-        PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
+        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
+        
+        // We just need to keep track of the realm, if we need to augment we will wrap the realm
         pluginDescriptor.setPluginArtifact( pluginArtifact );
         pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
         pluginDescriptor.setClassRealm( pluginRealm );
@@ -575,24 +612,18 @@ public class DefaultPluginManager
                 {
                     boolean warnOfDeprecation = false;
                     PlexusConfiguration child = extractedMojoConfiguration.getChild( param.getName() );
-                    try
+                        
+                    if ( ( child != null ) && ( child.getValue() != null ) )
                     {
+                        warnOfDeprecation = true;
+                    }
+                    else if ( param.getAlias() != null )
+                    {
+                        child = extractedMojoConfiguration.getChild( param.getAlias() );
                         if ( ( child != null ) && ( child.getValue() != null ) )
                         {
                             warnOfDeprecation = true;
                         }
-                        else if ( param.getAlias() != null )
-                        {
-                            child = extractedMojoConfiguration.getChild( param.getAlias() );
-                            if ( ( child != null ) && ( child.getValue() != null ) )
-                            {
-                                warnOfDeprecation = true;
-                            }
-                        }
-                    }
-                    catch ( PlexusConfigurationException e )
-                    {
-                        // forget it, this is just for deprecation checking, after all...
                     }
 
                     if ( warnOfDeprecation )
@@ -629,14 +660,6 @@ public class DefaultPluginManager
             if ( parameterMap.containsKey( child.getName() ) )
             {
                 extractedConfiguration.addChild( copyConfiguration( child ) );
-            }
-            else
-            {
-                // TODO: I defy anyone to find these messages in the '-X' output! Do we need a new log level?
-                // ideally, this would be elevated above the true debug output, but below the default INFO level...
-                // [BP] (2004-07-18): need to understand the context more but would prefer this could be either WARN or
-                // removed - shouldn't need DEBUG to diagnose a problem most of the time.
-                logger.debug( "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'" + mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
             }
         }
 
@@ -1082,8 +1105,8 @@ public class DefaultPluginManager
         }
     }
    
-    public void resolvePluginVersion( Plugin plugin, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, InvalidPluginException, PluginVersionNotFoundException
+    public void resolvePluginVersion( Plugin plugin, MavenProject project, MavenSession session ) 
+        throws PluginVersionNotFoundException
     {        
         String version = plugin.getVersion();
         
@@ -1107,8 +1130,6 @@ public class DefaultPluginManager
             }
         }
         
-        // final pass...retrieve the version for RELEASE and also set that resolved version as the <useVersion/>
-        // in settings.xml.
         if ( StringUtils.isEmpty( version ) || Artifact.RELEASE_VERSION.equals( version ) )
         {
             // 1. resolve the version to be used            
@@ -1190,5 +1211,177 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
     // Validate plugin 
     // ----------------------------------------------------------------------
+ 
+    // ----------------------------------------------------------------------
+    // Component Discovery
+    // ----------------------------------------------------------------------
     
+    private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
+
+    public String getComponentDescriptorLocation()
+    {
+        return "META-INF/maven/plugin.xml";
+    }
+
+    public ComponentSetDescriptor createComponentDescriptors( Reader componentDescriptorConfiguration, String source )
+        throws PlexusConfigurationException
+    {
+        return builder.build( componentDescriptorConfiguration, source );
+    }    
+
+    public List<ComponentSetDescriptor> findComponents( Context context, ClassRealm realm )
+        throws PlexusConfigurationException
+    {
+        System.out.println( "realm: " + realm );
+        
+        List<ComponentSetDescriptor> componentSetDescriptors = new ArrayList<ComponentSetDescriptor>();
+
+        Enumeration<URL> resources;
+        try
+        {
+            // We don't always want to scan parent realms. For plexus
+            // testcase, most components are in the root classloader so that needs to be scanned,
+            // but for child realms, we don't.
+            if ( realm.getParentRealm() != null )
+            {
+                resources = realm.findRealmResources( getComponentDescriptorLocation() );
+            }
+            else
+            {
+                resources = realm.findResources( getComponentDescriptorLocation() );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new PlexusConfigurationException( "Unable to retrieve resources for: " + getComponentDescriptorLocation() + " in class realm: " + realm.getId() );
+        }
+
+        for ( URL url : Collections.list( resources ) )
+        {
+            Reader reader = null;
+
+            try
+            {
+                URLConnection conn = url.openConnection();
+
+                conn.setUseCaches( false );
+
+                conn.connect();
+
+                reader = ReaderFactory.newXmlReader( conn.getInputStream() );
+
+                InterpolationFilterReader interpolationFilterReader = new InterpolationFilterReader( reader, new ContextMapAdapter( context ) );
+
+                ComponentSetDescriptor componentSetDescriptor = createComponentDescriptors( interpolationFilterReader, url.toString() );
+
+                if ( componentSetDescriptor.getComponents() != null )
+                {
+                    for ( ComponentDescriptor<?> cd : componentSetDescriptor.getComponents() )
+                    {
+                        cd.setComponentSetDescriptor( componentSetDescriptor );
+                        cd.setRealm( realm );
+                    }
+                }
+
+                componentSetDescriptors.add( componentSetDescriptor );
+
+                // Fire the event
+                ComponentDiscoveryEvent event = new ComponentDiscoveryEvent( componentSetDescriptor );
+
+                manager.fireComponentDiscoveryEvent( event );
+            }
+            catch ( IOException ex )
+            {
+                throw new PlexusConfigurationException( "Error reading configuration " + url, ex );
+            }
+            finally
+            {
+                IOUtil.close( reader );
+            }
+        }
+
+        return componentSetDescriptors;
+    }
+
+    public void setManager( ComponentDiscovererManager manager )
+    {
+        this.manager = manager;
+    }
+    
+    // ----------------------------------------------------------------------
+    // Component Discovery Listener
+    // ----------------------------------------------------------------------
+    
+    private Set pluginsInProcess = new HashSet();
+
+    private Map pluginIdsByPrefix = new HashMap();
+    
+    private ComponentDiscovererManager manager;
+    
+    public void componentDiscovered( ComponentDiscoveryEvent event )
+    {        
+        ComponentSetDescriptor componentSetDescriptor = event.getComponentSetDescriptor();
+
+        if ( componentSetDescriptor instanceof PluginDescriptor )
+        {
+            PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;            
+
+            String key = constructPluginKey( pluginDescriptor );
+            
+            if ( !pluginsInProcess.contains( key ) )
+            {
+                pluginsInProcess.add( key );
+
+                pluginDescriptors.put( key, pluginDescriptor );                
+            }
+        }
+    }
+
+    public String getId()
+    {
+        return "maven-plugin-collector";
+    }
+
+    public PluginDescriptor getPluginDescriptor( Plugin plugin )
+    {
+        return pluginDescriptors.get( constructPluginKey( plugin ) );
+    }
+
+    public Collection<PluginDescriptor> getPluginDescriptors()
+    {
+        return pluginDescriptors.values();    
+    }
+
+    private String constructPluginKey( Plugin plugin )
+    {
+        String version = ArtifactUtils.toSnapshotVersion( plugin.getVersion() );
+        return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + version;
+    }
+
+    private String constructPluginKey( PluginDescriptor pluginDescriptor )
+    {
+        String version = ArtifactUtils.toSnapshotVersion( pluginDescriptor.getVersion() );
+        return pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" + version;
+    }
+
+    public boolean isPluginInstalled( Plugin plugin )
+    {
+        String key = constructPluginKey( plugin );
+        return pluginDescriptors.containsKey( key );
+    }
+
+    public Set<PluginDescriptor> getPluginDescriptorsForPrefix( String prefix )
+    {
+        Set result = new HashSet();
+        for ( Iterator it = pluginDescriptors.values().iterator(); it.hasNext(); )
+        {
+            PluginDescriptor pd = (PluginDescriptor) it.next();
+            if ( pd.getGoalPrefix().equals( prefix ) )
+            {
+                result.add( pd );
+            }
+        }
+
+        return result;
+    }
 }

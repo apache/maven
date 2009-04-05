@@ -37,8 +37,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.plugin.MavenPluginCollector;
-import org.apache.maven.plugin.MavenPluginDiscoverer;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
@@ -408,8 +406,8 @@ public class MavenEmbedder
         try
         {
             ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .addComponentDiscoverer( new MavenPluginDiscoverer() )
-                .addComponentDiscoveryListener( new MavenPluginCollector() )
+                .addComponentDiscoverer( PluginManager.class )
+                .addComponentDiscoveryListener( PluginManager.class )
                 .setClassWorld( classWorld )
                 .setName( "embedder" );
 
