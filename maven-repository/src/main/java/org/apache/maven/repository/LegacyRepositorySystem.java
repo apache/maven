@@ -59,7 +59,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author Jason van Zyl
  */
-@Component( role = RepositorySystem.class, hint = "default" )
+@Component( role = RepositorySystem.class, hint = "legacy" )
 public class LegacyRepositorySystem
     implements RepositorySystem
 {

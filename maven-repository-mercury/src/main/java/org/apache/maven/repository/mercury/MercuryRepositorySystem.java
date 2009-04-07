@@ -25,6 +25,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.mercury.artifact.Artifact;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.mercury.artifact.ArtifactQueryList;
 import org.apache.maven.mercury.artifact.ArtifactScopeEnum;
@@ -48,7 +49,7 @@ import org.codehaus.plexus.lang.Language;
  * @author Oleg Gusakov
  * @version $Id$
  */
-@Component( role = RepositorySystem.class, hint = "mercury" )
+@Component( role = RepositorySystem.class, hint = "default" )
 public class MercuryRepositorySystem
     extends LegacyRepositorySystem
     implements RepositorySystem
@@ -83,15 +84,25 @@ public class MercuryRepositorySystem
 
         try
         {
-            List<ArtifactMetadata> mercuryMetadataList =
-                _mercury.resolve( repos, null, MercuryAdaptor.toMercuryMetadata( request.getArtifact() ) );
+            org.apache.maven.artifact.Artifact mavenRootArtifact = request.getArtifact();
+            
+            ArtifactMetadata rootMd = MercuryAdaptor.toMercuryMetadata( mavenRootArtifact );
+            
+            List<ArtifactMetadata> mercuryMetadataList = _mercury.resolve( repos, null,  rootMd );
 
             List<org.apache.maven.mercury.artifact.Artifact> mercuryArtifactList =
                 _mercury.read( repos, mercuryMetadataList );
 
             if ( !Util.isEmpty( mercuryArtifactList ) )
+            {
                 for ( org.apache.maven.mercury.artifact.Artifact a : mercuryArtifactList )
                     result.addArtifact( MercuryAdaptor.toMavenArtifact( _artifactFactory, a ) );
+                
+                // maven likes the original artifact instance - fill it in
+                Artifact mercuryRootArtifact = mercuryArtifactList.get( 0 );
+                
+                mavenRootArtifact.setFile( mercuryRootArtifact.getFile() );
+            }
         }
         catch ( RepositoryException e )
         {

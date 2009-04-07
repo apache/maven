@@ -21,9 +21,14 @@ package org.apache.maven.repository.mercury;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -46,9 +51,13 @@ import org.apache.maven.repository.MetadataGraphNode;
  */
 public class MercuryAdaptor
 {
+    
+    private static Map<String, Repository> _repos = Collections.synchronizedMap(  new HashMap<String, Repository>() );
+    
     public static List<Repository> toMercuryRepos( ArtifactRepository localRepository,
                                                    List<ArtifactRepository> remoteRepositories,
-                                                   DependencyProcessor dependencyProcessor )
+                                                   DependencyProcessor dependencyProcessor
+                                                 )
     {
         if ( localRepository == null && Util.isEmpty( remoteRepositories ) )
             return null;
@@ -60,9 +69,25 @@ public class MercuryAdaptor
 
         if ( localRepository != null )
         {
-            LocalRepositoryM2 lr =
-                new LocalRepositoryM2( localRepository.getId(), new File( localRepository.getUrl() ),
-                                       dependencyProcessor );
+            String url = localRepository.getUrl();
+            
+            LocalRepositoryM2 lr = (LocalRepositoryM2) _repos.get( url );
+            
+            if( lr == null )
+                try
+                {
+                    URI rootURI = new URI( url );
+                    
+                    File localRepoDir =  new File( rootURI );
+                    
+                    lr = new LocalRepositoryM2( localRepository.getId(), localRepoDir, dependencyProcessor );
+                    
+                    _repos.put( url, lr );
+                }
+                catch ( URISyntaxException e )
+                {
+                    throw new IllegalArgumentException( e );
+                }
             res.add( lr );
         }
 
@@ -70,16 +95,24 @@ public class MercuryAdaptor
         {
             for ( ArtifactRepository ar : remoteRepositories )
             {
-                Server server;
-                try
+                String url = ar.getUrl();
+                
+                RemoteRepositoryM2 rr = (RemoteRepositoryM2) _repos.get( url );
+                
+                if( rr == null )
                 {
-                    server = new Server( ar.getId(), new URL( ar.getUrl() ) );
+                    Server server;
+                    try
+                    {
+                        server = new Server( ar.getId(), new URL( url ) );
+                    }
+                    catch ( MalformedURLException e )
+                    {
+                        throw new IllegalArgumentException( e );
+                    }
+                    rr = new RemoteRepositoryM2( server, dependencyProcessor );
+                    _repos.put( url, rr );
                 }
-                catch ( MalformedURLException e )
-                {
-                    throw new IllegalArgumentException( e );
-                }
-                RemoteRepositoryM2 rr = new RemoteRepositoryM2( server, dependencyProcessor );
 
                 res.add( rr );
             }
