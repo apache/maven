@@ -50,7 +50,7 @@ public class DefaultProfileManager
     private static final ProfileMatcher defaultMatcher = new DefaultMatcher();
 
     private static final List<ProfileMatcher> matchers =
-        (List<ProfileMatcher>) Collections.unmodifiableList( Arrays.asList( new DefaultMatcher(), new PropertyMatcher(), new FileMatcher() ) );    
+        (List<ProfileMatcher>) Collections.unmodifiableList( Arrays.asList( new PropertyMatcher(), new FileMatcher() ) );    
 
     /**
      * the properties passed to the profile manager are the props that
@@ -207,7 +207,7 @@ public class DefaultProfileManager
 	    {           
 	    	projectProfiles.addAll( externalProfileManager.getActiveProfiles() );    
 	    }
-	
+
 	    ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
 	    profileManager.addProfiles( model.getProfiles() );
 	    projectProfiles.addAll( profileManager.getActiveProfiles() ); 

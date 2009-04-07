@@ -1284,6 +1284,16 @@ public class PomConstructionTest
         assertEquals( "CHILD", pom.getValue( "properties/interpolated" ) );
     }
     
+    /* MNG-3545 */
+    public void testProfileDefaultActivation()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "profile-default-deactivation" , "profile4");
+        assertEquals(1, pom.getMavenProject().getActiveProfiles().size() );
+        assertEquals(1, ( (List<?>) pom.getValue( "build/plugins" )).size() );
+        assertEquals("2.1", pom.getValue( "build/plugins[1]/version" ));
+    }    
+    
     /* FIXME: MNG-1995 
     public void testBooleanInterpolation()
         throws Exception
@@ -1297,7 +1307,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "build-extension-inheritance/sub" ); 
-        System.out.println(pom.getDomainModel().asString());
         assertEquals(3, ( (List<?>) pom.getValue( "build/extensions" )).size() );
         assertEquals("b", pom.getValue( "build/extensions[1]/artifactId" ) );
         assertEquals("a", pom.getValue( "build/extensions[2]/artifactId" ) );
