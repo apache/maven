@@ -303,12 +303,14 @@ END SNIPPET: ant-bootstrap -->
       <arg value="install"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
       <arg value="-Dsurefire.useFile=${surefire.useFile}"/>
-    	<!-- <debug-the-bootstrap> -->
+<!-- <debug-the-bootstrap> 
+
     	<jvmarg value="-Xdebug"/>
     	<jvmarg value="-Xnoagent"/>
     	<jvmarg value="-Djava.compiler=NONE"/>
     	<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/>
-      <!-- </debug-the-bootstrap> -->
+</debug-the-bootstrap>
+-->
     </java>
   </target>
 
