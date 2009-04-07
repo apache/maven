@@ -81,12 +81,21 @@ public class ProcessorContext
     public static PomClassicDomainModel mergeProfilesIntoModel(Collection<Profile> profiles, PomClassicDomainModel domainModel) throws IOException
     {
         List<Model> profileModels = new ArrayList<Model>();
-
+        List<Model> externalProfileModels = new ArrayList<Model>();
+        
         for(Profile profile : profiles)
         {
-            profileModels.add( attachProfileNodesToModel(profile) );
+        	if("pom".equals(profile.getSource()))
+        	{
+        		profileModels.add( attachProfileNodesToModel(profile) );	
+        	}
+        	else
+        	{
+        		externalProfileModels.add(attachProfileNodesToModel(profile));
+        	}
         }
-        Collections.reverse( profileModels );
+        profileModels.addAll(externalProfileModels);//external takes precedence
+       // Collections.reverse( profileModels );
         
         Model model = domainModel.getModel();
         profileModels.add( 0, model );

@@ -1242,16 +1242,16 @@ public class PomConstructionTest
     }
 
     /* MNG-2309*/
-    /*
+
     public void testProfileInjectionOrder()
         throws Exception
     {
         PomTestWrapper pom =
             buildPom( "profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d" );
-        System.out.println(pom.getDomainModel().asString());
+        //System.out.println(pom.getDomainModel().asString());
         assertEquals( "e", pom.getValue( "properties[1]/pomProperty" ) );
     }
-*/
+
     public void testPropertiesInheritance()
         throws Exception
     {
