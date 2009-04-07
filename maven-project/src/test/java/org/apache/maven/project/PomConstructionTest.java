@@ -1248,7 +1248,6 @@ public class PomConstructionTest
     {
         PomTestWrapper pom =
             buildPom( "profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d" );
-        //System.out.println(pom.getDomainModel().asString());
         assertEquals( "e", pom.getValue( "properties[1]/pomProperty" ) );
     }
 
@@ -1313,6 +1312,14 @@ public class PomConstructionTest
         assertEquals("0.2", pom.getValue( "build/extensions[2]/version" ) );
         assertEquals("c", pom.getValue( "build/extensions[3]/artifactId" ) );
     }
+    
+    /* MNG-2174 */
+    public void testProfilePluginMngDependencies()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "profile-plugin-mng-dependencies/sub" , "maven-core-it"); 
+        assertEquals("a", pom.getValue( "build/plugins[1]/dependencies[1]/artifactId" ) );
+    }    
     
     /** MNG-4116 */
     public void testPercentEncodedUrlsMustNotBeDecoded()

@@ -95,7 +95,6 @@ public class ProcessorContext
         	}
         }
         profileModels.addAll(externalProfileModels);//external takes precedence
-       // Collections.reverse( profileModels );
         
         Model model = domainModel.getModel();
         profileModels.add( 0, model );
@@ -118,11 +117,23 @@ public class ProcessorContext
         }
      
         DependencyManagement depMng = model.getDependencyManagement();
-        model.setDependencyManagement( depMng );
         
         Model target = processModelsForInheritance(profileModels, processors);
-        //TODO: Merge
-        target.getBuild().setPluginManagement( mng );
+
+        PluginsManagementProcessor pmp = new PluginsManagementProcessor();
+        if( mng != null )
+        {
+        	if(target.getBuild().getPluginManagement() != null)
+        	{
+        		pmp.process(null, mng.getPlugins(), target.getBuild().getPluginManagement().getPlugins(), false);	
+        	}
+        	else
+        	{
+        		target.getBuild().setPluginManagement( mng );	
+        	}  		
+        }
+        
+        //TODO: Merge Dependency Management
         target.setDependencyManagement( depMng );
         
         PomClassicDomainModel targetModel = convertToDomainModel( target, domainModel.isMostSpecialized());
@@ -578,11 +589,23 @@ public class ProcessorContext
         b.setDirectory( base.getDirectory() );
         b.setFilters( new ArrayList<String>(base.getFilters()) );
         b.setFinalName( base.getFinalName() );
-        b.setPluginManagement( base.getPluginManagement() );
+        b.setPluginManagement( copyPluginManagement(base.getPluginManagement()) );
         b.setPlugins( copyPlugins(base.getPlugins()) );
         b.setResources( new ArrayList<Resource>(base.getResources()) );
         b.setTestResources( new ArrayList<Resource>(base.getTestResources()) );    
         return b;
+    }
+    
+    private static PluginManagement copyPluginManagement(PluginManagement mng)
+    {
+    	if(mng == null)
+    	{
+    		return null;
+    	}
+    	
+    	PluginManagement pm = new PluginManagement();
+    	pm.setPlugins(copyPlugins(mng.getPlugins()));
+    	return pm;
     }
     
     private static List<Plugin> copyPlugins(List<Plugin> plugins)
