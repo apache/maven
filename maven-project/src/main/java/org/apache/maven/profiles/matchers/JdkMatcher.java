@@ -1,60 +1,56 @@
-package org.apache.maven.project.builder.profile;
-
-import org.apache.maven.shared.model.ModelContainer;
-import org.apache.maven.shared.model.InterpolatorProperty;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.project.builder.ProjectUri;
+package org.apache.maven.profiles.matchers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class JdkMatcher
-    implements ActiveProfileMatcher
-{
-    public boolean isMatch( ModelContainer modelContainer, List<InterpolatorProperty> properties )
-    {
-        if ( modelContainer == null )
-        {
-            throw new IllegalArgumentException( "modelContainer: null" );
-        }
+import org.apache.maven.model.Profile;
+import org.apache.maven.shared.model.InterpolatorProperty;
 
-        if ( properties == null )
+public class JdkMatcher
+	implements ProfileMatcher 
+	{
+	
+    private static final String JDK_VERSION = "${java.version}";
+
+	public boolean isMatch(Profile profile,
+			List<InterpolatorProperty> properties) {
+        String version = null;
+        for(InterpolatorProperty ip : properties)
+        {
+        	if(ip.getKey().equals(JDK_VERSION))
+        	{
+        		version = ip.getValue();
+        		break;
+        	}
+        }
+        if ( version == null )
         {
             return false;
         }
-
-        for ( InterpolatorProperty property : properties )
+        
+        org.apache.maven.model.Activation activation = profile.getActivation();
+        if(activation == null || activation.getJdk() == null)
         {
-            if ( property.getKey().equals( "${java.specification.version}" ) )
-            {
-                String version = property.getValue();
-                for ( ModelProperty modelProperty : modelContainer.getProperties() )
-                {
-
-                    if ( modelProperty.getUri().equals( ProjectUri.Profiles.Profile.Activation.jdk ) )
-                    {
-                        if ( modelProperty.getResolvedValue().startsWith( "!" ) )
-                        {
-                            return !version.startsWith( modelProperty.getResolvedValue().replaceFirst( "!", "" ) );
-                        }
-                        else if ( isRange( modelProperty.getResolvedValue() ) )
-                        {
-                            return isInRange( version, getRange( modelProperty.getResolvedValue() ) );
-                        }
-                        else
-                        {
-                            return version.startsWith( modelProperty.getResolvedValue() );
-                        }
-
-                    }
-                }
-                return false;
-            }
+        	return false;
         }
-        return false;
-    }
+     
+        String jdk = activation.getJdk();
+        if ( jdk.startsWith( "!" ) )
+        {
+            return !version.startsWith( jdk.replaceFirst( "!", "" ) );
+        }
+        else if ( isRange( jdk ) )
+        {
+            return isInRange( version, getRange( jdk ) );
+        }
+        else
+        {
+            return version.startsWith( jdk );
+        }
 
+	}
+	
     private static boolean isInRange( String value, List<RangeValue> range )
     {
         int leftRelation = getRelationOrder( value, range.get( 0 ), true );
@@ -165,7 +161,7 @@ public class JdkMatcher
         return ranges;
     }
 
-    public static class RangeValue
+    private static class RangeValue
     {
         private String value;
 
@@ -191,5 +187,5 @@ public class JdkMatcher
         {
             return value;
         }
-    }
+    }	
 }

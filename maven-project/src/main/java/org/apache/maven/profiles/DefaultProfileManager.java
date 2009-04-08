@@ -27,6 +27,7 @@ import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.matchers.DefaultMatcher;
 import org.apache.maven.profiles.matchers.FileMatcher;
+import org.apache.maven.profiles.matchers.JdkMatcher;
 import org.apache.maven.profiles.matchers.ProfileMatcher;
 import org.apache.maven.profiles.matchers.PropertyMatcher;
 import org.apache.maven.shared.model.InterpolatorProperty;
@@ -50,7 +51,7 @@ public class DefaultProfileManager
     private static final ProfileMatcher defaultMatcher = new DefaultMatcher();
 
     private static final List<ProfileMatcher> matchers =
-        (List<ProfileMatcher>) Collections.unmodifiableList( Arrays.asList( new PropertyMatcher(), new FileMatcher() ) );    
+        (List<ProfileMatcher>) Collections.unmodifiableList( Arrays.asList( new PropertyMatcher(), new FileMatcher(), new JdkMatcher() ) );    
 
     /**
      * the properties passed to the profile manager are the props that
@@ -197,11 +198,13 @@ public class DefaultProfileManager
 	    List<Profile> projectProfiles = new ArrayList<Profile>();
 	    ProfileManager externalProfileManager = config.getGlobalProfileManager();
 	    
-	    Properties props = new Properties(config.getExecutionProperties());
+	    Properties props = new Properties();
+	    props.putAll(config.getExecutionProperties());
 	    props.putAll(config.getUserProperties());
 	    
-	    ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( props, false ):
+	    ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( new Properties(), false ):
 	        externalProfileManager.getProfileActivationContext();
+	    profileActivationContext.getExecutionProperties().putAll(props);
 	    
 	    if(externalProfileManager != null)
 	    {           

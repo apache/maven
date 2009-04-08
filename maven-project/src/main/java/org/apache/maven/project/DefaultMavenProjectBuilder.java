@@ -440,8 +440,12 @@ public class DefaultMavenProjectBuilder
         List<String> inactiveProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration
             .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
                                                                               : new ArrayList<String>();
-
-            ProfileManagerInfo profileInfo = new ProfileManagerInfo(null, activeProfileIds, inactiveProfileIds);
+            
+            List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
+            interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( projectBuilderConfiguration.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
+            interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( projectBuilderConfiguration.getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
+            
+            ProfileManagerInfo profileInfo = new ProfileManagerInfo(interpolatorProperties, activeProfileIds, inactiveProfileIds);
             PomClassicDomainModel domainModel = new PomClassicDomainModel( pomFile );
             domainModel.setProjectDirectory( pomFile.getParentFile() );
             domainModel.setMostSpecialized( true );
@@ -510,6 +514,7 @@ public class DefaultMavenProjectBuilder
 
             // Lineage count is inclusive to add the POM read in itself.
             transformedDomainModel.setLineageCount( lineageCount + 1 );
+            Model m = transformedDomainModel.getModel();
             transformedDomainModel.setParentFile( parentFile );
 
             return transformedDomainModel;

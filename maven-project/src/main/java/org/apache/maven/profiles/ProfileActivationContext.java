@@ -40,7 +40,7 @@ public class ProfileActivationContext
 
     public ProfileActivationContext( Properties executionProperties, boolean isCustomActivatorFailureSuppressed )
     {
-        this.executionProperties = executionProperties;
+        this.executionProperties = (executionProperties != null) ? executionProperties : new Properties();
         this.isCustomActivatorFailureSuppressed = isCustomActivatorFailureSuppressed;
     }
 

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -876,14 +877,10 @@ public class PomConstructionTest
     }
 
     /** MNG-4027*/
-    /* FIXME*/
-
     public void testProfileInjectedDependencies()
         throws Exception
     {
-    	//c.b,d,a
         PomTestWrapper pom = buildPom( "profile-injected-dependencies" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( 4, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
         assertEquals( "a", pom.getValue( "dependencies[1]/artifactId" ) );
         assertEquals( "c", pom.getValue( "dependencies[2]/artifactId" ) );
@@ -891,18 +888,14 @@ public class PomConstructionTest
         assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
     }
     
-
     public void testDependencyInheritance()
         throws Exception
     {
-    	//c.b,d,a
         PomTestWrapper pom = buildPom( "dependency-inheritance/sub" );
         assertEquals(1,  ( (List<?>) pom.getValue( "dependencies" ) ).size() );
         assertEquals("4.4",  pom.getValue("dependencies[1]/version") );
-        System.out.println(pom.getDomainModel().asString());
     }
   
-//*/
     /** MNG-4034 */
     public void testManagedProfileDependency()
         throws Exception
@@ -1334,6 +1327,20 @@ public class PomConstructionTest
         assertEquals("c", pom.getValue( "build/extensions[3]/artifactId" ) );
     }
     
+    /*MNG-1957*/
+    public void testJdkActivation()
+    	throws Exception
+	{
+    	Properties props = new Properties();
+	    props.put("java.version", "1.5.0_15");
+	    	
+	    PomTestWrapper pom = buildPom( "jdk-activation",  props ); 
+	    assertEquals(3, pom.getMavenProject().getActiveProfiles().size());	
+	    assertEquals("PASSED", pom.getValue("properties/jdkProperty3"));
+	    assertEquals("PASSED", pom.getValue("properties/jdkProperty2"));
+	    assertEquals("PASSED", pom.getValue("properties/jdkProperty1"));
+	}   
+    
     /* MNG-2174 */
     public void testProfilePluginMngDependencies()
         throws Exception
@@ -1372,7 +1379,24 @@ public class PomConstructionTest
     {
         assertEquals( new File( value.toString() ).getPath(), value.toString() );
     }
+    
+    private PomTestWrapper buildPom( String pomPath, Properties properties)
+    throws Exception
+{
+    File pomFile = new File( testDirectory , pomPath );
+    if ( pomFile.isDirectory() )
+    {
+        pomFile = new File( pomFile, "pom.xml" );
+    }
+    ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+    config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
+    ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
 
+    config.setExecutionProperties(properties);
+    config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
+    return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
+}
+    
     private PomTestWrapper buildPom( String pomPath, String... profileIds )
         throws Exception
     {
