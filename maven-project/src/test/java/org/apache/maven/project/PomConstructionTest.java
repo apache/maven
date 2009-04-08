@@ -1026,6 +1026,13 @@ public class PomConstructionTest
     	assertEquals("child",  pom.getValue( "properties/pomProfile" ) );
     }
     
+    public void testPomInheritance()
+		throws Exception
+	{
+		PomTestWrapper pom = buildPom( "pom-inheritance/sub" );	
+		assertEquals("parent-description", pom.getValue("description"));
+	}   
+    
     public void testCompleteModelWithoutParent()
         throws Exception
     {

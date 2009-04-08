@@ -111,6 +111,10 @@ public class ModelProcessor
         {
         	t.setDescription( c.getDescription() );	
         }
+        else if(p != null && p.getDescription() != null)
+        {
+        	t.setDescription(p.getDescription());
+        }
                 
         if ( c.getInceptionYear() != null )
         {
