@@ -139,6 +139,10 @@ public class PluginProcessor
     
     private static void copyDependencies(List<Dependency> parent, List<Dependency> child, Plugin target, boolean isChild)
     {
+    	if(parent.isEmpty() && child.isEmpty())
+    	{
+    		return;
+    	}
         DependenciesProcessor proc = new DependenciesProcessor();
         proc.process( parent, child, target.getDependencies(), isChild );            
     }

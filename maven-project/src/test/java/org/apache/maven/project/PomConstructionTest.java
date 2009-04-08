@@ -876,10 +876,12 @@ public class PomConstructionTest
     }
 
     /** MNG-4027*/
-    /* FIXME
+    /* FIXME*/
+
     public void testProfileInjectedDependencies()
         throws Exception
     {
+    	//c.b,d,a
         PomTestWrapper pom = buildPom( "profile-injected-dependencies" );
         System.out.println(pom.getDomainModel().asString());
         assertEquals( 4, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
@@ -888,6 +890,18 @@ public class PomConstructionTest
         assertEquals( "b", pom.getValue( "dependencies[3]/artifactId" ) );
         assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
     }
+    
+
+    public void testDependencyInheritance()
+        throws Exception
+    {
+    	//c.b,d,a
+        PomTestWrapper pom = buildPom( "dependency-inheritance/sub" );
+        assertEquals(1,  ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+        assertEquals("4.4",  pom.getValue("dependencies[1]/version") );
+        System.out.println(pom.getDomainModel().asString());
+    }
+  
 //*/
     /** MNG-4034 */
     public void testManagedProfileDependency()

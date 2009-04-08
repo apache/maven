@@ -50,7 +50,6 @@ public class PomConstructionWithSettingsTest
     public void testPomAndSettingsInterpolation() throws Exception
     {
     	PomTestWrapper pom = buildPom( "test-pom-and-settings-interpolation" );
-    	System.out.println(pom.getDomainModel().asString());
     	assertEquals("applied", pom.getValue( "properties/settingsProfile" ) );
     	assertEquals("applied", pom.getValue( "properties/pomProfile" ) );
     	assertEquals("settings", pom.getValue( "properties/pomVsSettings" ) );

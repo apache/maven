@@ -145,7 +145,8 @@ public class ModelProcessor
              
         if(deps.size() > 0)
         {
-            t.getDependencies().addAll( deps );
+        	t.setDependencies(deps);
+           // t.getDependencies().addAll( deps );
         }  
         
         //Dependency Management

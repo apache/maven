@@ -60,13 +60,16 @@ public class DependencyProcessor
             {
                 isAdd = false;
             }
-            copy( (Dependency) child, targetDependency);
+            
             if(!isAdd)
             {
                 t.remove( targetDependency );               
             }
-           
+            
+            copy( (Dependency) child, targetDependency);
+              
             t.add( targetDependency );
+            
         }
         else if ( parent != null && child == null )
         {
@@ -86,12 +89,27 @@ public class DependencyProcessor
         else
         // JOIN
         {
-            Dependency targetDependency = new Dependency();          
-            
-            copy( (Dependency) child, targetDependency);
-            copy( (Dependency) parent, targetDependency );
+            Dependency targetDependency = new Dependency();  
+        	copy( (Dependency) parent, targetDependency ); 
+            copy( (Dependency) child, targetDependency);    
+            /*
+            if( isMatch( (Dependency) child, (Dependency) parent))
+            {
+            	copy( (Dependency) child, targetDependency);	
+            }
+            else
+            {
+            	copy( (Dependency) parent, targetDependency ); 
+                copy( (Dependency) child, targetDependency);                        	
+            }
+*/
             t.add( targetDependency );               
         }
+    }
+    
+    private static boolean isMatch(Dependency d1, Dependency d2)
+    {
+    	return d1.getGroupId().equals(d2.getGroupId()) && d1.getArtifactId().equals(d2.getArtifactId());
     }
     
     private Dependency contains(Dependency d1, List<Dependency> dependencies)

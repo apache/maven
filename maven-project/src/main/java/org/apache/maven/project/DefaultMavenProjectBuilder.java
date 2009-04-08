@@ -133,6 +133,7 @@ public class DefaultMavenProjectBuilder
 		}
 
 		//Profiles
+
         List<Profile> projectProfiles;
         try
         {
@@ -149,17 +150,23 @@ public class DefaultMavenProjectBuilder
 		
         try
         {
+        	List<Profile> externalProfiles = new ArrayList<Profile>();
             for(Profile p : projectProfiles)
     		{
-    			logger.debug("Merging profile into model (build): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
+            	if(!"pom".equals(p.getSource()))
+            	{
+            		logger.debug("Merging profile into model (build): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
+            		externalProfiles.add(p);
+            	}   			
     		}
     		        	
-            domainModel = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
+            domainModel = ProcessorContext.mergeProfilesIntoModel( externalProfiles, domainModel );
         }
         catch ( IOException e )
         {
             throw new ProjectBuildingException("", "");
-        }  		
+        }
+        
 		//Interpolation
         MavenProject project = interpolateDomainModel( domainModel, configuration, pomFile );
         project.setActiveProfiles( projectProfiles );
