@@ -27,13 +27,18 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
+import org.apache.maven.mercury.artifact.ArtifactScopeEnum;
 import org.apache.maven.mercury.artifact.MetadataTreeNode;
 import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.repository.api.Repository;
@@ -61,11 +66,12 @@ public class MercuryAdaptor
     {
         if ( localRepository == null && Util.isEmpty( remoteRepositories ) )
             return null;
-
+        
         int nRepos =
             ( localRepository == null ? 0 : 1 ) + ( Util.isEmpty( remoteRepositories ) ? 0 : remoteRepositories.size() );
 
-        List<Repository> res = new ArrayList<Repository>( nRepos );
+        Map<String, Repository> repos = new LinkedHashMap<String, Repository>(nRepos);
+        
 
         if ( localRepository != null )
         {
@@ -88,7 +94,7 @@ public class MercuryAdaptor
                 {
                     throw new IllegalArgumentException( e );
                 }
-            res.add( lr );
+                repos.put( url, lr );
         }
 
         if ( !Util.isEmpty( remoteRepositories ) )
@@ -114,10 +120,17 @@ public class MercuryAdaptor
                     _repos.put( url, rr );
                 }
 
-                res.add( rr );
+                repos.put( url, rr );
             }
         }
 
+        List<Repository> res = new ArrayList<Repository>( repos.size() );
+
+        for( Entry<String, Repository> e : repos.entrySet() )
+            res.add( e.getValue() );
+        
+//System.out.println("Converted "+nRepos+" -> "+res.size());
+//
         return res;
     }
 
@@ -154,6 +167,10 @@ public class MercuryAdaptor
         ma.setScope( a.getScope() );
         
         ma.setFile( a.getFile() );
+        
+        ma.setResolved( true );
+        
+        ma.setResolvedVersion( a.getVersion() );
 
         return ma;
     }
@@ -243,6 +260,47 @@ public class MercuryAdaptor
             
             addKids( kid, node, graph );
         }
+    }
+
+    /**
+     * @param reqArtifact 
+     * @param isPlugin 
+     * @param filter
+     * @return
+     */
+    public static ArtifactScopeEnum extractScope( Artifact reqArtifact, boolean isPlugin, ArtifactFilter filter )
+    {
+        String scopeStr = reqArtifact.getScope(); //org.apache.maven.mercury.artifact.Artifact.SCOPE_COMPILE;
+        
+        if( filter != null )
+        {
+            if( ScopeArtifactFilter.class.isAssignableFrom( filter.getClass() ) )
+                scopeStr = ((ScopeArtifactFilter)filter).getScope(); 
+        }
+        
+        if( "org.apache.maven.plugins:maven-remote-resources-plugin".equals( 
+                                                      reqArtifact.getGroupId()+":"+reqArtifact.getArtifactId() 
+                                                                           )
+        ) scopeStr = null;
+        
+//        else if( isPlugin )
+//            scopeStr = org.apache.maven.mercury.artifact.Artifact.SCOPE_RUNTIME;
+        
+        if( scopeStr != null )
+        {
+            if( org.apache.maven.mercury.artifact.Artifact.SCOPE_COMPILE.equals( scopeStr ) )
+                return ArtifactScopeEnum.compile;
+            else if( org.apache.maven.mercury.artifact.Artifact.SCOPE_TEST.equals( scopeStr ) )
+                return ArtifactScopeEnum.test;
+            else if( org.apache.maven.mercury.artifact.Artifact.SCOPE_PROVIDED.equals( scopeStr ) )
+                return ArtifactScopeEnum.provided;
+            else if( org.apache.maven.mercury.artifact.Artifact.SCOPE_RUNTIME.equals( scopeStr ) )
+                return ArtifactScopeEnum.runtime;
+            else if( org.apache.maven.mercury.artifact.Artifact.SCOPE_SYSTEM.equals( scopeStr ) )
+                return ArtifactScopeEnum.system;
+        }
+
+        return null;
     }
 
 }

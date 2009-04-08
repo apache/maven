@@ -59,7 +59,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author Jason van Zyl
  */
-@Component( role = RepositorySystem.class, hint = "legacy" )
+@Component( role = RepositorySystem.class, hint = "default" )
 public class LegacyRepositorySystem
     implements RepositorySystem
 {
@@ -373,8 +373,12 @@ public class LegacyRepositorySystem
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {                        
-        return artifactResolver.resolve( request );
+    {             
+        
+//System.out.println("legacy: request with "+request.getRemoteRepostories().size()+" repos" );
+        ArtifactResolutionResult res = artifactResolver.resolve( request );
+//System.out.println( "legacy resolved: "+request.getArtifact() );
+        return res;
     }
 
     public void setOnline( boolean online )
