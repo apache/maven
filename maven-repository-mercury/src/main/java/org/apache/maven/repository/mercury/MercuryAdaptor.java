@@ -36,6 +36,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.IncludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.mercury.artifact.ArtifactScopeEnum;
@@ -60,7 +62,7 @@ public class MercuryAdaptor
     private static Map<String, Repository> _repos = Collections.synchronizedMap(  new HashMap<String, Repository>() );
     
     public static List<Repository> toMercuryRepos( ArtifactRepository localRepository,
-                                                   List<ArtifactRepository> remoteRepositories,
+                                                   List<?> remoteRepositories,
                                                    DependencyProcessor dependencyProcessor
                                                  )
     {
@@ -99,9 +101,25 @@ public class MercuryAdaptor
 
         if ( !Util.isEmpty( remoteRepositories ) )
         {
-            for ( ArtifactRepository ar : remoteRepositories )
+            for ( Object o : remoteRepositories )
             {
-                String url = ar.getUrl();
+                String url;
+                String id;
+                
+                if( ArtifactRepository.class.isAssignableFrom( o.getClass() ))
+                {
+                    ArtifactRepository ar = (ArtifactRepository) o;
+                    url = ar.getUrl();
+                    id = ar.getId();
+                }
+                else if( org.apache.maven.model.Repository.class.isAssignableFrom( o.getClass() ))
+                {
+                    org.apache.maven.model.Repository ar = (org.apache.maven.model.Repository) o;
+                    url = ar.getUrl();
+                    id = ar.getId();
+                }
+                else
+                    throw new IllegalArgumentException( "found illegal class in the remote repository list - " + o.getClass().getName() );
                 
                 RemoteRepositoryM2 rr = (RemoteRepositoryM2) _repos.get( url );
                 
@@ -110,7 +128,7 @@ public class MercuryAdaptor
                     Server server;
                     try
                     {
-                        server = new Server( ar.getId(), new URL( url ) );
+                        server = new Server( id, new URL( url ) );
                     }
                     catch ( MalformedURLException e )
                     {
@@ -134,18 +152,22 @@ public class MercuryAdaptor
         return res;
     }
 
-    public static ArtifactMetadata toMercuryBasicMetadata( Artifact a )
+    private static void setInExClusion( ArtifactMetadata md, List<String> patterns, boolean inc )
     {
-        ArtifactMetadata md = new ArtifactMetadata();
-        md.setGroupId( a.getGroupId() );
-        md.setArtifactId( a.getArtifactId() );
-        md.setVersion( a.getVersion() );
-        md.setType( a.getType() );
-        md.setScope( a.getScope() );
-
-        return md;
+        if( Util.isEmpty( patterns ) )
+            return;
+        
+        List<ArtifactMetadata> lusions = new ArrayList<ArtifactMetadata>( patterns.size() );
+        
+        for( String pattern : patterns )
+            lusions.add( new ArtifactMetadata(pattern) );
+        
+        if( inc )
+            md.setInclusions( lusions );
+        else
+            md.setExclusions( lusions );
     }
-
+    
     public static ArtifactMetadata toMercuryMetadata( Artifact a )
     {
         ArtifactMetadata md = new ArtifactMetadata();
@@ -154,21 +176,46 @@ public class MercuryAdaptor
         md.setVersion( a.getVersion() );
         md.setType( a.getType() );
         md.setScope( a.getScope() );
-
+        
+        if( "test-jar".equals( a.getType() ) )
+        {
+            md.setType( "jar" );
+            md.setClassifier( "tests" );
+        }
+        
+        ArtifactFilter af = a.getDependencyFilter();
+        
+        if( af != null )
+        {
+            if( ExcludesArtifactFilter.class.isAssignableFrom( af.getClass() ) )
+            {
+                setInExClusion( md, ((ExcludesArtifactFilter)af).getPatterns(), false );
+            }
+            else if( IncludesArtifactFilter.class.isAssignableFrom( af.getClass() ) )
+                {
+                    setInExClusion( md, ((IncludesArtifactFilter)af).getPatterns(), true );
+                }
+        }
         return md;
     }
 
     public static Artifact toMavenArtifact( ArtifactFactory af, org.apache.maven.mercury.artifact.Artifact a )
     {
-        Artifact ma = a.getClassifier() == null 
-                        ? af.createArtifact( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getScope(), a.getType() )
-                        : af.createArtifactWithClassifier( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getType(), a.getClassifier() )
+        boolean isTestJar = "test-jar".equals( a.getType() );
+        
+        String type = isTestJar ? "jar" : a.getType();
+        
+        String classifier = isTestJar ? "tests" : a.getType();
+        
+        Artifact ma = classifier == null 
+                        ? af.createArtifact( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getScope(), type )
+                        : af.createArtifactWithClassifier( a.getGroupId(), a.getArtifactId(), a.getVersion(), type, classifier )
                         ;
         ma.setScope( a.getScope() );
         
         ma.setFile( a.getFile() );
         
-        ma.setResolved( true );
+        ma.setResolved( a.getFile() != null );
         
         ma.setResolvedVersion( a.getVersion() );
 
@@ -177,9 +224,15 @@ public class MercuryAdaptor
     
     public static Artifact toMavenArtifact( ArtifactFactory af, org.apache.maven.mercury.artifact.ArtifactMetadata a )
     {
-        Artifact ma = a.getClassifier() == null 
-                                ? af.createArtifact( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getScope(), a.getType() )
-                                : af.createArtifactWithClassifier( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getType(), a.getClassifier() )
+        boolean isTestJar = "test-jar".equals( a.getType() );
+        
+        String type = isTestJar ? "jar" : a.getType();
+        
+        String classifier = isTestJar ? "tests" : a.getType();
+        
+        Artifact ma = classifier == null 
+                                ? af.createArtifact( a.getGroupId(), a.getArtifactId(), a.getVersion(), a.getScope(), type )
+                                : af.createArtifactWithClassifier( a.getGroupId(), a.getArtifactId(), a.getVersion(), type, classifier )
                                 ;
         ma.setScope( a.getScope() );
 
@@ -199,6 +252,12 @@ public class MercuryAdaptor
         mmd.setVersion( md.getVersion() );
         mmd.setClassifier( md.getClassifier() );
         mmd.setType( md.getType() );
+        
+        if( "test-jar".equals( md.getType() ) )
+        {
+            mmd.setType( "jar" );
+            mmd.setClassifier( "tests" );
+        }
 
         return mmd;
     }
@@ -211,6 +270,12 @@ public class MercuryAdaptor
         mmd.setVersion( md.getVersion() );
         mmd.setClassifier( md.getClassifier() );
         mmd.setType( md.getType() );
+        
+        if( "test-jar".equals( md.getType() ) )
+        {
+            mmd.setType( "jar" );
+            mmd.setClassifier( "tests" );
+        }
 
         return mmd;
     }
@@ -223,6 +288,12 @@ public class MercuryAdaptor
         mmd.setVersion( md.getVersion() );
         mmd.setClassifier( md.getClassifier() );
         mmd.setType( md.getType() );
+        
+        if( "test-jar".equals( md.getType() ) )
+        {
+            mmd.setType( "jar" );
+            mmd.setClassifier( "tests" );
+        }
 
         return mmd;
     }
@@ -278,10 +349,10 @@ public class MercuryAdaptor
                 scopeStr = ((ScopeArtifactFilter)filter).getScope(); 
         }
         
-        if( "org.apache.maven.plugins:maven-remote-resources-plugin".equals( 
-                                                      reqArtifact.getGroupId()+":"+reqArtifact.getArtifactId() 
-                                                                           )
-        ) scopeStr = null;
+//        if( "org.apache.maven.plugins:maven-remote-resources-plugin".equals( 
+//                                                      reqArtifact.getGroupId()+":"+reqArtifact.getArtifactId() 
+//                                                                           )
+//        ) scopeStr = null;
         
 //        else if( isPlugin )
 //            scopeStr = org.apache.maven.mercury.artifact.Artifact.SCOPE_RUNTIME;
@@ -296,11 +367,28 @@ public class MercuryAdaptor
                 return ArtifactScopeEnum.provided;
             else if( org.apache.maven.mercury.artifact.Artifact.SCOPE_RUNTIME.equals( scopeStr ) )
                 return ArtifactScopeEnum.runtime;
+            else if( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM.equals( scopeStr ) )
+                return ArtifactScopeEnum.runtime;
             else if( org.apache.maven.mercury.artifact.Artifact.SCOPE_SYSTEM.equals( scopeStr ) )
                 return ArtifactScopeEnum.system;
         }
 
         return null;
+    }
+    
+    public static Map<String,ArtifactMetadata> toMercuryVersionMap(Map<String,Artifact> map  )
+    {
+        if( Util.isEmpty( map ) )
+            return null;
+        
+        Map<String,ArtifactMetadata> res = new HashMap<String, ArtifactMetadata>( map.size() );
+        
+        for( Entry<String, Artifact> e : map.entrySet() )
+        {
+            res.put( e.getKey(), toMercuryMetadata( e.getValue() ) );
+        }
+        
+        return res;
     }
 
 }

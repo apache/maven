@@ -31,7 +31,7 @@ under the License.
   <description>Mercury implementation for the Maven Repository System</description>
 
   <properties>
-    <mercury.version>1.0-alpha-6-SNAPSHOT</mercury.version>
+    <mercury.version>1.0-alpha-7-SNAPSHOT</mercury.version>
   </properties>
 
   <dependencies>

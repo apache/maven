@@ -373,11 +373,14 @@ public class LegacyRepositorySystem
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {             
-        
-//System.out.println("legacy: request with "+request.getRemoteRepostories().size()+" repos" );
+    {
+
+if(request.getRemoteRepostories() != null && request.getRemoteRepostories().size() > 10 )
+{
+    System.out.println("legacy: request with "+request.getRemoteRepostories().size()+" remote repositories" );
+}
         ArtifactResolutionResult res = artifactResolver.resolve( request );
-//System.out.println( "legacy resolved: "+request.getArtifact() );
+
         return res;
     }
 

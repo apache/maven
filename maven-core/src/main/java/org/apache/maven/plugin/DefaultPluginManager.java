@@ -426,10 +426,8 @@ public class DefaultPluginManager
 
         Set<Artifact> resolved = new LinkedHashSet<Artifact>();
 
-        for ( Iterator<Artifact> it = result.getArtifacts().iterator(); it.hasNext(); )
+        for ( Artifact artifact : result.getArtifacts() )
         {
-            Artifact artifact = it.next();
-
             if ( !artifact.equals( pluginArtifact ) )
             {
                 artifact = project.replaceWithActiveArtifact( artifact );
