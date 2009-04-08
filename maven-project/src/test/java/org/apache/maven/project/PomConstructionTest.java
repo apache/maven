@@ -1307,13 +1307,15 @@ public class PomConstructionTest
         assertEquals("2.1", pom.getValue( "build/plugins[1]/version" ));
     }    
     
-    /* FIXME: MNG-1995 
+    /* MNG-1995 */
     public void testBooleanInterpolation()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "boolean-interpolation" );
+        assertTrue ((Boolean) pom.getValue( "repositories[2]/releases/enabled" ) );     
+        assertTrue((Boolean) pom.getValue( "build/resources[1]/filtering" ) ); 
     }    
-    */ 
+
     
     /* MNG-3899 */
     public void testBuildExtensionInheritance()
