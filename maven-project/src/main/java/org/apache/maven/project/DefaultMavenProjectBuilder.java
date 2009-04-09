@@ -820,7 +820,7 @@ public class DefaultMavenProjectBuilder
         MavenProject project = null;
         try
         {
-            project = assembleLineage( model, lineage, config, projectDir, parentSearchRepositories,
+            project = assembleLineage( model, lineage, config, projectDescriptor, parentSearchRepositories,
                                        aggregatedRemoteWagonRepositories, strict );
         }
         catch ( InvalidRepositoryException e )
@@ -1159,13 +1159,19 @@ public class DefaultMavenProjectBuilder
     private MavenProject assembleLineage( Model model,
                                           LinkedList lineage,
                                           ProjectBuilderConfiguration config,
-                                          File projectDir,
+                                          File projectDescriptor,
                                           List parentSearchRepositories,
                                           Set aggregatedRemoteWagonRepositories,
                                           boolean strict )
         throws ProjectBuildingException, InvalidRepositoryException
     {
         Model originalModel = ModelUtils.cloneModel( model );
+
+        File projectDir = null;
+        if ( projectDescriptor != null )
+        {
+            projectDir = projectDescriptor.getAbsoluteFile().getParentFile();
+        }
 
         ProfileManager externalProfileManager = config.getGlobalProfileManager();
         ProfileManager profileManager;
@@ -1221,6 +1227,7 @@ public class DefaultMavenProjectBuilder
 
         MavenProject project = new MavenProject( model, getLogger() );
 
+        project.setFile( projectDescriptor );
         project.setActiveProfiles( activeProfiles );
         project.setOriginalModel( originalModel );
 
@@ -1406,21 +1413,13 @@ public class DefaultMavenProjectBuilder
                     projectId + " has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
             }
 
-            File parentProjectDir = null;
-            if ( parentDescriptor != null )
-            {
-                parentProjectDir = parentDescriptor.getParentFile();
-            }
-
             MavenProject parent = assembleLineage( model,
                                                    lineage,
                                                    config,
-                                                   parentProjectDir,
+                                                   parentDescriptor,
                                                    parentSearchRepositories,
                                                    aggregatedRemoteWagonRepositories,
                                                    strict );
-
-            parent.setFile( parentDescriptor );
 
             project.setParent( parent );
 
