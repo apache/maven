@@ -153,14 +153,14 @@ public class PluginsManagementProcessor extends BaseProcessor
             target.setId( source.getId() );
         }
         
-        if(target.getInherited() == null)
+        if ( target.getInherited() == null )
         {
-            source.setInherited( target.getInherited() );
+            target.setInherited( source.getInherited() );
         }
-        
-        if(target.getPhase() != null)
+
+        if ( target.getPhase() == null )
         {
-            source.setPhase( target.getPhase() );
+            target.setPhase( source.getPhase() );
         }
         
         List<String> goals = new ArrayList<String>(target.getGoals());

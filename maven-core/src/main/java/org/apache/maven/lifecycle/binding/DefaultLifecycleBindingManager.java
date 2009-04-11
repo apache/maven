@@ -161,7 +161,6 @@ public class DefaultLifecycleBindingManager
             for ( Iterator it = plugins.iterator(); it.hasNext(); )
             {
                 Plugin plugin = (Plugin) it.next();
-                BindingUtils.injectPluginManagementInfo( plugin, project );
 
                 PluginDescriptor pluginDescriptor = null;
 
