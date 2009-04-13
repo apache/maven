@@ -31,7 +31,7 @@ import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.project.builder.legacy.PomClassicDomainModel;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.ModelProperty;
 import org.codehaus.plexus.util.WriterFactory;
@@ -169,16 +169,6 @@ public class PomTestWrapper
     public File getBasedir()
     {
         return ( pomFile != null ) ? pomFile.getParentFile() : null;
-    }
-
-    public String getValueOfProjectUri( String projectUri, boolean withResolvedValue )
-        throws IOException
-    {
-        if ( projectUri.contains( "#collection" ) || projectUri.contains( "#set" ) )
-        {
-            throw new IllegalArgumentException( "projectUri: contains a collection or set" );
-        }
-        return asMap( withResolvedValue ).get( projectUri );
     }
 
     public void setValueOnModel( String expression, Object value )

@@ -30,9 +30,9 @@ import org.apache.maven.profiles.matchers.FileMatcher;
 import org.apache.maven.profiles.matchers.JdkMatcher;
 import org.apache.maven.profiles.matchers.ProfileMatcher;
 import org.apache.maven.profiles.matchers.PropertyMatcher;
-import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.interpolator.InterpolatorProperty;
+import org.apache.maven.project.builder.interpolator.PomInterpolatorTag;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
 

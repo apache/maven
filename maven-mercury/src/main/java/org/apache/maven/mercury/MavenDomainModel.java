@@ -28,11 +28,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
-import org.apache.maven.project.builder.PomClassicDomainModel;
-import org.apache.maven.project.builder.PomTransformer;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.factories.ExclusionModelContainerFactory;
+import org.apache.maven.project.builder.legacy.PomClassicDomainModel;
+import org.apache.maven.project.builder.legacy.PomTransformer;
 import org.apache.maven.project.builder.profile.ProfileContext;
 import org.apache.maven.shared.model.DataSourceException;
 import org.apache.maven.shared.model.InterpolatorProperty;

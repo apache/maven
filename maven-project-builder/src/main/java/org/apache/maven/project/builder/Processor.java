@@ -1,4 +1,8 @@
-package org.apache.maven.profiles.matchers;
+package org.apache.maven.project.builder;
+
+import java.util.List;
+
+import org.apache.maven.model.Model;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,20 +23,14 @@ package org.apache.maven.profiles.matchers;
  * under the License.
  */
 
-import java.util.List;
-
-import org.apache.maven.model.Profile;
-import org.apache.maven.project.builder.interpolator.InterpolatorProperty;
-
-public class DefaultMatcher implements ProfileMatcher
+public interface Processor
 {
-    public boolean isMatch( Profile profile, List<InterpolatorProperty> properties )
-    {
-        if(profile.getActivation() == null)
-        {
-            return false;
-        }
-        return profile.getActivation().isActiveByDefault();
-    }
+    void process( Object parent, Object child, Object target, boolean isChildMostSpecialized );
+
+    Object getParent();
+
+    Object getChild();
+    
+    List<Model> getParentModels();
 
 }

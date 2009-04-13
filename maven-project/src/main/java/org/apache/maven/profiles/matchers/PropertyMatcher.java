@@ -22,7 +22,7 @@ package org.apache.maven.profiles.matchers;
 import java.util.List;
 
 import org.apache.maven.model.Profile;
-import org.apache.maven.shared.model.InterpolatorProperty;
+import org.apache.maven.project.builder.interpolator.InterpolatorProperty;
 
 public class PropertyMatcher implements ProfileMatcher
 {

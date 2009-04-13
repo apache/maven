@@ -1,58 +1,44 @@
 package org.apache.maven.project.builder;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.ModelMarshaller;
-import org.apache.maven.shared.model.InputStreamDomainModel;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * Provides a wrapper for the maven model.
- */
-public class PomClassicDomainModel implements InputStreamDomainModel
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.project.builder.interpolator.DomainModel;
+import org.apache.maven.project.builder.interpolator.ModelProperty;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+public class PomClassicDomainModel implements DomainModel
 {
 
     /**
      * Bytes containing the underlying model
      */
     private byte[] inputBytes;
-
-    /**
-     * History of joins and deletes of model properties
-     */
-    private String eventHistory;
 
     private String id;
 
@@ -74,74 +60,8 @@ public class PomClassicDomainModel implements InputStreamDomainModel
 
     public Model getModel() throws IOException
     {
-        if(model == null)
-        {
-            InputStream is;
-			try {
-				is = getInputStream();
-			} catch (Exception e1) {
-				throw new IOException("inputStream not set");
-			}
-
-            MavenXpp3Reader reader = new MavenXpp3Reader();
-            try
-            {
-                model =  reader.read( is, false ) ;
-            }
-            catch ( XmlPullParserException e )
-            {
-                throw new IOException( e.getMessage() );
-            }            
-        }
         return model;        
     }   
-    
-    public PomClassicDomainModel( List<ModelProperty> modelProperties )
-    {
-        this.modelProperties = modelProperties;
-        try
-        {
-            String xml = ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-            inputBytes = xml.getBytes( "UTF-8" );
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalStateException( "Unmarshalling of model properties failed", e );
-        }
-        initializeProperties( modelProperties );
-    }
-    
-    public PomClassicDomainModel( List<ModelProperty> modelProperties, boolean isMostSpecialized )
-    {
-    	this( modelProperties );
-    	this.isMostSpecialized = isMostSpecialized;
-    }
-    
-
-    /**
-     * Constructor
-     *
-     * @param inputStream input stream of the maven model
-     * @throws IOException if there is a problem constructing the model
-     */
-    public PomClassicDomainModel( InputStream inputStream )
-        throws IOException
-    {
-        if ( inputStream == null )
-        {
-            throw new IllegalArgumentException( "inputStream: null" );
-        }
-        this.inputBytes = IOUtil.toByteArray( inputStream );
-        modelProperties = getModelProperties();
-        initializeProperties( modelProperties );
-    }
-    
-    public PomClassicDomainModel( InputStream inputStream, boolean isMostSpecialized )
-    	throws IOException
-	{
-    	this( inputStream );
-    	this.isMostSpecialized = isMostSpecialized;
-	}    
 
     private void initializeProperties(List<ModelProperty> modelProperties)
     {
@@ -212,17 +132,54 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     public PomClassicDomainModel( File file )
         throws IOException
     {
-        this( new FileInputStream( file ) );
+    	this( new FileInputStream( file ) );
         this.file = file;
     }
+    
+    public PomClassicDomainModel( InputStream is )
+    	throws IOException
+    {
+	    this.inputBytes = IOUtil.toByteArray( is);
+	    
+	    MavenXpp3Reader reader = new MavenXpp3Reader();
+	    try
+	    {
+	        model =  reader.read( new ByteArrayInputStream( inputBytes ), false ) ;
+	    }
+	    catch ( XmlPullParserException e )
+	    {
+	        throw new IOException( e.getMessage() );
+	    }  
+	    
+	    modelProperties = getModelProperties();
+	    initializeProperties( modelProperties );
 
-    public PomClassicDomainModel(Model model2) {
-    	this.model = model2;
+    }    
+
+    public PomClassicDomainModel(Model model) throws IOException {
+    	this (model, false);
 	}
 
-	public PomClassicDomainModel(Model model2, boolean b) {
-		this.model = model2;
+	public PomClassicDomainModel(Model model, boolean b) throws IOException {
+		this.model = model;
 		this.isMostSpecialized = b;
+		
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer out = null;
+        MavenXpp3Writer writer = new MavenXpp3Writer();
+        try
+        {
+            out = WriterFactory.newXmlWriter( baos );
+            writer.write( out, model );
+        }
+        finally
+        {
+            if ( out != null )
+            {
+                out.close();
+            }
+        }
+        inputBytes = baos.toByteArray();
     }
 
 	public File getParentFile()
@@ -318,7 +275,6 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     {
         byte[] copy = new byte[inputBytes.length];
         System.arraycopy( inputBytes, 0, copy, 0, inputBytes.length );
-        //System.out.println(new String(copy));
         return new ByteArrayInputStream( copy );
     }
 
@@ -336,7 +292,7 @@ public class PomClassicDomainModel implements InputStreamDomainModel
         {
             Set<String> s = new HashSet<String>();
             //TODO: Should add all collections from ProjectUri
-            s.addAll(PomTransformer.URIS);
+            s.addAll(URIS);
             s.add(ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri);
             s.add(ProjectUri.DependencyManagement.Dependencies.Dependency.Exclusions.xUri);
             s.add(ProjectUri.Dependencies.Dependency.Exclusions.xUri);
@@ -359,30 +315,9 @@ public class PomClassicDomainModel implements InputStreamDomainModel
             s.add(ProjectUri.Profiles.Profile.Dependencies.xUri);
             s.add(ProjectUri.Profiles.Profile.Build.Plugins.Plugin.configuration);
             
-            modelProperties = ModelMarshaller.marshallXmlToModelProperties(
-                getInputStream(), ProjectUri.baseUri, s );
+            modelProperties = marshallXmlToModelProperties(getInputStream(), ProjectUri.baseUri, s );
         }
         return new ArrayList<ModelProperty>(modelProperties);
-    }
-
-    /**
-     * @see org.apache.maven.shared.model.DomainModel#getEventHistory()
-     */
-    public String getEventHistory()
-    {
-        return eventHistory;
-    }
-
-    /**
-     * @see org.apache.maven.shared.model.DomainModel#setEventHistory(String)
-     */
-    public void setEventHistory( String eventHistory )
-    {
-        if ( eventHistory == null )
-        {
-            throw new IllegalArgumentException( "eventHistory: null" );
-        }
-        this.eventHistory = eventHistory;
     }
 
     public int getLineageCount()
@@ -393,17 +328,6 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     public void setLineageCount( int lineageCount )
     {
         this.lineageCount = lineageCount;
-    }
-
-    public PomClassicDomainModel createCopy()
-    {
-        List<ModelProperty> props = new ArrayList<ModelProperty>();
-        for(ModelProperty mp : modelProperties)
-        {
-            props.add(mp.createCopyOfOriginal());
-        }
-
-        return new PomClassicDomainModel(props);
     }
 
     /**
@@ -436,5 +360,223 @@ public class PomClassicDomainModel implements InputStreamDomainModel
     {
         return String.valueOf( id );
     }
+    
+    private static final Set<String> URIS = Collections.unmodifiableSet(new HashSet<String>( Arrays.asList(  ProjectUri.Build.Extensions.xUri,
+            ProjectUri.Build.PluginManagement.Plugins.xUri,
+            ProjectUri.Build.PluginManagement.Plugins.Plugin.configuration,
+            ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri,
+            ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.Execution.Goals.xURI,
+            ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
+            ProjectUri.Build.PluginManagement.Plugins.Plugin.Dependencies.Dependency.Exclusions.xUri,
+            ProjectUri.Build.Plugins.xUri,
+            ProjectUri.properties,
+            ProjectUri.Build.Plugins.Plugin.configuration,
+            ProjectUri.Reporting.Plugins.xUri,
+            ProjectUri.Reporting.Plugins.Plugin.configuration,
+            ProjectUri.Build.Plugins.Plugin.Dependencies.xUri,
+            ProjectUri.Build.Resources.xUri,
+            ProjectUri.Build.Resources.Resource.includes,
+            ProjectUri.Build.Resources.Resource.excludes,
+            ProjectUri.Build.TestResources.xUri,
+            ProjectUri.Build.Filters.xUri,
+            ProjectUri.CiManagement.Notifiers.xUri,
+            ProjectUri.Contributors.xUri,
+            ProjectUri.Dependencies.xUri,
+            ProjectUri.DependencyManagement.Dependencies.xUri,
+            ProjectUri.Developers.xUri,
+            ProjectUri.Developers.Developer.roles,
+            ProjectUri.Licenses.xUri,
+            ProjectUri.MailingLists.xUri,
+            ProjectUri.Modules.xUri,
+            ProjectUri.PluginRepositories.xUri,
+            ProjectUri.Profiles.xUri,
+            ProjectUri.Profiles.Profile.Build.Plugins.xUri,
+            ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Dependencies.xUri,
+            ProjectUri.Profiles.Profile.Build.Plugins.Plugin.Executions.xUri,
+            ProjectUri.Profiles.Profile.Build.Resources.xUri,
+            ProjectUri.Profiles.Profile.Build.TestResources.xUri,
+            ProjectUri.Profiles.Profile.Dependencies.xUri,
+            ProjectUri.Profiles.Profile.DependencyManagement.Dependencies.xUri,
+            ProjectUri.Profiles.Profile.PluginRepositories.xUri,
+            ProjectUri.Profiles.Profile.Reporting.Plugins.xUri,
+            ProjectUri.Profiles.Profile.Repositories.xUri,
+            ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.xUri,
+            ProjectUri.Profiles.Profile.Build.PluginManagement.Plugins.Plugin.Dependencies.xUri,
+            ProjectUri.Reporting.Plugins.xUri,
+            ProjectUri.Repositories.xUri) ));    
+    
+   /**
+    * Returns list of model properties transformed from the specified input stream.
+    *
+    * @param inputStream input stream containing the xml document. May not be null.
+    * @param baseUri     the base uri of every model property. May not be null or empty.
+    * @param collections set of uris that are to be treated as a collection (multiple entries). May be null.
+    * @return list of model properties transformed from the specified input stream.
+    * @throws IOException if there was a problem doing the transform
+    */
+    public static List<ModelProperty> marshallXmlToModelProperties( InputStream inputStream, String baseUri,
+            Set<String> collections )
+			throws IOException {
+		if (inputStream == null) {
+			throw new IllegalArgumentException("inputStream: null");
+		}
 
+		if (baseUri == null || baseUri.trim().length() == 0) {
+			throw new IllegalArgumentException("baseUri: null");
+		}
+
+		if (collections == null) {
+			collections = Collections.emptySet();
+		}
+
+		List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
+		XMLInputFactory xmlInputFactory = new com.ctc.wstx.stax.WstxInputFactory();
+		xmlInputFactory.setProperty(
+				XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
+		xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE,
+				Boolean.FALSE);
+
+		Uri uri = new Uri(baseUri);
+		String tagName = baseUri;
+		StringBuilder tagValue = new StringBuilder(256);
+
+		int depth = 0;
+		int depthOfTagValue = depth;
+		XMLStreamReader xmlStreamReader = null;
+		try {
+			xmlStreamReader = xmlInputFactory
+					.createXMLStreamReader(inputStream);
+
+			Map<String, String> attributes = new HashMap<String, String>();
+			for (;; xmlStreamReader.next()) {
+				int type = xmlStreamReader.getEventType();
+				switch (type) {
+
+				case XMLStreamConstants.CDATA:
+				case XMLStreamConstants.CHARACTERS: {
+					if (depth == depthOfTagValue) {
+						tagValue.append(xmlStreamReader.getTextCharacters(),
+								xmlStreamReader.getTextStart(), xmlStreamReader
+										.getTextLength());
+					}
+					break;
+				}
+
+				case XMLStreamConstants.START_ELEMENT: {
+					if (!tagName.equals(baseUri)) {
+						String value = null;
+						if (depth < depthOfTagValue) {
+							value = tagValue.toString().trim();
+						}
+						modelProperties.add(new ModelProperty(tagName, value));
+						if (!attributes.isEmpty()) {
+							for (Map.Entry<String, String> e : attributes
+									.entrySet()) {
+								modelProperties.add(new ModelProperty(e
+										.getKey(), e.getValue()));
+							}
+							attributes.clear();
+						}
+					}
+
+					depth++;
+					tagName = uri.getUriFor(xmlStreamReader.getName()
+							.getLocalPart(), depth);
+					if (collections.contains(tagName + "#collection")) {
+						tagName = tagName + "#collection";
+						uri.addTag(xmlStreamReader.getName().getLocalPart()
+								+ "#collection");
+					} else if (collections.contains(tagName + "#set")) {
+						tagName = tagName + "#set";
+						uri.addTag(xmlStreamReader.getName().getLocalPart()
+								+ "#set");
+					} else {
+						uri.addTag(xmlStreamReader.getName().getLocalPart());
+					}
+					tagValue.setLength(0);
+					depthOfTagValue = depth;
+				}
+				case XMLStreamConstants.ATTRIBUTE: {
+					for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
+
+						attributes.put(tagName
+								+ "#property/"
+								+ xmlStreamReader.getAttributeName(i)
+										.getLocalPart(), xmlStreamReader
+								.getAttributeValue(i));
+					}
+					break;
+				}
+				case XMLStreamConstants.END_ELEMENT: {
+					depth--;
+					break;
+				}
+				case XMLStreamConstants.END_DOCUMENT: {
+					modelProperties.add(new ModelProperty(tagName, tagValue
+							.toString().trim()));
+					if (!attributes.isEmpty()) {
+						for (Map.Entry<String, String> e : attributes
+								.entrySet()) {
+							modelProperties.add(new ModelProperty(e.getKey(), e
+									.getValue()));
+						}
+						attributes.clear();
+					}
+					return modelProperties;
+				}
+				}
+			}
+		} catch (XMLStreamException e) {
+			throw new IOException(":" + e.toString());
+		} finally {
+			if (xmlStreamReader != null) {
+				try {
+					xmlStreamReader.close();
+				} catch (XMLStreamException e) {
+					e.printStackTrace();
+				}
+			}
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+
+			}
+		}
+	}
+   /**
+    * Class for storing information about URIs.
+    */
+   private static class Uri
+   {
+
+       List<String> uris;
+
+       Uri( String baseUri )
+       {
+           uris = new LinkedList<String>();
+           uris.add( baseUri );
+       }
+
+       String getUriFor( String tag, int depth )
+       {
+           setUrisToDepth( depth );
+           StringBuffer sb = new StringBuffer();
+           for ( String tagName : uris )
+           {
+               sb.append( tagName ).append( "/" );
+           }
+           sb.append( tag );
+           return sb.toString();
+       }
+
+       void addTag( String tag )
+       {
+           uris.add( tag );
+       }
+
+       void setUrisToDepth( int depth )
+       {
+           uris = new LinkedList<String>( uris.subList( 0, depth ) );
+       }
+   }
 }

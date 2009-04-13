@@ -41,23 +41,22 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManagerInfo;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.PomClassicDomainModel;
-import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.project.processor.ProcessorContext;
+import org.apache.maven.project.builder.ProcessorContext;
+import org.apache.maven.project.builder.interpolator.DomainModel;
+import org.apache.maven.project.builder.interpolator.InterpolatorProperty;
+import org.apache.maven.project.builder.interpolator.ModelProperty;
+import org.apache.maven.project.builder.interpolator.PomInterpolatorTag;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
-import org.apache.maven.shared.model.DomainModel;
-import org.apache.maven.shared.model.InterpolatorProperty;
 import org.apache.maven.shared.model.ModelEventListener;
-import org.apache.maven.shared.model.ModelProperty;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -65,7 +64,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.WriterFactory;
 
 /**
  * @version $Id$
@@ -388,11 +386,13 @@ public class DefaultMavenProjectBuilder
         {
             interpolatorProperties.add( new InterpolatorProperty( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ),
                                                                   PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        }      
+        }    
+        
             try
             {
-            	List<ModelProperty> mps = domainModel.getModelProperties();
-            	ProcessorContext.interpolateModelProperties( mps, interpolatorProperties, domainModel );
+            	//List<ModelProperty> mps = domainModel.getModelProperties();
+            	model = ProcessorContext.interpolateDomainModel( domainModel, interpolatorProperties ).getModel();
+            	/*
             	if ( domainModel.getProjectDirectory() != null )
             	{
             		mps = ProcessorContext.alignPaths( mps, domainModel.getProjectDirectory() );
@@ -400,14 +400,17 @@ public class DefaultMavenProjectBuilder
             	File f = domainModel.getParentFile();
             	domainModel = new PomClassicDomainModel( mps, false );
             	domainModel.setParentFile(f);
+
             	model = domainModel.getModel();
+            	*/
 
             }
             catch ( IOException e )
             {
 
                 throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
-            }   
+            }  
+            
 
         MavenProject project;
 
@@ -481,7 +484,7 @@ public class DefaultMavenProjectBuilder
             	domainModels.addAll( mavenParents );
             }
 
-            domainModels.add( convertToDomainModel( getSuperModel(), false ) );
+            domainModels.add( new PomClassicDomainModel( getSuperModel(), false ) );
             List<DomainModel> profileModels = new ArrayList<DomainModel>();
             //Process Profiles
             for(DomainModel domain : domainModels)
@@ -565,31 +568,6 @@ public class DefaultMavenProjectBuilder
             parent.getModel().getBuild().setDirectory( parent.getFile().getAbsolutePath() );
             setBuildOutputDirectoryOnParent( parent );
         }
-    }
-
-    private static PomClassicDomainModel convertToDomainModel( Model model, boolean isMostSpecialized )
-        throws IOException
-    {
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model: null" );
-        }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer out = null;
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        try
-        {
-            out = WriterFactory.newXmlWriter( baos );
-            writer.write( out, model );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                out.close();
-            }
-        }
-        return new PomClassicDomainModel( new ByteArrayInputStream( baos.toByteArray() ), isMostSpecialized );
     }
 
     /**

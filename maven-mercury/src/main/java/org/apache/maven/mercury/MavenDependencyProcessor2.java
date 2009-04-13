@@ -10,7 +10,7 @@ import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.builder.api.DependencyProcessorException;
 import org.apache.maven.mercury.builder.api.MetadataReader;
 import org.apache.maven.mercury.builder.api.MetadataReaderException;
-import org.apache.maven.project.processor.ProcessorContext;
+import org.apache.maven.project.builder.ProcessorContext;
 import org.apache.maven.shared.model.DomainModel;
 import org.apache.maven.shared.model.InterpolatorProperty;
 import org.codehaus.plexus.component.annotations.Component;
@@ -62,7 +62,7 @@ public class MavenDependencyProcessor2
         {
             throw new MetadataReaderException( "Failed to create domain model. Message = " + e.getMessage(), e );
         }
-
+/*
         try
         {
         	MavenDomainModel model = new MavenDomainModel(ProcessorContext.build(domainModels, interpolatorProperties));
@@ -72,5 +72,7 @@ public class MavenDependencyProcessor2
         {
             throw new MetadataReaderException( "Unable to transform model", e );
         }
+        */
+        return null;
     }
 }
