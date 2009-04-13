@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface DomainModel {
-	
-    List<ModelProperty> getModelProperties() throws IOException;
     
     boolean isMostSpecialized();
     
