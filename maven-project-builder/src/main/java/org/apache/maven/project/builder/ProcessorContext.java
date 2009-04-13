@@ -20,11 +20,8 @@ package org.apache.maven.project.builder;
  */
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,18 +42,13 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Resource;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.interpolator.DomainModel;
 import org.apache.maven.project.builder.interpolator.InterpolatorProperty;
 import org.apache.maven.project.builder.interpolator.ModelProperty;
 import org.apache.maven.project.builder.interpolator.PomInterpolatorTag;
-import org.apache.maven.shared.model.ModelEventListener;
-import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class ProcessorContext
 {

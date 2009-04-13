@@ -30,7 +30,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Resource;
-import org.apache.maven.shared.model.ModelEventListener;
 
 public class BuildProcessor
     extends BaseProcessor
