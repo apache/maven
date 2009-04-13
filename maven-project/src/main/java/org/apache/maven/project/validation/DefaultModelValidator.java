@@ -86,9 +86,9 @@ public class DefaultModelValidator
 
             validateId( "dependencies.dependency.groupId", result, d.getGroupId() );
 
-            validateStringNotEmpty( "dependencies.dependency.type", result, d.getType(), dependencySourceHint( d ) );
+            validateStringNotEmpty( "dependencies.dependency.type", result, d.getType(), d.getManagementKey() );
 
-            validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion(), dependencySourceHint( d ) );
+            validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion(), d.getManagementKey() );
 
             if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) )
             {
@@ -262,19 +262,6 @@ public class DefaultModelValidator
     // ----------------------------------------------------------------------
     // Field validation
     // ----------------------------------------------------------------------
-
-    /**
-     * Create a hint string consisting of the groupId and artifactId for user validation
-     * messages. For example when the version or type information is missing from a
-     * dependency.
-     *
-     * @param d The dependency from which to make the hint.
-     * @return String of the form g:a.
-     */
-    private String dependencySourceHint( Dependency d )
-    {
-        return d.getGroupId() + ":" + d.getArtifactId();
-    }
 
     private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string )
     {
