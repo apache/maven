@@ -657,6 +657,7 @@ public class ProcessorContext
 				for (ModelProperty mp : unresolvedProperties) {
 					if (mp.resolveWith(ip) && !continueInterpolation) {
 						continueInterpolation = true;
+						break;
 					}
 				}
 			}

@@ -63,70 +63,50 @@ public class PomClassicDomainModel implements DomainModel
         return model;        
     }   
 
-    private void initializeProperties(List<ModelProperty> modelProperties)
+    private void initializeProperties(Model model)
     {
-        String groupId = null, artifactId = null, version = null;
-        for(ModelProperty mp : modelProperties)
-        {
-            if(mp.getUri().equals(ProjectUri.groupId))
-            {
-                groupId = mp.getResolvedValue();
-            }
-            else if(mp.getUri().equals(ProjectUri.artifactId))
-            {
-                artifactId = mp.getResolvedValue();
-            }
-            else if(mp.getUri().equals(ProjectUri.version))
-            {
-                version = mp.getResolvedValue();
-            }
-            else if(mp.getUri().equals(ProjectUri.Parent.artifactId))
-            {
-                parentArtifactId = mp.getResolvedValue();
-            }
-            else if(mp.getUri().equals(ProjectUri.Parent.groupId))
-            {
-                parentGroupId = mp.getResolvedValue();
-            }
-            else if(mp.getUri().equals(ProjectUri.Parent.version))
-            {
-                parentVersion = mp.getResolvedValue();
-            }
-            else if(mp.getUri().equals(ProjectUri.Parent.relativePath))
-            {
-                parentRelativePath = mp.getResolvedValue();
-            }
+    	String groupId = null, artifactId = null, version = null;
 
-            if(groupId != null && artifactId != null && version != null && parentGroupId != null &&
-                    parentArtifactId != null && parentVersion != null & parentRelativePath != null)
-            {
-                break;
-            }
-        }
-            if( groupId == null && parentGroupId != null)
-            {
-                groupId = parentGroupId;
-            }
-            if( artifactId == null && parentArtifactId != null)
-            {
-                artifactId = parentArtifactId;
-            }
-            if( version == null && parentVersion != null )
-            {
-                version = parentVersion;
-            }
+    	groupId = model.getGroupId();
 
-        if(parentGroupId != null && parentArtifactId != null && parentVersion != null)
-        {
-            parentId = parentGroupId + ":" + parentArtifactId + ":" + parentVersion;
-        }
+    	artifactId = model.getArtifactId();
+    	version = model.getVersion();
+    	
+    	if( model.getParent() != null)
+    	{
+    		parentArtifactId =model.getParent().getArtifactId();
 
-        if(parentRelativePath == null)
-        {
-            parentRelativePath = ".." + File.separator + "pom.xml";
-        }
+    		parentGroupId = model.getParent().getGroupId();
 
-        id = groupId + ":" + artifactId + ":" + version;
+    		parentVersion = model.getParent().getVersion();
+
+    		parentRelativePath = model.getParent().getRelativePath();
+    	}
+
+    	if( groupId == null && parentGroupId != null)
+    	{
+    		groupId = parentGroupId;
+    	}
+    	if( artifactId == null && parentArtifactId != null)
+    	{
+    		artifactId = parentArtifactId;
+    	}
+    	if( version == null && parentVersion != null )
+    	{
+    		version = parentVersion;
+    	}
+
+    	if(parentGroupId != null && parentArtifactId != null && parentVersion != null)
+    	{
+    		parentId = parentGroupId + ":" + parentArtifactId + ":" + parentVersion;
+    	}
+
+    	if(parentRelativePath == null)
+    	{
+    		parentRelativePath = ".." + File.separator + "pom.xml";
+    	}
+
+    	id = groupId + ":" + artifactId + ":" + version;
     }
 
     public PomClassicDomainModel( File file )
@@ -151,8 +131,7 @@ public class PomClassicDomainModel implements DomainModel
 	        throw new IOException( e.getMessage() );
 	    }  
 	    
-	    modelProperties = getModelProperties();
-	    initializeProperties( modelProperties );
+	    initializeProperties( model );
 
     }    
 
@@ -179,6 +158,7 @@ public class PomClassicDomainModel implements DomainModel
                 out.close();
             }
         }
+        initializeProperties( model );
         inputBytes = baos.toByteArray();
     }
 
