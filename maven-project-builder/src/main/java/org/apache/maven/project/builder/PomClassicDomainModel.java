@@ -111,7 +111,6 @@ public class PomClassicDomainModel implements DomainModel
 	    }  
 	    
 	    initializeProperties( model );
-
     }    
 
     public PomClassicDomainModel(Model model) throws IOException {
@@ -122,23 +121,9 @@ public class PomClassicDomainModel implements DomainModel
 		this.model = model;
 		this.isMostSpecialized = b;
 		
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer out = null;
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        try
-        {
-            out = WriterFactory.newXmlWriter( baos );
-            writer.write( out, model );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                out.close();
-            }
-        }
+
         initializeProperties( model );
-        inputBytes = baos.toByteArray();
+        
     }
 
 	public File getParentFile()
@@ -213,27 +198,62 @@ public class PomClassicDomainModel implements DomainModel
      *
      * @return XML model as string
      */
-    public String asString()
+    public String asString() throws IOException
     {
-        try
-        {
-            return IOUtil.toString( ReaderFactory.newXmlReader( new ByteArrayInputStream( inputBytes ) ) );
-        }
-        catch ( IOException ioe )
-        {
-            // should not occur: everything is in-memory
-            return "";
-        }
+    	if(inputBytes == null)
+    	{
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Writer out = null;
+            MavenXpp3Writer writer = new MavenXpp3Writer();
+            try
+            {
+                out = WriterFactory.newXmlWriter( baos );
+                writer.write( out, model );
+            }
+            finally
+            {
+                if ( out != null )
+                {
+                    out.close();
+                }
+            }
+            inputBytes = baos.toByteArray();		
+    	}
+
+	    return IOUtil.toString( ReaderFactory.newXmlReader( new ByteArrayInputStream( inputBytes ) ) );
     }
 
     /**
      * @see org.apache.maven.shared.model.InputStreamDomainModel#getInputStream()
      */
-    public InputStream getInputStream()
+    public InputStream getInputStream() throws IOException
     {
-        byte[] copy = new byte[inputBytes.length];
-        System.arraycopy( inputBytes, 0, copy, 0, inputBytes.length );
-        return new ByteArrayInputStream( copy );
+    	if(inputBytes != null)
+    	{
+            byte[] copy = new byte[inputBytes.length];
+            System.arraycopy( inputBytes, 0, copy, 0, inputBytes.length );
+            return new ByteArrayInputStream( copy );    		
+    	}
+    	else
+    	{
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Writer out = null;
+            MavenXpp3Writer writer = new MavenXpp3Writer();
+            try
+            {
+                out = WriterFactory.newXmlWriter( baos );
+                writer.write( out, model );
+            }
+            finally
+            {
+                if ( out != null )
+                {
+                    out.close();
+                }
+            }
+            inputBytes = baos.toByteArray();
+            return new ByteArrayInputStream(inputBytes);
+    	}
     }
 
     /**
