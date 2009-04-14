@@ -22,7 +22,6 @@ package org.apache.maven.cli;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -78,7 +77,7 @@ public final class CLIRequestUtils
         //
         // ----------------------------------------------------------------------
 
-        List goals = commandLine.getArgList();
+        List<String> goals = commandLine.getArgList();
 
         boolean recursive = true;
 
@@ -140,9 +139,9 @@ public final class CLIRequestUtils
         // Profile Activation
         // ----------------------------------------------------------------------
 
-        List activeProfiles = new ArrayList();
+        List<String> activeProfiles = new ArrayList<String>();
 
-        List inactiveProfiles = new ArrayList();
+        List<String> inactiveProfiles = new ArrayList<String>();
 
         if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
@@ -275,10 +274,8 @@ public final class CLIRequestUtils
         try
         {
             Properties envVars = CommandLineUtils.getSystemEnvVars();
-            Iterator i = envVars.entrySet().iterator();
-            while ( i.hasNext() )
+            for ( Entry<Object, Object> e : envVars.entrySet() )
             {
-                Entry e = (Entry) i.next();
                 executionProperties.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
             }
         }
