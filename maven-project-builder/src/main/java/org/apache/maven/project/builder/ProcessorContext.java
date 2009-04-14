@@ -52,10 +52,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.ProjectUri;
-import org.apache.maven.project.builder.interpolator.DomainModel;
-import org.apache.maven.project.builder.interpolator.InterpolatorProperty;
-import org.apache.maven.project.builder.interpolator.ModelProperty;
-import org.apache.maven.project.builder.interpolator.PomInterpolatorTag;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class ProcessorContext

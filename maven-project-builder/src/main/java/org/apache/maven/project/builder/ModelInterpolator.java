@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder.interpolator;
+package org.apache.maven.project.builder;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.project.builder.PomClassicDomainModel;
-import org.apache.maven.project.builder.ProjectUri;
 
 public class ModelInterpolator {
 

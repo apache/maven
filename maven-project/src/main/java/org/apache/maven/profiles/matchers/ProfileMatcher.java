@@ -21,7 +21,7 @@ package org.apache.maven.profiles.matchers;
 
 import java.util.List;
 
-import org.apache.maven.project.builder.interpolator.InterpolatorProperty;
+import org.apache.maven.project.builder.InterpolatorProperty;
 import org.apache.maven.model.Profile;
 
 public interface ProfileMatcher

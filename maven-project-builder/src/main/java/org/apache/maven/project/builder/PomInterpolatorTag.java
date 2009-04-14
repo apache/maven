@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder.interpolator;
+package org.apache.maven.project.builder;
 
 
 public enum PomInterpolatorTag

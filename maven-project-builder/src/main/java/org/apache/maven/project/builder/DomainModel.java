@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder.interpolator;
+package org.apache.maven.project.builder;
 
 import java.io.IOException;
 import java.util.List;

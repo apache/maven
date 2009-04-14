@@ -11,7 +11,6 @@ import java.io.Writer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.project.builder.interpolator.DomainModel;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
@@ -200,27 +199,7 @@ public class PomClassicDomainModel implements DomainModel
      */
     public String asString() throws IOException
     {
-    	if(inputBytes == null)
-    	{
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Writer out = null;
-            MavenXpp3Writer writer = new MavenXpp3Writer();
-            try
-            {
-                out = WriterFactory.newXmlWriter( baos );
-                writer.write( out, model );
-            }
-            finally
-            {
-                if ( out != null )
-                {
-                    out.close();
-                }
-            }
-            inputBytes = baos.toByteArray();		
-    	}
-
-	    return IOUtil.toString( ReaderFactory.newXmlReader( new ByteArrayInputStream( inputBytes ) ) );
+	    return IOUtil.toString( ReaderFactory.newXmlReader( getInputStream() ) );
     }
 
     /**

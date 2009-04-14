@@ -26,13 +26,13 @@ import java.util.*;
 import org.apache.maven.shared.model.*;
 import org.apache.maven.shared.model.impl.DefaultModelDataSource;
 import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.builder.rules.*;
 import org.apache.maven.project.builder.factories.PluginExecutionIdModelContainerFactory;
 import org.apache.maven.project.builder.factories.AlwaysJoinModelContainerFactory;
 import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
 import org.apache.maven.project.builder.factories.IdModelContainerFactory;
-import org.apache.maven.project.builder.interpolator.PomInterpolatorTag;
 
 /**
  * Provides methods for transforming model properties into a domain model for the pom classic format and vice versa.
