@@ -36,8 +36,14 @@ import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class DefaultProfileManager
     implements ProfileManager
@@ -51,7 +57,7 @@ public class DefaultProfileManager
     private static final ProfileMatcher defaultMatcher = new DefaultMatcher();
 
     private static final List<ProfileMatcher> matchers =
-        (List<ProfileMatcher>) Collections.unmodifiableList( Arrays.asList( new PropertyMatcher(), new FileMatcher(), new JdkMatcher() ) );    
+        Collections.unmodifiableList( Arrays.asList( new PropertyMatcher(), new FileMatcher(), new JdkMatcher() ) );    
 
     /**
      * the properties passed to the profile manager are the props that
@@ -109,7 +115,7 @@ public class DefaultProfileManager
     {
         String profileId = profile.getId();
 
-        Profile existing = (Profile) profilesById.get( profileId );
+        Profile existing = profilesById.get( profileId );
         if ( existing != null )
         {
             container.getLogger().warn( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource() +
@@ -135,12 +141,10 @@ public class DefaultProfileManager
     {
         List<Profile> activeFromPom = new ArrayList<Profile>();
         List<Profile> activeExternal = new ArrayList<Profile>();
-        for ( Iterator it = profilesById.entrySet().iterator(); it.hasNext(); )
+        for ( Map.Entry<String, Profile> entry : profilesById.entrySet() )
         {
-            Map.Entry entry = (Entry) it.next();
-
-            String profileId = (String) entry.getKey();
-            Profile profile = (Profile) entry.getValue();
+            String profileId = entry.getKey();
+            Profile profile = entry.getValue();
 
             if ( !profileActivationContext.isExplicitlyInactive( profileId )
             		&& (profileActivationContext.isExplicitlyActive( profileId ) || isActive( profile, profileActivationContext ) ) )
@@ -170,7 +174,7 @@ public class DefaultProfileManager
                 {
                     continue;
                 }
-                Profile profile = (Profile) profilesById.get( profileId );
+                Profile profile = profilesById.get( profileId );
 
                 if ( profile != null )
                 {
@@ -266,10 +270,8 @@ public class DefaultProfileManager
      */
     public void addProfiles( List<Profile> profiles )
     {
-        for ( Iterator it = profiles.iterator(); it.hasNext(); )
+        for ( Profile profile : profiles )
         {
-            Profile profile = (Profile) it.next();
-
             addProfile( profile );
         }
     }   
@@ -279,7 +281,7 @@ public class DefaultProfileManager
         List<Profile> defaults = new ArrayList<Profile>();
         for(Profile p : profiles)
         {
-            if( (p.getActivation() != null && p.getActivation().isActiveByDefault()) || p.getActivation() == null )
+            if ( p.getActivation() != null && p.getActivation().isActiveByDefault() )
             {
                 defaults.add( p );
             }
@@ -310,7 +312,7 @@ public class DefaultProfileManager
 
     private void activateAsDefault( String profileId )
     {
-        List defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
+        List<String> defaultIds = profileActivationContext.getActiveByDefaultProfileIds();
 
         if ( !defaultIds.contains( profileId ) )
         {
