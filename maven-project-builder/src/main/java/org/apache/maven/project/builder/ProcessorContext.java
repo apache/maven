@@ -41,6 +41,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -49,6 +50,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.ProjectUri;
@@ -56,23 +58,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class ProcessorContext
 {
-
-    /**
-     * The URIs that denote file/directory paths and need their basedir alignment or normalization.
-     */
-    private static final Collection<String> PATH_URIS =
-        Collections.unmodifiableSet( new HashSet<String>(
-                                                          Arrays.asList(
-                                                                         ProjectUri.Build.directory,
-                                                                         ProjectUri.Build.outputDirectory,
-                                                                         ProjectUri.Build.testOutputDirectory,
-                                                                         ProjectUri.Build.sourceDirectory,
-                                                                         ProjectUri.Build.testSourceDirectory,
-                                                                         ProjectUri.Build.scriptSourceDirectory,
-                                                                         ProjectUri.Build.Resources.Resource.directory,
-                                                                         ProjectUri.Build.TestResources.TestResource.directory,
-                                                                         ProjectUri.Build.Filters.filter,
-                                                                         ProjectUri.Reporting.outputDirectory ) ) );   
 
     public static PomClassicDomainModel mergeProfilesIntoModel(Collection<Profile> profiles, PomClassicDomainModel domainModel) throws IOException
     {
@@ -338,37 +323,65 @@ public class ProcessorContext
      * @param basedir The project directory, must not be {@code null}.
      * @return The updated model properties, never {@code null}.
      */
-    public static List<ModelProperty> alignPaths( Collection<ModelProperty> modelProperties, File basedir )
+    private static void alignPaths( Model model, File basedir )
     {
-        List<ModelProperty> mps = new ArrayList<ModelProperty>( modelProperties.size() );
-
-        for ( ModelProperty mp : modelProperties )
+    	Build build = model.getBuild();
+    	if(build != null)
+    	{
+    		build.setDirectory(getAlignedPathFor(build.getDirectory(), basedir));
+    		build.setOutputDirectory(getAlignedPathFor(build.getOutputDirectory(), basedir));	
+    		build.setTestOutputDirectory(getAlignedPathFor(build.getTestOutputDirectory(), basedir));
+    		build.setSourceDirectory(getAlignedPathFor(build.getSourceDirectory(), basedir));
+    		build.setScriptSourceDirectory(getAlignedPathFor(build.getScriptSourceDirectory(), basedir));
+    		
+    		for( Resource r : build.getResources() )
+    		{
+    			r.setDirectory(getAlignedPathFor(r.getDirectory(), basedir));
+    		}  	
+    		
+    		for( Resource r : build.getTestResources() )
+    		{
+    			r.setDirectory(getAlignedPathFor(r.getDirectory(), basedir));
+    		}  	
+    		
+    		List<String> filters = new ArrayList<String>();
+    		for( String f : build.getFilters() )
+    		{
+    			filters.add(getAlignedPathFor(f, basedir));
+    		}  
+    		build.setFilters(filters);
+    	}
+    	
+    	Reporting reporting = model.getReporting();
+    	if(reporting != null)
+    	{
+    		reporting.setOutputDirectory(getAlignedPathFor(reporting.getOutputDirectory(), basedir));	
+    	}
+          
+    }
+    
+    private static String getAlignedPathFor(String path, File basedir)
+    {
+        if ( path != null )
         {
-            String value = mp.getResolvedValue();
-            if ( value != null && PATH_URIS.contains( mp.getUri() ) )
+            File file = new File( path );
+            if ( file.isAbsolute() )
             {
-                File file = new File( value );
-                if ( file.isAbsolute() )
-                {
-                    // path was already absolute, just normalize file separator and we're done
-                    value = file.getPath();
-                }
-                else if ( file.getPath().startsWith( File.separator ) )
-                {
-                    // drive-relative Windows path, don't align with project directory but with drive root
-                    value = file.getAbsolutePath();
-                }
-                else
-                {
-                    // an ordinary relative path, align with project directory
-                    value = new File( new File( basedir, value ).toURI().normalize() ).getAbsolutePath();
-                }
-                mp = new ModelProperty( mp.getUri(), value );
+                // path was already absolute, just normalize file separator and we're done
+                path = file.getPath();
             }
-            mps.add( mp );
-        }
-
-        return mps;
+            else if ( file.getPath().startsWith( File.separator ) )
+            {
+                // drive-relative Windows path, don't align with project directory but with drive root
+                path = file.getAbsolutePath();
+            }
+            else
+            {
+                // an ordinary relative path, align with project directory
+                path = new File( new File( basedir, path ).toURI().normalize() ).getAbsolutePath();
+            }
+        }   
+        return path;
     }
 
     public static Profile copyOfProfile(Profile profile)
@@ -602,16 +615,15 @@ public class ProcessorContext
 
 		interpolateModelProperties(modelProperties, ips2);
 		
-
-        
-    	if ( dm.getProjectDirectory() != null )
-    	{
-    		modelProperties = ProcessorContext.alignPaths( modelProperties, dm.getProjectDirectory() );
-    	}
         try
         {
             String xml = unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-            return new PomClassicDomainModel( new ByteArrayInputStream ( xml.getBytes( "UTF-8" )));
+            PomClassicDomainModel domainModel = new PomClassicDomainModel( new ByteArrayInputStream ( xml.getBytes( "UTF-8" )));
+        	if ( dm.getProjectDirectory() != null )
+        	{
+        		alignPaths(domainModel.getModel(), dm.getProjectDirectory());
+        	}
+        	return domainModel;
         }
         catch ( IOException e )
         {
