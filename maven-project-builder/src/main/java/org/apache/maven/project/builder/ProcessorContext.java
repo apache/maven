@@ -319,45 +319,45 @@ public class ProcessorContext
      * Post-processes the paths of build directories by aligning relative paths to the project directory and normalizing
      * file separators to the platform-specific separator.
      * 
-     * @param modelProperties The model properties to process, must not be {@code null}.
+     * @param model The model to process, must not be {@code null}.
      * @param basedir The project directory, must not be {@code null}.
-     * @return The updated model properties, never {@code null}.
      */
     private static void alignPaths( Model model, File basedir )
     {
-    	Build build = model.getBuild();
-    	if(build != null)
-    	{
-    		build.setDirectory(getAlignedPathFor(build.getDirectory(), basedir));
-    		build.setOutputDirectory(getAlignedPathFor(build.getOutputDirectory(), basedir));	
-    		build.setTestOutputDirectory(getAlignedPathFor(build.getTestOutputDirectory(), basedir));
-    		build.setSourceDirectory(getAlignedPathFor(build.getSourceDirectory(), basedir));
-    		build.setScriptSourceDirectory(getAlignedPathFor(build.getScriptSourceDirectory(), basedir));
-    		
-    		for( Resource r : build.getResources() )
-    		{
-    			r.setDirectory(getAlignedPathFor(r.getDirectory(), basedir));
-    		}  	
-    		
-    		for( Resource r : build.getTestResources() )
-    		{
-    			r.setDirectory(getAlignedPathFor(r.getDirectory(), basedir));
-    		}  	
-    		
-    		List<String> filters = new ArrayList<String>();
-    		for( String f : build.getFilters() )
-    		{
-    			filters.add(getAlignedPathFor(f, basedir));
-    		}  
-    		build.setFilters(filters);
-    	}
-    	
-    	Reporting reporting = model.getReporting();
-    	if(reporting != null)
-    	{
-    		reporting.setOutputDirectory(getAlignedPathFor(reporting.getOutputDirectory(), basedir));	
-    	}
-          
+        Build build = model.getBuild();
+        if ( build != null )
+        {
+            build.setDirectory( getAlignedPathFor( build.getDirectory(), basedir ) );
+            build.setOutputDirectory( getAlignedPathFor( build.getOutputDirectory(), basedir ) );
+            build.setTestOutputDirectory( getAlignedPathFor( build.getTestOutputDirectory(), basedir ) );
+            build.setSourceDirectory( getAlignedPathFor( build.getSourceDirectory(), basedir ) );
+            build.setTestSourceDirectory( getAlignedPathFor( build.getTestSourceDirectory(), basedir ) );
+            build.setScriptSourceDirectory( getAlignedPathFor( build.getScriptSourceDirectory(), basedir ) );
+
+            for ( Resource r : build.getResources() )
+            {
+                r.setDirectory( getAlignedPathFor( r.getDirectory(), basedir ) );
+            }
+
+            for ( Resource r : build.getTestResources() )
+            {
+                r.setDirectory( getAlignedPathFor( r.getDirectory(), basedir ) );
+            }
+
+            List<String> filters = new ArrayList<String>();
+            for ( String f : build.getFilters() )
+            {
+                filters.add( getAlignedPathFor( f, basedir ) );
+            }
+            build.setFilters( filters );
+        }
+
+        Reporting reporting = model.getReporting();
+        if ( reporting != null )
+        {
+            reporting.setOutputDirectory( getAlignedPathFor( reporting.getOutputDirectory(), basedir ) );
+        }
+
     }
     
     private static String getAlignedPathFor(String path, File basedir)
