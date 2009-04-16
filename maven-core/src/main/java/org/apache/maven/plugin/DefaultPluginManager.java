@@ -15,7 +15,6 @@ package org.apache.maven.plugin;
  * the License.
  */
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -73,6 +72,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.builder.DefaultInterpolator;
 import org.apache.maven.project.builder.InterpolatorProperty;
 import org.apache.maven.project.builder.ModelProperty;
 import org.apache.maven.project.builder.PomInterpolatorTag;
@@ -511,7 +511,7 @@ public class DefaultPluginManager
                                                                                               PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
                 interpolatorProperties
                     .addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
-                String interpolatedDom = interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
+                String interpolatedDom = new DefaultInterpolator().interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
                 dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
             }
             catch ( XmlPullParserException e )
@@ -1524,30 +1524,6 @@ public class DefaultPluginManager
                 realmWithTransientParent.setParentRealm( null );
             }
         }
-    }
-
-    private static String interpolateXmlString( String xml, List<InterpolatorProperty> interpolatorProperties )
-        throws IOException
-    {
-        List<ModelProperty> modelProperties = ProcessorContext.marshallXmlToModelProperties( new ByteArrayInputStream( xml.getBytes() ), ProjectUri.baseUri, ProcessorContext.URIS );
-
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.put( "project.", "pom." );
-
-        List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>( interpolatorProperties );
-        ips.addAll( ProcessorContext.createInterpolatorProperties( modelProperties, ProjectUri.baseUri, aliases, PomInterpolatorTag.PROJECT_PROPERTIES.name()) );
-
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.properties ) && mp.getValue() != null )
-            {
-                String uri = mp.getUri();
-                ips.add( new InterpolatorProperty( "${" + uri.substring( uri.lastIndexOf( "/" ) + 1, uri.length() ) + "}", mp.getValue() ) );
-            }
-        }
-
-        ProcessorContext.interpolateModelProperties( modelProperties, ips );
-        return ProcessorContext.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
     }
 
     // Plugin Prefix Loader

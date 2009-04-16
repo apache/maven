@@ -43,6 +43,7 @@ import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManagerInfo;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.builder.DefaultInterpolator;
 import org.apache.maven.project.builder.DomainModel;
 import org.apache.maven.project.builder.InterpolatorProperty;
 import org.apache.maven.project.builder.ModelEventListener;
@@ -387,7 +388,7 @@ public class DefaultMavenProjectBuilder
             try
             {
             	//List<ModelProperty> mps = domainModel.getModelProperties();
-            	model = ProcessorContext.interpolateDomainModel( domainModel, interpolatorProperties ).getModel();
+            	model = new DefaultInterpolator().interpolateDomainModel( domainModel, interpolatorProperties ).getModel();
             	/*
             	if ( domainModel.getProjectDirectory() != null )
             	{

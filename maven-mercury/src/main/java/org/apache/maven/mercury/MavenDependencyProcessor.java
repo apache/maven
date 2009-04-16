@@ -29,9 +29,9 @@ import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.builder.api.DependencyProcessorException;
 import org.apache.maven.mercury.builder.api.MetadataReader;
 import org.apache.maven.mercury.builder.api.MetadataReaderException;
+import org.apache.maven.project.builder.DefaultInterpolator;
 import org.apache.maven.project.builder.DomainModel;
 import org.apache.maven.project.builder.InterpolatorProperty;
-import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProcessorContext;
 import org.codehaus.plexus.component.annotations.Component;
@@ -108,7 +108,7 @@ public class MavenDependencyProcessor
         }
 
         try {
-			return new MavenDomainModel(ProcessorContext.interpolateDomainModel(ProcessorContext.build(domainModels, null), 
+			return new MavenDomainModel(new DefaultInterpolator().interpolateDomainModel(ProcessorContext.build(domainModels, null), 
 					interpolatorProperties)).getDependencyMetadata();
 		} catch (IOException e) {
 			throw new DependencyProcessorException();
