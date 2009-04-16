@@ -220,7 +220,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-management-dependencies/sub", "test" );
-        System.out.println(pom.getDomainModel().asString());
         assertEquals( "1.0-alpha-21", pom.getValue( "build/plugins[1]/version" ) );
         assertEquals( "1.0", pom.getValue( "build/plugins[1]/dependencies[1]/version" ) );
     }
@@ -782,7 +781,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-config-append/" + test + "/subproject" );
-        System.out.println(pom.getDomainModel().asString());
         String prefix = "build/plugins[1]/configuration/";
         assertEquals( "PARENT-1", pom.getValue( prefix + "stringParams/stringParam[1]" ) );
         assertEquals( "PARENT-3", pom.getValue( prefix + "stringParams/stringParam[2]" ) );

@@ -170,10 +170,17 @@ public class ProcessorContext
         return models;
     }
 
-    public static PomClassicDomainModel build( List<DomainModel> domainModels,
-            List<InterpolatorProperty> interpolationProperties, List<ModelEventListener> listeners)
-	throws IOException
-	{  
+    /**
+     * Parent domain models on bottom.
+     * 
+     * @param domainModels
+     * @param listeners 
+     * @return
+     * @throws IOException
+     */
+    public static PomClassicDomainModel build( List<DomainModel> domainModels, List<ModelEventListener> listeners )
+        throws IOException
+    {  
         PomClassicDomainModel child = null;
         for ( DomainModel domainModel : domainModels )
         {   
@@ -196,24 +203,18 @@ public class ProcessorContext
                                        new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor(),
                                        new ContributorsProcessor(), new DevelopersProcessor(), new ProfilesProcessor() );
         Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors );
-        
+        if(listeners != null)
+        {
+        	for(ModelEventListener listener : listeners)
+        	{
+        		listener.fire(target);
+        	}
+        }       
         PomClassicDomainModel domainModel = new PomClassicDomainModel( target, child.isMostSpecialized() );
         domainModel.setProjectDirectory(child.getProjectDirectory());
         domainModel.setParentFile(child.getParentFile());
+
         return domainModel;
-	}
-    /**
-     * Parent domain models on bottom.
-     * 
-     * @param domainModels
-     * @return
-     * @throws IOException
-     */
-    public static PomClassicDomainModel build( List<DomainModel> domainModels,
-                                               List<InterpolatorProperty> interpolationProperties )
-        throws IOException
-    {  
-    	return build(domainModels, interpolationProperties, null);
     }
     
     private static Model processModelsForInheritance(List<Model> models, List<Processor> processors)
@@ -680,7 +681,7 @@ public class ProcessorContext
 		}
 	}
     
-    private static List<InterpolatorProperty> createInterpolatorProperties(List<ModelProperty> modelProperties,
+    public static List<InterpolatorProperty> createInterpolatorProperties(List<ModelProperty> modelProperties,
             String baseUriForModel,
             Map<String, String> aliases,
             String interpolatorTag)
@@ -864,7 +865,7 @@ public class ProcessorContext
         return sb.toString();
     }    
     
-    public static List<ModelProperty> getModelProperties(InputStream is) throws IOException
+    private static List<ModelProperty> getModelProperties(InputStream is) throws IOException
     {
             Set<String> s = new HashSet<String>();
             //TODO: Should add all collections from ProjectUri
@@ -893,7 +894,7 @@ public class ProcessorContext
             
         return new ArrayList<ModelProperty>(marshallXmlToModelProperties(is, ProjectUri.baseUri, s ));
     }    
-    private static final Set<String> URIS = Collections.unmodifiableSet(new HashSet<String>( Arrays.asList(  ProjectUri.Build.Extensions.xUri,
+    public static final Set<String> URIS = Collections.unmodifiableSet(new HashSet<String>( Arrays.asList(  ProjectUri.Build.Extensions.xUri,
             ProjectUri.Build.PluginManagement.Plugins.xUri,
             ProjectUri.Build.PluginManagement.Plugins.Plugin.configuration,
             ProjectUri.Build.PluginManagement.Plugins.Plugin.Executions.xUri,

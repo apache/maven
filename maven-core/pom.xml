@@ -28,10 +28,6 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-reporting-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-    </dependency>
     <!-- Required for Maven Artifact mediator as we phase it out. -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -110,10 +106,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>model-builder</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-sec-dispatcher</artifactId>
     </dependency>
@@ -121,6 +113,20 @@
     	<groupId>commons-jxpath</groupId>
     	<artifactId>commons-jxpath</artifactId>
     </dependency>
+    
+    <dependency>
+    	<groupId>org.apache.maven.mercury</groupId>
+    	<artifactId>mercury-repo-remote-m2</artifactId>
+    	<version>${mercuryVersion}</version>
+    	<scope>test</scope>
+    </dependency>
+     <dependency>
+    	<groupId>org.apache.maven.mercury</groupId>
+    	<artifactId>mercury-transport-http</artifactId>
+    	<version>${mercuryVersion}</version>
+    	<scope>test</scope>
+    </dependency>   
+        
   </dependencies>
   <build>
     <plugins>

@@ -2,17 +2,13 @@ package org.apache.maven.listeners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.project.builder.factories.ArtifactModelContainerFactory;
+import org.apache.maven.model.Extension;
+import org.apache.maven.model.Model;
 import org.apache.maven.project.builder.ProjectUri;
-import org.apache.maven.shared.model.DataSourceException;
-import org.apache.maven.shared.model.ModelContainer;
-import org.apache.maven.shared.model.ModelContainerFactory;
-import org.apache.maven.shared.model.ModelProperty;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
@@ -43,81 +39,17 @@ public class BuildExtensionListener
     @Requirement
     PlexusPluginManager pluginManager;
     
-    private List<BuildExtension> buildExtensions = new ArrayList<BuildExtension>();
-    
-    public void fire(List<? extends ModelContainer> modelContainers) 
-        throws DataSourceException     
-    {        
-        if ( !inBuild )
-        {
-            return;
-        }
-
-        for ( ModelContainer mc : modelContainers )
-        {
-            if ( hasExtension( mc ) )
-            {
-                buildExtensions.add( new BuildExtension( mc.getProperties() ) );
-            }
-        }
+    private List<Extension> buildExtensions = new ArrayList<Extension>();
+     
+    public void fire(Model model)
+    {
+    	buildExtensions.addAll(new ArrayList<Extension>(model.getBuild().getExtensions()));
     }
            
     public List<String> getUris()
     {
         return Arrays.asList( ProjectUri.Build.Extensions.Extension.xUri );
     }
-
-    public Collection<ModelContainerFactory> getModelContainerFactories()
-    {
-        return Arrays.asList( (ModelContainerFactory) new ArtifactModelContainerFactory() );
-    }
-
-    private static boolean hasExtension( ModelContainer container )
-    {
-        for ( ModelProperty mp : container.getProperties() )
-        {
-            if ( mp.getUri().equals( ProjectUri.Build.Extensions.Extension.xUri ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static class BuildExtension
-    {
-        private String groupId;
-
-        private String artifactId;
-
-        private String version;
-        
-        public BuildExtension( String groupId, String artifactId, String version )
-        {
-            this.groupId = groupId;
-            this.artifactId = artifactId;
-            this.version = version;
-        }
-
-        BuildExtension( List<ModelProperty> modelProperties )
-        {
-            for ( ModelProperty mp : modelProperties )
-            {
-                if ( mp.getUri().equals( ProjectUri.Build.Extensions.Extension.groupId ) )
-                {
-                    groupId = mp.getValue();
-                }
-                else if ( mp.getUri().equals( ProjectUri.Build.Extensions.Extension.artifactId ) )
-                {
-                    artifactId = mp.getValue();
-                }
-                else if ( mp.getUri().equals( ProjectUri.Build.Extensions.Extension.version ) )
-                {
-                    version = mp.getValue();
-                }
-            }
-        }
-    }   
     
     /**
      * Take the extension elements that were found during the POM construction process and now
@@ -129,11 +61,16 @@ public class BuildExtensionListener
      * @param session Maven session used as the execution context for the current Maven project.
      */
     public void processModelContainers( MavenSession session )
-    {       
-        for ( BuildExtension be : buildExtensions )
+    {    
+    	if(!inBuild)
+    	{
+    		return;
+    	}
+    	
+        for ( Extension be : buildExtensions )
         {
             PluginResolutionRequest request = new PluginResolutionRequest()
-                .setPluginMetadata( new PluginMetadata( be.groupId, be.artifactId, be.version ) )
+                .setPluginMetadata( new PluginMetadata( be.getGroupId(), be.getArtifactId(), be.getVersion() ) )
                 .addLocalRepository( session.getRequest().getLocalRepositoryPath() )
                 .setRemoteRepositories( convertToMercuryRepositories( session.getRequest().getRemoteRepositories() ) );
 

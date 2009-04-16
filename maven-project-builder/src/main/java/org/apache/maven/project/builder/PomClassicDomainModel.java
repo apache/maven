@@ -38,7 +38,7 @@ public class PomClassicDomainModel implements DomainModel
 
     private String parentGroupId = null, parentArtifactId = null, parentVersion = null, parentId = null, parentRelativePath;
     
-    private Model model;
+    protected Model model;
 
     public Model getModel() throws IOException
     {

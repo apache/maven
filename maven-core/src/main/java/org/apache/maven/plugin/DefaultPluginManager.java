@@ -73,9 +73,11 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.builder.InterpolatorProperty;
+import org.apache.maven.project.builder.ModelProperty;
 import org.apache.maven.project.builder.PomInterpolatorTag;
+import org.apache.maven.project.builder.ProcessorContext;
 import org.apache.maven.project.builder.ProjectUri;
-import org.apache.maven.project.builder.legacy.PomTransformer;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
@@ -83,10 +85,6 @@ import org.apache.maven.realm.RealmScanningUtils;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
-import org.apache.maven.shared.model.InterpolatorProperty;
-import org.apache.maven.shared.model.ModelMarshaller;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.ModelTransformerContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -1531,13 +1529,13 @@ public class DefaultPluginManager
     private static String interpolateXmlString( String xml, List<InterpolatorProperty> interpolatorProperties )
         throws IOException
     {
-        List<ModelProperty> modelProperties = ModelMarshaller.marshallXmlToModelProperties( new ByteArrayInputStream( xml.getBytes() ), ProjectUri.baseUri, PomTransformer.URIS );
+        List<ModelProperty> modelProperties = ProcessorContext.marshallXmlToModelProperties( new ByteArrayInputStream( xml.getBytes() ), ProjectUri.baseUri, ProcessorContext.URIS );
 
         Map<String, String> aliases = new HashMap<String, String>();
         aliases.put( "project.", "pom." );
 
         List<InterpolatorProperty> ips = new ArrayList<InterpolatorProperty>( interpolatorProperties );
-        ips.addAll( ModelTransformerContext.createInterpolatorProperties( modelProperties, ProjectUri.baseUri, aliases, PomInterpolatorTag.PROJECT_PROPERTIES.name(), false, false ) );
+        ips.addAll( ProcessorContext.createInterpolatorProperties( modelProperties, ProjectUri.baseUri, aliases, PomInterpolatorTag.PROJECT_PROPERTIES.name()) );
 
         for ( ModelProperty mp : modelProperties )
         {
@@ -1548,8 +1546,8 @@ public class DefaultPluginManager
             }
         }
 
-        ModelTransformerContext.interpolateModelProperties( modelProperties, ips );
-        return ModelMarshaller.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
+        ProcessorContext.interpolateModelProperties( modelProperties, ips );
+        return ProcessorContext.unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
     }
 
     // Plugin Prefix Loader

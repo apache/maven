@@ -20,26 +20,18 @@ package org.apache.maven.project.harness;
  */
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.builder.legacy.PomClassicDomainModel;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.model.ModelProperty;
-import org.codehaus.plexus.util.WriterFactory;
+import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomTestWrapper
 {
-
     private PomClassicDomainModel domainModel;
 
     private File pomFile;
@@ -125,7 +117,7 @@ public class PomTestWrapper
         {
             try
             {
-                domainModel = convertToDomainModel( mavenProject.getModel() );
+                domainModel = new PomClassicDomainModel( mavenProject.getModel() );
                 int lineageCount = 1;
                 for ( MavenProject parent = mavenProject.getParent(); parent != null; parent = parent.getParent() )
                 {
@@ -142,30 +134,6 @@ public class PomTestWrapper
         return this.domainModel;
     }
 
-    private PomClassicDomainModel convertToDomainModel(Model model) throws IOException
-    {
-                if ( model == null )
-        {
-            throw new IllegalArgumentException( "model: null" );
-        }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer out = null;
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        try
-        {
-            out = WriterFactory.newXmlWriter( baos );
-            writer.write( out, model );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                out.close();
-            }
-        }
-        return new PomClassicDomainModel(new ByteArrayInputStream(baos.toByteArray()));
-    }
-
     public File getBasedir()
     {
         return ( pomFile != null ) ? pomFile.getParentFile() : null;
@@ -175,20 +143,6 @@ public class PomTestWrapper
     {
         context.setValue( expression, value );
     }
-
-    /*
-    public int containerCountForUri( String uri )
-        throws IOException
-    {
-        if ( uri == null || uri.trim().equals( "" ) )
-        {
-            throw new IllegalArgumentException( "uri: null or empty" );
-        }
-        ModelDataSource source = new DefaultModelDataSource();
-        source.init( domainModel.getModelProperties(), null );
-        return source.queryFor( uri ).size();
-    }
-	*/
 
 	public Iterator<?> getIteratorForXPathExpression( String expression )
     {
@@ -216,107 +170,4 @@ public class PomTestWrapper
     {
         return context.getValue( expression ) != null && context.getValue( expression ).equals( value );
     }
-
-    public Map<String, String> asMap( boolean withResolvedValues )
-        throws IOException
-    {
-        Map<String, String> map = new HashMap<String, String>();
-        for ( ModelProperty mp : domainModel.getModelProperties() )
-        {
-            if ( withResolvedValues )
-            {
-                map.put( mp.getUri(), mp.getResolvedValue() );
-            }
-            else
-            {
-                map.put( mp.getUri(), mp.getValue() );
-            }
-
-        }
-        return map;
-    }
-
-    public boolean containsModelProperty( ModelProperty modelProperty )
-        throws IOException
-    {
-        return domainModel.getModelProperties().contains( modelProperty );
-    }
-
-    public boolean containsAllModelPropertiesOf( List<ModelProperty> modelProperties )
-        throws IOException
-    {
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( !containsModelProperty( mp ) )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean matchModelProperties( List<ModelProperty> hasProperties, List<ModelProperty> doesNotHaveProperties )
-        throws IOException
-    {
-        return containsAllModelPropertiesOf( hasProperties ) && containNoModelPropertiesOf( doesNotHaveProperties );
-    }
-
-    public boolean matchUris( List<String> hasAllUris, List<String> doesNotHaveUris )
-        throws IOException
-    {
-        return hasAllUris( hasAllUris ) && hasNoUris( doesNotHaveUris );
-    }
-
-    public boolean containNoModelPropertiesOf( List<ModelProperty> modelProperties )
-        throws IOException
-    {
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( containsModelProperty( mp ) )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean hasUri( String uri )
-        throws IOException
-    {
-        for ( ModelProperty mp : domainModel.getModelProperties() )
-        {
-            if ( mp.getValue().equals( uri ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasAllUris( List<String> uris )
-        throws IOException
-    {
-        for ( String s : uris )
-        {
-            if ( !hasUri( s ) )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean hasNoUris( List<String> uris )
-        throws IOException
-    {
-        for ( String s : uris )
-        {
-            if ( hasUri( s ) )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
 }

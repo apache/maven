@@ -21,7 +21,6 @@ package org.apache.maven.mercury;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,14 +29,11 @@ import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.builder.api.DependencyProcessorException;
 import org.apache.maven.mercury.builder.api.MetadataReader;
 import org.apache.maven.mercury.builder.api.MetadataReaderException;
+import org.apache.maven.project.builder.DomainModel;
+import org.apache.maven.project.builder.InterpolatorProperty;
+import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.project.builder.ProjectUri;
-import org.apache.maven.project.builder.legacy.PomTransformer;
-import org.apache.maven.shared.model.DomainModel;
-import org.apache.maven.shared.model.InterpolatorProperty;
-import org.apache.maven.shared.model.ModelContainer;
-import org.apache.maven.shared.model.ModelProperty;
-import org.apache.maven.shared.model.ModelTransformerContext;
+import org.apache.maven.project.builder.ProcessorContext;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -52,6 +48,7 @@ import org.codehaus.plexus.component.annotations.Component;
 public class MavenDependencyProcessor
     implements DependencyProcessor
 {
+    
 	/**
 	 * Over-ride this method to change how dependencies are obtained
 	 */
@@ -88,14 +85,14 @@ public class MavenDependencyProcessor
             MavenDomainModel domainModel = new MavenDomainModel( superBytes );
             domainModel.setMostSpecialized(true);
             domainModels.add( domainModel );
-
+/*TODO: Profiles
             Collection<ModelContainer> activeProfiles = domainModel.getActiveProfileContainers( interpolatorProperties );
 
             for ( ModelContainer mc : activeProfiles )
             {
                 domainModels.add( new MavenDomainModel( transformProfiles( mc.getProperties() ) ) );
             }
-
+*/
             List<DomainModel> parentModels = getParentsOfDomainModel( domainModel, mdReader );
 
             if ( parentModels == null )
@@ -110,21 +107,13 @@ public class MavenDependencyProcessor
             throw new MetadataReaderException( "Failed to create domain model. Message = " + e.getMessage(), e );
         }
 
-        PomTransformer transformer = new PomTransformer( new MavenDomainModelFactory() );
-        ModelTransformerContext ctx =
-            new ModelTransformerContext( PomTransformer.MODEL_CONTAINER_INFOS );
+        try {
+			return new MavenDomainModel(ProcessorContext.interpolateDomainModel(ProcessorContext.build(domainModels, null), 
+					interpolatorProperties)).getDependencyMetadata();
+		} catch (IOException e) {
+			throw new DependencyProcessorException();
+		}
 
-        try
-        {
-            MavenDomainModel model =
-                ( (MavenDomainModel) ctx.transform( domainModels, transformer, transformer, null,
-                                                    interpolatorProperties, null ) );
-            return model.getDependencyMetadata();
-        }
-        catch ( IOException e )
-        {
-            throw new MetadataReaderException( "Unable to transform model", e );
-        }
     }
     
     protected final List<InterpolatorProperty> createInterpolatorProperties(Map system, Map user)
@@ -164,21 +153,5 @@ public class MavenDependencyProcessor
             domainModels.addAll( getParentsOfDomainModel( parentDomainModel, mdReader ) );
         }
         return domainModels;
-    }
-
-    private static List<ModelProperty> transformProfiles( List<ModelProperty> modelProperties )
-    {
-        List<ModelProperty> properties = new ArrayList<ModelProperty>();
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( mp.getUri().startsWith( ProjectUri.Profiles.Profile.xUri )
-                && !mp.getUri().equals( ProjectUri.Profiles.Profile.id )
-                && !mp.getUri().startsWith( ProjectUri.Profiles.Profile.Activation.xUri ) )
-            {
-                properties.add( new ModelProperty( mp.getUri().replace( ProjectUri.Profiles.Profile.xUri,
-                                                                        ProjectUri.xUri ), mp.getResolvedValue() ) );
-            }
-        }
-        return properties;
     }
 }

@@ -15,12 +15,9 @@ package org.apache.maven.project;
  * the License.
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +45,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.DomainModel;
 import org.apache.maven.project.builder.InterpolatorProperty;
-import org.apache.maven.project.builder.ModelProperty;
+import org.apache.maven.project.builder.ModelEventListener;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProcessorContext;
@@ -56,7 +53,6 @@ import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
-import org.apache.maven.shared.model.ModelEventListener;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -513,7 +509,7 @@ public class DefaultMavenProjectBuilder
             	}                
             }
 
-            PomClassicDomainModel transformedDomainModel = ProcessorContext.build( profileModels, null );
+            PomClassicDomainModel transformedDomainModel = ProcessorContext.build(profileModels, listeners);
 
             // Lineage count is inclusive to add the POM read in itself.
             transformedDomainModel.setLineageCount( lineageCount + 1 );
