@@ -27,7 +27,6 @@ import java.util.Properties;
 
 public class ProfileActivationContext
 {
-
     private boolean isCustomActivatorFailureSuppressed;
 
     private final Properties executionProperties;

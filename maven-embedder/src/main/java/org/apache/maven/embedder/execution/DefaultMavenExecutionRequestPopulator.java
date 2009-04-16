@@ -526,7 +526,7 @@ public class DefaultMavenExecutionRequestPopulator
         activationContext.setExplicitlyActiveProfileIds( request.getActiveProfiles() );
         activationContext.setExplicitlyInactiveProfileIds( request.getInactiveProfiles() );
 
-        ProfileManager globalProfileManager = new DefaultProfileManager( container, activationContext );
+        ProfileManager globalProfileManager = new DefaultProfileManager( activationContext );
 
         request.setProfileManager( globalProfileManager );
         request.setProfileActivationContext( activationContext );

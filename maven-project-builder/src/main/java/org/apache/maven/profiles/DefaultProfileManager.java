@@ -30,11 +30,8 @@ import org.apache.maven.profiles.matchers.FileMatcher;
 import org.apache.maven.profiles.matchers.JdkMatcher;
 import org.apache.maven.profiles.matchers.ProfileMatcher;
 import org.apache.maven.profiles.matchers.PropertyMatcher;
-import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.builder.InterpolatorProperty;
 import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.MutablePlexusContainer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +45,6 @@ import java.util.Properties;
 public class DefaultProfileManager
     implements ProfileManager
 {
-    private MutablePlexusContainer container;
 
     private Map<String, Profile> profilesById = new LinkedHashMap<String, Profile>();
 
@@ -63,9 +59,8 @@ public class DefaultProfileManager
      * the properties passed to the profile manager are the props that
      * are passed to maven, possibly containing profile activator properties
      */
-    public DefaultProfileManager( PlexusContainer container, ProfileActivationContext profileActivationContext )
+    public DefaultProfileManager( ProfileActivationContext profileActivationContext )
     {
-        this.container = (MutablePlexusContainer) container;
         if ( profileActivationContext == null )
         {
             this.profileActivationContext = createDefaultActivationContext();
@@ -74,17 +69,6 @@ public class DefaultProfileManager
         {
             this.profileActivationContext = profileActivationContext;
         }
-    }
-
-    // TODO: Remove this, if possible. It uses system properties, which are not safe for IDE and other embedded environments.
-    /**
-     * @deprecated Using this is dangerous when extensions or non-global system properties are in play.
-     */
-    public DefaultProfileManager( PlexusContainer container )
-    {
-        this.container = (MutablePlexusContainer) container;
-
-        profileActivationContext = createDefaultActivationContext();
     }
 
     private ProfileActivationContext createDefaultActivationContext()
@@ -118,7 +102,7 @@ public class DefaultProfileManager
         Profile existing = profilesById.get( profileId );
         if ( existing != null )
         {
-            container.getLogger().warn( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource() +
+            System.out.println( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource() +
                 ") with new instance from source: " + profile.getSource() );
         }
 
@@ -196,26 +180,21 @@ public class DefaultProfileManager
         return allActive;
     }
     
-    public static List<Profile> getActiveProfilesFrom(ProjectBuilderConfiguration config, Model model, PlexusContainer container)
+    public static List<Profile> getActiveProfilesFrom(ProfileManager globalProfileManager, Properties properties, Model model)
 		throws ProfileActivationException
 	{
 	    List<Profile> projectProfiles = new ArrayList<Profile>();
-	    ProfileManager externalProfileManager = config.getGlobalProfileManager();
 	    
-	    Properties props = new Properties();
-	    props.putAll(config.getExecutionProperties());
-	    props.putAll(config.getUserProperties());
+	    ProfileActivationContext profileActivationContext = (globalProfileManager == null) ? new ProfileActivationContext( new Properties(), false ):
+	        globalProfileManager.getProfileActivationContext();
+	    profileActivationContext.getExecutionProperties().putAll(properties);
 	    
-	    ProfileActivationContext profileActivationContext = (externalProfileManager == null) ? new ProfileActivationContext( new Properties(), false ):
-	        externalProfileManager.getProfileActivationContext();
-	    profileActivationContext.getExecutionProperties().putAll(props);
-	    
-	    if(externalProfileManager != null)
+	    if(globalProfileManager != null)
 	    {           
-	    	projectProfiles.addAll( externalProfileManager.getActiveProfiles() );    
+	    	projectProfiles.addAll( globalProfileManager.getActiveProfiles() );    
 	    }
 
-	    ProfileManager profileManager = new DefaultProfileManager( container, profileActivationContext );
+	    ProfileManager profileManager = new DefaultProfileManager( profileActivationContext );
 	    profileManager.addProfiles( model.getProfiles() );
 	    projectProfiles.addAll( profileManager.getActiveProfiles() ); 
 	    return projectProfiles;

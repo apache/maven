@@ -65,7 +65,7 @@ public class PomConstructionWithSettingsTest
 	    Settings settings = readSettingsFile(settingsFile);
 	    
 	    ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
-	    ProfileManager profileManager = new DefaultProfileManager(getContainer(), pCtx);
+	    ProfileManager profileManager = new DefaultProfileManager(pCtx);
 	    
 	    for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
 	    {

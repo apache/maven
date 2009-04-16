@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Properties;
 
 import java.util.List;
 import java.util.Map;
@@ -134,9 +135,12 @@ public class DefaultMavenProjectBuilder
 		//Profiles
 
         List<Profile> projectProfiles;
+	    Properties props = new Properties();
+	    props.putAll(configuration.getExecutionProperties());
+	    props.putAll(configuration.getUserProperties());
         try
         {
-        	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration, domainModel.getModel(), container);
+        	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration.getGlobalProfileManager(), props, domainModel.getModel() );
         }
         catch ( ProfileActivationException e )
         {
@@ -239,9 +243,13 @@ public class DefaultMavenProjectBuilder
 		}
         
         List<Profile> projectProfiles;
+	    Properties props = new Properties();
+	    props.putAll(configuration.getExecutionProperties());
+	    props.putAll(configuration.getUserProperties());
+	    
         try
         {
-        	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration, domainModel.getModel(), container);
+        	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration.getGlobalProfileManager(), props, domainModel.getModel() );
         }
         catch ( ProfileActivationException e )
         {

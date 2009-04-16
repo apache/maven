@@ -20,7 +20,6 @@ package org.apache.maven.profiles.manager;
  */
 
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.DefaultProfileManager;
@@ -65,7 +64,7 @@ public class DefaultProfileManagerTest
         Properties props = new Properties();
         ProfileActivationContext ctx = new ProfileActivationContext( props, false );
 
-        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+        ProfileManager profileManager = new DefaultProfileManager( ctx );
 
         profileManager.addProfile( notActivated );
         profileManager.addProfile( defaultActivated );
@@ -104,7 +103,7 @@ public class DefaultProfileManagerTest
         Properties props = System.getProperties();
         ProfileActivationContext ctx = new ProfileActivationContext( props, false );
 
-        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+        ProfileManager profileManager = new DefaultProfileManager( ctx );
 
         profileManager.addProfile( syspropActivated );
         profileManager.addProfile( defaultActivated );
@@ -135,7 +134,7 @@ public class DefaultProfileManagerTest
         Properties props = System.getProperties();
         ProfileActivationContext ctx = new ProfileActivationContext( props, false );
 
-        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+        ProfileManager profileManager = new DefaultProfileManager( ctx );
 
         profileManager.addProfile( syspropActivated );
 
@@ -163,7 +162,7 @@ public class DefaultProfileManagerTest
         Properties props = System.getProperties();
         ProfileActivationContext ctx = new ProfileActivationContext( props, false );
 
-        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+        ProfileManager profileManager = new DefaultProfileManager( ctx );
 
         profileManager.addProfile( syspropActivated );
 
@@ -194,7 +193,7 @@ public class DefaultProfileManagerTest
         Properties props = System.getProperties();
         ProfileActivationContext ctx = new ProfileActivationContext( props, false );
 
-        ProfileManager profileManager = new DefaultProfileManager( getContainer(), ctx );
+        ProfileManager profileManager = new DefaultProfileManager( ctx );
 
         profileManager.addProfile( syspropActivated );
 

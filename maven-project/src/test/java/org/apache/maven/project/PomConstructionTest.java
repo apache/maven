@@ -1393,7 +1393,7 @@ public class PomConstructionTest
     ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
 
     config.setExecutionProperties(properties);
-    config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
+    config.setGlobalProfileManager(new DefaultProfileManager(pCtx));
     return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
 }
     
@@ -1413,7 +1413,7 @@ public class PomConstructionTest
             pCtx.setExplicitlyActiveProfileIds( Arrays.asList( profileIds ) );
         }
 
-        config.setGlobalProfileManager(new DefaultProfileManager(this.getContainer(), pCtx));
+        config.setGlobalProfileManager(new DefaultProfileManager(pCtx));
         return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
     }
 
