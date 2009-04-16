@@ -243,7 +243,7 @@ under the License.
     <module>maven-plugin-api</module>
     <module>maven-project</module>
     <module>maven-reporting-api</module>
-    <module>maven-project-builder</module>
+    <module>maven-model-builder</module>
     <module>maven-mercury</module>
     <module>maven-embedder</module>
     <module>maven-toolchain</module>
