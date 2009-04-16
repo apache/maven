@@ -40,6 +40,53 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class ProcessorContext
 {
 
+    /**
+     * Parent domain models on bottom.
+     * 
+     * @param domainModels
+     * @param listeners 
+     * @return
+     * @throws IOException
+     */
+    public static PomClassicDomainModel build( List<DomainModel> domainModels, List<ModelEventListener> listeners )
+        throws IOException
+    {  
+        PomClassicDomainModel child = null;
+        for ( DomainModel domainModel : domainModels )
+        {   
+            if(domainModel.isMostSpecialized())
+            {
+                child = (PomClassicDomainModel) domainModel;
+            }
+        }
+        if(child == null)
+        {
+            throw new IOException("Could not find child model");
+        }
+        
+        List<Processor> processors =
+            Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ), new ModuleProcessor(),
+                                       new PropertiesProcessor(), new ParentProcessor(), new OrganizationProcessor(),
+                                       new MailingListProcessor(), new IssueManagementProcessor(),
+                                       new CiManagementProcessor(), new ReportingProcessor(),
+                                       new RepositoriesProcessor(), new DistributionManagementProcessor(),
+                                       new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor(),
+                                       new ContributorsProcessor(), new DevelopersProcessor(), new ProfilesProcessor() );
+        Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors );
+        if(listeners != null)
+        {
+        	for(ModelEventListener listener : listeners)
+        	{
+        		listener.fire(target);
+        	}
+        }       
+        PomClassicDomainModel domainModel = new PomClassicDomainModel( target, child.isMostSpecialized() );
+        domainModel.setProjectDirectory(child.getProjectDirectory());
+        domainModel.setParentFile(child.getParentFile());
+
+        return domainModel;
+    }
+    
     public static PomClassicDomainModel mergeProfilesIntoModel(Collection<Profile> profiles, PomClassicDomainModel domainModel) throws IOException
     {
         List<Model> profileModels = new ArrayList<Model>();
@@ -149,53 +196,6 @@ public class ProcessorContext
         }
 
         return models;
-    }
-
-    /**
-     * Parent domain models on bottom.
-     * 
-     * @param domainModels
-     * @param listeners 
-     * @return
-     * @throws IOException
-     */
-    public static PomClassicDomainModel build( List<DomainModel> domainModels, List<ModelEventListener> listeners )
-        throws IOException
-    {  
-        PomClassicDomainModel child = null;
-        for ( DomainModel domainModel : domainModels )
-        {   
-            if(domainModel.isMostSpecialized())
-            {
-                child = (PomClassicDomainModel) domainModel;
-            }
-        }
-        if(child == null)
-        {
-            throw new IOException("Could not find child model");
-        }
-        
-        List<Processor> processors =
-            Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ), new ModuleProcessor(),
-                                       new PropertiesProcessor(), new ParentProcessor(), new OrganizationProcessor(),
-                                       new MailingListProcessor(), new IssueManagementProcessor(),
-                                       new CiManagementProcessor(), new ReportingProcessor(),
-                                       new RepositoriesProcessor(), new DistributionManagementProcessor(),
-                                       new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor(),
-                                       new ContributorsProcessor(), new DevelopersProcessor(), new ProfilesProcessor() );
-        Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors );
-        if(listeners != null)
-        {
-        	for(ModelEventListener listener : listeners)
-        	{
-        		listener.fire(target);
-        	}
-        }       
-        PomClassicDomainModel domainModel = new PomClassicDomainModel( target, child.isMostSpecialized() );
-        domainModel.setProjectDirectory(child.getProjectDirectory());
-        domainModel.setParentFile(child.getParentFile());
-
-        return domainModel;
     }
     
     private static Model processModelsForInheritance(List<Model> models, List<Processor> processors)

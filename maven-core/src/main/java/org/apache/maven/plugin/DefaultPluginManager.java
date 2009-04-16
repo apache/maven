@@ -73,11 +73,9 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.DefaultInterpolator;
+import org.apache.maven.project.builder.Interpolator;
 import org.apache.maven.project.builder.InterpolatorProperty;
-import org.apache.maven.project.builder.ModelProperty;
 import org.apache.maven.project.builder.PomInterpolatorTag;
-import org.apache.maven.project.builder.ProcessorContext;
-import org.apache.maven.project.builder.ProjectUri;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.realm.RealmManagementException;
@@ -152,6 +150,9 @@ public class DefaultPluginManager
 
     @Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;    
+    
+    @Requirement
+    protected Interpolator interpolator;        
     
     private Map pluginDefinitionsByPrefix = new HashMap();
     
@@ -511,7 +512,7 @@ public class DefaultPluginManager
                                                                                               PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
                 interpolatorProperties
                     .addAll( InterpolatorProperty.toInterpolatorProperties( session.getProjectBuilderConfiguration().getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
-                String interpolatedDom = new DefaultInterpolator().interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
+                String interpolatedDom = interpolator.interpolateXmlString( String.valueOf( dom ), interpolatorProperties );
                 dom = Xpp3DomBuilder.build( new StringReader( interpolatedDom ) );
             }
             catch ( XmlPullParserException e )

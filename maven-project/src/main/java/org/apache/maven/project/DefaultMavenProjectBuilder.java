@@ -45,6 +45,7 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.builder.DefaultInterpolator;
 import org.apache.maven.project.builder.DomainModel;
+import org.apache.maven.project.builder.Interpolator;
 import org.apache.maven.project.builder.InterpolatorProperty;
 import org.apache.maven.project.builder.ModelEventListener;
 import org.apache.maven.project.builder.PomClassicDomainModel;
@@ -83,6 +84,9 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     List<ModelEventListener> listeners;
+    
+    @Requirement
+    private Interpolator interpolator;    
     
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;    
@@ -387,20 +391,7 @@ public class DefaultMavenProjectBuilder
         
             try
             {
-            	//List<ModelProperty> mps = domainModel.getModelProperties();
-            	model = new DefaultInterpolator().interpolateDomainModel( domainModel, interpolatorProperties ).getModel();
-            	/*
-            	if ( domainModel.getProjectDirectory() != null )
-            	{
-            		mps = ProcessorContext.alignPaths( mps, domainModel.getProjectDirectory() );
-            	}
-            	File f = domainModel.getParentFile();
-            	domainModel = new PomClassicDomainModel( mps, false );
-            	domainModel.setParentFile(f);
-
-            	model = domainModel.getModel();
-            	*/
-
+            	model = interpolator.interpolateDomainModel( domainModel, interpolatorProperties ).getModel();
             }
             catch ( IOException e )
             {

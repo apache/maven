@@ -25,7 +25,9 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
+import org.codehaus.plexus.component.annotations.Component;
 
+@Component(role=Interpolator.class)
 public class DefaultInterpolator implements Interpolator {
 	
 	public String interpolateXmlString(String xml,
