@@ -3,7 +3,7 @@ package org.apache.maven.model.interpolator;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.model.PomClassicDomainModel;
 
 public interface Interpolator 
 {

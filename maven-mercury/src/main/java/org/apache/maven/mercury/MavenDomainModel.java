@@ -28,7 +28,7 @@ import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Parent;
-import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.model.PomClassicDomainModel;
 
 public final class MavenDomainModel
     extends PomClassicDomainModel

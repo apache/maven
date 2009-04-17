@@ -25,7 +25,7 @@ import java.util.Iterator;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.model.PomClassicDomainModel;
 import org.apache.maven.project.MavenProject;
 
 public class PomTestWrapper

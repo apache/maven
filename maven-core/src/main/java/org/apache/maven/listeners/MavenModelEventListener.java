@@ -1,7 +1,7 @@
 package org.apache.maven.listeners;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.project.builder.ModelEventListener;
+import org.apache.maven.model.ModelEventListener;
 
 
 public interface MavenModelEventListener
