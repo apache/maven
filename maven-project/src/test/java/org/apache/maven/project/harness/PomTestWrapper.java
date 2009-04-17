@@ -20,22 +20,13 @@ package org.apache.maven.project.harness;
  */
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.builder.ModelProperty;
 import org.apache.maven.project.builder.PomClassicDomainModel;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomTestWrapper
 {

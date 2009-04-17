@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.model.interpolator;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -25,6 +25,8 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
+import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.project.builder.ProjectUri;
 import org.codehaus.plexus.component.annotations.Component;
 
 @Component(role=Interpolator.class)

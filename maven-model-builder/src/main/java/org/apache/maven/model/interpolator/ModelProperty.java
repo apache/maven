@@ -1,4 +1,4 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.model.interpolator;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 /**
  * Maps a URI to a string value, which may be null. This class is immutable.
  */
-public final class ModelProperty
+final class ModelProperty
 {
 
     /**

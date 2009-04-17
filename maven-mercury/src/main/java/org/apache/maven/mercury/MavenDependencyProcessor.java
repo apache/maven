@@ -29,10 +29,10 @@ import org.apache.maven.mercury.builder.api.DependencyProcessor;
 import org.apache.maven.mercury.builder.api.DependencyProcessorException;
 import org.apache.maven.mercury.builder.api.MetadataReader;
 import org.apache.maven.mercury.builder.api.MetadataReaderException;
-import org.apache.maven.project.builder.DefaultInterpolator;
+import org.apache.maven.model.interpolator.DefaultInterpolator;
+import org.apache.maven.model.interpolator.InterpolatorProperty;
+import org.apache.maven.model.interpolator.PomInterpolatorTag;
 import org.apache.maven.project.builder.DomainModel;
-import org.apache.maven.project.builder.InterpolatorProperty;
-import org.apache.maven.project.builder.PomInterpolatorTag;
 import org.apache.maven.project.builder.ProcessorContext;
 import org.codehaus.plexus.component.annotations.Component;
 

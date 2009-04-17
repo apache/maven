@@ -22,6 +22,8 @@ package org.apache.maven.profiles;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.interpolator.InterpolatorProperty;
+import org.apache.maven.model.interpolator.PomInterpolatorTag;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
@@ -30,8 +32,6 @@ import org.apache.maven.profiles.matchers.FileMatcher;
 import org.apache.maven.profiles.matchers.JdkMatcher;
 import org.apache.maven.profiles.matchers.ProfileMatcher;
 import org.apache.maven.profiles.matchers.PropertyMatcher;
-import org.apache.maven.project.builder.InterpolatorProperty;
-import org.apache.maven.project.builder.PomInterpolatorTag;
 
 import java.util.ArrayList;
 import java.util.Arrays;

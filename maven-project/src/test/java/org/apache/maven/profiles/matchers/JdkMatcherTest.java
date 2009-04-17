@@ -4,7 +4,7 @@ import java.util.Collections;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
-import org.apache.maven.project.builder.InterpolatorProperty;
+import org.apache.maven.model.interpolator.InterpolatorProperty;
 
 import junit.framework.TestCase;
 

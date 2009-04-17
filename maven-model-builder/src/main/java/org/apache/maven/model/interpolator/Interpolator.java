@@ -1,7 +1,9 @@
-package org.apache.maven.project.builder;
+package org.apache.maven.model.interpolator;
 
 import java.io.IOException;
 import java.util.List;
+
+import org.apache.maven.project.builder.PomClassicDomainModel;
 
 public interface Interpolator 
 {

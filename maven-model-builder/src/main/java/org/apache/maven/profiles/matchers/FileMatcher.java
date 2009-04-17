@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
-import org.apache.maven.project.builder.InterpolatorProperty;
+import org.apache.maven.model.interpolator.InterpolatorProperty;
 
 public class FileMatcher implements ProfileMatcher {
 
