@@ -11,14 +11,18 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+
   <artifactId>maven-core</artifactId>
+
   <name>Maven Core</name>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -110,24 +114,24 @@
       <artifactId>plexus-sec-dispatcher</artifactId>
     </dependency>
     <dependency>
-    	<groupId>commons-jxpath</groupId>
-    	<artifactId>commons-jxpath</artifactId>
+      <groupId>commons-jxpath</groupId>
+      <artifactId>commons-jxpath</artifactId>
     </dependency>
-    
+
     <dependency>
-    	<groupId>org.apache.maven.mercury</groupId>
-    	<artifactId>mercury-repo-remote-m2</artifactId>
-    	<version>${mercuryVersion}</version>
-    	<scope>test</scope>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-repo-remote-m2</artifactId>
+      <version>${mercuryVersion}</version>
+      <scope>test</scope>
     </dependency>
-     <dependency>
-    	<groupId>org.apache.maven.mercury</groupId>
-    	<artifactId>mercury-transport-http</artifactId>
-    	<version>${mercuryVersion}</version>
-    	<scope>test</scope>
-    </dependency>   
-        
+    <dependency>
+      <groupId>org.apache.maven.mercury</groupId>
+      <artifactId>mercury-transport-http</artifactId>
+      <version>${mercuryVersion}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
