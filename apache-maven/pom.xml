@@ -21,12 +21,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
     <version>2.1.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-maven</artifactId>
+
   <name>Maven Distribution</name>
 
   <build>

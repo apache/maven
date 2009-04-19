@@ -18,15 +18,26 @@ specific language governing permissions and limitations
 under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
     <version>2.1.1-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+
   <artifactId>maven-model</artifactId>
+
   <name>Maven Model</name>
   <description>Maven Model</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -48,6 +59,7 @@ under the License.
       </plugin>
     </plugins>
   </build>
+
   <profiles>
     <profile>
       <id>all-models</id>
@@ -90,10 +102,4 @@ under the License.
       </build>
     </profile>
   </profiles>
-  <dependencies>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
-  </dependencies>
 </project>

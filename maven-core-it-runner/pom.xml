@@ -23,6 +23,7 @@ under the License.
   <groupId>org.apache.maven</groupId>
   <version>2.1.1-SNAPSHOT</version>
   <artifactId>maven-core-it-runner</artifactId>
+
   <name>Integration Test Executor</name>
 
   <scm>
@@ -60,6 +61,7 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -102,6 +104,7 @@ under the License.
       </plugin>
     </plugins>
   </build>
+
   <profiles>
     <profile>
       <id>no-local-repo-defined</id>

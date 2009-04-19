@@ -18,28 +18,18 @@ specific language governing permissions and limitations
 under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
     <version>2.1.1-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+
   <artifactId>maven-plugin-descriptor</artifactId>
+
   <name>Maven Plugin Descriptor Model</name>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <configuration>
-          <models>
-            <model>src/main/mdo/lifecycle.mdo</model>
-          </models>
-          <version>1.0.0</version>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -54,4 +44,19 @@ under the License.
       <artifactId>plexus-container-default</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <models>
+            <model>src/main/mdo/lifecycle.mdo</model>
+          </models>
+          <version>1.0.0</version>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
