@@ -282,6 +282,7 @@ public class DefaultMaven
                 if ( isRoot )
                 {
                     project.setExecutionRoot( true );
+                    request.getProjectBuildingConfiguration().setTopLevelProjectForReactor(project);
                 }
 
                 if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )

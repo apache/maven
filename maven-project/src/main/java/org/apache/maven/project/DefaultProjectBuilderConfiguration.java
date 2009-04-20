@@ -44,6 +44,18 @@ public class DefaultProjectBuilderConfiguration
     private Date buildStartTime;
 
     private List<ModelEventListener> listeners;
+    
+    private MavenProject topProject;
+    
+    public MavenProject getTopLevelProjectFromReactor()
+    {
+    	return topProject;
+    }
+    
+    public void setTopLevelProjectForReactor(MavenProject mavenProject)
+    {
+    	this.topProject = mavenProject;
+    }
         
     public ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager )
     {

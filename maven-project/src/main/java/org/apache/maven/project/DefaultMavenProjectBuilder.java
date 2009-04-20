@@ -42,7 +42,6 @@ import org.apache.maven.model.ModelEventListener;
 import org.apache.maven.model.PomClassicDomainModel;
 import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.interpolator.DefaultInterpolator;
 import org.apache.maven.model.interpolator.Interpolator;
 import org.apache.maven.model.interpolator.InterpolatorProperty;
 import org.apache.maven.model.interpolator.PomInterpolatorTag;
@@ -79,9 +78,6 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     private RepositorySystem repositorySystem;
-
-    @Requirement
-    private PlexusContainer container;
 
     @Requirement
     List<ModelEventListener> listeners;
@@ -460,9 +456,14 @@ public class DefaultMavenProjectBuilder
             if ( domainModel.getParentId() != null )
             {
             	List<DomainModel> mavenParents;
-            	if ( isParentLocal( domainModel.getRelativePathOfParent(), pomFile.getParentFile() ) )
+            	MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
+            	if(useTopLevelProjectForParent(domainModel, topProject) )
             	{
-            		mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, pomFile.getParentFile() );
+            		mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, topProject.getFile(), projectBuilderConfiguration );
+            	}
+            	else if ( isParentLocal( domainModel.getRelativePathOfParent(), pomFile.getParentFile() ) )
+            	{
+            		mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, pomFile.getParentFile(), projectBuilderConfiguration );
             	}
             	else
             	{
@@ -513,10 +514,22 @@ public class DefaultMavenProjectBuilder
 
             // Lineage count is inclusive to add the POM read in itself.
             transformedDomainModel.setLineageCount( lineageCount + 1 );
-            Model m = transformedDomainModel.getModel();
             transformedDomainModel.setParentFile( parentFile );
 
             return transformedDomainModel;
+    }
+    
+    private static boolean useTopLevelProjectForParent(PomClassicDomainModel currentModel, MavenProject topProject) throws IOException
+    {
+    	if(topProject == null || currentModel.getModel().getParent() == null)
+    	{
+    		return false;
+    	}
+
+    	return topProject.getGroupId().equals(currentModel.getParentGroupId()) 
+    	&& topProject.getArtifactId().equals(currentModel.getParentArtifactId()) 
+    	&& topProject.getVersion().equals(currentModel.getParentVersion());
+    	
     }
 
     private void validateModel( Model model, File pomFile )
@@ -646,7 +659,7 @@ public class DefaultMavenProjectBuilder
      * @throws IOException
      */
     private List<DomainModel> getDomainModelParentsFromLocalPath( PomClassicDomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                                                  File projectDirectory )
+                                                                  File projectDirectory, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
@@ -663,14 +676,22 @@ public class DefaultMavenProjectBuilder
         {
             parentFile = new File( parentFile.getAbsolutePath(), "pom.xml" );
         }
-
-        if ( !parentFile.isFile() )
+    	MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
+    	boolean isTop = useTopLevelProjectForParent(domainModel, topProject);
+    	PomClassicDomainModel parentDomainModel = null;
+        if ( !isTop  )
         {
-            throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );
+        	if(!parentFile.isFile())
+        	{
+        		throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );	
+        	}     
+        	parentDomainModel = new PomClassicDomainModel( parentFile );
+        	parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
         }
-
-        PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( parentFile );
-        parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
+        else
+        {
+        	parentDomainModel = new PomClassicDomainModel(projectBuilderConfiguration.getTopLevelProjectFromReactor().getFile());
+        }
 
         if ( !parentDomainModel.matchesParentOf( domainModel ) )
         {
@@ -691,9 +712,20 @@ public class DefaultMavenProjectBuilder
         domainModels.add( parentDomainModel );
         if ( domainModel.getParentId() != null )
         {
-            if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
+        	if(isTop)
+        	{
+        		 if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
+                 {
+        			 domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, topProject.getFile(), projectBuilderConfiguration ) );
+                 }
+                 else
+                 {
+                     domainModels.addAll( getDomainModelParentsFromRepository( parentDomainModel, localRepository, remoteRepositories ) );
+                 }       		
+        	}
+        	else if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
             {
-                domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, parentFile.getParentFile() ) );
+                domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, parentFile.getParentFile(), projectBuilderConfiguration ) );
             }
             else
             {
