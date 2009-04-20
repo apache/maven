@@ -11,16 +11,13 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
+    <groupId>org.apache.maven</groupId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>maven-mercury</artifactId>
-
   <name>Maven Mercury</name>
 
   <dependencies>
@@ -103,14 +100,14 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-          <executions>
-            <execution>
-              <goals>
-                <goal>generate-metadata</goal>
-                <goal>generate-test-metadata</goal>
-              </goals>
-            </execution>
-          </executions>
+          <executions>                                                                                                          
+            <execution>                                                                                                         
+              <goals>                                                                                                           
+                <goal>generate-metadata</goal>                                                                                  
+                <goal>generate-test-metadata</goal>                                                                             
+              </goals>                                                                                                          
+            </execution>                                                                                                        
+          </executions>                                                                                                         
       </plugin>
     </plugins>
   </build>
