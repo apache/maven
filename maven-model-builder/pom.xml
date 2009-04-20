@@ -11,16 +11,19 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
+
   <artifactId>maven-model-builder</artifactId>
   <version>3.0-SNAPSHOT</version>
+
   <name>Maven Model Builder</name>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -29,11 +32,11 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
       <artifactId>wstx-asl</artifactId>
@@ -41,7 +44,7 @@
     <dependency>
       <groupId>stax</groupId>
       <artifactId>stax-api</artifactId>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -49,13 +52,14 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-     </plugin>
-  </plugins>
+      </plugin>
+    </plugins>
   </build>
 
 </project>

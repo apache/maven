@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
   <!--
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements. See the NOTICE file distributed with
@@ -13,15 +14,20 @@
     License for the specific language governing permissions and
     limitations under the License.
   -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
+
   <artifactId>apache-maven</artifactId>
+
   <name>Maven Distribution</name>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -82,6 +88,7 @@
       <version>${mercuryVersion}</version>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -97,6 +104,7 @@
       </plugin>
     </plugins>
   </build>
+
   <profiles>
      <profile>
       <id>standard</id>
