@@ -71,9 +71,9 @@ END SNIPPET: ant-bootstrap -->
     <property name="maven.repo.update.policy" value="always"/>
 -->
     <property name="maven.repo.update.policy" value="daily"/>
-    
+
     <property name="maven.repo.system" value="don.t"/>
-    
+
     <condition property="do.not.clean.local.repo">
       <not>
         <isset property="clean.local.repo"/>
@@ -110,13 +110,13 @@ END SNIPPET: ant-bootstrap -->
       <replacefilter token='@Component( role = RepositorySystem.class, hint = "default" )'
                      value='@Component( role = RepositorySystem.class, hint = "${mercury-hint}" )'/>
     </replace>
-    
+
     <echo>maven.repo.system is ${maven.repo.system}, flip: legacy-hint=${legacy-hint}, mercury-hint=${mercury-hint}</echo>
 
   </target>
 
   <target name="flip-default-repository-system" description="flips repository system impl">
-  	
+
     <condition property="legacy-hint" value="default">
       <equals arg1="${maven.repo.system}" arg2="legacy"/>
     </condition>
@@ -130,11 +130,11 @@ END SNIPPET: ant-bootstrap -->
     <condition property="mercury-hint" value="default">
       <equals arg1="${maven.repo.system}" arg2="mercury"/>
     </condition>
-    
+
     <condition property="do.not.flip.repository" value="default">
       <equals arg1="${maven.repo.system}" arg2="don.t"/>
     </condition>
-  	
+
   	<antcall target="flip-default-repository"/>
 
   </target>
@@ -143,8 +143,8 @@ END SNIPPET: ant-bootstrap -->
     <property name="verbose" value="false"/>
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-start-comment--&gt;" value="&lt;!--"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-end-comment--&gt;" value="--&gt;"/>
 
     <mercury:local-repository location="${maven.repo.local}"/>
     <mercury:remote-repository id="central" location="${maven.repo.central}" updatePolicy="${maven.repo.update.policy}"/>
