@@ -31,7 +31,7 @@ import java.util.List;
 public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {
-    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) )

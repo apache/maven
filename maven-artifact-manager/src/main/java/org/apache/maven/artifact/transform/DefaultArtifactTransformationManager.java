@@ -28,32 +28,30 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class DefaultArtifactTransformationManager
     implements ArtifactTransformationManager, Initializable
 {
-    private List artifactTransformations;
+    private List<ArtifactTransformation> artifactTransformations;
     
 	public void initialize() throws InitializationException {
 		// TODO this is a hack until plexus can fix the ordering of the arrays
-		Object obj[] = artifactTransformations.toArray();
-		for (int x = 0; x < obj.length; x++)
+		ArtifactTransformation transforms[] = artifactTransformations.toArray( new ArtifactTransformation[]{} );
+		for (int x = 0; x < transforms.length; x++)
 		{
-			if (obj[x].getClass().getName().indexOf("Snapshot") != -1) {
-				artifactTransformations.remove(obj[x]);
-				artifactTransformations.add(obj[x]);
+			if (transforms[x].getClass().getName().indexOf("Snapshot") != -1) {
+				artifactTransformations.remove(transforms[x]);
+				artifactTransformations.add(transforms[x]);
 			}
 		}
 	}
     
-    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
+        for ( ArtifactTransformation transform : artifactTransformations )
         {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
             transform.transformForResolve( artifact, remoteRepositories, localRepository );
         }
     }
@@ -61,9 +59,8 @@ public class DefaultArtifactTransformationManager
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
+        for ( ArtifactTransformation transform : artifactTransformations )
         {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
             transform.transformForInstall( artifact, localRepository );
         }
     }
@@ -72,9 +69,8 @@ public class DefaultArtifactTransformationManager
                                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
+        for ( ArtifactTransformation transform : artifactTransformations )
         {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
             transform.transformForDeployment( artifact, remoteRepository, localRepository );
         }
     }

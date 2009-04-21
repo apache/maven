@@ -43,7 +43,7 @@ public interface ArtifactTransformationManager
      * @param remoteRepositories the repositories to check
      * @param localRepository the local repository
      */
-    void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
