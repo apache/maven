@@ -544,7 +544,7 @@ public class DefaultMavenProjectBuilder
         {
             for ( String s : (List<String>) validationResult.getMessages() )
             {
-                logger.debug( s );
+                logger.info( s );
             }
             throw new InvalidProjectModelException( projectId, "Failed to validate POM", pomFile, validationResult );
         }

@@ -74,7 +74,6 @@ public class PluginProcessor
             copy( (Plugin) parent, targetPlugin, false );
             copyDependencies( new ArrayList<Dependency>(( (Plugin) parent).getDependencies() ), new ArrayList<Dependency>(), 
                       targetPlugin, true );            
-           // copyDependencies( (Plugin) parent, targetPlugin, false );
             if(isAdd) t.add( targetPlugin );
         }
         else
@@ -111,6 +110,28 @@ public class PluginProcessor
             }  
         }       
     }
+ 
+    public void process( Plugin parent,  List<Plugin> t, boolean isChildMostSpecialized )
+    {
+        if (parent == null) {
+			return;
+		}
+
+		boolean isAdd = true;
+		Plugin targetPlugin = find((Plugin) parent, t);
+		if (targetPlugin == null) {
+			targetPlugin = new Plugin();
+		} else {
+			isAdd = false;
+		}
+
+		copy2((Plugin) parent, targetPlugin, false);
+		copyDependencies(new ArrayList<Dependency>(((Plugin) parent)
+				.getDependencies()), new ArrayList<Dependency>(), targetPlugin,
+				true);
+		if (isAdd)
+			t.add(targetPlugin);
+    }    
     
     private static Plugin find(Plugin p1, List<Plugin> plugins)
     {
@@ -132,9 +153,9 @@ public class PluginProcessor
     private static String getId( Plugin d )
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( d.getGroupId() ).append( ":" ).append( d.getArtifactId() ).append( ":" );
+        sb.append( (d.getGroupId() != null) ? d.getGroupId() : "org.apache.maven.plugins").append( ":" ).append( d.getArtifactId() ).append( ":" );
         return sb.toString();
-    }    
+    }      
     
     
     private static void copyDependencies(List<Dependency> parent, List<Dependency> child, Plugin target, boolean isChild)
@@ -146,7 +167,76 @@ public class PluginProcessor
         DependenciesProcessor proc = new DependenciesProcessor();
         proc.process( parent, child, target.getDependencies(), isChild );            
     }
-    
+ 
+    /**
+     * Don't overwrite values
+     * 
+     * @param source
+     * @param target
+     * @param isChild
+     */
+    private static void copy2(Plugin source, Plugin target, boolean isChild)
+    {
+        if(!isChild && source.getInherited() != null && !source.getInherited().equalsIgnoreCase( "true" ))
+        {
+            return;
+        }
+        
+        if(target.getArtifactId() == null)
+        {
+            target.setArtifactId( source.getArtifactId() );   
+        }
+        
+        if(target.getGroupId() == null)
+        {
+            target.setGroupId( source.getGroupId() );           	
+        }
+        
+        if(target.getInherited() == null)
+        {
+            target.setInherited( source.getInherited() );    
+        }
+        
+        if(target.getVersion() == null)
+        {
+            target.setVersion( source.getVersion() );    
+        }
+               
+        for( PluginExecution pe : source.getExecutions())
+        {
+            PluginExecution idMatch = contains(pe, target.getExecutions());
+            if(idMatch != null)//Join
+            {
+               copyPluginExecution(pe, idMatch, isChild);    
+            }
+            else 
+            {
+                PluginExecution targetPe = new PluginExecution();
+                copyPluginExecution(pe, targetPe, isChild); 
+                target.addExecution( targetPe );
+            }
+            
+        }
+        
+        if(source.getConfiguration() != null)
+        {
+            //TODO: Not copying
+            if(target.getConfiguration() != null)
+            {
+                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() )); 
+            }
+            else
+            {
+                target.setConfiguration( source.getConfiguration() );
+            }
+                
+        }
+       
+       // p2.setConfiguration( configuration ) merge nodes
+        //Goals
+        target.setExtensions(source.isExtensions()); 
+        
+    }    
     
     private static void copy(Plugin source, Plugin target, boolean isChild)
     {

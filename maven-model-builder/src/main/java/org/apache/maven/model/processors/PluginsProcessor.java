@@ -22,8 +22,6 @@ package org.apache.maven.model.processors;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 
 public class PluginsProcessor
@@ -56,26 +54,33 @@ public class PluginsProcessor
             if ( !c.isEmpty() )
             {
                 List<Plugin> parentDependencies = new ArrayList<Plugin>();
-                for ( Plugin d1 : c)
+                for ( Plugin childPlugin : c)
                 {
-                    for ( Plugin d2 : p)
+                    for ( Plugin parentPlugin : p)
                     {
-                        if ( match( d1, d2 ) )
+                        if ( match( childPlugin, parentPlugin ) )
                         {
-                            processor.process( d2, d1, plugins, isChildMostSpecialized );// JOIN
+                            processor.process( parentPlugin, childPlugin, plugins, isChildMostSpecialized );// JOIN
                         }
                         else
                         {
-                            processor.process( null, d1, plugins, isChildMostSpecialized );
-                            parentDependencies.add( d2 );
+                            processor.process( null, childPlugin, plugins, isChildMostSpecialized );
+                            if(!parentDependencies.contains(parentPlugin))
+                            	{
+                            	parentDependencies.add( parentPlugin );
+                            }
                         }
                     }
                 }
-
+                
+                /**
+                 * Process Parents after child to keep plugin order but don't want to overwrite the child values. Use different method
+                 */
                 for ( Plugin d2 : parentDependencies )
                 {
-                    processor.process( d2, null, plugins, isChildMostSpecialized );
+                    processor.process( d2, plugins, isChildMostSpecialized );
                 }
+                
             }
             else if( p != null)
             {
@@ -96,7 +101,7 @@ public class PluginsProcessor
     private static String getId( Plugin d )
     {
         StringBuilder sb = new StringBuilder();
-        sb.append( d.getGroupId() ).append( ":" ).append( d.getArtifactId() ).append( ":" );
+        sb.append( (d.getGroupId() != null) ? d.getGroupId() : "org.apache.maven.plugins").append( ":" ).append( d.getArtifactId() ).append( ":" );
         return sb.toString();
     }    
 }

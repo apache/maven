@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1368,6 +1367,35 @@ public class PomConstructionTest
                       pom.getValue( "distributionManagement/site/url" ) );
     }    
 
+    public void testPluginManagementInheritance()
+        throws Exception
+    {
+        PomTestWrapper pom = this.buildPom( "plugin-management-inheritance");
+        assertEquals("0.1-stub-SNAPSHOT", pom.getValue( "build/pluginManagement/plugins[1]/version" ) );
+    }   
+    
+    public void testProfilePlugins()
+	    throws Exception
+	{
+	    PomTestWrapper pom = this.buildPom( "profile-plugins", "standard");
+	    assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
+	    assertEquals("maven-assembly2-plugin", pom.getValue( "build/plugins[2]/artifactId" ) );	    
+	}       
+    
+    public void testPluginInheritanceSimple()
+	    throws Exception
+	{
+	    PomTestWrapper pom = this.buildPom( "plugin-inheritance-simple/sub");
+	    assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );   
+	} 
+    
+    public void testPluginManagementDuplicate()
+	    throws Exception
+	{
+	    PomTestWrapper pom = this.buildPom( "plugin-management-duplicate/sub");
+	    assertEquals( 20, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );   
+	} 
+    
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
@@ -1381,21 +1409,21 @@ public class PomConstructionTest
     }
     
     private PomTestWrapper buildPom( String pomPath, Properties properties)
-    throws Exception
-{
-    File pomFile = new File( testDirectory , pomPath );
-    if ( pomFile.isDirectory() )
-    {
-        pomFile = new File( pomFile, "pom.xml" );
-    }
-    ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
-    config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
-    ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
-
-    config.setExecutionProperties(properties);
-    config.setGlobalProfileManager(new DefaultProfileManager(pCtx));
-    return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
-}
+	    throws Exception
+	{
+	    File pomFile = new File( testDirectory , pomPath );
+	    if ( pomFile.isDirectory() )
+	    {
+	        pomFile = new File( pomFile, "pom.xml" );
+	    }
+	    ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+	    config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
+	    ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
+	
+	    config.setExecutionProperties(properties);
+	    config.setGlobalProfileManager(new DefaultProfileManager(pCtx));
+	    return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
+	}
     
     private PomTestWrapper buildPom( String pomPath, String... profileIds )
         throws Exception
