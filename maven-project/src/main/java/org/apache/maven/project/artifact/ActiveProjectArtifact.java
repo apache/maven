@@ -151,7 +151,7 @@ public class ActiveProjectArtifact
     }
 
     /** {@inheritDoc} */
-    public Collection getMetadataList()
+    public Collection<ArtifactMetadata> getMetadataList()
     {
         return artifact.getMetadataList();
     }
@@ -205,13 +205,13 @@ public class ActiveProjectArtifact
     }
 
     /** {@inheritDoc} */
-    public List getDependencyTrail()
+    public List<String> getDependencyTrail()
     {
         return artifact.getDependencyTrail();
     }
 
     /** {@inheritDoc} */
-    public void setDependencyTrail( List dependencyTrail )
+    public void setDependencyTrail( List<String> dependencyTrail )
     {
         artifact.setDependencyTrail( dependencyTrail );
     }
@@ -259,9 +259,9 @@ public class ActiveProjectArtifact
     }
 
     /** {@inheritDoc} */
-    public int compareTo( Object o )
+    public int compareTo( Artifact a )
     {
-        return artifact.compareTo( o );
+        return artifact.compareTo( a );
     }
 
     /** {@inheritDoc} */
@@ -307,13 +307,13 @@ public class ActiveProjectArtifact
     }
 
     /** {@inheritDoc} */
-    public List getAvailableVersions()
+    public List<ArtifactVersion> getAvailableVersions()
     {
         return artifact.getAvailableVersions();
     }
 
     /** {@inheritDoc} */
-    public void setAvailableVersions( List versions )
+    public void setAvailableVersions( List<ArtifactVersion> versions )
     {
         artifact.setAvailableVersions( versions );
     }
@@ -400,7 +400,7 @@ public class ActiveProjectArtifact
         return true;
     }
 
-    public ArtifactMetadata getMetadata( Class metadataClass )
+    public ArtifactMetadata getMetadata( Class<?> metadataClass )
     {
         return artifact.getMetadata( metadataClass );
     }
