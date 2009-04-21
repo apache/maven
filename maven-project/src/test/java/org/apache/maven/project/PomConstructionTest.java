@@ -1396,6 +1396,13 @@ public class PomConstructionTest
 	    assertEquals( 20, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );   
 	} 
     
+    public void testDistributionManagement()
+	    throws Exception
+	{
+	    PomTestWrapper pom = this.buildPom( "distribution-management");
+	    assertEquals("legacy", pom.getValue( "distributionManagement/repository/layout" ));
+}     
+    
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();

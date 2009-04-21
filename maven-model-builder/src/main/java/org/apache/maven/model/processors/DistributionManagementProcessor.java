@@ -45,12 +45,12 @@ public class DistributionManagementProcessor
 
         if ( c.getDistributionManagement() != null )
         {
-            copy( c.getDistributionManagement(), t.getDistributionManagement(), isChildMostSpecialized,
-                  c.getArtifactId(), p );
             if ( p != null && p.getDistributionManagement() != null )
             {
                 copy( p.getDistributionManagement(), t.getDistributionManagement(), false, c.getArtifactId(), p );
-            }
+            }        	
+            copy( c.getDistributionManagement(), t.getDistributionManagement(), isChildMostSpecialized,
+                  c.getArtifactId(), p );
         }
         else if ( p != null && p.getDistributionManagement() != null )
         {
@@ -66,12 +66,12 @@ public class DistributionManagementProcessor
     private void copy( DistributionManagement source, DistributionManagement target, boolean isChild,
                               String artifactId, Model parent )
     {
-        if ( target.getDownloadUrl() == null )
+        if ( source.getDownloadUrl() != null )
         {
             target.setDownloadUrl( source.getDownloadUrl() );
         }
 
-        if ( target.getRelocation() == null && isChild && source.getRelocation() != null )
+        if ( isChild && source.getRelocation() != null )
         {
             Relocation sourceRelocation = source.getRelocation();
             Relocation r = new Relocation();
@@ -82,24 +82,24 @@ public class DistributionManagementProcessor
             target.setRelocation( r );
         }
 
-        if ( target.getStatus() == null )
+        if ( source.getStatus() != null )
         {
             target.setStatus( source.getStatus() );
         }
 
-        if ( target.getRepository() == null && source.getRepository() != null )
+        if ( source.getRepository() != null )
         {
             target.setRepository( new DeploymentRepository() );
             copyRepository( source.getRepository(), target.getRepository() );
         }
 
-        if ( target.getSnapshotRepository() == null && source.getSnapshotRepository() != null )
+        if ( source.getSnapshotRepository() != null )
         {
             target.setSnapshotRepository( new DeploymentRepository() );
             copyRepository( source.getSnapshotRepository(), target.getSnapshotRepository() );
         }
 
-        if ( target.getSite() == null && source.getSite() != null )
+        if (  source.getSite() != null )
         {
             target.setSite( new Site() );
             copySite( source.getSite(), target.getSite(), isChild, artifactId, parent );
@@ -108,22 +108,22 @@ public class DistributionManagementProcessor
 
     private void copyRepository( DeploymentRepository source, DeploymentRepository target )
     {
-        if ( target.getId() == null )
+        if ( source.getId() != null )
         {
             target.setId( source.getId() );
         }
 
-        if ( target.getLayout() == null )
+        if ( source.getLayout() != null )
         {
             target.setLayout( source.getLayout() );
         }
 
-        if ( target.getUrl() == null )
+        if ( source.getUrl() != null )
         {
         	target.setUrl( source.getUrl() );
         }
 
-        if ( target.getName() == null )
+        if ( source.getName() != null )
         {
             target.setName( source.getName() );
         }
@@ -133,12 +133,12 @@ public class DistributionManagementProcessor
 
     private void copySite( Site source, Site target, boolean isChild, String artifactId, Model parent )
     {
-        if ( target.getId() == null )
+        if ( source.getId() != null )
         {
             target.setId( source.getId() );
         }
 
-        if ( target.getName() == null )
+        if ( source.getName() != null )
         {
             target.setName( source.getName() );
         }
