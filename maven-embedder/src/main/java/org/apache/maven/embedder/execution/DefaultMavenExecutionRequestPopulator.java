@@ -220,6 +220,17 @@ public class DefaultMavenExecutionRequestPopulator
                             throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
                         }
                     }
+                    for ( Repository r : profile.getPluginRepositories() )
+                    {
+                        try
+                        {
+                            request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
+                        }
+                        catch ( InvalidRepositoryException e )
+                        {
+                            throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
+                        }
+                    }                    
                 }
             }
             catch ( ProfileActivationException e )
