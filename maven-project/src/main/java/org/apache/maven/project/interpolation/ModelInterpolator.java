@@ -41,13 +41,13 @@ public interface ModelInterpolator
     /**
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
-    Model interpolate( Model project, Map context )
+    Model interpolate( Model project, Map<String, ?> context )
         throws ModelInterpolationException;
 
     /**
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
-    Model interpolate( Model model, Map context, boolean strict )
+    Model interpolate( Model model, Map<String, ?> context, boolean strict )
         throws ModelInterpolationException;
 
     Model interpolate( Model model,
