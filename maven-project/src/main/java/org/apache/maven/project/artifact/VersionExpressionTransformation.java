@@ -37,26 +37,89 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
-import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.codehaus.plexus.interpolation.SimpleRecursionInterceptor;
 import org.codehaus.plexus.interpolation.ValueSource;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.xml.XmlStreamWriter;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 public class VersionExpressionTransformation
     extends StringSearchModelInterpolator
     implements Initializable, ArtifactTransformation
 {
+
+    private static final List<String> VERSION_INTERPOLATION_TARGET_XPATHS;
+
+    static
+    {
+        List<String> targets = new ArrayList<String>();
+
+        targets.add( "/project/parent/version/text()" );
+        targets.add( "/project/version/text()" );
+        
+        targets.add( "/project/dependencies/dependency/version/text()" );
+        targets.add( "/project/dependencyManagement/dependencies/dependency/version/text()" );
+        
+        targets.add( "/project/build/plugins/plugin/version/text()" );
+        targets.add( "/project/build/pluginManagement/plugins/plugin/version/text()" );
+        targets.add( "/project/build/plugins/plugin/dependencies/dependency/version/text()" );
+        targets.add( "/project/build/pluginManagement/plugins/plugin/dependencies/dependency/version/text()" );
+        
+        targets.add( "/project/reporting/plugins/plugin/version/text()" );
+
+        targets.add( "/project/profiles/profile/dependencies/dependency/version/text()" );
+        targets.add( "/project/profiles/profile/dependencyManagement/dependencies/dependency/version/text()" );
+        
+        targets.add( "/project/profiles/profile/build/plugins/plugin/version/text()" );
+        targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/version/text()" );
+        targets.add( "/project/profiles/profile/build/plugins/plugin/dependencies/dependency/version/text()" );
+        targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/version/text()" );
+        
+        targets.add( "/project/profiles/profile/reporting/plugins/plugin/version/text()" );
+
+        targets = Collections.unmodifiableList( targets );
+
+        VERSION_INTERPOLATION_TARGET_XPATHS = targets;
+    }
 
     public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
@@ -74,12 +137,12 @@ public class VersionExpressionTransformation
             pomFile = artifact.getFile();
             pomArtifact = true;
         }
-        // FIXME: We can't be this smart (yet) since the deployment step transforms from the 
+        // FIXME: We can't be this smart (yet) since the deployment step transforms from the
         // original POM once again and re-installs over the top of the install step.
-//        else if ( metadata == null || metadata.isVersionExpressionsResolved() )
-//        {
-//            return;
-//        }
+        // else if ( metadata == null || metadata.isVersionExpressionsResolved() )
+        // {
+        // return;
+        // }
         else if ( metadata != null )
         {
             pomFile = metadata.getFile();
@@ -92,10 +155,11 @@ public class VersionExpressionTransformation
         try
         {
             File outFile = transformVersions( pomFile, artifact, localRepository );
-            
+
             if ( pomArtifact )
             {
-                // FIXME: We need a way to mark a POM artifact as resolved WRT version expressions, so we don't reprocess...
+                // FIXME: We need a way to mark a POM artifact as resolved WRT version expressions, so we don't
+                // reprocess...
                 artifact.setFile( outFile );
             }
             else
@@ -117,7 +181,8 @@ public class VersionExpressionTransformation
     public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        ProjectArtifactMetadata metadata = (ProjectArtifactMetadata) artifact.getMetadata( ProjectArtifactMetadata.class );
+        ProjectArtifactMetadata metadata =
+            (ProjectArtifactMetadata) artifact.getMetadata( ProjectArtifactMetadata.class );
         File pomFile;
         boolean pomArtifact = false;
         if ( "pom".equals( artifact.getType() ) )
@@ -129,12 +194,12 @@ public class VersionExpressionTransformation
             pomFile = artifact.getFile();
             pomArtifact = true;
         }
-        // FIXME: We can't be this smart (yet) since the deployment step transforms from the 
+        // FIXME: We can't be this smart (yet) since the deployment step transforms from the
         // original POM once again and re-installs over the top of the install step.
-//        else if ( metadata == null || metadata.isVersionExpressionsResolved() )
-//        {
-//            return;
-//        }
+        // else if ( metadata == null || metadata.isVersionExpressionsResolved() )
+        // {
+        // return;
+        // }
         else if ( metadata != null )
         {
             pomFile = metadata.getFile();
@@ -147,10 +212,11 @@ public class VersionExpressionTransformation
         try
         {
             File outFile = transformVersions( pomFile, artifact, localRepository );
-            
+
             if ( pomArtifact )
             {
-                // FIXME: We need a way to mark a POM artifact as resolved WRT version expressions, so we don't reprocess...
+                // FIXME: We need a way to mark a POM artifact as resolved WRT version expressions, so we don't
+                // reprocess...
                 artifact.setFile( outFile );
             }
             else
@@ -169,7 +235,8 @@ public class VersionExpressionTransformation
         }
     }
 
-    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
+                                     ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return;
@@ -194,11 +261,12 @@ public class VersionExpressionTransformation
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                                  "WARNING: Artifact: " + artifact
-                                      + " does not have project-builder metadata (ProjectBuilderConfiguration) associated with it.\n"
-                                      + "Cannot access CLI properties for version transformation." );
+                                   "WARNING: Artifact: "
+                                       + artifact
+                                       + " does not have project-builder metadata (ProjectBuilderConfiguration) associated with it.\n"
+                                       + "Cannot access CLI properties for version transformation." );
             }
-            
+
             pbConfig = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
             projectDir = pomFile.getAbsoluteFile().getParentFile();
             outputFile = new File( projectDir, "target/pom-transformed.xml" );
@@ -210,17 +278,18 @@ public class VersionExpressionTransformation
         {
             reader = ReaderFactory.newXmlReader( pomFile );
             model = new MavenXpp3Reader().read( reader );
-            
+
             interpolateVersions( pomFile, outputFile, model, projectDir, pbConfig );
         }
         catch ( XmlPullParserException e )
         {
             String message =
                 "Failed to parse POM for version transformation. Proceeding with original (non-interpolated) POM file.";
-            
-            String detail = "\n\nNOTE: Error was in file: " + pomFile + ", at line: "
-                    + e.getLineNumber() + ", column: " + e.getColumnNumber();
-            
+
+            String detail =
+                "\n\nNOTE: Error was in file: " + pomFile + ", at line: " + e.getLineNumber() + ", column: "
+                    + e.getColumnNumber();
+
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( message + detail, e );
@@ -229,18 +298,20 @@ public class VersionExpressionTransformation
             {
                 getLogger().warn( message + " See debug output for details." );
             }
-            
+
             outputFile = pomFile;
         }
         finally
         {
             IOUtil.close( reader );
         }
-        
+
         return outputFile;
     }
 
-    protected void interpolateVersions( File pomFile, File outputFile, Model model, File projectDir, ProjectBuilderConfiguration config )
+    @SuppressWarnings("unchecked")
+    protected void interpolateVersions( File pomFile, File outputFile, Model model, File projectDir,
+                                        ProjectBuilderConfiguration config )
         throws ModelInterpolationException
     {
         boolean debugEnabled = getLogger().isDebugEnabled();
@@ -249,60 +320,54 @@ public class VersionExpressionTransformation
         // use of the XPP3 Model reader/writers, which have a tendency to lose XML comments and such.
         // SOOO, we're using a two-stage string interpolation here. The first stage selects all XML 'version'
         // elements, and subjects their values to interpolation in the second stage.
-        Interpolator interpolator = new StringSearchInterpolator( "<version>", "</version>" );
-        
+        XPathInterpolator interpolator = new XPathInterpolator( getLogger() );
+
         // The second-stage interpolator is the 'normal' one used in all Model interpolation throughout
         // maven-project.
         Interpolator secondaryInterpolator = getInterpolator();
-        
+
         // We'll just reuse the recursion interceptor...not sure it makes any difference.
         RecursionInterceptor recursionInterceptor = getRecursionInterceptor();
-        
+
         // This is a ValueSource implementation that simply delegates to the second-stage "real" interpolator
         // once we've isolated the version elements from the input XML.
         interpolator.addValueSource( new SecondaryInterpolationValueSource( secondaryInterpolator, recursionInterceptor ) );
-        
-        // The primary interpolator is searching for version XML elements, and interpolating their values. Since
-        // '<version>' and '</version>' are the delimiters for this, the interpolator will remove these tokens
-        // from the result. So, we need to put them back before including the interpolated result.
-        interpolator.addPostProcessor( new VersionRestoringPostProcessor() );
 
-        List valueSources = createValueSources( model, projectDir, config );
-        List postProcessors = createPostProcessors( model, projectDir, config );
+        List<ValueSource> valueSources = createValueSources( model, projectDir, config );
+        List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
         synchronized ( this )
         {
-            for ( Iterator it = valueSources.iterator(); it.hasNext(); )
+            for ( ValueSource vs : valueSources )
             {
-                ValueSource vs = (ValueSource) it.next();
                 secondaryInterpolator.addValueSource( vs );
             }
 
-            for ( Iterator it = postProcessors.iterator(); it.hasNext(); )
+            for ( InterpolationPostProcessor postProcessor : postProcessors )
             {
-                InterpolationPostProcessor postProcessor = (InterpolationPostProcessor) it.next();
-
                 secondaryInterpolator.addPostProcessor( postProcessor );
             }
 
             String pomContents;
             try
             {
-                Reader reader = null;
+                XmlStreamReader reader = null;
                 try
                 {
                     reader = ReaderFactory.newXmlReader( pomFile );
                     pomContents = IOUtil.toString( reader );
+                    interpolator.setEncoding( reader.getEncoding() );
                 }
                 catch ( IOException e )
                 {
-                    throw new ModelInterpolationException( "Error reading POM for version-expression interpolation: " + e.getMessage(), e );
+                    throw new ModelInterpolationException( "Error reading POM for version-expression interpolation: "
+                        + e.getMessage(), e );
                 }
                 finally
                 {
                     IOUtil.close( reader );
                 }
-                
+
                 try
                 {
                     pomContents = interpolator.interpolate( pomContents );
@@ -314,16 +379,14 @@ public class VersionExpressionTransformation
 
                 if ( debugEnabled )
                 {
-                    List feedback = interpolator.getFeedback();
+                    List<Object> feedback = (List<Object>) interpolator.getFeedback();
                     if ( feedback != null && !feedback.isEmpty() )
                     {
                         getLogger().debug( "Maven encountered the following problems while transforming POM versions:" );
 
                         Object last = null;
-                        for ( Iterator it = feedback.iterator(); it.hasNext(); )
+                        for ( Object next : feedback )
                         {
-                            Object next = it.next();
-
                             if ( next instanceof Throwable )
                             {
                                 if ( last == null )
@@ -357,40 +420,39 @@ public class VersionExpressionTransformation
             }
             finally
             {
-                for ( Iterator iterator = valueSources.iterator(); iterator.hasNext(); )
+                for ( ValueSource vs : valueSources )
                 {
-                    ValueSource vs = (ValueSource) iterator.next();
                     secondaryInterpolator.removeValuesSource( vs );
                 }
 
-                for ( Iterator iterator = postProcessors.iterator(); iterator.hasNext(); )
+                for ( InterpolationPostProcessor postProcessor : postProcessors )
                 {
-                    InterpolationPostProcessor postProcessor = (InterpolationPostProcessor) iterator.next();
                     secondaryInterpolator.removePostProcessor( postProcessor );
                 }
 
                 getInterpolator().clearAnswers();
             }
-            
+
             Writer writer = null;
             try
             {
                 outputFile.getParentFile().mkdirs();
-                
+
                 writer = WriterFactory.newXmlWriter( outputFile );
-                
+
                 IOUtil.copy( pomContents, writer );
             }
             catch ( IOException e )
             {
-                throw new ModelInterpolationException( "Failed to write transformed POM: " + outputFile.getAbsolutePath(), e );
+                throw new ModelInterpolationException( "Failed to write transformed POM: "
+                    + outputFile.getAbsolutePath(), e );
             }
             finally
             {
                 IOUtil.close( writer );
             }
         }
-        
+
         // if ( error != null )
         // {
         // throw error;
@@ -400,11 +462,13 @@ public class VersionExpressionTransformation
     private static final class SecondaryInterpolationValueSource
         implements ValueSource
     {
-        
+
         private Interpolator secondary;
+
         private final RecursionInterceptor recursionInterceptor;
-        private List localFeedback = new ArrayList();
-        
+
+        private List<Object> localFeedback = new ArrayList<Object>();
+
         public SecondaryInterpolationValueSource( Interpolator secondary, RecursionInterceptor recursionInterceptor )
         {
             this.secondary = secondary;
@@ -416,6 +480,7 @@ public class VersionExpressionTransformation
             secondary.clearFeedback();
         }
 
+        @SuppressWarnings("unchecked")
         public List getFeedback()
         {
             List result = secondary.getFeedback();
@@ -423,9 +488,9 @@ public class VersionExpressionTransformation
             {
                 result = new ArrayList( result );
             }
-            
+
             result.addAll( localFeedback );
-            
+
             return result;
         }
 
@@ -440,20 +505,243 @@ public class VersionExpressionTransformation
                 localFeedback.add( "Error during version expression interpolation." );
                 localFeedback.add( e );
             }
-            
+
             return null;
         }
     }
-    
-    private static final class VersionRestoringPostProcessor
-        implements InterpolationPostProcessor
+
+    private static final class XPathInterpolator
+        implements Interpolator
     {
 
-        public Object execute( String expression, Object value )
+        private List<InterpolationPostProcessor> postProcessors = new ArrayList<InterpolationPostProcessor>();
+
+        private List<ValueSource> valueSources = new ArrayList<ValueSource>();
+
+        private Map<String, Object> answers = new HashMap<String, Object>();
+
+        private List<Object> feedback = new ArrayList<Object>();
+
+        private final Logger logger;
+
+        private String encoding;
+
+        public XPathInterpolator( Logger logger )
         {
-            return "<version>" + value + "</version>";
+            this.logger = logger;
         }
-        
+
+        public void setEncoding( String encoding )
+        {
+            this.encoding = encoding;
+        }
+
+        public String interpolate( String input, RecursionInterceptor recursionInterceptor )
+            throws InterpolationException
+        {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            TransformerFactory txFactory = TransformerFactory.newInstance();
+            XPathFactory xpFactory = XPathFactory.newInstance();
+            
+            DocumentBuilder builder;
+            Transformer transformer;
+            XPath xpath;
+            try
+            {
+                builder = dbFactory.newDocumentBuilder();
+                transformer = txFactory.newTransformer();
+                xpath = xpFactory.newXPath();
+            }
+            catch ( ParserConfigurationException e )
+            {
+                throw new InterpolationException( "Failed to construct XML DocumentBuilder: " + e.getMessage(), "-NONE-", e );
+            }
+            catch ( TransformerConfigurationException e )
+            {
+                throw new InterpolationException( "Failed to construct XML Transformer: " + e.getMessage(), "-NONE-", e );
+            }
+            
+            Document document;
+            try
+            {
+                document = builder.parse( new InputSource( new StringReader( input ) ) );
+            }
+            catch ( SAXException e )
+            {
+                throw new InterpolationException( "Failed to parse XML: " + e.getMessage(), "-NONE-", e );
+            }
+            catch ( IOException e )
+            {
+                throw new InterpolationException( "Failed to parse XML: " + e.getMessage(), "-NONE-", e );
+            }
+            
+            inteprolateInternal( document, xpath );
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            XmlStreamWriter writer;
+            try
+            {
+                writer = WriterFactory.newXmlWriter( baos );
+            }
+            catch ( IOException e )
+            {
+                throw new InterpolationException( "Failed to get XML writer: " + e.getMessage(), "-NONE-", e );
+            }
+            
+            StreamResult r = new StreamResult( writer );
+            DOMSource s = new DOMSource( document );
+            
+            try
+            {
+                if ( encoding != null )
+                {
+                    logger.info( "Writing transformed POM using encoding: " + encoding );
+                    transformer.setOutputProperty( OutputKeys.ENCODING, encoding );
+                }
+                else
+                {
+                    logger.info( "Writing transformed POM using default encoding" );
+                }
+                
+                transformer.transform( s, r );
+            }
+            catch ( TransformerException e )
+            {
+                throw new InterpolationException( "Failed to render interpolated XML: " + e.getMessage(), "-NONE-", e );
+            }
+            
+            try
+            {
+                return baos.toString( writer.getEncoding() );
+            }
+            catch ( UnsupportedEncodingException e )
+            {
+                throw new InterpolationException( "Failed to render interpolated XML: " + e.getMessage(), "-NONE-", e );
+            }
+        }
+
+        private void inteprolateInternal( Document document, XPath xp )
+            throws InterpolationException
+        {
+            for ( String expr : VERSION_INTERPOLATION_TARGET_XPATHS )
+            {
+                NodeList nodes;
+                try
+                {
+                    XPathExpression xpath = xp.compile( expr );
+                    nodes = (NodeList) xpath.evaluate( document, XPathConstants.NODESET );
+                }
+                catch ( XPathExpressionException e )
+                {
+                    throw new InterpolationException( "Failed to evaluate XPath: " + expr + " (" + e.getMessage() + ")", "-NONE-", e );
+                }
+                
+                if ( nodes != null )
+                {
+                    for( int idx = 0; idx < nodes.getLength(); idx++ )
+                    {
+                        Node node = nodes.item( idx );
+                        Object value = node.getNodeValue();
+                        if ( value == null )
+                        {
+                            continue;
+                        }
+                        
+                        for ( ValueSource vs : valueSources )
+                        {
+                            if ( vs != null )
+                            {
+                                value = vs.getValue( value.toString() );
+                                if ( value != null && !value.equals( node.getNodeValue() ) )
+                                {
+                                    break;
+                                }
+                                else if ( value == null )
+                                {
+                                    value = node.getNodeValue();
+                                }
+                            }
+                        }
+                        
+                        if ( value != null && !value.equals( node.getNodeValue() ) )
+                        {
+                            for ( InterpolationPostProcessor postProcessor : postProcessors )
+                            {
+                                if ( postProcessor != null )
+                                {
+                                    value = postProcessor.execute( node.getNodeValue(), value );
+                                }
+                            }
+                            
+                            node.setNodeValue( String.valueOf( value ) );
+                        }
+                    }
+                }
+            }
+        }
+
+        public void addPostProcessor( InterpolationPostProcessor postProcessor )
+        {
+            postProcessors.add( postProcessor );
+        }
+
+        public void addValueSource( ValueSource valueSource )
+        {
+            valueSources.add( valueSource );
+        }
+
+        public void clearAnswers()
+        {
+            answers.clear();
+        }
+
+        public void clearFeedback()
+        {
+            feedback.clear();
+        }
+
+        @SuppressWarnings( "unchecked" )
+        public List getFeedback()
+        {
+            return feedback;
+        }
+
+        public String interpolate( String input )
+            throws InterpolationException
+        {
+            return interpolate( input, new SimpleRecursionInterceptor() );
+        }
+
+        public String interpolate( String input, String thisPrefixPattern )
+            throws InterpolationException
+        {
+            return interpolate( input, new SimpleRecursionInterceptor() );
+        }
+
+        public String interpolate( String input, String thisPrefixPattern, RecursionInterceptor recursionInterceptor )
+            throws InterpolationException
+        {
+            return interpolate( input, recursionInterceptor );
+        }
+
+        public boolean isCacheAnswers()
+        {
+            return true;
+        }
+
+        public void removePostProcessor( InterpolationPostProcessor postProcessor )
+        {
+            postProcessors.remove( postProcessor );
+        }
+
+        public void removeValuesSource( ValueSource valueSource )
+        {
+            valueSources.remove( valueSource );
+        }
+
+        public void setCacheAnswers( boolean cacheAnswers )
+        {
+        }
     }
 
 }

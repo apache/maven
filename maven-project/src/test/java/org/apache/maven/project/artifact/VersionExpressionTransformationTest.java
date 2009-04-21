@@ -37,6 +37,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Scm;
@@ -63,7 +64,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
@@ -75,12 +75,14 @@ public class VersionExpressionTransformationTest
 
     private VersionExpressionTransformation transformation;
 
-    private Set toDelete = new HashSet();
+    private Set<File> toDelete = new HashSet<File>();
 
     public void setUp()
         throws Exception
     {
         super.setUp();
+
+        // getContainer().getLoggerManager().setThreshold( Logger.LEVEL_DEBUG );
 
         transformation =
             (VersionExpressionTransformation) lookup( ArtifactTransformation.class.getName(), "version-expression" );
@@ -93,10 +95,8 @@ public class VersionExpressionTransformationTest
 
         if ( toDelete != null && !toDelete.isEmpty() )
         {
-            for ( Iterator it = toDelete.iterator(); it.hasNext(); )
+            for ( File f : toDelete )
             {
-                File f = (File) it.next();
-
                 try
                 {
                     FileUtils.forceDelete( f );
@@ -115,7 +115,7 @@ public class VersionExpressionTransformationTest
     {
         String pomResource = "version-expressions/invalid-pom.xml";
         File pomFile = getPom( pomResource );
-        
+
         File projectDir;
         if ( pomFile != null )
         {
@@ -131,7 +131,7 @@ public class VersionExpressionTransformationTest
 
             File newPomFile = new File( projectDir, "pom.xml" );
             FileUtils.copyFile( pomFile, newPomFile );
-            
+
             pomFile = newPomFile;
         }
 
@@ -142,8 +142,8 @@ public class VersionExpressionTransformationTest
         toDelete.add( repoDir );
 
         Artifact a =
-            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersion( "1" ),
-                                 null, "jar", null, new DefaultArtifactHandler( "jar" ) );
+            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersion( "1" ), null, "jar", null,
+                                 new DefaultArtifactHandler( "jar" ) );
 
         ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
         a.addMetadata( pam );
@@ -152,8 +152,58 @@ public class VersionExpressionTransformationTest
             new DefaultArtifactRepository( "local", repoDir.getAbsolutePath(), new DefaultRepositoryLayout() );
 
         transformation.transformVersions( pomFile, a, localRepository );
-        
+
         assertEquals( pomFile, pam.getFile() );
+    }
+
+    public void testTransform_MaintainEncoding()
+        throws URISyntaxException, IOException, XmlPullParserException, ModelInterpolationException
+    {
+        String pomResource = "version-expressions/alternative-encoding-pom.xml";
+        File pomFile = getPom( pomResource );
+
+        File projectDir;
+        if ( pomFile != null )
+        {
+            projectDir = pomFile.getParentFile();
+        }
+        else
+        {
+            projectDir = File.createTempFile( "VersionExpressionTransformationTest.project.", ".tmp.dir" );
+            projectDir.delete();
+            projectDir.mkdirs();
+
+            toDelete.add( projectDir );
+
+            File newPomFile = new File( projectDir, "pom.xml" );
+            FileUtils.copyFile( pomFile, newPomFile );
+
+            pomFile = newPomFile;
+        }
+
+        File repoDir = File.createTempFile( "VersionExpressionTransformationTest.repo.", ".tmp.dir" );
+        repoDir.delete();
+        repoDir.mkdirs();
+
+        toDelete.add( repoDir );
+
+        Artifact a =
+            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersion( "1" ), null, "jar", null,
+                                 new DefaultArtifactHandler( "jar" ) );
+
+        ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
+        a.addMetadata( pam );
+
+        ArtifactRepository localRepository =
+            new DefaultArtifactRepository( "local", repoDir.getAbsolutePath(), new DefaultRepositoryLayout() );
+
+        File result = transformation.transformVersions( pomFile, a, localRepository );
+        
+        String xml = FileUtils.fileRead( result );
+        
+        System.out.println( xml );
+        
+        assertTrue( xml.indexOf( "encoding=\"ISO-8859-1\"" ) > -1 );
     }
 
     public void testTransformForInstall_PreserveComments()
@@ -338,8 +388,8 @@ public class VersionExpressionTransformationTest
             StringWriter swriter = new StringWriter();
             IOUtil.copy( reader, swriter );
 
-//            System.out.println( "Transformed POM:\n\n\n" + swriter.toString() );
-//            System.out.flush();
+            // System.out.println( "Transformed POM:\n\n\n" + swriter.toString() );
+            // System.out.flush();
 
             model = new MavenXpp3Reader().read( new StringReader( swriter.toString() ) );
         }
@@ -839,6 +889,38 @@ public class VersionExpressionTransformationTest
         // /project/reporting/plugins/plugin/version
         ReportPlugin rplugin = (ReportPlugin) model.getReporting().getPlugins().get( 0 );
         assertEquals( VERSION, rplugin.getVersion() );
+
+        // ---
+
+        Profile profile = (Profile) model.getProfiles().get( 0 );
+
+        // /project/profiles/profile/dependencies/dependency/version
+        dep = (Dependency) profile.getDependencies().get( 0 );
+        assertEquals( VERSION, dep.getVersion() );
+
+        // /project/profiles/profile/dependencyManagement/dependencies/dependency/version
+        dep = (Dependency) profile.getDependencyManagement().getDependencies().get( 0 );
+        assertEquals( VERSION, dep.getVersion() );
+
+        // /project/profiles/profile/build/plugins/plugin/version
+        plugin = (Plugin) profile.getBuild().getPlugins().get( 0 );
+        assertEquals( VERSION, plugin.getVersion() );
+
+        // /project/profiles/profile/build/plugins/plugin/dependencies/dependency/version
+        dep = (Dependency) profile.getDependencies().get( 0 );
+        assertEquals( VERSION, dep.getVersion() );
+
+        // /project/profiles/profile/build/pluginManagement/plugins/plugin/version
+        plugin = (Plugin) profile.getBuild().getPluginManagement().getPlugins().get( 0 );
+        assertEquals( VERSION, plugin.getVersion() );
+
+        // /project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/version
+        dep = (Dependency) profile.getDependencies().get( 0 );
+        assertEquals( VERSION, dep.getVersion() );
+
+        // /project/profiles/profile/reporting/plugins/plugin/version
+        rplugin = (ReportPlugin) profile.getReporting().getPlugins().get( 0 );
+        assertEquals( VERSION, rplugin.getVersion() );
     }
 
     public void testInterpolate_ShouldInterpolateAllVersionsUsingCLIProperties()
@@ -961,6 +1043,70 @@ public class VersionExpressionTransformationTest
         reporting.addPlugin( rplugin );
 
         model.setReporting( reporting );
+
+        Profile profile = new Profile();
+        profile.setId( "profile" );
+
+        model.addProfile( profile );
+
+        dep = new Dependency();
+        dep.setGroupId( "profile.group.id" );
+        dep.setArtifactId( "profile-artifact-id" );
+        dep.setVersion( expression );
+
+        profile.addDependency( dep );
+
+        dep = new Dependency();
+        dep.setGroupId( "profile.managed.group.id" );
+        dep.setArtifactId( "profile-managed-artifact-id" );
+        dep.setVersion( expression );
+
+        dmgmt = new DependencyManagement();
+        dmgmt.addDependency( dep );
+
+        profile.setDependencyManagement( dmgmt );
+
+        build = new Build();
+        profile.setBuild( build );
+
+        plugin = new Plugin();
+        plugin.setGroupId( "profile.plugin.group" );
+        plugin.setArtifactId( "profile-plugin-artifact" );
+        plugin.setVersion( expression );
+
+        dep = new Dependency();
+        dep.setGroupId( "profile.plugin.dep.group" );
+        dep.setArtifactId( "profile-plugin-dep-artifact" );
+        dep.setVersion( expression );
+        plugin.addDependency( dep );
+
+        build.addPlugin( plugin );
+
+        plugin = new Plugin();
+        plugin.setGroupId( "profile.plugin.other.group" );
+        plugin.setArtifactId( "profile-plugin-other-artifact" );
+        plugin.setVersion( expression );
+
+        dep = new Dependency();
+        dep.setGroupId( "profile.plugin.dep.other.group" );
+        dep.setArtifactId( "profile.plugin-dep-other-artifact" );
+        dep.setVersion( expression );
+        plugin.addDependency( dep );
+
+        pmgmt = new PluginManagement();
+        pmgmt.addPlugin( plugin );
+
+        build.setPluginManagement( pmgmt );
+
+        rplugin = new ReportPlugin();
+        rplugin.setGroupId( "profile.report.group" );
+        rplugin.setArtifactId( "profile-report-artifact" );
+        rplugin.setVersion( expression );
+
+        reporting = new Reporting();
+        reporting.addPlugin( rplugin );
+
+        profile.setReporting( reporting );
 
         return model;
     }
