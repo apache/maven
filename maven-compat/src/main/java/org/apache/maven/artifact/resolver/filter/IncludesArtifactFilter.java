@@ -55,4 +55,9 @@ public class IncludesArtifactFilter
         }
         return matched;
     }
+    
+    public List<String> getPatterns()
+    {
+        return patterns;
+    }
 }

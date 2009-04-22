@@ -30,7 +30,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -38,7 +37,6 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
@@ -54,13 +52,12 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author Jason van Zyl
  */
-@Component(role = RepositorySystem.class)
+@Component( role = RepositorySystem.class, hint = "default" )
 public class LegacyRepositorySystem
     implements RepositorySystem
 {
@@ -80,16 +77,7 @@ public class LegacyRepositorySystem
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
     @Requirement
-    private ArtifactMetadataSource artifactMetadataSource;
-
-    @Requirement
     private MirrorBuilder mirrorBuilder;
-
-    @Requirement
-    private ResolutionErrorHandler resolutionErrorHandler;
-
-    @Requirement
-    private Logger logger;
 
     private Map<String, ProxyInfo> proxies = new HashMap<String, ProxyInfo>();
 
@@ -395,7 +383,14 @@ public class LegacyRepositorySystem
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
-        return artifactResolver.resolve( request );
+
+        if ( request.getRemoteRepostories() != null && request.getRemoteRepostories().size() > 10 )
+        {
+            System.out.println( "legacy: request with " + request.getRemoteRepostories().size() + " remote repositories" );
+        }
+        ArtifactResolutionResult res = artifactResolver.resolve( request );
+
+        return res;
     }
 
     public void setOnline( boolean online )
@@ -419,6 +414,8 @@ public class LegacyRepositorySystem
         proxyInfo.setPassword( password );
 
         proxies.put( protocol, proxyInfo );
+
+        wagonManager.addProxy( protocol, host, port, username, password, nonProxyHosts );
     }
 
     public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase )
@@ -468,5 +465,10 @@ public class LegacyRepositorySystem
     public List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories )
     {
         return mirrorBuilder.getMirrors( repositories );
+    }
+
+    public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
+    {
+        return null;
     }
 }

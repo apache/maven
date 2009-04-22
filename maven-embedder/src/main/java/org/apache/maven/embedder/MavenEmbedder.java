@@ -83,6 +83,8 @@ public class MavenEmbedder
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
         new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
 
+    public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
+
     // ----------------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------------

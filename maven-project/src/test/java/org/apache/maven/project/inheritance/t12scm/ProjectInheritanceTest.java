@@ -69,12 +69,12 @@ public class ProjectInheritanceTest
         System.out.println( "Child SCM developer connection is: "
                             + project1.getScm().getDeveloperConnection() );
 
-        assertEquals( project1.getScm().getUrl(), project0.getScm().getUrl() + "/p1" );
+        assertEquals( project1.getScm().getUrl(), project0.getScm().getUrl() + "/modules/p1" );
         assertEquals( project1.getScm().getConnection(), project0.getScm().getConnection()
-                                                         + "/p1" );
+                                                         + "/modules/p1" );
         assertEquals( project1.getScm().getDeveloperConnection(), project0.getScm()
                                                                           .getDeveloperConnection()
-                                                                  + "/p1" );
+                                                                  + "/modules/p1" );
     }
 
     public void testScmInfoCalculatedCorrectlyOnChildOnlyRead()
@@ -93,10 +93,9 @@ public class ProjectInheritanceTest
         System.out.println( "Child SCM developer connection is: "
                             + project1.getScm().getDeveloperConnection() );
 
-        assertEquals( project1.getScm().getUrl(), "http://host/viewer?path=/p0/p1" );
-        assertEquals( project1.getScm().getConnection(), "scm:svn:http://host/p0/p1" );
-        assertEquals( project1.getScm().getDeveloperConnection(),
-                      "scm:svn:https://host/p0/p1" );
+        assertEquals( "http://host/viewer?path=/p0/modules/p1", project1.getScm().getUrl() );
+        assertEquals( "scm:svn:http://host/p0/modules/p1", project1.getScm().getConnection() );
+        assertEquals( "scm:svn:https://host/p0/modules/p1", project1.getScm().getDeveloperConnection() );
     }
 
 //    public void testScmInfoCalculatedCorrectlyOnChildReadFromLocalRepository()

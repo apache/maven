@@ -20,18 +20,21 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+
   <artifactId>maven-repository-mercury</artifactId>
+
   <name>Mercury Repository implementation</name>
   <description>Mercury implementation for the Maven Repository System</description>
 
   <properties>
-    <mercury.version>1.0-alpha-6-SNAPSHOT</mercury.version>
+    <mercury.version>1.0-alpha-7-SNAPSHOT</mercury.version>
   </properties>
 
   <dependencies>
@@ -41,7 +44,7 @@ under the License.
       <artifactId>maven-repository</artifactId>
       <version>${project.version}</version>
     </dependency>
-<!-- 
+<!--
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-legacy</artifactId>
@@ -132,7 +135,7 @@ under the License.
       <version>${mercury.version}</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository</artifactId>
@@ -140,24 +143,24 @@ under the License.
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-compat</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>                                                                                
-      <artifactId>plexus-jetty6</artifactId>                                                                                
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty6</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-webdav</artifactId>
       <scope>test</scope>
     </dependency>
-  
+
   </dependencies>
 
   <build>
@@ -165,14 +168,14 @@ under the License.
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-          <executions>                                                                                                          
-            <execution>                                                                                                         
-              <goals>                                                                                                           
-                <goal>generate-metadata</goal>                                                                                  
-                <goal>generate-test-metadata</goal>                                                                             
-              </goals>                                                                                                          
-            </execution>                                                                                                        
-          </executions>                                                                                                         
+          <executions>
+            <execution>
+              <goals>
+                <goal>generate-metadata</goal>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
       </plugin>
     </plugins>
   </build>

@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ResolutionListener;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
@@ -40,7 +39,9 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
  */
 public class MetadataResolutionRequest
 {
-    private Artifact artifact;
+    private MavenArtifactMetadata mad;
+
+    private String scope;
 
     // Needs to go away
     private Set<Artifact> artifactDependencies;
@@ -49,41 +50,40 @@ public class MetadataResolutionRequest
 
     private List<ArtifactRepository> remoteRepositories;
 
-    // Not sure what to do with this?
-    // Scope
-    // Lock down lists
-    private ArtifactFilter filter;
-
-    // Needs to go away
-    private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
-
     // This is like a filter but overrides all transitive versions 
     private Map managedVersionMap;
 
-    // This should not be in here, it's a component
-    private ArtifactMetadataSource metadataSource;
-
-    private boolean resolveRoot = true;
+    /** result type - flat list; the default */
+    private boolean asList = true;
+    
+    /** result type - dirty tree */
+    private boolean asDirtyTree = false;
+    
+    /** result type - resolved tree */
+    private boolean asResolvedTree = false;
+    
+    /** result type - graph */
+    private boolean asGraph = false;
     
     public MetadataResolutionRequest()
     {  
     }
     
-    public MetadataResolutionRequest( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
+    public MetadataResolutionRequest( MavenArtifactMetadata md, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
     {        
-        this.artifact = artifact;
+        this.mad = md;
         this.localRepository = localRepository;
         this.remoteRepositories = remoteRepositories;
     }
     
-    public Artifact getArtifact()
+    public MavenArtifactMetadata getArtifactMetadata()
     {
-        return artifact;
+        return mad;
     }
 
-    public MetadataResolutionRequest setArtifact( Artifact artifact )
+    public MetadataResolutionRequest setArtifactMetadata( MavenArtifactMetadata md )
     {
-        this.artifact = artifact;
+        this.mad = md;
 
         return this;
     }
@@ -124,53 +124,6 @@ public class MetadataResolutionRequest
         return this;
     }
 
-    public ArtifactFilter getFilter()
-    {
-        return filter;
-    }
-
-    public MetadataResolutionRequest setFilter( ArtifactFilter filter )
-    {
-        this.filter = filter;
-
-        return this;
-    }
-
-    public List<ResolutionListener> getListeners()
-    {
-        return listeners;
-    }
-
-    public MetadataResolutionRequest setListeners( List<ResolutionListener> listeners )
-    {        
-        this.listeners = listeners;
-        
-        return this;
-    }
-    
-    public MetadataResolutionRequest addListener( ResolutionListener listener )
-    {
-        listeners.add( listener );
-
-        return this;
-    }
-
-    // ------------------------------------------------------------------------
-    //
-    // ------------------------------------------------------------------------
-
-    public ArtifactMetadataSource getMetadataSource()
-    {
-        return metadataSource;
-    }
-
-    public MetadataResolutionRequest setMetadataSource( ArtifactMetadataSource metadataSource )
-    {
-        this.metadataSource = metadataSource;
-
-        return this;
-    }
-
     public Map getManagedVersionMap()
     {
         return managedVersionMap;
@@ -183,28 +136,71 @@ public class MetadataResolutionRequest
         return this;
     }
 
-    public MetadataResolutionRequest setResolveRoot( boolean resolveRoot )
-    {
-        this.resolveRoot = resolveRoot;
-        
-        return this;
-    }
-    
-    public boolean isResolveRoot()
-    {
-        return resolveRoot;
-    }
-    
     public String toString()
     {
         StringBuffer sb = new StringBuffer()
                 .append( "REQUEST: " ).append(  "\n" )
-                .append( "artifact: " ).append( artifact ).append(  "\n" )
+                .append( "artifact: " ).append( mad ).append(  "\n" )
                 .append( artifactDependencies ).append(  "\n" )
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
                 .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
-                .append( "metadataSource: " ).append(  metadataSource ).append(  "\n" );
+                ;
         
         return sb.toString();
+    }
+
+    public boolean isAsList()
+    {
+        return asList;
+    }
+
+    public MetadataResolutionRequest setAsList( boolean asList )
+    {
+        this.asList = asList;
+        return this;
+    }
+
+    public boolean isAsDirtyTree()
+    {
+        return asDirtyTree;
+    }
+
+    public MetadataResolutionRequest setAsDirtyTree( boolean asDirtyTree )
+    {
+        this.asDirtyTree = asDirtyTree;
+        return this;
+    }
+
+    public boolean isAsResolvedTree()
+    {
+        return asResolvedTree;
+    }
+
+    public MetadataResolutionRequest setAsResolvedTree( boolean asResolvedTree )
+    {
+        this.asResolvedTree = asResolvedTree;
+        return this;
+    }
+
+    public boolean isAsGraph()
+    {
+        return asGraph;
+    }
+
+    public MetadataResolutionRequest setAsGraph( boolean asGraph )
+    {
+        this.asGraph = asGraph;
+        return this;
+    }
+
+    public MetadataResolutionRequest setScope( String scope )
+    {
+        this.scope = scope;
+        return this;
+    }
+
+    public String getScope()
+    {
+        return scope;
     }
 }

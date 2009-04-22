@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.ModelEventListener;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.shared.model.ModelEventListener;
 
 public class DefaultProjectBuilderConfiguration
     implements ProjectBuilderConfiguration
@@ -44,6 +44,18 @@ public class DefaultProjectBuilderConfiguration
     private Date buildStartTime;
 
     private List<ModelEventListener> listeners;
+    
+    private MavenProject topProject;
+    
+    public MavenProject getTopLevelProjectFromReactor()
+    {
+    	return topProject;
+    }
+    
+    public void setTopLevelProjectForReactor(MavenProject mavenProject)
+    {
+    	this.topProject = mavenProject;
+    }
         
     public ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager )
     {

@@ -211,7 +211,7 @@ public class DefaultMaven
                 File basedir = file.getParentFile();
 
                 List<File> moduleFiles = new ArrayList<File>();
-
+                
                 for ( String name : project.getModules() )
                 {
                     if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )

@@ -67,7 +67,13 @@ END SNIPPET: ant-bootstrap -->
     <property name="maven.repo.central" value="http://repository.sonatype.org/content/groups/public"/>
 <!--
     <property name="maven.repo.central" value="http://repo1.maven.org/maven2"/>
+    <property name="maven.repo.update.policy" value="daily"/>
+    <property name="maven.repo.update.policy" value="always"/>
 -->
+    <property name="maven.repo.update.policy" value="daily"/>
+
+    <property name="maven.repo.system" value="don.t"/>
+
     <condition property="do.not.clean.local.repo">
       <not>
         <isset property="clean.local.repo"/>
@@ -87,15 +93,61 @@ END SNIPPET: ant-bootstrap -->
     <mkdir dir="${maven.repo.local}"/>
   </target>
 
+  <target name="flip-default-repository" unless="do.not.flip.repository">
+
+    <replace dir="${basedir}/maven-repository/src/main/java">
+      <include name="**/LegacyRepositorySystem.java"/>
+      <replacefilter token='@Component( role = RepositorySystem.class, hint = "default" )'
+                     value='@Component( role = RepositorySystem.class, hint = "${legacy-hint}" )'/>
+      <replacefilter token='@Component( role = RepositorySystem.class, hint = "legacy" )'
+                     value='@Component( role = RepositorySystem.class, hint = "${legacy-hint}" )'/>
+    </replace>
+
+    <replace dir="${basedir}/maven-repository-mercury/src/main/java">
+      <include name="**/MercuryRepositorySystem.java"/>
+      <replacefilter token='@Component( role = RepositorySystem.class, hint = "mercury" )'
+                     value='@Component( role = RepositorySystem.class, hint = "${mercury-hint}" )'/>
+      <replacefilter token='@Component( role = RepositorySystem.class, hint = "default" )'
+                     value='@Component( role = RepositorySystem.class, hint = "${mercury-hint}" )'/>
+    </replace>
+
+    <echo>maven.repo.system is ${maven.repo.system}, flip: legacy-hint=${legacy-hint}, mercury-hint=${mercury-hint}</echo>
+
+  </target>
+
+  <target name="flip-default-repository-system" description="flips repository system impl">
+
+    <condition property="legacy-hint" value="default">
+      <equals arg1="${maven.repo.system}" arg2="legacy"/>
+    </condition>
+    <condition property="mercury-hint" value="mercury">
+      <equals arg1="${maven.repo.system}" arg2="legacy"/>
+    </condition>
+
+    <condition property="legacy-hint" value="legacy">
+      <equals arg1="${maven.repo.system}" arg2="mercury"/>
+    </condition>
+    <condition property="mercury-hint" value="default">
+      <equals arg1="${maven.repo.system}" arg2="mercury"/>
+    </condition>
+
+    <condition property="do.not.flip.repository" value="default">
+      <equals arg1="${maven.repo.system}" arg2="don.t"/>
+    </condition>
+
+  	<antcall target="flip-default-repository"/>
+
+  </target>
+
   <target name="pull" depends="init,clean-local-repo" unless="skip.pull">
     <property name="verbose" value="false"/>
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-start-comment--&gt;" value="&lt;!--"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-end-comment--&gt;" value="--&gt;"/>
 
     <mercury:local-repository location="${maven.repo.local}"/>
-    <mercury:remote-repository id="central" location="${maven.repo.central}"/>
+    <mercury:remote-repository id="central" location="${maven.repo.central}" updatePolicy="${maven.repo.update.policy}"/>
 
     <property name="tsFormat" value="HH:mm:ss"/>
     <tstamp><format property="start.time" pattern="${tsFormat}"/></tstamp>
@@ -121,10 +173,10 @@ END SNIPPET: ant-bootstrap -->
     <property name="mc" refid="mercury.classpath"/>
     <echo>mercury.classpath=${mc}</echo>
     <echo>========================================================================</echo>
-<!--
--->
 
+<!--
     <delete file="${basedir}/dependencies.xml"/>
+-->
 
     <tstamp><format property="modello.start.time" pattern="${tsFormat}"/></tstamp>
 
@@ -209,14 +261,15 @@ END SNIPPET: ant-bootstrap -->
     </macrodef>
 
     <modello file="maven-model/src/main/mdo/maven.mdo" version="4.0.0"/>
+    <modello file="maven-lifecycle/src/main/mdo/maven-lifecycle.mdo"/>
     <modello file="maven-plugin-api/src/main/mdo/lifecycle.mdo"/>
-    <modello file="maven-project/src/main/mdo/profiles.mdo"/>
+    <modello file="maven-model-builder/src/main/mdo/profiles.mdo"/>
     <modello file="maven-core/src/main/mdo/settings.mdo"/>
     <modello file="maven-toolchain/src/main/mdo/toolchains.xml"/>
     <modello file="maven-compat/src/main/mdo/metadata.mdo"/>
   </target>
 
-  <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
+  <target name="compile-boot" depends="generate-sources,flip-default-repository-system" description="compiles the bootstrap sources">
 
     <path id="sources">
       <dirset dir=".">
@@ -244,12 +297,22 @@ END SNIPPET: ant-bootstrap -->
   <target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <classpath refid="maven.classpath"/>
-      <arg value="-e"/>
+      <arg value="-X"/>
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
       <arg value="-Dsurefire.useFile=${surefire.useFile}"/>
+<!--
+<debug-the-bootstrap>
+
+    	<jvmarg value="-Xdebug"/>
+    	<jvmarg value="-Xnoagent"/>
+    	<jvmarg value="-Djava.compiler=NONE"/>
+    	<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/>
+
+</debug-the-bootstrap>
+-->
     </java>
   </target>
 

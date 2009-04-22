@@ -8,7 +8,7 @@ You'll need:
 
 First, give Ant a location into which the completed Maven distro should be installed:
 
-    export M2_HOME=$HOME/apps/maven/apache-maven-2.1-SNAPSHOT
+    export M2_HOME=$HOME/apps/maven/apache-maven-3.0-SNAPSHOT
 
 Then, run Ant:
 

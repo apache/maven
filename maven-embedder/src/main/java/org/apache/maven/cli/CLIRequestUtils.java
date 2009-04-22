@@ -22,7 +22,6 @@ package org.apache.maven.cli;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -30,6 +29,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.MavenTransferListener;
+import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -77,7 +77,7 @@ public final class CLIRequestUtils
         //
         // ----------------------------------------------------------------------
 
-        List goals = commandLine.getArgList();
+        List<String> goals = commandLine.getArgList();
 
         boolean recursive = true;
 
@@ -139,9 +139,9 @@ public final class CLIRequestUtils
         // Profile Activation
         // ----------------------------------------------------------------------
 
-        List activeProfiles = new ArrayList();
+        List<String> activeProfiles = new ArrayList<String>();
 
-        List inactiveProfiles = new ArrayList();
+        List<String> inactiveProfiles = new ArrayList<String>();
 
         if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
@@ -222,6 +222,16 @@ public final class CLIRequestUtils
         Properties userProperties = new Properties();
         populateProperties( commandLine, executionProperties, userProperties );
 
+        File userToolchainsFile;
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
+        {
+            userToolchainsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_TOOLCHAINS ) );
+        }
+        else
+        {
+            userToolchainsFile = MavenEmbedder.DEFAULT_USER_TOOLCHAINS_FILE;
+        }
+
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( baseDirectory )
             .setGoals( goals )
@@ -239,7 +249,9 @@ public final class CLIRequestUtils
             .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
-            .setGlobalChecksumPolicy( globalChecksumPolicy ); // default: warn
+            .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
+            .setUserToolchainsFile( userToolchainsFile );
+        
 
         if ( alternatePomFile != null )
         {
@@ -261,10 +273,8 @@ public final class CLIRequestUtils
         try
         {
             Properties envVars = CommandLineUtils.getSystemEnvVars();
-            Iterator i = envVars.entrySet().iterator();
-            while ( i.hasNext() )
+            for ( Entry<Object, Object> e : envVars.entrySet() )
             {
-                Entry e = (Entry) i.next();
                 executionProperties.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
             }
         }

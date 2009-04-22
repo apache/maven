@@ -29,10 +29,12 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
+import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
@@ -41,6 +43,7 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
+import org.apache.maven.toolchain.ToolchainsBuilder;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -71,6 +74,9 @@ public class DefaultMavenExecutionRequestPopulator
     @Requirement
     private RepositorySystem repositorySystem;
 
+    @Requirement
+    private ToolchainsBuilder toolchainsBuilder;
+
     // 2009-03-05 Oleg: this component is defined sub-classed in this package
     @Requirement(hint = "maven")
     private SecDispatcher securityDispatcher;
@@ -83,6 +89,8 @@ public class DefaultMavenExecutionRequestPopulator
         settings( request, configuration );
 
         localRepository( request, configuration );
+
+        toolchains( request, configuration );
 
         artifactTransferMechanism( request, configuration );
 
@@ -150,20 +158,40 @@ public class DefaultMavenExecutionRequestPopulator
                 Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
 
                 profileManager.addProfile( profile );
+            }
 
-                // We need to convert profile repositories to artifact repositories
-
-                for ( Repository r : profile.getRepositories() )
+            // We need to convert profile repositories to artifact repositories
+            try
+            {
+                for ( Profile profile : profileManager.getActiveProfiles() )
                 {
-                    try
+                    for ( Repository r : profile.getRepositories() )
                     {
-                        request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
+                        try
+                        {
+                            request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
+                        }
+                        catch ( InvalidRepositoryException e )
+                        {
+                            throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
+                        }
                     }
-                    catch ( InvalidRepositoryException e )
+                    for ( Repository r : profile.getPluginRepositories() )
                     {
-                        throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
-                    }
+                        try
+                        {
+                            request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
+                        }
+                        catch ( InvalidRepositoryException e )
+                        {
+                            throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
+                        }
+                    }                    
                 }
+            }
+            catch ( ProfileActivationException e )
+            {
+                throw new MavenEmbedderException( "Cannot determine active profiles", e );
             }
         }
 
@@ -391,9 +419,15 @@ public class DefaultMavenExecutionRequestPopulator
         activationContext.setExplicitlyActiveProfileIds( request.getActiveProfiles() );
         activationContext.setExplicitlyInactiveProfileIds( request.getInactiveProfiles() );
 
-        ProfileManager globalProfileManager = new DefaultProfileManager( container, activationContext );
+        ProfileManager globalProfileManager = new DefaultProfileManager( activationContext );
 
         request.setProfileManager( globalProfileManager );
         request.setProfileActivationContext( activationContext );
     }
+
+    private void toolchains( MavenExecutionRequest request, Configuration configuration )
+    {
+        toolchainsBuilder.setUserToolchainsFile( request.getUserToolchainsFile() );
+    }
+
 }

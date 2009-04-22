@@ -39,9 +39,13 @@ public class ScopeArtifactFilter
     private final boolean providedScope;
 
     private final boolean systemScope;
+
+    private final String scope;
     
     public ScopeArtifactFilter( String scope )
     {
+        this.scope = scope;
+        
         if ( Artifact.SCOPE_COMPILE.equals( scope ) )
         {
             systemScope = true;
@@ -110,5 +114,10 @@ public class ScopeArtifactFilter
         {
             return true;
         }
+    }
+
+    public String getScope()
+    {
+        return scope;
     }
 }

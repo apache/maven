@@ -33,4 +33,8 @@ public interface ProjectBuilderConfiguration
     Date getBuildStartTime();
 
     ProjectBuilderConfiguration setBuildStartTime( Date buildStartTime );    
+    
+    MavenProject getTopLevelProjectFromReactor();
+    
+    void setTopLevelProjectForReactor(MavenProject mavenProject);
 }

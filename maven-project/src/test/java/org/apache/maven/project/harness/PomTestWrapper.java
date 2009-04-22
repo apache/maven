@@ -20,22 +20,13 @@ package org.apache.maven.project.harness;
  */
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.builder.PomClassicDomainModel;
+import org.apache.maven.model.PomClassicDomainModel;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.model.ModelProperty;
-import org.codehaus.plexus.util.WriterFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomTestWrapper
 {
@@ -68,11 +59,7 @@ public class PomTestWrapper
         }
         this.domainModel = domainModel;
         this.pomFile = pomFile;
-        try {
-            context = JXPathContext.newContext( new MavenXpp3Reader().read(domainModel.getInputStream()));
-        } catch (XmlPullParserException e) {
-            throw new IOException(e.getMessage());
-        }
+        context = JXPathContext.newContext( domainModel.getModel());
     }
 
     public PomTestWrapper( File pomFile, MavenProject mavenProject )
@@ -107,11 +94,7 @@ public class PomTestWrapper
         }
 
         this.domainModel = new PomClassicDomainModel( file );
-        try {
-            context = JXPathContext.newContext( new MavenXpp3Reader().read(domainModel.getInputStream()));
-        } catch (XmlPullParserException e) {
-            throw new IOException(e.getMessage());
-        }
+        context = JXPathContext.newContext( domainModel.getModel() );
     }
 
     public MavenProject getMavenProject()
@@ -120,56 +103,24 @@ public class PomTestWrapper
     }
 
     public PomClassicDomainModel getDomainModel()
-    {
-        if(domainModel == null && mavenProject != null)
+    	throws IOException {
+        if ( domainModel == null && mavenProject != null )
         {
-            try {
-                return convertToDomainModel(mavenProject.getModel());
-            } catch (IOException e) {
-
-            }
+                domainModel = new PomClassicDomainModel( mavenProject.getModel() );
+                int lineageCount = 1;
+                for ( MavenProject parent = mavenProject.getParent(); parent != null; parent = parent.getParent() )
+                {
+                    lineageCount++;
+                }
+                domainModel.setLineageCount( lineageCount );
         }
 
         return this.domainModel;
     }
 
-    private PomClassicDomainModel convertToDomainModel(Model model) throws IOException
-    {
-                if ( model == null )
-        {
-            throw new IllegalArgumentException( "model: null" );
-        }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer out = null;
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        try
-        {
-            out = WriterFactory.newXmlWriter( baos );
-            writer.write( out, model );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                out.close();
-            }
-        }
-        return new PomClassicDomainModel(new ByteArrayInputStream(baos.toByteArray()));
-    }
-
     public File getBasedir()
     {
         return ( pomFile != null ) ? pomFile.getParentFile() : null;
-    }
-
-    public String getValueOfProjectUri( String projectUri, boolean withResolvedValue )
-        throws IOException
-    {
-        if ( projectUri.contains( "#collection" ) || projectUri.contains( "#set" ) )
-        {
-            throw new IllegalArgumentException( "projectUri: contains a collection or set" );
-        }
-        return asMap( withResolvedValue ).get( projectUri );
     }
 
     public void setValueOnModel( String expression, Object value )
@@ -216,108 +167,6 @@ public class PomTestWrapper
     public boolean xPathExpressionEqualsValue( String expression, String value )
     {
         return context.getValue( expression ) != null && context.getValue( expression ).equals( value );
-    }
-
-    public Map<String, String> asMap( boolean withResolvedValues )
-        throws IOException
-    {
-        Map<String, String> map = new HashMap<String, String>();
-        for ( ModelProperty mp : domainModel.getModelProperties() )
-        {
-            if ( withResolvedValues )
-            {
-                map.put( mp.getUri(), mp.getResolvedValue() );
-            }
-            else
-            {
-                map.put( mp.getUri(), mp.getValue() );
-            }
-
-        }
-        return map;
-    }
-
-    public boolean containsModelProperty( ModelProperty modelProperty )
-        throws IOException
-    {
-        return domainModel.getModelProperties().contains( modelProperty );
-    }
-
-    public boolean containsAllModelPropertiesOf( List<ModelProperty> modelProperties )
-        throws IOException
-    {
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( !containsModelProperty( mp ) )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean matchModelProperties( List<ModelProperty> hasProperties, List<ModelProperty> doesNotHaveProperties )
-        throws IOException
-    {
-        return containsAllModelPropertiesOf( hasProperties ) && containNoModelPropertiesOf( doesNotHaveProperties );
-    }
-
-    public boolean matchUris( List<String> hasAllUris, List<String> doesNotHaveUris )
-        throws IOException
-    {
-        return hasAllUris( hasAllUris ) && hasNoUris( doesNotHaveUris );
-    }
-
-    public boolean containNoModelPropertiesOf( List<ModelProperty> modelProperties )
-        throws IOException
-    {
-        for ( ModelProperty mp : modelProperties )
-        {
-            if ( containsModelProperty( mp ) )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean hasUri( String uri )
-        throws IOException
-    {
-        for ( ModelProperty mp : domainModel.getModelProperties() )
-        {
-            if ( mp.getValue().equals( uri ) )
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasAllUris( List<String> uris )
-        throws IOException
-    {
-        for ( String s : uris )
-        {
-            if ( !hasUri( s ) )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean hasNoUris( List<String> uris )
-        throws IOException
-    {
-        for ( String s : uris )
-        {
-            if ( hasUri( s ) )
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
 }

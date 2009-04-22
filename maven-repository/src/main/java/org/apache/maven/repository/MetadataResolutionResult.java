@@ -65,6 +65,12 @@ public class MetadataResolutionResult
     private Set<Artifact> requestedArtifacts;
 
     private Set<Artifact> artifacts;
+    
+    private MetadataGraph dirtyTree;
+    
+    private MetadataGraph resolvedTree;
+    
+    private MetadataGraph resolvedGraph;
 
     public Artifact getOriginatingArtifact()
     {
@@ -227,13 +233,10 @@ public class MetadataResolutionResult
         return errorArtifactExceptions != null;
     }
 
-    public MetadataResolutionResult addErrorArtifactException( ArtifactResolutionException e )
+    public MetadataResolutionResult addError( Exception e )
     {
-        errorArtifactExceptions = initList( errorArtifactExceptions );
-
-        errorArtifactExceptions.add( e );
-
-        exceptions = initList( exceptions );
+        if( exceptions == null )
+            initList( exceptions );
 
         exceptions.add( e );
 
@@ -340,4 +343,15 @@ public class MetadataResolutionResult
 
         return sb.toString();
     }
+
+    public MetadataGraph getResolvedTree()
+    {
+        return resolvedTree;
+    }
+
+    public void setResolvedTree( MetadataGraph resolvedTree )
+    {
+        this.resolvedTree = resolvedTree;
+    }
+    
 }

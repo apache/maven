@@ -67,6 +67,8 @@ public class DefaultMavenExecutionRequest
 
     private File globalSettingsFile;
 
+    private File userToolchainsFile;
+
     // ----------------------------------------------------------------------------
     // Request
     // ----------------------------------------------------------------------------
@@ -130,6 +132,7 @@ public class DefaultMavenExecutionRequest
         copy.setProjectPresent( original.isProjectPresent() );
         copy.setUserSettingsFile( original.getUserSettingsFile() );
         copy.setGlobalSettingsFile( original.getGlobalSettingsFile() );
+        copy.setUserToolchainsFile( original.getUserToolchainsFile() );
         copy.setBaseDirectory( new File( original.getBaseDirectory() ) );
         copy.setGoals( original.getGoals() );
         copy.setRecursive( original.isRecursive() );
@@ -611,7 +614,7 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    // Settin10gs files
+    // Settings files
 
     public File getUserSettingsFile()
     {
@@ -633,6 +636,18 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setGlobalSettingsFile( File globalSettingsFile )
     {
         this.globalSettingsFile = globalSettingsFile;
+
+        return this;
+    }
+
+    public File getUserToolchainsFile()
+    {
+        return userToolchainsFile;
+    }
+
+    public MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile )
+    {
+        this.userToolchainsFile = userToolchainsFile;
 
         return this;
     }

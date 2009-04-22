@@ -3,6 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>a</groupId>
   <artifactId>b</artifactId>
+  <version>1.0</version>
 
     <build>
         <filters>

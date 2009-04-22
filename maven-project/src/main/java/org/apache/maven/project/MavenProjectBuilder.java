@@ -40,6 +40,9 @@ public interface MavenProjectBuilder
 
     MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException;
+    
+    MavenProject buildFromRepository(Artifact artifact, ProjectBuilderConfiguration configuration )
+		throws ProjectBuildingException;    
 
     MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;

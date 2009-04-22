@@ -292,27 +292,18 @@
      */
     public synchronized Proxy getActiveProxy()
     {
-        if(activeProxy == null)
+        if (activeProxy == null)
         {
-            java.util.List proxies = getProxies();
+            java.util.List<Proxy> proxies = getProxies();
             if ( proxies != null && !proxies.isEmpty() )
             {
-                if ( proxies.size() > 1 )
+                for ( Proxy proxy : proxies )
                 {
-                    for ( java.util.Iterator it = proxies.iterator(); it.hasNext(); )
+                    if ( proxy.isActive() )
                     {
-                        Proxy proxy = (Proxy) it.next();
-                        if ( proxy.isActive() )
-                        {
-                            activeProxy = proxy;
-                            break;
-                        }
+                        activeProxy = proxy;
+                        break;
                     }
-                }
-                else
-                {
-                    // If we only have one proxy, use it as the active one.
-                    activeProxy = (Proxy) proxies.get( 0 );
                 }
             }
         }
@@ -464,7 +455,7 @@
           <name>active</name>
           <version>1.0.0</version>
           <required>false</required>
-          <defaultValue>false</defaultValue>
+          <defaultValue>true</defaultValue>
           <description>
             <![CDATA[
             Whether this proxy configuration is the active one.

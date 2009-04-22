@@ -135,7 +135,7 @@ public abstract class AbstractMavenProjectTestCase
 
         ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
         pbc.setLocalRepository( getLocalRepository() );
-        pbc.setGlobalProfileManager( new DefaultProfileManager( getContainer(), ctx ) );
+        pbc.setGlobalProfileManager( new DefaultProfileManager( ctx ) );
 
         return projectBuilder.build( pom, pbc );
     }

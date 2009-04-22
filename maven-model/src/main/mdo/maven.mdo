@@ -583,6 +583,12 @@
 
           return id.toString();
       }
+
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2110,8 +2116,8 @@
           </description>
           <type>String</type>
         </field>
-        <field>
-          <name>filtering</name>
+        <field xml.tagName="filtering">
+          <name>filteringValue</name>
           <version>3.0.0+</version>
           <description>
             <![CDATA[
@@ -2120,8 +2126,7 @@
             properties in the files listed in the <code>filters</code> element.
             ]]>
           </description>
-          <type>boolean</type>
-          <defaultValue>false</defaultValue>
+          <type>String</type>
         </field>
         <field>
           <name>mergeId</name>
@@ -2152,7 +2157,17 @@
             setMergeId( "resource-" + (mergeIdCounter++) );
         }
     }
+    
+    public boolean isFiltering()
+    {
+        return filteringValue != null ? (new Boolean(filteringValue)).booleanValue() : false;
+    }
 
+    public void setFiltering( boolean filtering )
+    {
+        filteringValue = String.valueOf(filtering);
+    }  
+    
     /**
      * @see java.lang.Object#toString()
      */
@@ -2433,12 +2448,11 @@
       <version>4.0.0</version>
       <description>Download policy.</description>
       <fields>
-        <field>
-          <name>enabled</name>
+        <field xml.tagName="enabled">
+          <name>enabledValue</name>
           <version>4.0.0</version>
           <description>Whether to use this repository for downloading this type of artifact.</description>
-          <type>boolean</type>
-          <defaultValue>true</defaultValue>
+          <type>String</type>
         </field>
         <field>
           <name>updatePolicy</name>
@@ -2474,6 +2488,26 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0</version>
+          <code>
+            <![CDATA[
+
+    public boolean isEnabled()
+    {
+        return enabledValue != null ? (new Boolean(enabledValue)).booleanValue() : false;
+    }
+
+    public void setEnabled( boolean enabled )
+    {
+        enabledValue = String.valueOf(enabled);
+    }
+
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>      
     </class>
 
     <!--@todo find better solution for management of site deployments -->
@@ -2736,7 +2770,7 @@
           <name>id</name>
           <version>4.0.0</version>
           <type>String</type>
-          <defaultValue>default-execution-id</defaultValue>
+          <defaultValue>default</defaultValue>
           <description>The identifier of this execution for labelling the goals during the build,
             and for matching executions to merge during inheritance.</description>
         </field>
@@ -2762,7 +2796,7 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-    public static final String DEFAULT_EXECUTION_ID = "default-execution-id";
+    public static final String DEFAULT_EXECUTION_ID = "default";
             ]]>
           </code>
         </codeSegment>
