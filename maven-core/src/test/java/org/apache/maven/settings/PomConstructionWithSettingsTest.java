@@ -56,12 +56,10 @@ public class PomConstructionWithSettingsTest
     	assertEquals("settings", pom.getValue( "properties/pomVsSettingsInterpolated" ) );
     }    
     
-    /**MNG-4107 */
     public void testRepositories() throws Exception
     {
     	PomTestWrapper pom = buildPom( "repositories" );
     	assertEquals("maven-core-it-0", pom.getValue( "repositories[1]/id" ));
-    	System.out.println(pom.getDomainModel().asString());
     }       
 
     private PomTestWrapper buildPom( String pomPath )

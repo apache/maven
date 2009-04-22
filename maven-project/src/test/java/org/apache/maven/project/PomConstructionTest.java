@@ -885,6 +885,14 @@ public class PomConstructionTest
         assertEquals( "d", pom.getValue( "dependencies[4]/artifactId" ) );
     }
     
+    /** IT-0021*/
+    public void testProfileDependenciesMultipleProfiles()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "profile-dependencies-multiple-profiles", "profile-1", "profile-2" );
+        assertEquals(2,  ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+    }    
+    
     public void testDependencyInheritance()
         throws Exception
     {
@@ -1401,8 +1409,15 @@ public class PomConstructionTest
 	{
 	    PomTestWrapper pom = this.buildPom( "distribution-management");
 	    assertEquals("legacy", pom.getValue( "distributionManagement/repository/layout" ));
-}     
-    
+	}   
+ /*   
+    public void testRelativePath()
+	    throws Exception
+	{
+	    PomTestWrapper pom = this.buildPom( "relative-path/C");
+	    System.out.println(pom.getDomainModel().asString());
+	}      
+*/    
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
