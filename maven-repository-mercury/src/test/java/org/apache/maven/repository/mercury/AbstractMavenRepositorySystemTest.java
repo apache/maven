@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 */
 
-package org.apache.maven.repository;
+package org.apache.maven.repository.mercury;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,13 +35,12 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.mercury.util.FileUtil;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
-import org.sonatype.plexus.jetty.DefaultServletContainer;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.plexus.webcontainer.ServletContainer;
 
 /**

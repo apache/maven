@@ -19,7 +19,6 @@ under the License.
 
 package org.apache.maven.repository.mercury;
 
-import org.apache.maven.repository.AbstractMavenRepositorySystemTest;
 import org.apache.maven.repository.RepositorySystem;
 
 /**

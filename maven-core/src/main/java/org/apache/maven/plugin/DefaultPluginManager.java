@@ -1288,7 +1288,7 @@ public class DefaultPluginManager
                 // Fire the event
                 ComponentDiscoveryEvent event = new ComponentDiscoveryEvent( componentSetDescriptor );
 
-                manager.fireComponentDiscoveryEvent( event );
+                componentDiscovererManager.fireComponentDiscoveryEvent( event );
             }
             catch ( IOException ex )
             {
@@ -1305,7 +1305,7 @@ public class DefaultPluginManager
 
     public void setManager( ComponentDiscovererManager manager )
     {
-        this.manager = manager;
+        this.componentDiscovererManager = manager;
     }
     
     // ----------------------------------------------------------------------
@@ -1316,7 +1316,7 @@ public class DefaultPluginManager
 
     private Map pluginIdsByPrefix = new HashMap();
     
-    private ComponentDiscovererManager manager;
+    private ComponentDiscovererManager componentDiscovererManager;
     
     public void componentDiscovered( ComponentDiscoveryEvent event )
     {        
