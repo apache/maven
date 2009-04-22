@@ -670,7 +670,7 @@ public class DefaultMavenProjectBuilder
         {
             return domainModels;
         }
-
+        
         File parentFile = new File( projectDirectory, domainModel.getRelativePathOfParent() ).getCanonicalFile();
         if ( parentFile.isDirectory() )
         {
@@ -716,7 +716,7 @@ public class DefaultMavenProjectBuilder
         	{
         		 if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
                  {
-        			 domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, topProject.getFile(), projectBuilderConfiguration ) );
+        			 domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, topProject.getFile().getParentFile(), projectBuilderConfiguration ) );
                  }
                  else
                  {

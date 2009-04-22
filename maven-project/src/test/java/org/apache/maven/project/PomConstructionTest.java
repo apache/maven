@@ -1409,15 +1409,8 @@ public class PomConstructionTest
 	{
 	    PomTestWrapper pom = this.buildPom( "distribution-management");
 	    assertEquals("legacy", pom.getValue( "distributionManagement/repository/layout" ));
-	}   
- /*   
-    public void testRelativePath()
-	    throws Exception
-	{
-	    PomTestWrapper pom = this.buildPom( "relative-path/C");
-	    System.out.println(pom.getDomainModel().asString());
-	}      
-*/    
+	}       
+  
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
