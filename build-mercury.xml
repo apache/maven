@@ -301,8 +301,9 @@ END SNIPPET: ant-bootstrap -->
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
-      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
-      <arg value="-Dsurefire.useFile=${surefire.useFile}"/>
+
+      <jvmarg value="-Dmaven.repo.local=${maven.repo.local}"/>
+      <jvmarg value="-Dsurefire.useFile=${surefire.useFile}"/>
 <!--
 <debug-the-bootstrap>
 
