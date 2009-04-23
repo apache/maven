@@ -149,7 +149,7 @@ public class PomConstructionTest
         System.out.println(pom.getDomainModel().asString());
 
     }
-    */
+
     /*MNG- 4010*/
     public void testDuplicateExclusionsDependency()
         throws Exception
@@ -1409,7 +1409,17 @@ public class PomConstructionTest
 	{
 	    PomTestWrapper pom = this.buildPom( "distribution-management");
 	    assertEquals("legacy", pom.getValue( "distributionManagement/repository/layout" ));
-	}       
+	}      
+    
+    public void testDependencyScopeInheritance()
+	    throws Exception
+	{
+	    PomTestWrapper pom = buildPom( "dependency-scope-inheritance/sub" );
+	    String scope = (String) pom.getValue("dependencies[1]/scope");
+	    assertNull("Scope not null: " + scope, scope);
+	    System.out.println(pom.getDomainModel().asString());
+	
+	}    
   
     private void assertPathSuffixEquals( String expected, Object actual )
     {
