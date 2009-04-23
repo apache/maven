@@ -156,16 +156,27 @@ public class ProjectSorter
 
                           if ( dag.getVertex( dependencyId ) != null )
                           {
-                              project.addProjectReference( (MavenProject) projectMap.get( dependencyId ) );
+                              // If the plugin in which this dependency is listed is actually used here,
+                              // it will probably be stuck using an older version of this project that
+                              // already exists in the local repository. If not yet installed, it is
+                              // likely that we'll get an ArtifactNotFoundException when this plugin
+                              // is executed to build this project.
+                              //
+                              // If the plugin is NOT actually used here, it may actually belong in the
+                              // pluginManagement section.
+                              if ( !id.equals( dependencyId ) )
+                              {
+                                  project.addProjectReference( (MavenProject) projectMap.get( dependencyId ) );
 
-                              addEdgeWithParentCheck( projectMap, dependencyId, project, id );
-                              
-                              // TODO: Shouldn't we add an edge between the plugin and its dependency?
-                              // Note that doing this may result in cycles...run 
-                              // ProjectSorterTest.testPluginDependenciesInfluenceSorting_DeclarationInParent() 
-                              // for more information, if you change this:
-                              
-                              // dag.addEdge( pluginId, dependencyId );
+                                  addEdgeWithParentCheck( projectMap, dependencyId, project, id );
+                                  
+                                  // TODO: Shouldn't we add an edge between the plugin and its dependency?
+                                  // Note that doing this may result in cycles...run 
+                                  // ProjectSorterTest.testPluginDependenciesInfluenceSorting_DeclarationInParent() 
+                                  // for more information, if you change this:
+                                  
+                                  // dag.addEdge( pluginId, dependencyId );
+                              }
                           }
                        }
                     }

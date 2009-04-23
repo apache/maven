@@ -26,6 +26,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.List;
 
 /**
  * Test sorting projects by dependencies.
- *
+ * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
@@ -49,22 +50,22 @@ public class ProjectSorterTest
         MavenProject project = createProject( "group", "artifactA", "1.0" );
 
         List projects = new ProjectSorter( Collections.singletonList( project ) ).getSortedProjects();
-        
+
         assertEquals( "Wrong number of projects: " + projects, 1, projects.size() );
         assertEquals( "Didn't match project", project, projects.get( 0 ) );
     }
-    
+
     public void testBasicMultiProject()
         throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
         MavenProject projectA = createProject( "group", "artifactA", "1.0" );
         MavenProject projectB = createProject( "group", "artifactB", "1.0" );
         MavenProject projectC = createProject( "group", "artifactC", "1.0" );
-        
+
         projectA.getDependencies().add( createDependency( projectB ) );
         projectB.getDependencies().add( createDependency( projectC ) );
-        
-        List projects = Arrays.asList( new Object[] { projectA, projectB, projectC} );
+
+        List projects = Arrays.asList( new Object[] { projectA, projectB, projectC } );
 
         projects = new ProjectSorter( projects ).getSortedProjects();
 
@@ -145,7 +146,8 @@ public class ProjectSorterTest
         List projects = Arrays.asList( new Object[] { projectA, projectB, projectC } );
         List selectedProjects = Arrays.asList( new Object[] { "group:artifactB" } );
 
-        projects = new ProjectSorter( projects, selectedProjects, null, false/* make */, true/*makeDependents*/ ).getSortedProjects();
+        projects =
+            new ProjectSorter( projects, selectedProjects, null, false/* make */, true/* makeDependents */).getSortedProjects();
 
         assertEquals( "Wrong number of projects: " + projects, 2, projects.size() );
         assertEquals( "Didn't match project", projectB, projects.get( 0 ) );
@@ -178,32 +180,100 @@ public class ProjectSorterTest
         assertEquals( "Didn't match project", projectE, projects.get( 2 ) );
         assertEquals( "Didn't match project", projectD, projects.get( 3 ) );
     }
-    
-    public void testShouldNotFailWhenProjectReferencesNonExistentProject()
+
+    public void testShouldNotFailWhenPluginDepReferencesCurrentProject()
         throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
         MavenProject project = createProject( "group", "artifact", "1.0" );
         Model model = project.getModel();
-        
+
         Build build = model.getBuild();
-        
+
+        if ( build == null )
+        {
+            build = new Build();
+            model.setBuild( build );
+        }
+
+        Plugin plugin = new Plugin();
+
+        plugin.setArtifactId( "other-artifact" );
+        plugin.setGroupId( "other.group" );
+        plugin.setVersion( "1.0" );
+
+        Dependency dep = new Dependency();
+        dep.setGroupId( "group" );
+        dep.setArtifactId( "artifact" );
+        dep.setVersion( "1.0" );
+
+        plugin.addDependency( dep );
+
+        build.addPlugin( plugin );
+
+        new ProjectSorter( Collections.singletonList( project ) );
+    }
+
+    public void testShouldNotFailWhenManagedPluginDepReferencesCurrentProject()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject project = createProject( "group", "artifact", "1.0" );
+        Model model = project.getModel();
+
+        Build build = model.getBuild();
+
         if ( build == null )
         {
             build = new Build();
             model.setBuild( build );
         }
         
-        Extension extension = new Extension();
+        PluginManagement pMgmt = new PluginManagement();
+
+        Plugin plugin = new Plugin();
+
+        plugin.setArtifactId( "other-artifact" );
+        plugin.setGroupId( "other.group" );
+        plugin.setVersion( "1.0" );
+
+        Dependency dep = new Dependency();
+        dep.setGroupId( "group" );
+        dep.setArtifactId( "artifact" );
+        dep.setVersion( "1.0" );
+
+        plugin.addDependency( dep );
+
+        pMgmt.addPlugin( plugin );
         
+        build.setPluginManagement( pMgmt );
+
+        new ProjectSorter( Collections.singletonList( project ) );
+    }
+
+    public void testShouldNotFailWhenProjectReferencesNonExistentProject()
+        throws CycleDetectedException, DuplicateProjectException, MissingProjectException
+    {
+        MavenProject project = createProject( "group", "artifact", "1.0" );
+        Model model = project.getModel();
+
+        Build build = model.getBuild();
+
+        if ( build == null )
+        {
+            build = new Build();
+            model.setBuild( build );
+        }
+
+        Extension extension = new Extension();
+
         extension.setArtifactId( "other-artifact" );
         extension.setGroupId( "other.group" );
         extension.setVersion( "1.0" );
-        
+
         build.addExtension( extension );
-        
+
         new ProjectSorter( Collections.singletonList( project ) );
     }
-    
+
     public void testMatchingArtifactIdsDifferentGroupIds()
         throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
@@ -245,7 +315,7 @@ public class ProjectSorterTest
         MavenProject project2 = createProject( "groupId", "artifactId", "1.0" );
         projects.add( project2 );
 
-        try 
+        try
         {
             projects = new ProjectSorter( projects ).getSortedProjects();
             fail( "Duplicate projects should fail" );
@@ -266,7 +336,7 @@ public class ProjectSorterTest
         MavenProject project2 = createProject( "groupId", "artifactId", "2.0" );
         projects.add( project2 );
 
-        try 
+        try
         {
             projects = new ProjectSorter( projects ).getSortedProjects();
             fail( "Duplicate projects should fail" );
@@ -317,13 +387,13 @@ public class ProjectSorterTest
         build.addPlugin( plugin );
 
         projects = new ProjectSorter( projects ).getSortedProjects();
-        
+
         assertEquals( parentProject, projects.get( 0 ) );
-        
+
         // the order of these two is non-deterministic, based on when they're added to the reactor.
         assertTrue( projects.contains( pluginProject ) );
         assertTrue( projects.contains( pluginLevelDepProject ) );
-        
+
         // the declaring project MUST be listed after the plugin and its plugin-level dep, though.
         assertEquals( declaringProject, projects.get( 3 ) );
     }
@@ -363,11 +433,11 @@ public class ProjectSorterTest
         build.addPlugin( plugin );
 
         projects = new ProjectSorter( projects ).getSortedProjects();
-        
+
         System.out.println( projects );
 
         assertEquals( parentProject, projects.get( 0 ) );
-        
+
         // the order of these two is non-deterministic, based on when they're added to the reactor.
         assertTrue( projects.contains( pluginProject ) );
         assertTrue( projects.contains( pluginLevelDepProject ) );
