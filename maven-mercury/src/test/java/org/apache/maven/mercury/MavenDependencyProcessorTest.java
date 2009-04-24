@@ -160,7 +160,6 @@ public class MavenDependencyProcessorTest
     {
         RepositoryReader rr = _remoteRepo.getReader();
  
-//        String gav = "org.apache.maven.plugins:maven-dependency-plugin:2.0";
         String gav = "org.codehaus.plexus:plexus-compiler-api:1.5.3::jar";
  
         ArtifactMetadata bmd = new ArtifactMetadata( gav );
@@ -184,10 +183,45 @@ public class MavenDependencyProcessorTest
         ArtifactMetadata md = deps.get(0); 
 
         System.out.println("found "+gav+" dependencies: "+deps);
+    }
+
+    @Test
+    public void testForCompileScope()
+    throws Exception
+    {
+        RepositoryReader rr = _remoteRepo.getReader();
+ 
+        String gav = "org.codehaus.plexus:plexus-container-default:1.0-alpha-9";
+ 
+        ArtifactMetadata bmd = new ArtifactMetadata( gav );
+        ArrayList<ArtifactMetadata> query = new ArrayList<ArtifactMetadata>(1);
+        query.add( bmd );
+ 
+        MetadataResults res = rr.readDependencies( query );
+ 
+        assertNotNull( res );
+ 
+        assertFalse( res.hasExceptions() );
+ 
+        assertTrue( res.hasResults() );
+ 
+        List<ArtifactMetadata> deps = res.getResult( bmd );
+ 
+        assertNotNull( deps );
+ 
+        assertFalse( deps.isEmpty() );
         
-//        assertEquals( "3.0", md.getVersion() );
+        System.out.println("found "+gav+" dependencies: "+deps);
         
-//        assertEquals( ArtifactScopeEnum.compile, md.getArtifactScope() );
+        for( ArtifactMetadata md : deps )
+        {
+            System.out.println( "    "+md.toScopedString() );
+            
+            // junit has explicit "compile" scope, although it's parent defines it as "test" - see below 
+            // http://repo2.maven.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-9/plexus-container-default-1.0-alpha-9.pom
+            if( "junit".equals( md.getArtifactId() ) )
+                assertEquals( ArtifactScopeEnum.compile, md.getArtifactScope() );
+        }
     }
     
 }
