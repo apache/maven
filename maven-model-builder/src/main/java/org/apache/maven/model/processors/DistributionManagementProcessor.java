@@ -50,7 +50,7 @@ public class DistributionManagementProcessor
                 copy( p.getDistributionManagement(), t.getDistributionManagement(), false, c.getArtifactId(), p );
             }        	
             copy( c.getDistributionManagement(), t.getDistributionManagement(), isChildMostSpecialized,
-                  c.getArtifactId(), p );
+                  c.getArtifactId(), c );
         }
         else if ( p != null && p.getDistributionManagement() != null )
         {
