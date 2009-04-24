@@ -160,14 +160,22 @@ public class DefaultMavenProjectBuilder
     		}
     		        	
             domainModel = ProcessorContext.mergeProfilesIntoModel( externalProfiles, domainModel );
+            
         }
         catch ( IOException e )
         {
             throw new ProjectBuildingException("", "");
         }
         
-		//Interpolation
-        MavenProject project = interpolateDomainModel( domainModel, configuration, pomFile );
+        //Interpolation & Management
+        MavenProject project;
+		try {
+			Model model = ProcessorContext.processManagementNodes(interpolateDomainModel( domainModel, configuration, pomFile ));
+			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
+		} catch (IOException e) {
+			throw new ProjectBuildingException("", "");
+		}
+		
         project.setActiveProfiles( projectProfiles );
          
         Build build = project.getBuild();
@@ -269,7 +277,14 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException("", "");
         }
-        project = interpolateDomainModel( domainModel, configuration, artifact.getFile() );
+       
+    		try {
+    			Model model = ProcessorContext.processManagementNodes(interpolateDomainModel( domainModel, configuration, artifact.getFile() ));
+    			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, artifact.getFile());
+    		} catch (IOException e) {
+    			throw new ProjectBuildingException("", "");
+    		}
+
         project.setActiveProfiles( projectProfiles );
         artifact.setFile( artifact.getFile() );
         project.setVersion( artifact.getVersion() );
@@ -368,7 +383,7 @@ public class DefaultMavenProjectBuilder
         return new MavenProjectBuildingResult( project, result );
     }
     
-    private MavenProject interpolateDomainModel( PomClassicDomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
+    private Model interpolateDomainModel( PomClassicDomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
         throws ProjectBuildingException
     {
     	Model model;
@@ -403,9 +418,15 @@ public class DefaultMavenProjectBuilder
                 throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
             }  
             
+       return model;
 
+    }
+    
+    private MavenProject fromDomainModelToMavenProject(Model model, File parentFile, ProjectBuilderConfiguration config, File projectDescriptor)
+    	throws InvalidProjectModelException, IOException
+    {
         MavenProject project;
-
+        String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
         try
         {
             project = new MavenProject( model, repositorySystem, this, config );
@@ -415,7 +436,7 @@ public class DefaultMavenProjectBuilder
             Artifact projectArtifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
             project.setArtifact( projectArtifact );
 
-            project.setParentFile( domainModel.getParentFile() );
+            project.setParentFile( parentFile );
 
         }
         catch ( InvalidRepositoryException e )
@@ -423,7 +444,7 @@ public class DefaultMavenProjectBuilder
             throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
         }
 
-        return project;
+        return project;   	
     }
     
     private PomClassicDomainModel build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )

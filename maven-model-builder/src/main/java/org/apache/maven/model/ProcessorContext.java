@@ -251,6 +251,14 @@ public class ProcessorContext
                 }
             }           
         }
+ 
+        return target;
+      
+    }
+    
+    public static Model processManagementNodes(Model target) 
+    	throws IOException
+    {
 
         // Dependency Management
         DependencyManagementProcessor depProc = new DependencyManagementProcessor();
@@ -261,16 +269,14 @@ public class ProcessorContext
         }
         
         // Plugin Management      
-
         PluginsManagementProcessor procMng = new PluginsManagementProcessor();
         if ( target.getBuild() != null && target.getBuild().getPluginManagement() != null)
         {
             procMng.process( null, new ArrayList<Plugin>( target.getBuild().getPluginManagement().getPlugins() ),
                               target.getBuild().getPlugins(), true );
         }
-        
-        return target;
-      
+
+        return target;    	
     }
 
     public static Profile copyOfProfile(Profile profile)

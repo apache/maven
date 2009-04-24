@@ -1419,13 +1419,23 @@ public class PomConstructionTest
 	    assertNull("Scope not null: " + scope, scope);
 	    System.out.println(pom.getDomainModel().asString());
 	
-	}    
+	}   
+    
     public void testDependencyScope()
 	    throws Exception
 	{
 	    PomTestWrapper pom = buildPom( "dependency-scope/sub" );
-	    System.out.println(pom.getDomainModel().asString());	
-	}      
+	 //   System.out.println(pom.getDomainModel().asString());	
+	}   
+ 
+    //This will fail on a validation error if incorrect
+    public void testDependencyManagementWithInterpolation()
+	    throws Exception
+	{
+	    PomTestWrapper pom = buildPom( "dependency-management-with-interpolation/sub" );
+	}   
+    
+    
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();

@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.PomClassicDomainModel;
 
@@ -54,6 +55,12 @@ public final class MavenDomainModel
     	super(model.getModel());
     }    
     
+    public MavenDomainModel(Model model) 
+		throws IOException
+	{
+		super(model);
+	}    
+  
     public boolean hasParent()
     {
         return getParentMetadata() != null;

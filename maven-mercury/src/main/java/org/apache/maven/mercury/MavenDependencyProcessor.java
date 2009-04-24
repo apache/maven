@@ -119,7 +119,7 @@ public class MavenDependencyProcessor
             }
             iModels.get(0).setMostSpecialized(true);
                 	
-			return new MavenDomainModel(ProcessorContext.build(iModels, null)).getDependencyMetadata();
+			return new MavenDomainModel( ProcessorContext.processManagementNodes(ProcessorContext.build(iModels, null).getModel() )  ).getDependencyMetadata();
 		} catch (IOException e) {
 			throw new DependencyProcessorException(e);
 		}
