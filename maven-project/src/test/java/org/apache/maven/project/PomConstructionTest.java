@@ -886,15 +886,13 @@ public class PomConstructionTest
     }
     
     /** IT-0021*/
-    /*
     public void testProfileDependenciesMultipleProfiles()
         throws Exception
     {
         PomTestWrapper pom = buildPom( "profile-dependencies-multiple-profiles", "profile-1", "profile-2" );
         assertEquals(2,  ( (List<?>) pom.getValue( "dependencies" ) ).size() );
     }    
-    */
-    /*
+
     public void testDependencyInheritance()
         throws Exception
     {
@@ -902,7 +900,7 @@ public class PomConstructionTest
         assertEquals(1,  ( (List<?>) pom.getValue( "dependencies" ) ).size() );
         assertEquals("4.4",  pom.getValue("dependencies[1]/version") );
     }
-  */
+
     /** MNG-4034 */
     public void testManagedProfileDependency()
         throws Exception

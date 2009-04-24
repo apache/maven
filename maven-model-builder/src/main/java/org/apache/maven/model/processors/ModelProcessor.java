@@ -37,9 +37,12 @@ public class ModelProcessor
     extends BaseProcessor
 {
 
-    public ModelProcessor( Collection<Processor> processors )
+	private boolean isProfile;
+	
+    public ModelProcessor( Collection<Processor> processors, boolean isProfile )
     {
         super( processors );
+        this.isProfile = isProfile;
     }
 
     public void process( Object parent, Object child, Object target, boolean isChildMostSpecialized )
@@ -146,8 +149,17 @@ public class ModelProcessor
              
         if(deps.size() > 0)
         {
-        	t.setDependencies(deps);
-           // t.getDependencies().addAll( deps );
+        	//Multiple profiles may be processed so we need to add them
+        	if(isProfile)
+        	{
+        		t.getDependencies().addAll( deps );	
+        	}
+        	else
+        	{
+        		t.setDependencies(deps);	
+        	}
+        	
+           // 
         }  
         
         //Dependency Management
