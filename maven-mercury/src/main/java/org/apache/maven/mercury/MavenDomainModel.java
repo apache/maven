@@ -69,7 +69,7 @@ public final class MavenDomainModel
         	metadata.setArtifactId(d.getArtifactId());
         	metadata.setClassifier(d.getClassifier());
         	metadata.setGroupId(d.getGroupId());
-        	metadata.setScope( (d.getScope() == null) ? "runtime" : d.getScope());
+        	metadata.setScope( (d.getScope() == null) ? "compile" : d.getScope());
         	metadata.setVersion(d.getVersion());
         	metadata.setOptional(d.isOptional());
         	
