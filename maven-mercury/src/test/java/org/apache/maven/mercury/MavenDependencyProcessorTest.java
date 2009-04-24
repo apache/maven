@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
  
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
+import org.apache.maven.mercury.artifact.ArtifactScopeEnum;
 import org.apache.maven.mercury.metadata.DependencyBuilder;
 import org.apache.maven.mercury.metadata.DependencyBuilderFactory;
 import org.apache.maven.mercury.repository.api.MetadataResults;
@@ -144,8 +145,14 @@ public class MavenDependencyProcessorTest
         assertNotNull( deps );
  
         assertFalse( deps.isEmpty() );
-        assertEquals("3.0", deps.get(0).getVersion());
-        System.out.println(deps);
+        
+        ArtifactMetadata md = deps.get(0); 
+
+        System.out.println("found "+gav+" dependencies: "+deps);
+        
+        assertEquals( "3.0", md.getVersion() );
+        
+        assertEquals( ArtifactScopeEnum.compile, md.getArtifactScope() );
     }
  
 }
