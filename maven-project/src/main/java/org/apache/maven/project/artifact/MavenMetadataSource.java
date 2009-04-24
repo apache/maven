@@ -209,13 +209,15 @@ public class MavenMetadataSource
                         }
                     }
 
-                    project = null;
+                    throw new ArtifactMetadataRetrievalException(
+                            "Cannot validate pom " + e.getMessage(), e );
                 }
                 catch ( ProjectBuildingException e )
                 {
                     handleInvalidOrMissingMavenPOM( artifact, e );
 
-                    project = null;
+                    throw new ArtifactMetadataRetrievalException(
+                            "Cannot build project: " + e.getMessage(), e );
                 }
 
 
