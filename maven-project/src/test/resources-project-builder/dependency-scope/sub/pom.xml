@@ -15,17 +15,10 @@
   </scm>
 
   <dependencies>
-
     <dependency>
       <groupId>maven-test</groupId>
       <artifactId>t10-a</artifactId>
+      <version>1.0</version>
     </dependency>
-
-    <dependency>
-      <groupId>maven-test</groupId>
-      <artifactId>t10-c</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
   </dependencies>
 </project>
