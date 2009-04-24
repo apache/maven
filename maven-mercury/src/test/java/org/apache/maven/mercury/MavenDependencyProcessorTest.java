@@ -154,5 +154,40 @@ public class MavenDependencyProcessorTest
         
         assertEquals( ArtifactScopeEnum.compile, md.getArtifactScope() );
     }
+    @Test
+    public void testForNPE()
+    throws Exception
+    {
+        RepositoryReader rr = _remoteRepo.getReader();
  
+//        String gav = "org.apache.maven.plugins:maven-dependency-plugin:2.0";
+        String gav = "org.codehaus.plexus:plexus-compiler-api:1.5.3::jar";
+ 
+        ArtifactMetadata bmd = new ArtifactMetadata( gav );
+        ArrayList<ArtifactMetadata> query = new ArrayList<ArtifactMetadata>(1);
+        query.add( bmd );
+ 
+        MetadataResults res = rr.readDependencies( query );
+ 
+        assertNotNull( res );
+ 
+        assertFalse( res.hasExceptions() );
+ 
+        assertTrue( res.hasResults() );
+ 
+        List<ArtifactMetadata> deps = res.getResult( bmd );
+ 
+        assertNotNull( deps );
+ 
+        assertFalse( deps.isEmpty() );
+        
+        ArtifactMetadata md = deps.get(0); 
+
+        System.out.println("found "+gav+" dependencies: "+deps);
+        
+//        assertEquals( "3.0", md.getVersion() );
+        
+//        assertEquals( ArtifactScopeEnum.compile, md.getArtifactScope() );
+    }
+    
 }
