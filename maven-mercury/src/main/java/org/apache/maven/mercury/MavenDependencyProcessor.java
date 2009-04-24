@@ -21,6 +21,7 @@ package org.apache.maven.mercury;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import org.apache.maven.mercury.builder.api.DependencyProcessorException;
 import org.apache.maven.mercury.builder.api.MetadataReader;
 import org.apache.maven.mercury.builder.api.MetadataReaderException;
 import org.apache.maven.model.DomainModel;
+import org.apache.maven.model.PomClassicDomainModel;
 import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.interpolator.DefaultInterpolator;
 import org.apache.maven.model.interpolator.InterpolatorProperty;
@@ -68,7 +70,7 @@ public class MavenDependencyProcessor
 
         List<InterpolatorProperty> interpolatorProperties = createInterpolatorProperties(system, user);
 
-        List<DomainModel> domainModels = new ArrayList<DomainModel>();
+        List<PomClassicDomainModel> domainModels = new ArrayList<PomClassicDomainModel>();
         try
         {
             // MavenDomainModel superPom =
@@ -93,7 +95,7 @@ public class MavenDependencyProcessor
                 domainModels.add( new MavenDomainModel( transformProfiles( mc.getProperties() ) ) );
             }
 */
-            List<DomainModel> parentModels = getParentsOfDomainModel( domainModel, mdReader );
+            List<PomClassicDomainModel> parentModels = getParentsOfDomainModel( domainModel, mdReader );
 
             if ( parentModels == null )
             {
@@ -107,11 +109,19 @@ public class MavenDependencyProcessor
             throw new MetadataReaderException( "Failed to create domain model. Message = " + e.getMessage(), e );
         }
 
+        List<DomainModel> iModels = new ArrayList<DomainModel>();
+
+        
         try {
-			return new MavenDomainModel(new DefaultInterpolator().interpolateDomainModel(ProcessorContext.build(domainModels, null), 
-					interpolatorProperties)).getDependencyMetadata();
+            for(PomClassicDomainModel m : domainModels)
+            {
+            	iModels.add(new DefaultInterpolator().interpolateDomainModel(m, interpolatorProperties));
+            }
+            iModels.get(0).setMostSpecialized(true);
+                	
+			return new MavenDomainModel(ProcessorContext.build(iModels, null)).getDependencyMetadata();
 		} catch (IOException e) {
-			throw new DependencyProcessorException();
+			throw new DependencyProcessorException(e);
 		}
 
     }
@@ -135,10 +145,10 @@ public class MavenDependencyProcessor
         return interpolatorProperties;
     }
 
-    protected final List<DomainModel> getParentsOfDomainModel( MavenDomainModel domainModel, MetadataReader mdReader )
+    protected final List<PomClassicDomainModel> getParentsOfDomainModel( MavenDomainModel domainModel, MetadataReader mdReader )
         throws IOException, MetadataReaderException, DependencyProcessorException
     {
-        List<DomainModel> domainModels = new ArrayList<DomainModel>();
+        List<PomClassicDomainModel> domainModels = new ArrayList<PomClassicDomainModel>();
         if ( domainModel.hasParent() )
         {
             byte[] b = mdReader.readMetadata( domainModel.getParentMetadata() );

@@ -1,15 +1,16 @@
 package org.apache.maven.mercury;
-
+ 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+ 
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
+ 
 import org.apache.maven.mercury.artifact.ArtifactMetadata;
 import org.apache.maven.mercury.metadata.DependencyBuilder;
 import org.apache.maven.mercury.metadata.DependencyBuilderFactory;
@@ -23,7 +24,7 @@ import org.apache.maven.mercury.util.FileUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
+ 
 /**
  *
  *
@@ -34,25 +35,25 @@ import org.junit.Test;
 public class MavenDependencyProcessorTest
 {
     LocalRepositoryM2 _localRepo;
-    
+ 
     RemoteRepositoryM2 _remoteRepo;
-    
+ 
     File _localRepoFile;
-
+ 
     static final String _remoteRepoDir = "./target/test-classes/repo";
-
+ 
     File _remoteRepoFile;
-
-    static final String _remoteRepoUrlPrefix = "http://localhost:";
-
-    static final String _remoteRepoUrlSufix = "/maven2";
-
+ 
+    static  String _remoteRepoUrlPrefix = "http://localhost:";
+ 
+    static  String _remoteRepoUrlSufix = "/maven2";
+ 
 //    HttpTestServer _jetty;
-
+ 
     int _port;
-    
+ 
     DependencyBuilder _depBuilder; 
-
+ 
     /**
      * @throws java.lang.Exception
      */
@@ -61,30 +62,35 @@ public class MavenDependencyProcessorTest
     throws Exception
     {
         MavenDependencyProcessor dp = new MavenDependencyProcessor();
-        
+ 
         _localRepoFile = File.createTempFile( "maven-mercury-", "-test-repo" );
         FileUtil.delete( _localRepoFile );
         _localRepoFile.mkdirs();
         _localRepoFile.deleteOnExit();
         _localRepo = new LocalRepositoryM2( "localRepo", _localRepoFile, dp );
-
+ 
         _remoteRepoFile = new File( _remoteRepoDir );
 //        _jetty = new HttpTestServer( _remoteRepoFile, _remoteRepoUrlSufix );
 // FIXME 2009-02-12 Oleg: disabling not to mess with jetty server. Will move to Mercury ITs             
 //        _jetty.start();
 //        _port = _jetty.getPort();
-        
+ 
+//        Server server = new Server( "testRemote", new URL(_remoteRepoUrlPrefix + _port + _remoteRepoUrlSufix) );
+ 
+        _remoteRepoUrlPrefix = "http://repo2.maven.org:";
+        _port = 80;
+        _remoteRepoUrlSufix = "/maven2";
         Server server = new Server( "testRemote", new URL(_remoteRepoUrlPrefix + _port + _remoteRepoUrlSufix) );
         _remoteRepo = new RemoteRepositoryM2( server, dp );
-        
+ 
         ArrayList<Repository> repos = new ArrayList<Repository>(2);
-        
+ 
         repos.add( _localRepo );
         repos.add( _remoteRepo );
-        
+ 
         _depBuilder = DependencyBuilderFactory.create( DependencyBuilderFactory.JAVA_DEPENDENCY_MODEL, repos, null, null, null );
     }
-
+ 
     /**
      * @throws java.lang.Exception
      */
@@ -101,47 +107,45 @@ public class MavenDependencyProcessorTest
 //            System.out.println( "Jetty on :" + _port + " destroyed\n<========\n\n" );
 //        }
     }
-    
+ 
     @Test
     public void testDummy()
     throws Exception
     {
-        
+ 
     }
-
+ 
     /**
      * Test method for {@link org.apache.maven.mercury.MavenDependencyProcessor#getDependencies(org.apache.maven.mercury.artifact.ArtifactMetadata, org.apache.maven.mercury.builder.api.MetadataReader, java.util.Map, java.util.Map)}.
      */
+    @Test
     public void testMavenVersion()
     throws Exception
     {
         RepositoryReader rr = _remoteRepo.getReader();
-        
-        String gav = "org.apache.maven.plugins:maven-dependency-plugin:2.0";
-        
+ 
+//        String gav = "org.apache.maven.plugins:maven-dependency-plugin:2.0";
+        String gav = "asm:asm-xml:3.0";
+ 
         ArtifactMetadata bmd = new ArtifactMetadata( gav );
         ArrayList<ArtifactMetadata> query = new ArrayList<ArtifactMetadata>(1);
         query.add( bmd );
-        
+ 
         MetadataResults res = rr.readDependencies( query );
-        
+ 
         assertNotNull( res );
-        
+ 
         assertFalse( res.hasExceptions() );
-        
+ 
         assertTrue( res.hasResults() );
-        
+ 
         List<ArtifactMetadata> deps = res.getResult( bmd );
-        
+ 
         assertNotNull( deps );
-        
+ 
         assertFalse( deps.isEmpty() );
-        
+        assertEquals("3.0", deps.get(0).getVersion());
         System.out.println(deps);
-        
-        for( ArtifactMetadata md : deps )
-            if( "${maven.version}".equals( md.getVersion() ) )
-                fail( "dependency has unresolved variable: "+md.toString() );
     }
-
+ 
 }
