@@ -130,9 +130,6 @@ under the License.
     <module>maven-project</module>
     <module>maven-reporting-api</module>
     <module>maven-model-builder</module>
-    <!--
-    <module>maven-mercury</module>
-    -->
     <module>maven-embedder</module>
     <module>maven-toolchain</module>
     <module>maven-compat</module>
@@ -176,9 +173,6 @@ under the License.
     <plexusWebdavVersion>1.0</plexusWebdavVersion>
     <wagonVersion>1.0-beta-5</wagonVersion>
     <modelBuilderVersion>1.8</modelBuilderVersion>
-    <!--
-    <mercuryVersion>1.0-alpha-7-SNAPSHOT</mercuryVersion>     <mercuryMp3Version>1.0-alpha-1</mercuryMp3Version>
-    -->
     <securityDispatcherVersion>1.2</securityDispatcherVersion>
     <woodstoxVersion>3.2.6</woodstoxVersion>
     <modelloVersion>1.0.1</modelloVersion>
