@@ -73,8 +73,6 @@ public class DefaultUpdateCheckManager
         // we can safely assume that we're calculating based on the snapshot policy here if we've made it past the
         // release-artifact short circuit above.
         ArtifactRepositoryPolicy policy = repository.getSnapshots();
-
-        System.out.println( "snappies " + repository.getSnapshots().getUpdatePolicy() );
         
         return isUpdateRequired( artifact, repository, policy );
     }

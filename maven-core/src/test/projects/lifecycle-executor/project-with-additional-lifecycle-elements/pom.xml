@@ -4,7 +4,7 @@
   <groupId>org.apache.maven.lifecycle.test</groupId>
   <artifactId>project-with-additional-lifecycle-elements</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <name>project-with-additional-lifecycle-elements</name>
   <url>http://maven.apache.org</url>
   <dependencies>

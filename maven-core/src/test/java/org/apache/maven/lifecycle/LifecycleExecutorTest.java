@@ -48,7 +48,7 @@ public class LifecycleExecutorTest
         File pom = getProject( "project-with-additional-lifecycle-elements" );
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
-        assertEquals( "1.0-SNAPSHOT", session.getCurrentProject().getVersion() );
+        assertEquals( "1.0", session.getCurrentProject().getVersion() );
         List<MojoDescriptor> lifecyclePlan = lifecycleExecutor.calculateLifecyclePlan( "package", session );
         
         // resources:resources
@@ -76,7 +76,7 @@ public class LifecycleExecutorTest
         File pom = getProject( "project-with-additional-lifecycle-elements" );
         MavenSession session = createMavenSession( pom );        
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
-        assertEquals( "1.0-SNAPSHOT", session.getCurrentProject().getVersion() );                                
+        assertEquals( "1.0", session.getCurrentProject().getVersion() );                                
         lifecycleExecutor.execute( session );
     }    
 }
