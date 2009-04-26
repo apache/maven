@@ -22,7 +22,7 @@ under the License.
   xsd.namespace="http://maven.apache.org/METADATA/${version}"
   xml.schemaLocation="http://maven.apache.org/xsd/metadata-${version}.xsd">
   <id>repository-metadata</id>
-  <name>Repository Metadata</name>
+  <name>RepositoryMetadata</name>
   <description>Per-directory repository metadata.</description>
   <defaults>
     <default>
