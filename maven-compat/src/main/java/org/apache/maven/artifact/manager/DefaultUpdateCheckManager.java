@@ -44,7 +44,6 @@ public class DefaultUpdateCheckManager
     extends AbstractLogEnabled
     implements UpdateCheckManager
 {
-
     public DefaultUpdateCheckManager()
     {
 
@@ -75,6 +74,8 @@ public class DefaultUpdateCheckManager
         // release-artifact short circuit above.
         ArtifactRepositoryPolicy policy = repository.getSnapshots();
 
+        System.out.println( "snappies " + repository.getSnapshots().getUpdatePolicy() );
+        
         return isUpdateRequired( artifact, repository, policy );
     }
 

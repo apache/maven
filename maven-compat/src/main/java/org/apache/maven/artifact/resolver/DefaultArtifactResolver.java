@@ -142,6 +142,8 @@ public class DefaultArtifactResolver
         }
         else if ( !artifact.isResolved() )
         {
+            System.out.println( "looking!" );
+            
             // ----------------------------------------------------------------------
             // Check for the existence of the artifact in the specified local
             // ArtifactRepository. If it is present then simply return as the
@@ -150,6 +152,7 @@ public class DefaultArtifactResolver
 
             String localPath = localRepository.pathOf( artifact );
 
+            System.out.println( "3 " + localPath );
             artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
 
             transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
@@ -158,6 +161,9 @@ public class DefaultArtifactResolver
 
             destination = artifact.getFile();
 
+            System.out.println( "4 " + destination );
+            System.out.println( "5 " + destination.exists() );
+            
             boolean resolved = false;
 
             // There are three conditions in which we'll go after the artifact here:
@@ -183,6 +189,7 @@ public class DefaultArtifactResolver
                     }
                     else
                     {
+                        System.out.println( "trying to get artifact.");
                         wagonManager.getArtifact( artifact, remoteRepositories, downloadMonitor, force );
                     }
 

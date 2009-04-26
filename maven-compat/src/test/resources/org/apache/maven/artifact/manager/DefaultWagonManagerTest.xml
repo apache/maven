@@ -44,9 +44,5 @@ under the License.
       <role-hint>string</role-hint>
       <implementation>org.apache.maven.artifact.manager.StringWagon</implementation>
     </component>
-    <component>
-      <role>org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider</role>
-      <implementation>org.apache.maven.artifact.repository.authentication.DummyAuthenticationInfoProvider</implementation>
-    </component>
   </components>
 </plexus>

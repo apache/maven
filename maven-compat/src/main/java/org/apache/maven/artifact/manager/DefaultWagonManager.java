@@ -93,7 +93,7 @@ public class DefaultWagonManager
     private ArtifactRepositoryFactory repositoryFactory;
 
     @Requirement(role = Wagon.class)
-    private Map wagons;
+    private Map<String,Wagon> wagons;
 
     //@Requirement
     private CredentialsDataSource credentialsDataSource;
@@ -324,11 +324,6 @@ public class DefaultWagonManager
     public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
-    	if(remoteRepositories == null)
-    	{
-    		throw new IllegalArgumentException("remoteRepositories: null");
-    	}
-    	
         for ( ArtifactRepository repository : remoteRepositories )
         {
             try
@@ -351,8 +346,8 @@ public class DefaultWagonManager
             {
                 logger.debug( "Unable to get resource '" + artifact.getId() + "' from repository " + repository.getId() + " (" + repository.getUrl() + ")", e );
             }
-        }
-
+        }        
+        
         // if it already exists locally we were just trying to force it - ignore the update
         if ( !artifact.getFile().exists() )
         {
@@ -370,11 +365,15 @@ public class DefaultWagonManager
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOf( artifact );
-
+        
         ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+                
+        boolean updateCheckIsRequired = updateCheckManager.isUpdateRequired( artifact, repository );
 
+        System.out.println( "update check:" + updateCheckIsRequired );
+        
         if ( !policy.isEnabled() )
-        {
+        {            
             logger.debug( "Skipping disabled repository " + repository.getId() );
         }
         else if ( repository.isBlacklisted() )
@@ -383,9 +382,11 @@ public class DefaultWagonManager
         }
         // If the artifact is a snapshot, we need to determine whether it's time to check this repository for an update:
         // 1. If it's forced, then check
-        // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.
-        else if ( artifact.isSnapshot() && ( force || updateCheckManager.isUpdateRequired( artifact, repository ) ) )
+        // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.        
+        else if ( artifact.isSnapshot() && ( force || updateCheckIsRequired ) )
         {
+            System.out.println( "!!!!!!!!!!!!!!!!!!!!!");
+            
             logger.debug( "Trying repository " + repository.getId() );
 
             try
@@ -476,6 +477,8 @@ public class DefaultWagonManager
     {
         String protocol = repository.getProtocol();
 
+        System.out.println( wagons );
+        
         Wagon wagon;
 
         try
@@ -488,7 +491,7 @@ public class DefaultWagonManager
         {
             throw new TransferFailedException( "Unsupported Protocol: '" + protocol + "': " + e.getMessage(), e );
         }
-
+        
         if ( downloadMonitor != null )
         {
             wagon.addTransferListener( downloadMonitor );

@@ -84,9 +84,7 @@ public class ArtifactResolverTest
     {
         Artifact b = createRemoteArtifact( "b", "1.0-SNAPSHOT" );
         deleteLocalArtifact( b );
-
         artifactResolver.resolve( b, remoteRepositories(), localRepository() );
-
         assertLocalArtifactPresent( b );
     }
 

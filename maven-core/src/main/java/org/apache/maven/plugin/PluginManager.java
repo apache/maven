@@ -20,11 +20,14 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 
 /**
  * @author Jason van Zyl
  */
 public interface PluginManager
+    extends ComponentDiscoverer, ComponentDiscoveryListener
 {
     // - find the plugin [extension point: any client may wish to do whatever they choose]
     // - load the plugin into a classloader [extension point: we want to take them from a repository, some may take from disk or whatever]

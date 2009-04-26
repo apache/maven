@@ -72,7 +72,6 @@ import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
-import org.codehaus.plexus.component.discovery.ComponentDiscovererManager;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
@@ -132,7 +131,6 @@ public class DefaultPluginManager
     
     public DefaultPluginManager()
     {
-        System.out.println( "hello!!!!");
         pluginDescriptors = new HashMap<String,PluginDescriptor>();        
     }
 
@@ -150,8 +148,6 @@ public class DefaultPluginManager
     {        
         PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
             
-        System.out.println( "XXX plugin: " + plugin );
-        
         // There are cases where plugins are discovered but not actually populated. These are edge cases where you are working in the IDE on
         // Maven itself so this speaks to a problem we have with the system not starting entirely clean.
         if ( pluginDescriptor != null && pluginDescriptor.getClassRealm() != null )
@@ -216,8 +212,6 @@ public class DefaultPluginManager
         resolutionErrorHandler.throwErrors( request, result );
 
         ClassRealm pluginRealm = container.createChildRealm( pluginKey( plugin ) );
-
-        System.out.println( "plugin: " + pluginArtifact );
         
         Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, project, session.getLocalRepository() );
 
@@ -589,13 +583,17 @@ public class DefaultPluginManager
             return mojo;
 
         }
+        catch ( PlexusConfigurationException e )
+        {
+            throw new PluginConfigurationException( pluginDescriptor, "Error checking parameters: " + e.getMessage() );
+        }
         finally
         {
             Thread.currentThread().setContextClassLoader( oldClassLoader );
         }
     }
 
-    private void checkDeprecatedParameters( MojoDescriptor mojoDescriptor, PlexusConfiguration extractedMojoConfiguration )
+    private void checkDeprecatedParameters( MojoDescriptor mojoDescriptor, PlexusConfiguration extractedMojoConfiguration ) throws PlexusConfigurationException
     {
         if ( ( extractedMojoConfiguration == null ) || ( extractedMojoConfiguration.getChildCount() < 1 ) )
         {
@@ -1232,8 +1230,6 @@ public class DefaultPluginManager
     public List<ComponentSetDescriptor> findComponents( Context context, ClassRealm realm )
         throws PlexusConfigurationException
     {
-        System.out.println( "realm: " + realm );
-        
         List<ComponentSetDescriptor> componentSetDescriptors = new ArrayList<ComponentSetDescriptor>();
 
         Enumeration<URL> resources;
@@ -1282,13 +1278,8 @@ public class DefaultPluginManager
                         cd.setRealm( realm );
                     }
                 }
-
+                
                 componentSetDescriptors.add( componentSetDescriptor );
-
-                // Fire the event
-                ComponentDiscoveryEvent event = new ComponentDiscoveryEvent( componentSetDescriptor );
-
-                componentDiscovererManager.fireComponentDiscoveryEvent( event );
             }
             catch ( IOException ex )
             {
@@ -1302,11 +1293,6 @@ public class DefaultPluginManager
 
         return componentSetDescriptors;
     }
-
-    public void setManager( ComponentDiscovererManager manager )
-    {
-        this.componentDiscovererManager = manager;
-    }
     
     // ----------------------------------------------------------------------
     // Component Discovery Listener
@@ -1315,9 +1301,7 @@ public class DefaultPluginManager
     private Set pluginsInProcess = new HashSet();
 
     private Map pluginIdsByPrefix = new HashMap();
-    
-    private ComponentDiscovererManager componentDiscovererManager;
-    
+        
     public void componentDiscovered( ComponentDiscoveryEvent event )
     {        
         ComponentSetDescriptor componentSetDescriptor = event.getComponentSetDescriptor();

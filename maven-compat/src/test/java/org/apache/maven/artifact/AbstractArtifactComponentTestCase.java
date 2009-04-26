@@ -71,7 +71,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository badLocalRepository()
         throws Exception
     {
-        String path = "target/test-classes/repositories/" + component() + "/bad-local-repository";
+        String path = "target/test-repositories/" + component() + "/bad-local-repository";
 
         File f = new File( getBasedir(), path );
 
@@ -91,7 +91,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository localRepository()
         throws Exception
     {
-        String path = "target/test-classes/repositories/" + component() + "/local-repository";
+        String path = "target/test-repositories/" + component() + "/local-repository";
 
         File f = new File( getBasedir(), path );
 
@@ -104,7 +104,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository remoteRepository()
         throws Exception
     {
-        String path = "target/test-classes/repositories/" + component() + "/remote-repository";
+        String path = "target/test-repositories/" + component() + "/remote-repository";
 
         File f = new File( getBasedir(), path );
 
@@ -217,6 +217,8 @@ public abstract class AbstractArtifactComponentTestCase
     {
         Artifact artifact = createArtifact( artifactId, version );
 
+        System.out.println( "1 " + artifact );
+        
         createArtifact( artifact, remoteRepository() );
 
         return artifact;
@@ -241,6 +243,8 @@ public abstract class AbstractArtifactComponentTestCase
 
         File artifactFile = new File( repository.getBasedir(), path );
 
+        System.out.println( "2 " + artifactFile.getParentFile() );
+        
         if ( !artifactFile.getParentFile().exists() )
         {
             artifactFile.getParentFile().mkdirs();
@@ -268,7 +272,9 @@ public abstract class AbstractArtifactComponentTestCase
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
         throws Exception
     {
-        return artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
+        Artifact a = artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
+                
+        return a;
     }
 
     protected void deleteLocalArtifact( Artifact artifact )
