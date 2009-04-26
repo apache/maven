@@ -217,8 +217,6 @@ public abstract class AbstractArtifactComponentTestCase
     {
         Artifact artifact = createArtifact( artifactId, version );
 
-        System.out.println( "1 " + artifact );
-        
         createArtifact( artifact, remoteRepository() );
 
         return artifact;
@@ -243,8 +241,6 @@ public abstract class AbstractArtifactComponentTestCase
 
         File artifactFile = new File( repository.getBasedir(), path );
 
-        System.out.println( "2 " + artifactFile.getParentFile() );
-        
         if ( !artifactFile.getParentFile().exists() )
         {
             artifactFile.getParentFile().mkdirs();
