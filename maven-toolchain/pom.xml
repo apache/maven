@@ -69,7 +69,7 @@
           <version>1.0.0</version>
           <packageWithVersion>false</packageWithVersion>
           <models>
-            <model>src/main/mdo/toolchains.xml</model>
+            <model>src/main/mdo/toolchains.mdo</model>
           </models>
         </configuration>
       </plugin>
