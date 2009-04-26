@@ -170,11 +170,13 @@ public class MavenEmbedder
         return pluginManager.getMojoExecutionsForGoal( goal );
     }
 
+    /*
     public Object getMojoParameterFor(MojoExecution mojoExecution, String xPath) 
         throws Exception
     {
         return pluginManager.getMojoParameterFor( mojoExecution, xPath);
     }
+    */
 
     public void executeMojo(MojoExecution mojoExecution, MavenSession mavenSession ) 
         throws Exception

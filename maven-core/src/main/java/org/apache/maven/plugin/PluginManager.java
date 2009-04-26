@@ -17,6 +17,7 @@ package org.apache.maven.plugin;
 
 import java.util.Collection;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
@@ -56,9 +57,11 @@ public interface PluginManager
     Collection<MojoExecution> getMojoExecutionsForGoal( String goal )
         throws Exception;
 
+    /*
     Object getMojoParameterFor( MojoExecution mojoExecution, String xPath )
         throws Exception;
-
+    */
+    
     void executeMojo( MojoExecution mojoExecution, MavenSession session )
         throws Exception;
     

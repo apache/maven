@@ -97,6 +97,7 @@
     <dependency>
       <groupId>commons-jxpath</groupId>
       <artifactId>commons-jxpath</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

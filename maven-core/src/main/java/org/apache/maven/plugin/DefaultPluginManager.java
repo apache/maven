@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -1679,6 +1678,7 @@ public class DefaultPluginManager
         return mojoExecutions;
     }
 
+    /*
     public Object getMojoParameterFor( MojoExecution mojoExecution, String xPath )
         throws Exception
     {
@@ -1688,6 +1688,7 @@ public class DefaultPluginManager
 
         return JXPathContext.newContext( mergedConfig ).getValue( xPath );
     }
+    */
 
     public void executeMojo( MojoExecution mojoExecution, MavenSession session )
         throws Exception
