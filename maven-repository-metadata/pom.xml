@@ -28,7 +28,7 @@ under the License.
   <artifactId>maven-repository-metadata</artifactId>
 
   <name>Maven Repository Metadata Model</name>
-  <description>Maven Plugin Mapping</description>
+  <description>Per-directory repository metadata.</description>
 
   <dependencies>
     <dependency>

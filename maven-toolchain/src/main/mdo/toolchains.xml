@@ -38,7 +38,7 @@
         <class rootElement="true" xml.tagName="toolchains" xsd.compositor="sequence">
             <name>PersistedToolchains</name>
             <description><![CDATA[
-         The <code>&lt;project&gt;</code> element is the root of the descriptor.
+         The <code>&lt;toolchains&gt;</code> element is the root of the descriptor.
          The following table lists all of the possible child elements.
             ]]></description>
             <version>1.0.0+</version>
