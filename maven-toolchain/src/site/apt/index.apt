@@ -1,0 +1,17 @@
+ -----
+ Maven Toolchains
+ -----
+ Hervé Boutemy
+ -----
+ 2009-04-26
+ -----
+
+Maven Toolchains
+
+ This is strictly the model for Maven Toolchains, so really just plain objects.
+
+ The following are generated from this model:
+
+   * {{{apidocs/index.html}Java sources}} with Reader for the Xpp3 XML parser, to read <<<toolchains.xml>>> file
+
+   * A {{{toolchains.html}Descriptor Reference}}
