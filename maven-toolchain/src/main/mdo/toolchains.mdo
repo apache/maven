@@ -24,7 +24,7 @@
   xml.namespace="http://maven.apache.org/TOOLCHAINS/${version}"
   xml.schemaLocation="http://maven.apache.org/xsd/toolchains-${version}.xsd">
     <id>toolchains</id>
-    <name>Maven Toolchains</name>
+    <name>MavenToolchains</name>
     <description><![CDATA[
 
     ]]></description>
