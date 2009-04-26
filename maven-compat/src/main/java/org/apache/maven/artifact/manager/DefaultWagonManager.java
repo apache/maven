@@ -369,8 +369,6 @@ public class DefaultWagonManager
         ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
                 
         boolean updateCheckIsRequired = updateCheckManager.isUpdateRequired( artifact, repository );
-
-        System.out.println( "update check:" + updateCheckIsRequired );
         
         if ( !policy.isEnabled() )
         {            
@@ -385,8 +383,6 @@ public class DefaultWagonManager
         // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.        
         else if ( artifact.isSnapshot() && ( force || updateCheckIsRequired ) )
         {
-            System.out.println( "!!!!!!!!!!!!!!!!!!!!!");
-            
             logger.debug( "Trying repository " + repository.getId() );
 
             try
@@ -476,8 +472,6 @@ public class DefaultWagonManager
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String protocol = repository.getProtocol();
-
-        System.out.println( wagons );
         
         Wagon wagon;
 
