@@ -151,7 +151,7 @@ TODO:
     <modello file="maven-profile/src/main/mdo/profiles.mdo"/>
     <modello file="maven-settings/src/main/mdo/settings.mdo"/>
     <modello file="maven-repository-metadata/src/main/mdo/metadata.mdo"/>
-    <modello file="maven-toolchain/src/main/mdo/toolchains.xml"/>
+    <modello file="maven-toolchain/src/main/mdo/toolchains.mdo"/>
 
   </target>
 
