@@ -13,6 +13,8 @@ public class PluginManagerTest
     @Requirement
     private PluginManager pluginManager;
     
+    private String plexusVersion = "1.0-beta-3.0.7-SNAPSHOT";
+    
     protected void setUp()
         throws Exception
     {
@@ -32,7 +34,7 @@ public class PluginManagerTest
         Plugin plugin = new Plugin();
         plugin.setGroupId( "org.codehaus.plexus" );
         plugin.setArtifactId( "plexus-component-metadata" );
-        plugin.setVersion( "1.0-beta-3.0.6" );
+        plugin.setVersion( plexusVersion );
         PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, session.getCurrentProject(), session );
         assertNotNull( pluginDescriptor );
         assertNotNull( pluginDescriptor.getClassRealm() );
@@ -46,7 +48,7 @@ public class PluginManagerTest
         Plugin plugin = new Plugin();
         plugin.setGroupId( "org.codehaus.plexus" );
         plugin.setArtifactId( "plexus-component-metadata" );
-        plugin.setVersion( "1.0-beta-3.0.6" );
+        plugin.setVersion( plexusVersion );
         
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );        
         assertNotNull( mojoDescriptor );
@@ -58,7 +60,7 @@ public class PluginManagerTest
         assertNotNull( pluginDescriptor );
         assertEquals( "org.codehaus.plexus", pluginDescriptor.getGroupId() );
         assertEquals( "plexus-component-metadata", pluginDescriptor.getArtifactId() );
-        assertEquals( "1.0-beta-3.0.6", pluginDescriptor.getVersion() );
+        assertEquals( plexusVersion, pluginDescriptor.getVersion() );
         assertNotNull( pluginDescriptor.getClassRealm() );
     }
     
