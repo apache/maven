@@ -197,15 +197,15 @@ public class DefaultPluginManager
         
         ArtifactRepository localRepository = session.getLocalRepository();
 
-        MavenProject pluginProject = buildPluginProject( plugin, localRepository, project.getRemoteArtifactRepositories() );
+        MavenProject pluginProject = buildPluginProject( plugin, localRepository, new ArrayList( project.getRemoteArtifactRepositories() ) );
 
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
-        checkRequiredMavenVersion( plugin, pluginProject, localRepository, project.getRemoteArtifactRepositories() );
+        checkRequiredMavenVersion( plugin, pluginProject, localRepository, new ArrayList( project.getRemoteArtifactRepositories() ) );
 
         pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, new ArrayList( project.getRemoteArtifactRepositories() ) );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
@@ -290,7 +290,7 @@ public class DefaultPluginManager
             Artifact pluginPomArtifact = repositorySystem.createProjectArtifact( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
             
             // This does not populate the artifacts of the dependenct projects
-            MavenProject pluginProject = mavenProjectBuilder.buildFromRepository( pluginPomArtifact, project.getRemoteArtifactRepositories(), localRepository );
+            MavenProject pluginProject = mavenProjectBuilder.buildFromRepository( pluginPomArtifact, new ArrayList( project.getRemoteArtifactRepositories() ), localRepository );
             
             // This needs to be changed so that the resolver deals with this
             for ( Dependency d : pluginProject.getDependencies() )
@@ -320,11 +320,11 @@ public class DefaultPluginManager
             .setArtifact( pluginArtifact )
             .setArtifactDependencies( dependencies )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setRemoteRepostories( new ArrayList( project.getRemoteArtifactRepositories() ) )
             .setManagedVersionMap( pluginManagedDependencies )
             .setFilter( filter )
             .setResolveRoot( false ); // We are setting this to false because the artifact itself has been resolved.
-
+        
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
 
@@ -1084,7 +1084,7 @@ public class DefaultPluginManager
             .setResolveRoot( false )
             .setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( session.getLocalRepository() )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setRemoteRepostories( new ArrayList( project.getRemoteArtifactRepositories() ) )
             .setManagedVersionMap( project.getManagedVersionMap() )
             .setFilter( filter );
 
@@ -1095,7 +1095,7 @@ public class DefaultPluginManager
         project.setArtifacts( result.getArtifacts() );                
         
         ArtifactRepository localRepository = session.getLocalRepository();
-        List<ArtifactRepository> remoteArtifactRepositories = session.getCurrentProject().getRemoteArtifactRepositories();
+        List<ArtifactRepository> remoteArtifactRepositories = new ArrayList( session.getCurrentProject().getRemoteArtifactRepositories() );
 
         for ( Artifact projectArtifact : session.getCurrentProject().getArtifacts() )
         {            

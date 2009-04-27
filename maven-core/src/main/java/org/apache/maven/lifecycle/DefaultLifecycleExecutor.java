@@ -60,6 +60,10 @@ public class DefaultLifecycleExecutor
     @Requirement
     private PluginManager pluginManager;
 
+    /**
+     * These mappings correspond to packaging types, like WAR packaging, which configure a particular mojos
+     * to run in a given phase.
+     */
     @Requirement
     private Map<String, LifecycleMapping> lifecycleMappings;
     
@@ -91,29 +95,8 @@ public class DefaultLifecycleExecutor
         {
             throw new BuildFailureException( "\n\nYou must specify at least one goal. Try 'mvn install' to build or 'mvn --help' for options \nSee http://maven.apache.org for more information.\n\n" );
         }
-
-        executeTaskSegments( goals, session, rootProject );
-    }
-
-    public List<String> getLifecyclePhases()
-    {
-        for ( Lifecycle lifecycle : lifecycles )
-        {
-            if ( lifecycle.getId().equals( "default" ) )
-            {
-                return (List<String>) lifecycle.getPhases();
-            }
-        }
-
-        return null;
-    }
-
-    private void executeTaskSegments( List<String> goals, MavenSession session, MavenProject rootProject )
-        throws LifecycleExecutionException, BuildFailureException
-    {
-        List<MavenProject> sortedProjects = session.getSortedProjects();
-
-        for ( MavenProject currentProject : sortedProjects )
+        
+        for ( MavenProject currentProject : session.getSortedProjects() )
         {
             if ( !session.getReactorManager().isBlackListed( currentProject ) )
             {
@@ -128,6 +111,7 @@ public class DefaultLifecycleExecutor
                     for ( String goal : goals )
                     {
                         String target = currentProject.getId() + " ( " + goal + " )";
+                        System.out.println( "target: " + target );
                         executeGoalAndHandleFailures( goal, session, currentProject, buildStartTime, target );
                     }
                 }
@@ -138,7 +122,7 @@ public class DefaultLifecycleExecutor
 
                 session.getReactorManager().registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
             }
-        }
+        }        
     }
 
     private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, long buildStartTime, String target )
@@ -192,6 +176,8 @@ public class DefaultLifecycleExecutor
         {
             MojoExecution mojoExecution = new MojoExecution( mojoDescriptor ); 
 
+            System.out.println( mojoExecution.getMojoDescriptor().getGoal() );
+            
             try
             {
                 pluginManager.executeMojo( session, mojoExecution );
@@ -219,22 +205,51 @@ public class DefaultLifecycleExecutor
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
     // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
     // 5. Bind mojos specified in the project itself to the lifecycle
-    public List<MojoDescriptor> calculateLifecyclePlan( String task, MavenSession session )
+    public List<MojoDescriptor> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
         throws LifecycleExecutionException
-    {
+    {        
         // Extract the project from the session
         MavenProject project = session.getCurrentProject();
         
-        // 1. 
-        Lifecycle lifecycle = phaseToLifecycleMap.get( task );
+        // 1.
+        //
+        // Based on the lifecycle phase we are given, let's find the corresponding lifecycle.
+        //
+        Lifecycle lifecycle = phaseToLifecycleMap.get( lifecyclePhase );                
         
         // 2. 
-        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( project.getPackaging() );
+        //
+        // If we are dealing with the "clean" or "site" lifecycle then there are currently no lifecycle mappings but there are default phases
+        // that need to be run instead.
+        //
+        // Now we need to take into account the packaging type of the project. For a project of type WAR, the lifecycle where mojos are mapped
+        // on to the given phases in the lifecycle are going to be a little different then, say, a project of type JAR.
+        //
+           
+        Map<String, String> lifecyclePhasesForPackaging;
         
+        if ( lifecyclePhase.equals( "clean" ) )
+        {
+            lifecyclePhasesForPackaging = new HashMap<String,String>();
+            
+            for( String phase : lifecycle.getDefaultPhases() )
+            {
+                lifecyclePhasesForPackaging.put( "clean", "org.apache.maven.plugins:maven-clean-plugin:clean" );
+            }
+        }
+        else
+        {
+            LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( project.getPackaging() );
+          
+            lifecyclePhasesForPackaging = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() ).getPhases();            
+        }
+                
         // 3.
-        Map<String, String> lifecyclePhasesForPackaging = lifecycleMappingForPackaging.getLifecycles().get( "default" ).getPhases();
-        
-        // Create an order Map of the phases in the lifecycle to a list of mojos to execute.
+        //
+        // Once we have the lifecycle mapping for the given packaging, we need to know whats phases we need to worry about executing.
+        //
+                        
+        // Create an ordered Map of the phases in the lifecycle to a list of mojos to execute.
         Map<String,List<String>> phaseToMojoMapping = new LinkedHashMap<String,List<String>>();
         
         // 4. 
@@ -255,21 +270,26 @@ public class DefaultLifecycleExecutor
             phaseToMojoMapping.put( phase, mojos );    
             
             // We only want to execute up to and including the specified lifecycle phase.
-            if ( phase.equals( task ) )
+            if ( phase.equals( lifecyclePhase ) )
             {
                 break;
             }
         }
               
         // 5. 
-        
+        //
+        // We are only interested in the phases that correspond to the lifecycle we are trying to run. If we are running the "clean"
+        // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
+        //
         for( Plugin plugin : project.getBuild().getPlugins() )
         {
+            System.out.println( plugin.getArtifactId() );
+            
             for( PluginExecution execution : plugin.getExecutions() )
             {
                 // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
                 // to examine the phase it is associated to.                
-                if ( execution.getPhase() != null )
+                if ( execution.getPhase() != null && execution.getPhase().equals( lifecyclePhase ) )
                 {
                     for( String goal : execution.getGoals() )
                     {
@@ -285,8 +305,18 @@ public class DefaultLifecycleExecutor
                     for( String goal : execution.getGoals() )
                     {
                         String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
-                        MojoDescriptor md = getMojoDescriptor( s, session, project);
-                        phaseToMojoMapping.get( md.getPhase() ).add( s );
+                        MojoDescriptor md = getMojoDescriptor( s, session, project );
+                        
+                        boolean include = lifecycle.getPhases().contains( md.getPhase() );                        
+                        System.out.println( ">>> " + goal );
+                        System.out.println( ">>> " + md.getPhase() );                                                
+                        System.out.println( ">>> " + include );
+                        
+                        // need to know if this plugin belongs to a phase in the lifecycle that's running
+                        if ( md.getPhase() != null && include )
+                        {
+                            phaseToMojoMapping.get( md.getPhase() ).add( s );
+                        }
                     }
                 }
             }
@@ -307,13 +337,18 @@ public class DefaultLifecycleExecutor
             }
         }  
         
+        for ( MojoDescriptor md : lifecyclePlan )
+        {
+            System.out.println( md.getGoal() );
+        }
+        
         return lifecyclePlan;
     }  
            
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException
-    {
+    {        
         String goal;
         
         Plugin plugin;
@@ -418,7 +453,7 @@ public class DefaultLifecycleExecutor
         for ( Lifecycle lifecycle : lifecycles )
         {
             for ( String phase : lifecycle.getPhases() )
-            {
+            {                
                 // The first definition wins.
                 if ( !phaseToLifecycleMap.containsKey( phase ) )
                 {
@@ -426,5 +461,18 @@ public class DefaultLifecycleExecutor
                 }
             }
         }
-    }
+    }   
+    
+    public List<String> getLifecyclePhases()
+    {
+        for ( Lifecycle lifecycle : lifecycles )
+        {
+            if ( lifecycle.getId().equals( "default" ) )
+            {
+                return (List<String>) lifecycle.getPhases();
+            }
+        }
+
+        return null;
+    }    
 }

@@ -32,7 +32,15 @@ public interface LifecycleExecutor
 {    
     List<String> getLifecyclePhases();
         
-    List<MojoDescriptor> calculateLifecyclePlan( String task, MavenSession session )
+    /**
+     * Calculate the list of {@link org.apache.maven.plugin.descriptor.MojoDescriptor} objects to run for the selected lifecycle phase.
+     * 
+     * @param phase
+     * @param session
+     * @return
+     * @throws LifecycleExecutionException
+     */
+    List<MojoDescriptor> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
         throws LifecycleExecutionException;
         
     void execute( MavenSession session )

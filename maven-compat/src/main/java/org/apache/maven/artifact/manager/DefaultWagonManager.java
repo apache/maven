@@ -116,6 +116,8 @@ public class DefaultWagonManager
     {
         String protocol = repository.getProtocol();
 
+        System.out.println( "PROTOCOL: " + protocol );
+        
         if ( protocol == null )
         {
             throw new UnsupportedProtocolException( "The repository " + repository + " does not specify a protocol" );

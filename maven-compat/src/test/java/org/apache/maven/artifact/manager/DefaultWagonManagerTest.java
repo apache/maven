@@ -72,6 +72,12 @@ public class DefaultWagonManagerTest
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
     
+    public void testAvailableProtocols()
+        throws Exception
+    {
+        wagonManager.getWagon( "file" );
+    }    
+    
     public void testUnnecessaryRepositoryLookup() throws Exception {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
 

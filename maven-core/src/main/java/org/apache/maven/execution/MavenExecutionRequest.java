@@ -105,11 +105,6 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setRecursive( boolean recursive );
     boolean isRecursive();
 
-    // Pom
-    MavenExecutionRequest setPomFile( String pomFilename );
-
-    String getPomFile();
-
     MavenExecutionRequest setPom( File pom );
     File getPom();
 

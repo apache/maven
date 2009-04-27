@@ -171,7 +171,7 @@ public class DefaultMaven
     protected List<MavenProject> getProjects( MavenExecutionRequest request )
         throws MavenExecutionException
     {
-        List<File> files = Arrays.asList( new File[] { new File( request.getPomFile() ) } );
+        List<File> files = Arrays.asList( new File[] { request.getPom() } );
 
         List<MavenProject> projects = collectProjects( files, request );
 

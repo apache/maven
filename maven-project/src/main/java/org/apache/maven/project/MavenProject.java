@@ -124,6 +124,8 @@ public class MavenProject
 
     private List<String> scriptSourceRoots = new ArrayList<String>();
 
+    private List<ArtifactRepository> pluginArtifactRepositories;
+
     private ArtifactRepository releaseArtifactRepository;
 
     private ArtifactRepository snapshotArtifactRepository;
@@ -164,6 +166,7 @@ public class MavenProject
     private ProjectBuilderConfiguration projectBuilderConfiguration;
 
     private RepositorySystem repositorySystem;
+    //
 
     private File parentFile;
 
@@ -1327,7 +1330,21 @@ public class MavenProject
         return build;
     }
 
-    //!!jvz remove ModelUtils
+    public void addPlugin( Plugin plugin )
+    {
+        Build build = getModelBuild();
+
+        if ( !build.getPluginsAsMap().containsKey( plugin.getKey() ) )
+        {
+            injectPluginManagementInfo( plugin );
+
+            build.addPlugin( plugin );
+
+            build.flushPluginMap();
+        }
+    }
+
+    //TODO: remove ModelUtils
     public void injectPluginManagementInfo( Plugin plugin )
     {
         PluginManagement pm = getModelBuild().getPluginManagement();
@@ -1359,6 +1376,7 @@ public class MavenProject
 
     public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
+        this.pluginArtifactRepositories = pluginArtifactRepositories;
     }
 
     /**

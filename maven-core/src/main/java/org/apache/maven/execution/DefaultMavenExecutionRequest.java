@@ -182,12 +182,6 @@ public class DefaultMavenExecutionRequest
         return properties;
     }
 
-    /** @deprecated use {@link #getPom()} */
-    public String getPomFile()
-    {
-        return pom.getAbsolutePath();
-    }
-
     public File getPom()
     {
         return pom;

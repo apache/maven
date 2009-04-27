@@ -439,6 +439,7 @@ under the License.
             <useJava5>true</useJava5>
           </configuration>
           <executions>
+            <!--
             <execution>
               <id>site-docs</id>
               <phase>pre-site</phase>
@@ -447,6 +448,7 @@ under the License.
                 <goal>xsd</goal>
               </goals>
             </execution>
+            -->
             <execution>
               <id>standard</id>
               <goals>
@@ -477,6 +479,11 @@ under the License.
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.4-SNAPSHOT</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-remote-resources-plugin</artifactId>
+          <version>1.0.1-SNAPSHOT</version>
+        </plugin>        
       </plugins>
     </pluginManagement>
   </build>

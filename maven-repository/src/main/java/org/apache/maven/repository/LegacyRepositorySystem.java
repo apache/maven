@@ -382,10 +382,8 @@ public class LegacyRepositorySystem
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {        
-        ArtifactResolutionResult res = artifactResolver.resolve( request );
-
-        return res;
+    {                
+        return artifactResolver.resolve( request );
     }
 
     public void setOnline( boolean online )
