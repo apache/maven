@@ -60,12 +60,6 @@ under the License.
         <exclude>org.apache.maven.mercury:mercury-crypto-basic</exclude>        
       </excludes>
     </dependencySet>
-    <dependencySet>
-      <outputDirectory>bin/.cd/bin</outputDirectory>
-      <includes>
-        <include>org.sonatype.mercury:mercury-mp3-cli</include>
-      </includes>
-    </dependencySet>
   </dependencySets>
   <fileSets>
     <fileSet>

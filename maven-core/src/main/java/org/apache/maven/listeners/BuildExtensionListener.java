@@ -9,15 +9,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ProjectUri;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.sonatype.plexus.plugin.manager.PlexusPluginManager;
-import org.sonatype.plexus.plugin.manager.PluginMetadata;
-import org.sonatype.plexus.plugin.manager.PluginResolutionRequest;
-import org.sonatype.plexus.plugin.manager.PluginResolutionResult;
 
 /**
  * This listener has two parts: the collection of the extension elements which happens during POM construction,
@@ -36,8 +29,8 @@ public class BuildExtensionListener
     @Configuration(value = "true")
     private boolean inBuild = true;
 
-    @Requirement
-    PlexusPluginManager pluginManager;
+    //@Requirement
+    //PlexusPluginManager pluginManager;
     
     private List<Extension> buildExtensions = new ArrayList<Extension>();
      
@@ -69,6 +62,7 @@ public class BuildExtensionListener
     	
         for ( Extension be : buildExtensions )
         {
+        	/*
             PluginResolutionRequest request = new PluginResolutionRequest()
                 .setPluginMetadata( new PluginMetadata( be.getGroupId(), be.getArtifactId(), be.getVersion() ) )
                 .addLocalRepository( session.getRequest().getLocalRepositoryPath() )
@@ -90,6 +84,7 @@ public class BuildExtensionListener
             {
                 e.printStackTrace();
             }
+            */
         }
     } 
     

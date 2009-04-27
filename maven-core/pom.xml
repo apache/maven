@@ -18,11 +18,8 @@
     <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>maven-core</artifactId>
-
   <name>Maven Core</name>
-
   <dependencies>
     <!--  Maven -->
     <dependency>
@@ -75,27 +72,12 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-plugin-manager</artifactId>
-    </dependency>
-    <dependency>
-      <!--
-      NOTE: This is originally a transitive dependency of plexus-plugin-manager. However, unless we specify this
-      artifact as a direct dependency of ourselves, Maven's project sorter will not detect the (indirect) dependency
-      of maven-core on maven-mercury. Proper detection of this dependency is crucial to ensure that maven-mercury is
-      built before maven-core. Otherwise, Maven would query the repos instead of the reactor cache for maven-mercury
-      when building maven-core, happily using out-dated snapshots and potentially failing the build.
-      -->
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-mercury</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-sec-dispatcher</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-jxpath</groupId>
       <artifactId>commons-jxpath</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
