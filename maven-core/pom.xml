@@ -238,7 +238,7 @@
       </build>
     </profile>
     <profile>
-      <id>buildnumber</id>
+      <id>canonical-buildnumber</id>
       <activation>
         <file>
           <exists>.svn</exists>
@@ -267,7 +267,7 @@
       </build>
     </profile>
     <profile>
-      <id>buildnumber-git</id>
+      <id>non-canonical-buildnumber</id>
       <activation>
         <file>
           <missing>.svn</missing>
@@ -290,7 +290,7 @@
             <configuration>
               <doCheck>false</doCheck>
               <doUpdate>false</doUpdate>
-              <format>{0,date,yyyy-MM-dd_HH-mm}_{1}</format>
+              <format>NON-CANONICAL_{0,date,yyyy-MM-dd_HH-mm}_{1}</format>
               <items>
                 <item>timestamp</item>
                 <item>${user.name}</item>
