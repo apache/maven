@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
 /**
@@ -44,5 +45,5 @@ public interface LifecycleExecutor
         throws LifecycleExecutionException;
         
     void execute( MavenSession session )
-        throws LifecycleExecutionException, BuildFailureException;
+        throws LifecycleExecutionException, MojoFailureException;
 }

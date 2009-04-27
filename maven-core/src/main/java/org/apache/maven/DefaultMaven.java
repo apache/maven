@@ -31,6 +31,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -103,7 +104,7 @@ public class DefaultMaven
 
             return result;
         }
-        catch ( BuildFailureException e )
+        catch ( MojoFailureException e )
         {
             result.addException( e );
 

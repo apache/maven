@@ -22,10 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Properties;
-
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -48,14 +47,13 @@ import org.apache.maven.model.interpolator.PomInterpolatorTag;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationException;
-import org.apache.maven.profiles.ProfileManagerInfo;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.profiles.ProfileManagerInfo;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -303,14 +301,16 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-    	if(remoteRepositories == null)
+    	if(remoteRepositories ==    null)
     	{
     		throw new IllegalArgumentException("repositories: null");
     	}
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()        
-        .setLocalRepository( localRepository )
-        .setRemoteRepositories(remoteRepositories);
-        return buildFromRepository(artifact, configuration);
+            
+    	ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()        
+            .setLocalRepository( localRepository )
+            .setRemoteRepositories(remoteRepositories);
+        
+    	return buildFromRepository(artifact, configuration);
     }
 
     /**

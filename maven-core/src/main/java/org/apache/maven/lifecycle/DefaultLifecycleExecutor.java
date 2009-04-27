@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.maven.BuildFailureException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
@@ -73,7 +72,7 @@ public class DefaultLifecycleExecutor
     private Map<String, Lifecycle> phaseToLifecycleMap;
 
     public void execute( MavenSession session )
-        throws BuildFailureException, LifecycleExecutionException
+        throws LifecycleExecutionException, MojoFailureException
     {
         // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
         // within the same reactor (using an inclusion pattern to gather them up)...
@@ -93,7 +92,7 @@ public class DefaultLifecycleExecutor
 
         if ( goals.isEmpty() )
         {
-            throw new BuildFailureException( "\n\nYou must specify at least one goal. Try 'mvn install' to build or 'mvn --help' for options \nSee http://maven.apache.org for more information.\n\n" );
+            throw new LifecycleExecutionException( "\n\nYou must specify at least one goal. Try 'mvn install' to build or 'mvn --help' for options \nSee http://maven.apache.org for more information.\n\n" );
         }
         
         for ( MavenProject currentProject : session.getSortedProjects() )
@@ -126,20 +125,13 @@ public class DefaultLifecycleExecutor
     }
 
     private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, long buildStartTime, String target )
-        throws BuildFailureException, LifecycleExecutionException
+        throws LifecycleExecutionException, MojoFailureException
     {
         try
         {
             executeGoal( task, session, project );
         }
         catch ( LifecycleExecutionException e )
-        {
-            if ( handleExecutionFailure( session, project, e, task, buildStartTime ) )
-            {
-                throw e;
-            }
-        }
-        catch ( BuildFailureException e )
         {
             if ( handleExecutionFailure( session, project, e, task, buildStartTime ) )
             {
@@ -168,7 +160,7 @@ public class DefaultLifecycleExecutor
     }
     
     private void executeGoal( String task, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException, BuildFailureException
+        throws LifecycleExecutionException, MojoFailureException
     {
         List<MojoDescriptor> lifecyclePlan = calculateLifecyclePlan( task, session );        
         
@@ -181,11 +173,6 @@ public class DefaultLifecycleExecutor
             try
             {
                 pluginManager.executeMojo( session, mojoExecution );
-            }
-            catch ( MojoFailureException e )
-            {
-                // If the mojo actually screws up, like a compilation error
-                throw new LifecycleExecutionException( "Error executing goal.", e );                                        
             }
             catch ( PluginExecutionException e )
             {
@@ -308,9 +295,9 @@ public class DefaultLifecycleExecutor
                         MojoDescriptor md = getMojoDescriptor( s, session, project );
                         
                         boolean include = lifecycle.getPhases().contains( md.getPhase() );                        
-                        System.out.println( ">>> " + goal );
-                        System.out.println( ">>> " + md.getPhase() );                                                
-                        System.out.println( ">>> " + include );
+//                        System.out.println( ">>> " + goal );
+//                        System.out.println( ">>> " + md.getPhase() );                                                
+//                        System.out.println( ">>> " + include );
                         
                         // need to know if this plugin belongs to a phase in the lifecycle that's running
                         if ( md.getPhase() != null && include )
@@ -336,12 +323,7 @@ public class DefaultLifecycleExecutor
                 lifecyclePlan.add( getMojoDescriptor( mojo, session, project ) );
             }
         }  
-        
-        for ( MojoDescriptor md : lifecyclePlan )
-        {
-            System.out.println( md.getGoal() );
-        }
-        
+                
         return lifecyclePlan;
     }  
            
