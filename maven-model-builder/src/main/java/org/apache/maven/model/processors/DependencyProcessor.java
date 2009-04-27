@@ -167,10 +167,7 @@ public class DependencyProcessor
             targetDependency.setGroupId( source.getGroupId() );
         }
 
-        if (isMatch(source.getScope(), targetDependency.getScope(), isDependencyManagement) )
-        {
-            targetDependency.setScope( source.getScope() );
-        }
+        targetDependency.setScope( source.getScope() );
 
         if ( isMatch(source.getSystemPath(), targetDependency.getSystemPath(), isDependencyManagement) )
         {

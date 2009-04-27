@@ -93,7 +93,7 @@ public class ProcessorContext
                                        new RepositoriesProcessor(), new DistributionManagementProcessor(),
                                        new LicensesProcessor(), new ScmProcessor(), new PrerequisitesProcessor(),
                                        new ContributorsProcessor(), new DevelopersProcessor(), new ProfilesProcessor() );
-        Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors );
+        Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ), processors, false );
         if(listeners != null)
         {
         	for(ModelEventListener listener : listeners)
@@ -148,7 +148,7 @@ public class ProcessorContext
      
         DependencyManagement depMng = model.getDependencyManagement();
         
-        Model target = processModelsForInheritance(profileModels, processors);
+        Model target = processModelsForInheritance(profileModels, processors, true);
 
         PluginsManagementProcessor pmp = new PluginsManagementProcessor();
         if( mng != null )
@@ -219,9 +219,9 @@ public class ProcessorContext
         return models;
     }
     
-    private static Model processModelsForInheritance(List<Model> models, List<Processor> processors)
+    private static Model processModelsForInheritance(List<Model> models, List<Processor> processors, boolean isProfile)
     {
-        ModelProcessor modelProcessor = new ModelProcessor( processors );
+        ModelProcessor modelProcessor = new ModelProcessor( processors, isProfile );
         Collections.reverse( models );    
 
         int length = models.size();
@@ -251,6 +251,14 @@ public class ProcessorContext
                 }
             }           
         }
+ 
+        return target;
+      
+    }
+    
+    public static Model processManagementNodes(Model target) 
+    	throws IOException
+    {
 
         // Dependency Management
         DependencyManagementProcessor depProc = new DependencyManagementProcessor();
@@ -261,16 +269,14 @@ public class ProcessorContext
         }
         
         // Plugin Management      
-
         PluginsManagementProcessor procMng = new PluginsManagementProcessor();
         if ( target.getBuild() != null && target.getBuild().getPluginManagement() != null)
         {
             procMng.process( null, new ArrayList<Plugin>( target.getBuild().getPluginManagement().getPlugins() ),
                               target.getBuild().getPlugins(), true );
         }
-        
-        return target;
-      
+
+        return target;    	
     }
 
     public static Profile copyOfProfile(Profile profile)
