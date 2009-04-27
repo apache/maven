@@ -60,7 +60,7 @@ public class MavenITmng1830ShowVersionTest
         verifier.resetStreams();
 
         String line = (String) verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false ).get( 1 );
-        assertTrue( line, line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) );
+        assertTrue( line, line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) || line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" ) );
 
         // check timestamp parses
         String timestamp = line.substring( line.lastIndexOf( ';' ) + 1, line.length() - 1 ).trim();
