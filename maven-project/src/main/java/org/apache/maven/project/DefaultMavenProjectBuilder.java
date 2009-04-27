@@ -224,7 +224,12 @@ public class DefaultMavenProjectBuilder
         {
         	throw new IllegalArgumentException("configuration.getRemoteRepositories(): null");
         }
-
+        
+        if ( !artifact.getType().equals( "pom" ) )
+        {
+            artifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+        }
+        
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, configuration.getLocalRepository(), configuration.getRemoteRepositories() );
         ArtifactResolutionResult result = repositorySystem.resolve( request );
                 
