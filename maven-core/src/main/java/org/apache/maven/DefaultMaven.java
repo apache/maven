@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -76,6 +77,8 @@ public class DefaultMaven
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
+        request.setStartTime( new Date() );
+        
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         MavenSession session = createMavenSession( request, result );        
