@@ -34,8 +34,19 @@ under the License.
       </excludes>
     </fileSet>
     <fileSet>
-      <directory>../target/maven-shared-archive-resources/META-INF</directory>
+      <directory>target/maven-shared-archive-resources/META-INF</directory>
       <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>DEPENDENCIES</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>.</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>LICENSE.txt</include>
+        <include>NOTICE.txt</include>
+      </includes>
     </fileSet>
   </fileSets>
 </assembly>
