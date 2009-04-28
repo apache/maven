@@ -268,8 +268,8 @@ public class ProcessorContext
     public static void addPluginsToModel(Model target, Set<Plugin> plugins)
     {
     	Build build = target.getBuild();
-    	addPlugin(build, "maven-compiler-plugin");
-    	addPlugin(build, "maven-resources-plugin");
+   // 	addPlugin(build, "maven-compiler-plugin");
+    //	addPlugin(build, "maven-resources-plugin");
     	//addPlugin(build, "maven-deploy-plugin");
     	//addPlugin(build, "maven-jar-plugin");
     //	addPlugin(build, "maven-surefire-plugin");
@@ -283,7 +283,7 @@ public class ProcessorContext
             [java] PLUGIN: org.apache.maven.plugins:maven-resources-plugin
             [java] PLUGIN: org.apache.maven.plugins:maven-surefire-plugin
             [java] PLUGIN: org.apache.maven.plugins:maven-deploy-plugin
-/*   	
+  	*/
     	List<Plugin> mPlugins = target.getBuild().getPlugins();
     	
     	List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
@@ -292,13 +292,14 @@ public class ProcessorContext
     	{
     		if( !containsPlugin( p, mPlugins) )
     		{
+    			p.setConfiguration(null);
     			lifecyclePlugins.add(p);
-    			System.out.println("PLUGIN: " + p.getKey());
+    			//System.out.println("PLUGIN: " + p.getKey() +":" + ((p.getConfiguration() != null) ? p.getConfiguration().toString() : "") );
     		}
     	}
     	
     	target.getBuild().getPlugins().addAll(lifecyclePlugins);
-    */	
+
     }
     
     private static boolean containsPlugin(Plugin plugin, List<Plugin> plugins)
