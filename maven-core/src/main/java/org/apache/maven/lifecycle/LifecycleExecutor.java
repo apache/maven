@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -47,8 +48,8 @@ public interface LifecycleExecutor
     List<MojoDescriptor> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
         throws LifecycleExecutionException;
         
-    Set<Plugin> lifecyclePlugins( String lifecycleId, String packaging );
+    Set<Plugin> lifecyclePlugins( String packaging );
     
     void execute( MavenSession session )
-        throws LifecycleExecutionException, MojoFailureException;
+        throws LifecycleExecutionException, MojoFailureException, MojoExecutionException;
 }

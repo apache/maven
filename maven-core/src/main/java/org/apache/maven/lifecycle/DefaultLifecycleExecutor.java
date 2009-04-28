@@ -193,25 +193,42 @@ public class DefaultLifecycleExecutor
         }         
     }
       
-    public Set<Plugin> lifecyclePlugins( String lifecycleId, String packaging )
+    public Set<Plugin> lifecyclePlugins( String packaging )
     {
         Set<Plugin> plugins = new LinkedHashSet<Plugin>();
         
-        Lifecycle lifecycle = lifecycleMap.get( lifecycleId );                
-                
-        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
-          
-        Map<String, String> lifecyclePhasesForPackaging = lifecycleMappingForPackaging.getLifecycles().get( lifecycleId ).getPhases();            
-        
-        for ( String s : lifecyclePhasesForPackaging.values() )
+        for ( Lifecycle lifecycle : lifecycles )
         {
-            String[] p = StringUtils.split( s, ":" );
-            Plugin plugin = new Plugin();        
-            plugin.setGroupId( p[0] );
-            plugin.setArtifactId( p[1] );
-            plugins.add( plugin );
+            LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
+
+            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );                                                           
+            
+            if ( lifecycleConfiguration != null )
+            {
+                Map<String, String> lifecyclePhasesForPackaging = lifecycleConfiguration.getPhases();
+
+                for ( String s : lifecyclePhasesForPackaging.values() )
+                {
+                    String[] p = StringUtils.split( s, ":" );
+                    Plugin plugin = new Plugin();
+                    plugin.setGroupId( p[0] );
+                    plugin.setArtifactId( p[1] );
+                    plugins.add( plugin );
+                }
+            }
+            else if ( lifecycle.getDefaultPhases() != null )
+            {
+                for ( String s : lifecycle.getDefaultPhases() )
+                {
+                    String[] p = StringUtils.split( s, ":" );
+                    Plugin plugin = new Plugin();
+                    plugin.setGroupId( p[0] );
+                    plugin.setArtifactId( p[1] );
+                    plugins.add( plugin );
+                }                
+            }        
         }
-        
+
         return plugins;
     }        
     
@@ -308,8 +325,7 @@ public class DefaultLifecycleExecutor
                     {
                         String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
                         phaseToMojoMapping.get( execution.getPhase() ).add( s );
-                    }
-                    
+                    }                    
                 }                
                 // if not then i need to grab the mojo descriptor and look at
                 // the phase that is specified
