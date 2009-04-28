@@ -47,6 +47,7 @@ import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -1024,6 +1025,11 @@ public class DefaultPluginManager
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
         throws PluginLoaderException
     {
+        if ( plugin.getVersion() == null )
+        {
+        	throw new IllegalArgumentException("plugin.version: null");
+        }
+        
         PluginDescriptor pluginDescriptor =  loadPlugin( plugin, session.getCurrentProject(), session );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
