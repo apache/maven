@@ -20,11 +20,14 @@ package org.apache.maven.project;
  */
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.ModelEventListener;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.profiles.ProfileManager;
 
 public class DefaultProjectBuilderConfiguration
@@ -46,6 +49,22 @@ public class DefaultProjectBuilderConfiguration
     private List<ModelEventListener> listeners;
     
     private MavenProject topProject;
+    
+    private Set<Plugin> plugins;
+    
+    public void setPlugins(Set<Plugin> plugins)
+    {
+    	this.plugins = plugins;
+    }
+    
+    public Set<Plugin> getPlugins()
+    {
+    	if(plugins == null)
+    	{
+    		plugins = new HashSet<Plugin>();
+    	}
+    	return plugins;
+    }
     
     public MavenProject getTopLevelProjectFromReactor()
     {

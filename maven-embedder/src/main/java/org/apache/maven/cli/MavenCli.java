@@ -34,6 +34,7 @@ import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -242,7 +243,7 @@ public class MavenCli
         {
             configuration.setLocalRepository( new File( localRepoProperty ) );
         }
-
+        
         return configuration;
     }
 

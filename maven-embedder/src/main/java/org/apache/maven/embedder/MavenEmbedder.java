@@ -33,6 +33,7 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -125,6 +126,8 @@ public class MavenEmbedder
     private Configuration configuration;
 
     private MavenExecutionRequest request;
+    
+    private LifecycleExecutor lifecycleExecutor;
 
     // ----------------------------------------------------------------------------
     // Constructors
@@ -452,6 +455,8 @@ public class MavenEmbedder
 
             container.lookup( RepositorySystem.class );
             
+            lifecycleExecutor = container.lookup( LifecycleExecutor.class );
+            
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.
             request = new DefaultMavenExecutionRequest();
@@ -572,6 +577,8 @@ public class MavenEmbedder
 
         int oldThreshold = loggerManager.getThreshold();
 
+        request.setPlugins(lifecycleExecutor.lifecyclePlugins("default", "jar"));
+        
         try
         {
             loggerManager.setThresholds( request.getLoggingLevel() );

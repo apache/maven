@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -256,10 +258,69 @@ public class ProcessorContext
       
     }
     
+    private static void addPlugin(Build build, String id)
+    {	
+    	Plugin p1 = new Plugin();
+    	p1.setArtifactId(id);
+    	build.addPlugin(p1);   	
+    }
+    
+    public static void addPluginsToModel(Model target, Set<Plugin> plugins)
+    {
+    	Build build = target.getBuild();
+    	addPlugin(build, "maven-compiler-plugin");
+    	addPlugin(build, "maven-resources-plugin");
+    	addPlugin(build, "maven-deploy-plugin");
+    	addPlugin(build, "maven-jar-plugin");
+    	addPlugin(build, "maven-compiler-plugin");
+    	addPlugin(build, "maven-surefire-plugin");
+        	
+     /*   	
+        	rg.apache.maven.plugins:maven-jar-plugin
+            [java] PLUGIN: org.apache.maven.plugins:maven-resources-plugin
+            [java] PLUGIN: org.apache.maven.plugins:maven-deploy-plugin
+            [java] PLUGIN: org.apache.maven.plugins:maven-install-plugin
+            [java] PLUGIN: org.apache.maven.plugins:maven-jar-plugin
+            [java] PLUGIN: org.apache.maven.plugins:maven-resources-plugin
+            [java] PLUGIN: org.apache.maven.plugins:maven-surefire-plugin
+            [java] PLUGIN: org.apache.maven.plugins:maven-deploy-plugin
+/*   	
+    	List<Plugin> mPlugins = target.getBuild().getPlugins();
+    	
+    	List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
+    	
+    	for( Plugin p : plugins )
+    	{
+    		if( !containsPlugin( p, mPlugins) )
+    		{
+    			lifecyclePlugins.add(p);
+    			System.out.println("PLUGIN: " + p.getKey());
+    		}
+    	}
+    	
+    	target.getBuild().getPlugins().addAll(lifecyclePlugins);
+    */	
+    }
+    
+    private static boolean containsPlugin(Plugin plugin, List<Plugin> plugins)
+    {
+    	for(Plugin p : plugins)
+    	{
+    		if( p.getGroupId().equals(plugin.getGroupId()) && p.getArtifactId().equals(plugin.getArtifactId()))
+    		{
+    			return true;
+    		}
+    	}
+    	
+    	return false;
+    }
+    
     public static Model processManagementNodes(Model target) 
     	throws IOException
     {
-
+    //	Plugin plugin = new Plugin();
+    //	plugin.setArtifactId("maven-compiler-plugin");
+  //  	target.getBuild().addPlugin(plugin);
         // Dependency Management
         DependencyManagementProcessor depProc = new DependencyManagementProcessor();
         if ( target.getDependencyManagement() != null )

@@ -23,9 +23,11 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.ProjectBuilderConfiguration;
@@ -211,4 +213,8 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
     ProjectBuilderConfiguration getProjectBuildingConfiguration();
+    
+    void setPlugins(Set<Plugin> plugins);
+    
+    Set<Plugin> getPlugins();   
 }

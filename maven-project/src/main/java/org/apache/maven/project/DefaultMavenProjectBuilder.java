@@ -168,7 +168,10 @@ public class DefaultMavenProjectBuilder
         //Interpolation & Management
         MavenProject project;
 		try {
-			Model model = ProcessorContext.processManagementNodes(interpolateDomainModel( domainModel, configuration, pomFile ));
+			Model model = interpolateDomainModel( domainModel, configuration, pomFile );
+			ProcessorContext.addPluginsToModel(model, configuration.getPlugins());
+			
+			ProcessorContext.processManagementNodes(model);
 			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
 		} catch (IOException e) {
 			throw new ProjectBuildingException("", "");
@@ -281,6 +284,7 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException("", "");
         }
        
+        
     		try {
     			Model model = ProcessorContext.processManagementNodes(interpolateDomainModel( domainModel, configuration, artifact.getFile() ));
     			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, artifact.getFile());

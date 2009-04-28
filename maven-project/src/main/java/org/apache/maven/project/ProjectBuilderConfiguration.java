@@ -1,11 +1,13 @@
 package org.apache.maven.project;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.profiles.ProfileManager;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 public interface ProjectBuilderConfiguration
 {
@@ -37,4 +39,8 @@ public interface ProjectBuilderConfiguration
     MavenProject getTopLevelProjectFromReactor();
     
     void setTopLevelProjectForReactor(MavenProject mavenProject);
+    
+    void setPlugins(Set<Plugin> plugins);
+    
+    Set<Plugin> getPlugins();
 }

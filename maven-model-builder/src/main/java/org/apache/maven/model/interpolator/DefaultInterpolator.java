@@ -14,7 +14,9 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -55,7 +57,19 @@ public class DefaultInterpolator implements Interpolator {
         interpolateModelProperties( modelProperties, ips );
         return unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
 	} 
-	
+
+    public PomClassicDomainModel interpolateDomainModel( PomClassicDomainModel dm, Properties properties  )
+		throws IOException 
+	{
+    	List<InterpolatorProperty> props = new ArrayList<InterpolatorProperty>();
+    	for(Entry<Object, Object> e : properties
+					.entrySet())
+    	{
+    	//	props.add(new InterpolatorProperty(e.getKey(), e.getValue(), PomInterpolatorTag.EXECUTION_PROPERTIES))
+    	}
+    	return interpolateDomainModel(dm, props);
+    }
+    
     public PomClassicDomainModel interpolateDomainModel( PomClassicDomainModel dm, List<InterpolatorProperty> interpolatorProperties )
 		throws IOException {
 	

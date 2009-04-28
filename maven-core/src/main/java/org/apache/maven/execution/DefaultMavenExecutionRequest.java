@@ -18,10 +18,13 @@ package org.apache.maven.execution;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
@@ -68,6 +71,8 @@ public class DefaultMavenExecutionRequest
     private File globalSettingsFile;
 
     private File userToolchainsFile;
+    
+    private Set<Plugin> plugins;
 
     // ----------------------------------------------------------------------------
     // Request
@@ -115,6 +120,8 @@ public class DefaultMavenExecutionRequest
      * @issue MNG-2681
      */
     private boolean noSnapshotUpdates;
+    
+    public DefaultMavenExecutionRequest() { }
         
     public static MavenExecutionRequest copy( MavenExecutionRequest original )
     {
@@ -149,6 +156,7 @@ public class DefaultMavenExecutionRequest
         copy.setProfileManager( original.getProfileManager() );
         copy.setRemoteRepositories( original.getRemoteRepositories() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
+        copy.setPlugins(original.getPlugins());//TODO - deeper copy
         return original;        
     }
    
@@ -697,8 +705,23 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration.setUserProperties( getUserProperties() );
             projectBuildingConfiguration.setBuildStartTime( getStartTime() );
             projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
+            projectBuildingConfiguration.setPlugins(getPlugins());
         }
 
         return projectBuildingConfiguration;
     }
+    
+    public void setPlugins(Set<Plugin> plugins)
+    {
+    	this.plugins = plugins;
+    }
+    
+    public Set<Plugin> getPlugins()
+    {
+    	if(plugins == null)
+    	{
+    		plugins = new HashSet<Plugin>();
+    	}
+    	return plugins;
+    }    
 }
