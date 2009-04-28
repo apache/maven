@@ -703,19 +703,19 @@ public class DefaultMaven
 
         WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
 
+        SecDispatcher sd = null;
+        
         try
         {
             Proxy proxy = settings.getActiveProxy();
             
-            SecDispatcher sd = null;
-            
             try
             {
-                sd = (SecDispatcher) container.lookup( SecDispatcher.ROLE, "maven" );
+                sd = (SecDispatcher) container.lookup( SecDispatcher.ROLE );
             }
             catch (Exception e)
             {
-                getLogger().warn( "security features are disabled. Cannot find plexus component "+SecDispatcher.ROLE +":maven");
+                getLogger().warn( "Security features are disabled. Cannot find plexus component "+SecDispatcher.ROLE );
                 
                 line();
             }
@@ -799,6 +799,10 @@ public class DefaultMaven
         finally
         {
             container.release( wagonManager );
+            if ( sd != null )
+            {
+                container.release( sd );
+            }
         }
         
         // Would be better in settings.xml, but it is not extensible yet
