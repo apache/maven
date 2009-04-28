@@ -1957,6 +1957,19 @@ public class DefaultLifecycleExecutor
                 throw new InitializationException( "Failed to lookup model interpolator after it was NOT injected via component requirement." );
             }
         }
+        
+        if ( configInterpolator == null )
+        {
+            warnOfIncompleteComponentConfiguration( ConfigurationInterpolator.ROLE );
+            try
+            {
+                configInterpolator = (ConfigurationInterpolator) container.lookup( ConfigurationInterpolator.ROLE );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new InitializationException( "Failed to lookup plugin-configuration interpolator after it was NOT injected via component requirement." );
+            }
+        }
     }
     
     private void warnOfIncompleteComponentConfiguration( String role )
