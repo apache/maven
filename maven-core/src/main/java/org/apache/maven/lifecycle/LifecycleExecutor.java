@@ -20,11 +20,14 @@ package org.apache.maven.lifecycle;
  */
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.project.MavenProject;
 
 /**
  * @author Jason van  Zyl
@@ -44,6 +47,8 @@ public interface LifecycleExecutor
     List<MojoDescriptor> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
         throws LifecycleExecutionException;
         
+    Set<Plugin> lifecyclePlugins( String lifecycleId, String packaging );
+    
     void execute( MavenSession session )
         throws LifecycleExecutionException, MojoFailureException;
 }

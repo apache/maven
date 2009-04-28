@@ -1,10 +1,13 @@
 package org.apache.maven.lifecycle;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -79,4 +82,12 @@ public class LifecycleExecutorTest
         assertEquals( "1.0", session.getCurrentProject().getVersion() );                                
         lifecycleExecutor.execute( session );
     }    
+    
+    public void testLifecyclePluginsRetrievalForDefaultLifecycle()
+        throws Exception
+    {
+        List<Plugin> plugins = new ArrayList<Plugin>( lifecycleExecutor.lifecyclePlugins( "default", "jar" ) );  
+        
+        assertEquals( 6, plugins.size() );
+    }
 }

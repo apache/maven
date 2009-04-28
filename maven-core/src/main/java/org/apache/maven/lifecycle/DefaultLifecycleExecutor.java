@@ -19,8 +19,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.maven.execution.MavenSession;
@@ -41,11 +43,13 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.StringUtils;
 
 //TODO: The configuration for the lifecycle needs to be externalized so that I can use the annotations
 //      properly for the wiring and reference and external source for the lifecycle configuration.
 //TODO: Inside an IDE we are replacing the notion of our reactor with a workspace. In both of these cases
 //      we need to layer these as local repositories.
+//TODO: Cache the lookups of the PluginDescriptors
 
 /**
  * @author Jason van Zyl
@@ -69,6 +73,8 @@ public class DefaultLifecycleExecutor
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")    
     private List<Lifecycle> lifecycles;
 
+    private Map<String,Lifecycle> lifecycleMap;
+    
     private Map<String, Lifecycle> phaseToLifecycleMap;
 
     public void execute( MavenSession session )
@@ -186,7 +192,29 @@ public class DefaultLifecycleExecutor
             }
         }         
     }
-
+      
+    public Set<Plugin> lifecyclePlugins( String lifecycleId, String packaging )
+    {
+        Set<Plugin> plugins = new LinkedHashSet<Plugin>();
+        
+        Lifecycle lifecycle = lifecycleMap.get( lifecycleId );                
+                
+        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
+          
+        Map<String, String> lifecyclePhasesForPackaging = lifecycleMappingForPackaging.getLifecycles().get( lifecycleId ).getPhases();            
+        
+        for ( String s : lifecyclePhasesForPackaging.values() )
+        {
+            String[] p = StringUtils.split( s, ":" );
+            Plugin plugin = new Plugin();        
+            plugin.setGroupId( p[0] );
+            plugin.setArtifactId( p[1] );
+            plugins.add( plugin );
+        }
+        
+        return plugins;
+    }        
+    
     // 1. Find the lifecycle given the phase (default lifecycle when given install)
     // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
@@ -293,14 +321,9 @@ public class DefaultLifecycleExecutor
                     {
                         String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
                         MojoDescriptor md = getMojoDescriptor( s, session, project );
-                        
-                        boolean include = lifecycle.getPhases().contains( md.getPhase() );                        
-//                        System.out.println( ">>> " + goal );
-//                        System.out.println( ">>> " + md.getPhase() );                                                
-//                        System.out.println( ">>> " + include );
-                        
+                                                
                         // need to know if this plugin belongs to a phase in the lifecycle that's running
-                        if ( md.getPhase() != null && include )
+                        if ( md.getPhase() != null && lifecycle.getPhases().contains( md.getPhase() ) )
                         {
                             phaseToMojoMapping.get( md.getPhase() ).add( s );
                         }
@@ -423,17 +446,19 @@ public class DefaultLifecycleExecutor
                 
         return mojoDescriptor;
     }
-
+    
     public void initialize()
         throws InitializationException
     {
+        lifecycleMap = new HashMap<String,Lifecycle>();
+        
         // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly so
         // that they don't interfere with internally defined lifecycles.
 
         phaseToLifecycleMap = new HashMap<String,Lifecycle>();
 
         for ( Lifecycle lifecycle : lifecycles )
-        {
+        {                        
             for ( String phase : lifecycle.getPhases() )
             {                
                 // The first definition wins.
@@ -442,6 +467,8 @@ public class DefaultLifecycleExecutor
                     phaseToLifecycleMap.put( phase, lifecycle );
                 }
             }
+            
+            lifecycleMap.put( lifecycle.getId(), lifecycle );
         }
     }   
     
