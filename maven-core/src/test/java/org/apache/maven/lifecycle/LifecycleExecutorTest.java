@@ -86,8 +86,13 @@ public class LifecycleExecutorTest
     public void testLifecyclePluginsRetrievalForDefaultLifecycle()
         throws Exception
     {
-        List<Plugin> plugins = new ArrayList<Plugin>( lifecycleExecutor.lifecyclePlugins( "default", "jar" ) );  
+        List<Plugin> plugins = new ArrayList<Plugin>( lifecycleExecutor.lifecyclePlugins( "jar" ) );  
         
-        assertEquals( 6, plugins.size() );
+        for( Plugin plugin : plugins )
+        {
+            System.out.println( plugin.getArtifactId() );
+        }
+        
+        assertEquals( 8, plugins.size() );
     }
 }
