@@ -1330,40 +1330,6 @@ public class MavenProject
         return build;
     }
 
-    public void addPlugin( Plugin plugin )
-    {
-        Build build = getModelBuild();
-
-        if ( !build.getPluginsAsMap().containsKey( plugin.getKey() ) )
-        {
-            injectPluginManagementInfo( plugin );
-
-            build.addPlugin( plugin );
-
-            build.flushPluginMap();
-        }
-    }
-
-    //TODO: remove ModelUtils
-    public void injectPluginManagementInfo( Plugin plugin )
-    {
-        PluginManagement pm = getModelBuild().getPluginManagement();
-
-        if ( pm != null )
-        {
-            Map<String, Plugin> pmByKey = pm.getPluginsAsMap();
-
-            String pluginKey = plugin.getKey();
-
-            if ( ( pmByKey != null ) && pmByKey.containsKey( pluginKey ) )
-            {
-                Plugin pmPlugin = pmByKey.get( pluginKey );
-
-                ModelUtils.mergePluginDefinitions( plugin, pmPlugin, false );
-            }
-        }
-    }
-
     public List<MavenProject> getCollectedProjects()
     {
         return collectedProjects;
