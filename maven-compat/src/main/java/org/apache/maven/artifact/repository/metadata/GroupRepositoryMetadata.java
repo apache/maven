@@ -21,9 +21,6 @@ package org.apache.maven.artifact.repository.metadata;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Metadata for the group directory of the repository.
  *

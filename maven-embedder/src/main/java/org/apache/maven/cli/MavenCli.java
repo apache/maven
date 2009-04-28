@@ -20,7 +20,6 @@ package org.apache.maven.cli;
  */
 
 import java.io.File;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
@@ -34,8 +33,6 @@ import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
@@ -148,6 +145,7 @@ public class MavenCli
 
         MavenEmbedder mavenEmbedder;
         MavenEmbedderLogger logger;
+        
         try
         {
             mavenEmbedder = new MavenEmbedder( configuration );
@@ -167,26 +165,13 @@ public class MavenCli
         }
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
-
-        //CLIReportingUtils.logResult( request, result, logger );
-
-        System.out.println( "exceptions: " + result.hasExceptions() );
         
-        System.out.println( result.getExceptions() );
-        
-        Exception e = result.getExceptions().get( 0 );
-        
-        if ( e instanceof MojoFailureException )
-        {
-            System.out.println( ((MojoFailureException)e).getLongMessage() );
-        }
-        else
-        {
-            System.out.println( e.getMessage() );
-        }
+        // The exception handling should be handled in Maven itself.
         
         if ( result.hasExceptions() )
         {
+            System.out.println( result.getExceptionSummary().getMessage() );
+            
             return 1;
         }
         else

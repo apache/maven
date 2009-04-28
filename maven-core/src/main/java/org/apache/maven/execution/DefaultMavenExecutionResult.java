@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.project.MavenProject;
 
 /** @author Jason van Zyl */
@@ -40,6 +41,8 @@ public class DefaultMavenExecutionResult
 
     private ReactorManager reactorManager;
 
+    private ExceptionSummary exceptionSummary;
+    
     public MavenExecutionResult setProject( MavenProject project )
     {
         this.project = project;
@@ -108,5 +111,17 @@ public class DefaultMavenExecutionResult
         this.reactorManager = reactorManager;
 
         return this;
+    }
+
+    public MavenExecutionResult setExceptionSummary( ExceptionSummary exceptionSummary )
+    {
+        this.exceptionSummary = exceptionSummary;
+
+        return this;
+    }
+    
+    public ExceptionSummary getExceptionSummary()
+    {
+        return exceptionSummary;
     }
 }

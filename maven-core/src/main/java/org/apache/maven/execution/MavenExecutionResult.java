@@ -22,6 +22,7 @@ package org.apache.maven.execution;
 import java.util.List;
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -51,4 +52,7 @@ public interface MavenExecutionResult
     MavenExecutionResult addException( Throwable e );
 
     boolean hasExceptions();
+        
+    MavenExecutionResult setExceptionSummary( ExceptionSummary exceptionSummary );
+    ExceptionSummary getExceptionSummary();
 }

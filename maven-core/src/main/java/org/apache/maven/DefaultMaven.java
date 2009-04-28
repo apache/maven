@@ -23,16 +23,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.exception.DefaultExceptionHandler;
+import org.apache.maven.exception.ExceptionHandler;
+import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -98,25 +98,22 @@ public class DefaultMaven
         try
         {
             lifecycleExecutor.execute( session );
-        }
-        catch ( LifecycleExecutionException e )
-        {
+        }        
+        catch ( Exception e )
+        {            
+            ExceptionHandler handler = new DefaultExceptionHandler();
+            
+            // This will only be more then one if we have fail at end on and we collect
+            // them per project.
+            ExceptionSummary es = handler.handleException( result.getExceptions().get( 0 ) );                        
+         
             result.addException( e );
 
+            result.setExceptionSummary( es );
+            
             return result;
         }
-        catch ( MojoFailureException e )
-        {
-            result.addException( e );
 
-            return result;
-        }
-        catch ( MojoExecutionException e )
-        {
-            result.addException( e );
-
-            return result;
-        }
         result.setTopologicallySortedProjects( session.getReactorManager().getSortedProjects() );
 
         result.setProject( session.getReactorManager().getTopLevelProject() );
