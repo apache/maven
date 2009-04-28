@@ -31,6 +31,7 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
+import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -170,7 +171,11 @@ public class MavenCli
         
         if ( result.hasExceptions() )
         {
-            System.out.println( result.getExceptionSummary().getMessage() );
+            ExceptionSummary es = result.getExceptionSummary();
+            
+            System.out.println( es.getMessage() );
+            
+            es.getException().printStackTrace();
             
             return 1;
         }
