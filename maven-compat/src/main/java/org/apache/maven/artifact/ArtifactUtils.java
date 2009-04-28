@@ -43,6 +43,11 @@ public final class ArtifactUtils
 
     public static String toSnapshotVersion( String version )
     {
+    	if(version == null)
+    	{
+    		throw new IllegalArgumentException("version: null");
+    	}
+    	
         Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
         if ( m.matches() )
         {
