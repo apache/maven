@@ -31,6 +31,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -110,7 +111,12 @@ public class DefaultMaven
 
             return result;
         }
+        catch ( MojoExecutionException e )
+        {
+            result.addException( e );
 
+            return result;
+        }
         result.setTopologicallySortedProjects( session.getReactorManager().getSortedProjects() );
 
         result.setProject( session.getReactorManager().getTopLevelProject() );

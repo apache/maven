@@ -577,7 +577,7 @@ public class MavenEmbedder
 
         int oldThreshold = loggerManager.getThreshold();
 
-        request.setPlugins(lifecycleExecutor.lifecyclePlugins("default", "jar"));
+        
         
         try
         {
@@ -585,6 +585,7 @@ public class MavenEmbedder
 
             try
             {
+            	request.setPlugins(lifecycleExecutor.lifecyclePlugins("jar"));
                 request = populator.populateDefaults( request, configuration );
             }
             catch ( MavenEmbedderException e )
