@@ -105,7 +105,7 @@ public class DefaultMaven
             
             // This will only be more then one if we have fail at end on and we collect
             // them per project.
-            ExceptionSummary es = handler.handleException( result.getExceptions().get( 0 ) );                        
+            ExceptionSummary es = handler.handleException( e );                        
          
             result.addException( e );
 
