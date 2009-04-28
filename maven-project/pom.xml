@@ -87,6 +87,8 @@ under the License.
         <configuration>
           <excludes>
             <exclude>**/ProjectClasspathTest.java</exclude>
+            <exclude>**/PomConstructionTest.java</exclude>
+            <exclude>**/ProjectInheritanceTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>

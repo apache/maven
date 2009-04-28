@@ -270,10 +270,9 @@ public class ProcessorContext
     	Build build = target.getBuild();
     	addPlugin(build, "maven-compiler-plugin");
     	addPlugin(build, "maven-resources-plugin");
-    	addPlugin(build, "maven-deploy-plugin");
-    	addPlugin(build, "maven-jar-plugin");
-    	addPlugin(build, "maven-compiler-plugin");
-    	addPlugin(build, "maven-surefire-plugin");
+    	//addPlugin(build, "maven-deploy-plugin");
+    	//addPlugin(build, "maven-jar-plugin");
+    //	addPlugin(build, "maven-surefire-plugin");
         	
      /*   	
         	rg.apache.maven.plugins:maven-jar-plugin
