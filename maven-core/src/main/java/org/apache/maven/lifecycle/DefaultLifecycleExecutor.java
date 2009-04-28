@@ -297,9 +297,7 @@ public class DefaultLifecycleExecutor
         // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
         //
         for( Plugin plugin : project.getBuild().getPlugins() )
-        {
-            System.out.println( plugin.getArtifactId() );
-            
+        {            
             for( PluginExecution execution : plugin.getExecutions() )
             {
                 // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
@@ -429,8 +427,6 @@ public class DefaultLifecycleExecutor
                     break;
                 }
             }
-
-            project.injectPluginManagementInfo( plugin );
         }
 
         MojoDescriptor mojoDescriptor;
