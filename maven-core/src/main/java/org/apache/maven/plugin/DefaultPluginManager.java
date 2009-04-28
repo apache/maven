@@ -451,7 +451,7 @@ public class DefaultPluginManager
 
         try
         {
-            mojo = getConfiguredMojo( session, mojoExecution.getConfiguration(), project, false, mojoExecution );
+            mojo = getConfiguredMojo( session, mojoExecution, project, false, mojoExecution );
 
             pluginRealm = pluginDescriptor.getClassRealm();            
             
@@ -505,7 +505,7 @@ public class DefaultPluginManager
         }
     }
 
-    private Mojo getConfiguredMojo( MavenSession session, Xpp3Dom dom, MavenProject project, boolean report, MojoExecution mojoExecution )
+    private Mojo getConfiguredMojo( MavenSession session, MojoExecution MojoExecution, MavenProject project, boolean report, MojoExecution mojoExecution )
         throws PluginConfigurationException, PluginManagerException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -553,8 +553,10 @@ public class DefaultPluginManager
 
             mojo.setLog( new DefaultLog( logger ) );
 
-            XmlPlexusConfiguration pomConfiguration;
-
+            Xpp3Dom dom = mojoExecution.getConfiguration();
+            
+            PlexusConfiguration pomConfiguration;
+            
             if ( dom == null )
             {
                 pomConfiguration = new XmlPlexusConfiguration( "configuration" );
@@ -568,17 +570,13 @@ public class DefaultPluginManager
             // override in the POM.
             validatePomConfiguration( mojoDescriptor, pomConfiguration );
 
-            PlexusConfiguration mergedConfiguration = mergeMojoConfiguration( pomConfiguration, mojoDescriptor );
-
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
-
-            PlexusConfiguration extractedMojoConfiguration = extractMojoConfiguration( mergedConfiguration, mojoDescriptor );
 
             checkDeprecatedParameters( mojoDescriptor, pomConfiguration );
 
-            checkRequiredParameters( mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
+            checkRequiredParameters( mojoDescriptor, pomConfiguration, expressionEvaluator );
 
-            populatePluginFields( mojo, mojoDescriptor, extractedMojoConfiguration, expressionEvaluator );
+            populatePluginFields( mojo, mojoDescriptor, pomConfiguration, expressionEvaluator );
 
             return mojo;
 
@@ -641,27 +639,6 @@ public class DefaultPluginManager
                 }
             }
         }
-    }
-
-    private PlexusConfiguration extractMojoConfiguration( PlexusConfiguration mergedConfiguration, MojoDescriptor mojoDescriptor )
-    {
-        Map<String,Parameter> parameterMap = mojoDescriptor.getParameterMap();
-
-        PlexusConfiguration[] mergedChildren = mergedConfiguration.getChildren();
-
-        XmlPlexusConfiguration extractedConfiguration = new XmlPlexusConfiguration( "configuration" );
-
-        for ( int i = 0; i < mergedChildren.length; i++ )
-        {
-            PlexusConfiguration child = mergedChildren[i];
-
-            if ( parameterMap.containsKey( child.getName() ) )
-            {
-                extractedConfiguration.addChild( copyConfiguration( child ) );
-            }
-        }
-
-        return extractedConfiguration;
     }
 
     private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
@@ -783,159 +760,7 @@ public class DefaultPluginManager
             }
         }
     }
-
-    private PlexusConfiguration mergeMojoConfiguration( XmlPlexusConfiguration fromPom, MojoDescriptor mojoDescriptor )
-    {
-        XmlPlexusConfiguration result = new XmlPlexusConfiguration( fromPom.getName() );
-        result.setValue( fromPom.getValue( null ) );
-
-        if ( mojoDescriptor.getParameters() != null )
-        {
-            PlexusConfiguration fromMojo = mojoDescriptor.getMojoConfiguration();
-
-            for ( Parameter parameter : mojoDescriptor.getParameters() )
-            {
-                String paramName = parameter.getName();
-                String alias = parameter.getAlias();
-                String implementation = parameter.getImplementation();
-
-                PlexusConfiguration pomConfig = fromPom.getChild( paramName );
-                PlexusConfiguration aliased = null;
-
-                if ( alias != null )
-                {
-                    aliased = fromPom.getChild( alias );
-                }
-
-                PlexusConfiguration mojoConfig = fromMojo.getChild( paramName, false );
-
-                // first we'll merge configurations from the aliased and real params.
-                // TODO: Is this the right thing to do?
-                if ( aliased != null )
-                {
-                    if ( pomConfig == null )
-                    {
-                        pomConfig = new XmlPlexusConfiguration( paramName );
-                    }
-
-                    pomConfig = buildTopDownMergedConfiguration( pomConfig, aliased );
-                }
-
-                PlexusConfiguration toAdd = null;
-
-                if ( pomConfig != null )
-                {
-                    pomConfig = buildTopDownMergedConfiguration( pomConfig, mojoConfig );
-
-                    if ( StringUtils.isNotEmpty( pomConfig.getValue( null ) ) || ( pomConfig.getChildCount() > 0 ) )
-                    {
-                        toAdd = pomConfig;
-                    }
-                }
-
-                if ( ( toAdd == null ) && ( mojoConfig != null ) )
-                {
-                    toAdd = copyConfiguration( mojoConfig );
-                }
-
-                if ( toAdd != null )
-                {
-                    if ( ( implementation != null ) && ( toAdd.getAttribute( "implementation", null ) == null ) )
-                    {
-
-                        XmlPlexusConfiguration implementationConf = new XmlPlexusConfiguration( paramName );
-
-                        implementationConf.setAttribute( "implementation", parameter.getImplementation() );
-
-                        toAdd = buildTopDownMergedConfiguration( toAdd, implementationConf );
-                    }
-
-                    result.addChild( toAdd );
-                }
-            }
-        }
-        return result;
-    }
-
-    private XmlPlexusConfiguration buildTopDownMergedConfiguration( PlexusConfiguration dominant, PlexusConfiguration recessive )
-    {
-        XmlPlexusConfiguration result = new XmlPlexusConfiguration( dominant.getName() );
-
-        String value = dominant.getValue( null );
-
-        if ( StringUtils.isEmpty( value ) && ( recessive != null ) )
-        {
-            value = recessive.getValue( null );
-        }
-
-        if ( StringUtils.isNotEmpty( value ) )
-        {
-            result.setValue( value );
-        }
-
-        String[] attributeNames = dominant.getAttributeNames();
-
-        for ( int i = 0; i < attributeNames.length; i++ )
-        {
-            String attributeValue = dominant.getAttribute( attributeNames[i], null );
-
-            result.setAttribute( attributeNames[i], attributeValue );
-        }
-
-        if ( recessive != null )
-        {
-            attributeNames = recessive.getAttributeNames();
-
-            for ( int i = 0; i < attributeNames.length; i++ )
-            {
-                String attributeValue = recessive.getAttribute( attributeNames[i], null );
-                // TODO: recessive seems to be dominant here?
-                result.setAttribute( attributeNames[i], attributeValue );
-            }
-        }
-
-        PlexusConfiguration[] children = dominant.getChildren();
-
-        for ( int i = 0; i < children.length; i++ )
-        {
-            PlexusConfiguration childDom = children[i];
-            PlexusConfiguration childRec = recessive == null ? null : recessive.getChild( childDom.getName(), false );
-
-            if ( childRec != null )
-            {
-                result.addChild( buildTopDownMergedConfiguration( childDom, childRec ) );
-            }
-            else
-            { // FIXME: copy, or use reference?
-                result.addChild( copyConfiguration( childDom ) );
-            }
-        }
-
-        return result;
-    }
-
-    public static PlexusConfiguration copyConfiguration( PlexusConfiguration src )
-    {
-        // TODO: shouldn't be necessary
-        XmlPlexusConfiguration dom = new XmlPlexusConfiguration( src.getName() );
-        dom.setValue( src.getValue( null ) );
-
-        String[] attributeNames = src.getAttributeNames();
-        for ( int i = 0; i < attributeNames.length; i++ )
-        {
-            String attributeName = attributeNames[i];
-            dom.setAttribute( attributeName, src.getAttribute( attributeName, null ) );
-        }
-
-        PlexusConfiguration[] children = src.getChildren();
-        for ( int i = 0; i < children.length; i++ )
-        {
-            dom.addChild( copyConfiguration( children[i] ) );
-        }
-
-        return dom;
-    }
-
+    
     // ----------------------------------------------------------------------
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
