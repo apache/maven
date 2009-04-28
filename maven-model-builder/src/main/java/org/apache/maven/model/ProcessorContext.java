@@ -267,23 +267,6 @@ public class ProcessorContext
     
     public static void addPluginsToModel(Model target, Set<Plugin> plugins)
     {
-    	Build build = target.getBuild();
-   // 	addPlugin(build, "maven-compiler-plugin");
-    //	addPlugin(build, "maven-resources-plugin");
-    	//addPlugin(build, "maven-deploy-plugin");
-    	//addPlugin(build, "maven-jar-plugin");
-    //	addPlugin(build, "maven-surefire-plugin");
-        	
-     /*   	
-        	rg.apache.maven.plugins:maven-jar-plugin
-            [java] PLUGIN: org.apache.maven.plugins:maven-resources-plugin
-            [java] PLUGIN: org.apache.maven.plugins:maven-deploy-plugin
-            [java] PLUGIN: org.apache.maven.plugins:maven-install-plugin
-            [java] PLUGIN: org.apache.maven.plugins:maven-jar-plugin
-            [java] PLUGIN: org.apache.maven.plugins:maven-resources-plugin
-            [java] PLUGIN: org.apache.maven.plugins:maven-surefire-plugin
-            [java] PLUGIN: org.apache.maven.plugins:maven-deploy-plugin
-  	*/
     	List<Plugin> mPlugins = target.getBuild().getPlugins();
     	
     	List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
@@ -294,7 +277,6 @@ public class ProcessorContext
     		{
     			p.setConfiguration(null);
     			lifecyclePlugins.add(p);
-    			//System.out.println("PLUGIN: " + p.getKey() +":" + ((p.getConfiguration() != null) ? p.getConfiguration().toString() : "") );
     		}
     	}
     	
