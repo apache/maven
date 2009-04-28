@@ -34,7 +34,7 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
-import org.apache.maven.wagon.providers.http.LightweightHttpWagon;
+import org.apache.maven.wagon.providers.http.HttpWagon;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
@@ -420,7 +420,7 @@ public class DefaultWagonManagerTest
             private void runThread()
                 throws Exception
             {
-                LightweightHttpWagon wagon = (LightweightHttpWagon) wagonManager.getWagon( repository );
+                HttpWagon wagon = (HttpWagon) wagonManager.getWagon( repository );
                 assertEquals( TEST_USER_AGENT, wagon.getHttpHeaders().getProperty( "User-Agent" ) );
                 container.release( wagon );
             }

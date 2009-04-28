@@ -50,7 +50,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-http-lightweight</artifactId>
+      <artifactId>wagon-http</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
