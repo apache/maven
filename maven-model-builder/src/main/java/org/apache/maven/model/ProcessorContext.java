@@ -275,7 +275,6 @@ public class ProcessorContext
     	{
     		if( !containsPlugin( p, mPlugins) )
     		{
-    			p.setConfiguration(null);
     			lifecyclePlugins.add(p);
     		}
     	}

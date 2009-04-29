@@ -22,9 +22,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -34,11 +36,13 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelEventListener;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.interpolator.Interpolator;
@@ -86,6 +90,13 @@ public class DefaultMavenProjectBuilder
     
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;    
+
+    //DO NOT USE, it is here only for backward compatibility reasons. The existing
+    // maven-assembly-plugin (2.2-beta-1) is accessing it via reflection.
+
+    // the aspect weaving seems not to work for reflection from plugin.
+
+    private Map processedProjectCache = new HashMap();
 
     private static HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();
 
@@ -161,14 +172,27 @@ public class DefaultMavenProjectBuilder
         
         //Interpolation & Management
         MavenProject project;
-		try {
+		try 
+		{		
 			Model model = interpolateDomainModel( domainModel, configuration, pomFile );
-			ProcessorContext.addPluginsToModel(model, lifecycle.getPluginsBoundByDefaultToAllLifecycles(model.getPackaging()));
-			
+			Set<Plugin> plugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles(model.getPackaging());
+			ProcessorContext.addPluginsToModel(model, plugins);			
 			ProcessorContext.processManagementNodes(model);
 			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
-		} catch (IOException e) {
+				
+			plugins = lifecycle.populateDefaultConfigurationForPlugins(new HashSet<Plugin>(model.getBuild().getPlugins()), 
+				project, configuration.getLocalRepository());
+
+			project.getModel().getBuild().setPlugins(new ArrayList<Plugin>(plugins));
+		} 
+		catch (IOException e) 
+		{
 			throw new ProjectBuildingException("", "");
+		}
+		catch (LifecycleExecutionException e) 
+		{
+			e.printStackTrace();
+			throw new ProjectBuildingException("",e.getMessage());
 		}
 		
         project.setActiveProfiles( projectProfiles );
@@ -184,7 +208,7 @@ public class DefaultMavenProjectBuilder
         setBuildOutputDirectoryOnParent( project );
 
         hm.put( ArtifactUtils.artifactId( project.getGroupId(), project.getArtifactId(), "pom", project.getVersion() ), project );
-   
+        
         return project;
     }
     
