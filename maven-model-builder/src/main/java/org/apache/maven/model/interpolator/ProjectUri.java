@@ -1,4 +1,4 @@
-package org.apache.maven.model;
+package org.apache.maven.model.interpolator;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,7 +22,7 @@ package org.apache.maven.model;
 /**
  * Defines all the unique ids for canonical data model.
  */
-public class ProjectUri
+final class ProjectUri
 {
 
     /*
