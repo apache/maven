@@ -156,7 +156,6 @@ public class DefaultMavenExecutionRequest
         copy.setProfileManager( original.getProfileManager() );
         copy.setRemoteRepositories( original.getRemoteRepositories() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
-        copy.setPlugins(original.getPlugins());//TODO - deeper copy
         return original;        
     }
    
@@ -702,10 +701,8 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration.setLocalRepository( getLocalRepository() );
             projectBuildingConfiguration.setExecutionProperties( getProperties() );
             projectBuildingConfiguration.setGlobalProfileManager( getProfileManager() );
-            projectBuildingConfiguration.setUserProperties( getUserProperties() );
             projectBuildingConfiguration.setBuildStartTime( getStartTime() );
             projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
-            projectBuildingConfiguration.setPlugins(getPlugins());
         }
 
         return projectBuildingConfiguration;

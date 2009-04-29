@@ -17,8 +17,6 @@ public interface ProjectBuilderConfiguration
 
     ProfileManager getGlobalProfileManager();
 
-    Properties getUserProperties();
-
     Properties getExecutionProperties();
 
     ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager );
@@ -26,8 +24,6 @@ public interface ProjectBuilderConfiguration
     ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository );
 
     ProjectBuilderConfiguration setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
-
-    ProjectBuilderConfiguration setUserProperties( Properties userProperties );
 
     ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties );
 
@@ -40,7 +36,4 @@ public interface ProjectBuilderConfiguration
     
     void setTopLevelProjectForReactor(MavenProject mavenProject);
     
-    void setPlugins(Set<Plugin> plugins);
-    
-    Set<Plugin> getPlugins();
 }

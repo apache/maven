@@ -136,7 +136,7 @@ public class DefaultMavenProjectBuilder
         List<Profile> projectProfiles;
 	    Properties props = new Properties();
 	    props.putAll(configuration.getExecutionProperties());
-	    props.putAll(configuration.getUserProperties());
+
         try
         {
         	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration.getGlobalProfileManager(), props, domainModel.getModel() );

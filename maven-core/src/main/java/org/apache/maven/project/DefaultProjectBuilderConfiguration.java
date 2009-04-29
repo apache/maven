@@ -50,22 +50,6 @@ public class DefaultProjectBuilderConfiguration
     
     private MavenProject topProject;
     
-    private Set<Plugin> plugins;
-    
-    public void setPlugins(Set<Plugin> plugins)
-    {
-    	this.plugins = plugins;
-    }
-    
-    public Set<Plugin> getPlugins()
-    {
-    	if(plugins == null)
-    	{
-    		plugins = new HashSet<Plugin>();
-    	}
-    	return plugins;
-    }
-    
     public MavenProject getTopLevelProjectFromReactor()
     {
     	return topProject;
@@ -108,23 +92,7 @@ public class DefaultProjectBuilderConfiguration
         this.remoteRepositories = remoteRepositories;
         return this;
     }
-
-    public ProjectBuilderConfiguration setUserProperties( Properties userProperties )
-    {
-        this.userProperties = userProperties;
-        return this;
-    }
-
-    public Properties getUserProperties()
-    {
-        if ( userProperties == null )
-        {
-            userProperties = new Properties();
-        }
-
-        return userProperties;
-    }
-
+    
     public Properties getExecutionProperties()
     {
         return executionProperties;
