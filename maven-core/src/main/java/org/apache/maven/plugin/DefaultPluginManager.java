@@ -89,11 +89,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 // TODO: get plugin groups
 // TODO: separate out project downloading
 // TODO: template method plugin validation as its framework specific
-// TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think
-// about how that works
-// TODO: remove the ProjectBuilder
+// TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO: remove the coreArtifactFilterManager
 // TODO: remove the runtimeInformation
+// TODO: move deprecated parameter check outside of the plugin manager
+// TODO: move checkRequiredMavenVersion to lifecycle executor, don't run 5 out of 10 plugins and then blow up ...
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
