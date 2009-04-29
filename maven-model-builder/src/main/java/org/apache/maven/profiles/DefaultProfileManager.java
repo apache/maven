@@ -22,7 +22,6 @@ package org.apache.maven.profiles;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.interpolator.PomInterpolatorTag;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
