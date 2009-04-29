@@ -393,44 +393,6 @@ public class DefaultPluginManager
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-        // Here we are walking throught the POM to find plugin configuraiton that we
-        // need to inject into the POM. Shane will soon take care of this.
-        // Merge the plugin level configuration with the execution level configuration
-        // where the latter is dominant.
-
-        /*
-        if ( project.getBuildPlugins() != null )
-        {
-            for ( Plugin buildPlugin : project.getBuildPlugins() )
-            {
-                // The POM builder should have merged any configuration at the upper level of the plugin
-                // element with the execution level configuration where our goal is.
-
-                // We have our plugin
-                if ( buildPlugin.getArtifactId().equals( pluginDescriptor.getArtifactId() ) )
-                {
-                    Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
-
-                    // Search through executions
-                    for ( PluginExecution e : buildPlugin.getExecutions() )
-                    {
-                        // Search though goals to match what's been asked for.
-                        for ( String g : e.getGoals() )
-                        {
-                            // This goal matches what's been asked for.                            
-                            if ( g.equals( mojoDescriptor.getGoal() ) )
-                            {
-                                dom = Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) e.getConfiguration(), dom );
-                            }
-                        }
-                    }
-
-                    mojoExecution.setConfiguration( dom );
-                }
-            }
-        }
-        */
-
         String goalExecId = goalName;
         if ( mojoExecution.getExecutionId() != null )
         {
