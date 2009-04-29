@@ -87,7 +87,7 @@ public class LifecycleExecutorTest
     public void testLifecyclePluginsRetrievalForDefaultLifecycle()
         throws Exception
     {
-        List<Plugin> plugins = new ArrayList<Plugin>( lifecycleExecutor.lifecyclePlugins( "jar" ) );  
+        List<Plugin> plugins = new ArrayList<Plugin>( lifecycleExecutor.getPluginsBoundByDefaultToLifecycles( "jar" ) );  
         
         for( Plugin plugin : plugins )
         {

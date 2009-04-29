@@ -16,6 +16,7 @@ package org.apache.maven.lifecycle;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -196,45 +197,6 @@ public class DefaultLifecycleExecutor
             }
         }         
     }
-      
-    public Set<Plugin> lifecyclePlugins( String packaging )
-    {
-        Set<Plugin> plugins = new LinkedHashSet<Plugin>();
-        
-        for ( Lifecycle lifecycle : lifecycles )
-        {
-            LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
-
-            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );                                                           
-            
-            if ( lifecycleConfiguration != null )
-            {
-                Map<String, String> lifecyclePhasesForPackaging = lifecycleConfiguration.getPhases();
-
-                for ( String s : lifecyclePhasesForPackaging.values() )
-                {
-                    String[] p = StringUtils.split( s, ":" );
-                    Plugin plugin = new Plugin();
-                    plugin.setGroupId( p[0] );
-                    plugin.setArtifactId( p[1] );
-                    plugins.add( plugin );
-                }
-            }
-            else if ( lifecycle.getDefaultPhases() != null )
-            {
-                for ( String s : lifecycle.getDefaultPhases() )
-                {
-                    String[] p = StringUtils.split( s, ":" );
-                    Plugin plugin = new Plugin();
-                    plugin.setGroupId( p[0] );
-                    plugin.setArtifactId( p[1] );
-                    plugins.add( plugin );
-                }                
-            }        
-        }
-
-        return plugins;
-    }        
     
     // 1. Find the lifecycle given the phase (default lifecycle when given install)
     // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
@@ -501,6 +463,80 @@ public class DefaultLifecycleExecutor
 
         return null;
     }   
+    
+    // These methods deal with construction intact Plugin object that look like they come from a standard
+    // <plugin/> block in a Maven POM. We have to do some wiggling to pull the sources of information
+    // together and this really shows the problem of constructing a sensible default configuration but
+    // it's all encapsulated here so it appears normalized to the POM builder.
+    
+    // We are going to take the project packaging and find all plugin in the default lifecycle and create
+    // fully populated Plugin objects, including executions with goals and default configuration taken
+    // from the plugin.xml inside a plugin.
+    //
+    public Set<Plugin> getPluginsBoundByDefaultToLifecycles( String packaging )
+    {
+        Set<Plugin> plugins = new LinkedHashSet<Plugin>();
+        
+        for ( Lifecycle lifecycle : lifecycles )
+        {
+            LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
+
+            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );                                                           
+            
+            if ( lifecycleConfiguration != null )
+            {
+                Map<String, String> lifecyclePhasesForPackaging = lifecycleConfiguration.getPhases();
+
+                // These are of the form:
+                //
+                // org.apache.maven.plugins:maven-compiler-plugin:compile
+                //
+                for ( String s : lifecyclePhasesForPackaging.values() )
+                {
+                    plugins.add( populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( s ) );
+                }
+            }
+            else if ( lifecycle.getDefaultPhases() != null )
+            {
+                for ( String s : lifecycle.getDefaultPhases() )
+                {
+                    plugins.add( populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( s ) );
+                }                
+            }        
+        }
+
+        return plugins;
+    }        
+    
+    private Plugin populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( String lifecyclePhaseDefinition )
+    {
+        String[] p = StringUtils.split( lifecyclePhaseDefinition, ":" );
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( p[0] );
+        plugin.setArtifactId( p[1] );
+        PluginExecution execution = new PluginExecution();
+        execution.setGoals( Arrays.asList( new String[]{ p[2] } ) );
+        plugin.setExecutions( Arrays.asList( new PluginExecution[]{ execution } ) );
+        return plugin;
+    }
+    
+    public Set<Plugin> populateDefaultConfigurationForPlugins( Set<Plugin> plugins, MavenProject project, ArtifactRepository localRepository ) 
+        throws LifecycleExecutionException
+    {
+        for( Plugin p: plugins )
+        {
+            for( PluginExecution e : p.getExecutions() )
+            {
+                for( String g : e.getGoals() )
+                {
+                    Xpp3Dom dom = getDefaultPluginConfiguration( p.getGroupId(), p.getArtifactId(), p.getVersion(), g, project, localRepository );
+                    e.setConfiguration( dom );
+                }
+            }
+        }
+        
+        return plugins;
+    }    
     
     public Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository ) 
         throws LifecycleExecutionException

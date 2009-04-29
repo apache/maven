@@ -585,7 +585,7 @@ public class MavenEmbedder
 
             try
             {
-            	request.setPlugins(lifecycleExecutor.lifecyclePlugins("jar"));
+            	request.setPlugins(lifecycleExecutor.getPluginsBoundByDefaultToLifecycles("jar"));
                 request = populator.populateDefaults( request, configuration );
             }
             catch ( MavenEmbedderException e )
