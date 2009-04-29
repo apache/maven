@@ -473,7 +473,7 @@ public class DefaultLifecycleExecutor
     // fully populated Plugin objects, including executions with goals and default configuration taken
     // from the plugin.xml inside a plugin.
     //
-    public Set<Plugin> getPluginsBoundByDefaultToLifecycles( String packaging )
+    public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
         Set<Plugin> plugins = new LinkedHashSet<Plugin>();
         

@@ -59,7 +59,7 @@ public interface LifecycleExecutor
     // We need to know the specific version so that we can lookup the right version of the plugin descriptor
     // which tells us what the default configuration is.
     //
-    Set<Plugin> getPluginsBoundByDefaultToLifecycles( String packaging );
+    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging );
 
     // Given a set of {@link org.apache.maven.Plugin} objects where the GAV is set we can lookup the plugin
     // descriptor and populate the default configuration.
