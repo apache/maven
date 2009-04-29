@@ -34,6 +34,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.Model;
@@ -70,6 +71,9 @@ public class DefaultMavenProjectBuilder
     
     @Requirement
     private ModelValidator validator;
+    
+    @Requirement
+    private LifecycleExecutor lifecycle;    
 
     @Requirement
     private RepositorySystem repositorySystem;
@@ -166,7 +170,7 @@ public class DefaultMavenProjectBuilder
         MavenProject project;
 		try {
 			Model model = interpolateDomainModel( domainModel, configuration, pomFile );
-			ProcessorContext.addPluginsToModel(model, configuration.getPlugins());
+			ProcessorContext.addPluginsToModel(model, lifecycle.getPluginsBoundByDefaultToAllLifecycles(model.getPackaging()));
 			
 			ProcessorContext.processManagementNodes(model);
 			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
