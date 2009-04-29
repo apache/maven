@@ -202,7 +202,7 @@ public class DefaultProfileManager
  
     public static Collection<Profile> getActiveProfiles(List<Profile> profiles, ProfileManagerInfo profileContextInfo)
     {
-        List<InterpolatorProperty> properties = profileContextInfo.getInterpolatorProperties();
+        Properties properties = profileContextInfo.getInterpolatorProperties();
         Collection<String> activeProfileIds = profileContextInfo.getActiveProfileIds();
         Collection<String> inactiveProfileIds = profileContextInfo.getInactiveProfileIds();
         
@@ -271,17 +271,9 @@ public class DefaultProfileManager
     private boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
-        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-        if(context.getExecutionProperties() != null)
-        {
-            interpolatorProperties.addAll(InterpolatorProperty.toInterpolatorProperties(
-                                                                                        context.getExecutionProperties(),
-                                                                                        PomInterpolatorTag.EXECUTION_PROPERTIES.name()));              
-        }
-     
         for(ProfileMatcher matcher : matchers)
         {
-            if(matcher.isMatch(profile, interpolatorProperties))
+            if(matcher.isMatch(profile, context.getExecutionProperties()))
             {
                 return true;
             }

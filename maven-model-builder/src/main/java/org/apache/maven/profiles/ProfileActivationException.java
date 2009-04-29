@@ -23,7 +23,9 @@ public class ProfileActivationException
     extends Exception
 {
 
-    public ProfileActivationException( String message, Throwable cause )
+	private static final long serialVersionUID = -90820222109103638L;
+
+	public ProfileActivationException( String message, Throwable cause )
     {
         super( message, cause );
     }

@@ -19,12 +19,11 @@ package org.apache.maven.profiles.matchers;
  * under the License.
  */
 
-import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.interpolator.InterpolatorProperty;
 
 public interface ProfileMatcher
 {
-    boolean isMatch( Profile profile, List<InterpolatorProperty> properties );
+    boolean isMatch( Profile profile, Properties properties );
 }

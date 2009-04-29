@@ -3,9 +3,10 @@ package org.apache.maven.profiles.matchers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.interpolator.InterpolatorProperty;
 
 public class JdkMatcher
 	implements ProfileMatcher 
@@ -14,16 +15,17 @@ public class JdkMatcher
     private static final String JDK_VERSION = "${java.version}";
 
 	public boolean isMatch(Profile profile,
-			List<InterpolatorProperty> properties) {
+			Properties properties) {
         String version = null;
-        for(InterpolatorProperty ip : properties)
+        for ( Entry<Object, Object> ip : properties.entrySet() )
         {
         	if(ip.getKey().equals(JDK_VERSION))
         	{
-        		version = ip.getValue();
+        		version = (String) ip.getValue();
         		break;
-        	}
+        	}         
         }
+
         if ( version == null )
         {
             return false;

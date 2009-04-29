@@ -19,14 +19,13 @@ package org.apache.maven.profiles.matchers;
  * under the License.
  */
 
-import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.interpolator.InterpolatorProperty;
 
 public class DefaultMatcher implements ProfileMatcher
 {
-    public boolean isMatch( Profile profile, List<InterpolatorProperty> properties )
+    public boolean isMatch( Profile profile, Properties properties )
     {
         if(profile.getActivation() == null)
         {

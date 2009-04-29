@@ -463,10 +463,7 @@ public class DefaultMavenProjectBuilder
             .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
                                                                               : new ArrayList<String>();
             
-            List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-            interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( projectBuilderConfiguration.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
-            
-            ProfileManagerInfo profileInfo = new ProfileManagerInfo(interpolatorProperties, activeProfileIds, inactiveProfileIds);
+            ProfileManagerInfo profileInfo = new ProfileManagerInfo(projectBuilderConfiguration.getExecutionProperties(), activeProfileIds, inactiveProfileIds);
             DomainModel domainModel = new DomainModel( pomFile );
             domainModel.setProjectDirectory( pomFile.getParentFile() );
             domainModel.setMostSpecialized( true );

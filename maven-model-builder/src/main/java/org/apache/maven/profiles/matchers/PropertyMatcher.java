@@ -20,13 +20,14 @@ package org.apache.maven.profiles.matchers;
  */
 
 import java.util.List;
+import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.interpolator.InterpolatorProperty;
 
 public class PropertyMatcher implements ProfileMatcher
 {
-    public boolean isMatch( Profile profile, List<InterpolatorProperty> properties )
+    public boolean isMatch( Profile profile, Properties properties )
     {
         if (profile == null) {
             throw new IllegalArgumentException("profile: null");
@@ -49,12 +50,14 @@ public class PropertyMatcher implements ProfileMatcher
             return !name.startsWith("!");
         }
 
-        for(InterpolatorProperty ip : properties) {
-            if(ip.getKey().equals("${" + name + "}")) {
-                return ip.getValue().equals(value);
-            }
+        for ( Entry<Object, Object> ip : properties.entrySet() )
+        {
+        	if(ip.getKey().equals("${" + name + "}"))
+        	{
+        		return ((String) ip.getValue()).equals(value);
+        	}         
         }
-
+       
         return false;
     }
 }

@@ -2,26 +2,25 @@ package org.apache.maven.profiles;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Properties;
 
-import org.apache.maven.model.interpolator.InterpolatorProperty;
 
 public class ProfileManagerInfo
 {
-	private List<InterpolatorProperty> interpolatorProperties;
+	private Properties interpolatorProperties;
 	
 	private Collection<String> activeProfileIds;
 	
 	private Collection<String> inactiveProfileIds;
 	
-	public ProfileManagerInfo(List<InterpolatorProperty> interpolatorProperties, Collection<String> activeProfileIds, Collection<String> inactiveProfileIds)
+	public ProfileManagerInfo(Properties interpolatorProperties, Collection<String> activeProfileIds, Collection<String> inactiveProfileIds)
 	{
-		this.interpolatorProperties = (interpolatorProperties != null) ? interpolatorProperties : new ArrayList<InterpolatorProperty>();
+		this.interpolatorProperties = (interpolatorProperties != null) ? interpolatorProperties : new Properties();
 		this.activeProfileIds = (activeProfileIds != null) ? activeProfileIds : new ArrayList<String>();
 		this.inactiveProfileIds = (inactiveProfileIds != null) ? inactiveProfileIds : new ArrayList<String>();
 	}
 
-	public List<InterpolatorProperty> getInterpolatorProperties() {
+	public Properties getInterpolatorProperties() {
 		return interpolatorProperties;
 	}
 
