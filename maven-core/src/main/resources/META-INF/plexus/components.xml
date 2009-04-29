@@ -623,7 +623,5 @@ under the License.
         <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
       </configuration>
     </component>    
-<!-- 
- -->
   </components>
 </component-set>
