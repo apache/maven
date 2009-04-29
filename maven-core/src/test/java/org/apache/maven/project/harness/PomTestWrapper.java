@@ -25,13 +25,13 @@ import java.util.Iterator;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.maven.model.PomClassicDomainModel;
+import org.apache.maven.model.DomainModel;
 import org.apache.maven.project.MavenProject;
 
 public class PomTestWrapper
 {
 
-    private PomClassicDomainModel domainModel;
+    private DomainModel domainModel;
 
     private File pomFile;
 
@@ -44,13 +44,13 @@ public class PomTestWrapper
         JXPathContextReferenceImpl.addNodePointerFactory( new Xpp3DomPointerFactory() );
     }
 
-    public PomTestWrapper( PomClassicDomainModel domainModel )
+    public PomTestWrapper( DomainModel domainModel )
         throws IOException
     {
         this( null, domainModel );
     }
 
-    public PomTestWrapper( File pomFile, PomClassicDomainModel domainModel )
+    public PomTestWrapper( File pomFile, DomainModel domainModel )
         throws IOException
     {
         if ( domainModel == null )
@@ -93,7 +93,7 @@ public class PomTestWrapper
             throw new IllegalArgumentException( "file: null" );
         }
 
-        this.domainModel = new PomClassicDomainModel( file );
+        this.domainModel = new DomainModel( file );
         context = JXPathContext.newContext( domainModel.getModel() );
     }
 
@@ -102,11 +102,11 @@ public class PomTestWrapper
         return mavenProject;
     }
 
-    public PomClassicDomainModel getDomainModel()
+    public DomainModel getDomainModel()
     	throws IOException {
         if ( domainModel == null && mavenProject != null )
         {
-                domainModel = new PomClassicDomainModel( mavenProject.getModel() );
+                domainModel = new DomainModel( mavenProject.getModel() );
                 int lineageCount = 1;
                 for ( MavenProject parent = mavenProject.getParent(); parent != null; parent = parent.getParent() )
                 {

@@ -71,15 +71,15 @@ public class ProcessorContext
      * @return
      * @throws IOException
      */
-    public static PomClassicDomainModel build( List<DomainModel> domainModels, List<ModelEventListener> listeners )
+    public static DomainModel build( List<DomainModel> domainModels, List<ModelEventListener> listeners )
         throws IOException
     {  
-        PomClassicDomainModel child = null;
+        DomainModel child = null;
         for ( DomainModel domainModel : domainModels )
         {   
             if(domainModel.isMostSpecialized())
             {
-                child = (PomClassicDomainModel) domainModel;
+                child = (DomainModel) domainModel;
             }
         }
         if(child == null)
@@ -103,14 +103,14 @@ public class ProcessorContext
         		listener.fire(target);
         	}
         }       
-        PomClassicDomainModel domainModel = new PomClassicDomainModel( target, child.isMostSpecialized() );
+        DomainModel domainModel = new DomainModel( target, child.isMostSpecialized() );
         domainModel.setProjectDirectory(child.getProjectDirectory());
         domainModel.setParentFile(child.getParentFile());
 
         return domainModel;
     }
     
-    public static PomClassicDomainModel mergeProfilesIntoModel(Collection<Profile> profiles, PomClassicDomainModel domainModel) throws IOException
+    public static DomainModel mergeProfilesIntoModel(Collection<Profile> profiles, DomainModel domainModel) throws IOException
     {
         List<Model> profileModels = new ArrayList<Model>();
         List<Model> externalProfileModels = new ArrayList<Model>();
@@ -168,7 +168,7 @@ public class ProcessorContext
         //TODO: Merge Dependency Management
         target.setDependencyManagement( depMng );
         
-        PomClassicDomainModel targetModel = new PomClassicDomainModel( target, domainModel.isMostSpecialized());
+        DomainModel targetModel = new DomainModel( target, domainModel.isMostSpecialized());
         targetModel.setParentFile(domainModel.getParentFile());
         targetModel.setProjectDirectory(domainModel.getProjectDirectory());
         return targetModel;
@@ -198,7 +198,7 @@ public class ProcessorContext
         List<Model> models = new ArrayList<Model>();
         for(DomainModel domainModel : domainModels)
         {
-            PomClassicDomainModel dm = (PomClassicDomainModel) domainModel;
+            DomainModel dm = (DomainModel) domainModel;
             if(dm.getModel() != null)
             {
                 if(dm.isMostSpecialized())

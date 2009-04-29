@@ -27,7 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.PomClassicDomainModel;
+import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.ProjectUri;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
@@ -172,7 +172,7 @@ public class DefaultInterpolator
         try
         {
             String xml = unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-            Model m = new PomClassicDomainModel( new ByteArrayInputStream( xml.getBytes( "UTF-8" ) ) ).getModel();
+            Model m = new DomainModel( new ByteArrayInputStream( xml.getBytes( "UTF-8" ) ) ).getModel();
             if ( projectDirectory != null )
             {
                 alignPaths( m, projectDirectory );

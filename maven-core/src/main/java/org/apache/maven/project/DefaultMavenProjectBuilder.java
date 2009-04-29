@@ -38,7 +38,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelEventListener;
-import org.apache.maven.model.PomClassicDomainModel;
+import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.interpolator.Interpolator;
@@ -116,7 +116,7 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
     	//Do inheritance
-        PomClassicDomainModel domainModel;
+        DomainModel domainModel;
 		try 
 		{
 			domainModel = build( "unknown", pomFile, configuration );
@@ -242,7 +242,7 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
-        PomClassicDomainModel domainModel;
+        DomainModel domainModel;
         try 
         {
 			domainModel = build( "unknown", artifact.getFile(), configuration );
@@ -392,7 +392,7 @@ public class DefaultMavenProjectBuilder
         return new MavenProjectBuildingResult( project, result );
     }
     
-    private Model interpolateDomainModel( PomClassicDomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
+    private Model interpolateDomainModel( DomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
         throws ProjectBuildingException
     {
         Model model;
@@ -453,7 +453,7 @@ public class DefaultMavenProjectBuilder
         return project;   	
     }
     
-    private PomClassicDomainModel build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
+    private DomainModel build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
     {
         List<String> activeProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration.getGlobalProfileManager()
@@ -467,7 +467,7 @@ public class DefaultMavenProjectBuilder
             interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( projectBuilderConfiguration.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
             
             ProfileManagerInfo profileInfo = new ProfileManagerInfo(interpolatorProperties, activeProfileIds, inactiveProfileIds);
-            PomClassicDomainModel domainModel = new PomClassicDomainModel( pomFile );
+            DomainModel domainModel = new DomainModel( pomFile );
             domainModel.setProjectDirectory( pomFile.getParentFile() );
             domainModel.setMostSpecialized( true );
 
@@ -498,7 +498,7 @@ public class DefaultMavenProjectBuilder
 
             	if ( mavenParents.size() > 0 )
             	{
-            		PomClassicDomainModel dm = (PomClassicDomainModel) mavenParents.get( 0 );
+            		DomainModel dm = (DomainModel) mavenParents.get( 0 );
             		parentFile = dm.getFile();
             		domainModel.setParentFile( parentFile );
             		lineageCount = mavenParents.size();
@@ -507,12 +507,12 @@ public class DefaultMavenProjectBuilder
             	domainModels.addAll( mavenParents );
             }
 
-            domainModels.add( new PomClassicDomainModel( getSuperModel(), false ) );
+            domainModels.add( new DomainModel( getSuperModel(), false ) );
             List<DomainModel> profileModels = new ArrayList<DomainModel>();
             //Process Profiles
             for(DomainModel domain : domainModels)
             {
-            	PomClassicDomainModel dm = (PomClassicDomainModel) domain;
+            	DomainModel dm = (DomainModel) domain;
 
             	if(!dm.getModel().getProfiles().isEmpty())
             	{
@@ -536,7 +536,7 @@ public class DefaultMavenProjectBuilder
             	}                
             }
 
-            PomClassicDomainModel transformedDomainModel = ProcessorContext.build(profileModels, listeners);
+            DomainModel transformedDomainModel = ProcessorContext.build(profileModels, listeners);
 
             // Lineage count is inclusive to add the POM read in itself.
             transformedDomainModel.setLineageCount( lineageCount + 1 );
@@ -545,7 +545,7 @@ public class DefaultMavenProjectBuilder
             return transformedDomainModel;
     }
     
-    private static boolean useTopLevelProjectForParent(PomClassicDomainModel currentModel, MavenProject topProject) throws IOException
+    private static boolean useTopLevelProjectForParent(DomainModel currentModel, MavenProject topProject) throws IOException
     {
     	if(topProject == null || currentModel.getModel().getParent() == null)
     	{
@@ -633,7 +633,7 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private List<DomainModel> getDomainModelParentsFromRepository(  PomClassicDomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    private List<DomainModel> getDomainModelParentsFromRepository(  DomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws IOException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
@@ -659,7 +659,7 @@ public class DefaultMavenProjectBuilder
                 + " could not be retrieved from any repository" ).initCause( e );
         }
 
-        PomClassicDomainModel parentDomainModel = new PomClassicDomainModel( artifactParent.getFile() );
+        DomainModel parentDomainModel = new DomainModel( artifactParent.getFile() );
 
         if ( !parentDomainModel.matchesParentOf( domainModel ) )
         {
@@ -684,7 +684,7 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws IOException
      */
-    private List<DomainModel> getDomainModelParentsFromLocalPath( PomClassicDomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+    private List<DomainModel> getDomainModelParentsFromLocalPath( DomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                                                                   File projectDirectory, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException
     {
@@ -704,19 +704,19 @@ public class DefaultMavenProjectBuilder
         }
     	MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
     	boolean isTop = useTopLevelProjectForParent(domainModel, topProject);
-    	PomClassicDomainModel parentDomainModel = null;
+    	DomainModel parentDomainModel = null;
         if ( !isTop  )
         {
         	if(!parentFile.isFile())
         	{
         		throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );	
         	}     
-        	parentDomainModel = new PomClassicDomainModel( parentFile );
+        	parentDomainModel = new DomainModel( parentFile );
         	parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
         }
         else
         {
-        	parentDomainModel = new PomClassicDomainModel(projectBuilderConfiguration.getTopLevelProjectFromReactor().getFile());
+        	parentDomainModel = new DomainModel(projectBuilderConfiguration.getTopLevelProjectFromReactor().getFile());
         }
 
         if ( !parentDomainModel.matchesParentOf( domainModel ) )
