@@ -50,7 +50,22 @@ public interface LifecycleExecutor
     List<MojoDescriptor> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
         throws LifecycleExecutionException;
         
-    Set<Plugin> lifecyclePlugins( String packaging );
+    // For a given project packaging find all the plugins that are bound to any registered
+    // lifecycles. The project builder needs to now what default plugin information needs to be
+    // merged into POM being built. Once the POM builder has this plugin information, versions can be assigned
+    // by the POM builder because they will have to be defined in plugin management. Once this is done then it
+    // can be passed back so that the default configuraiton information can be populated.
+    //
+    // We need to know the specific version so that we can lookup the right version of the plugin descriptor
+    // which tells us what the default configuration is.
+    //
+    Set<Plugin> getPluginsBoundByDefaultToLifecycles( String packaging );
+
+    // Given a set of {@link org.apache.maven.Plugin} objects where the GAV is set we can lookup the plugin
+    // descriptor and populate the default configuration.
+    //
+    Set<Plugin> populateDefaultConfigurationForPlugins( Set<Plugin> plugins, MavenProject project, ArtifactRepository localRepository )
+        throws LifecycleExecutionException;
     
     void execute( MavenSession session )
         throws LifecycleExecutionException, MojoFailureException, MojoExecutionException;
