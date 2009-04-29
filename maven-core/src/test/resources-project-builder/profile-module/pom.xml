@@ -1,0 +1,24 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>gid</groupId>
+  <artifactId>aid</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>module-2</module>
+    <module>module-1</module>
+    <module>module-3</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>a</id>
+      <properties>
+        <b>test-prop</b>
+      </properties>
+      <modules>
+        <module>module-1</module>
+        <module>module-4</module>
+      </modules>
+    </profile>
+  </profiles>
+</project>

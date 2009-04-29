@@ -1,0 +1,18 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>nexus-parent</artifactId>
+  <version>8-SNAPSHOT</version>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>${plexus.version}</version>
+        </plugin>
+        </plugins>
+    </pluginManagement>
+  </build>
+</project>

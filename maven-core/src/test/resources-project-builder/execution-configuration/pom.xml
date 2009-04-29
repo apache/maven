@@ -1,0 +1,58 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus</artifactId>
+    <version>1.3.0-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.modello</groupId>
+                <artifactId>modello-maven-plugin</artifactId>
+                <version>1.0-alpha-21</version>
+                <executions>
+                    <execution>
+                        <id>nexus.xml</id>
+                        <goals>
+                            <goal>java</goal>
+                            <goal>xpp3-reader</goal>
+                            <goal>xpp3-writer</goal>
+                        </goals>
+                        <configuration>
+                            <version>1.0.8</version>
+                            <packagedVersions>
+                                <packagedVersion>1.0.0</packagedVersion>
+                                <packagedVersion>1.0.1</packagedVersion>
+                                <packagedVersion>1.0.6</packagedVersion>
+                            </packagedVersions>
+                            <model>src/main/mdo/nexus.xml</model>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>security.xml</id>
+                        <goals>
+                            <goal>java1</goal>
+                            <goal>xpp3-reader1</goal>
+                            <goal>xpp3-writer1</goal>
+                        </goals>
+                        <configuration>
+                            <version>1.0.0</version>
+                            <model>src/main/mdo/security.xml</model>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.modello</groupId>
+                    <artifactId>modello-maven-plugin</artifactId>
+                    <version>1.0-alpha-21</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

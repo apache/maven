@@ -1,0 +1,24 @@
+<project>
+  <parent>
+    <artifactId>p0</artifactId>
+    <groupId>maven-t10</groupId>
+    <version>1.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven-t10</groupId>
+  <artifactId>p1</artifactId>
+  <packaging>pom</packaging>
+  <name>p1</name>
+  <version>1.0</version>
+  <scm>
+    <url>scm-url</url>
+  </scm>
+
+  <dependencies>
+    <dependency>
+      <groupId>maven-test</groupId>
+      <artifactId>t10-a</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,15 @@
+<project >
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.commons</groupId>
+  <artifactId>commons-parent</artifactId>
+  <packaging>pom</packaging>
+  <version>11</version>
+
+  <distributionManagement>
+    <repository>
+      <id>dummy</id>
+      <name>Dummy to avoid accidental deploys</name>
+      <url />
+    </repository>
+  </distributionManagement>
+</project>
