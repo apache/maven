@@ -45,8 +45,14 @@ public class PluginParameterExpressionEvaluator
     private String basedir;
 
     private Properties properties;    
-    
+
+    @Deprecated
     public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution )
+    {
+        this( session );
+    }
+
+    public PluginParameterExpressionEvaluator( MavenSession session )
     {
         this.session = session;
         this.mojoExecution = mojoExecution;

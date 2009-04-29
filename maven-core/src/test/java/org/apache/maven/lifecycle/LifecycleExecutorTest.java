@@ -13,6 +13,7 @@ import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class LifecycleExecutorTest
     extends AbstractCoreMavenComponentTestCase
@@ -95,4 +96,15 @@ public class LifecycleExecutorTest
         
         assertEquals( 8, plugins.size() );
     }
+    
+    public void testPluginConfigurationCreation()
+        throws Exception
+    {
+        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        MavenSession session = createMavenSession( pom );
+        MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( "org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process", session.getCurrentProject(), session.getLocalRepository() );
+        Xpp3Dom dom = lifecycleExecutor.convert( mojoDescriptor.getMojoConfiguration() );
+        System.out.println( dom );
+    }
+        
 }

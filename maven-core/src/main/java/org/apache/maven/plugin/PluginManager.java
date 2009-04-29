@@ -15,6 +15,7 @@ package org.apache.maven.plugin;
  * the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -34,12 +35,12 @@ public interface PluginManager
     // - configure the plugin [extension point]
     // - execute the plugin    
     
-    Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session );
+    Plugin findPluginForPrefix( String prefix, MavenProject project );
     
-    PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
+    PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, ArtifactRepository localRepository )
         throws PluginLoaderException;
     
-    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
+    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenProject project, ArtifactRepository localRepository )
         throws PluginLoaderException;
     
     void executeMojo( MavenSession session, MojoExecution execution )

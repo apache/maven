@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
@@ -40,10 +41,13 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 //TODO: The configuration for the lifecycle needs to be externalized so that I can use the annotations
 //      properly for the wiring and reference and external source for the lifecycle configuration.
@@ -334,7 +338,7 @@ public class DefaultLifecycleExecutor
                     for( String goal : execution.getGoals() )
                     {
                         String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
-                        MojoDescriptor md = getMojoDescriptor( s, session, project );
+                        MojoDescriptor md = getMojoDescriptor( s, session.getCurrentProject(), session.getLocalRepository() );
                                                 
                         // need to know if this plugin belongs to a phase in the lifecycle that's running
                         if ( md.getPhase() != null && lifecycle.getPhases().contains( md.getPhase() ) )
@@ -357,7 +361,7 @@ public class DefaultLifecycleExecutor
                 //
                 // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
                 //
-                lifecyclePlan.add( getMojoDescriptor( mojo, session, project ) );
+                lifecyclePlan.add( getMojoDescriptor( mojo, project, session.getLocalRepository() ) );
             }
         }  
                 
@@ -365,7 +369,8 @@ public class DefaultLifecycleExecutor
     }  
            
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
-    MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
+    MojoDescriptor getMojoDescriptor( String task, MavenProject project, ArtifactRepository localRepository )
+    //MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository )
         throws LifecycleExecutionException
     {        
         String goal;
@@ -389,7 +394,7 @@ public class DefaultLifecycleExecutor
             // Maven plugin deployment we will find the right PluginDescriptor from the remote
             // repository.
 
-            plugin = pluginManager.findPluginForPrefix( prefix, project, session );
+            plugin = pluginManager.findPluginForPrefix( prefix, project );
 
             // Search plugin in the current POM
             if ( plugin == null )
@@ -400,7 +405,7 @@ public class DefaultLifecycleExecutor
                     
                     try
                     {
-                        desc = pluginManager.loadPlugin( buildPlugin, project, session );
+                        desc = pluginManager.loadPlugin( buildPlugin, project, localRepository );
                     }
                     catch ( PluginLoaderException e )
                     {
@@ -449,7 +454,7 @@ public class DefaultLifecycleExecutor
         
         try
         {
-            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session );
+            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, project, localRepository );
         }
         catch ( PluginLoaderException e )
         {
@@ -495,5 +500,34 @@ public class DefaultLifecycleExecutor
         }
 
         return null;
-    }    
+    }   
+    
+    public Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository ) 
+        throws LifecycleExecutionException
+    {
+        return convert( getMojoDescriptor( groupId+":"+artifactId+":"+version+":"+goal, project, localRepository ).getMojoConfiguration() );
+    }
+    
+    public Xpp3Dom getMojoConfiguration( MojoDescriptor mojoDescriptor )
+    {
+        PlexusConfiguration configuration = mojoDescriptor.getConfiguration();
+        
+        return convert( configuration );
+    }
+    
+    public Xpp3Dom convert( PlexusConfiguration c )
+    {
+        Xpp3Dom dom = new Xpp3Dom( "configuration" );
+        
+        PlexusConfiguration[] ces = c.getChildren();
+        
+        for( PlexusConfiguration ce : ces )
+        {
+            Xpp3Dom e = new Xpp3Dom( ce.getName() );
+            e.setValue( ce.getValue( ce.getAttribute( "default-value", null ) ) );
+            dom.addChild( e );            
+        }
+
+        return dom;
+    }
 }

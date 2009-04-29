@@ -274,13 +274,13 @@ public class MavenEmbedder
      * mkleint: protected so that IDE integrations can selectively allow downloading artifacts
      * from remote repositories (if they prohibit by default on project loading)
      * @throws PluginLoaderException 
-     */
     protected void verifyPlugin( Plugin plugin, MavenProject project )
         throws ComponentLookupException, PluginLoaderException
     {
         MavenSession session = new MavenSession( request );
         pluginManager.loadPlugin( plugin, project, session );
     }
+     */
 
     // ----------------------------------------------------------------------
     // Project

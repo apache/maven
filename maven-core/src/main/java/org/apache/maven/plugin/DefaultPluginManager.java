@@ -47,7 +47,6 @@ import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -136,7 +135,7 @@ public class DefaultPluginManager
     }
 
     // This should be template method code for allowing subclasses to assist in contributing search/hint information
-    public Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
+    public Plugin findPluginForPrefix( String prefix, MavenProject project )
     {
         //Use the plugin managers capabilities to get information to augement the request
         
@@ -144,7 +143,7 @@ public class DefaultPluginManager
         //return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
     }
     
-    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
+    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, ArtifactRepository localRepository )
         throws PluginLoaderException
     {        
         PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
@@ -158,7 +157,7 @@ public class DefaultPluginManager
                         
         try
         {                                              
-            return addPlugin( plugin, project, session );
+            return addPlugin( plugin, project, localRepository );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -191,13 +190,11 @@ public class DefaultPluginManager
         return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
     }
     
-    protected PluginDescriptor addPlugin( Plugin plugin, MavenProject project, MavenSession session )
+    protected PluginDescriptor addPlugin( Plugin plugin, MavenProject project, ArtifactRepository localRepository )
         throws ArtifactNotFoundException, ArtifactResolutionException, InvalidPluginException, PluginVersionResolutionException, PluginContainerException, PluginVersionNotFoundException
     {
-        resolvePluginVersion( plugin, project, session );
+        resolvePluginVersion( plugin, project );
         
-        ArtifactRepository localRepository = session.getLocalRepository();
-
         MavenProject pluginProject = buildPluginProject( plugin, localRepository, new ArrayList( project.getRemoteArtifactRepositories() ) );
 
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
@@ -214,7 +211,7 @@ public class DefaultPluginManager
 
         ClassRealm pluginRealm = container.createChildRealm( pluginKey( plugin ) );
         
-        Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, project, session.getLocalRepository() );
+        Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, project, localRepository );
 
         for ( Artifact a : pluginArtifacts )
         {
@@ -571,7 +568,7 @@ public class DefaultPluginManager
             // override in the POM.
             validatePomConfiguration( mojoDescriptor, pomConfiguration );
 
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
 
             checkDeprecatedParameters( mojoDescriptor, pomConfiguration );
 
@@ -929,7 +926,7 @@ public class DefaultPluginManager
         }
     }
    
-    public void resolvePluginVersion( Plugin plugin, MavenProject project, MavenSession session ) 
+    public void resolvePluginVersion( Plugin plugin, MavenProject project ) 
         throws PluginVersionNotFoundException
     {        
         String version = plugin.getVersion();
@@ -1022,7 +1019,7 @@ public class DefaultPluginManager
         }
     }    
     
-    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenSession session )
+    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenProject project, ArtifactRepository localRepository )
         throws PluginLoaderException
     {
         if ( plugin.getVersion() == null )
@@ -1030,7 +1027,7 @@ public class DefaultPluginManager
         	throw new IllegalArgumentException("plugin.version: null");
         }
         
-        PluginDescriptor pluginDescriptor =  loadPlugin( plugin, session.getCurrentProject(), session );
+        PluginDescriptor pluginDescriptor =  loadPlugin( plugin, project, localRepository );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
         
