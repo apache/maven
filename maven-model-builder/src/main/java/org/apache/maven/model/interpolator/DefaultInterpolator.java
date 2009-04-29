@@ -65,7 +65,7 @@ public class DefaultInterpolator implements Interpolator {
     	for(Entry<Object, Object> e : properties
 					.entrySet())
     	{
-    	//	props.add(new InterpolatorProperty(e.getKey(), e.getValue(), PomInterpolatorTag.EXECUTION_PROPERTIES))
+    		props.add(new InterpolatorProperty((String) e.getKey(), (String) e.getValue(), PomInterpolatorTag.EXECUTION_PROPERTIES.toString()));
     	}
     	return interpolateDomainModel(dm, props);
     }
