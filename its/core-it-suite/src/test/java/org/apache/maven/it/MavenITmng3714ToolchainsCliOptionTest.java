@@ -38,7 +38,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
 {
     public MavenITmng3714ToolchainsCliOptionTest()
     {
-        super( "[2.2.0,)" );
+        super( "[2.3.0,)" );
     }
 
     /**
