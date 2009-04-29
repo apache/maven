@@ -711,11 +711,11 @@ public class DefaultMaven
             
             try
             {
-                sd = (SecDispatcher) container.lookup( SecDispatcher.ROLE );
+                sd = (SecDispatcher) container.lookup( SecDispatcher.ROLE, "maven" );
             }
             catch (Exception e)
             {
-                getLogger().warn( "Security features are disabled. Cannot find plexus component "+SecDispatcher.ROLE );
+                getLogger().warn( "Security features are disabled. Cannot find plexus component "+SecDispatcher.ROLE + ":maven" );
                 
                 line();
             }
