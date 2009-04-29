@@ -26,12 +26,11 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.maven.model.PomClassicDomainModel;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomTestWrapper
 {
+
     private PomClassicDomainModel domainModel;
 
     private File pomFile;
@@ -60,11 +59,7 @@ public class PomTestWrapper
         }
         this.domainModel = domainModel;
         this.pomFile = pomFile;
-        try {
-            context = JXPathContext.newContext( new MavenXpp3Reader().read(domainModel.getInputStream()));
-        } catch (XmlPullParserException e) {
-            throw new IOException(e.getMessage());
-        }
+        context = JXPathContext.newContext( domainModel.getModel());
     }
 
     public PomTestWrapper( File pomFile, MavenProject mavenProject )
@@ -99,11 +94,7 @@ public class PomTestWrapper
         }
 
         this.domainModel = new PomClassicDomainModel( file );
-        try {
-            context = JXPathContext.newContext( new MavenXpp3Reader().read(domainModel.getInputStream()));
-        } catch (XmlPullParserException e) {
-            throw new IOException(e.getMessage());
-        }
+        context = JXPathContext.newContext( domainModel.getModel() );
     }
 
     public MavenProject getMavenProject()
@@ -112,11 +103,9 @@ public class PomTestWrapper
     }
 
     public PomClassicDomainModel getDomainModel()
-    {
+    	throws IOException {
         if ( domainModel == null && mavenProject != null )
         {
-            try
-            {
                 domainModel = new PomClassicDomainModel( mavenProject.getModel() );
                 int lineageCount = 1;
                 for ( MavenProject parent = mavenProject.getParent(); parent != null; parent = parent.getParent() )
@@ -124,11 +113,6 @@ public class PomTestWrapper
                     lineageCount++;
                 }
                 domainModel.setLineageCount( lineageCount );
-            }
-            catch ( IOException e )
-            {
-
-            }
         }
 
         return this.domainModel;
@@ -143,6 +127,20 @@ public class PomTestWrapper
     {
         context.setValue( expression, value );
     }
+
+    /*
+    public int containerCountForUri( String uri )
+        throws IOException
+    {
+        if ( uri == null || uri.trim().equals( "" ) )
+        {
+            throw new IllegalArgumentException( "uri: null or empty" );
+        }
+        ModelDataSource source = new DefaultModelDataSource();
+        source.init( domainModel.getModelProperties(), null );
+        return source.queryFor( uri ).size();
+    }
+	*/
 
 	public Iterator<?> getIteratorForXPathExpression( String expression )
     {
@@ -170,4 +168,5 @@ public class PomTestWrapper
     {
         return context.getValue( expression ) != null && context.getValue( expression ).equals( value );
     }
+
 }
