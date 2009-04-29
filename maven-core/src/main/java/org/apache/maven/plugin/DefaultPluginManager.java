@@ -93,13 +93,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 // TODO: get plugin groups
 // TODO: separate out project downloading
 // TODO: template method plugin validation as its framework specific
-// TODO: provide a method to get default configuraiton for a given plugin
-// TODO: get rid of all the custom configuration merging here, that's domain specific but needs to
-// incorporate defaults the plugin manager can provide
 // TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think
 // about how that works
-// TODO: merge the plugin collector into the plugin manager
-// TODO: merge the plugin discovery listener into the plugin manager
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
