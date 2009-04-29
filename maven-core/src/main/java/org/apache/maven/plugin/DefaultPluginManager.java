@@ -214,7 +214,7 @@ public class DefaultPluginManager
                 // Not going to happen
             }
         }
-
+        
         try
         {
             logger.debug( "Discovering components in realm: " + pluginRealm );
@@ -312,8 +312,9 @@ public class DefaultPluginManager
             .setRemoteRepostories( new ArrayList( project.getRemoteArtifactRepositories() ) )
             .setManagedVersionMap( pluginManagedDependencies )
             .setFilter( filter )
+            .setResolveDependencies( true )
             .setResolveRoot( true ); // We are setting this to false because the artifact itself has been resolved.
-
+        
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
 

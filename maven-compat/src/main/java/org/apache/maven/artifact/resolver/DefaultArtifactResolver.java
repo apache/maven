@@ -27,6 +27,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -416,6 +417,20 @@ public class DefaultArtifactResolver
             catch ( ArtifactNotFoundException e )
             {
                 result.addMissingArtifact( request.getArtifact() );
+                return result;
+            }
+        }
+        
+        if ( request.isResolveDependencies() )
+        {
+            try
+            {                
+                artifacts = source.retrieve( rootArtifact, localRepository, remoteRepositories ).getArtifacts();
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                e.printStackTrace();
+                // need to add metadata resolution exception
                 return result;
             }
         }

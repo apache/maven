@@ -45,6 +45,8 @@ public class ArtifactResolutionRequest
     private TransferListener transferListener;
     
     private boolean resolveRoot = true;
+
+    private boolean resolveDependencies = false;
     
     public ArtifactResolutionRequest()
     {  
@@ -174,6 +176,18 @@ public class ArtifactResolutionRequest
     public boolean isResolveRoot()
     {
         return resolveRoot;
+    }        
+
+    public ArtifactResolutionRequest setResolveDependencies( boolean resolveDependencies )
+    {
+        this.resolveDependencies = resolveDependencies;
+        
+        return this;
+    }
+    
+    public boolean isResolveDependencies()
+    {
+        return resolveDependencies;
     }        
     
     public TransferListener getTransferListener()
