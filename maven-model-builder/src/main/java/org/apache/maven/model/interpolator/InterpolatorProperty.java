@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * Provides interpolator property information.
  */
-public final class InterpolatorProperty
+final class InterpolatorProperty
 {
     /**
      * The key (or name) of the property

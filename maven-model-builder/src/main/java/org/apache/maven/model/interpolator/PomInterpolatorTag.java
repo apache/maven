@@ -1,6 +1,6 @@
 package org.apache.maven.model.interpolator;
 
-public enum PomInterpolatorTag
+enum PomInterpolatorTag
 {
     PROJECT_PROPERTIES,
 
