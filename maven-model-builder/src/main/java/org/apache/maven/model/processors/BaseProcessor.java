@@ -35,10 +35,6 @@ import org.apache.maven.model.Processor;
 public abstract class BaseProcessor implements Processor
 {
 
-    Object parent;
-
-    Object child;
-
     Collection<Processor> processors;
     
     private List<Model> parentModels;
@@ -75,8 +71,6 @@ public abstract class BaseProcessor implements Processor
             throw new IllegalArgumentException( "target: null" );
         }
 
-        this.parent = parent;
-        this.child = child;
         if(parent instanceof Model)
         {
         	parentModels.add( (Model) parent );
@@ -85,19 +79,8 @@ public abstract class BaseProcessor implements Processor
         {
             processor.process( parent, child, target, isChildMostSpecialized );
         }
-
     }
-
-    public Object getChild()
-    {
-        return child;
-    }
-
-    public Object getParent()
-    {
-        return parent;
-    }
-    
+  
     protected String normalizeUriWithRelativePath(String u, String artifactId, Model parent)
     {
     	if(u == null)

@@ -48,7 +48,7 @@ public class DefaultInterpolator
         
         if(properties == null)
         {
-        	return model;
+        	properties = new Properties();
         }
         
         List<InterpolatorProperty>  interpolatorProperties = new ArrayList<InterpolatorProperty>();

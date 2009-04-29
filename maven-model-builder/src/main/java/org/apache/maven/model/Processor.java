@@ -26,10 +26,6 @@ import org.apache.maven.model.Model;
 public interface Processor
 {
     void process( Object parent, Object child, Object target, boolean isChildMostSpecialized );
-
-    Object getParent();
-
-    Object getChild();
     
     List<Model> getParentModels();
 
