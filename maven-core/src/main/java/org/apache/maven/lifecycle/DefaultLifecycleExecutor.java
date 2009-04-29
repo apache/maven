@@ -39,11 +39,11 @@ import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -173,14 +173,10 @@ public class DefaultLifecycleExecutor
     private void executeGoal( String task, MavenSession session, MavenProject project )
         throws LifecycleExecutionException, MojoFailureException
     {
-        List<MojoDescriptor> lifecyclePlan = calculateLifecyclePlan( task, session );        
+        List<MojoExecution> lifecyclePlan = calculateLifecyclePlan( task, session );        
         
-        for ( MojoDescriptor mojoDescriptor : lifecyclePlan )
-        {
-            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor ); 
-
-            System.out.println( mojoExecution.getMojoDescriptor().getGoal() );
-            
+        for ( MojoExecution mojoExecution : lifecyclePlan )
+        {            
             try
             {
                 pluginManager.executeMojo( session, mojoExecution );
@@ -203,7 +199,7 @@ public class DefaultLifecycleExecutor
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
     // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
     // 5. Bind mojos specified in the project itself to the lifecycle
-    public List<MojoDescriptor> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
+    public List<MojoExecution> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
         throws LifecycleExecutionException
     {        
         // Extract the project from the session
@@ -304,16 +300,21 @@ public class DefaultLifecycleExecutor
                                                 
                         // need to know if this plugin belongs to a phase in the lifecycle that's running
                         if ( md.getPhase() != null && lifecycle.getPhases().contains( md.getPhase() ) )
-                        {
-                            phaseToMojoMapping.get( md.getPhase() ).add( s );
+                        {                                                          
+                            if ( phaseToMojoMapping.get( md.getPhase() ) != null )                                
+                            {
+                                phaseToMojoMapping.get( md.getPhase() ).add( s );                                
+                            }                            
                         }
+                        
+                        //TODO Here we need to break when we have reached the desired phase.
                     }
                 }
             }
         }
                
-        List<MojoDescriptor> lifecyclePlan = new ArrayList<MojoDescriptor>(); 
-        
+        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>(); 
+                        
         // We need to turn this into a set of MojoExecutions
         for( List<String> mojos : phaseToMojoMapping.values() )
         {
@@ -323,7 +324,28 @@ public class DefaultLifecycleExecutor
                 //
                 // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
                 //
-                lifecyclePlan.add( getMojoDescriptor( mojo, project, session.getLocalRepository() ) );
+                MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, project, session.getLocalRepository() ); 
+                
+                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+                
+                String g = mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId();
+                
+                String a = mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId();
+                
+                Plugin p = project.getPlugin( g + ":" + a );
+                
+                for( PluginExecution e : p.getExecutions() )
+                {
+                    for( String goal : e.getGoals() )
+                    {
+                        if( mojoDescriptor.getGoal().equals( goal ) )
+                        {
+                            mojoExecution.setConfiguration( (Xpp3Dom) e.getConfiguration() );
+                        }
+                    }
+                }
+                
+                lifecyclePlan.add( mojoExecution );
             }
         }  
                 
@@ -541,27 +563,29 @@ public class DefaultLifecycleExecutor
     public Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository ) 
         throws LifecycleExecutionException
     {
-        return convert( getMojoDescriptor( groupId+":"+artifactId+":"+version+":"+goal, project, localRepository ).getMojoConfiguration() );
+        return convert( getMojoDescriptor( groupId+":"+artifactId+":"+version+":"+goal, project, localRepository ) );
     }
     
     public Xpp3Dom getMojoConfiguration( MojoDescriptor mojoDescriptor )
     {
-        PlexusConfiguration configuration = mojoDescriptor.getConfiguration();
-        
-        return convert( configuration );
+        return convert( mojoDescriptor );
     }
     
-    public Xpp3Dom convert( PlexusConfiguration c )
+    public Xpp3Dom convert( MojoDescriptor mojoDescriptor  )
     {
-        Xpp3Dom dom = new Xpp3Dom( "configuration" );
+        Map<String,Parameter> parameters = mojoDescriptor.getParameterMap();
         
+        Xpp3Dom dom = new Xpp3Dom( "configuration" );
+
+        PlexusConfiguration c = mojoDescriptor.getMojoConfiguration();
+                
         PlexusConfiguration[] ces = c.getChildren();
         
         for( PlexusConfiguration ce : ces )
         {
             Xpp3Dom e = new Xpp3Dom( ce.getName() );
             e.setValue( ce.getValue( ce.getAttribute( "default-value", null ) ) );
-            dom.addChild( e );            
+            dom.addChild( e );
         }
 
         return dom;

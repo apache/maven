@@ -22,13 +22,12 @@ package org.apache.maven.lifecycle;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.BuildFailureException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -47,7 +46,7 @@ public interface LifecycleExecutor
      * @return
      * @throws LifecycleExecutionException
      */
-    List<MojoDescriptor> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
+    List<MojoExecution> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
         throws LifecycleExecutionException;
         
     // For a given project packaging find all the plugins that are bound to any registered

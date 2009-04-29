@@ -519,16 +519,19 @@ public class DefaultPluginManager
             {
                 pomConfiguration = new XmlPlexusConfiguration( dom );
             }
-
+            
             // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to
             // override in the POM.
-            validatePomConfiguration( mojoDescriptor, pomConfiguration );
 
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session );
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
 
+            // This stuff is moved to the lifecycle executor
+            //validatePomConfiguration( mojoDescriptor, pomConfiguration );
+            
             checkDeprecatedParameters( mojoDescriptor, pomConfiguration );
 
             checkRequiredParameters( mojoDescriptor, pomConfiguration, expressionEvaluator );
+            //
 
             populatePluginFields( mojo, mojoDescriptor, pomConfiguration, expressionEvaluator );
 
@@ -939,24 +942,6 @@ public class DefaultPluginManager
 
         plugin.setVersion( version );
     }
-
-    /*
-    public MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws InvalidPluginException
-    {
-        Artifact artifact = repositorySystem.createProjectArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion() );
-        try
-        {
-            MavenProject p = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
-
-            return p;
-        }
-        catch ( ProjectBuildingException e )
-        {
-            throw new InvalidPluginException( "Unable to build project for plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
-        }
-    }
-    */
 
     public void checkRequiredMavenVersion( Plugin plugin, MavenProject pluginProject, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginVersionResolutionException, InvalidPluginException

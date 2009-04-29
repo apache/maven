@@ -46,13 +46,12 @@ public class PluginParameterExpressionEvaluator
 
     private Properties properties;    
 
-    @Deprecated
-    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution )
+    public PluginParameterExpressionEvaluator( MavenSession session )
     {
-        this( session );
+        this( session, null );
     }
 
-    public PluginParameterExpressionEvaluator( MavenSession session )
+    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution )
     {
         this.session = session;
         this.mojoExecution = mojoExecution;
