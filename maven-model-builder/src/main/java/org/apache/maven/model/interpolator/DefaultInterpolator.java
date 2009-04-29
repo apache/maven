@@ -789,5 +789,11 @@ public class DefaultInterpolator
             uris = new LinkedList<String>( uris.subList( 0, depth ) );
         }
     }
+    
+    private static enum PomInterpolatorTag
+    {
+        PROJECT_PROPERTIES,
 
+        EXECUTION_PROPERTIES
+    }
 }

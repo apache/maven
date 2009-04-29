@@ -30,1197 +30,1197 @@ final class ProjectUri
      * downstream code compiles against them.
      */
 
-    public static String baseUri = "http://apache.org/maven";
+    public static final String baseUri = "http://apache.org/maven";
 
-    public static String xUri = "http://apache.org/maven/project";
+    public static final String xUri = "http://apache.org/maven/project";
 
-    public static class Parent
+    public static final class Parent
     {
-        public static String xUri = "http://apache.org/maven/project/parent";
+        public static final String xUri = "http://apache.org/maven/project/parent";
 
-        public static String artifactId = "http://apache.org/maven/project/parent/artifactId";
+        public static final String artifactId = "http://apache.org/maven/project/parent/artifactId";
 
-        public static String groupId = "http://apache.org/maven/project/parent/groupId";
+        public static final String groupId = "http://apache.org/maven/project/parent/groupId";
 
-        public static String version = "http://apache.org/maven/project/parent/version";
+        public static final String version = "http://apache.org/maven/project/parent/version";
 
-        public static String relativePath = "http://apache.org/maven/project/parent/relativePath";
+        public static final String relativePath = "http://apache.org/maven/project/parent/relativePath";
     }
 
-    public static String modelVersion = "http://apache.org/maven/project/modelVersion";
+    public static final String modelVersion = "http://apache.org/maven/project/modelVersion";
 
-    public static String groupId = "http://apache.org/maven/project/groupId";
+    public static final String groupId = "http://apache.org/maven/project/groupId";
 
-    public static String artifactId = "http://apache.org/maven/project/artifactId";
+    public static final String artifactId = "http://apache.org/maven/project/artifactId";
 
-    public static String packaging = "http://apache.org/maven/project/packaging";
+    public static final String packaging = "http://apache.org/maven/project/packaging";
 
-    public static String name = "http://apache.org/maven/project/name";
+    public static final String name = "http://apache.org/maven/project/name";
 
-    public static String version = "http://apache.org/maven/project/version";
+    public static final String version = "http://apache.org/maven/project/version";
 
-    public static String description = "http://apache.org/maven/project/description";
+    public static final String description = "http://apache.org/maven/project/description";
 
-    public static String url = "http://apache.org/maven/project/url";
+    public static final String url = "http://apache.org/maven/project/url";
 
-    public static class Prerequisites
+    public static final class Prerequisites
     {
-        public static String xUri = "http://apache.org/maven/project/prerequisites";
+        public static final String xUri = "http://apache.org/maven/project/prerequisites";
 
-        public static String maven = "http://apache.org/maven/project/prerequisites/maven";
+        public static final String maven = "http://apache.org/maven/project/prerequisites/maven";
     }
 
-    public static class IssueManagement
+    public static final class IssueManagement
     {
-        public static String xUri = "http://apache.org/maven/project/issueManagement";
+        public static final String xUri = "http://apache.org/maven/project/issueManagement";
 
-        public static String system = "http://apache.org/maven/project/issueManagement/system";
+        public static final String system = "http://apache.org/maven/project/issueManagement/system";
 
-        public static String url = "http://apache.org/maven/project/issueManagement/url";
+        public static final String url = "http://apache.org/maven/project/issueManagement/url";
     }
 
-    public static class CiManagement
+    public static final class CiManagement
     {
-        public static String xUri = "http://apache.org/maven/project/ciManagement";
+        public static final String xUri = "http://apache.org/maven/project/ciManagement";
 
-        public static String system = "http://apache.org/maven/project/ciManagement/system";
+        public static final String system = "http://apache.org/maven/project/ciManagement/system";
 
-        public static String url = "http://apache.org/maven/project/ciManagement/url";
+        public static final String url = "http://apache.org/maven/project/ciManagement/url";
 
-        public static class Notifiers
+        public static final class Notifiers
         {
-            public static String xUri = "http://apache.org/maven/project/ciManagement/notifiers#collection";
+            public static final String xUri = "http://apache.org/maven/project/ciManagement/notifiers#collection";
 
-            public static class Notifier
+            public static final class Notifier
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier";
 
-                public static String type =
+                public static final String type =
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/type";
 
-                public static String sendOnError =
+                public static final String sendOnError =
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/sendOnError";
 
-                public static String sendOnFailure =
+                public static final String sendOnFailure =
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/sendOnFailure";
 
-                public static String sendOnSuccess =
+                public static final String sendOnSuccess =
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/sendOnSuccess";
 
-                public static String sendOnWarning =
+                public static final String sendOnWarning =
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/sendOnWarning";
 
-                public static String address =
+                public static final String address =
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/address";
 
-                public static String configuration =
+                public static final String configuration =
                     "http://apache.org/maven/project/ciManagement/notifiers#collection/notifier/configuration#set";
             }
         }
     }
 
-    public static String inceptionYear = "http://apache.org/maven/project/inceptionYear";
+    public static final String inceptionYear = "http://apache.org/maven/project/inceptionYear";
 
-    public static class MailingLists
+    public static final class MailingLists
     {
-        public static String xUri = "http://apache.org/maven/project/mailingLists#collection";
+        public static final String xUri = "http://apache.org/maven/project/mailingLists#collection";
 
-        public static class MailingList
+        public static final class MailingList
         {
-            public static String xUri = "http://apache.org/maven/project/mailingLists#collection/mailingList";
+            public static final String xUri = "http://apache.org/maven/project/mailingLists#collection/mailingList";
 
-            public static String name = "http://apache.org/maven/project/mailingLists#collection/mailingList/name";
+            public static final String name = "http://apache.org/maven/project/mailingLists#collection/mailingList/name";
 
-            public static String subscribe =
+            public static final String subscribe =
                 "http://apache.org/maven/project/mailingLists#collection/mailingList/subscribe";
 
-            public static String unsubscribe =
+            public static final String unsubscribe =
                 "http://apache.org/maven/project/mailingLists#collection/mailingList/unsubscribe";
 
-            public static String post = "http://apache.org/maven/project/mailingLists#collection/mailingList/post";
+            public static final String post = "http://apache.org/maven/project/mailingLists#collection/mailingList/post";
 
-            public static String archive =
+            public static final String archive =
                 "http://apache.org/maven/project/mailingLists#collection/mailingList/archive";
 
-            public static String otherArchives =
+            public static final String otherArchives =
                 "http://apache.org/maven/project/mailingLists#collection/mailingList/otherArchives";
         }
     }
 
-    public static class Developers
+    public static final class Developers
     {
-        public static String xUri = "http://apache.org/maven/project/developers#collection";
+        public static final String xUri = "http://apache.org/maven/project/developers#collection";
 
-        public static class Developer
+        public static final class Developer
         {
-            public static String xUri = "http://apache.org/maven/project/developers#collection/developer";
+            public static final String xUri = "http://apache.org/maven/project/developers#collection/developer";
 
-            public static String id = "http://apache.org/maven/project/developers#collection/developer/id";
+            public static final String id = "http://apache.org/maven/project/developers#collection/developer/id";
 
-            public static String name = "http://apache.org/maven/project/developers#collection/developer/name";
+            public static final String name = "http://apache.org/maven/project/developers#collection/developer/name";
 
-            public static String email = "http://apache.org/maven/project/developers#collection/developer/email";
+            public static final String email = "http://apache.org/maven/project/developers#collection/developer/email";
 
-            public static String url = "http://apache.org/maven/project/developers#collection/developer/url";
+            public static final String url = "http://apache.org/maven/project/developers#collection/developer/url";
 
-            public static String organization =
+            public static final String organization =
                 "http://apache.org/maven/project/developers#collection/developer/organization";
 
-            public static String organizationUrl =
+            public static final String organizationUrl =
                 "http://apache.org/maven/project/developers#collection/developer/organizationUrl";
 
-            public static String roles =
+            public static final String roles =
                 "http://apache.org/maven/project/developers#collection/developer/roles#collection";
 
-            public static String timezone = "http://apache.org/maven/project/developers#collection/developer/timezone";
+            public static final String timezone = "http://apache.org/maven/project/developers#collection/developer/timezone";
 
-            public static String properties =
+            public static final String properties =
                 "http://apache.org/maven/project/developers#collection/developer/properties";
         }
     }
 
-    public static class Contributors
+    public static final class Contributors
     {
-        public static String xUri = "http://apache.org/maven/project/contributors#collection";
+        public static final String xUri = "http://apache.org/maven/project/contributors#collection";
 
-        public static class Contributor
+        public static final class Contributor
         {
-            public static String xUri = "http://apache.org/maven/project/contributors#collection/contributor";
+            public static final String xUri = "http://apache.org/maven/project/contributors#collection/contributor";
 
-            public static String name = "http://apache.org/maven/project/contributors#collection/contributor/name";
+            public static final String name = "http://apache.org/maven/project/contributors#collection/contributor/name";
 
-            public static String email = "http://apache.org/maven/project/contributors#collection/contributor/email";
+            public static final String email = "http://apache.org/maven/project/contributors#collection/contributor/email";
 
-            public static String url = "http://apache.org/maven/project/contributors#collection/contributor/url";
+            public static final String url = "http://apache.org/maven/project/contributors#collection/contributor/url";
 
-            public static String organization =
+            public static final String organization =
                 "http://apache.org/maven/project/contributors#collection/contributor/organization";
 
-            public static String organizationUrl =
+            public static final String organizationUrl =
                 "http://apache.org/maven/project/contributors#collection/contributor/organizationUrl";
 
-            public static String roles =
+            public static final String roles =
                 "http://apache.org/maven/project/contributors#collection/contributor/roles#collection";
 
-            public static String timezone =
+            public static final String timezone =
                 "http://apache.org/maven/project/contributors#collection/contributor/timezone";
 
-            public static String properties =
+            public static final String properties =
                 "http://apache.org/maven/project/contributors#collection/contributor/properties";
         }
     }
 
-    public static class Licenses
+    public static final class Licenses
     {
-        public static String xUri = "http://apache.org/maven/project/licenses#collection";
+        public static final String xUri = "http://apache.org/maven/project/licenses#collection";
 
-        public static class License
+        public static final class License
         {
-            public static String xUri = "http://apache.org/maven/project/licenses#collection/license";
+            public static final String xUri = "http://apache.org/maven/project/licenses#collection/license";
 
-            public static String name = "http://apache.org/maven/project/licenses#collection/license/name";
+            public static final String name = "http://apache.org/maven/project/licenses#collection/license/name";
 
-            public static String url = "http://apache.org/maven/project/licenses#collection/license/url";
+            public static final String url = "http://apache.org/maven/project/licenses#collection/license/url";
 
-            public static String distribution =
+            public static final String distribution =
                 "http://apache.org/maven/project/licenses#collection/license/distribution";
 
-            public static String comments = "http://apache.org/maven/project/licenses#collection/license/comments";
+            public static final String comments = "http://apache.org/maven/project/licenses#collection/license/comments";
         }
     }
 
-    public static class Scm
+    public static final class Scm
     {
-        public static String xUri = "http://apache.org/maven/project/scm";
+        public static final String xUri = "http://apache.org/maven/project/scm";
 
-        public static String connection = "http://apache.org/maven/project/scm/connection";
+        public static final String connection = "http://apache.org/maven/project/scm/connection";
 
-        public static String developerConnection = "http://apache.org/maven/project/scm/developerConnection";
+        public static final String developerConnection = "http://apache.org/maven/project/scm/developerConnection";
 
-        public static String tag = "http://apache.org/maven/project/scm/tag";
+        public static final String tag = "http://apache.org/maven/project/scm/tag";
 
-        public static String url = "http://apache.org/maven/project/scm/url";
+        public static final String url = "http://apache.org/maven/project/scm/url";
     }
 
-    public static class Organization
+    public static final class Organization
     {
-        public static String xUri = "http://apache.org/maven/project/organization";
+        public static final String xUri = "http://apache.org/maven/project/organization";
 
-        public static String name = "http://apache.org/maven/project/organization/name";
+        public static final String name = "http://apache.org/maven/project/organization/name";
 
-        public static String url = "http://apache.org/maven/project/organization/url";
+        public static final String url = "http://apache.org/maven/project/organization/url";
     }
 
-    public static class Build
+    public static final class Build
     {
-        public static String xUri = "http://apache.org/maven/project/build";
+        public static final String xUri = "http://apache.org/maven/project/build";
 
-        public static String sourceDirectory = "http://apache.org/maven/project/build/sourceDirectory";
+        public static final String sourceDirectory = "http://apache.org/maven/project/build/sourceDirectory";
 
-        public static String scriptSourceDirectory = "http://apache.org/maven/project/build/scriptSourceDirectory";
+        public static final String scriptSourceDirectory = "http://apache.org/maven/project/build/scriptSourceDirectory";
 
-        public static String testSourceDirectory = "http://apache.org/maven/project/build/testSourceDirectory";
+        public static final String testSourceDirectory = "http://apache.org/maven/project/build/testSourceDirectory";
 
-        public static String outputDirectory = "http://apache.org/maven/project/build/outputDirectory";
+        public static final String outputDirectory = "http://apache.org/maven/project/build/outputDirectory";
 
-        public static String testOutputDirectory = "http://apache.org/maven/project/build/testOutputDirectory";
+        public static final String testOutputDirectory = "http://apache.org/maven/project/build/testOutputDirectory";
 
-        public static class Extensions
+        public static final class Extensions
         {
-            public static String xUri = "http://apache.org/maven/project/build/extensions#collection";
+            public static final String xUri = "http://apache.org/maven/project/build/extensions#collection";
 
-            public static class Extension
+            public static final class Extension
             {
-                public static String xUri = "http://apache.org/maven/project/build/extensions#collection/extension";
+                public static final String xUri = "http://apache.org/maven/project/build/extensions#collection/extension";
 
-                public static String groupId =
+                public static final String groupId =
                     "http://apache.org/maven/project/build/extensions#collection/extension/groupId";
 
-                public static String artifactId =
+                public static final String artifactId =
                     "http://apache.org/maven/project/build/extensions#collection/extension/artifactId";
 
-                public static String version =
+                public static final String version =
                     "http://apache.org/maven/project/build/extensions#collection/extension/version";
             }
         }
 
-        public static String defaultGoal = "http://apache.org/maven/project/build/defaultGoal";
+        public static final String defaultGoal = "http://apache.org/maven/project/build/defaultGoal";
 
-        public static class Resources
+        public static final class Resources
         {
-            public static String xUri = "http://apache.org/maven/project/build/resources#collection";
+            public static final String xUri = "http://apache.org/maven/project/build/resources#collection";
 
-            public static class Resource
+            public static final class Resource
             {
-                public static String xUri = "http://apache.org/maven/project/build/resources#collection/resource";
+                public static final String xUri = "http://apache.org/maven/project/build/resources#collection/resource";
 
-                public static String targetPath =
+                public static final String targetPath =
                     "http://apache.org/maven/project/build/resources#collection/resource/targetPath";
 
-                public static String filtering =
+                public static final String filtering =
                     "http://apache.org/maven/project/build/resources#collection/resource/filtering";
 
-                public static String directory =
+                public static final String directory =
                     "http://apache.org/maven/project/build/resources#collection/resource/directory";
 
-                public static String includes =
+                public static final String includes =
                     "http://apache.org/maven/project/build/resources#collection/resource/includes#collection";
 
-                public static String excludes =
+                public static final String excludes =
                     "http://apache.org/maven/project/build/resources#collection/resource/excludes#collection";
             }
         }
 
-        public static class TestResources
+        public static final class TestResources
         {
-            public static String xUri = "http://apache.org/maven/project/build/testResources#collection";
+            public static final String xUri = "http://apache.org/maven/project/build/testResources#collection";
 
-            public static class TestResource
+            public static final class TestResource
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/build/testResources#collection/testResource";
 
-                public static String targetPath =
+                public static final String targetPath =
                     "http://apache.org/maven/project/build/testResources#collection/testResource/targetPath";
 
-                public static String filtering =
+                public static final String filtering =
                     "http://apache.org/maven/project/build/testResources#collection/testResource/filtering";
 
-                public static String directory =
+                public static final String directory =
                     "http://apache.org/maven/project/build/testResources#collection/testResource/directory";
 
-                public static String excludes =
+                public static final String excludes =
                     "http://apache.org/maven/project/build/testResources#collection/testResource/excludes";
 
-                public static class Includes
+                public static final class Includes
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/build/testResources#collection/testResource/includes";
 
-                    public static String include =
+                    public static final String include =
                         "http://apache.org/maven/project/build/testResources#collection/testResource/includes/include";
                 }
             }
         }
 
-        public static String directory = "http://apache.org/maven/project/build/directory";
+        public static final String directory = "http://apache.org/maven/project/build/directory";
 
-        public static String finalName = "http://apache.org/maven/project/build/finalName";
+        public static final String finalName = "http://apache.org/maven/project/build/finalName";
 
-        public static class Filters
+        public static final class Filters
         {
-            public static String xUri = "http://apache.org/maven/project/build/filters#collection";
+            public static final String xUri = "http://apache.org/maven/project/build/filters#collection";
 
-            public static String filter = xUri + "/filter";
+            public static final String filter = xUri + "/filter";
         }
 
-        public static class PluginManagement
+        public static final class PluginManagement
         {
-            public static String xUri = "http://apache.org/maven/project/build/pluginManagement";
+            public static final String xUri = "http://apache.org/maven/project/build/pluginManagement";
 
-            public static class Plugins
+            public static final class Plugins
             {
-                public static String xUri = "http://apache.org/maven/project/build/pluginManagement/plugins#collection";
+                public static final String xUri = "http://apache.org/maven/project/build/pluginManagement/plugins#collection";
 
-                public static class Plugin
+                public static final class Plugin
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin";
 
-                    public static String groupId =
+                    public static final String groupId =
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/groupId";
 
-                    public static String artifactId =
+                    public static final String artifactId =
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/artifactId";
 
-                    public static String version =
+                    public static final String version =
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/version";
 
-                    public static String extensions =
+                    public static final String extensions =
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/extensions";
 
-                    public static class Executions
+                    public static final class Executions
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection";
 
-                        public static class Execution
+                        public static final class Execution
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution";
 
-                            public static String id =
+                            public static final String id =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/id";
 
-                            public static String phase =
+                            public static final String phase =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/phase";
 
-                            public static class Goals
+                            public static final class Goals
                             {
-                                public static String xURI =
+                                public static final String xURI =
                                     "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals#collection";
 
-                                public static String goal =
+                                public static final String goal =
                                     "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals#collection/goal";
                             }
 
-                            public static String inherited =
+                            public static final String inherited =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
 
-                            public static String configuration =
+                            public static final String configuration =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/execution#collection/execution/configuration#set";
                         }
                     }
 
-                    public static class Dependencies
+                    public static final class Dependencies
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection";
 
-                        public static class Dependency
+                        public static final class Dependency
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency";
 
-                            public static String groupId =
+                            public static final String groupId =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/groupId";
 
-                            public static String artifactId =
+                            public static final String artifactId =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/artifactId";
 
-                            public static String version =
+                            public static final String version =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/version";
 
-                            public static String type =
+                            public static final String type =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/type";
 
-                            public static String classifier =
+                            public static final String classifier =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/classifier";
 
-                            public static String scope =
+                            public static final String scope =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/scope";
 
-                            public static String systemPath =
+                            public static final String systemPath =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/systemPath";
 
-                            public static class Exclusions
+                            public static final class Exclusions
                             {
-                                public static String xUri =
+                                public static final String xUri =
                                     "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection";
 
-                                public static class Exclusion
+                                public static final class Exclusion
                                 {
-                                    public static String xUri =
+                                    public static final String xUri =
                                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion";
 
-                                    public static String artifactId =
+                                    public static final String artifactId =
                                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
-                                    public static String groupId =
+                                    public static final String groupId =
                                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                                 }
                             }
 
-                            public static String optional =
+                            public static final String optional =
                                 "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/optional";
                         }
                     }
 
-                    public static class Goals
+                    public static final class Goals
                     {
-                        public static String xURI =
+                        public static final String xURI =
                             "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/goals#collection";
 
-                        public static String goal =
+                        public static final String goal =
                             "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/goals#collection/goal";
 
                     }
 
-                    public static String inherited =
+                    public static final String inherited =
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/inherited";
 
-                    public static String configuration =
+                    public static final String configuration =
                         "http://apache.org/maven/project/build/pluginManagement/plugins#collection/plugin/configuration#set";
                 }
             }
         }
 
-        public static class Plugins
+        public static final class Plugins
         {
-            public static String xUri = "http://apache.org/maven/project/build/plugins#collection";
+            public static final String xUri = "http://apache.org/maven/project/build/plugins#collection";
 
-            public static class Plugin
+            public static final class Plugin
             {
-                public static String xUri = "http://apache.org/maven/project/build/plugins#collection/plugin";
+                public static final String xUri = "http://apache.org/maven/project/build/plugins#collection/plugin";
 
-                public static String groupId =
+                public static final String groupId =
                     "http://apache.org/maven/project/build/plugins#collection/plugin/groupId";
 
-                public static String artifactId =
+                public static final String artifactId =
                     "http://apache.org/maven/project/build/plugins#collection/plugin/artifactId";
 
-                public static String version =
+                public static final String version =
                     "http://apache.org/maven/project/build/plugins#collection/plugin/version";
 
-                public static String extensions =
+                public static final String extensions =
                     "http://apache.org/maven/project/build/plugins#collection/plugin/extensions";
 
-                public static class Executions
+                public static final class Executions
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection";
 
-                    public static class Execution
+                    public static final class Execution
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution";
 
-                        public static String id =
+                        public static final String id =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/id";
 
-                        public static String phase =
+                        public static final String phase =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/phase";
 
-                        public static class Goals
+                        public static final class Goals
                         {
-                            public static String xURI =
+                            public static final String xURI =
                                 "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/goals#collection";
 
-                            public static String goal =
+                            public static final String goal =
                                 "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/goals#collection/goal";
                         }
 
-                        public static String inherited =
+                        public static final String inherited =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/inherited";
 
-                        public static String configuration =
+                        public static final String configuration =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/executions#collection/execution/configuration#set";
                     }
                 }
 
-                public static class Dependencies
+                public static final class Dependencies
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection";
 
-                    public static class Dependency
+                    public static final class Dependency
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency";
 
-                        public static String groupId =
+                        public static final String groupId =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/groupId";
 
-                        public static String artifactId =
+                        public static final String artifactId =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/artifactId";
 
-                        public static String version =
+                        public static final String version =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/version";
 
-                        public static String type =
+                        public static final String type =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/type";
 
-                        public static String classifier =
+                        public static final String classifier =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/classifier";
 
-                        public static String scope =
+                        public static final String scope =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/scope";
 
-                        public static String systemPath =
+                        public static final String systemPath =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/systemPath";
 
-                        public static class Exclusions
+                        public static final class Exclusions
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection";
 
-                            public static class Exclusion
+                            public static final class Exclusion
                             {
-                                public static String xUri =
+                                public static final String xUri =
                                     "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion";
 
-                                public static String artifactId =
+                                public static final String artifactId =
                                     "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
-                                public static String groupId =
+                                public static final String groupId =
                                     "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                             }
                         }
 
-                        public static String optional =
+                        public static final String optional =
                             "http://apache.org/maven/project/build/plugins#collection/plugin/dependencies#collection/dependency/optional";
                     }
                 }
-                public static class Goals
+                public static final class Goals
                 {
-                    public static String xURI =
+                    public static final String xURI =
                         "http://apache.org/maven/project/build/plugins#collection/plugin/goals#collection";
 
-                    public static String goal =
+                    public static final String goal =
                         "http://apache.org/maven/project/build/plugins#collection/plugin/goals#collection/goal";
                 }
 
-                public static String inherited =
+                public static final String inherited =
                     "http://apache.org/maven/project/build/plugins#collection/plugin/inherited";
 
-                public static String configuration =
+                public static final String configuration =
                     "http://apache.org/maven/project/build/plugins#collection/plugin/configuration#set";
             }
         }
     }
 
-    public static class Profiles
+    public static final class Profiles
     {
-        public static String xUri = "http://apache.org/maven/project/profiles#collection";
+        public static final String xUri = "http://apache.org/maven/project/profiles#collection";
 
-        public static class Profile
+        public static final class Profile
         {
-            public static String xUri = "http://apache.org/maven/project/profiles#collection/profile";
+            public static final String xUri = "http://apache.org/maven/project/profiles#collection/profile";
 
-            public static String id = "http://apache.org/maven/project/profiles#collection/profile/id";
+            public static final String id = "http://apache.org/maven/project/profiles#collection/profile/id";
 
-            public static class Activation
+            public static final class Activation
             {
-                public static String xUri = "http://apache.org/maven/project/profiles#collection/profile/activation";
+                public static final String xUri = "http://apache.org/maven/project/profiles#collection/profile/activation";
 
-                public static String activeByDefault =
+                public static final String activeByDefault =
                     "http://apache.org/maven/project/profiles#collection/profile/activation/activeByDefault";
 
-                public static String jdk = "http://apache.org/maven/project/profiles#collection/profile/activation/jdk";
+                public static final String jdk = "http://apache.org/maven/project/profiles#collection/profile/activation/jdk";
 
-                public static class Os
+                public static final class Os
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/os";
 
-                    public static String name =
+                    public static final String name =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/os/name";
 
-                    public static String family =
+                    public static final String family =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/os/family";
 
-                    public static String arch =
+                    public static final String arch =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/os/arch";
 
-                    public static String version =
+                    public static final String version =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/os/version";
                 }
 
-                public static class Property
+                public static final class Property
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/property";
 
-                    public static String name =
+                    public static final String name =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/property/name";
 
-                    public static String value =
+                    public static final String value =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/property/value";
                 }
 
-                public static class File
+                public static final class File
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/file";
 
-                    public static String missing =
+                    public static final String missing =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/file/missing";
 
-                    public static String exists =
+                    public static final String exists =
                         "http://apache.org/maven/project/profiles#collection/profile/activation/file/exists";
                 }
             }
 
-            public static class Build
+            public static final class Build
             {
-                public static String xUri = "http://apache.org/maven/project/profiles#collection/profile/build";
+                public static final String xUri = "http://apache.org/maven/project/profiles#collection/profile/build";
 
-                public static String defaultGoal =
+                public static final String defaultGoal =
                     "http://apache.org/maven/project/profiles#collection/profile/build/defaultGoal";
 
-                public static class Resources
+                public static final class Resources
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/build/resources#collection";
 
-                    public static class Resource
+                    public static final class Resource
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/build/resources#collection/resource";
 
-                        public static String targetPath =
+                        public static final String targetPath =
                             "http://apache.org/maven/project/profiles#collection/profile/build/resources#collection/resource/targetPath";
 
-                        public static String filtering =
+                        public static final String filtering =
                             "http://apache.org/maven/project/profiles#collection/profile/build/resources#collection/resource/filtering";
 
-                        public static String directory =
+                        public static final String directory =
                             "http://apache.org/maven/project/profiles#collection/profile/build/resources#collection/resource/directory";
 
-                        public static String includes =
+                        public static final String includes =
                             "http://apache.org/maven/project/profiles#collection/profile/build/resources#collection/resource/includes#collection";
 
-                        public static String excludes =
+                        public static final String excludes =
                             "http://apache.org/maven/project/profiles#collection/profile/build/resources#collection/resource/excludes#collection";
                     }
                 }
 
-                public static class TestResources
+                public static final class TestResources
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/build/testResources#collection";
 
-                    public static class TestResource
+                    public static final class TestResource
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/build/testResources#collection/testResource";
 
-                        public static String targetPath =
+                        public static final String targetPath =
                             "http://apache.org/maven/project/profiles#collection/profile/build/testResources#collection/testResource/targetPath";
 
-                        public static String filtering =
+                        public static final String filtering =
                             "http://apache.org/maven/project/profiles#collection/profile/build/testResources#collection/testResource/filtering";
 
-                        public static String directory =
+                        public static final String directory =
                             "http://apache.org/maven/project/profiles#collection/profile/build/testResources#collection/testResource/directory";
 
-                        public static String includes =
+                        public static final String includes =
                             "http://apache.org/maven/project/profiles#collection/profile/build/testResources#collection/testResource/includes#collection";
 
-                        public static String excludes =
+                        public static final String excludes =
                             "http://apache.org/maven/project/profiles#collection/profile/build/testResources#collection/testResource/excludes#collection";
 
                     }
                 }
 
-                public static String directory =
+                public static final String directory =
                     "http://apache.org/maven/project/profiles#collection/profile/build/directory";
 
-                public static String finalName =
+                public static final String finalName =
                     "http://apache.org/maven/project/profiles#collection/profile/build/finalName";
 
-                public static String filters =
+                public static final String filters =
                     "http://apache.org/maven/project/profiles#collection/profile/build/filters";
 
-                public static class PluginManagement
+                public static final class PluginManagement
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement";
 
-                    public static class Plugins
+                    public static final class Plugins
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection";
 
-                        public static class Plugin
+                        public static final class Plugin
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin";
 
-                            public static String groupId =
+                            public static final String groupId =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/groupId";
 
-                            public static String artifactId =
+                            public static final String artifactId =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/artifactId";
 
-                            public static String version =
+                            public static final String version =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/version";
 
-                            public static String extensions =
+                            public static final String extensions =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/extensions";
 
-                            public static class Executions
+                            public static final class Executions
                             {
-                                public static String xUri =
+                                public static final String xUri =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection";
 
-                                public static class Execution
+                                public static final class Execution
                                 {
-                                    public static String xUri =
+                                    public static final String xUri =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution";
 
-                                    public static String id =
+                                    public static final String id =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/id";
 
-                                    public static String phase =
+                                    public static final String phase =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/phase";
 
-                                     public static class Goals
+                                     public static final class Goals
                                      {
-                                        public static String xURI =
+                                        public static final String xURI =
                                             "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals#collection";
 
-                                        public static String goal =
+                                        public static final String goal =
                                              "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/goals#collection/goal";
                                      }
 
-                                    public static String inherited =
+                                    public static final String inherited =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/inherited";
 
-                                    public static String configuration =
+                                    public static final String configuration =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/executions#collection/execution/configuration#set";
                                 }
                             }
 
-                            public static class Dependencies
+                            public static final class Dependencies
                             {
-                                public static String xUri =
+                                public static final String xUri =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection";
 
-                                public static class Dependency
+                                public static final class Dependency
                                 {
-                                    public static String xUri =
+                                    public static final String xUri =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency";
 
-                                    public static String groupId =
+                                    public static final String groupId =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/groupId";
 
-                                    public static String artifactId =
+                                    public static final String artifactId =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/artifactId";
 
-                                    public static String version =
+                                    public static final String version =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/version";
 
-                                    public static String type =
+                                    public static final String type =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/type";
 
-                                    public static String classifier =
+                                    public static final String classifier =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/classifier";
 
-                                    public static String scope =
+                                    public static final String scope =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/scope";
 
-                                    public static String systemPath =
+                                    public static final String systemPath =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/systemPath";
 
-                                    public static class Exclusions
+                                    public static final class Exclusions
                                     {
-                                        public static String xUri =
+                                        public static final String xUri =
                                             "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection";
 
-                                        public static class Exclusion
+                                        public static final class Exclusion
                                         {
-                                            public static String xUri =
+                                            public static final String xUri =
                                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion";
 
-                                            public static String artifactId =
+                                            public static final String artifactId =
                                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
-                                            public static String groupId =
+                                            public static final String groupId =
                                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                                         }
                                     }
 
-                                    public static String optional =
+                                    public static final String optional =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/dependencies#collection/dependency/optional";
                                 }
                             }
 
-                            public static class Goals
+                            public static final class Goals
                             {
-                                public static String xURI =
+                                public static final String xURI =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/goals#collection";
 
-                                public static String goal =
+                                public static final String goal =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/goals#collection/goal";
                             }
 
-                            public static String inherited =
+                            public static final String inherited =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/inherited";
 
-                            public static String configuration =
+                            public static final String configuration =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/pluginManagement/plugins#collection/plugin/configuration#set";
                         }
                     }
                 }
 
-                public static class Plugins
+                public static final class Plugins
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection";
 
-                    public static class Plugin
+                    public static final class Plugin
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin";
 
-                        public static String groupId =
+                        public static final String groupId =
                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/groupId";
 
-                        public static String artifactId =
+                        public static final String artifactId =
                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/artifactId";
 
-                        public static String version =
+                        public static final String version =
                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/version";
 
-                        public static String extensions =
+                        public static final String extensions =
                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/extensions#collection";
 
-                        public static class Executions
+                        public static final class Executions
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection";
 
-                            public static class Execution
+                            public static final class Execution
                             {
-                                public static String xUri =
+                                public static final String xUri =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution";
 
-                                public static String id =
+                                public static final String id =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/id";
 
-                                public static String phase =
+                                public static final String phase =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/phase";
 
-                                public static class Goals
+                                public static final class Goals
                                 {
-                                    public static String xURI =
+                                    public static final String xURI =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/goals#collection";
 
-                                    public static String goal =
+                                    public static final String goal =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/goals#collection/goal";
                                 }
 
-                                public static String inherited =
+                                public static final String inherited =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/inherited";
 
-                                public static String configuration =
+                                public static final String configuration =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/executions#collection/execution/configuration#set";
                             }
                         }
 
-                        public static class Dependencies
+                        public static final class Dependencies
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection";
 
-                            public static class Dependency
+                            public static final class Dependency
                             {
-                                public static String xUri =
+                                public static final String xUri =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency";
 
-                                public static String groupId =
+                                public static final String groupId =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/groupId";
 
-                                public static String artifactId =
+                                public static final String artifactId =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/artifactId";
 
-                                public static String version =
+                                public static final String version =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/version";
 
-                                public static String type =
+                                public static final String type =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/type";
 
-                                public static String classifier =
+                                public static final String classifier =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/classifier";
 
-                                public static String scope =
+                                public static final String scope =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/scope";
 
-                                public static String systemPath =
+                                public static final String systemPath =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/systemPath";
 
-                                public static class Exclusions
+                                public static final class Exclusions
                                 {
-                                    public static String xUri =
+                                    public static final String xUri =
                                         "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection";
 
-                                    public static class Exclusion
+                                    public static final class Exclusion
                                     {
-                                        public static String xUri =
+                                        public static final String xUri =
                                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion";
 
-                                        public static String artifactId =
+                                        public static final String artifactId =
                                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
-                                        public static String groupId =
+                                        public static final String groupId =
                                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                                     }
                                 }
 
-                                public static String optional =
+                                public static final String optional =
                                     "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/dependencies#collection/dependency/optional";
                             }
                         }
 
-                        public static class Goals
+                        public static final class Goals
                         {
-                            public static String xURI =
+                            public static final String xURI =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/goals#collection";
 
-                            public static String goal =
+                            public static final String goal =
                                 "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/goals#collection/goal";
                         }
 
-                        public static String inherited =
+                        public static final String inherited =
                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/inherited";
 
-                        public static String configuration =
+                        public static final String configuration =
                             "http://apache.org/maven/project/profiles#collection/profile/build/plugins#collection/plugin/configuration#set";
                     }
                 }
             }
 
-            public static String modules = "http://apache.org/maven/project/profiles#collection/profile/modules#collection";
+            public static final String modules = "http://apache.org/maven/project/profiles#collection/profile/modules#collection";
 
-            public static class Repositories
+            public static final class Repositories
             {
-                public static String xUri = "http://apache.org/maven/project/profiles#collection/profile/repositories#collection";
+                public static final String xUri = "http://apache.org/maven/project/profiles#collection/profile/repositories#collection";
 
-                public static class Repository
+                public static final class Repository
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository";
 
-                    public static class Releases
+                    public static final class Releases
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/releases";
 
-                        public static String enabled =
+                        public static final String enabled =
                             "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/releases/enabled";
 
-                        public static String updatePolicy =
+                        public static final String updatePolicy =
                             "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/releases/updatePolicy";
 
-                        public static String checksumPolicy =
+                        public static final String checksumPolicy =
                             "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/releases/checksumPolicy";
                     }
 
-                    public static class Snapshots
+                    public static final class Snapshots
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/snapshots";
 
-                        public static String enabled =
+                        public static final String enabled =
                             "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/snapshots/enabled";
 
-                        public static String updatePolicy =
+                        public static final String updatePolicy =
                             "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/snapshots/updatePolicy";
 
-                        public static String checksumPolicy =
+                        public static final String checksumPolicy =
                             "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/snapshots/checksumPolicy";
                     }
 
-                    public static String id =
+                    public static final String id =
                         "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/id";
 
-                    public static String name =
+                    public static final String name =
                         "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/name";
 
-                    public static String url =
+                    public static final String url =
                         "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/url";
 
-                    public static String layout =
+                    public static final String layout =
                         "http://apache.org/maven/project/profiles#collection/profile/repositories#collection/repository/layout";
                 }
             }
 
-            public static class PluginRepositories
+            public static final class PluginRepositories
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection";
 
-                public static class PluginRepository
+                public static final class PluginRepository
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository";
 
-                    public static class Releases
+                    public static final class Releases
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/releases";
 
-                        public static String enabled =
+                        public static final String enabled =
                             "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/releases/enabled";
 
-                        public static String updatePolicy =
+                        public static final String updatePolicy =
                             "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/releases/updatePolicy";
 
-                        public static String checksumPolicy =
+                        public static final String checksumPolicy =
                             "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/releases/checksumPolicy";
                     }
 
-                    public static class Snapshots
+                    public static final class Snapshots
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/snapshots";
 
-                        public static String enabled =
+                        public static final String enabled =
                             "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/snapshots/enabled";
 
-                        public static String updatePolicy =
+                        public static final String updatePolicy =
                             "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/snapshots/updatePolicy";
 
-                        public static String checksumPolicy =
+                        public static final String checksumPolicy =
                             "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/snapshots/checksumPolicy";
                     }
 
-                    public static String id =
+                    public static final String id =
                         "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/id";
 
-                    public static String name =
+                    public static final String name =
                         "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/name";
 
-                    public static String url =
+                    public static final String url =
                         "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/url";
 
-                    public static String layout =
+                    public static final String layout =
                         "http://apache.org/maven/project/profiles#collection/profile/pluginRepositories#collection/pluginRepository/layout";
                 }
             }
 
-            public static class Dependencies
+            public static final class Dependencies
             {
-                public static String xUri = "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection";
+                public static final String xUri = "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection";
 
-                public static class Dependency
+                public static final class Dependency
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency";
 
-                    public static String groupId =
+                    public static final String groupId =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/groupId";
 
-                    public static String artifactId =
+                    public static final String artifactId =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/artifactId";
 
-                    public static String version =
+                    public static final String version =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/version";
 
-                    public static String type =
+                    public static final String type =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/type";
 
-                    public static String classifier =
+                    public static final String classifier =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/classifier";
 
-                    public static String scope =
+                    public static final String scope =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/scope";
 
-                    public static String systemPath =
+                    public static final String systemPath =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/systemPath";
 
-                    public static class Exclusions
+                    public static final class Exclusions
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/exclusions#collection";
 
-                        public static class Exclusion
+                        public static final class Exclusion
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/exclusions#collection/exclusion";
 
-                            public static String artifactId =
+                            public static final String artifactId =
                                 "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
-                            public static String groupId =
+                            public static final String groupId =
                                 "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                         }
                     }
 
-                    public static String optional =
+                    public static final String optional =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencies#collection/dependency/optional";
                 }
             }
 
-            public static String reports = "http://apache.org/maven/project/profiles#collection/profile/reports";
+            public static final String reports = "http://apache.org/maven/project/profiles#collection/profile/reports";
 
-            public static class Reporting
+            public static final class Reporting
             {
-                public static String xUri = "http://apache.org/maven/project/profiles#collection/profile/reporting";
+                public static final String xUri = "http://apache.org/maven/project/profiles#collection/profile/reporting";
 
-                public static String excludeDefaults =
+                public static final String excludeDefaults =
                     "http://apache.org/maven/project/profiles#collection/profile/reporting/excludeDefaults";
 
-                public static String outputDirectory =
+                public static final String outputDirectory =
                     "http://apache.org/maven/project/profiles#collection/profile/reporting/outputDirectory";
 
-                public static class Plugins
+                public static final class Plugins
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection";
 
-                    public static class Plugin
+                    public static final class Plugin
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin";
 
-                        public static String groupId =
+                        public static final String groupId =
                             "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/groupId";
 
-                        public static String artifactId =
+                        public static final String artifactId =
                             "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/artifactId";
 
-                        public static String version =
+                        public static final String version =
                             "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/version";
 
-                        public static String inherited =
+                        public static final String inherited =
                             "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/inherited";
 
-                        public static String configuration =
+                        public static final String configuration =
                             "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/configuration#set";
 
-                        public static class ReportSets
+                        public static final class ReportSets
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection";
 
-                            public static class ReportSet
+                            public static final class ReportSet
                             {
-                                public static String xUri =
+                                public static final String xUri =
                                     "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet";
 
-                                public static String id =
+                                public static final String id =
                                     "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet/id";
 
-                                public static String configuration =
+                                public static final String configuration =
                                     "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet/configuration#set";
 
-                                public static String inherited =
+                                public static final String inherited =
                                     "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet/inherited";
 
-                                public static String reports =
+                                public static final String reports =
                                     "http://apache.org/maven/project/profiles#collection/profile/reporting/plugins#collection/plugin/reportSets#collection/reportSet/reports";
                             }
                         }
@@ -1228,366 +1228,366 @@ final class ProjectUri
                 }
             }
 
-            public static class DependencyManagement
+            public static final class DependencyManagement
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement";
 
-                public static class Dependencies
+                public static final class Dependencies
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection";
 
-                    public static class Dependency
+                    public static final class Dependency
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency";
 
-                        public static String groupId =
+                        public static final String groupId =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/groupId";
 
-                        public static String artifactId =
+                        public static final String artifactId =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/artifactId";
 
-                        public static String version =
+                        public static final String version =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/version";
 
-                        public static String type =
+                        public static final String type =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/type";
 
-                        public static String classifier =
+                        public static final String classifier =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/classifier";
 
-                        public static String scope =
+                        public static final String scope =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/scope";
 
-                        public static String systemPath =
+                        public static final String systemPath =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/systemPath";
 
-                        public static class Exclusions
+                        public static final class Exclusions
                         {
-                            public static String xUri =
+                            public static final String xUri =
                                 "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions#collection";
 
-                            public static class Exclusion
+                            public static final class Exclusion
                             {
-                                public static String xUri =
+                                public static final String xUri =
                                     "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion";
 
-                                public static String artifactId =
+                                public static final String artifactId =
                                     "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
-                                public static String groupId =
+                                public static final String groupId =
                                     "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                             }
                         }
 
-                        public static String optional =
+                        public static final String optional =
                             "http://apache.org/maven/project/profiles#collection/profile/dependencyManagement/dependencies#collection/dependency/optional";
                     }
                 }
             }
 
-            public static class DistributionManagement
+            public static final class DistributionManagement
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/profiles#collection/profile/distributionManagement";
 
-                public static class Repository
+                public static final class Repository
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/repository";
 
-                    public static String uniqueVersion =
+                    public static final String uniqueVersion =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/repository/uniqueVersion";
 
-                    public static String id =
+                    public static final String id =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/repository/id";
 
-                    public static String name =
+                    public static final String name =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/repository/name";
 
-                    public static String url =
+                    public static final String url =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/repository/url";
 
-                    public static String layout =
+                    public static final String layout =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/repository/layout";
                 }
 
-                public static class SnapshotRepository
+                public static final class SnapshotRepository
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/snapshotRepository";
 
-                    public static String uniqueVersion =
+                    public static final String uniqueVersion =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/snapshotRepository/uniqueVersion";
 
-                    public static String id =
+                    public static final String id =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/snapshotRepository/id";
 
-                    public static String name =
+                    public static final String name =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/snapshotRepository/name";
 
-                    public static String url =
+                    public static final String url =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/snapshotRepository/url";
 
-                    public static String layout =
+                    public static final String layout =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/snapshotRepository/layout";
                 }
 
-                public static class Site
+                public static final class Site
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/site";
 
-                    public static String id =
+                    public static final String id =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/site/id";
 
-                    public static String name =
+                    public static final String name =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/site/name";
 
-                    public static String url =
+                    public static final String url =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/site/url";
                 }
 
-                public static String downloadUrl =
+                public static final String downloadUrl =
                     "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/downloadUrl";
 
-                public static class Relocation
+                public static final class Relocation
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/relocation";
 
-                    public static String groupId =
+                    public static final String groupId =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/relocation/groupId";
 
-                    public static String artifactId =
+                    public static final String artifactId =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/relocation/artifactId";
 
-                    public static String version =
+                    public static final String version =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/relocation/version";
 
-                    public static String message =
+                    public static final String message =
                         "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/relocation/message";
                 }
 
-                public static String status =
+                public static final String status =
                     "http://apache.org/maven/project/profiles#collection/profile/distributionManagement/status";
             }
 
-            public static String properties = "http://apache.org/maven/project/profiles#collection/profile/properties";
+            public static final String properties = "http://apache.org/maven/project/profiles#collection/profile/properties";
         }
     }
 
-    public static class Modules
+    public static final class Modules
     {
-        public static String xUri = "http://apache.org/maven/project/modules#collection";
+        public static final String xUri = "http://apache.org/maven/project/modules#collection";
 
-        public static String module = "http://apache.org/maven/project/modules#collection/module";
+        public static final String module = "http://apache.org/maven/project/modules#collection/module";
     }
 
-    public static class Repositories
+    public static final class Repositories
     {
-        public static String xUri = "http://apache.org/maven/project/repositories#collection";
+        public static final String xUri = "http://apache.org/maven/project/repositories#collection";
 
-        public static class Repository
+        public static final class Repository
         {
-            public static String xUri = "http://apache.org/maven/project/repositories#collection/repository";
+            public static final String xUri = "http://apache.org/maven/project/repositories#collection/repository";
 
-            public static class Releases
+            public static final class Releases
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/repositories#collection/repository/releases";
 
-                public static String enabled =
+                public static final String enabled =
                     "http://apache.org/maven/project/repositories#collection/repository/releases/enabled";
 
-                public static String updatePolicy =
+                public static final String updatePolicy =
                     "http://apache.org/maven/project/repositories#collection/repository/releases/updatePolicy";
 
-                public static String checksumPolicy =
+                public static final String checksumPolicy =
                     "http://apache.org/maven/project/repositories#collection/repository/releases/checksumPolicy";
             }
 
-            public static class Snapshots
+            public static final class Snapshots
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/repositories#collection/repository/snapshots";
 
-                public static String enabled =
+                public static final String enabled =
                     "http://apache.org/maven/project/repositories#collection/repository/snapshots/enabled";
 
-                public static String updatePolicy =
+                public static final String updatePolicy =
                     "http://apache.org/maven/project/repositories#collection/repository/snapshots/updatePolicy";
 
-                public static String checksumPolicy =
+                public static final String checksumPolicy =
                     "http://apache.org/maven/project/repositories#collection/repository/snapshots/checksumPolicy";
             }
 
-            public static String id = "http://apache.org/maven/project/repositories#collection/repository/id";
+            public static final String id = "http://apache.org/maven/project/repositories#collection/repository/id";
 
-            public static String name = "http://apache.org/maven/project/repositories#collection/repository/name";
+            public static final String name = "http://apache.org/maven/project/repositories#collection/repository/name";
 
-            public static String url = "http://apache.org/maven/project/repositories#collection/repository/url";
+            public static final String url = "http://apache.org/maven/project/repositories#collection/repository/url";
 
-            public static String layout = "http://apache.org/maven/project/repositories#collection/repository/layout";
+            public static final String layout = "http://apache.org/maven/project/repositories#collection/repository/layout";
         }
     }
 
-    public static class PluginRepositories
+    public static final class PluginRepositories
     {
-        public static String xUri = "http://apache.org/maven/project/pluginRepositories#collection";
+        public static final String xUri = "http://apache.org/maven/project/pluginRepositories#collection";
 
-        public static class PluginRepository
+        public static final class PluginRepository
         {
-            public static String xUri =
+            public static final String xUri =
                 "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository";
 
-            public static class Releases
+            public static final class Releases
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/releases";
 
-                public static String enabled =
+                public static final String enabled =
                     "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/releases/enabled";
 
-                public static String updatePolicy =
+                public static final String updatePolicy =
                     "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/releases/updatePolicy";
 
-                public static String checksumPolicy =
+                public static final String checksumPolicy =
                     "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/releases/checksumPolicy";
             }
 
-            public static class Snapshots
+            public static final class Snapshots
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/snapshots";
 
-                public static String enabled =
+                public static final String enabled =
                     "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/snapshots/enabled";
 
-                public static String updatePolicy =
+                public static final String updatePolicy =
                     "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/snapshots/updatePolicy";
 
-                public static String checksumPolicy =
+                public static final String checksumPolicy =
                     "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/snapshots/checksumPolicy";
             }
 
-            public static String id =
+            public static final String id =
                 "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/id";
 
-            public static String name =
+            public static final String name =
                 "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/name";
 
-            public static String url =
+            public static final String url =
                 "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/url";
 
-            public static String layout =
+            public static final String layout =
                 "http://apache.org/maven/project/pluginRepositories#collection/pluginRepository/layout";
         }
     }
 
-    public static class Dependencies
+    public static final class Dependencies
     {
-        public static String xUri = "http://apache.org/maven/project/dependencies#collection";
+        public static final String xUri = "http://apache.org/maven/project/dependencies#collection";
 
-        public static class Dependency
+        public static final class Dependency
         {
-            public static String xUri = "http://apache.org/maven/project/dependencies#collection/dependency";
+            public static final String xUri = "http://apache.org/maven/project/dependencies#collection/dependency";
 
-            public static String groupId = "http://apache.org/maven/project/dependencies#collection/dependency/groupId";
+            public static final String groupId = "http://apache.org/maven/project/dependencies#collection/dependency/groupId";
 
-            public static String artifactId =
+            public static final String artifactId =
                 "http://apache.org/maven/project/dependencies#collection/dependency/artifactId";
 
-            public static String version = "http://apache.org/maven/project/dependencies#collection/dependency/version";
+            public static final String version = "http://apache.org/maven/project/dependencies#collection/dependency/version";
 
-            public static String type = "http://apache.org/maven/project/dependencies#collection/dependency/type";
+            public static final String type = "http://apache.org/maven/project/dependencies#collection/dependency/type";
 
-            public static String classifier =
+            public static final String classifier =
                 "http://apache.org/maven/project/dependencies#collection/dependency/classifier";
 
-            public static String scope = "http://apache.org/maven/project/dependencies#collection/dependency/scope";
+            public static final String scope = "http://apache.org/maven/project/dependencies#collection/dependency/scope";
 
-            public static String systemPath =
+            public static final String systemPath =
                 "http://apache.org/maven/project/dependencies#collection/dependency/systemPath";
 
-            public static class Exclusions
+            public static final class Exclusions
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/dependencies#collection/dependency/exclusions#collection";
 
-                public static class Exclusion
+                public static final class Exclusion
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/dependencies#collection/dependency/exclusions#collection/exclusion";
 
-                    public static String artifactId =
+                    public static final String artifactId =
                         "http://apache.org/maven/project/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
-                    public static String groupId =
+                    public static final String groupId =
                         "http://apache.org/maven/project/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                 }
             }
 
-            public static String optional =
+            public static final String optional =
                 "http://apache.org/maven/project/dependencies#collection/dependency/optional";
         }
     }
 
-    public static String reports = "http://apache.org/maven/project/reports";
+    public static final String reports = "http://apache.org/maven/project/reports";
 
-    public static class Reporting
+    public static final class Reporting
     {
-        public static String xUri = "http://apache.org/maven/project/reporting";
+        public static final String xUri = "http://apache.org/maven/project/reporting";
 
-        public static String excludeDefaults = "http://apache.org/maven/project/reporting/excludeDefaults";
+        public static final String excludeDefaults = "http://apache.org/maven/project/reporting/excludeDefaults";
 
-        public static String outputDirectory = "http://apache.org/maven/project/reporting/outputDirectory";
+        public static final String outputDirectory = "http://apache.org/maven/project/reporting/outputDirectory";
 
-        public static class Plugins
+        public static final class Plugins
         {
-            public static String xUri = "http://apache.org/maven/project/reporting/plugins#collection";
+            public static final String xUri = "http://apache.org/maven/project/reporting/plugins#collection";
 
-            public static class Plugin
+            public static final class Plugin
             {
-                public static String xUri = "http://apache.org/maven/project/reporting/plugins#collection/plugin";
+                public static final String xUri = "http://apache.org/maven/project/reporting/plugins#collection/plugin";
 
-                public static String groupId =
+                public static final String groupId =
                     "http://apache.org/maven/project/reporting/plugins#collection/plugin/groupId";
 
-                public static String artifactId =
+                public static final String artifactId =
                     "http://apache.org/maven/project/reporting/plugins#collection/plugin/artifactId";
 
-                public static String version =
+                public static final String version =
                     "http://apache.org/maven/project/reporting/plugins#collection/plugin/version";
 
-                public static String inherited =
+                public static final String inherited =
                     "http://apache.org/maven/project/reporting/plugins#collection/plugin/inherited";
 
-                public static String configuration =
+                public static final String configuration =
                     "http://apache.org/maven/project/reporting/plugins#collection/plugin/configuration#set";
 
-                public static class ReportSets
+                public static final class ReportSets
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection";
 
-                    public static class ReportSet
+                    public static final class ReportSet
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet";
 
-                        public static String id =
+                        public static final String id =
                             "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/id";
 
-                        public static String configuration =
+                        public static final String configuration =
                             "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/configuration#set";
 
-                        public static String inherited =
+                        public static final String inherited =
                             "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/inherited";
 
-                        public static String reports =
+                        public static final String reports =
                             "http://apache.org/maven/project/reporting/plugins#collection/plugin/reportSets#collection/reportSet/reports";
                     }
                 }
@@ -1595,132 +1595,132 @@ final class ProjectUri
         }
     }
 
-    public static class DependencyManagement
+    public static final class DependencyManagement
     {
-        public static String xUri = "http://apache.org/maven/project/dependencyManagement";
+        public static final String xUri = "http://apache.org/maven/project/dependencyManagement";
 
-        public static class Dependencies
+        public static final class Dependencies
         {
-            public static String xUri = "http://apache.org/maven/project/dependencyManagement/dependencies#collection";
+            public static final String xUri = "http://apache.org/maven/project/dependencyManagement/dependencies#collection";
 
-            public static class Dependency
+            public static final class Dependency
             {
-                public static String xUri =
+                public static final String xUri =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency";
 
-                public static String groupId =
+                public static final String groupId =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/groupId";
 
-                public static String artifactId =
+                public static final String artifactId =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/artifactId";
 
-                public static String version =
+                public static final String version =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/version";
 
-                public static String type =
+                public static final String type =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/type";
 
-                public static String classifier =
+                public static final String classifier =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/classifier";
 
-                public static String scope =
+                public static final String scope =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/scope";
 
-                public static String systemPath =
+                public static final String systemPath =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/systemPath";
 
-                public static class Exclusions
+                public static final class Exclusions
                 {
-                    public static String xUri =
+                    public static final String xUri =
                         "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions#collection";
 
-                    public static class Exclusion
+                    public static final class Exclusion
                     {
-                        public static String xUri =
+                        public static final String xUri =
                             "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion";
 
-                        public static String artifactId =
+                        public static final String artifactId =
                             "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion/artifactId";
 
-                        public static String groupId =
+                        public static final String groupId =
                             "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/exclusions#collection/exclusion/groupId";
                     }
                 }
 
-                public static String optional =
+                public static final String optional =
                     "http://apache.org/maven/project/dependencyManagement/dependencies#collection/dependency/optional";
             }
         }
     }
 
-    public static class DistributionManagement
+    public static final class DistributionManagement
     {
-        public static String xUri = "http://apache.org/maven/project/distributionManagement";
+        public static final String xUri = "http://apache.org/maven/project/distributionManagement";
 
-        public static class Repository
+        public static final class Repository
         {
-            public static String xUri = "http://apache.org/maven/project/distributionManagement/repository";
+            public static final String xUri = "http://apache.org/maven/project/distributionManagement/repository";
 
-            public static String uniqueVersion =
+            public static final String uniqueVersion =
                 "http://apache.org/maven/project/distributionManagement/repository/uniqueVersion";
 
-            public static String id = "http://apache.org/maven/project/distributionManagement/repository/id";
+            public static final String id = "http://apache.org/maven/project/distributionManagement/repository/id";
 
-            public static String name = "http://apache.org/maven/project/distributionManagement/repository/name";
+            public static final String name = "http://apache.org/maven/project/distributionManagement/repository/name";
 
-            public static String url = "http://apache.org/maven/project/distributionManagement/repository/url";
+            public static final String url = "http://apache.org/maven/project/distributionManagement/repository/url";
 
-            public static String layout = "http://apache.org/maven/project/distributionManagement/repository/layout";
+            public static final String layout = "http://apache.org/maven/project/distributionManagement/repository/layout";
         }
 
-        public static class SnapshotRepository
+        public static final class SnapshotRepository
         {
-            public static String xUri = "http://apache.org/maven/project/distributionManagement/snapshotRepository";
+            public static final String xUri = "http://apache.org/maven/project/distributionManagement/snapshotRepository";
 
-            public static String uniqueVersion =
+            public static final String uniqueVersion =
                 "http://apache.org/maven/project/distributionManagement/snapshotRepository/uniqueVersion";
 
-            public static String id = "http://apache.org/maven/project/distributionManagement/snapshotRepository/id";
+            public static final String id = "http://apache.org/maven/project/distributionManagement/snapshotRepository/id";
 
-            public static String name =
+            public static final String name =
                 "http://apache.org/maven/project/distributionManagement/snapshotRepository/name";
 
-            public static String url = "http://apache.org/maven/project/distributionManagement/snapshotRepository/url";
+            public static final String url = "http://apache.org/maven/project/distributionManagement/snapshotRepository/url";
 
-            public static String layout =
+            public static final String layout =
                 "http://apache.org/maven/project/distributionManagement/snapshotRepository/layout";
         }
 
-        public static class Site
+        public static final class Site
         {
-            public static String xUri = "http://apache.org/maven/project/distributionManagement/site";
+            public static final String xUri = "http://apache.org/maven/project/distributionManagement/site";
 
-            public static String id = "http://apache.org/maven/project/distributionManagement/site/id";
+            public static final String id = "http://apache.org/maven/project/distributionManagement/site/id";
 
-            public static String name = "http://apache.org/maven/project/distributionManagement/site/name";
+            public static final String name = "http://apache.org/maven/project/distributionManagement/site/name";
 
-            public static String url = "http://apache.org/maven/project/distributionManagement/site/url";
+            public static final String url = "http://apache.org/maven/project/distributionManagement/site/url";
         }
 
-        public static String downloadUrl = "http://apache.org/maven/project/distributionManagement/downloadUrl";
+        public static final String downloadUrl = "http://apache.org/maven/project/distributionManagement/downloadUrl";
 
-        public static class Relocation
+        public static final class Relocation
         {
-            public static String xUri = "http://apache.org/maven/project/distributionManagement/relocation";
+            public static final String xUri = "http://apache.org/maven/project/distributionManagement/relocation";
 
-            public static String groupId = "http://apache.org/maven/project/distributionManagement/relocation/groupId";
+            public static final String groupId = "http://apache.org/maven/project/distributionManagement/relocation/groupId";
 
-            public static String artifactId =
+            public static final String artifactId =
                 "http://apache.org/maven/project/distributionManagement/relocation/artifactId";
 
-            public static String version = "http://apache.org/maven/project/distributionManagement/relocation/version";
+            public static final String version = "http://apache.org/maven/project/distributionManagement/relocation/version";
 
-            public static String message = "http://apache.org/maven/project/distributionManagement/relocation/message";
+            public static final String message = "http://apache.org/maven/project/distributionManagement/relocation/message";
         }
 
-        public static String status = "http://apache.org/maven/project/distributionManagement/status";
+        public static final String status = "http://apache.org/maven/project/distributionManagement/status";
     }
 
-    public static String properties = "http://apache.org/maven/project/properties";
+    public static final String properties = "http://apache.org/maven/project/properties";
 
 }
