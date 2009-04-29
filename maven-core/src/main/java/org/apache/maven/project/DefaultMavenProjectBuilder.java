@@ -255,7 +255,7 @@ public class DefaultMavenProjectBuilder
         List<Profile> projectProfiles;
 	    Properties props = new Properties();
 	    props.putAll(configuration.getExecutionProperties());
-	    props.putAll(configuration.getUserProperties());
+	   // props.putAll(configuration.getUserProperties());
 	    
         try
         {
@@ -407,19 +407,14 @@ public class DefaultMavenProjectBuilder
 		
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
         
-        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
-        interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( config.getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
-
+        Properties props = new Properties(config.getExecutionProperties());
         if ( config.getBuildStartTime() != null )
         {
-            interpolatorProperties.add( new InterpolatorProperty( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ),
-                                                                  PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        }    
-        
+           props.put("${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ) );
+        }   
             try
             {
-            	model = interpolator.interpolateDomainModel( domainModel, interpolatorProperties ).getModel();
+            	model = interpolator.interpolateDomainModel( domainModel, props ).getModel();
             }
             catch ( IOException e )
             {
