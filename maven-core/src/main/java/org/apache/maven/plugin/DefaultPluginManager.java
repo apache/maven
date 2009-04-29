@@ -307,8 +307,14 @@ public class DefaultPluginManager
         // followed by the plugin's default artifact set
         dependencies.addAll( pluginArtifacts );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pluginArtifact ).setArtifactDependencies( dependencies ).setLocalRepository( localRepository )
-            .setRemoteRepostories( new ArrayList( project.getRemoteArtifactRepositories() ) ).setManagedVersionMap( pluginManagedDependencies ).setFilter( filter ).setResolveRoot( false ); // We are setting this to false because the artifact itself has been resolved.
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( pluginArtifact )
+            .setArtifactDependencies( dependencies )
+            .setLocalRepository( localRepository )
+            .setRemoteRepostories( new ArrayList( project.getRemoteArtifactRepositories() ) )
+            .setManagedVersionMap( pluginManagedDependencies )
+            .setFilter( filter )
+            .setResolveRoot( false ); // We are setting this to false because the artifact itself has been resolved.
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
@@ -392,6 +398,7 @@ public class DefaultPluginManager
         // Merge the plugin level configuration with the execution level configuration
         // where the latter is dominant.
 
+        /*
         if ( project.getBuildPlugins() != null )
         {
             for ( Plugin buildPlugin : project.getBuildPlugins() )
@@ -422,6 +429,7 @@ public class DefaultPluginManager
                 }
             }
         }
+        */
 
         String goalExecId = goalName;
         if ( mojoExecution.getExecutionId() != null )
