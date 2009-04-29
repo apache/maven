@@ -417,7 +417,7 @@ public class DefaultMavenProjectBuilder
         }
         try
         {
-            model = interpolator.interpolateDomainModel( domainModel, props ).getModel();
+            model = interpolator.interpolateModel( model, props, domainModel.getProjectDirectory() );
         }
         catch ( IOException e )
         {
@@ -465,7 +465,6 @@ public class DefaultMavenProjectBuilder
             
             List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
             interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( projectBuilderConfiguration.getExecutionProperties(), PomInterpolatorTag.EXECUTION_PROPERTIES.name() ) );
-            interpolatorProperties.addAll( InterpolatorProperty.toInterpolatorProperties( projectBuilderConfiguration.getUserProperties(), PomInterpolatorTag.USER_PROPERTIES.name() ) );
             
             ProfileManagerInfo profileInfo = new ProfileManagerInfo(interpolatorProperties, activeProfileIds, inactiveProfileIds);
             PomClassicDomainModel domainModel = new PomClassicDomainModel( pomFile );

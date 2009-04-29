@@ -1,9 +1,11 @@
 package org.apache.maven.model.interpolator;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,39 +31,41 @@ import org.apache.maven.model.PomClassicDomainModel;
 import org.apache.maven.model.ProjectUri;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.WriterFactory;
 
 @Component(role = Interpolator.class)
 public class DefaultInterpolator
     implements Interpolator
 {
-    public PomClassicDomainModel interpolateDomainModel( PomClassicDomainModel dm, Properties properties )
+    public Model interpolateModel( Model model, Properties properties, File projectDirectory )
         throws IOException
     {
-        List<InterpolatorProperty> props = new ArrayList<InterpolatorProperty>();
+        if ( model == null )
+        {
+            throw new IllegalArgumentException( "model: null" );
+        }
+        
+        if(properties == null)
+        {
+        	return model;
+        }
+        
+        List<InterpolatorProperty>  interpolatorProperties = new ArrayList<InterpolatorProperty>();
         for ( Entry<Object, Object> e : properties.entrySet() )
         {
-            props.add( new InterpolatorProperty( (String) e.getKey(), (String) e.getValue(), PomInterpolatorTag.EXECUTION_PROPERTIES.toString() ) );
+        	 interpolatorProperties.add( new InterpolatorProperty( (String) e.getKey(), (String) e.getValue(), PomInterpolatorTag.EXECUTION_PROPERTIES.toString() ) );
         }
-        return interpolateDomainModel( dm, props );
-    }
 
-    public PomClassicDomainModel interpolateDomainModel( PomClassicDomainModel dm, List<InterpolatorProperty> interpolatorProperties )
-        throws IOException
-    {
-
-        if ( dm == null )
-        {
-            throw new IllegalArgumentException( "dm: null" );
-        }
         if ( !containsProjectVersion( interpolatorProperties ) )
         {
             aliases.put( "\\$\\{project.version\\}", "\\$\\{version\\}" );
         }
         //TODO: Insert customized logic for parsing
-        List<ModelProperty> modelProperties = getModelProperties( dm.getInputStream() );
+        List<ModelProperty> modelProperties = getModelProperties( model );
 
-        if ( "jar".equals( dm.getModel().getPackaging() ) )
+        if ( "jar".equals( model.getPackaging() ) )
         {
             modelProperties.add( new ModelProperty( ProjectUri.packaging, "jar" ) );
         }
@@ -88,17 +92,14 @@ public class DefaultInterpolator
 
         List<InterpolatorProperty> standardInterpolatorProperties = new ArrayList<InterpolatorProperty>();
 
-        if ( dm.isPomInBuild() )
-        {
-            String basedir = dm.getProjectDirectory().getAbsolutePath();
-            standardInterpolatorProperties.add( new InterpolatorProperty( "${project.basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-            standardInterpolatorProperties.add( new InterpolatorProperty( "${basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-            standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+        String basedir = projectDirectory.getAbsolutePath();
+        standardInterpolatorProperties.add( new InterpolatorProperty( "${project.basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+        standardInterpolatorProperties.add( new InterpolatorProperty( "${basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+        standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
 
-            String baseuri = dm.getProjectDirectory().toURI().toString();
-            standardInterpolatorProperties.add( new InterpolatorProperty( "${project.baseUri}", baseuri, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-            standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.baseUri}", baseuri, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        }
+        String baseuri = projectDirectory.toURI().toString();
+        standardInterpolatorProperties.add( new InterpolatorProperty( "${project.baseUri}", baseuri, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+        standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.baseUri}", baseuri, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
 
         for ( ModelProperty mp : modelProperties )
         {
@@ -129,28 +130,24 @@ public class DefaultInterpolator
 
         interpolateModelProperties( modelProperties, ips1 );
 
-        // SECOND PASS - Set absolute paths on build directories
-        if ( dm.isPomInBuild() )
+        Map<ModelProperty, ModelProperty> buildDirectories = new HashMap<ModelProperty, ModelProperty>();
+        for ( ModelProperty mp : secondPassModelProperties )
         {
-            String basedir = dm.getProjectDirectory().getAbsolutePath();
-            Map<ModelProperty, ModelProperty> buildDirectories = new HashMap<ModelProperty, ModelProperty>();
-            for ( ModelProperty mp : secondPassModelProperties )
-            {
-                if ( mp.getUri().startsWith( ProjectUri.Build.xUri ) || mp.getUri().equals( ProjectUri.Reporting.outputDirectory ) )
-                {
-                    File file = new File( mp.getResolvedValue() );
-                    if ( !file.isAbsolute() && !mp.getResolvedValue().startsWith( "${project.build." ) && !mp.getResolvedValue().equals( "${project.basedir}" ) )
-                    {
-                        buildDirectories.put( mp, new ModelProperty( mp.getUri(), new File( basedir, file.getPath() ).getAbsolutePath() ) );
-                    }
-                }
-            }
-            for ( Map.Entry<ModelProperty, ModelProperty> e : buildDirectories.entrySet() )
-            {
-                secondPassModelProperties.remove( e.getKey() );
-                secondPassModelProperties.add( e.getValue() );
-            }
+        	if ( mp.getUri().startsWith( ProjectUri.Build.xUri ) || mp.getUri().equals( ProjectUri.Reporting.outputDirectory ) )
+        	{
+        		File file = new File( mp.getResolvedValue() );
+        		if ( !file.isAbsolute() && !mp.getResolvedValue().startsWith( "${project.build." ) && !mp.getResolvedValue().equals( "${project.basedir}" ) )
+        		{
+        			buildDirectories.put( mp, new ModelProperty( mp.getUri(), new File( basedir, file.getPath() ).getAbsolutePath() ) );
+        		}
+        	}
         }
+        for ( Map.Entry<ModelProperty, ModelProperty> e : buildDirectories.entrySet() )
+        {
+        	secondPassModelProperties.remove( e.getKey() );
+        	secondPassModelProperties.add( e.getValue() );
+        }
+
 
         // THIRD PASS - Use build directories as interpolator properties
         List<InterpolatorProperty> ips2 = new ArrayList<InterpolatorProperty>( interpolatorProperties );
@@ -175,30 +172,17 @@ public class DefaultInterpolator
         try
         {
             String xml = unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-            PomClassicDomainModel domainModel = new PomClassicDomainModel( new ByteArrayInputStream( xml.getBytes( "UTF-8" ) ) );
-            if ( dm.getProjectDirectory() != null )
+            Model m = new PomClassicDomainModel( new ByteArrayInputStream( xml.getBytes( "UTF-8" ) ) ).getModel();
+            if ( projectDirectory != null )
             {
-                alignPaths( domainModel.getModel(), dm.getProjectDirectory() );
+                alignPaths( m, projectDirectory );
             }
-            return domainModel;
+            return m;
         }
         catch ( IOException e )
         {
             throw new IllegalStateException( "Unmarshalling of model properties failed", e );
         }
-
-        /*
-        for(ModelProperty mp : modelProperties)
-        {
-        	if((mp.getValue() != null) && !mp.getValue().equals(mp.getResolvedValue()))
-        	{
-        		if(mp.getUri().equals(ProjectUri.version))
-        		{
-        			
-        		}
-        	}
-        }
-        */
     }
 
     /**
@@ -350,9 +334,27 @@ public class DefaultInterpolator
         return ips;
     }
 
-    private static List<ModelProperty> getModelProperties( InputStream is )
+    
+    private static List<ModelProperty> getModelProperties( Model model )
         throws IOException
     {
+    	
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer out = null;
+        MavenXpp3Writer writer = new MavenXpp3Writer();
+        try
+        {
+            out = WriterFactory.newXmlWriter( baos );
+            writer.write( out, model );
+        }
+        finally
+        {
+            if ( out != null )
+            {
+                out.close();
+            }
+        }
+  	
         Set<String> s = new HashSet<String>();
         //TODO: Should add all collections from ProjectUri
         s.addAll( URIS );
@@ -378,7 +380,7 @@ public class DefaultInterpolator
         s.add( ProjectUri.Profiles.Profile.Dependencies.xUri );
         s.add( ProjectUri.Profiles.Profile.Build.Plugins.Plugin.configuration );
 
-        return new ArrayList<ModelProperty>( marshallXmlToModelProperties( is, ProjectUri.baseUri, s ) );
+        return new ArrayList<ModelProperty>( marshallXmlToModelProperties(  new ByteArrayInputStream(baos.toByteArray()), ProjectUri.baseUri, s ) );
     }
 
     /**
@@ -414,8 +416,6 @@ public class DefaultInterpolator
                 continue;
             }
 
-            //String val = (mp.getResolvedValue() != null) ? "\"" + mp.getResolvedValue() + "\"" : null;
-            //   System.out.println("new ModelProperty(\"" + mp.getUri() +"\" , " + val +"),");
             if ( !uri.startsWith( baseUri ) )
             {
                 throw new IllegalArgumentException( "Passed in model property that does not match baseUri: Property URI = " + uri + ", Base URI = " + baseUri );
