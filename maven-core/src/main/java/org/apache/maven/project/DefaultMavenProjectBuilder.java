@@ -395,35 +395,37 @@ public class DefaultMavenProjectBuilder
     private Model interpolateDomainModel( PomClassicDomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
         throws ProjectBuildingException
     {
-    	Model model;
-		try 
-		{
-			model = domainModel.getModel();
-		} 
-		catch (IOException e) 
-		{
-			throw new ProjectBuildingException("", e.getMessage());
-		}
-		
+        Model model;
+        try
+        {
+            model = domainModel.getModel();
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( "", e.getMessage() );
+        }
+
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-        
-        Properties props = new Properties(config.getExecutionProperties());
+
+        Properties props = new Properties( config.getExecutionProperties() );
+
+        //TODO: this magical property should not be placed in here in the middle of the project builder. move somewhere out to
+        //      the front-end where they can all be collected.
         if ( config.getBuildStartTime() != null )
         {
-           props.put("${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ) );
-        }   
-            try
-            {
-            	model = interpolator.interpolateDomainModel( domainModel, props ).getModel();
-            }
-            catch ( IOException e )
-            {
+            props.put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ) );
+        }
+        try
+        {
+            model = interpolator.interpolateDomainModel( domainModel, props ).getModel();
+        }
+        catch ( IOException e )
+        {
 
-                throw new ProjectBuildingException(projectId, "", projectDescriptor, e);
-            }  
-            
-       return model;
+            throw new ProjectBuildingException( projectId, "", projectDescriptor, e );
+        }
 
+        return model;
     }
     
     private MavenProject fromDomainModelToMavenProject(Model model, File parentFile, ProjectBuilderConfiguration config, File projectDescriptor)
