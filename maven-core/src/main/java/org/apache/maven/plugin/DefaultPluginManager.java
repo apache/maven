@@ -46,9 +46,7 @@ import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -56,8 +54,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
@@ -95,6 +91,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 // TODO: template method plugin validation as its framework specific
 // TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think
 // about how that works
+// TODO: remove the ProjectBuilder
+// TODO: remove the coreArtifactFilterManager
+// TODO: remove the runtimeInformation
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
@@ -117,9 +116,6 @@ public class DefaultPluginManager
 
     @Requirement
     protected RuntimeInformation runtimeInformation;
-
-    @Requirement
-    protected MavenProjectBuilder mavenProjectBuilder;
 
     private Map<String, PluginDescriptor> pluginDescriptors;
 
@@ -189,11 +185,11 @@ public class DefaultPluginManager
     {
         resolvePluginVersion( plugin, project );
 
-        MavenProject pluginProject = buildPluginProject( plugin, localRepository, new ArrayList( project.getRemoteArtifactRepositories() ) );
+        //MavenProject pluginProject = buildPluginProject( plugin, localRepository, new ArrayList( project.getRemoteArtifactRepositories() ) );
 
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
-        checkRequiredMavenVersion( plugin, pluginProject, localRepository, new ArrayList( project.getRemoteArtifactRepositories() ) );
+        //checkRequiredMavenVersion( plugin, pluginProject, localRepository, new ArrayList( project.getRemoteArtifactRepositories() ) );
 
         pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
 
@@ -276,6 +272,7 @@ public class DefaultPluginManager
 
         List<Artifact> pluginArtifacts = new ArrayList<Artifact>();
 
+        /*
         try
         {
             Artifact pluginPomArtifact = repositorySystem.createProjectArtifact( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
@@ -298,6 +295,7 @@ public class DefaultPluginManager
         {
             throw new InvalidPluginException( "Error resolving plugin POM " + e.getMessage() );
         }
+        */
 
         Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
 
@@ -314,7 +312,7 @@ public class DefaultPluginManager
             .setRemoteRepostories( new ArrayList( project.getRemoteArtifactRepositories() ) )
             .setManagedVersionMap( pluginManagedDependencies )
             .setFilter( filter )
-            .setResolveRoot( false ); // We are setting this to false because the artifact itself has been resolved.
+            .setResolveRoot( true ); // We are setting this to false because the artifact itself has been resolved.
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
@@ -941,6 +939,7 @@ public class DefaultPluginManager
         plugin.setVersion( version );
     }
 
+    /*
     public MavenProject buildPluginProject( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws InvalidPluginException
     {
@@ -956,6 +955,7 @@ public class DefaultPluginManager
             throw new InvalidPluginException( "Unable to build project for plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
         }
     }
+    */
 
     public void checkRequiredMavenVersion( Plugin plugin, MavenProject pluginProject, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginVersionResolutionException, InvalidPluginException
