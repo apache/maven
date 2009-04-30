@@ -45,7 +45,6 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -262,15 +261,21 @@ public class DefaultExtensionManager
         return child;
     }
 
-    @SuppressWarnings("unchecked")
     public void registerWagons()
     {
         if ( extensionContainer != null )
         {
-            Map<String, ComponentDescriptor> wagons = extensionContainer.getComponentDescriptorMap( Wagon.ROLE );
-            
-            getLogger().debug( "Wagons to register: " + wagons.keySet() );
-            wagonManager.registerWagons( wagons.keySet(), extensionContainer );
+            try
+            {
+                Map wagons = extensionContainer.lookupMap( Wagon.ROLE );
+                getLogger().debug( "Wagons to register: " + wagons.keySet() );
+                wagonManager.registerWagons( wagons.keySet(), extensionContainer );
+            }
+            catch ( ComponentLookupException e )
+            {
+                // no wagons found in the extension
+                getLogger().debug( "No wagons found in the extensions or other internal error: " + e.getMessage(), e );
+            }
         }
         else
         {
