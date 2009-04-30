@@ -42,10 +42,12 @@ import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelEventListener;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.interpolator.Interpolator;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.processors.PluginProcessor;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
@@ -61,6 +63,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * @version $Id$
@@ -117,6 +120,7 @@ public class DefaultMavenProjectBuilder
 		try 
 		{
 			domainModel = build( "unknown", pomFile, configuration );
+
 		} 
 		catch (IOException e) 
 		{
@@ -155,27 +159,72 @@ public class DefaultMavenProjectBuilder
     		}
     		        	
             domainModel = ProcessorContext.mergeProfilesIntoModel( externalProfiles, domainModel );
+    
             
         }
         catch ( IOException e )
         {
             throw new ProjectBuildingException("", "");
         }
-        
+   
         //Interpolation & Management
         MavenProject project;
 		try 
 		{		
 			Model model = interpolateDomainModel( domainModel, configuration, pomFile );
-			Set<Plugin> plugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles(model.getPackaging());
-			ProcessorContext.addPluginsToModel(model, plugins);			
-			ProcessorContext.processManagementNodes(model);
-			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
 				
-			plugins = lifecycle.populateDefaultConfigurationForPlugins(new HashSet<Plugin>(model.getBuild().getPlugins()), 
-				project, configuration.getLocalRepository());
+			List<Plugin> plns = new ArrayList<Plugin>();
+			
+			Set<Plugin> plugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles(model.getPackaging());
 
-			project.getModel().getBuild().setPlugins(new ArrayList<Plugin>(plugins));
+			addPluginsToModel(model, plugins);			
+							
+			ProcessorContext.processManagementNodes(model);
+			
+			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
+		
+			ArrayList<Plugin> pln = new ArrayList<Plugin>();
+			for(Plugin p : project.getModel().getBuild().getPlugins())
+			{
+				Plugin copy = new Plugin();
+				PluginProcessor.copy2(p, copy, true);	
+				pln.add(copy);
+			}
+	  		
+			Set<Plugin> pl = lifecycle.populateDefaultConfigurationForPlugins(new HashSet<Plugin>(pln), 
+				project, configuration.getLocalRepository());
+			/*
+    		if(model.getArtifactId() != null &&
+    				model.getArtifactId().equals("maven-model"))
+    			{
+    			System.out.println(new DomainModel(project.getModel()).asString());
+    			} 			
+			*/
+    		
+			for (Plugin buildPlugin : pl) {
+				Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
+				Plugin x = containsPlugin(buildPlugin, project.getModel()
+						.getBuild().getPlugins());
+
+				for (PluginExecution e : buildPlugin.getExecutions()) {
+					for (String g : e.getGoals()) {
+						if (x != null) {
+							PluginExecution pe = contains(g, x.getExecutions());
+							if (pe != null) {
+								Xpp3Dom dom1 = Xpp3Dom.mergeXpp3Dom(
+										(Xpp3Dom) pe.getConfiguration(),
+										(Xpp3Dom) e.getConfiguration());
+								e.setConfiguration(dom1);
+							}
+						}
+						Xpp3Dom dom1 = Xpp3Dom.mergeXpp3Dom((Xpp3Dom) e
+								.getConfiguration(), dom);
+						e.setConfiguration(dom1);
+					}
+				}
+
+			}    		
+			project.getModel().getBuild().setPlugins(new ArrayList<Plugin>(pl));	
 		} 
 		catch (IOException e) 
 		{
@@ -186,7 +235,6 @@ public class DefaultMavenProjectBuilder
 			e.printStackTrace();
 			throw new ProjectBuildingException("",e.getMessage());
 		}
-		
         project.setActiveProfiles( projectProfiles );
          
         Build build = project.getBuild();
@@ -203,6 +251,56 @@ public class DefaultMavenProjectBuilder
         
         return project;
     }
+
+    
+    
+    private static PluginExecution contains(String goal, List<PluginExecution> plugins)
+    {
+    	for(PluginExecution pe : plugins)
+    	{
+    		if(pe.getGoals().contains(goal))
+    		{
+    			return pe;
+    		}
+    	}
+    	return null;
+    }
+    
+    public static void addPluginsToModel(Model target, Set<Plugin> plugins)
+    {
+    	List<Plugin> mPlugins = new ArrayList<Plugin>(target.getBuild().getPlugins());
+    	
+    	List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
+    	
+    	for( Plugin p : plugins )
+    	{
+    		Plugin mPlugin = containsPlugin( p, mPlugins);
+    		if( mPlugin == null)
+    		{
+    			lifecyclePlugins.add(p);
+    		}
+    		else if(p.getConfiguration() != null)
+    		{
+    			System.out.println(Xpp3Dom.mergeXpp3Dom((Xpp3Dom) p.getConfiguration(), (Xpp3Dom) mPlugin.getConfiguration()));
+    		}
+    	}
+    	mPlugins.addAll(lifecyclePlugins);
+    	target.getBuild().setPlugins(mPlugins);
+
+    }
+    
+    private static Plugin containsPlugin(Plugin plugin, List<Plugin> plugins)
+    {
+    	for(Plugin p : plugins)
+    	{
+    		if( p.getGroupId().equals(plugin.getGroupId()) && p.getArtifactId().equals(plugin.getArtifactId()))
+    		{
+    			return p;
+    		}
+    	}
+    	
+    	return null;
+    }    
         
     public MavenProject buildFromRepository(Artifact artifact, ProjectBuilderConfiguration configuration )
     	throws ProjectBuildingException
@@ -618,7 +716,17 @@ public class DefaultMavenProjectBuilder
         Artifact artifactParent = repositorySystem.createProjectArtifact( domainModel.getParentGroupId(), domainModel.getParentArtifactId(), domainModel.getParentVersion() );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifactParent, localRepository, remoteRepositories );
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        ArtifactResolutionResult result;
+		try 
+		{
+			result = repositorySystem.resolve( request );
+		} 
+		catch (Exception e) 
+		{
+            throw (IOException) new IOException( "The parent POM " + artifactParent
+                    + " could not be retrieved from any repository" ).initCause( e );
+		}
+		
         try
         {
             resolutionErrorHandler.throwErrors( request, result );

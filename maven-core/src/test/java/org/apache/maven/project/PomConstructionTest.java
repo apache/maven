@@ -1434,7 +1434,13 @@ public class PomConstructionTest
 	{
 	    PomTestWrapper pom = buildPom( "dependency-management-with-interpolation/sub" );
 	}   
-    
+
+    public void testMaven()
+	    throws Exception
+	{
+	    PomTestWrapper pom = buildPom( "maven/sub" );
+	    System.out.println(pom.getDomainModel().asString());
+	}       
     
     private void assertPathSuffixEquals( String expected, Object actual )
     {

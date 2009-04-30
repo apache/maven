@@ -26,6 +26,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomUtils;
 
 public class PluginProcessor
     extends BaseProcessor
@@ -175,7 +176,7 @@ public class PluginProcessor
      * @param target
      * @param isChild
      */
-    private static void copy2(Plugin source, Plugin target, boolean isChild)
+    public static void copy2(Plugin source, Plugin target, boolean isChild)
     {
         if(!isChild && source.getInherited() != null && !source.getInherited().equalsIgnoreCase( "true" ))
         {
@@ -223,11 +224,11 @@ public class PluginProcessor
             //TODO: Not copying
             if(target.getConfiguration() != null)
             {
-                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() )); 
+                target.setConfiguration( new Xpp3Dom(Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() ))); 
             }
             else
             {
-                target.setConfiguration( source.getConfiguration() );
+                target.setConfiguration( new Xpp3Dom((Xpp3Dom) source.getConfiguration() ) );
             }
                 
         }
@@ -283,11 +284,11 @@ public class PluginProcessor
             //TODO: Not copying
             if(target.getConfiguration() != null)
             {
-                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() )); 
+                target.setConfiguration( new Xpp3Dom(Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() ) )); 
             }
             else
             {
-                target.setConfiguration( source.getConfiguration() );
+                target.setConfiguration( new Xpp3Dom((Xpp3Dom) source.getConfiguration() ) );
             }
                 
         }
@@ -347,11 +348,11 @@ public class PluginProcessor
         {
             if(target.getConfiguration() != null)
             {
-                target.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() ));     
+                target.setConfiguration( new Xpp3Dom(Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) source.getConfiguration(), (Xpp3Dom) target.getConfiguration() )));     
             }
             else
             {
-                target.setConfiguration( source.getConfiguration() );
+                target.setConfiguration( new Xpp3Dom( (Xpp3Dom) source.getConfiguration()) );
             }            
         }
       

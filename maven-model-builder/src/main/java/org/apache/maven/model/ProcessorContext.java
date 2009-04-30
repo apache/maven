@@ -256,37 +256,6 @@ public class ProcessorContext
     	build.addPlugin(p1);   	
     }
     
-    public static void addPluginsToModel(Model target, Set<Plugin> plugins)
-    {
-    	List<Plugin> mPlugins = target.getBuild().getPlugins();
-    	
-    	List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
-    	
-    	for( Plugin p : plugins )
-    	{
-    		if( !containsPlugin( p, mPlugins) )
-    		{
-    			lifecyclePlugins.add(p);
-    		}
-    	}
-    	
-    	target.getBuild().getPlugins().addAll(lifecyclePlugins);
-
-    }
-    
-    private static boolean containsPlugin(Plugin plugin, List<Plugin> plugins)
-    {
-    	for(Plugin p : plugins)
-    	{
-    		if( p.getGroupId().equals(plugin.getGroupId()) && p.getArtifactId().equals(plugin.getArtifactId()))
-    		{
-    			return true;
-    		}
-    	}
-    	
-    	return false;
-    }
-    
     public static Model processManagementNodes(Model target) 
     	throws IOException
     {
