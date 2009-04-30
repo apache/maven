@@ -16,6 +16,7 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -26,7 +27,11 @@ public interface MavenProjectBuilder
     // site
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;
-
+    
+    // remote-resources-plugin    
+    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+        throws ProjectBuildingException;    
+        
     MavenProject build( File project, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 

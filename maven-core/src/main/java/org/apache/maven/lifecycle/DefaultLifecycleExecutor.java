@@ -121,7 +121,6 @@ public class DefaultLifecycleExecutor
                     for ( String goal : goals )
                     {
                         String target = currentProject.getId() + " ( " + goal + " )";
-                        System.out.println( "target: " + target );
                         executeGoalAndHandleFailures( goal, session, currentProject, buildStartTime, target );
                     }
                 }
@@ -179,6 +178,7 @@ public class DefaultLifecycleExecutor
         {            
             try
             {
+                logger.info( executionDescription( mojoExecution ) );
                 pluginManager.executeMojo( session, mojoExecution );
             }
             catch ( PluginExecutionException e )
@@ -192,6 +192,14 @@ public class DefaultLifecycleExecutor
                 throw new LifecycleExecutionException( "Error executing goal.", e );                                        
             }
         }         
+    }
+
+    private String executionDescription( MojoExecution me )
+    {
+        PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
+        StringBuffer sb = new StringBuffer();
+        sb.append( pd.getArtifactId() + ":" + pd.getVersion() + ":" + me.getMojoDescriptor().getGoal() );
+        return sb.toString();
     }
     
     // 1. Find the lifecycle given the phase (default lifecycle when given install)
