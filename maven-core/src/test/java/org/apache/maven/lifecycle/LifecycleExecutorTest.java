@@ -53,7 +53,7 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoDescriptor> lifecyclePlan = lifecycleExecutor.calculateLifecyclePlan( "package", session );
+        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateLifecyclePlan( "package", session );
         
         // resources:resources
         // compiler:compile
@@ -64,14 +64,14 @@ public class LifecycleExecutorTest
         // surefire:test
         // jar:jar
         
-        assertEquals( "resources:resources", lifecyclePlan.get( 0 ).getFullGoalName() );
-        assertEquals( "compiler:compile", lifecyclePlan.get( 1 ).getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 2 ).getFullGoalName() );
-        assertEquals( "resources:testResources", lifecyclePlan.get( 3 ).getFullGoalName() );
-        assertEquals( "compiler:testCompile", lifecyclePlan.get( 4 ).getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-test-metadata", lifecyclePlan.get( 5 ).getFullGoalName() );
-        assertEquals( "surefire:test", lifecyclePlan.get( 6 ).getFullGoalName() );
-        assertEquals( "jar:jar", lifecyclePlan.get( 7 ).getFullGoalName() );        
+        assertEquals( "resources:resources", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:compile", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:testResources", lifecyclePlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:testCompile", lifecyclePlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-test-metadata", lifecyclePlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "surefire:test", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "jar:jar", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );        
     }    
     
     public void testLifecycleExecutionUsingADefaultLifecyclePhase()
@@ -103,7 +103,7 @@ public class LifecycleExecutorTest
         File pom = getProject( "project-with-additional-lifecycle-elements" );
         MavenSession session = createMavenSession( pom );
         MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( "org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process", session.getCurrentProject(), session.getLocalRepository() );
-        Xpp3Dom dom = lifecycleExecutor.convert( mojoDescriptor.getMojoConfiguration() );
+        Xpp3Dom dom = lifecycleExecutor.convert( mojoDescriptor );
         System.out.println( dom );
     }
         
