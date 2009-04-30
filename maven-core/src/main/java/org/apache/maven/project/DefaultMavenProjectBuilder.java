@@ -180,7 +180,7 @@ public class DefaultMavenProjectBuilder
 			addPluginsToModel(model, plugins);			
 							
 			ProcessorContext.processManagementNodes(model);
-			
+		 					
 			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
  			
 			ArrayList<Plugin> pln = new ArrayList<Plugin>();
@@ -194,13 +194,9 @@ public class DefaultMavenProjectBuilder
 			Set<Plugin> pl = lifecycle.populateDefaultConfigurationForPlugins(new HashSet<Plugin>(pln), 
 				project, configuration.getLocalRepository());
 			/*
-    		if(model.getArtifactId() != null &&
-    				model.getArtifactId().equals("maven-model"))
-    			{
-    			System.out.println(new DomainModel(project.getModel()).asString());
-    			} 			
+		
 			*/
-    		
+		   		
 			for (Plugin buildPlugin : pl) {
 				Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
 				Plugin x = containsPlugin(buildPlugin, project.getModel()
@@ -224,8 +220,14 @@ public class DefaultMavenProjectBuilder
 				}
 
 			}    		
-			project.getModel().getBuild().setPlugins(new ArrayList<Plugin>(pl));	
-
+			project.getModel().getBuild().setPlugins(new ArrayList<Plugin>(pl));
+			/*
+	 		if(model.getArtifactId() != null &&
+    				model.getArtifactId().equals("maven-model"))
+    			{
+    			System.out.println(new DomainModel(project.getModel()).asString());
+    			} 
+    			*/
 		} 
 		catch (IOException e) 
 		{
@@ -277,24 +279,35 @@ public class DefaultMavenProjectBuilder
     
     public static void addPluginsToModel(Model target, Set<Plugin> plugins)
     {
-    	List<Plugin> mPlugins = new ArrayList<Plugin>(target.getBuild().getPlugins());
+    	List<Plugin> mngPlugins = (target.getBuild().getPluginManagement() != null)
+    		? target.getBuild().getPluginManagement().getPlugins() : new ArrayList<Plugin>();
+    		
+    	List<Plugin> pomPlugins = new ArrayList<Plugin>(target.getBuild().getPlugins());
     	
     	List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
     	
     	for( Plugin p : plugins )
     	{
-    		Plugin mPlugin = containsPlugin( p, mPlugins);
-    		if( mPlugin == null)
+    		//Go ahead and add version if exists in pluginManagement - don't use default version
+    		Plugin mngPlugin = containsPlugin(p, mngPlugins);
+    		if(mngPlugin != null && mngPlugin.getVersion() != null)
+    		{
+    			//System.out.println("Set version:" + p.getVersion() + ": To = " + mngPlugin.getVersion());
+    			p.setVersion(mngPlugin.getVersion());
+    		}
+    		
+    		Plugin pomPlugin = containsPlugin( p, pomPlugins);
+    		if( pomPlugin == null)
     		{
     			lifecyclePlugins.add(p);
     		}
     		else if(p.getConfiguration() != null)
     		{
-    			System.out.println(Xpp3Dom.mergeXpp3Dom((Xpp3Dom) p.getConfiguration(), (Xpp3Dom) mPlugin.getConfiguration()));
+    			System.out.println(Xpp3Dom.mergeXpp3Dom((Xpp3Dom) p.getConfiguration(), (Xpp3Dom) pomPlugin.getConfiguration()));
     		}
     	}
-    	mPlugins.addAll(lifecyclePlugins);
-    	target.getBuild().setPlugins(mPlugins);
+    	pomPlugins.addAll(lifecyclePlugins);
+    	target.getBuild().setPlugins(pomPlugins);
 
     }
     
@@ -310,7 +323,7 @@ public class DefaultMavenProjectBuilder
     	
     	return null;
     }    
-        
+	    
     public MavenProject buildFromRepository(Artifact artifact, ProjectBuilderConfiguration configuration )
     	throws ProjectBuildingException
     {
