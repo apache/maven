@@ -182,7 +182,7 @@ public class DefaultMavenProjectBuilder
 			ProcessorContext.processManagementNodes(model);
 			
 			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
-		
+ 			
 			ArrayList<Plugin> pln = new ArrayList<Plugin>();
 			for(Plugin p : project.getModel().getBuild().getPlugins())
 			{
@@ -190,7 +190,7 @@ public class DefaultMavenProjectBuilder
 				PluginProcessor.copy2(p, copy, true);	
 				pln.add(copy);
 			}
-	  		
+		
 			Set<Plugin> pl = lifecycle.populateDefaultConfigurationForPlugins(new HashSet<Plugin>(pln), 
 				project, configuration.getLocalRepository());
 			/*
@@ -225,6 +225,7 @@ public class DefaultMavenProjectBuilder
 
 			}    		
 			project.getModel().getBuild().setPlugins(new ArrayList<Plugin>(pl));	
+
 		} 
 		catch (IOException e) 
 		{
@@ -252,7 +253,15 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    
+    private static void printPlugin(Plugin plugin, String tag)
+    {
+    	System.out.println(tag + ":" + plugin);
+    	System.out.println("CONFIG:" + plugin.getConfiguration());
+    	for(PluginExecution pe : plugin.getExecutions())
+    	{
+    		System.out.println("PE:" + pe.getConfiguration());
+    	}
+    }
     
     private static PluginExecution contains(String goal, List<PluginExecution> plugins)
     {

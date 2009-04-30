@@ -188,7 +188,7 @@ public class PluginProcessor
             target.setArtifactId( source.getArtifactId() );   
         }
         
-        if(target.getGroupId() == null)
+        if(target.getGroupId() == null || !source.getGroupId().equals("org.apache.maven.plugins"))
         {
             target.setGroupId( source.getGroupId() );           	
         }
@@ -352,9 +352,10 @@ public class PluginProcessor
             }
             else
             {
+            	
                 target.setConfiguration( new Xpp3Dom( (Xpp3Dom) source.getConfiguration()) );
+                //System.out.println("+++++++++++COPY PE+++++++++++++++++" + target.getConfiguration());
             }            
-        }
-      
+        }     
     }
 }

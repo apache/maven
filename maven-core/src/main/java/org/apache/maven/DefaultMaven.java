@@ -91,7 +91,7 @@ public class DefaultMaven
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         MavenSession session = createMavenSession( request, result );        
-
+        
         if ( session.getReactorManager().hasMultipleProjects() )
         {
             //logger.info( "Reactor build order: " );
