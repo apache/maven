@@ -19,11 +19,11 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

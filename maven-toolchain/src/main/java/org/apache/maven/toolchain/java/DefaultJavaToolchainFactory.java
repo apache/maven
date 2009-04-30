@@ -20,6 +20,7 @@
 package org.apache.maven.toolchain.java;
 
 import java.io.File;
+
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcherFactory;
 import org.apache.maven.toolchain.ToolchainFactory;

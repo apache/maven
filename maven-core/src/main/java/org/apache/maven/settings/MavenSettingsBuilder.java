@@ -19,10 +19,10 @@ package org.apache.maven.settings;
  * under the License.
  */
 
+import java.io.IOException;
+
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.IOException;
 
 /**
  * @author jdcasey

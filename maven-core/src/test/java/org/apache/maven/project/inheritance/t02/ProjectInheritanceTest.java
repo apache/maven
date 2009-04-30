@@ -19,17 +19,17 @@ package org.apache.maven.project.inheritance.t02;
  * under the License.
  */
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.MailingList;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.model.Build;
+import org.apache.maven.model.MailingList;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 
 /**
  * A test which demonstrates maven's recursive inheritance where

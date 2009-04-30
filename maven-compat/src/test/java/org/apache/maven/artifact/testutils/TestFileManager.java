@@ -38,14 +38,15 @@ package org.apache.maven.artifact.testutils;
  * under the License.
  */
 
-import junit.framework.Assert;
-import org.codehaus.plexus.util.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import junit.framework.Assert;
+
+import org.codehaus.plexus.util.FileUtils;
 
 public class TestFileManager
 {

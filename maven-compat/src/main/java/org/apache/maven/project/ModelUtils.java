@@ -19,10 +19,19 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.model.*;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import java.util.*;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Repository;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /** @deprecated */
 @Deprecated

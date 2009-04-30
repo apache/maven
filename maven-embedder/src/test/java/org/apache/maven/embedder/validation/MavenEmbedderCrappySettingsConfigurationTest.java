@@ -19,6 +19,10 @@ package org.apache.maven.embedder.validation;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Iterator;
+
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.ConfigurationValidationResult;
 import org.apache.maven.embedder.DefaultConfiguration;
@@ -28,10 +32,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusTestCase;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
 
 public class MavenEmbedderCrappySettingsConfigurationTest
     extends PlexusTestCase

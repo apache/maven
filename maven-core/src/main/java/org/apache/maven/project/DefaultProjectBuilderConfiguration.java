@@ -19,15 +19,12 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.ModelEventListener;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.profiles.ProfileManager;
 
 public class DefaultProjectBuilderConfiguration
@@ -39,16 +36,22 @@ public class DefaultProjectBuilderConfiguration
 
     private List<ArtifactRepository> remoteRepositories;
     
-    private Properties userProperties;
-
     //!!jvz Find out who added this. It's wrong, the execution properties are what come from the embedder setup not system properties. 
     private Properties executionProperties = System.getProperties();
-
-    private Date buildStartTime;
 
     private List<ModelEventListener> listeners;
     
     private MavenProject topProject;
+    
+    public DefaultProjectBuilderConfiguration()
+    {        
+    }
+
+    public DefaultProjectBuilderConfiguration( ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    {        
+        this.localRepository = localRepository;
+        this.remoteRepositories = remoteRepositories;
+    }
     
     public MavenProject getTopLevelProjectFromReactor()
     {
@@ -101,17 +104,6 @@ public class DefaultProjectBuilderConfiguration
     public ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties )
     {
         this.executionProperties = executionProperties;
-        return this;
-    }
-
-    public Date getBuildStartTime()
-    {
-        return buildStartTime;
-    }
-
-    public ProjectBuilderConfiguration setBuildStartTime( Date buildStartTime )
-    {
-        this.buildStartTime = buildStartTime;
         return this;
     }
 

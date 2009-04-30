@@ -19,14 +19,14 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
-import org.apache.maven.execution.MavenExecutionRequest;
-
 import java.util.List;
 import java.util.Properties;
 
 import junit.framework.TestCase;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.ParseException;
+import org.apache.maven.execution.MavenExecutionRequest;
 
 public class CLIRequestUtilsTest
     extends TestCase

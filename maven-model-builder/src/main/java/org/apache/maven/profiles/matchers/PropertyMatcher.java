@@ -19,7 +19,6 @@ package org.apache.maven.profiles.matchers;
  * under the License.
  */
 
-import java.util.List;
 import java.util.Properties;
 import java.util.Map.Entry;
 

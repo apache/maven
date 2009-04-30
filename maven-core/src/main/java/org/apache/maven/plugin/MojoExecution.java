@@ -22,9 +22,6 @@ package org.apache.maven.plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Describes a single mojo invocation.
  *

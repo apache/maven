@@ -19,12 +19,12 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.codehaus.plexus.component.annotations.Component;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Jason van Zyl

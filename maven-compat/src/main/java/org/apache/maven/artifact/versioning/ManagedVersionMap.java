@@ -20,8 +20,8 @@ package org.apache.maven.artifact.versioning;
  */
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 public class ManagedVersionMap
     extends HashMap

@@ -19,6 +19,8 @@ package org.apache.maven.artifact.transform;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
@@ -27,10 +29,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Jason van Zyl

@@ -701,7 +701,6 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration.setLocalRepository( getLocalRepository() );
             projectBuildingConfiguration.setExecutionProperties( getProperties() );
             projectBuildingConfiguration.setGlobalProfileManager( getProfileManager() );
-            projectBuildingConfiguration.setBuildStartTime( getStartTime() );
             projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
         }
 

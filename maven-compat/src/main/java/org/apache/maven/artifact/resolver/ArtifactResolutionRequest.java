@@ -46,7 +46,7 @@ public class ArtifactResolutionRequest
     
     private boolean resolveRoot = true;
 
-    private boolean resolveDependencies = false;
+    private boolean resolveTransitively = false;
     
     public ArtifactResolutionRequest()
     {  
@@ -178,16 +178,16 @@ public class ArtifactResolutionRequest
         return resolveRoot;
     }        
 
-    public ArtifactResolutionRequest setResolveDependencies( boolean resolveDependencies )
+    public ArtifactResolutionRequest setResolveTransitively( boolean resolveDependencies )
     {
-        this.resolveDependencies = resolveDependencies;
+        this.resolveTransitively = resolveDependencies;
         
         return this;
     }
     
-    public boolean isResolveDependencies()
+    public boolean isResolveTransitively()
     {
-        return resolveDependencies;
+        return resolveTransitively;
     }        
     
     public TransferListener getTransferListener()

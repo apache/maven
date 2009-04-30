@@ -19,14 +19,14 @@ package org.apache.maven.embedder.validation;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.ConfigurationValidationResult;
 import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
 
 /** @author Jason van Zyl */
 public class ValidateConfigurationTest

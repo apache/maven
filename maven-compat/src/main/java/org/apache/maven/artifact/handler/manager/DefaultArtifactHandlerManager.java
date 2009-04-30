@@ -19,13 +19,13 @@ package org.apache.maven.artifact.handler.manager;
  * under the License.
  */
 
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Jason van Zyl

@@ -19,9 +19,9 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-
 import java.io.File;
+
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 public class InvalidProjectVersionException
     extends ProjectBuildingException

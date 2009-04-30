@@ -19,11 +19,11 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-
-import java.io.File;
 
 /** @author jdcasey */
 public interface ArtifactRepositoryFactory

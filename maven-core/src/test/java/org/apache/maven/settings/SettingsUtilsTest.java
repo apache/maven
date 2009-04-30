@@ -19,9 +19,9 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import java.util.List;
+
+import junit.framework.TestCase;
 
 public class SettingsUtilsTest
     extends TestCase

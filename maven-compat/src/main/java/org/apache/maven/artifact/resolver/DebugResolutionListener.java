@@ -19,12 +19,12 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.logging.Logger;
-
-import java.util.Set;
-import java.util.HashSet;
 
 /**
  * Send resolution events to the debug log.

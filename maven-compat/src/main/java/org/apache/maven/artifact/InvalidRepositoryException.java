@@ -1,8 +1,8 @@
 package org.apache.maven.artifact;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
 import java.net.MalformedURLException;
+
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

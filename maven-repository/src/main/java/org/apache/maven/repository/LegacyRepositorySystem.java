@@ -188,6 +188,8 @@ public class LegacyRepositorySystem
             }
 
             VersionRange versionRange;
+            
+            //TODO: how does a poorly specified range turn into a VersionNotFoundException?
             try
             {
                 versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
@@ -196,6 +198,7 @@ public class LegacyRepositorySystem
             {
                 throw new VersionNotFoundException( reactor.getId(), d, reactor.getFile(), e );
             }
+            
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), scope, inheritedScope, d.isOptional() );
 
             if ( Artifact.SCOPE_SYSTEM.equals( scope ) )

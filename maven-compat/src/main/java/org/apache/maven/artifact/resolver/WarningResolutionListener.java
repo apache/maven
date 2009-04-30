@@ -23,9 +23,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.logging.Logger;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Send resolution warning events to the warning log.
  *

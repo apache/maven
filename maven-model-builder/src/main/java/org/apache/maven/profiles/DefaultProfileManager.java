@@ -19,18 +19,6 @@ package org.apache.maven.profiles;
  * under the License.
  */
 
-import org.apache.maven.model.Activation;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.profiles.ProfileActivationException;
-import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.profiles.matchers.DefaultMatcher;
-import org.apache.maven.profiles.matchers.FileMatcher;
-import org.apache.maven.profiles.matchers.JdkMatcher;
-import org.apache.maven.profiles.matchers.ProfileMatcher;
-import org.apache.maven.profiles.matchers.PropertyMatcher;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,6 +27,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.maven.model.Activation;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
+import org.apache.maven.profiles.matchers.DefaultMatcher;
+import org.apache.maven.profiles.matchers.FileMatcher;
+import org.apache.maven.profiles.matchers.JdkMatcher;
+import org.apache.maven.profiles.matchers.ProfileMatcher;
+import org.apache.maven.profiles.matchers.PropertyMatcher;
 
 public class DefaultProfileManager
     implements ProfileManager

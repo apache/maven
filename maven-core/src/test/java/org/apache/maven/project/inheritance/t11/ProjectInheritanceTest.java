@@ -19,10 +19,10 @@ package org.apache.maven.project.inheritance.t11;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-
-import java.io.File;
 
 /**
  * Verifies scope of root project is preserved regardless of parent depenedency management.

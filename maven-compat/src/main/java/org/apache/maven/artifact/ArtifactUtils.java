@@ -19,14 +19,14 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.versioning.VersionRange;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
+
+import org.apache.maven.artifact.versioning.VersionRange;
 
 public final class ArtifactUtils
 {

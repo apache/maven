@@ -19,16 +19,12 @@ under the License.
 
 package org.apache.maven.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ResolutionListener;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 /**
  *

@@ -19,15 +19,15 @@ package org.apache.maven.project.canonical;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.AbstractMavenProjectTestCase;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author Jason van Zyl

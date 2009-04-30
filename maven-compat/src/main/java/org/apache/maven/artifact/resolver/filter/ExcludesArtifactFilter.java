@@ -19,9 +19,9 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
 import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
 
 /**
  * Filter to exclude from a list of artifact patterns.

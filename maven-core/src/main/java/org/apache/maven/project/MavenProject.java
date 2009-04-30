@@ -69,8 +69,8 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.MavenRepositoryWrapper;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -363,6 +363,7 @@ public class MavenProject
                 }
                 catch ( ProjectBuildingException e )
                 {
+                    //TODO: awful
                     e.printStackTrace();
                 }
             }
@@ -370,10 +371,11 @@ public class MavenProject
             {
                 try
                 {
-                    parent = mavenProjectBuilder.buildFromRepository( getParentArtifact(), this.remoteArtifactRepositories, projectBuilderConfiguration.getLocalRepository() );
+                    parent = mavenProjectBuilder.buildFromRepository( getParentArtifact(), projectBuilderConfiguration );
                 }
                 catch ( ProjectBuildingException e )
                 {
+                    // TODO: awful
                     e.printStackTrace();
                 }
             }

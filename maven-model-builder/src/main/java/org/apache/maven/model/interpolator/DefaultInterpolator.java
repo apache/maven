@@ -26,8 +26,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.DomainModel;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;

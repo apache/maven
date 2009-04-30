@@ -27,15 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.Resource;
 import org.apache.maven.model.processors.BuildProcessor;
 import org.apache.maven.model.processors.CiManagementProcessor;
 import org.apache.maven.model.processors.ContributorsProcessor;

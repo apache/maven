@@ -19,12 +19,12 @@ package org.apache.maven.project.inheritance.t12;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Map;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-
-import java.io.File;
-import java.util.Map;
 
 /**
  * Verifies that plugin execution sections in the parent POM that have

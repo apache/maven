@@ -19,10 +19,10 @@ package org.apache.maven.artifact.installer;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-
-import java.io.File;
 
 /**
  * @author <a href="michal@codehaus.org">Michal Maczka</a>

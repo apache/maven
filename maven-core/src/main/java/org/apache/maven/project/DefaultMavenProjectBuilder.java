@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -204,23 +203,7 @@ public class DefaultMavenProjectBuilder
         
         return project;
     }
-    
-  //  private static void setRepositoriesOn(MavenProject project, )
-
-    //!! This is used by the RR plugin
-    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteArtifactRepositories, ArtifactRepository localRepository, boolean allowStubs )
-        throws ProjectBuildingException
-    {
-        Artifact pomArtifact = artifact;
         
-        if ( !artifact.getType().equals( "pom" ) )
-        {
-            pomArtifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-        }
-        
-        return buildFromRepository( pomArtifact, remoteArtifactRepositories, localRepository );
-    }
-    
     public MavenProject buildFromRepository(Artifact artifact, ProjectBuilderConfiguration configuration )
     	throws ProjectBuildingException
     {
@@ -310,23 +293,7 @@ public class DefaultMavenProjectBuilder
         hm.put( artifact.getId(), project );
 
         return project;   	
-    }
-    
-    //TODO: Get rid of this after merge of new PluginManager code
-    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
-        throws ProjectBuildingException
-    {
-    	if(remoteRepositories ==    null)
-    	{
-    		throw new IllegalArgumentException("repositories: null");
-    	}
-            
-    	ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()        
-            .setLocalRepository( localRepository )
-            .setRemoteRepositories(remoteRepositories);
-        
-    	return buildFromRepository(artifact, configuration);
-    }
+    }    
 
     /**
      * This is used for pom-less execution like running archetype:generate.
@@ -377,7 +344,8 @@ public class DefaultMavenProjectBuilder
         Artifact pomArtifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         pomArtifact.setFile( pomFile );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pomArtifact ).setArtifactDependencies( project.getDependencyArtifacts() )
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( pomArtifact ).setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( configuration.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() );
@@ -420,12 +388,6 @@ public class DefaultMavenProjectBuilder
 
         Properties props = new Properties( config.getExecutionProperties() );
 
-        //TODO: this magical property should not be placed in here in the middle of the project builder. move somewhere out to
-        //      the front-end where they can all be collected.
-        if ( config.getBuildStartTime() != null )
-        {
-            props.put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( config.getBuildStartTime() ) );
-        }
         try
         {
             model = interpolator.interpolateModel( model, props, domainModel.getProjectDirectory() );

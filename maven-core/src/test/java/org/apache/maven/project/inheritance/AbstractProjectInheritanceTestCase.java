@@ -19,9 +19,9 @@ package org.apache.maven.project.inheritance;
  * under the License.
  */
 
-import org.apache.maven.project.AbstractMavenProjectTestCase;
-
 import java.io.File;
+
+import org.apache.maven.project.AbstractMavenProjectTestCase;
 
 /**
  * @author Jason van Zyl

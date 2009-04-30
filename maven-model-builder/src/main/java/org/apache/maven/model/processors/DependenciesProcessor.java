@@ -20,7 +20,6 @@ package org.apache.maven.model.processors;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;

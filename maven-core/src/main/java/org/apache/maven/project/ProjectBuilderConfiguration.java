@@ -1,13 +1,10 @@
 package org.apache.maven.project;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.profiles.ProfileManager;
-
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.profiles.ProfileManager;
 
 public interface ProjectBuilderConfiguration
 {
@@ -26,11 +23,6 @@ public interface ProjectBuilderConfiguration
     ProjectBuilderConfiguration setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
 
     ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties );
-
-    //TODO: these do not belong here, we can profile things else where
-    Date getBuildStartTime();
-
-    ProjectBuilderConfiguration setBuildStartTime( Date buildStartTime );    
     
     MavenProject getTopLevelProjectFromReactor();
     

@@ -2,10 +2,10 @@ package org.apache.maven.profiles.matchers;
 
 import java.util.Properties;
 
+import junit.framework.TestCase;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
-
-import junit.framework.TestCase;
 
 public class JdkMatcherTest extends TestCase
 {

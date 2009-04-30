@@ -19,6 +19,10 @@ package org.apache.maven.project.validation;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -32,10 +36,6 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>

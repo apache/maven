@@ -19,13 +19,13 @@ package org.apache.maven.project.validation;
  * under the License.
  */
 
+import java.io.Reader;
+import java.util.List;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.AbstractMavenProjectTestCase;
 import org.codehaus.plexus.util.ReaderFactory;
-
-import java.io.Reader;
-import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>

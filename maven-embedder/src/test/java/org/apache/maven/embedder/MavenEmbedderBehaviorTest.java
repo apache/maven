@@ -19,8 +19,6 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import org.codehaus.plexus.PlexusTestCase;
-
 import java.io.File;
 
 /** @author Jason van Zyl */

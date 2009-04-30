@@ -15,13 +15,11 @@ package org.apache.maven.profiles;
  * the License.
  */
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.profiles.ProfileActivationException;
-
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
 
 public interface ProfileManager
 {

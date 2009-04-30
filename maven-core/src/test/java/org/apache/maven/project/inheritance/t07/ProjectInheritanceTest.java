@@ -19,13 +19,13 @@ package org.apache.maven.project.inheritance.t07;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 
 /**
  * A test which demonstrates maven's dependency management

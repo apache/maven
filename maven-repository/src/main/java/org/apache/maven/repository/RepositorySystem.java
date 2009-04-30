@@ -22,20 +22,13 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
-import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * @author Jason van Zyl
@@ -88,6 +81,9 @@ public interface RepositorySystem
     
     ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException;
+    
+    //correct all uses to let the resolver find the deps of the root and 
+    //pass in overrides where necessary
     
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 

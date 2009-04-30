@@ -19,10 +19,10 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.util.Map;
+
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
-
-import java.util.Map;
 
 /**
  * Abstract class to provide most of the infrastructure required to implement a <code>Mojo</code> except for

@@ -1,11 +1,5 @@
 package org.apache.maven.artifact.transform;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
 import org.apache.maven.artifact.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraph;

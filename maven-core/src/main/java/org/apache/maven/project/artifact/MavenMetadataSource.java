@@ -43,6 +43,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -182,7 +183,7 @@ public class MavenMetadataSource
             {
                 try
                 {
-                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, new DefaultProjectBuilderConfiguration( localRepository, remoteRepositories ) );
                 }
                 catch ( InvalidProjectModelException e )
                 {

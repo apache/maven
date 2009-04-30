@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.ReactorManager;
 
 /**
  * @author Jason van Zyl

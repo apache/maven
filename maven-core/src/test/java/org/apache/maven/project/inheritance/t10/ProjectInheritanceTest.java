@@ -19,12 +19,12 @@ package org.apache.maven.project.inheritance.t10;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Map;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-
-import java.io.File;
-import java.util.Map;
 
 /**
  * Verifies scope inheritence of direct and transitive dependencies.

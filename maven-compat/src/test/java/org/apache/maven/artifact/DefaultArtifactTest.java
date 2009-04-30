@@ -19,10 +19,10 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
+import junit.framework.TestCase;
+
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
-
-import junit.framework.TestCase;
 
 public class DefaultArtifactTest
     extends TestCase

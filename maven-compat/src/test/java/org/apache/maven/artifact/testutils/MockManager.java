@@ -19,11 +19,11 @@ package org.apache.maven.artifact.testutils;
  * under the License.
  */
 
-import org.easymock.MockControl;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.easymock.MockControl;
 
 public class MockManager
 {

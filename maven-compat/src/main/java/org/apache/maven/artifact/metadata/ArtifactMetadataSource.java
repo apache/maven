@@ -19,11 +19,11 @@ package org.apache.maven.artifact.metadata;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
-
-import java.util.List;
 
 /**
  * Provides some metadata operations, like querying the remote repository for a list of versions available for an

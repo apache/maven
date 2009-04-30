@@ -19,11 +19,11 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
 
 public class InvalidProjectModelException
     extends ProjectBuildingException

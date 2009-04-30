@@ -19,6 +19,9 @@ package org.apache.maven.embedder.project;
  * under the License.
  */
 
+import java.io.File;
+import java.util.List;
+
 import org.apache.maven.embedder.AbstractEmbedderTestCase;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.ConfigurationValidationResult;
@@ -29,10 +32,6 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
-
-import java.io.File;
-import java.util.List;
-import java.util.Set;
 
 /**
  * We want to make sure when projects are newly created and have dependencies between them that

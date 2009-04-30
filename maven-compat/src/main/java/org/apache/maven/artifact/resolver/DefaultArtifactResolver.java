@@ -421,7 +421,7 @@ public class DefaultArtifactResolver
             }
         }
         
-        if ( request.isResolveDependencies() )
+        if ( request.isResolveTransitively() )
         {
             try
             {                

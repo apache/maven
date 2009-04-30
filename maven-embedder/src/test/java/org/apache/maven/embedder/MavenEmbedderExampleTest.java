@@ -19,15 +19,8 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.PlexusContainer;
-
-import java.io.File;
-import java.util.Arrays;
+import org.codehaus.plexus.PlexusTestCase;
 
 public class MavenEmbedderExampleTest
     extends PlexusTestCase

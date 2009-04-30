@@ -19,15 +19,15 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 /**
  * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use

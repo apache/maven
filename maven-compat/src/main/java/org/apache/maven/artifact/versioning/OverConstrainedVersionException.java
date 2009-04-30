@@ -19,11 +19,11 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-
-import java.util.List;
 
 /**
  * Occurs when ranges exclude each other and no valid value remains.

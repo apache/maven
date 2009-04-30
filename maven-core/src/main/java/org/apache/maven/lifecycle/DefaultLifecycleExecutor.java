@@ -299,12 +299,9 @@ public class DefaultLifecycleExecutor
                         MojoDescriptor md = getMojoDescriptor( s, session.getCurrentProject(), session.getLocalRepository() );
                                                 
                         // need to know if this plugin belongs to a phase in the lifecycle that's running
-                        if ( md.getPhase() != null && lifecycle.getPhases().contains( md.getPhase() ) )
-                        {                                                          
-                            if ( phaseToMojoMapping.get( md.getPhase() ) != null )                                
-                            {
-                                phaseToMojoMapping.get( md.getPhase() ).add( s );                                
-                            }                            
+                        if ( md.getPhase() != null && phaseToMojoMapping.get( md.getPhase() ) != null )
+                        {
+                            phaseToMojoMapping.get( md.getPhase() ).add( s );
                         }
                         
                         //TODO Here we need to break when we have reached the desired phase.
@@ -590,4 +587,201 @@ public class DefaultLifecycleExecutor
 
         return dom;
     }
+    
+    // These are checks that should be available in real time to IDEs
+
+    /*
+    checkRequiredMavenVersion( plugin, localRepository, project.getRemoteArtifactRepositories() );
+        // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to override in the POM.
+        //validatePomConfiguration( mojoDescriptor, pomConfiguration );            
+        //checkDeprecatedParameters( mojoDescriptor, pomConfiguration );
+        //checkRequiredParameters( mojoDescriptor, pomConfiguration, expressionEvaluator );        
+    
+    public void checkRequiredMavenVersion( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws PluginVersionResolutionException, InvalidPluginException
+    {
+        // if we don't have the required Maven version, then ignore an update
+        if ( ( pluginProject.getPrerequisites() != null ) && ( pluginProject.getPrerequisites().getMaven() != null ) )
+        {
+            DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
+
+            if ( runtimeInformation.getApplicationInformation().getVersion().compareTo( requiredVersion ) < 0 )
+            {
+                throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(), "Plugin requires Maven version " + requiredVersion );
+            }
+        }
+    }
+    
+   private void checkDeprecatedParameters( MojoDescriptor mojoDescriptor, PlexusConfiguration extractedMojoConfiguration )
+        throws PlexusConfigurationException
+    {
+        if ( ( extractedMojoConfiguration == null ) || ( extractedMojoConfiguration.getChildCount() < 1 ) )
+        {
+            return;
+        }
+
+        List<Parameter> parameters = mojoDescriptor.getParameters();
+
+        if ( ( parameters != null ) && !parameters.isEmpty() )
+        {
+            for ( Parameter param : parameters )
+            {
+                if ( param.getDeprecated() != null )
+                {
+                    boolean warnOfDeprecation = false;
+                    PlexusConfiguration child = extractedMojoConfiguration.getChild( param.getName() );
+
+                    if ( ( child != null ) && ( child.getValue() != null ) )
+                    {
+                        warnOfDeprecation = true;
+                    }
+                    else if ( param.getAlias() != null )
+                    {
+                        child = extractedMojoConfiguration.getChild( param.getAlias() );
+                        if ( ( child != null ) && ( child.getValue() != null ) )
+                        {
+                            warnOfDeprecation = true;
+                        }
+                    }
+
+                    if ( warnOfDeprecation )
+                    {
+                        StringBuffer buffer = new StringBuffer();
+                        buffer.append( "In mojo: " ).append( mojoDescriptor.getGoal() ).append( ", parameter: " ).append( param.getName() );
+
+                        if ( param.getAlias() != null )
+                        {
+                            buffer.append( " (alias: " ).append( param.getAlias() ).append( ")" );
+                        }
+
+                        buffer.append( " is deprecated:" ).append( "\n\n" ).append( param.getDeprecated() ).append( "\n" );
+
+                        logger.warn( buffer.toString() );
+                    }
+                }
+            }
+        }
+    }    
+    
+   private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
+        throws PluginConfigurationException
+    {
+        // TODO: this should be built in to the configurator, as we presently double process the expressions
+
+        List<Parameter> parameters = goal.getParameters();
+
+        if ( parameters == null )
+        {
+            return;
+        }
+
+        List<Parameter> invalidParameters = new ArrayList<Parameter>();
+
+        for ( int i = 0; i < parameters.size(); i++ )
+        {
+            Parameter parameter = parameters.get( i );
+
+            if ( parameter.isRequired() )
+            {
+                // the key for the configuration map we're building.
+                String key = parameter.getName();
+
+                Object fieldValue = null;
+                String expression = null;
+                PlexusConfiguration value = configuration.getChild( key, false );
+                try
+                {
+                    if ( value != null )
+                    {
+                        expression = value.getValue( null );
+
+                        fieldValue = expressionEvaluator.evaluate( expression );
+
+                        if ( fieldValue == null )
+                        {
+                            fieldValue = value.getAttribute( "default-value", null );
+                        }
+                    }
+
+                    if ( ( fieldValue == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
+                    {
+                        value = configuration.getChild( parameter.getAlias(), false );
+                        if ( value != null )
+                        {
+                            expression = value.getValue( null );
+                            fieldValue = expressionEvaluator.evaluate( expression );
+                            if ( fieldValue == null )
+                            {
+                                fieldValue = value.getAttribute( "default-value", null );
+                            }
+                        }
+                    }
+                }
+                catch ( ExpressionEvaluationException e )
+                {
+                    throw new PluginConfigurationException( goal.getPluginDescriptor(), e.getMessage(), e );
+                }
+
+                // only mark as invalid if there are no child nodes
+                if ( ( fieldValue == null ) && ( ( value == null ) || ( value.getChildCount() == 0 ) ) )
+                {
+                    parameter.setExpression( expression );
+                    invalidParameters.add( parameter );
+                }
+            }
+        }
+
+        if ( !invalidParameters.isEmpty() )
+        {
+            throw new PluginParameterException( goal, invalidParameters );
+        }
+    }
+
+    private void validatePomConfiguration( MojoDescriptor goal, PlexusConfiguration pomConfiguration )
+        throws PluginConfigurationException
+    {
+        List<Parameter> parameters = goal.getParameters();
+
+        if ( parameters == null )
+        {
+            return;
+        }
+
+        for ( int i = 0; i < parameters.size(); i++ )
+        {
+            Parameter parameter = parameters.get( i );
+
+            // the key for the configuration map we're building.
+            String key = parameter.getName();
+
+            PlexusConfiguration value = pomConfiguration.getChild( key, false );
+
+            if ( ( value == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
+            {
+                key = parameter.getAlias();
+                value = pomConfiguration.getChild( key, false );
+            }
+
+            if ( value != null )
+            {
+                // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM
+                if ( !parameter.isEditable() )
+                {
+                    StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " );
+                    errorMessage.append( key );
+                    errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
+
+                    throw new PluginConfigurationException( goal.getPluginDescriptor(), errorMessage.toString() );
+                }
+
+                String deprecated = parameter.getDeprecated();
+                if ( StringUtils.isNotEmpty( deprecated ) )
+                {
+                    logger.warn( "DEPRECATED [" + parameter.getName() + "]: " + deprecated );
+                }
+            }
+        }
+    }    
+    
+    */
 }

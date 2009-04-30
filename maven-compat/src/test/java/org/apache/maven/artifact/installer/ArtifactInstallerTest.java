@@ -19,10 +19,10 @@ package org.apache.maven.artifact.installer;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
-
-import java.io.File;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

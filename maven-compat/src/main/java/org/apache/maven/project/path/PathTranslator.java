@@ -19,9 +19,9 @@ package org.apache.maven.project.path;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
-
 import java.io.File;
+
+import org.apache.maven.model.Model;
 
 /**
  * @author Jason van Zyl

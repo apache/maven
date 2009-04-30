@@ -17,6 +17,7 @@ package org.apache.maven;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -79,6 +80,12 @@ public class DefaultMaven
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
+        // Need a general way to inject standard properties
+        if ( request.getStartTime() != null )
+        {
+            request.getProperties().put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
+        }        
+        
         request.setStartTime( new Date() );
         
         MavenExecutionResult result = new DefaultMavenExecutionResult();

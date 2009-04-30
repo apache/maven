@@ -19,6 +19,10 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -28,10 +32,6 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Wraps an active project instance to be able to receive updates from its artifact without affecting the original

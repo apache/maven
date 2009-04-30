@@ -1,5 +1,8 @@
 package org.apache.maven.project;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -7,9 +10,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.IOException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

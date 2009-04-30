@@ -19,7 +19,8 @@ package org.apache.maven.project.harness;
  * under the License.
  */
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.commons.jxpath.JXPathContext;

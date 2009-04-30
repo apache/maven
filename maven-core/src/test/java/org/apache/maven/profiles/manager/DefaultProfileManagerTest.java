@@ -19,6 +19,9 @@ package org.apache.maven.profiles.manager;
  * under the License.
  */
 
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
@@ -26,9 +29,6 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileManager;
 import org.codehaus.plexus.PlexusTestCase;
-
-import java.util.List;
-import java.util.Properties;
 
 public class DefaultProfileManagerTest
     extends PlexusTestCase

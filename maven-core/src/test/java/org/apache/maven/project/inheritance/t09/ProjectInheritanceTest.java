@@ -18,11 +18,11 @@ package org.apache.maven.project.inheritance.t09;
  * specific language governing permissions and limitations
  * under the License.
  */
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-
 import java.io.File;
 import java.util.Map;
+
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 
 /**
  * Verifies exclusions listed in dependencyManagement are valid for

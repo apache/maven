@@ -19,10 +19,10 @@ package org.apache.maven.reactor;
  * under the License.
  */
 
-import org.apache.maven.project.ProjectBuildingException;
-
 import java.io.File;
 import java.io.IOException;
+
+import org.apache.maven.project.ProjectBuildingException;
 
 /**
  * @author Jason van Zyl

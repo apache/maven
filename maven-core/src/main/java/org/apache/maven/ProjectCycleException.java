@@ -1,9 +1,9 @@
 package org.apache.maven;
 
+import java.util.List;
+
 import org.apache.maven.execution.ReactorManager;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-
-import java.util.List;
 
 /**
  * Exception which occurs when creating a new {@link ReactorManager} instance,

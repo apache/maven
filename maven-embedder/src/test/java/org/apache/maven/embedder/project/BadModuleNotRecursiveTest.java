@@ -1,5 +1,10 @@
 package org.apache.maven.embedder.project;
 
+import java.io.File;
+import java.util.Iterator;
+
+import junit.framework.TestCase;
+
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedder;
@@ -7,12 +12,6 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
-
-import java.io.File;
-import java.util.Iterator;
-
-import junit.framework.TestCase;
 
 public class BadModuleNotRecursiveTest
     extends TestCase

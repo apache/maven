@@ -8,11 +8,8 @@ import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
