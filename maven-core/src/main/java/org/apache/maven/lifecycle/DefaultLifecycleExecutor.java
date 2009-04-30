@@ -179,6 +179,7 @@ public class DefaultLifecycleExecutor
             try
             {
                 logger.info( executionDescription( mojoExecution ) );
+                System.out.println( mojoExecution.getConfiguration() );
                 pluginManager.executeMojo( session, mojoExecution );
             }
             catch ( PluginExecutionException e )
@@ -198,7 +199,7 @@ public class DefaultLifecycleExecutor
     {
         PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
         StringBuffer sb = new StringBuffer();
-        sb.append( pd.getArtifactId() + ":" + pd.getVersion() + ":" + me.getMojoDescriptor().getGoal() );
+        sb.append( "Executing " + pd.getArtifactId() + "[" + pd.getVersion() + "]: " + me.getMojoDescriptor().getGoal() );        
         return sb.toString();
     }
     
