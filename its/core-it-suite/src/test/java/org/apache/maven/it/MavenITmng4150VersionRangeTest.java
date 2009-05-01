@@ -31,30 +31,26 @@ import java.util.Collection;
  * @author Brett Porter
  * @version $Id$
  */
-public class MavenITmng0505VersionRangeTest
+public class MavenITmng4150VersionRangeTest
     extends AbstractMavenIntegrationTestCase
 {
-    /**
-     * Oleg 2009.04.30: the same functionality but simpler - no multiple ranges - syntax 
-     * is tested in MNG-4150
-     */
-    public MavenITmng0505VersionRangeTest()
+    public MavenITmng4150VersionRangeTest()
     {
-        super( "(,3.0-alpha-2]" );
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**
      * Test version range support.
      */
-    public void testitMNG505()
+    public void testitMNG4150()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0505" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4150" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng0505" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4150" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
@@ -64,10 +60,10 @@ public class MavenITmng0505VersionRangeTest
 
         Collection artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( 4, artifacts.size() );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:a:jar:1.1" ) );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:b:jar:1.0" ) );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:c:jar:3.8" ) );
-        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0505:d:jar:2.1.1" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4150:a:jar:1.1" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4150:b:jar:1.0" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4150:c:jar:3.8" ) );
+        assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4150:d:jar:2.1.1" ) );
     }
 
 }
