@@ -53,6 +53,8 @@ public class MavenITmng3057VersionExprTransformationsTest
     public void testitMNG3057 ()
         throws Exception
     {
+        requiresJavaVersion( "[1.5,)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3057" );
         
         File remoteRepo = new File( testDir, "target/deployment" );
