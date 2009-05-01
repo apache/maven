@@ -127,7 +127,7 @@ TODO:
           <arg file="bootstrap/target/generated-sources"/> <!-- output directory -->
           <arg value="@{version}"/> <!-- model version -->
           <arg value="false"/> <!-- package with version -->
-          <arg value="false"/> <!-- use Java 5 -->
+          <arg value="true"/> <!-- use Java 5 -->
           <arg value="UTF-8"/> <!-- encoding -->
         </java>
       </sequential>
