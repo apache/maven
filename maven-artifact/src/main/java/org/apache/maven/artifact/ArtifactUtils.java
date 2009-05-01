@@ -86,13 +86,13 @@ public final class ArtifactUtils
             baseVersion;
     }
 
-    public static Map artifactMapByVersionlessId( Collection artifacts )
+    public static Map<String, Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
     {
-        Map artifactMap = new LinkedHashMap();
+        Map<String, Artifact> artifactMap = new LinkedHashMap<String, Artifact>();
 
         if ( artifacts != null )
         {
-            for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+            for ( Iterator<Artifact> it = artifacts.iterator(); it.hasNext(); )
             {
                 Artifact artifact = (Artifact) it.next();
 

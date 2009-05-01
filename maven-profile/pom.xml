@@ -54,6 +54,7 @@ under the License.
           <models>
             <model>src/main/mdo/profiles.mdo</model>
           </models>
+		  <useJava5>true</useJava5>
         </configuration>
       </plugin>
     </plugins>
