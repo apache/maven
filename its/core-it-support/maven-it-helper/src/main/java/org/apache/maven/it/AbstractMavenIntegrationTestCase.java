@@ -61,6 +61,8 @@ public abstract class AbstractMavenIntegrationTestCase
     
     private boolean skip;
 
+    private static ArtifactVersion javaVersion;
+
     private ArtifactVersion mavenVersion;
 
     private VersionRange versionRange;
@@ -99,6 +101,27 @@ public abstract class AbstractMavenIntegrationTestCase
             out.println( "WARNING: " + getITName() + ": version range '" + versionRange
                 + "' supplied but no Maven version - not skipping test." );
         }
+    }
+
+    /**
+     * Gets the Java version used to run this test.
+     * 
+     * @return The Java version, never <code>null</code>.
+     */
+    private ArtifactVersion getJavaVersion()
+    {
+        if ( javaVersion == null )
+        {
+            String version = System.getProperty( "java.version" );
+            version = version.replaceAll( "[_-]", "." );
+            Matcher matcher = Pattern.compile( "(?s).*?(([0-9]+\\.[0-9]+)(\\.[0-9]+)?).*" ).matcher( version );
+            if ( matcher.matches() )
+            {
+                version = matcher.group( 1 );
+            }
+            javaVersion = new DefaultArtifactVersion( version );
+        }
+        return javaVersion;
     }
 
     /**
@@ -177,6 +200,12 @@ public abstract class AbstractMavenIntegrationTestCase
             String result = "OK " + formatTime( milliseconds );
             out.println( pad( RESULT_COLUMN - line.length() ) + result );
         }
+        catch ( UnsupportedJavaVersionException e )
+        {
+            String result = "SKIPPED - Java version " + e.javaVersion + " not in range " + e.supportedRange;
+            out.println( pad( RESULT_COLUMN - line.length() ) + result );
+            return;
+        }
         catch ( UnsupportedMavenVersionException e )
         {
             String result = "SKIPPED - version " + e.mavenVersion + " not in range " + e.supportedRange;
@@ -189,6 +218,33 @@ public abstract class AbstractMavenIntegrationTestCase
             String result = "FAILURE " + formatTime( milliseconds );
             out.println( pad( RESULT_COLUMN - line.length() ) + result );
             throw t;
+        }
+    }
+
+    /**
+     * Guards the execution of a test case by checking that the current Java version matches the specified version
+     * range. If the check fails, an exception will be thrown which aborts the current test and marks it as skipped. One
+     * would usually call this method right at the start of a test method.
+     * 
+     * @param versionRange The version range that specifies the acceptable Java versions for the test, must not be
+     *            <code>null</code>.
+     */
+    protected void requiresJavaVersion( String versionRange )
+    {
+        VersionRange range;
+        try
+        {
+            range = VersionRange.createFromVersionSpec( versionRange );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRange ).initCause( e );
+        }
+
+        ArtifactVersion version = getJavaVersion();
+        if ( !range.containsVersion( version ) )
+        {
+            throw new UnsupportedJavaVersionException( version, range );
         }
     }
 
@@ -225,6 +281,22 @@ public abstract class AbstractMavenIntegrationTestCase
             out.println( "WARNING: " + getITName() + ": version range '" + versionRange
                 + "' supplied but no Maven version found - not skipping test." );
         }
+    }
+
+    private class UnsupportedJavaVersionException
+        extends RuntimeException
+    {
+
+        public ArtifactVersion javaVersion;
+
+        public VersionRange supportedRange;
+
+        public UnsupportedJavaVersionException( ArtifactVersion javaVersion, VersionRange supportedRange )
+        {
+            this.javaVersion = javaVersion;
+            this.supportedRange = supportedRange;
+        }
+
     }
 
     private class UnsupportedMavenVersionException
