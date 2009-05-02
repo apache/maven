@@ -298,7 +298,7 @@ under the License.
   </modules>
 
   <properties>
-    <mavenVersion>2.2.0-RC1</mavenVersion>
+    <mavenVersion>2.2.0-RC2-SNAPSHOT</mavenVersion>
     <wagonVersion>1.0-beta-5</wagonVersion>
     <doxiaVersion>1.1</doxiaVersion>
   </properties>
