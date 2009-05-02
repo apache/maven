@@ -16,7 +16,8 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -115,9 +116,9 @@ under the License.
   </mailingLists>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/branches/maven-2.1.x</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.1.x</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/components/branches/maven-2.1.x</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/branches/maven-2.2.x</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.2.x</developerConnection>
+    <url>http://svn.apache.org/viewvc/maven/components/branches/maven-2.2.x</url>
   </scm>
 
   <build>
