@@ -193,9 +193,6 @@ public class DefaultMavenProjectBuilder
 		
 			Set<Plugin> pl = lifecycle.populateDefaultConfigurationForPlugins(new HashSet<Plugin>(pln), 
 				project, configuration.getLocalRepository());
-			/*
-		
-			*/
 		   		
 			for (Plugin buildPlugin : pl) {
 				Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
@@ -219,15 +216,9 @@ public class DefaultMavenProjectBuilder
 					}
 				}
 
-			}    		
+			}
+			
 			project.getModel().getBuild().setPlugins(new ArrayList<Plugin>(pl));
-			/*
-	 		if(model.getArtifactId() != null &&
-    				model.getArtifactId().equals("maven-model"))
-    			{
-    			System.out.println(new DomainModel(project.getModel()).asString());
-    			} 
-    			*/
 		} 
 		catch (IOException e) 
 		{

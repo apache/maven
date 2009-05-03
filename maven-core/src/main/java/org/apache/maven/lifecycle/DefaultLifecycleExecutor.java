@@ -15,6 +15,7 @@ package org.apache.maven.lifecycle;
  * the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,11 +39,14 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -177,8 +181,9 @@ public class DefaultLifecycleExecutor
         for ( MojoExecution mojoExecution : lifecyclePlan )
         {            
             try
-            {
+            {                
                 logger.info( executionDescription( mojoExecution ) );
+                System.out.println( "!!!");
                 System.out.println( mojoExecution.getConfiguration() );
                 pluginManager.executeMojo( session, mojoExecution );
             }
@@ -194,7 +199,7 @@ public class DefaultLifecycleExecutor
             }
         }         
     }
-
+    
     private String executionDescription( MojoExecution me )
     {
         PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
@@ -330,10 +335,10 @@ public class DefaultLifecycleExecutor
                 //
                 // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
                 //
-                MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, project, session.getLocalRepository() ); 
+                MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, project, session.getLocalRepository() );                                
                 
                 MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-                
+                                
                 String g = mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId();
                 
                 String a = mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId();
@@ -569,6 +574,7 @@ public class DefaultLifecycleExecutor
     public Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository ) 
         throws LifecycleExecutionException
     {
+        //return new Xpp3Dom( "configuration" );
         return convert( getMojoDescriptor( groupId+":"+artifactId+":"+version+":"+goal, project, localRepository ) );
     }
     
@@ -577,10 +583,9 @@ public class DefaultLifecycleExecutor
         return convert( mojoDescriptor );
     }
     
+    
     public Xpp3Dom convert( MojoDescriptor mojoDescriptor  )
-    {
-        Map<String,Parameter> parameters = mojoDescriptor.getParameterMap();
-        
+    {        
         Xpp3Dom dom = new Xpp3Dom( "configuration" );
 
         PlexusConfiguration c = mojoDescriptor.getMojoConfiguration();
@@ -588,14 +593,70 @@ public class DefaultLifecycleExecutor
         PlexusConfiguration[] ces = c.getChildren();
         
         for( PlexusConfiguration ce : ces )
-        {
-            Xpp3Dom e = new Xpp3Dom( ce.getName() );
-            e.setValue( ce.getValue( ce.getAttribute( "default-value", null ) ) );
-            dom.addChild( e );
+        {            
+            if ( ce.getValue( null ) != null )
+            {
+                Xpp3Dom e = new Xpp3Dom( ce.getName() );
+                e.setValue( ce.getValue( null ) );
+                dom.addChild( e );                
+            }
         }
 
         return dom;
     }
+    
+    // assign all values
+    // validate everything is fine
+    private Xpp3Dom processConfiguration( MavenSession session, MojoExecution mojoExecution )
+    {
+        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
+
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+        
+        Map<String,Parameter> parameters = mojoDescriptor.getParameterMap();
+
+        Xpp3Dom configuration = mojoExecution.getConfiguration();
+        
+        for( Xpp3Dom c : configuration.getChildren() )
+        {
+            String configurationName = c.getName();
+            
+            Parameter parameter = parameters.get( configurationName );
+            
+            // Read-only
+            
+            if ( !parameter.isEditable() )
+            {
+                
+            }
+            
+            
+            
+            try
+            {
+                Object value = expressionEvaluator.evaluate( c.getValue() );
+                if ( value == null )
+                {
+                    String e = c.getAttribute( "default-value" );
+                    if ( e != null )
+                    {
+                        System.out.println( ">> " + e );
+                        value = expressionEvaluator.evaluate( e );
+                    }                    
+                }
+                
+                if ( value instanceof String || value instanceof File )
+                c.setValue( value.toString() );
+            }
+            catch ( ExpressionEvaluationException e )
+            {
+                // do nothing
+            }
+        }
+        
+        return mojoExecution.getConfiguration();
+    }
+    
     
     // These are checks that should be available in real time to IDEs
 
