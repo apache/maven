@@ -598,7 +598,12 @@ public class DefaultLifecycleExecutor
             {
                 Xpp3Dom e = new Xpp3Dom( ce.getName() );
                 e.setValue( ce.getValue( null ) );
-                dom.addChild( e );                
+                String defaultValue = ce.getAttribute( "default-value", null );
+                if ( defaultValue != null )
+                {
+                    e.setAttribute( "default-value", defaultValue );
+                }
+                dom.addChild( e );
             }
         }
 
