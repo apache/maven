@@ -213,3 +213,5 @@ foreach configuration element:
 - we need to know what came from the POM, and validate those
 - plugin in any default values
 - check to see if anything is missing
+
+In the case of something like Modello where it is common to specify the configuration for all the goals outside the execution block we need to account for creating the right configuration element which includes only those configuration elements for a particular goal that that particular goal understands. We need to walk through the parameters of the Mojo in question and only take the configuration options that apply.
