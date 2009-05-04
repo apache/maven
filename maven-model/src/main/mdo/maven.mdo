@@ -2160,12 +2160,12 @@
     
     public boolean isFiltering()
     {
-        return filteringValue != null ? (new Boolean(filteringValue)).booleanValue() : false;
+        return ( filteringValue != null ) ? Boolean.parseBoolean( filteringValue ) : false;
     }
 
     public void setFiltering( boolean filtering )
     {
-        filteringValue = String.valueOf(filtering);
+        filteringValue = String.valueOf( filtering );
     }  
     
     /**
@@ -2496,12 +2496,12 @@
 
     public boolean isEnabled()
     {
-        return enabledValue != null ? (new Boolean(enabledValue)).booleanValue() : false;
+        return ( enabledValue != null ) ? Boolean.parseBoolean( enabledValue ) : true;
     }
 
     public void setEnabled( boolean enabled )
     {
-        enabledValue = String.valueOf(enabled);
+        enabledValue = String.valueOf( enabled );
     }
 
             ]]>
