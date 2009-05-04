@@ -317,7 +317,11 @@ public class LegacyRepositorySystem
     {
         try
         {
-            return createRepository( localRepository.toURI().toURL().toString(), RepositorySystem.DEFAULT_LOCAL_REPO_ID );
+            return createRepository( localRepository.toURI().toURL().toString(),
+                                     RepositorySystem.DEFAULT_LOCAL_REPO_ID, true,
+                                     ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
+                                     ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                     ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
         }
         catch ( MalformedURLException e )
         {
@@ -328,13 +332,19 @@ public class LegacyRepositorySystem
     public ArtifactRepository createDefaultRemoteRepository()
         throws InvalidRepositoryException
     {
-        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID );
+        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+                                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER, false,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
+                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
     
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException
     {
-        return createRepository( canonicalFileUrl( url ), repositoryId );
+        return createRepository( canonicalFileUrl( url ), repositoryId, true,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
     }
 
     private String canonicalFileUrl( String url )
@@ -366,22 +376,18 @@ public class LegacyRepositorySystem
         return url;
     }
 
-    private ArtifactRepository createRepository( String url, String repositoryId )
+    private ArtifactRepository createRepository( String url, String repositoryId, boolean releases,
+                                                 String releaseUpdates, boolean snapshots, String snapshotUpdates,
+                                                 String checksumPolicy )
     {
-        // snapshots vs releases
-        // offline = to turning the update policy off
+        ArtifactRepositoryPolicy snapshotsPolicy =
+            new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
 
-        //TODO: we'll need to allow finer grained creation of repositories but this will do for now
+        ArtifactRepositoryPolicy releasesPolicy =
+            new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
 
-        String updatePolicyFlag = ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS;
-
-        String checksumPolicyFlag = ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
-
-        ArtifactRepositoryPolicy snapshotsPolicy = new ArtifactRepositoryPolicy( true, updatePolicyFlag, checksumPolicyFlag );
-
-        ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy( true, updatePolicyFlag, checksumPolicyFlag );
-
-        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
+        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout,
+                                                                   snapshotsPolicy, releasesPolicy );
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )

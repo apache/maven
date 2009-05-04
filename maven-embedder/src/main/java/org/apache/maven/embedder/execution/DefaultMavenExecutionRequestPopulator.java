@@ -210,7 +210,7 @@ public class DefaultMavenExecutionRequestPopulator
             }
         }
 
-        if ( !definedRepositories.contains( "central" ) )
+        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
         {            
             try
             {
