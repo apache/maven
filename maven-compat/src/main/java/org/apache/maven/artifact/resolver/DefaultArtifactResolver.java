@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -424,8 +426,32 @@ public class DefaultArtifactResolver
         if ( request.isResolveTransitively() )
         {
             try
-            {                
-                artifacts = source.retrieve( rootArtifact, localRepository, remoteRepositories ).getArtifacts();
+            {
+                Set<Artifact> directArtifacts =
+                    source.retrieve( rootArtifact, localRepository, remoteRepositories ).getArtifacts();
+
+                if ( artifacts == null || artifacts.isEmpty() )
+                {
+                    artifacts = directArtifacts;
+                }
+                else
+                {
+                    List<Artifact> allArtifacts = new ArrayList<Artifact>();
+                    allArtifacts.addAll( artifacts );
+                    allArtifacts.addAll( directArtifacts );
+
+                    Map<String, Artifact> mergedArtifacts = new LinkedHashMap<String, Artifact>();
+                    for ( Artifact artifact : allArtifacts )
+                    {
+                        String conflictId = artifact.getDependencyConflictId();
+                        if ( !mergedArtifacts.containsKey( conflictId ) )
+                        {
+                            mergedArtifacts.put( conflictId, artifact );
+                        }
+                    }
+
+                    artifacts = new LinkedHashSet<Artifact>( mergedArtifacts.values() );
+                }
             }
             catch ( ArtifactMetadataRetrievalException e )
             {

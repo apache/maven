@@ -468,15 +468,15 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( message );
         }
 
-        if ( plugin.getVersion() == null )
+        for ( Plugin buildPlugin : project.getBuildPlugins() )
         {
-            for ( Plugin buildPlugin : project.getBuildPlugins() )
+            if ( buildPlugin.getKey().equals( plugin.getKey() ) )
             {
-                if ( buildPlugin.getKey().equals( plugin.getKey() ) )
+                if ( plugin.getVersion() == null || plugin.getVersion().equals( buildPlugin.getVersion() ) )
                 {
                     plugin = buildPlugin;
-                    break;
                 }
+                break;
             }
         }
 
