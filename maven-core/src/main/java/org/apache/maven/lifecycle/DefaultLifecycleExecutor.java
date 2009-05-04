@@ -18,10 +18,10 @@ package org.apache.maven.lifecycle;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -508,7 +508,7 @@ public class DefaultLifecycleExecutor
     //
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
-        Set<Plugin> plugins = new LinkedHashSet<Plugin>();
+        Map<Plugin, Plugin> plugins = new LinkedHashMap<Plugin, Plugin>();
         
         for ( Lifecycle lifecycle : lifecycles )
         {
@@ -524,23 +524,35 @@ public class DefaultLifecycleExecutor
                 //
                 // org.apache.maven.plugins:maven-compiler-plugin:compile
                 //
-                for ( String s : lifecyclePhasesForPackaging.values() )
-                {
-                    plugins.add( populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( s ) );
-                }
+                parseLifecyclePhaseDefinitions( plugins, lifecyclePhasesForPackaging.values() );
             }
             else if ( lifecycle.getDefaultPhases() != null )
             {
-                for ( String s : lifecycle.getDefaultPhases() )
-                {
-                    plugins.add( populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( s ) );
-                }                
+                parseLifecyclePhaseDefinitions( plugins, lifecycle.getDefaultPhases() );
             }        
         }
 
-        return plugins;
+        return plugins.keySet();
     }        
-    
+
+    private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins,
+                                                 Collection<String> lifecyclePhaseDefinitions )
+    {
+        for ( String lifecyclePhaseDefinition : lifecyclePhaseDefinitions )
+        {
+            Plugin plugin = populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( lifecyclePhaseDefinition );
+            Plugin existing = plugins.get( plugin );
+            if ( existing != null )
+            {
+                existing.getExecutions().addAll( plugin.getExecutions() );
+            }
+            else
+            {
+                plugins.put( plugin, plugin );
+            }
+        }
+    }
+
     private Plugin populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( String lifecyclePhaseDefinition )
     {
         String[] p = StringUtils.split( lifecyclePhaseDefinition, ":" );
@@ -548,8 +560,10 @@ public class DefaultLifecycleExecutor
         plugin.setGroupId( p[0] );
         plugin.setArtifactId( p[1] );
         PluginExecution execution = new PluginExecution();
-        execution.setGoals( Arrays.asList( new String[]{ p[2] } ) );
-        plugin.setExecutions( Arrays.asList( new PluginExecution[]{ execution } ) );
+        // FIXME: Find a better execution id
+        execution.setId( "default-" + p[2] );
+        execution.setGoals( new ArrayList<String>( Arrays.asList( new String[] { p[2] } ) ) );
+        plugin.setExecutions( new ArrayList<PluginExecution>( Arrays.asList( new PluginExecution[] { execution } ) ) );
         return plugin;
     }
     
@@ -563,7 +577,7 @@ public class DefaultLifecycleExecutor
                 for( String g : e.getGoals() )
                 {
                     Xpp3Dom dom = getDefaultPluginConfiguration( p.getGroupId(), p.getArtifactId(), p.getVersion(), g, project, localRepository );
-                    e.setConfiguration( dom );
+                    e.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) e.getConfiguration(), dom, Boolean.TRUE ) );
                 }
             }
         }
@@ -594,11 +608,11 @@ public class DefaultLifecycleExecutor
         
         for( PlexusConfiguration ce : ces )
         {            
-            if ( ce.getValue( null ) != null )
+            String defaultValue = ce.getAttribute( "default-value", null );
+            if ( ce.getValue( null ) != null || defaultValue != null )
             {
                 Xpp3Dom e = new Xpp3Dom( ce.getName() );
                 e.setValue( ce.getValue( null ) );
-                String defaultValue = ce.getAttribute( "default-value", null );
                 if ( defaultValue != null )
                 {
                     e.setAttribute( "default-value", defaultValue );

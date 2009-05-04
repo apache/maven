@@ -191,7 +191,7 @@ public class DefaultMavenProjectBuilder
 				pln.add(copy);
 			}
 		
-			// Merge the various sources for mojo configuration:
+            // Merge the various sources for mojo configuration:
             // 1. default values from mojo descriptor
             // 2. POM values from per-plugin configuration
             // 3. POM values from per-execution configuration
@@ -280,7 +280,7 @@ public class DefaultMavenProjectBuilder
     	return null;
     }
     
-    public static void addPluginsToModel(Model target, Set<Plugin> plugins)
+    public static void addPluginsToModel( Model target, Set<Plugin> plugins )
     {
     	List<Plugin> mngPlugins = (target.getBuild().getPluginManagement() != null)
     		? target.getBuild().getPluginManagement().getPlugins() : new ArrayList<Plugin>();
@@ -300,14 +300,19 @@ public class DefaultMavenProjectBuilder
     		}
     		
     		Plugin pomPlugin = containsPlugin( p, pomPlugins);
-    		if( pomPlugin == null)
-    		{
-    			lifecyclePlugins.add(p);
-    		}
-    		else if(p.getConfiguration() != null)
-    		{
-    			System.out.println(Xpp3Dom.mergeXpp3Dom((Xpp3Dom) p.getConfiguration(), (Xpp3Dom) pomPlugin.getConfiguration()));
-    		}
+    		if ( pomPlugin == null )
+            {
+                lifecyclePlugins.add( p );
+            }
+            else
+            {
+                PluginProcessor.copy2( p, pomPlugin, true );
+                if ( p.getConfiguration() != null )
+                {
+                    System.out.println( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) p.getConfiguration(),
+                                                              (Xpp3Dom) pomPlugin.getConfiguration() ) );
+                }
+            }
     	}
     	pomPlugins.addAll(lifecyclePlugins);
     	target.getBuild().setPlugins(pomPlugins);
