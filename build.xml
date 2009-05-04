@@ -200,6 +200,7 @@ END SNIPPET: ant-bootstrap -->
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
+      <arg value="-Dmaven.test.skip=true"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
       <arg value="-Dsurefire.useFile=${surefire.useFile}"/>
     </java>

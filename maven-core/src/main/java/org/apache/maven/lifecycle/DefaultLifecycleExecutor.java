@@ -183,6 +183,7 @@ public class DefaultLifecycleExecutor
             try
             {                
                 logger.info( executionDescription( mojoExecution ) );
+                mojoExecution.getMojoDescriptor().getRealm().display();
 //                System.out.println( "!!!");
 //                System.out.println( mojoExecution.getConfiguration() );
                 pluginManager.executeMojo( session, mojoExecution );
