@@ -349,9 +349,14 @@ public class DefaultLifecycleExecutor
                 {
                     for( String goal : e.getGoals() )
                     {
-                        if( mojoDescriptor.getGoal().equals( goal ) )
+                        if ( mojoDescriptor.getGoal().equals( goal ) )
                         {
-                            mojoExecution.setConfiguration( (Xpp3Dom) e.getConfiguration() );
+                            Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
+
+                            Xpp3Dom mojoConfiguration =
+                                extractMojoConfiguration( executionConfiguration, mojoDescriptor );
+
+                            mojoExecution.setConfiguration( mojoConfiguration );
                         }
                     }
                 }
@@ -362,7 +367,36 @@ public class DefaultLifecycleExecutor
                 
         return lifecyclePlan;
     }  
-           
+
+    /**
+     * Extracts the configuration for a single mojo from the specified execution configuration by discarding any
+     * non-applicable parameters. This is necessary because a plugin execution can have multiple goals with different
+     * parametes whose default configurations are all aggregated into the execution configuration. However, the
+     * underlying configurator will error out when trying to configure a mojo parameter that is specified in the
+     * configuration but not present in the mojo instance.
+     * 
+     * @param executionConfiguration The configuration from the plugin execution, must not be {@code null}.
+     * @param mojoDescriptor The descriptor for the mojo being configured, must not be {@code null}.
+     * @return The configuration for the mojo, never {@code null}.
+     */
+    private Xpp3Dom extractMojoConfiguration( Xpp3Dom executionConfiguration, MojoDescriptor mojoDescriptor )
+    {
+        Xpp3Dom mojoConfiguration = new Xpp3Dom( executionConfiguration );
+
+        Collection<String> mojoParameters = mojoDescriptor.getParameterMap().keySet();
+
+        for ( int i = mojoConfiguration.getChildCount() - 1; i >= 0; i-- )
+        {
+            String mojoParameter = mojoConfiguration.getChild( i ).getName();
+            if ( !mojoParameters.contains( mojoParameter ) )
+            {
+                mojoConfiguration.removeChild( i );
+            }
+        }
+
+        return mojoConfiguration;
+    }
+
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenProject project, ArtifactRepository localRepository )
     //MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository )
@@ -490,7 +524,7 @@ public class DefaultLifecycleExecutor
         {
             if ( lifecycle.getId().equals( "default" ) )
             {
-                return (List<String>) lifecycle.getPhases();
+                return lifecycle.getPhases();
             }
         }
 
