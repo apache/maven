@@ -183,8 +183,8 @@ public class DefaultLifecycleExecutor
             try
             {                
                 logger.info( executionDescription( mojoExecution ) );
-                System.out.println( "!!!");
-                System.out.println( mojoExecution.getConfiguration() );
+//                System.out.println( "!!!");
+//                System.out.println( mojoExecution.getConfiguration() );
                 pluginManager.executeMojo( session, mojoExecution );
             }
             catch ( PluginExecutionException e )
