@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,11 +21,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.Model;
@@ -32,7 +28,12 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.pull.MXParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @Component(role = Interpolator.class)
 public class DefaultInterpolator
@@ -580,9 +581,6 @@ public class DefaultInterpolator
         }
 
         List<ModelProperty> modelProperties = new ArrayList<ModelProperty>();
-        XMLInputFactory xmlInputFactory = new com.ctc.wstx.stax.WstxInputFactory();
-        xmlInputFactory.setProperty( XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE );
-        xmlInputFactory.setProperty( XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE );
 
         Uri uri = new Uri( baseUri );
         String tagName = baseUri;
@@ -590,29 +588,28 @@ public class DefaultInterpolator
 
         int depth = 0;
         int depthOfTagValue = depth;
-        XMLStreamReader xmlStreamReader = null;
+        Reader reader = null;
         try
         {
-            xmlStreamReader = xmlInputFactory.createXMLStreamReader( inputStream );
+            reader = ReaderFactory.newXmlReader( inputStream );
+
+            XmlPullParser parser = new MXParser();
+            parser.setInput( reader );
 
             Map<String, String> attributes = new HashMap<String, String>();
-            for ( ;; xmlStreamReader.next() )
+            for ( int type = parser.getEventType();; type = parser.next() )
             {
-                int type = xmlStreamReader.getEventType();
                 switch ( type )
                 {
-
-                    case XMLStreamConstants.CDATA:
-                    case XMLStreamConstants.CHARACTERS:
+                    case XmlPullParser.TEXT:
                     {
                         if ( depth == depthOfTagValue )
                         {
-                            tagValue.append( xmlStreamReader.getTextCharacters(), xmlStreamReader.getTextStart(), xmlStreamReader.getTextLength() );
+                            tagValue.append( parser.getText() );
                         }
                         break;
                     }
-
-                    case XMLStreamConstants.START_ELEMENT:
+                    case XmlPullParser.START_TAG:
                     {
                         if ( !tagName.equals( baseUri ) )
                         {
@@ -633,39 +630,38 @@ public class DefaultInterpolator
                         }
 
                         depth++;
-                        tagName = uri.getUriFor( xmlStreamReader.getName().getLocalPart(), depth );
+                        tagName = uri.getUriFor( parser.getName(), depth );
                         if ( collections.contains( tagName + "#collection" ) )
                         {
                             tagName = tagName + "#collection";
-                            uri.addTag( xmlStreamReader.getName().getLocalPart() + "#collection" );
+                            uri.addTag( parser.getName() + "#collection" );
                         }
                         else if ( collections.contains( tagName + "#set" ) )
                         {
                             tagName = tagName + "#set";
-                            uri.addTag( xmlStreamReader.getName().getLocalPart() + "#set" );
+                            uri.addTag( parser.getName() + "#set" );
                         }
                         else
                         {
-                            uri.addTag( xmlStreamReader.getName().getLocalPart() );
+                            uri.addTag( parser.getName() );
                         }
                         tagValue.setLength( 0 );
                         depthOfTagValue = depth;
-                    }
-                    case XMLStreamConstants.ATTRIBUTE:
-                    {
-                        for ( int i = 0; i < xmlStreamReader.getAttributeCount(); i++ )
+
+                        for ( int i = 0; i < parser.getAttributeCount(); i++ )
                         {
 
-                            attributes.put( tagName + "#property/" + xmlStreamReader.getAttributeName( i ).getLocalPart(), xmlStreamReader.getAttributeValue( i ) );
+                            attributes.put( tagName + "#property/" + parser.getAttributeName( i ),
+                                            parser.getAttributeValue( i ) );
                         }
                         break;
                     }
-                    case XMLStreamConstants.END_ELEMENT:
+                    case XmlPullParser.END_TAG:
                     {
                         depth--;
                         break;
                     }
-                    case XMLStreamConstants.END_DOCUMENT:
+                    case XmlPullParser.END_DOCUMENT:
                     {
                         modelProperties.add( new ModelProperty( tagName, tagValue.toString().trim() ) );
                         if ( !attributes.isEmpty() )
@@ -674,38 +670,20 @@ public class DefaultInterpolator
                             {
                                 modelProperties.add( new ModelProperty( e.getKey(), e.getValue() ) );
                             }
-                            attributes.clear();
                         }
                         return modelProperties;
                     }
                 }
+
             }
         }
-        catch ( XMLStreamException e )
+        catch ( XmlPullParserException e )
         {
-            throw new IOException( ":" + e.toString() );
+            throw (IOException) new IOException( "Failed to parser POM:" + e.toString() ).initCause( e );
         }
         finally
         {
-            if ( xmlStreamReader != null )
-            {
-                try
-                {
-                    xmlStreamReader.close();
-                }
-                catch ( XMLStreamException e )
-                {
-                    e.printStackTrace();
-                }
-            }
-            try
-            {
-                inputStream.close();
-            }
-            catch ( IOException e )
-            {
-
-            }
+            IOUtil.close( reader );
         }
     }
 
