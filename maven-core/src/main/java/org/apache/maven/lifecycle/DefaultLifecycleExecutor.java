@@ -202,7 +202,7 @@ public class DefaultLifecycleExecutor
                 logger.info( executionDescription( mojoExecution, project ) );
 //                mojoExecution.getMojoDescriptor().getRealm().display();
 //                System.out.println( "!!!");
-                System.out.println( mojoExecution.getConfiguration() );
+//                System.out.println( mojoExecution.getConfiguration() );
                 pluginManager.executeMojo( session, mojoExecution );
             }
             catch ( PluginExecutionException e )
@@ -278,9 +278,12 @@ public class DefaultLifecycleExecutor
         // Create an ordered Map of the phases in the lifecycle to a list of mojos to execute.
         Map<String,List<String>> phaseToMojoMapping = new LinkedHashMap<String,List<String>>();
         
-        // 4. 
+        // 4.
+        
+        //TODO: need to separate the lifecycles
+        
         for ( String phase : lifecycle.getPhases() )
-        {   
+        {               
             List<String> mojos = new ArrayList<String>(); 
             
             // Bind the mojos in the lifecycle mapping for the packaging to the lifecycle itself. If
@@ -293,19 +296,12 @@ public class DefaultLifecycleExecutor
                 mojos.add( mojo );
             }
             
-            phaseToMojoMapping.put( phase, mojos );    
-            
-            // We only want to execute up to and including the specified lifecycle phase.
-            if ( phase.equals( lifecyclePhase ) )
-            {
-                break;
-            }
+            phaseToMojoMapping.put( phase, mojos );                
         }
-              
-        // 5. 
+         
+        // 5. Just build up the list of mojos that will execute for every phase.
         //
-        // We are only interested in the phases that correspond to the lifecycle we are trying to run. If we are running the "clean"
-        // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
+        // This will be useful for having the complete build plan and then we can filter/optimize later.
         //
         for( Plugin plugin : project.getBuild().getPlugins() )
         {            
@@ -313,12 +309,23 @@ public class DefaultLifecycleExecutor
             {
                 // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
                 // to examine the phase it is associated to.                
-                if ( execution.getPhase() != null && execution.getPhase().equals( lifecyclePhase ) )
+                if ( execution.getPhase() != null )
                 {
                     for( String goal : execution.getGoals() )
                     {
                         String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
-                        phaseToMojoMapping.get( execution.getPhase() ).add( s );
+
+                        if ( phaseToMojoMapping.get( execution.getPhase() ) == null )
+                        {
+                            // This is happening because executions in the POM are getting mixed into the clean lifecycle
+                            // So for the lifecycle mapping we need a map with the phases as keys so we can easily check
+                            // if this phase belongs to the given lifecycle. this shows the system is messed up. this
+                            // shouldn't happen.
+                            System.out.println( execution.getPhase() + "?????????????");
+                            phaseToMojoMapping.put( execution.getPhase(), new ArrayList<String>() );
+                        }
+                        
+                        phaseToMojoMapping.get( execution.getPhase() ).add( s );                        
                     }                    
                 }                
                 // if not then i need to grab the mojo descriptor and look at
@@ -330,58 +337,78 @@ public class DefaultLifecycleExecutor
                         String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
                         MojoDescriptor md = getMojoDescriptor( s, session.getCurrentProject(), session.getLocalRepository() );
                                                 
-                        // need to know if this plugin belongs to a phase in the lifecycle that's running
                         if ( md.getPhase() != null && phaseToMojoMapping.get( md.getPhase() ) != null )
                         {
                             phaseToMojoMapping.get( md.getPhase() ).add( s );
                         }
-                        
-                        //TODO Here we need to break when we have reached the desired phase.
                     }
                 }
             }
         }
-               
-        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>(); 
-                        
-        // We need to turn this into a set of MojoExecutions
-        for( List<String> mojos : phaseToMojoMapping.values() )
+
+        // 6. 
+        //
+        // We are only interested in the phases that correspond to the lifecycle we are trying to run. If we are running the "clean"
+        // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
+        //        
+        
+        // We only want to execute up to and including the specified lifecycle phase.
+        // if ( phase.equals( lifecyclePhase ) )
+        //{
+        //    break;
+        //}
+        
+        List<String> phasesWithMojosToExecute = new ArrayList<String>();
+        
+        for( String phase : phaseToMojoMapping.keySet() )
         {
-            for( String mojo : mojos )
+            phasesWithMojosToExecute.addAll( phaseToMojoMapping.get( phase ) );
+            
+            if ( phase.equals( lifecyclePhase ) )
             {
-                // These are bits that look like this:
-                //
-                // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
-                //
-                MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, project, session.getLocalRepository() );                                
-                
-                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-                                
-                String g = mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId();
-                
-                String a = mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId();
-                
-                Plugin p = project.getPlugin( g + ":" + a );
-                
-                for( PluginExecution e : p.getExecutions() )
+                break;
+            }
+        }        
+        
+        
+        // 7. Now we create the correct configuration for the mojo to execute.
+        //TODO: this needs to go to the model builder.
+        
+        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
+
+        for ( String mojo : phasesWithMojosToExecute )
+        {
+            // These are bits that look like this:
+            //
+            // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
+            //
+            MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, project, session.getLocalRepository() );
+
+            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+
+            String g = mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId();
+
+            String a = mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId();
+
+            Plugin p = project.getPlugin( g + ":" + a );
+
+            for ( PluginExecution e : p.getExecutions() )
+            {
+                for ( String goal : e.getGoals() )
                 {
-                    for( String goal : e.getGoals() )
+                    if ( mojoDescriptor.getGoal().equals( goal ) )
                     {
-                        if ( mojoDescriptor.getGoal().equals( goal ) )
-                        {
-                            Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
+                        Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
 
-                            Xpp3Dom mojoConfiguration =
-                                extractMojoConfiguration( executionConfiguration, mojoDescriptor );
+                        Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoDescriptor );
 
-                            mojoExecution.setConfiguration( mojoConfiguration );
-                        }
+                        mojoExecution.setConfiguration( mojoConfiguration );
                     }
                 }
-                
-                lifecyclePlan.add( mojoExecution );
             }
-        }  
+
+            lifecyclePlan.add( mojoExecution );
+        }
                 
         return lifecyclePlan;
     }  
