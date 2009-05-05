@@ -65,6 +65,7 @@ END SNIPPET: ant-bootstrap -->
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
     <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
     <property name="maven.debug" value="-e"/>
+    <property name="maven.test.skip" value="true"/> <!-- TODO: Change this default back to false once we're done -->
     <property name="surefire.useFile" value="true"/>
     <echo>maven.home = ${maven.home.effective}</echo>
     <echo>maven.repo.local = ${maven.repo.local}</echo>
@@ -200,7 +201,7 @@ END SNIPPET: ant-bootstrap -->
       <arg value="-B"/>
       <arg value="clean"/>
       <arg value="install"/>
-      <arg value="-Dmaven.test.skip=true"/>
+      <arg value="-Dmaven.test.skip=${maven.test.skip}"/>
       <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
       <arg value="-Dsurefire.useFile=${surefire.useFile}"/>
     </java>
