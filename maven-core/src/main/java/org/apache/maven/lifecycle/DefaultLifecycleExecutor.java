@@ -182,10 +182,10 @@ public class DefaultLifecycleExecutor
         {            
             try
             {                
-                logger.info( executionDescription( mojoExecution ) );
-                mojoExecution.getMojoDescriptor().getRealm().display();
+                logger.info( executionDescription( mojoExecution, project ) );
+//                mojoExecution.getMojoDescriptor().getRealm().display();
 //                System.out.println( "!!!");
-//                System.out.println( mojoExecution.getConfiguration() );
+                System.out.println( mojoExecution.getConfiguration() );
                 pluginManager.executeMojo( session, mojoExecution );
             }
             catch ( PluginExecutionException e )
@@ -201,11 +201,11 @@ public class DefaultLifecycleExecutor
         }         
     }
     
-    private String executionDescription( MojoExecution me )
+    private String executionDescription( MojoExecution me, MavenProject project )
     {
         PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
         StringBuffer sb = new StringBuffer();
-        sb.append( "Executing " + pd.getArtifactId() + "[" + pd.getVersion() + "]: " + me.getMojoDescriptor().getGoal() );        
+        sb.append( "Executing " + pd.getArtifactId() + "[" + pd.getVersion() + "]: " + me.getMojoDescriptor().getGoal() + " on " + project.getArtifactId() );        
         return sb.toString();
     }
     

@@ -67,7 +67,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "plexus-component-api" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-interactivity-api" );
-        artifacts.add( "plexus-interpolation" );        
+        //artifacts.add( "plexus-interpolation" );        
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
