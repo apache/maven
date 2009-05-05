@@ -93,9 +93,14 @@ public class PomConstructionWithSettingsTest
         }	    
 	    
 	    ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
-	    config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
+
+        String localRepoUrl =
+            System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
+        localRepoUrl = "file://" + localRepoUrl;
+        config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
 	
 	    config.setGlobalProfileManager(profileManager);
+
 	    return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
 	}  
     

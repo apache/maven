@@ -61,6 +61,12 @@ public abstract class AbstractMavenProjectTestCase
         return projectBuilder;
     }
 
+    @Override
+    protected String getCustomConfigurationName()
+    {
+        return AbstractMavenProjectTestCase.class.getName().replace( '.', '/' ) + ".xml";
+    }
+
     // ----------------------------------------------------------------------
     // Local repository
     // ----------------------------------------------------------------------

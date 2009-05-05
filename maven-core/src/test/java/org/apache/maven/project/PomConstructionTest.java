@@ -1435,13 +1435,6 @@ public class PomConstructionTest
 	    PomTestWrapper pom = buildPom( "dependency-management-with-interpolation/sub" );
 	}   
 
-    public void testMaven()
-	    throws Exception
-	{
-	    PomTestWrapper pom = buildPom( "maven/sub" );
-	    System.out.println(pom.getDomainModel().asString());
-	}       
-    
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
@@ -1454,40 +1447,41 @@ public class PomConstructionTest
         assertEquals( new File( value.toString() ).getPath(), value.toString() );
     }
     
-    private PomTestWrapper buildPom( String pomPath, Properties properties)
-	    throws Exception
-	{
-	    File pomFile = new File( testDirectory , pomPath );
-	    if ( pomFile.isDirectory() )
-	    {
-	        pomFile = new File( pomFile, "pom.xml" );
-	    }
-	    ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
-	    config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
-	    ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
-	
-	    config.setExecutionProperties(properties);
-	    config.setGlobalProfileManager(new DefaultProfileManager(pCtx));
-	    return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
-	}
-    
     private PomTestWrapper buildPom( String pomPath, String... profileIds )
         throws Exception
     {
-        File pomFile = new File( testDirectory , pomPath );
+        return buildPom( pomPath, null, profileIds );
+    }
+
+    private PomTestWrapper buildPom( String pomPath, Properties executionProperties, String... profileIds )
+        throws Exception
+    {
+        File pomFile = new File( testDirectory, pomPath );
         if ( pomFile.isDirectory() )
         {
             pomFile = new File( pomFile, "pom.xml" );
         }
+
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
-        config.setLocalRepository(new DefaultArtifactRepository("default", "", new DefaultRepositoryLayout()));
-        ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
+
+        String localRepoUrl =
+            System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
+        localRepoUrl = "file://" + localRepoUrl;
+        config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
+
+        ProfileActivationContext pCtx = new ProfileActivationContext( null, true );
         if ( profileIds != null )
         {
             pCtx.setExplicitlyActiveProfileIds( Arrays.asList( profileIds ) );
         }
 
-        config.setGlobalProfileManager(new DefaultProfileManager(pCtx));
+        if ( executionProperties != null )
+        {
+            config.setExecutionProperties( executionProperties );
+        }
+
+        config.setGlobalProfileManager( new DefaultProfileManager( pCtx ) );
+
         return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
     }
 
