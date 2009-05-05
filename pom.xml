@@ -46,7 +46,7 @@ under the License.
   <inceptionYear>2001</inceptionYear>
 
   <properties>
-    <classWorldsVersion>1.3</classWorldsVersion>
+    <classWorldsVersion>1.5-SNAPSHOT</classWorldsVersion>
     <commonsCliVersion>1.0</commonsCliVersion>
     <!--
 
