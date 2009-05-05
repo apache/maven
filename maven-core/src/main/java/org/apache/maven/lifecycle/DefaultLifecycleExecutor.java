@@ -177,7 +177,24 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, MojoFailureException
     {
         List<MojoExecution> lifecyclePlan = calculateLifecyclePlan( task, session );        
-        
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "=== BUILD PLAN ===" );
+            logger.debug( "Project:       " + project );
+            for ( MojoExecution mojoExecution : lifecyclePlan )
+            {
+                MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+                PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+                logger.debug( "------------------" );
+                logger.debug( "Goal:          " + pluginDescriptor.getGroupId() + ':' + pluginDescriptor.getArtifactId() + ':'
+                    + pluginDescriptor.getVersion() + ':' + mojoDescriptor.getGoal() + ':'
+                    + mojoExecution.getExecutionId() );
+                logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
+            }
+            logger.debug( "==================" );
+        }
+
         for ( MojoExecution mojoExecution : lifecyclePlan )
         {            
             try
