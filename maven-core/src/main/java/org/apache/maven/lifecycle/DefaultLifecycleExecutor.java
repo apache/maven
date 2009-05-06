@@ -29,7 +29,6 @@ import java.util.StringTokenizer;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -89,9 +88,7 @@ public class DefaultLifecycleExecutor
     public void execute( MavenSession session )
         throws LifecycleExecutionException, MojoFailureException
     {
-        // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
-        // within the same reactor (using an inclusion pattern to gather them up)...
-        MavenProject rootProject = session.getReactorManager().getTopLevelProject();
+        MavenProject rootProject = session.getTopLevelProject();
 
         List<String> goals = session.getGoals();
 
@@ -112,28 +109,23 @@ public class DefaultLifecycleExecutor
         
         for ( MavenProject currentProject : session.getSortedProjects() )
         {
-            if ( !session.getReactorManager().isBlackListed( currentProject ) )
+            logger.info( "Building " + currentProject.getName() );
+
+            long buildStartTime = System.currentTimeMillis();
+
+            try
             {
-                logger.info( "Building " + currentProject.getName() );
+                session.setCurrentProject( currentProject );
 
-                long buildStartTime = System.currentTimeMillis();
-
-                try
+                for ( String goal : goals )
                 {
-                    session.setCurrentProject( currentProject );
-
-                    for ( String goal : goals )
-                    {
-                        String target = currentProject.getId() + " ( " + goal + " )";
-                        executeGoalAndHandleFailures( goal, session, currentProject, buildStartTime, target );
-                    }
+                    String target = currentProject.getId() + " ( " + goal + " )";
+                    executeGoalAndHandleFailures( goal, session, currentProject, buildStartTime, target );
                 }
-                finally
-                {
-                    session.setCurrentProject( null );
-                }
-
-                session.getReactorManager().registerBuildSuccess( currentProject, System.currentTimeMillis() - buildStartTime );
+            }
+            finally
+            {
+                session.setCurrentProject( null );
             }
         }        
     }
@@ -147,30 +139,9 @@ public class DefaultLifecycleExecutor
         }
         catch ( LifecycleExecutionException e )
         {
-            if ( handleExecutionFailure( session, project, e, task, buildStartTime ) )
-            {
-                throw e;
-            }
+            //TODO: Look at the reactor manager failure behavior
+            throw e;
         }
-    }
-
-    private boolean handleExecutionFailure( MavenSession session, MavenProject project, Exception e, String task, long buildStartTime )
-    {
-        //TODO: we shouldn't be registering build failures with the reactor manager, it should be in the session.
-        ReactorManager rm = session.getReactorManager();
-        
-        rm.registerBuildFailure( project, e, task, System.currentTimeMillis() - buildStartTime );
-
-        if ( ReactorManager.FAIL_FAST.equals( rm.getFailureBehavior() ) )
-        {
-            return true;
-        }
-        else if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) )
-        {
-            rm.blackList( project );
-        }
-        // if NEVER, don't blacklist
-        return false;
     }
     
     private void executeGoal( String task, MavenSession session, MavenProject project )

@@ -1,4 +1,4 @@
-package org.apache.maven.reactor;
+package org.apache.maven;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

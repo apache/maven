@@ -37,9 +37,7 @@ public class DefaultMavenExecutionResult
 
     private ArtifactResolutionResult artifactResolutionResult;
 
-    private List exceptions;
-
-    private ReactorManager reactorManager;
+    private List<Throwable> exceptions;
 
     private ExceptionSummary exceptionSummary;
     
@@ -55,7 +53,7 @@ public class DefaultMavenExecutionResult
         return project;
     }
 
-    public MavenExecutionResult setTopologicallySortedProjects( List topologicallySortedProjects )
+    public MavenExecutionResult setTopologicallySortedProjects( List<MavenProject> topologicallySortedProjects )
     {
         this.topologicallySortedProjects = topologicallySortedProjects;
 
@@ -99,18 +97,6 @@ public class DefaultMavenExecutionResult
     public boolean hasExceptions()
     {
         return !getExceptions().isEmpty();
-    }
-
-    public ReactorManager getReactorManager()
-    {
-        return reactorManager;
-    }
-
-    public MavenExecutionResult setReactorManager( ReactorManager reactorManager )
-    {
-        this.reactorManager = reactorManager;
-
-        return this;
     }
 
     public MavenExecutionResult setExceptionSummary( ExceptionSummary exceptionSummary )

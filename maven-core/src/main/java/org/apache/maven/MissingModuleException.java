@@ -1,4 +1,4 @@
-package org.apache.maven.reactor;
+package org.apache.maven;
 
 
 import java.io.File;

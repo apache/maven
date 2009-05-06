@@ -36,9 +36,7 @@ import org.codehaus.plexus.logging.Logger;
 @Component( role = ToolchainManager.class )
 public class DefaultToolchainManager
     implements ToolchainManager
-
 {
-
     @Requirement
     Logger logger;
 
@@ -86,9 +84,11 @@ public class DefaultToolchainManager
             desc.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( "toolchains" ) );
 
             MavenProject current = session.getCurrentProject();
+            
             if ( current != null )
             {
-                context = session.getPluginContext( desc, current );
+                //TODO: why is this using the context
+                //context = session.getPluginContext( desc, current );
             }
         }
 

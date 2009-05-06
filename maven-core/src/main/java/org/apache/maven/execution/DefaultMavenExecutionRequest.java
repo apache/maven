@@ -144,7 +144,6 @@ public class DefaultMavenExecutionRequest
         copy.setGoals( original.getGoals() );
         copy.setRecursive( original.isRecursive() );
         copy.setPom( original.getPom() );
-        copy.setReactorFailureBehavior( original.getReactorFailureBehavior() );
         copy.setProperties( original.getProperties() );
         copy.setShowErrors( original.isShowErrors() );
         copy.setActiveProfiles( original.getActiveProfiles());

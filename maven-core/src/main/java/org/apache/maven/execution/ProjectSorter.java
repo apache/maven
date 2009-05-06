@@ -12,9 +12,7 @@ import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Extension;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
@@ -56,24 +54,17 @@ public class ProjectSorter
     {
         dag = new DAG();
 
-        Map projectMap = new HashMap();
+        Map<String,MavenProject> projectMap = new HashMap<String,MavenProject>();
 
-        for ( Iterator i = projects.iterator(); i.hasNext(); )
+        for ( MavenProject project : projects )
         {
-            MavenProject project = (MavenProject) i.next();
-
             String id = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
             if ( dag.getVertex( id ) != null )
             {
                 MavenProject conflictingProject = (MavenProject) projectMap.get( id );
 
-                throw new DuplicateProjectException( id,
-                                                     conflictingProject.getFile(),
-                                                     project.getFile(),
-                                                     "Project '"
-                                                     + id
-                                                     + "' is duplicated in the reactor" );
+                throw new DuplicateProjectException( id, conflictingProject.getFile(), project.getFile(), "Project '" + id + "' is duplicated in the reactor" );
             }
 
             dag.addVertex( id );
@@ -81,18 +72,13 @@ public class ProjectSorter
             projectMap.put( id, project );
         }
 
-        for ( Iterator i = projects.iterator(); i.hasNext(); )
+        for ( MavenProject project : projects )
         {
-            MavenProject project = (MavenProject) i.next();
-
             String id = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
-            for ( Iterator j = project.getDependencies().iterator(); j.hasNext(); )
+            for( Dependency dependency : project.getDependencies() )
             {
-                Dependency dependency = (Dependency) j.next();
-
-                String dependencyId = ArtifactUtils
-                    .versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
+                String dependencyId = ArtifactUtils.versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
 
                 if ( dag.getVertex( dependencyId ) != null )
                 {
@@ -103,6 +89,7 @@ public class ProjectSorter
             }
 
             MavenProject parent = project.getParent();
+            
             if ( parent != null )
             {
                 String parentId = ArtifactUtils.versionlessKey( parent.getGroupId(), parent.getArtifactId() );
@@ -113,62 +100,38 @@ public class ProjectSorter
                     {
                         dag.removeEdge( parentId, id );
                     }
+                    
                     dag.addEdge( id, parentId );
                 }
             }
-
-            List buildPlugins = project.getBuildPlugins();
-            if ( buildPlugins != null )
+            
+            if ( project.getBuildPlugins() != null )
             {
-                for ( Iterator j = buildPlugins.iterator(); j.hasNext(); )
+                for( Plugin plugin : project.getBuildPlugins() )
                 {
-                    Plugin plugin = (Plugin) j.next();
                     String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
+                    
                     if ( ( dag.getVertex( pluginId ) != null ) && !pluginId.equals( id ) )
                     {
                         addEdgeWithParentCheck( projectMap, pluginId, project, id );
                     }
-                }
-            }
-
-            List reportPlugins = project.getReportPlugins();
-            if ( reportPlugins != null )
-            {
-                for ( Iterator j = reportPlugins.iterator(); j.hasNext(); )
-                {
-                    ReportPlugin plugin = (ReportPlugin) j.next();
-                    String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
-                    if ( ( dag.getVertex( pluginId ) != null ) && !pluginId.equals( id ) )
-                    {
-                        addEdgeWithParentCheck( projectMap, pluginId, project, id );
-                    }
-                }
-            }
-
-            for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
-            {
-                Extension extension = (Extension) j.next();
-                String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
-                if ( dag.getVertex( extensionId ) != null )
-                {
-                    addEdgeWithParentCheck( projectMap, extensionId, project, id );
                 }
             }
         }
 
-        List sortedProjects = new ArrayList();
+        List<MavenProject> sortedProjects = new ArrayList<MavenProject>();
 
-        for ( Iterator i = TopologicalSorter.sort( dag ).iterator(); i.hasNext(); )
+        List<String> sortedProjectLabels = TopologicalSorter.sort( dag );
+         
+        for( String id : sortedProjectLabels )
         {
-            String id = (String) i.next();
-
             sortedProjects.add( projectMap.get( id ) );
         }
 
         this.sortedProjects = Collections.unmodifiableList( sortedProjects );
     }
 
-    private void addEdgeWithParentCheck( Map projectMap, String projectRefId, MavenProject project, String id )
+    private void addEdgeWithParentCheck( Map<String,MavenProject> projectMap, String projectRefId, MavenProject project, String id )
         throws CycleDetectedException
     {
         MavenProject extProject = (MavenProject) projectMap.get( projectRefId );
@@ -220,7 +183,7 @@ public class ProjectSorter
         return sortedProjects.size() > 1;
     }
 
-    List getDependents( String id )
+    List<String> getDependents( String id )
     {
         return dag.getParentLabels( id );
     }

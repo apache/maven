@@ -92,8 +92,7 @@ public final class ArtifactUtils
                                      String classifier,
                                      String baseVersion )
     {
-        return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" ) + ":" +
-            baseVersion;
+        return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" ) + ":" + baseVersion;
     }
 
     public static Map<String,Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )

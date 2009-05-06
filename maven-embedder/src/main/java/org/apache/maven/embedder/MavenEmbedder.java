@@ -26,6 +26,8 @@ import java.io.Writer;
 import java.util.List;
 
 import org.apache.maven.Maven;
+import org.apache.maven.MavenExecutionException;
+import org.apache.maven.MissingModuleException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -42,8 +44,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsConfigurationException;

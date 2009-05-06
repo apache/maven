@@ -33,14 +33,11 @@ public interface MavenExecutionResult
     MavenExecutionResult setProject( MavenProject project );
     MavenProject getProject();
 
-    MavenExecutionResult setTopologicallySortedProjects( List projects );
+    MavenExecutionResult setTopologicallySortedProjects( List<MavenProject> projects );
     List<MavenProject> getTopologicallySortedProjects();
 
     MavenExecutionResult setArtifactResolutionResult( ArtifactResolutionResult result );
     ArtifactResolutionResult getArtifactResolutionResult();
-
-    MavenExecutionResult setReactorManager( ReactorManager reactorManager );
-    ReactorManager getReactorManager();
 
     // for each exception
     // - knowing what artifacts are missing

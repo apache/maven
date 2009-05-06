@@ -21,11 +21,9 @@ package org.apache.maven.execution;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.settings.Settings;
@@ -40,12 +38,14 @@ public class MavenSession
 {
     private PlexusContainer container;
     
-    private ReactorManager reactorManager;
-
     private MavenExecutionRequest request;
 
     private MavenProject currentProject;
         
+    private List<MavenProject> projects;
+    
+    private MavenProject topLevelProject;
+    
     // Used by the embedder to verifyPlugin
     public MavenSession( MavenExecutionRequest request )
     {
@@ -63,20 +63,10 @@ public class MavenSession
     {
         this.container = container;
         this.request = request;
-        this.reactorManager = new ReactorManager( projects, request.getReactorFailureBehavior() );
         this.currentProject = projects.get( 0 );
+        this.projects = projects;        
     }    
-    
-    public Map<String,Object> getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
-    {
-        if ( reactorManager == null )
-        {
-            return null;
-        }
         
-        return reactorManager.getPluginContext( pluginDescriptor, project );
-    }
-    
     public PlexusContainer getContainer()
     {
         return container;
@@ -104,7 +94,7 @@ public class MavenSession
 
     public List<MavenProject> getSortedProjects()
     {
-        return reactorManager.getSortedProjects();
+        return projects;
     }
 
     public String getExecutionRootDirectory()
@@ -145,10 +135,10 @@ public class MavenSession
     public boolean isOffline()
     {
         return request.isOffline();
-    }
-    
-    public ReactorManager getReactorManager()
+    }        
+
+    public MavenProject getTopLevelProject()
     {
-        return reactorManager;
+        return topLevelProject;
     }
 }

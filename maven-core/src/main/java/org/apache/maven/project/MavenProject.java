@@ -2058,18 +2058,6 @@ public class MavenProject
         {
             setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
         }
-
-        /*
-        if ( project.getReleaseArtifactRepository() != null )
-        {
-            setReleaseArtifactRepository( project.getReleaseArtifactRepository() );
-        }
-
-        if ( project.getSnapshotArtifactRepository() != null )
-        {
-            setSnapshotArtifactRepository( project.getSnapshotArtifactRepository() );
-        }
-        */
     }
 
     private void addArtifactPath( Artifact a, List<String> list )

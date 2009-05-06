@@ -32,13 +32,12 @@ import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectSorter;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.reactor.MissingModuleException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -64,7 +63,7 @@ public class DefaultMaven
 
     @Requirement
     protected RuntimeInformation runtimeInformation;
-
+    
     public List<String> getLifecyclePhases()
     {
         return lifecycleExecutor.getLifecyclePhases();
@@ -92,16 +91,6 @@ public class DefaultMaven
 
         MavenSession session = createMavenSession( request, result );        
         
-        if ( session.getReactorManager().hasMultipleProjects() )
-        {
-            //logger.info( "Reactor build order: " );
-
-            for ( MavenProject project : session.getReactorManager().getSortedProjects() )
-            {
-                //logger.info( "  " + project.getName() );
-            }
-        }
-
         try
         {
             lifecycleExecutor.execute( session );
@@ -121,9 +110,9 @@ public class DefaultMaven
             return result;
         }
 
-        result.setTopologicallySortedProjects( session.getReactorManager().getSortedProjects() );
+        result.setTopologicallySortedProjects( session.getSortedProjects() );
 
-        result.setProject( session.getReactorManager().getTopLevelProject() );
+        result.setProject( session.getTopLevelProject() );
 
         return result;
     }
@@ -158,9 +147,9 @@ public class DefaultMaven
 
         try
         {                        
-            session = new MavenSession( container, request, projects );
+            ProjectSorter projectSorter = new ProjectSorter( projects );
             
-            result.setReactorManager( session.getReactorManager() );            
+            session = new MavenSession( container, request, projectSorter.getSortedProjects() );            
         }
         catch ( CycleDetectedException e )
         {

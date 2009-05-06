@@ -61,11 +61,11 @@ public interface MavenExecutionRequest
     // Reactor Failure Mode
     // ----------------------------------------------------------------------
 
-    static final String REACTOR_FAIL_FAST = ReactorManager.FAIL_FAST;
+    static final String REACTOR_FAIL_FAST = "FAIL_FAST";    
 
-    static final String REACTOR_FAIL_AT_END = ReactorManager.FAIL_AT_END;
+    static final String REACTOR_FAIL_AT_END = "FAIL_AT_END";
 
-    static final String REACTOR_FAIL_NEVER = ReactorManager.FAIL_NEVER;
+    static final String REACTOR_FAIL_NEVER = "FAIL_NEVER";
 
     // ----------------------------------------------------------------------
     // Artifactr repository policies

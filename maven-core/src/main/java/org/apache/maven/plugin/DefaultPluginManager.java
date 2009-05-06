@@ -446,7 +446,8 @@ public class DefaultPluginManager
 
         if ( mojo instanceof ContextEnabled )
         {
-            Map<String, Object> pluginContext = session.getPluginContext( pluginDescriptor, project );
+            //TODO: find somewhere better to put the plugin context.
+            Map<String, Object> pluginContext = null;
 
             if ( pluginContext != null )
             {
