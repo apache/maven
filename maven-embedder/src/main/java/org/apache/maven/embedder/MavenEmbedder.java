@@ -71,6 +71,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author Jason van Zyl
  */
+//TODO: just turn this into a component
 public class MavenEmbedder
 {
     public static final String userHome = System.getProperty( "user.home" );
@@ -303,6 +304,13 @@ public class MavenEmbedder
      * can be populated. For example, a list of libraries that are used by an Eclipse, Netbeans, or
      * IntelliJ project.
      */
+    
+    // currently in m2eclipse each project is read read a single project for dependencies
+    // Project
+    // Exceptions
+    // explicit for exceptions where coordinate are involved.
+    // m2eclipse is not using the topological sorting at all because it keeps track itself.
+    
     public MavenExecutionResult readProjectWithDependencies( MavenExecutionRequest request )
     {
         MavenExecutionResult result = new DefaultMavenExecutionResult();
@@ -310,70 +318,26 @@ public class MavenEmbedder
         try
         {
             request = populator.populateDefaults( request, configuration );
-
-            readProject( request.getPom(), request );
         }
         catch ( MavenEmbedderException e )
         {
             return result.addException( e );
         }
-        catch ( ProjectBuildingException e )
-        {
-            return result.addException( e );
-        }
-        catch ( MissingModuleException e )
-        {
-            return result.addException( e );
-        }
-
-        //TODO: need to check for circularity problems here even though this is purely downloading and for IDEs they will take care of circularity problems.
-        
-        /*
-        ReactorManager reactorManager = maven.createReactorManager( request, result );
-
-        if ( result.hasExceptions() )
-        {
-            return result;
-        }
-        */
-
-        MavenProjectBuildingResult projectBuildingResult;
 
         try
         {
-            projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuildingConfiguration() );
+            MavenProjectBuildingResult projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuildingConfiguration() );
+            
+            result.setProject( projectBuildingResult.getProject() );
+
+            result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
+
+            return result;
         }
         catch ( ProjectBuildingException e )
         {
             return result.addException( e );
         }
-
-        /*
-        if ( reactorManager.hasMultipleProjects() )
-        {
-            result.setProject( projectBuildingResult.getProject() );
-
-            result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
-        }
-        else
-        {
-            result.setProject( projectBuildingResult.getProject() );
-
-            result.setTopologicallySortedProjects( Arrays.asList( new MavenProject[]{ projectBuildingResult.getProject()} ) );
-        }
-        */
-
-        result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
-
-        // From this I could produce something that would help IDE integrators create importers:
-        // - topo sorted list of projects
-        // - binary dependencies
-        // - source dependencies (projects in the reactor)
-        //
-        // We could create a layer approach here. As to do anything you must resolve a projects artifacts,
-        // and with that set you could then subsequently execute goals for each of those project.
-
-        return result;
     }
 
     // ----------------------------------------------------------------------
