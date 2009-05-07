@@ -2679,7 +2679,7 @@
             <![CDATA[
     public boolean isExtensions()
     {
-        return ( extensions != null ) ? Boolean.parseBoolean( extensions ) : true;
+        return ( extensions != null ) ? Boolean.parseBoolean( extensions ) : false;
     }
 
     public void setExtensions( boolean extensions )
