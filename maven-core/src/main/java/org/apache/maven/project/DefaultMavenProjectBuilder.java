@@ -18,7 +18,6 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,11 +51,9 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.ProfileManagerInfo;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -140,10 +137,6 @@ public class DefaultMavenProjectBuilder
         catch ( ProfileActivationException e )
         {
             throw new ProjectBuildingException( "", "Failed to activate pom profiles.");
-        }   
-        catch(IOException e)
-        {
-        	throw new ProjectBuildingException( "", "Failed to activate pom profiles.");	
         }
 		
         try
@@ -158,9 +151,7 @@ public class DefaultMavenProjectBuilder
             	}   			
     		}
     		        	
-            domainModel = ProcessorContext.mergeProfilesIntoModel( externalProfiles, domainModel );
-    
-            
+            domainModel = ProcessorContext.mergeProfilesIntoModel( externalProfiles, domainModel );                
         }
         catch ( IOException e )
         {
@@ -257,16 +248,6 @@ public class DefaultMavenProjectBuilder
         
         return project;
     }
-
-    private static void printPlugin(Plugin plugin, String tag)
-    {
-    	System.out.println(tag + ":" + plugin);
-    	System.out.println("CONFIG:" + plugin.getConfiguration());
-    	for(PluginExecution pe : plugin.getExecutions())
-    	{
-    		System.out.println("PE:" + pe.getConfiguration());
-    	}
-    }
     
     private static PluginExecution contains(String goal, List<PluginExecution> plugins)
     {
@@ -339,30 +320,24 @@ public class DefaultMavenProjectBuilder
         return buildFromRepository( artifact, new DefaultProjectBuilderConfiguration( localRepository, remoteRepositories ) );
     }
     
-    public MavenProject buildFromRepository(Artifact artifact, ProjectBuilderConfiguration configuration )
-    	throws ProjectBuildingException
+    public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration )
+        throws ProjectBuildingException
     {
-     
         MavenProject project = hm.get( artifact.getId() );
 
         if ( project != null )
         {
             return project;
         }
-        
-        if(configuration.getRemoteRepositories() == null)
-        {
-        	throw new IllegalArgumentException("configuration.getRemoteRepositories(): null");
-        }
-        
+
         if ( !artifact.getType().equals( "pom" ) )
         {
             artifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
         }
-        
+
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, configuration.getLocalRepository(), configuration.getRemoteRepositories() );
         ArtifactResolutionResult result = repositorySystem.resolve( request );
-                
+
         try
         {
             resolutionErrorHandler.throwErrors( request, result );
@@ -372,54 +347,52 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
         DomainModel domainModel;
-        try 
-        {
-			domainModel = build( "unknown", artifact.getFile(), configuration );
-		} 
-        catch (IOException e) 
-        {
-			throw new ProjectBuildingException(artifact.getId(), "Error reading project artifact.", e);
-		}
-        
-        List<Profile> projectProfiles;
-	    Properties props = new Properties();
-	    props.putAll(configuration.getExecutionProperties());
-	   // props.putAll(configuration.getUserProperties());
-	    
         try
         {
-        	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration.getGlobalProfileManager(), props, domainModel.getModel() );
+            domainModel = build( "unknown", artifact.getFile(), configuration );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( artifact.getId(), "Error reading project artifact.", e );
+        }
+
+        List<Profile> projectProfiles;
+        Properties props = new Properties();
+        props.putAll( configuration.getExecutionProperties() );
+        // props.putAll(configuration.getUserProperties());
+
+        try
+        {
+            projectProfiles = DefaultProfileManager.getActiveProfilesFrom( configuration.getGlobalProfileManager(), props, domainModel.getModel() );
         }
         catch ( ProfileActivationException e )
         {
-            throw new ProjectBuildingException( "", "Failed to activate pom profiles.");
-        }   
-        catch(IOException e)
-        {
-        	throw new ProjectBuildingException( "", "Failed to activate pom profiles.");	
+            throw new ProjectBuildingException( "", "Failed to activate pom profiles." );
         }
-        
+
         try
         {
-            for(Profile p : projectProfiles)
-    		{
-    			logger.debug("Merging profile into model (buildFromRepository): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
-    		}
-    		           	
+            for ( Profile p : projectProfiles )
+            {
+                logger.debug( "Merging profile into model (buildFromRepository): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
+            }
+
             domainModel = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException("", "");
+            throw new ProjectBuildingException( "", "" );
         }
-       
-        
-    		try {
-    			Model model = ProcessorContext.processManagementNodes(interpolateDomainModel( domainModel, configuration, artifact.getFile() ));
-    			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, artifact.getFile());
-    		} catch (IOException e) {
-    			throw new ProjectBuildingException("", "");
-    		}
+
+        try
+        {
+            Model model = ProcessorContext.processManagementNodes( interpolateDomainModel( domainModel, configuration, artifact.getFile() ) );
+            project = this.fromDomainModelToMavenProject( model, domainModel.getParentFile(), configuration, artifact.getFile() );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( "", "" );
+        }
 
         project.setActiveProfiles( projectProfiles );
         artifact.setFile( artifact.getFile() );
@@ -427,7 +400,7 @@ public class DefaultMavenProjectBuilder
 
         hm.put( artifact.getId(), project );
 
-        return project;   	
+        return project;
     }    
 
     /**
@@ -464,41 +437,23 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         MavenProject project = build( pomFile, configuration );
-
-        try
-        {
-            project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
-        }
-        catch ( VersionNotFoundException e )
-        {
-            InvalidDependencyVersionException ee = new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
-            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(),
-                                                pomFile, ee );
-        }
-
         Artifact pomArtifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         pomArtifact.setFile( pomFile );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( pomArtifact ).setArtifactDependencies( project.getDependencyArtifacts() )
+            .setArtifact( pomArtifact )
+            .setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( configuration.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() );
-        
-        
-        if(request.getRemoteRepostories() == null)
-        {
-            request.setRemoteRepostories( new ArrayList<ArtifactRepository>() );
-        }
-
+               
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         if ( result.hasExceptions() )
         {
             Exception e = result.getExceptions().get( 0 );
 
-            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(),
-                                                pomFile, e );
+            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(), pomFile, e );
         }
 
         project.setArtifacts( result.getArtifacts() );
@@ -509,23 +464,13 @@ public class DefaultMavenProjectBuilder
     private Model interpolateDomainModel( DomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
         throws ProjectBuildingException
     {
-        Model model;
-        try
-        {
-            model = domainModel.getModel();
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( "", e.getMessage() );
-        }
+        Model model = domainModel.getModel();
 
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
-        Properties props = new Properties( config.getExecutionProperties() );
-
         try
         {
-            model = interpolator.interpolateModel( model, props, domainModel.getProjectDirectory() );
+            model = interpolator.interpolateModel( model, config.getExecutionProperties(), domainModel.getProjectDirectory() );
         }
         catch ( IOException e )
         {

@@ -35,7 +35,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
@@ -68,10 +67,8 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.artifact.ActiveProjectArtifact;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.repository.MavenRepositoryWrapper;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -168,18 +165,6 @@ public class MavenProject
     private RepositorySystem repositorySystem;
     //
 
-    private File parentFile;
-
-    public File getParentFile()
-    {
-        return parentFile;
-    }
-
-    public void setParentFile( File parentFile )
-    {
-        this.parentFile = parentFile;
-    }
-
     public MavenProject()
     {
         Model model = new Model();
@@ -193,11 +178,35 @@ public class MavenProject
 
     public MavenProject( Model model )
     {
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model: null" );
-        }
         setModel( model );
+    }
+
+    /**
+     * @deprecated use {@link #clone()} so subclasses can provide a copy of the same class
+     */
+    @Deprecated
+    public MavenProject( MavenProject project )
+    {
+        deepCopy( project );
+    }
+    
+    @Deprecated
+    public MavenProject( Model model, RepositorySystem repositorySystem )
+    {        
+        this.repositorySystem = repositorySystem;
+        setModel( model );
+    }
+
+    private File parentFile;
+
+    public File getParentFile()
+    {
+        return parentFile;
+    }
+
+    public void setParentFile( File parentFile )
+    {
+        this.parentFile = parentFile;
     }
 
     /**
@@ -229,17 +238,6 @@ public class MavenProject
         this.repositorySystem = repositorySystem;
         originalModel = model;
         
-        /*
-        DistributionManagement dm = model.getDistributionManagement();
-
-        if ( dm != null )
-        {
-            ArtifactRepository repo = repositorySystem.buildArtifactRepository( dm.getRepository() );
-            setReleaseArtifactRepository( repo );
-
-        }
-        */
-
         setRemoteArtifactRepositories( (projectBuilderConfiguration.getRemoteRepositories() != null) ? new ArrayList<ArtifactRepository>(projectBuilderConfiguration.getRemoteRepositories()) : new ArrayList<ArtifactRepository>());
  
         for(Repository r: model.getPluginRepositories())
@@ -258,15 +256,6 @@ public class MavenProject
 
 			}
 		}        
-    }
-
-    /**
-     * @deprecated use {@link #clone()} so subclasses can provide a copy of the same class
-     */
-    @Deprecated
-    public MavenProject( MavenProject project )
-    {
-        deepCopy( project );
     }
 
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
@@ -518,13 +507,15 @@ public class MavenProject
         list.add( getBuild().getOutputDirectory() );
 
         for ( Artifact a : getArtifacts() )
-        {
+        {            
+            System.out.println( "++> " + a.getArtifactId() );
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
                     addArtifactPath( a, list );
+                    System.out.println( "--> " + a.getArtifactId() );
                 }
             }
         }
@@ -1614,17 +1605,29 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} >
      * @todo the lazy initialisation of this makes me uneasy.
      */
-    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter dependencyFilter )
-        throws InvalidDependencyVersionException
+    //TODO: this method doesn't belong here at all
+    @Deprecated
+    public Set<Artifact> createArtifacts( ArtifactFilter filter )
     {
-        try
+        Set<Artifact> artifacts = new HashSet<Artifact>();
+        
+        for( Dependency d : getDependencies() )
         {
-            return repositorySystem.createArtifacts( getDependencies(), inheritedScope, dependencyFilter, this );
+            //TODO: something is wrong here because the scope of compile is never set correctly.
+            if ( d.getScope() == null )
+            {
+                d.setScope( Artifact.SCOPE_COMPILE );
+            }                        
+            
+            Artifact artifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() );
+            
+            if ( filter == null || filter.include( artifact ) )
+            {            
+                artifacts.add( artifact );
+            }
         }
-        catch ( VersionNotFoundException e )
-        {
-            throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
-        }
+        
+        return artifacts;
     }
 
     public void addProjectReference( MavenProject project )
