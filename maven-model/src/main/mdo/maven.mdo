@@ -2116,14 +2116,16 @@
           </description>
           <type>String</type>
         </field>
-        <field xml.tagName="filtering">
-          <name>filteringValue</name>
+        <field>
+          <name>filtering</name>
           <version>3.0.0+</version>
           <description>
             <![CDATA[
             Whether resources are filtered to replace tokens with parameterised values or not.
             The values are taken from the <code>properties</code> element and from the
-            properties in the files listed in the <code>filters</code> element.
+            properties in the files listed in the <code>filters</code> element. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>false</code>.
             ]]>
           </description>
           <type>String</type>
@@ -2160,12 +2162,12 @@
     
     public boolean isFiltering()
     {
-        return ( filteringValue != null ) ? Boolean.parseBoolean( filteringValue ) : false;
+        return ( filtering != null ) ? Boolean.parseBoolean( filtering ) : false;
     }
 
     public void setFiltering( boolean filtering )
     {
-        filteringValue = String.valueOf( filtering );
+        this.filtering = String.valueOf( filtering );
     }  
     
     /**
@@ -2448,10 +2450,16 @@
       <version>4.0.0</version>
       <description>Download policy.</description>
       <fields>
-        <field xml.tagName="enabled">
-          <name>enabledValue</name>
+        <field>
+          <name>enabled</name>
           <version>4.0.0</version>
-          <description>Whether to use this repository for downloading this type of artifact.</description>
+          <description>
+            <![CDATA[
+            Whether to use this repository for downloading this type of artifact. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>true</code>.
+            ]]>
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -2496,12 +2504,12 @@
 
     public boolean isEnabled()
     {
-        return ( enabledValue != null ) ? Boolean.parseBoolean( enabledValue ) : true;
+        return ( enabled != null ) ? Boolean.parseBoolean( enabled ) : true;
     }
 
     public void setEnabled( boolean enabled )
     {
-        enabledValue = String.valueOf( enabled );
+        this.enabled = String.valueOf( enabled );
     }
 
             ]]>
@@ -2554,7 +2562,13 @@
         <field>
           <name>inherited</name>
           <version>4.0.0</version>
-          <description>Whether any configuration should be propagated to child POMs.</description>
+          <description>
+            <![CDATA[
+            Whether any configuration should be propagated to child POMs. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>true</code>.
+            ]]>
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -2617,10 +2631,15 @@
         <field>
           <name>extensions</name>
           <version>4.0.0</version>
-          <type>boolean</type>
-          <description>Whether to load Maven extensions (such as packaging and type handlers) from
-            this plugin. For performance reasons, this should only be enabled when necessary.</description>
-          <defaultValue>false</defaultValue>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            Whether to load Maven extensions (such as packaging and type handlers) from
+            this plugin. For performance reasons, this should only be enabled when necessary. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>false</code>.
+            ]]>
+          </description>
         </field>
         <field>
           <name>executions</name>
@@ -2658,6 +2677,16 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public boolean isExtensions()
+    {
+        return ( extensions != null ) ? Boolean.parseBoolean( extensions ) : true;
+    }
+
+    public void setExtensions( boolean extensions )
+    {
+        this.extensions = String.valueOf( extensions );
+    }
+
     private java.util.Map<String, PluginExecution> executionMap = null;
 
     /**
@@ -2836,10 +2865,15 @@
         <field>
           <name>excludeDefaults</name>
           <version>4.0.0</version>
-          <type>boolean</type>
-          <description>If true, then the default reports are not included in the site generation.
-            This includes the reports in the "Project Info" menu.</description>
-          <defaultValue>false</defaultValue>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            If true, then the default reports are not included in the site generation.
+            This includes the reports in the "Project Info" menu. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>false</code>.
+            ]]>
+          </description>
         </field>
         <field>
           <name>outputDirectory</name>
@@ -2869,6 +2903,16 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public boolean isExcludeDefaults()
+    {
+        return ( excludeDefaults != null ) ? Boolean.parseBoolean( excludeDefaults ) : false;
+    }
+
+    public void setExcludeDefaults( boolean excludeDefaults )
+    {
+        this.excludeDefaults = String.valueOf( excludeDefaults );
+    }
+
     java.util.Map<String, ReportPlugin> reportPluginMap;
 
     /**

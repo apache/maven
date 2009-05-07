@@ -91,7 +91,7 @@ public class RepositoriesProcessor extends BaseProcessor
     {
         RepositoryPolicy p = new RepositoryPolicy();
         p.setChecksumPolicy( policy.getChecksumPolicy() );
-        p.setEnabledValue(policy.getEnabledValue());
+        p.setEnabled(policy.getEnabled());
         p.setUpdatePolicy( policy.getUpdatePolicy() );
         return p;
     }

@@ -159,7 +159,7 @@ public class BuildProcessor
             {
                 Resource r = new Resource();
                 r.setDirectory( resource.getDirectory());
-                r.setFilteringValue( resource.getFilteringValue() );
+                r.setFiltering( resource.getFiltering() );
                 r.setMergeId( resource.getMergeId() );
                 r.setTargetPath( resource.getTargetPath() );
                 r.setExcludes( new ArrayList<String>(resource.getExcludes()) );
