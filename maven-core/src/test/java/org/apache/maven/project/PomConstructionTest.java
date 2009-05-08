@@ -176,13 +176,6 @@ public class PomConstructionTest
 
     }
     */
-      /*MNG-3803*/
-    public void testDependenciesWithDifferentVersions()
-       throws Exception
-    {
-        PomTestWrapper pom = buildPom( "dependencies-with-different-versions" );
-        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
-    }
 
     /* MNG-3567*/
     public void testParentInterpolation()
