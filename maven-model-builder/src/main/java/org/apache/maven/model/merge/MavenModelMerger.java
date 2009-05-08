@@ -468,26 +468,26 @@ public class MavenModelMerger
             Map<Object, PluginExecution> merged =
                 new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
 
-            for ( Iterator<PluginExecution> it = tgt.iterator(); it.hasNext(); )
+            // FIXME: This needs to consider the <inherited> flag. If this is not detected by a UT/IT, we might want to
+            // create one...
+
+            for ( Iterator<PluginExecution> it = src.iterator(); it.hasNext(); )
             {
                 PluginExecution element = it.next();
                 Object key = getPluginExecutionKey( element );
                 merged.put( key, element );
             }
 
-            for ( Iterator<PluginExecution> it = src.iterator(); it.hasNext(); )
+            for ( Iterator<PluginExecution> it = tgt.iterator(); it.hasNext(); )
             {
                 PluginExecution element = it.next();
                 Object key = getPluginExecutionKey( element );
                 PluginExecution existing = merged.get( key );
                 if ( existing != null )
                 {
-                    mergePluginExecution( existing, element, sourceDominant, context );
+                    mergePluginExecution( element, existing, sourceDominant, context );
                 }
-                else
-                {
-                    merged.put( key, element );
-                }
+                merged.put( key, element );
             }
 
             target.setExecutions( new ArrayList<PluginExecution>( merged.values() ) );
