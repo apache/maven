@@ -242,7 +242,7 @@ public class ProcessorContext
         Model previousModel = null;
         for ( Model currentModel : models )
         {
-            inheritanceAssembler.assembleModelInheritance( currentModel, previousModel, "" );
+            inheritanceAssembler.assembleModelInheritance( currentModel, previousModel );
             previousModel = currentModel;
         }
         if ( true )

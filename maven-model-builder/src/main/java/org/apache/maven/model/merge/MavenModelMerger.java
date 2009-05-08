@@ -568,7 +568,7 @@ public class MavenModelMerger
     {
         String uncleanPath = parentPath;
 
-        if ( pathAdjustment != null )
+        if ( pathAdjustment != null && pathAdjustment.length() > 0 )
         {
             uncleanPath += "/" + pathAdjustment;
         }

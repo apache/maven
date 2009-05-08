@@ -35,9 +35,7 @@ public interface InheritanceAssembler
      * @param child The child model into which to merge the values inherited from the parent, must not be
      *            <code>null</code>.
      * @param parent The (read-only) parent model from which to inherit the values, may be <code>null</code>.
-     * @param childPathAdjustment The relative path adjustment required to navigate from the parent's base directory to
-     *            the parent directory of the child's base directory, must not be <code>null</code>.
      */
-    void assembleModelInheritance( Model child, Model parent, String childPathAdjustment );
+    void assembleModelInheritance( Model child, Model parent );
 
 }
