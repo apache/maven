@@ -30,12 +30,21 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DeploymentRepository;
+import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Extension;
+import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
+import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.Scm;
@@ -82,6 +91,57 @@ public class MavenModelMerger
             {
                 target.setUrl( appendPath( src, context.get( ARTIFACT_ID ).toString(),
                                            context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+            }
+        }
+    }
+
+    /*
+     * TODO: Whether the merge continues recursively into an existing node or not could be an option for the generated merger
+     */
+    @Override
+    protected void mergeModel_Organization( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+    {
+        Organization src = source.getOrganization();
+        if ( source.getOrganization() != null )
+        {
+            Organization tgt = target.getOrganization();
+            if ( tgt == null )
+            {
+                target.setOrganization( tgt = new Organization() );
+                mergeOrganization( tgt, src, sourceDominant, context );
+            }
+        }
+    }
+
+    @Override
+    protected void mergeModel_IssueManagement( Model target, Model source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+    {
+        IssueManagement src = source.getIssueManagement();
+        if ( source.getIssueManagement() != null )
+        {
+            IssueManagement tgt = target.getIssueManagement();
+            if ( tgt == null )
+            {
+                target.setIssueManagement( tgt = new IssueManagement() );
+                mergeIssueManagement( tgt, src, sourceDominant, context );
+            }
+        }
+    }
+
+    @Override
+    protected void mergeModel_CiManagement( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+    {
+        CiManagement src = source.getCiManagement();
+        if ( source.getCiManagement() != null )
+        {
+            CiManagement tgt = target.getCiManagement();
+            if ( tgt == null )
+            {
+                target.setCiManagement( tgt = new CiManagement() );
+                mergeCiManagement( tgt, src, sourceDominant, context );
             }
         }
     }
@@ -177,6 +237,56 @@ public class MavenModelMerger
                 }
             }
             target.setFilters( merged );
+        }
+    }
+
+    @Override
+    protected void mergeDistributionManagement_Repository( DistributionManagement target,
+                                                           DistributionManagement source, boolean sourceDominant,
+                                                           Map<Object, Object> context )
+    {
+        DeploymentRepository src = source.getRepository();
+        if ( src != null )
+        {
+            DeploymentRepository tgt = target.getRepository();
+            if ( tgt == null )
+            {
+                target.setRepository( tgt = new DeploymentRepository() );
+                mergeDeploymentRepository( tgt, src, sourceDominant, context );
+            }
+        }
+    }
+
+    @Override
+    protected void mergeDistributionManagement_SnapshotRepository( DistributionManagement target,
+                                                                   DistributionManagement source,
+                                                                   boolean sourceDominant, Map<Object, Object> context )
+    {
+        DeploymentRepository src = source.getSnapshotRepository();
+        if ( src != null )
+        {
+            DeploymentRepository tgt = target.getSnapshotRepository();
+            if ( tgt == null )
+            {
+                target.setSnapshotRepository( tgt = new DeploymentRepository() );
+                mergeDeploymentRepository( tgt, src, sourceDominant, context );
+            }
+        }
+    }
+
+    @Override
+    protected void mergeDistributionManagement_Site( DistributionManagement target, DistributionManagement source,
+                                                     boolean sourceDominant, Map<Object, Object> context )
+    {
+        Site src = source.getSite();
+        if ( src != null )
+        {
+            Site tgt = target.getSite();
+            if ( tgt == null )
+            {
+                target.setSite( tgt = new Site() );
+                mergeSite( tgt, src, sourceDominant, context );
+            }
         }
     }
 
@@ -290,6 +400,43 @@ public class MavenModelMerger
     }
 
     @Override
+    protected void mergeReporting_Plugins( Reporting target, Reporting source, boolean sourceDominant,
+                                           Map<Object, Object> context )
+    {
+        List<ReportPlugin> src = source.getPlugins();
+        if ( !src.isEmpty() )
+        {
+            List<ReportPlugin> tgt = target.getPlugins();
+            Map<Object, ReportPlugin> merged =
+                new LinkedHashMap<Object, ReportPlugin>( ( src.size() + tgt.size() ) * 2 );
+
+            for ( Iterator<ReportPlugin> it = tgt.iterator(); it.hasNext(); )
+            {
+                ReportPlugin element = it.next();
+                Object key = getReportPluginKey( element );
+                merged.put( key, element );
+            }
+
+            for ( Iterator<ReportPlugin> it = src.iterator(); it.hasNext(); )
+            {
+                ReportPlugin element = it.next();
+                Object key = getReportPluginKey( element );
+                ReportPlugin existing = merged.get( key );
+                if ( existing != null )
+                {
+                    mergeReportPlugin( existing, element, sourceDominant, context );
+                }
+                else
+                {
+                    merged.put( key, element );
+                }
+            }
+
+            target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
+        }
+    }
+
+    @Override
     protected Object getDependencyKey( Dependency dependency )
     {
         return dependency.getManagementKey();
@@ -308,9 +455,27 @@ public class MavenModelMerger
     }
 
     @Override
+    protected Object getReportPluginKey( ReportPlugin object )
+    {
+        return object.getKey();
+    }
+
+    @Override
+    protected Object getReportSetKey( ReportSet object )
+    {
+        return object.getId();
+    }
+
+    @Override
     protected Object getRepositoryBaseKey( RepositoryBase object )
     {
         return object.getId();
+    }
+
+    @Override
+    protected Object getExtensionKey( Extension object )
+    {
+        return object.getGroupId() + ':' + object.getArtifactId();
     }
 
     private String appendPath( String parentPath, String childPath, String pathAdjustment )

@@ -58,6 +58,7 @@ import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
@@ -1094,6 +1095,118 @@ public class ModelMerger
             }
 
             target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
+        }
+    }
+
+    protected void mergeReportPlugin( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                      Map<Object, Object> context )
+    {
+        mergeReportPlugin_Inherited( target, source, sourceDominant, context );
+        mergeReportPlugin_Configuration( target, source, sourceDominant, context );
+        mergeReportPlugin_GroupId( target, source, sourceDominant, context );
+        mergeReportPlugin_ArtifactId( target, source, sourceDominant, context );
+        mergeReportPlugin_Version( target, source, sourceDominant, context );
+        mergeReportPlugin_ReportSets( target, source, sourceDominant, context );
+    }
+
+    protected void mergeReportPlugin_GroupId( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                              Map<Object, Object> context )
+    {
+        String src = source.getGroupId();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getGroupId() == null )
+            {
+                target.setGroupId( src );
+            }
+        }
+    }
+
+    protected void mergeReportPlugin_ArtifactId( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+    {
+        String src = source.getArtifactId();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getArtifactId() == null )
+            {
+                target.setArtifactId( src );
+            }
+        }
+    }
+
+    protected void mergeReportPlugin_Version( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                              Map<Object, Object> context )
+    {
+        String src = source.getVersion();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getVersion() == null )
+            {
+                target.setVersion( src );
+            }
+        }
+    }
+
+    protected void mergeReportPlugin_Inherited( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                                Map<Object, Object> context )
+    {
+        String src = source.getInherited();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getInherited() == null )
+            {
+                target.setInherited( src );
+            }
+        }
+    }
+
+    protected void mergeReportPlugin_Configuration( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                                    Map<Object, Object> context )
+    {
+        Xpp3Dom src = (Xpp3Dom) source.getConfiguration();
+        if ( src != null )
+        {
+            Xpp3Dom tgt = (Xpp3Dom) target.getConfiguration();
+            if ( sourceDominant || tgt == null )
+            {
+                tgt = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( src ), tgt );
+            }
+            else
+            {
+                tgt = Xpp3Dom.mergeXpp3Dom( tgt, src );
+            }
+            target.setConfiguration( tgt );
+        }
+    }
+
+    protected void mergeReportPlugin_ReportSets( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+    {
+        List<ReportSet> src = source.getReportSets();
+        if ( !src.isEmpty() )
+        {
+            List<ReportSet> tgt = target.getReportSets();
+            Map<Object, ReportSet> merged = new LinkedHashMap<Object, ReportSet>( ( src.size() + tgt.size() ) * 2 );
+
+            for ( Iterator<ReportSet> it = tgt.iterator(); it.hasNext(); )
+            {
+                ReportSet element = it.next();
+                Object key = getReportSetKey( element );
+                merged.put( key, element );
+            }
+
+            for ( Iterator<ReportSet> it = src.iterator(); it.hasNext(); )
+            {
+                ReportSet element = it.next();
+                Object key = getReportSetKey( element );
+                if ( sourceDominant || !merged.containsKey( key ) )
+                {
+                    merged.put( key, element );
+                }
+            }
+
+            target.setReportSets( new ArrayList<ReportSet>( merged.values() ) );
         }
     }
 
@@ -2424,6 +2537,11 @@ public class ModelMerger
     }
 
     protected Object getReportPluginKey( ReportPlugin object )
+    {
+        return object;
+    }
+
+    protected Object getReportSetKey( ReportSet object )
     {
         return object;
     }
