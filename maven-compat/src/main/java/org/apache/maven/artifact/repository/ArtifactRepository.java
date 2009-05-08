@@ -19,12 +19,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
-/**
- * Specifies the repository used for artifact handling.
- * 
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- */
 public interface ArtifactRepository
 {
     String pathOf( Artifact artifact );
@@ -59,9 +53,11 @@ public interface ArtifactRepository
 
     String getKey();
 
-    boolean isUniqueVersion();
-
     void setBlacklisted( boolean blackListed );
 
     boolean isBlacklisted();
+    
+    // New interface methods for the repository system. 
+    
+    Artifact find( Artifact artifact );
 }

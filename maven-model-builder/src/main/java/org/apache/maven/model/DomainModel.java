@@ -39,7 +39,7 @@ public class DomainModel
     
     protected Model model;
 
-    public Model getModel() throws IOException
+    public Model getModel()
     {
         return model;        
     }   

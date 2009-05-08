@@ -34,6 +34,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -76,6 +77,9 @@ public class LegacyRepositorySystem
     @Requirement
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
+    @Requirement
+    private ArtifactCollector artifactCollector;
+    
     @Requirement
     private MirrorBuilder mirrorBuilder;
 
@@ -157,118 +161,15 @@ public class LegacyRepositorySystem
         return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
     }
 
-    /**
-     * @return {@link Set} &lt; {@link Artifact} >
-     * @todo desperately needs refactoring. It's just here because it's implementation is
-     *       maven-project specific
-     */
-    public Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
-        throws VersionNotFoundException
-    {
-        return createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, reactor );
-    }
-
-    @Deprecated
-    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
-        throws VersionNotFoundException
-    {
-        Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>( dependencies.size() );
-
-        for ( Iterator<Dependency> i = dependencies.iterator(); i.hasNext(); )
-        {
-            Dependency d = i.next();
-
-            String scope = d.getScope();
-
-            if ( StringUtils.isEmpty( scope ) )
-            {
-                scope = Artifact.SCOPE_COMPILE;
-
-                d.setScope( scope );
-            }
-
-            VersionRange versionRange;
-            
-            //TODO: how does a poorly specified range turn into a VersionNotFoundException?
-            try
-            {
-                versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
-            }
-            catch ( InvalidVersionSpecificationException e )
-            {
-                throw new VersionNotFoundException( reactor.getId(), d, reactor.getFile(), e );
-            }
-            
-            Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), scope, inheritedScope, d.isOptional() );
-
-            if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
-            {
-                artifact.setFile( new File( d.getSystemPath() ) );
-            }
-
-            ArtifactFilter artifactFilter = dependencyFilter;
-
-            if ( ( artifact != null ) && ( ( artifactFilter == null ) || artifactFilter.include( artifact ) ) )
-            {
-                if ( ( d.getExclusions() != null ) && !d.getExclusions().isEmpty() )
-                {
-                    List<String> exclusions = new ArrayList<String>();
-                    for ( Iterator<Exclusion> j = d.getExclusions().iterator(); j.hasNext(); )
-                    {
-                        Exclusion e = j.next();
-                        exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
-                    }
-
-                    ArtifactFilter newFilter = new ExcludesArtifactFilter( exclusions );
-
-                    if ( artifactFilter != null )
-                    {
-                        AndArtifactFilter filter = new AndArtifactFilter();
-                        filter.add( artifactFilter );
-                        filter.add( newFilter );
-                        artifactFilter = filter;
-                    }
-                    else
-                    {
-                        artifactFilter = newFilter;
-                    }
-                }
-
-                artifact.setDependencyFilter( artifactFilter );
-
-                if ( reactor != null )
-                {
-                    artifact = reactor.find( artifact );
-                }
-
-                projectArtifacts.add( artifact );
-            }
-        }
-
-        return projectArtifacts;
-    }
-
     public ArtifactRepository buildArtifactRepository( Repository repo )
         throws InvalidRepositoryException
     {
         if ( repo != null )
         {
             String id = repo.getId();
+            
             String url = repo.getUrl();
-            /*
-            MNG-4050: Temporarily disabled this check since it is breaking the bootstrap unit tests on commons-parent pom
-             */
-            /*
-            if ( id == null || id.trim().length() < 1 )
-            {
-                throw new InvalidRepositoryException( "Repository ID must not be empty (URL is: " + url + ").", url );
-            }
-
-            if ( url == null || url.trim().length() < 1 )
-            {
-                throw new InvalidRepositoryException( "Repository URL must not be empty (ID is: " + id + ").", id );
-            }
-            */
+            
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
 
             ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
@@ -471,6 +372,18 @@ public class LegacyRepositorySystem
 
     public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
     {
+
+//      ArtifactResolutionResult collect( Set<Artifact> artifacts,
+//      Artifact originatingArtifact,
+//      Map managedVersions,
+//      ArtifactRepository localRepository,
+//      List<ArtifactRepository> remoteRepositories,
+//      ArtifactMetadataSource source,
+//      ArtifactFilter filter,
+//      List<ResolutionListener> listeners,
+//      List<ConflictResolver> conflictResolvers )
+        
+//        ArtifactResolutionResult result = artifactCollector.
         return null;
     }
 }

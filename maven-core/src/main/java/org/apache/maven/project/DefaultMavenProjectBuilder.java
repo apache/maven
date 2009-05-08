@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -71,26 +70,26 @@ public class DefaultMavenProjectBuilder
 {
     @Requirement
     private Logger logger;
-    
+
     @Requirement
     private ModelValidator validator;
-    
+
     @Requirement
-    private LifecycleExecutor lifecycle;    
+    private LifecycleExecutor lifecycle;
 
     @Requirement
     private RepositorySystem repositorySystem;
 
     @Requirement
     List<ModelEventListener> listeners;
-    
-    @Requirement
-    private Interpolator interpolator;    
-    
-    @Requirement
-    private ResolutionErrorHandler resolutionErrorHandler;    
 
-    private static HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();
+    @Requirement
+    private Interpolator interpolator;
+
+    @Requirement
+    private ResolutionErrorHandler resolutionErrorHandler;
+
+    //private static HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();
 
     private MavenProject superProject;
 
@@ -98,100 +97,85 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    // This is used by the SITE plugin.
-    public MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
-        throws ProjectBuildingException
-    {
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()        
-            .setLocalRepository( localRepository )
-            .setGlobalProfileManager( profileManager );
-        
-        return build( project, configuration );
-    }
-
     public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-    	//Do inheritance
         DomainModel domainModel;
-		try 
-		{
-			domainModel = build( "unknown", pomFile, configuration );
-
-		} 
-		catch (IOException e) 
-		{
-			throw new ProjectBuildingException("", "", e);
-		}
-
-		//Profiles
-
-        List<Profile> projectProfiles;
-	    Properties props = new Properties();
-	    props.putAll(configuration.getExecutionProperties());
 
         try
         {
-        	projectProfiles = DefaultProfileManager.getActiveProfilesFrom(configuration.getGlobalProfileManager(), props, domainModel.getModel() );
-        }
-        catch ( ProfileActivationException e )
-        {
-            throw new ProjectBuildingException( "", "Failed to activate pom profiles.");
-        }
-		
-        try
-        {
-        	List<Profile> externalProfiles = new ArrayList<Profile>();
-            for(Profile p : projectProfiles)
-    		{
-            	if(!"pom".equals(p.getSource()))
-            	{
-            		logger.debug("Merging profile into model (build): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
-            		externalProfiles.add(p);
-            	}   			
-    		}
-    		        	
-            domainModel = ProcessorContext.mergeProfilesIntoModel( externalProfiles, domainModel );                
+            domainModel = build( "unknown", pomFile, configuration );
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException("", "");
+            throw new ProjectBuildingException( "", "", e );
         }
-   
+
+        //Profiles
+
+        List<Profile> projectProfiles;
+        Properties props = new Properties();
+        props.putAll( configuration.getExecutionProperties() );
+
+        try
+        {
+            projectProfiles = DefaultProfileManager.getActiveProfilesFrom( configuration.getGlobalProfileManager(), props, domainModel.getModel() );
+        }
+        catch ( ProfileActivationException e )
+        {
+            throw new ProjectBuildingException( "", "Failed to activate pom profiles." );
+        }
+
+        try
+        {
+            List<Profile> externalProfiles = new ArrayList<Profile>();
+            for ( Profile p : projectProfiles )
+            {
+                if ( !"pom".equals( p.getSource() ) )
+                {
+                    logger.debug( "Merging profile into model (build): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
+                    externalProfiles.add( p );
+                }
+            }
+
+            domainModel = ProcessorContext.mergeProfilesIntoModel( externalProfiles, domainModel );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( "", "" );
+        }
+
         //Interpolation & Management
         MavenProject project;
-		try 
-		{		
-			Model model = interpolateDomainModel( domainModel, configuration, pomFile );
-				
-			List<Plugin> plns = new ArrayList<Plugin>();
-			
-			Set<Plugin> plugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles(model.getPackaging());
+        try
+        {
+            Model model = interpolateDomainModel( domainModel, configuration, pomFile );
 
-			addPluginsToModel(model, plugins);			
-							
-			ProcessorContext.processManagementNodes(model);
-		 					
-			project = this.fromDomainModelToMavenProject(model, domainModel.getParentFile(), configuration, pomFile);
- 			
-			ArrayList<Plugin> pln = new ArrayList<Plugin>();
-			for(Plugin p : project.getModel().getBuild().getPlugins())
-			{
-				Plugin copy = new Plugin();
-				PluginProcessor.copy2(p, copy, true);	
-				pln.add(copy);
-			}
-		
+            Set<Plugin> plugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles( model.getPackaging() );
+
+            addPluginsToModel( model, plugins );
+
+            ProcessorContext.processManagementNodes( model );
+
+            project = this.fromDomainModelToMavenProject( model, domainModel.getParentFile(), configuration, pomFile );
+
+            Set<Plugin> pluginsFromProject = new HashSet<Plugin>();
+            for ( Plugin p : project.getModel().getBuild().getPlugins() )
+            {
+                Plugin copy = new Plugin();
+                PluginProcessor.copy2( p, copy, true );
+                pluginsFromProject.add( copy );
+            }
+
             // Merge the various sources for mojo configuration:
             // 1. default values from mojo descriptor
             // 2. POM values from per-plugin configuration
             // 3. POM values from per-execution configuration
             // These configuration sources are given in increasing order of dominance.
 
-			Set<Plugin> pl = lifecycle.populateDefaultConfigurationForPlugins(new HashSet<Plugin>(pln), 
-				project, configuration.getLocalRepository());
-		   		
-			for ( Plugin buildPlugin : pl )
+            Set<Plugin> processedPlugins = lifecycle.populateDefaultConfigurationForPlugins( pluginsFromProject, project, configuration.getLocalRepository() );
+
+            for ( Plugin buildPlugin : processedPlugins )
             {
                 Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
                 Plugin x = containsPlugin( buildPlugin, project.getModel().getBuild().getPlugins() );
@@ -210,30 +194,27 @@ public class DefaultMavenProjectBuilder
                             PluginExecution pe = contains( g, x.getExecutions() );
                             if ( pe != null )
                             {
-                                Xpp3Dom dom2 =
-                                    Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pe.getConfiguration(),
-                                                          (Xpp3Dom) e.getConfiguration() );
+                                Xpp3Dom dom2 = Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pe.getConfiguration(), (Xpp3Dom) e.getConfiguration() );
                                 e.setConfiguration( dom2 );
                             }
                         }
                     }
                 }
-
             }
-			
-			project.getModel().getBuild().setPlugins(new ArrayList<Plugin>(pl));
-		} 
-		catch (IOException e) 
-		{
-			throw new ProjectBuildingException("", "");
-		}
-		catch (LifecycleExecutionException e) 
-		{
-			e.printStackTrace();
-			throw new ProjectBuildingException("",e.getMessage());
-		}
-        project.setActiveProfiles( projectProfiles );
-         
+
+            project.getModel().getBuild().setPlugins( new ArrayList<Plugin>( processedPlugins ) );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( "", "" );
+        }
+        catch ( LifecycleExecutionException e )
+        {
+            throw new ProjectBuildingException( "", e.getMessage() );
+        }
+
+        //project.setActiveProfiles( projectProfiles );
+
         Build build = project.getBuild();
         // NOTE: setting this script-source root before path translation, because
         // the plugin tools compose basedir and scriptSourceRoot into a single file.
@@ -241,95 +222,15 @@ public class DefaultMavenProjectBuilder
         project.addCompileSourceRoot( build.getSourceDirectory() );
         project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
         project.setFile( pomFile );
-        
+
         setBuildOutputDirectoryOnParent( project );
 
-        hm.put( ArtifactUtils.artifactId( project.getGroupId(), project.getArtifactId(), "pom", project.getVersion() ), project );
-        
         return project;
     }
-    
-    private static PluginExecution contains(String goal, List<PluginExecution> plugins)
-    {
-    	for(PluginExecution pe : plugins)
-    	{
-    		if(pe.getGoals().contains(goal))
-    		{
-    			return pe;
-    		}
-    	}
-    	return null;
-    }
-    
-    public static void addPluginsToModel( Model target, Set<Plugin> plugins )
-    {
-    	List<Plugin> mngPlugins = (target.getBuild().getPluginManagement() != null)
-    		? target.getBuild().getPluginManagement().getPlugins() : new ArrayList<Plugin>();
-    		
-    	List<Plugin> pomPlugins = new ArrayList<Plugin>(target.getBuild().getPlugins());
-    	
-    	List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
-    	
-    	for( Plugin p : plugins )
-    	{
-    		//Go ahead and add version if exists in pluginManagement - don't use default version
-    		Plugin mngPlugin = containsPlugin(p, mngPlugins);
-    		if(mngPlugin != null && mngPlugin.getVersion() != null)
-    		{
-    			//System.out.println("Set version:" + p.getVersion() + ": To = " + mngPlugin.getVersion());
-    			p.setVersion(mngPlugin.getVersion());
-    		}
-    		
-    		Plugin pomPlugin = containsPlugin( p, pomPlugins);
-    		if ( pomPlugin == null )
-            {
-                lifecyclePlugins.add( p );
-            }
-            else
-            {
-                PluginProcessor.copy2( p, pomPlugin, true );
-                if ( p.getConfiguration() != null )
-                {
-                    System.out.println( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) p.getConfiguration(),
-                                                              (Xpp3Dom) pomPlugin.getConfiguration() ) );
-                }
-            }
-    	}
-    	pomPlugins.addAll(lifecyclePlugins);
-    	target.getBuild().setPlugins(pomPlugins);
 
-    }
-    
-    private static Plugin containsPlugin(Plugin plugin, List<Plugin> plugins)
-    {
-    	for(Plugin p : plugins)
-    	{
-    		if( p.getGroupId().equals(plugin.getGroupId()) && p.getArtifactId().equals(plugin.getArtifactId()))
-    		{
-    			return p;
-    		}
-    	}
-    	
-    	return null;
-    }    
-
-    
-    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
-        throws ProjectBuildingException
-    {
-        return buildFromRepository( artifact, new DefaultProjectBuilderConfiguration( localRepository, remoteRepositories ) );
-    }
-    
     public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-        MavenProject project = hm.get( artifact.getId() );
-
-        if ( project != null )
-        {
-            return project;
-        }
-
         if ( !artifact.getType().equals( "pom" ) )
         {
             artifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
@@ -346,62 +247,24 @@ public class DefaultMavenProjectBuilder
         {
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
-        DomainModel domainModel;
-        try
-        {
-            domainModel = build( "unknown", artifact.getFile(), configuration );
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( artifact.getId(), "Error reading project artifact.", e );
-        }
 
-        List<Profile> projectProfiles;
-        Properties props = new Properties();
-        props.putAll( configuration.getExecutionProperties() );
-        // props.putAll(configuration.getUserProperties());
+        return build( artifact.getFile(), configuration );
+    }
 
-        try
-        {
-            projectProfiles = DefaultProfileManager.getActiveProfilesFrom( configuration.getGlobalProfileManager(), props, domainModel.getModel() );
-        }
-        catch ( ProfileActivationException e )
-        {
-            throw new ProjectBuildingException( "", "Failed to activate pom profiles." );
-        }
+    // This is used by the SITE plugin.
+    public MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
+        throws ProjectBuildingException
+    {
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ).setGlobalProfileManager( profileManager );
 
-        try
-        {
-            for ( Profile p : projectProfiles )
-            {
-                logger.debug( "Merging profile into model (buildFromRepository): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
-            }
+        return build( project, configuration );
+    }
 
-            domainModel = ProcessorContext.mergeProfilesIntoModel( projectProfiles, domainModel );
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( "", "" );
-        }
-
-        try
-        {
-            Model model = ProcessorContext.processManagementNodes( interpolateDomainModel( domainModel, configuration, artifact.getFile() ) );
-            project = this.fromDomainModelToMavenProject( model, domainModel.getParentFile(), configuration, artifact.getFile() );
-        }
-        catch ( IOException e )
-        {
-            throw new ProjectBuildingException( "", "" );
-        }
-
-        project.setActiveProfiles( projectProfiles );
-        artifact.setFile( artifact.getFile() );
-        project.setVersion( artifact.getVersion() );
-
-        hm.put( artifact.getId(), project );
-
-        return project;
-    }    
+    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+        return buildFromRepository( artifact, new DefaultProjectBuilderConfiguration( localRepository, remoteRepositories ) );
+    }
 
     /**
      * This is used for pom-less execution like running archetype:generate.
@@ -440,27 +303,86 @@ public class DefaultMavenProjectBuilder
         Artifact pomArtifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         pomArtifact.setFile( pomFile );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( pomArtifact )
-            .setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( configuration.getLocalRepository() )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
-            .setManagedVersionMap( project.getManagedVersionMap() );
-               
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pomArtifact ).setArtifactDependencies( project.getDependencyArtifacts() )
+            .setLocalRepository( configuration.getLocalRepository() ).setRemoteRepostories( project.getRemoteArtifactRepositories() ).setManagedVersionMap( project.getManagedVersionMap() );
+
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         if ( result.hasExceptions() )
         {
             Exception e = result.getExceptions().get( 0 );
 
-            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(), pomFile, e );
+            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(),
+                                                pomFile, e );
         }
 
         project.setArtifacts( result.getArtifacts() );
 
         return new MavenProjectBuildingResult( project, result );
     }
-    
+
+    private static PluginExecution contains( String goal, List<PluginExecution> plugins )
+    {
+        for ( PluginExecution pe : plugins )
+        {
+            if ( pe.getGoals().contains( goal ) )
+            {
+                return pe;
+            }
+        }
+        return null;
+    }
+
+    public static void addPluginsToModel( Model target, Set<Plugin> plugins )
+    {
+        List<Plugin> mngPlugins = ( target.getBuild().getPluginManagement() != null ) ? target.getBuild().getPluginManagement().getPlugins() : new ArrayList<Plugin>();
+
+        List<Plugin> pomPlugins = new ArrayList<Plugin>( target.getBuild().getPlugins() );
+
+        List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
+
+        for ( Plugin p : plugins )
+        {
+            //Go ahead and add version if exists in pluginManagement - don't use default version
+            Plugin mngPlugin = containsPlugin( p, mngPlugins );
+            if ( mngPlugin != null && mngPlugin.getVersion() != null )
+            {
+                //System.out.println("Set version:" + p.getVersion() + ": To = " + mngPlugin.getVersion());
+                p.setVersion( mngPlugin.getVersion() );
+            }
+
+            Plugin pomPlugin = containsPlugin( p, pomPlugins );
+            if ( pomPlugin == null )
+            {
+                lifecyclePlugins.add( p );
+            }
+            else
+            {
+                PluginProcessor.copy2( p, pomPlugin, true );
+                if ( p.getConfiguration() != null )
+                {
+                    System.out.println( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) p.getConfiguration(), (Xpp3Dom) pomPlugin.getConfiguration() ) );
+                }
+            }
+        }
+        pomPlugins.addAll( lifecyclePlugins );
+        target.getBuild().setPlugins( pomPlugins );
+
+    }
+
+    private static Plugin containsPlugin( Plugin plugin, List<Plugin> plugins )
+    {
+        for ( Plugin p : plugins )
+        {
+            if ( p.getGroupId().equals( plugin.getGroupId() ) && p.getArtifactId().equals( plugin.getArtifactId() ) )
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
     private Model interpolateDomainModel( DomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
         throws ProjectBuildingException
     {
@@ -474,15 +396,14 @@ public class DefaultMavenProjectBuilder
         }
         catch ( IOException e )
         {
-
             throw new ProjectBuildingException( projectId, "", projectDescriptor, e );
         }
 
         return model;
     }
-    
-    private MavenProject fromDomainModelToMavenProject(Model model, File parentFile, ProjectBuilderConfiguration config, File projectDescriptor)
-    	throws InvalidProjectModelException, IOException
+
+    private MavenProject fromDomainModelToMavenProject( Model model, File parentFile, ProjectBuilderConfiguration config, File projectDescriptor )
+        throws InvalidProjectModelException, IOException
     {
         MavenProject project;
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
@@ -503,9 +424,9 @@ public class DefaultMavenProjectBuilder
             throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
         }
 
-        return project;   	
+        return project;
     }
-    
+
     private DomainModel build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
     {
@@ -515,97 +436,97 @@ public class DefaultMavenProjectBuilder
         List<String> inactiveProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration
             .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
                                                                               : new ArrayList<String>();
-            
-            ProfileManagerInfo profileInfo = new ProfileManagerInfo(projectBuilderConfiguration.getExecutionProperties(), activeProfileIds, inactiveProfileIds);
-            DomainModel domainModel = new DomainModel( pomFile );
-            domainModel.setProjectDirectory( pomFile.getParentFile() );
-            domainModel.setMostSpecialized( true );
 
-            List<DomainModel> domainModels = new ArrayList<DomainModel>();
+        ProfileManagerInfo profileInfo = new ProfileManagerInfo( projectBuilderConfiguration.getExecutionProperties(), activeProfileIds, inactiveProfileIds );
+        DomainModel domainModel = new DomainModel( pomFile );
+        domainModel.setProjectDirectory( pomFile.getParentFile() );
+        domainModel.setMostSpecialized( true );
 
-            domainModels.add( domainModel );
-            ArtifactRepository localRepository = projectBuilderConfiguration.getLocalRepository();
-            List<ArtifactRepository> remoteRepositories = projectBuilderConfiguration.getRemoteRepositories();
+        List<DomainModel> domainModels = new ArrayList<DomainModel>();
 
-            File parentFile = null;
-            int lineageCount = 0;
-            if ( domainModel.getParentId() != null )
+        domainModels.add( domainModel );
+        ArtifactRepository localRepository = projectBuilderConfiguration.getLocalRepository();
+        List<ArtifactRepository> remoteRepositories = projectBuilderConfiguration.getRemoteRepositories();
+
+        File parentFile = null;
+        int lineageCount = 0;
+        if ( domainModel.getParentId() != null )
+        {
+            List<DomainModel> mavenParents;
+            MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
+            if ( useTopLevelProjectForParent( domainModel, topProject ) )
             {
-            	List<DomainModel> mavenParents;
-            	MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
-            	if(useTopLevelProjectForParent(domainModel, topProject) )
-            	{
-            		mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, topProject.getFile(), projectBuilderConfiguration );
-            	}
-            	else if ( isParentLocal( domainModel.getRelativePathOfParent(), pomFile.getParentFile() ) )
-            	{
-            		mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, pomFile.getParentFile(), projectBuilderConfiguration );
-            	}
-            	else
-            	{
-            		mavenParents = getDomainModelParentsFromRepository( domainModel, localRepository, remoteRepositories );
-            	}
-
-            	if ( mavenParents.size() > 0 )
-            	{
-            		DomainModel dm = (DomainModel) mavenParents.get( 0 );
-            		parentFile = dm.getFile();
-            		domainModel.setParentFile( parentFile );
-            		lineageCount = mavenParents.size();
-            	}
-
-            	domainModels.addAll( mavenParents );
+                mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, topProject.getFile(), projectBuilderConfiguration );
+            }
+            else if ( isParentLocal( domainModel.getRelativePathOfParent(), pomFile.getParentFile() ) )
+            {
+                mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, pomFile.getParentFile(), projectBuilderConfiguration );
+            }
+            else
+            {
+                mavenParents = getDomainModelParentsFromRepository( domainModel, localRepository, remoteRepositories );
             }
 
-            domainModels.add( new DomainModel( getSuperModel(), false ) );
-            List<DomainModel> profileModels = new ArrayList<DomainModel>();
-            //Process Profiles
-            for(DomainModel domain : domainModels)
+            if ( mavenParents.size() > 0 )
             {
-            	DomainModel dm = (DomainModel) domain;
-
-            	if(!dm.getModel().getProfiles().isEmpty())
-            	{
-            		Collection<Profile> profiles = DefaultProfileManager.getActiveProfiles(dm.getModel().getProfiles(), profileInfo);
-            		if(!profiles.isEmpty())
-            		{
-            			for(Profile p : profiles)
-            			{
-            				logger.debug("Merging profile into model: Model = " + dm.getId() + ", Profile = " + p.getId() );
-            			}
-            			profileModels.add(ProcessorContext.mergeProfilesIntoModel( profiles, dm ));  
-            		}
-            		else
-            		{
-            			profileModels.add( dm );   
-            		}
-            	}
-            	else
-            	{
-            		profileModels.add( dm );
-            	}                
+                DomainModel dm = (DomainModel) mavenParents.get( 0 );
+                parentFile = dm.getFile();
+                domainModel.setParentFile( parentFile );
+                lineageCount = mavenParents.size();
             }
 
-            DomainModel transformedDomainModel = ProcessorContext.build(profileModels, listeners);
+            domainModels.addAll( mavenParents );
+        }
 
-            // Lineage count is inclusive to add the POM read in itself.
-            transformedDomainModel.setLineageCount( lineageCount + 1 );
-            transformedDomainModel.setParentFile( parentFile );
+        domainModels.add( new DomainModel( getSuperModel(), false ) );
+        List<DomainModel> profileModels = new ArrayList<DomainModel>();
+        //Process Profiles
+        for ( DomainModel domain : domainModels )
+        {
+            DomainModel dm = (DomainModel) domain;
 
-            return transformedDomainModel;
+            if ( !dm.getModel().getProfiles().isEmpty() )
+            {
+                Collection<Profile> profiles = DefaultProfileManager.getActiveProfiles( dm.getModel().getProfiles(), profileInfo );
+                if ( !profiles.isEmpty() )
+                {
+                    for ( Profile p : profiles )
+                    {
+                        logger.debug( "Merging profile into model: Model = " + dm.getId() + ", Profile = " + p.getId() );
+                    }
+                    profileModels.add( ProcessorContext.mergeProfilesIntoModel( profiles, dm ) );
+                }
+                else
+                {
+                    profileModels.add( dm );
+                }
+            }
+            else
+            {
+                profileModels.add( dm );
+            }
+        }
+
+        DomainModel transformedDomainModel = ProcessorContext.build( profileModels, listeners );
+
+        // Lineage count is inclusive to add the POM read in itself.
+        transformedDomainModel.setLineageCount( lineageCount + 1 );
+        transformedDomainModel.setParentFile( parentFile );
+
+        return transformedDomainModel;
     }
-    
-    private static boolean useTopLevelProjectForParent(DomainModel currentModel, MavenProject topProject) throws IOException
-    {
-    	if(topProject == null || currentModel.getModel().getParent() == null)
-    	{
-    		return false;
-    	}
 
-    	return topProject.getGroupId().equals(currentModel.getParentGroupId()) 
-    	&& topProject.getArtifactId().equals(currentModel.getParentArtifactId()) 
-    	&& topProject.getVersion().equals(currentModel.getParentVersion());
-    	
+    private static boolean useTopLevelProjectForParent( DomainModel currentModel, MavenProject topProject )
+        throws IOException
+    {
+        if ( topProject == null || currentModel.getModel().getParent() == null )
+        {
+            return false;
+        }
+
+        return topProject.getGroupId().equals( currentModel.getParentGroupId() ) && topProject.getArtifactId().equals( currentModel.getParentArtifactId() )
+            && topProject.getVersion().equals( currentModel.getParentVersion() );
+
     }
 
     private void validateModel( Model model, File pomFile )
@@ -683,14 +604,14 @@ public class DefaultMavenProjectBuilder
         }
     }
 
-    private List<DomainModel> getDomainModelParentsFromRepository(  DomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    private List<DomainModel> getDomainModelParentsFromRepository( DomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws IOException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
 
         String parentId = domainModel.getParentId();
 
-        if ( parentId == null || localRepository == null)
+        if ( parentId == null || localRepository == null )
         {
             return domainModels;
         }
@@ -699,24 +620,22 @@ public class DefaultMavenProjectBuilder
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifactParent, localRepository, remoteRepositories );
         ArtifactResolutionResult result;
-		try 
-		{
-			result = repositorySystem.resolve( request );
-		} 
-		catch (Exception e) 
-		{
-            throw (IOException) new IOException( "The parent POM " + artifactParent
-                    + " could not be retrieved from any repository" ).initCause( e );
-		}
-		
+        try
+        {
+            result = repositorySystem.resolve( request );
+        }
+        catch ( Exception e )
+        {
+            throw (IOException) new IOException( "The parent POM " + artifactParent + " could not be retrieved from any repository" ).initCause( e );
+        }
+
         try
         {
             resolutionErrorHandler.throwErrors( request, result );
         }
         catch ( ArtifactResolutionException e )
         {
-            throw (IOException) new IOException( "The parent POM " + artifactParent
-                + " could not be retrieved from any repository" ).initCause( e );
+            throw (IOException) new IOException( "The parent POM " + artifactParent + " could not be retrieved from any repository" ).initCause( e );
         }
 
         DomainModel parentDomainModel = new DomainModel( artifactParent.getFile() );
@@ -726,7 +645,7 @@ public class DefaultMavenProjectBuilder
             //shane: what does this mean exactly and why does it occur
             logger.debug( "Parent pom ids do not match: Parent File = " + artifactParent.getFile().getAbsolutePath() + ": Child ID = " + domainModel.getId() );
 
-           // return domainModels;
+            // return domainModels;
         }
 
         domainModels.add( parentDomainModel );
@@ -744,8 +663,8 @@ public class DefaultMavenProjectBuilder
      * @return
      * @throws IOException
      */
-    private List<DomainModel> getDomainModelParentsFromLocalPath( DomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                                                  File projectDirectory, ProjectBuilderConfiguration projectBuilderConfiguration )
+    private List<DomainModel> getDomainModelParentsFromLocalPath( DomainModel domainModel, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, File projectDirectory,
+                                                                  ProjectBuilderConfiguration projectBuilderConfiguration )
         throws IOException
     {
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
@@ -756,27 +675,27 @@ public class DefaultMavenProjectBuilder
         {
             return domainModels;
         }
-        
+
         File parentFile = new File( projectDirectory, domainModel.getRelativePathOfParent() ).getCanonicalFile();
         if ( parentFile.isDirectory() )
         {
             parentFile = new File( parentFile.getAbsolutePath(), "pom.xml" );
         }
-    	MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
-    	boolean isTop = useTopLevelProjectForParent(domainModel, topProject);
-    	DomainModel parentDomainModel = null;
-        if ( !isTop  )
+        MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
+        boolean isTop = useTopLevelProjectForParent( domainModel, topProject );
+        DomainModel parentDomainModel = null;
+        if ( !isTop )
         {
-        	if(!parentFile.isFile())
-        	{
-        		throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );	
-        	}     
-        	parentDomainModel = new DomainModel( parentFile );
-        	parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
+            if ( !parentFile.isFile() )
+            {
+                throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );
+            }
+            parentDomainModel = new DomainModel( parentFile );
+            parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
         }
         else
         {
-        	parentDomainModel = new DomainModel(projectBuilderConfiguration.getTopLevelProjectFromReactor().getFile());
+            parentDomainModel = new DomainModel( projectBuilderConfiguration.getTopLevelProjectFromReactor().getFile() );
         }
 
         if ( !parentDomainModel.matchesParentOf( domainModel ) )
@@ -798,18 +717,19 @@ public class DefaultMavenProjectBuilder
         domainModels.add( parentDomainModel );
         if ( domainModel.getParentId() != null )
         {
-        	if(isTop)
-        	{
-        		 if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
-                 {
-        			 domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, topProject.getFile().getParentFile(), projectBuilderConfiguration ) );
-                 }
-                 else
-                 {
-                     domainModels.addAll( getDomainModelParentsFromRepository( parentDomainModel, localRepository, remoteRepositories ) );
-                 }       		
-        	}
-        	else if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
+            if ( isTop )
+            {
+                if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
+                {
+                    domainModels
+                        .addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, topProject.getFile().getParentFile(), projectBuilderConfiguration ) );
+                }
+                else
+                {
+                    domainModels.addAll( getDomainModelParentsFromRepository( parentDomainModel, localRepository, remoteRepositories ) );
+                }
+            }
+            else if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
             {
                 domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, parentFile.getParentFile(), projectBuilderConfiguration ) );
             }

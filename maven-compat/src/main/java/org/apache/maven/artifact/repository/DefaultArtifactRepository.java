@@ -31,6 +31,7 @@ import org.apache.maven.wagon.repository.Repository;
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
  */
+//TODO: this needs to be decoupled from Wagon
 public class DefaultArtifactRepository
     extends Repository
     implements ArtifactRepository
@@ -40,8 +41,6 @@ public class DefaultArtifactRepository
     private ArtifactRepositoryPolicy snapshots;
 
     private ArtifactRepositoryPolicy releases;
-
-    private boolean uniqueVersion = true;
 
     private boolean blacklisted;
 
@@ -69,7 +68,6 @@ public class DefaultArtifactRepository
     {
         super( id, url );
         this.layout = layout;
-        this.uniqueVersion = uniqueVersion;
     }
 
     /**
@@ -155,11 +153,6 @@ public class DefaultArtifactRepository
         return getId();
     }
 
-    public boolean isUniqueVersion()
-    {
-        return uniqueVersion;
-    }
-
     public boolean isBlacklisted()
     {
         return blacklisted;
@@ -183,5 +176,10 @@ public class DefaultArtifactRepository
         sb.append( ", update => " ).append( releases.getUpdatePolicy() ).append( "]\n" );
 
         return sb.toString();
+    }
+
+    public Artifact find( Artifact artifact )
+    {
+        return null;
     }
 }

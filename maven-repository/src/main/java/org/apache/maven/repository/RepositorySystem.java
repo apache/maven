@@ -25,7 +25,6 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
@@ -57,14 +56,9 @@ public interface RepositorySystem
     
     Artifact createDependencyArtifact( Dependency dependency );
     
-    //REMOVE
-    // This will disappear when we actually deal with resolving a root dependency and its dependencies. This is used everywhere because of that
-    // deficiency
-    Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
-        throws VersionNotFoundException;
-
-    // Repository creation
-
+    //TODO: this needs a project to do anything useful
+    //Set<Artifact> createArtifacts();
+    
     // maven model
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
@@ -97,13 +91,7 @@ public interface RepositorySystem
      * @return
      */
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
-       
-    //REMOVE
-    // Network enablement: this needs to go as we will know at a higher level from the embedder if the system is offline or not, we should not have to
-    // deal with this here.
-    void setOnline( boolean online );
-    boolean isOnline();
-    
+           
     //REMOVE
     // These should be associated with repositories and the repositories should be examine as part of metadatda and
     // artifact resolution. So these methods should also not be here.

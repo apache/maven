@@ -38,9 +38,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id$
- * @todo this should possibly be replaced by type handler
+ * @author Jason van Zyl
  */
 public class DefaultArtifact
     implements Artifact

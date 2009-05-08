@@ -38,7 +38,6 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -268,18 +267,6 @@ public class MavenEmbedder
             IOUtil.close( fileReader );
         }
     }
-
-    /**
-     * mkleint: protected so that IDE integrations can selectively allow downloading artifacts
-     * from remote repositories (if they prohibit by default on project loading)
-     * @throws PluginLoaderException 
-    protected void verifyPlugin( Plugin plugin, MavenProject project )
-        throws ComponentLookupException, PluginLoaderException
-    {
-        MavenSession session = new MavenSession( request );
-        pluginManager.loadPlugin( plugin, project, session );
-    }
-     */
 
     // ----------------------------------------------------------------------
     // Project

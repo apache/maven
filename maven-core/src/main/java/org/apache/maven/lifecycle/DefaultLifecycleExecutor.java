@@ -508,6 +508,36 @@ public class DefaultLifecycleExecutor
                 
         return mojoDescriptor;
     }
+        
+    private static int count = 0;
+    
+    // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
+    MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository )
+        throws LifecycleExecutionException
+    {        
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( groupId );
+        plugin.setArtifactId( artifactId );
+        plugin.setVersion( version );        
+
+        MojoDescriptor mojoDescriptor;
+    
+        //need to do the active project thing as the site plugin is referencing itself
+        
+        if ( artifactId.equals( "maven-site-plugin" ) ){ count++; System.out.println( count ); };
+        
+        System.out.println( ">>> " + artifactId );
+        try
+        {
+            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, project, localRepository );
+        }
+        catch ( PluginLoaderException e )
+        {
+            throw new LifecycleExecutionException( "Error loading MojoDescriptor.", e );
+        }        
+                
+        return mojoDescriptor;
+    }    
     
     public void initialize()
         throws InitializationException
@@ -620,13 +650,13 @@ public class DefaultLifecycleExecutor
     public Set<Plugin> populateDefaultConfigurationForPlugins( Set<Plugin> plugins, MavenProject project, ArtifactRepository localRepository ) 
         throws LifecycleExecutionException
     {
-        for( Plugin p: plugins )
+        for( Plugin p : plugins )
         {
             for( PluginExecution e : p.getExecutions() )
             {
-                for( String g : e.getGoals() )
+                for( String goal : e.getGoals() )
                 {
-                    Xpp3Dom dom = getDefaultPluginConfiguration( p.getGroupId(), p.getArtifactId(), p.getVersion(), g, project, localRepository );
+                    Xpp3Dom dom = getDefaultPluginConfiguration( p.getGroupId(), p.getArtifactId(), p.getVersion(), goal, project, localRepository );
                     e.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) e.getConfiguration(), dom, Boolean.TRUE ) );
                 }
             }
@@ -638,8 +668,7 @@ public class DefaultLifecycleExecutor
     public Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository ) 
         throws LifecycleExecutionException
     {
-        //return new Xpp3Dom( "configuration" );
-        return convert( getMojoDescriptor( groupId+":"+artifactId+":"+version+":"+goal, project, localRepository ) );
+        return convert( getMojoDescriptor( groupId, artifactId, version, goal, project, localRepository ) );
     }
     
     public Xpp3Dom getMojoConfiguration( MojoDescriptor mojoDescriptor )

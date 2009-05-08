@@ -54,7 +54,6 @@ import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.VersionNotFoundException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -149,10 +148,6 @@ public class DefaultPluginManager
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
-//        catch ( InvalidPluginException e )
-//        {
-//            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-//        }
         catch ( PluginVersionResolutionException e )
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
@@ -588,31 +583,16 @@ public class DefaultPluginManager
     {
         MavenProject project = session.getCurrentProject();
 
-        // TODO: such a call in MavenMetadataSource too - packaging not really the intention of type
         Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
-
-        // TODO: we don't need to resolve over and over again, as long as we are sure that the parameters are the same
-        // check this with yourkit as a hot spot.
-        // Don't recreate if already created - for effeciency, and because clover plugin adds to it
-        if ( project.getDependencyArtifacts() == null )
-        {
-            // NOTE: Don't worry about covering this case with the error-reporter bindings...it's already handled by the project error reporter.
-            try
-            {
-                project.setDependencyArtifacts( repositorySystem.createArtifacts( project.getDependencies(), null, null, project ) );
-            }
-            catch ( VersionNotFoundException e )
-            {
-                throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile(), e.getCauseException() );
-            }
-        }
-
+        
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
+            // Here the root is not resolved because we are presumably working with a project locally.
             .setResolveRoot( false )
-            .setArtifactDependencies( project.getDependencyArtifacts() )
+            .setResolveTransitively( true )
+            //.setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( session.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() )
@@ -622,6 +602,7 @@ public class DefaultPluginManager
 
         resolutionErrorHandler.throwErrors( request, result );
 
+        //TODO: this is wrong
         project.setArtifacts( result.getArtifacts() );
 
         ArtifactRepository localRepository = session.getLocalRepository();
@@ -698,11 +679,6 @@ public class DefaultPluginManager
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenProject project, ArtifactRepository localRepository )
         throws PluginLoaderException
     {
-        if ( plugin.getVersion() == null )
-        {
-            throw new IllegalArgumentException( "plugin.version: null" );
-        }
-
         PluginDescriptor pluginDescriptor = loadPlugin( plugin, project, localRepository );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );

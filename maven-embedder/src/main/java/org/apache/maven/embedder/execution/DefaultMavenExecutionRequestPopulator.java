@@ -90,8 +90,6 @@ public class DefaultMavenExecutionRequestPopulator
 
         toolchains( request, configuration );
 
-        artifactTransferMechanism( request, configuration );
-
         profileManager( request, configuration );
 
         processSettings( request, configuration );
@@ -341,27 +339,6 @@ public class DefaultMavenExecutionRequestPopulator
     // ------------------------------------------------------------------------
     // Artifact Transfer Mechanism
     // ------------------------------------------------------------------------
-
-    private void artifactTransferMechanism( MavenExecutionRequest request, Configuration configuration )
-        throws MavenEmbedderException
-    {
-        // ------------------------------------------------------------------------
-        // Artifact Transfer Mechanism
-        // ------------------------------------------------------------------------
-
-        if ( request.isOffline() )
-        {
-            repositorySystem.setOnline( false );
-        }
-        else if ( ( request.getSettings() != null ) && request.getSettings().isOffline() )
-        {
-            repositorySystem.setOnline( false );
-        }
-        else
-        {
-            repositorySystem.setOnline( true );
-        }
-    }
 
     public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings, Configuration configuration )
         throws MavenEmbedderException

@@ -512,13 +512,6 @@ public class DefaultArtifactCollector
                                     artifact.selectVersion( version.toString() );
                                     fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                                 }
-
-                                Artifact relocated = source.retrieveRelocatedArtifact( artifact, localRepository, childRemoteRepositories );
-                                if ( !artifact.equals( relocated ) )
-                                {
-                                    artifact = relocated;
-                                    child.setArtifact( artifact );
-                                }
                             }
                             while( !childKey.equals( child.getKey() ) );
 

@@ -34,19 +34,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  */
 public interface ArtifactMetadataSource
 {
-    String ROLE = ArtifactMetadataSource.class.getName();
-
-    ResolutionGroup retrieve( Artifact artifact,
-                              ArtifactRepository localRepository,
-                              List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException;
-
-    /**
-     * Resolve all relocations in the POM for this artifact, and return the new artifact coordinate.
-     */
-    Artifact retrieveRelocatedArtifact( Artifact artifact,
-                                        ArtifactRepository localRepository,
-                                        List<ArtifactRepository> remoteRepositories )
+    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
     /**
@@ -61,9 +49,7 @@ public interface ArtifactMetadataSource
      * @throws ArtifactMetadataRetrievalException
      *          in case of error while retrieving repository metadata from the repository.
      */
-    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact,
-                                    ArtifactRepository localRepository,
-                                    List<ArtifactRepository> remoteRepositories )
+    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
     /**
@@ -79,7 +65,6 @@ public interface ArtifactMetadataSource
      * @throws ArtifactMetadataRetrievalException
      *          in case of error while retrieving repository metadata from the repository.
      */
-    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
-                                                                             ArtifactRepository localRepository,
-                                                                             ArtifactRepository remoteRepository ) throws ArtifactMetadataRetrievalException;
+    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )                                                                            
+        throws ArtifactMetadataRetrievalException;
 }

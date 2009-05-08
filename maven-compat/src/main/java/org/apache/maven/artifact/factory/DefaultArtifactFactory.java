@@ -180,9 +180,8 @@ public class DefaultArtifactFactory
                                      String inheritedScope,
                                      boolean optional )
     {
-        // TODO: can refactor - inherited artifactScope calculation belongs in the collector, use artifactScope handler
-
         String desiredScope = Artifact.SCOPE_RUNTIME;
+        
         if ( inheritedScope == null )
         {
             desiredScope = scope;

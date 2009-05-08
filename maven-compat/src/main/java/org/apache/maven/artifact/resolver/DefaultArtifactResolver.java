@@ -455,7 +455,6 @@ public class DefaultArtifactResolver
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                e.printStackTrace();
                 // need to add metadata resolution exception
                 return result;
             }
