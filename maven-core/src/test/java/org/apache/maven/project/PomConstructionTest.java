@@ -925,7 +925,7 @@ public class PomConstructionTest
     }
     
     /** MNG-2006 */
-    public void testUrlAppend()
+    public void testUrlAppendWithChildPathAdjustment()
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "url-append/child" );

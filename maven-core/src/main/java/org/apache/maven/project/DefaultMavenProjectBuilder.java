@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -159,11 +160,12 @@ public class DefaultMavenProjectBuilder
 
             project = this.fromDomainModelToMavenProject( model, domainModel.getParentFile(), configuration, pomFile );
 
-            Set<Plugin> pluginsFromProject = new HashSet<Plugin>();
+            Set<Plugin> pluginsFromProject = new LinkedHashSet<Plugin>();
             for ( Plugin p : project.getModel().getBuild().getPlugins() )
             {
                 Plugin copy = new Plugin();
                 PluginProcessor.copy2( p, copy, true );
+                copy.setDependencies( p.getDependencies() );
                 pluginsFromProject.add( copy );
             }
 

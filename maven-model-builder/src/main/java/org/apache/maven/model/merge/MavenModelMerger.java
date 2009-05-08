@@ -1,24 +1,5 @@
 package org.apache.maven.model.merge;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBase;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.RepositoryBase;
-import org.apache.maven.model.Site;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -38,8 +19,30 @@ import org.apache.maven.model.Site;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBase;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.RepositoryBase;
+import org.apache.maven.model.Scm;
+import org.apache.maven.model.Site;
+
 /**
- * The domain-specific model merger for the Maven POM..
+ * The domain-specific model merger for the Maven POM.
  * 
  * @author Benjamin Bentmann
  */
@@ -66,6 +69,24 @@ public class MavenModelMerger
     }
 
     @Override
+    protected void mergeModel_Url( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        String src = source.getUrl();
+        if ( src != null )
+        {
+            if ( sourceDominant )
+            {
+                target.setUrl( src );
+            }
+            else if ( target.getUrl() == null )
+            {
+                target.setUrl( appendPath( src, context.get( ARTIFACT_ID ).toString(),
+                                           context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+            }
+        }
+    }
+
+    @Override
     protected void mergeModelBase_Modules( ModelBase target, ModelBase source, boolean sourceDominant,
                                            Map<Object, Object> context )
     {
@@ -73,10 +94,17 @@ public class MavenModelMerger
         if ( !src.isEmpty() && sourceDominant )
         {
             List<String> tgt = target.getModules();
-            Set<String> merged = new LinkedHashSet<String>( ( tgt.size() + src.size() ) * 2 );
+            Set<String> excludes = new LinkedHashSet<String>( tgt );
+            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
             merged.addAll( tgt );
-            merged.addAll( src );
-            target.setModules( new ArrayList<String>( merged ) );
+            for ( String s : src )
+            {
+                if ( !excludes.contains( s ) )
+                {
+                    merged.add( s );
+                }
+            }
+            target.setModules( merged );
         }
     }
 
@@ -127,6 +155,31 @@ public class MavenModelMerger
         }
     }
 
+    /*
+     * TODO: Whether duplicates should be removed looks like an option for the generated merger.
+     */
+    @Override
+    protected void mergeBuildBase_Filters( BuildBase target, BuildBase source, boolean sourceDominant,
+                                           Map<Object, Object> context )
+    {
+        List<String> src = source.getFilters();
+        if ( !src.isEmpty() )
+        {
+            List<String> tgt = target.getFilters();
+            Set<String> excludes = new LinkedHashSet<String>( tgt );
+            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            merged.addAll( tgt );
+            for ( String s : src )
+            {
+                if ( !excludes.contains( s ) )
+                {
+                    merged.add( s );
+                }
+            }
+            target.setFilters( merged );
+        }
+    }
+
     @Override
     protected void mergeSite_Url( Site target, Site source, boolean sourceDominant, Map<Object, Object> context )
     {
@@ -142,6 +195,97 @@ public class MavenModelMerger
                 target.setUrl( appendPath( src, context.get( ARTIFACT_ID ).toString(),
                                            context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
             }
+        }
+    }
+
+    @Override
+    protected void mergeScm_Url( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        String src = source.getUrl();
+        if ( src != null )
+        {
+            if ( sourceDominant )
+            {
+                target.setUrl( src );
+            }
+            else if ( target.getUrl() == null )
+            {
+                target.setUrl( appendPath( src, context.get( ARTIFACT_ID ).toString(),
+                                           context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+            }
+        }
+    }
+
+    @Override
+    protected void mergeScm_Connection( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        String src = source.getConnection();
+        if ( src != null )
+        {
+            if ( sourceDominant )
+            {
+                target.setConnection( src );
+            }
+            else if ( target.getConnection() == null )
+            {
+                target.setConnection( appendPath( src, context.get( ARTIFACT_ID ).toString(),
+                                                  context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+            }
+        }
+    }
+
+    @Override
+    protected void mergeScm_DeveloperConnection( Scm target, Scm source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+    {
+        String src = source.getDeveloperConnection();
+        if ( src != null )
+        {
+            if ( sourceDominant )
+            {
+                target.setDeveloperConnection( src );
+            }
+            else if ( target.getDeveloperConnection() == null )
+            {
+                target.setDeveloperConnection( appendPath( src, context.get( ARTIFACT_ID ).toString(),
+                                                           context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+            }
+        }
+    }
+
+    @Override
+    protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
+                                                 boolean sourceDominant, Map<Object, Object> context )
+    {
+        List<Plugin> src = source.getPlugins();
+        if ( !src.isEmpty() )
+        {
+            List<Plugin> tgt = target.getPlugins();
+            Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
+
+            for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
+            {
+                Plugin element = it.next();
+                Object key = getPluginKey( element );
+                merged.put( key, element );
+            }
+
+            for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
+            {
+                Plugin element = it.next();
+                Object key = getPluginKey( element );
+                Plugin existing = merged.get( key );
+                if ( existing != null )
+                {
+                    mergePlugin( existing, element, sourceDominant, context );
+                }
+                else
+                {
+                    merged.put( key, element );
+                }
+            }
+
+            target.setPlugins( new ArrayList<Plugin>( merged.values() ) );
         }
     }
 

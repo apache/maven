@@ -43,11 +43,6 @@ public class DefaultProfileInjector
 
     public void injectProfile( Model model, Profile profile )
     {
-        if ( profile == null )
-        {
-            return;
-        }
-
         if ( profile != null )
         {
             merger.mergeModelBase( model, profile );
