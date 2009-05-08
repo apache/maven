@@ -2361,6 +2361,12 @@
 
         return false;
     }
+
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2826,6 +2832,12 @@
           <code>
             <![CDATA[
     public static final String DEFAULT_EXECUTION_ID = "default";
+
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
             ]]>
           </code>
         </codeSegment>
@@ -3376,6 +3388,12 @@
     public boolean isInheritanceApplied()
     {
         return inheritanceApplied;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getId();
     }
             ]]>
           </code>
