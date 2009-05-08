@@ -224,6 +224,7 @@ public class DefaultMavenProjectBuilder
         project.addCompileSourceRoot( build.getSourceDirectory() );
         project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
         project.setFile( pomFile );
+        project.setActiveProfiles( projectProfiles );
 
         setBuildOutputDirectoryOnParent( project );
 
