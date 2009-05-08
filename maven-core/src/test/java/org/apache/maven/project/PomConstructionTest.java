@@ -1317,7 +1317,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "boolean-interpolation" );
-        assertTrue ((Boolean) pom.getValue( "repositories[2]/releases/enabled" ) );     
+        assertTrue ((Boolean) pom.getValue( "repositories[1]/releases/enabled" ) );     
         assertTrue((Boolean) pom.getValue( "build/resources[1]/filtering" ) ); 
     }    
 

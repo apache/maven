@@ -25,8 +25,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
+import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
+import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.processors.BuildProcessor;
 import org.apache.maven.model.processors.CiManagementProcessor;
 import org.apache.maven.model.processors.ContributorsProcessor;
@@ -49,7 +50,14 @@ import org.apache.maven.model.processors.PropertiesProcessor;
 import org.apache.maven.model.processors.ReportingProcessor;
 import org.apache.maven.model.processors.RepositoriesProcessor;
 import org.apache.maven.model.processors.ScmProcessor;
+import org.apache.maven.model.profile.DefaultProfileInjector;
+import org.apache.maven.model.profile.ProfileInjector;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+/*
+ *  TODO: Get rid of this class and go back to an inheritance assembler, profile injector and default injector, all
+ *  orchestrated by the model builder. The processors will also by replaced by the merger.
+ */
 
 public class ProcessorContext
 {
@@ -70,7 +78,7 @@ public class ProcessorContext
         {   
             if(domainModel.isMostSpecialized())
             {
-                child = (DomainModel) domainModel;
+                child = domainModel;
             }
         }
         if(child == null)
@@ -100,7 +108,9 @@ public class ProcessorContext
 
         return domainModel;
     }
-    
+
+    private static ProfileInjector profileInjector = new DefaultProfileInjector();
+
     public static DomainModel mergeProfilesIntoModel(Collection<Profile> profiles, DomainModel domainModel) throws IOException
     {
         List<Model> profileModels = new ArrayList<Model>();
@@ -118,8 +128,18 @@ public class ProcessorContext
         	}
         }
         profileModels.addAll(externalProfileModels);//external takes precedence
-        
+
         Model model = domainModel.getModel();
+
+        for ( Profile profile : profiles )
+        {
+            profileInjector.injectProfile( model, profile );
+        }
+        if ( true )
+        {
+            return domainModel;
+        }
+        
         profileModels.add( 0, model );
         List<Processor> processors =
             Arrays.<Processor> asList( new BuildProcessor( new ArrayList<Processor>() ), new ProfilesModuleProcessor(),
@@ -211,11 +231,24 @@ public class ProcessorContext
 
         return models;
     }
-    
+
+    private static InheritanceAssembler inheritanceAssembler = new DefaultInheritanceAssembler();
+
     private static Model processModelsForInheritance(List<Model> models, List<Processor> processors, boolean isProfile)
     {
         ModelProcessor modelProcessor = new ModelProcessor( processors, isProfile );
         Collections.reverse( models );    
+
+        Model previousModel = null;
+        for ( Model currentModel : models )
+        {
+            inheritanceAssembler.assembleModelInheritance( currentModel, previousModel, "" );
+            previousModel = currentModel;
+        }
+        if ( true )
+        {
+            return previousModel;
+        }
 
         int length = models.size();
         Model target = new Model();
