@@ -96,7 +96,8 @@ public class MavenModelMerger
     }
 
     /*
-     * TODO: Whether the merge continues recursively into an existing node or not could be an option for the generated merger
+     * TODO: Whether the merge continues recursively into an existing node or not could be an option for the generated
+     * merger
      */
     @Override
     protected void mergeModel_Organization( Model target, Model source, boolean sourceDominant,
@@ -237,6 +238,26 @@ public class MavenModelMerger
                 }
             }
             target.setFilters( merged );
+        }
+    }
+
+    @Override
+    protected void mergeBuildBase_Resources( BuildBase target, BuildBase source, boolean sourceDominant,
+                                             Map<Object, Object> context )
+    {
+        if ( sourceDominant || target.getResources().isEmpty() )
+        {
+            super.mergeBuildBase_Resources( target, source, sourceDominant, context );
+        }
+    }
+
+    @Override
+    protected void mergeBuildBase_TestResources( BuildBase target, BuildBase source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+    {
+        if ( sourceDominant || target.getTestResources().isEmpty() )
+        {
+            super.mergeBuildBase_TestResources( target, source, sourceDominant, context );
         }
     }
 
@@ -433,6 +454,65 @@ public class MavenModelMerger
             }
 
             target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
+        }
+    }
+
+    @Override
+    protected void mergePlugin_Executions( Plugin target, Plugin source, boolean sourceDominant,
+                                           Map<Object, Object> context )
+    {
+        List<PluginExecution> src = source.getExecutions();
+        if ( !src.isEmpty() )
+        {
+            List<PluginExecution> tgt = target.getExecutions();
+            Map<Object, PluginExecution> merged =
+                new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
+
+            for ( Iterator<PluginExecution> it = tgt.iterator(); it.hasNext(); )
+            {
+                PluginExecution element = it.next();
+                Object key = getPluginExecutionKey( element );
+                merged.put( key, element );
+            }
+
+            for ( Iterator<PluginExecution> it = src.iterator(); it.hasNext(); )
+            {
+                PluginExecution element = it.next();
+                Object key = getPluginExecutionKey( element );
+                PluginExecution existing = merged.get( key );
+                if ( existing != null )
+                {
+                    mergePluginExecution( existing, element, sourceDominant, context );
+                }
+                else
+                {
+                    merged.put( key, element );
+                }
+            }
+
+            target.setExecutions( new ArrayList<PluginExecution>( merged.values() ) );
+        }
+    }
+
+    @Override
+    protected void mergePluginExecution_Goals( PluginExecution target, PluginExecution source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+    {
+        List<String> src = source.getGoals();
+        if ( !src.isEmpty() )
+        {
+            List<String> tgt = target.getGoals();
+            Set<String> excludes = new LinkedHashSet<String>( tgt );
+            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            merged.addAll( tgt );
+            for ( String s : src )
+            {
+                if ( !excludes.contains( s ) )
+                {
+                    merged.add( s );
+                }
+            }
+            target.setGoals( merged );
         }
     }
 
