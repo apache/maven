@@ -2365,7 +2365,7 @@
     @Override
     public String toString()
     {
-        return getId();
+        return ( getId() != null ) ? getId() : "[null]";
     }
             ]]>
           </code>
