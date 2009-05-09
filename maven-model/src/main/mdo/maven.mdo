@@ -2588,6 +2588,16 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public boolean isInherited()
+    {
+        return ( inherited != null ) ? Boolean.parseBoolean( inherited ) : true;
+    }
+
+    public void setInherited( boolean inherited )
+    {
+        this.inherited = String.valueOf( inherited );
+    }
+
     private boolean inheritanceApplied = true;
 
     public void unsetInheritanceApplied()
