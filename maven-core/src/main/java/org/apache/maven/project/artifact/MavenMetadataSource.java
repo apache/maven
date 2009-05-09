@@ -42,6 +42,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 
 /**
  * @author Jason van Zyl
@@ -59,6 +60,9 @@ public class MavenMetadataSource
 
     @Requirement
     private MavenProjectBuilder projectBuilder;
+
+    @Requirement
+    private Logger logger;
 
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
@@ -104,6 +108,7 @@ public class MavenMetadataSource
             // When this happens we have a Maven 1.x POM, or some invalid POM. There is still a pile of
             // shit in the Maven 2.x repository that should have never found its way into the repository
             // but it did.
+            logger.debug( "Failed to resolve artifact dependencies: " + e.getMessage() );
         }
 
         return new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
