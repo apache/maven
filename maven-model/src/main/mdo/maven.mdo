@@ -1356,11 +1356,16 @@
         <field>
           <name>optional</name>
           <version>4.0.0</version>
-          <description>Indicates the dependency is optional for use of this library. While the
+          <description>
+            <![CDATA[
+            Indicates the dependency is optional for use of this library. While the
             version of the dependency will be taken into account for dependency calculation if the
-            library is used elsewhere, it will not be passed on transitively.</description>
-          <type>boolean</type>
-          <defaultValue>false</defaultValue>
+            library is used elsewhere, it will not be passed on transitively. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>false</code>.
+            ]]>
+          </description>
+          <type>String</type>
         </field>
       </fields>
       <codeSegments>
@@ -1382,6 +1387,16 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public boolean isOptional()
+    {
+        return ( optional != null ) ? Boolean.parseBoolean( optional ) : false;
+    }
+
+    public void setOptional( boolean optional )
+    {
+        this.optional = String.valueOf( optional );
+    }
+
     /**
      * @see java.lang.Object#toString()
      */
