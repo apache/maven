@@ -69,7 +69,7 @@ public class ProjectInheritanceTest
         Set set = project1.getArtifacts();
         assertNotNull("No artifacts", set);
         assertTrue("No Artifacts", set.size() > 0);
-        assertTrue("Set size should be 4, is " + set.size(), set.size() == 4);
+        assertTrue("Set size should be 3, is " + set.size(), set.size() == 3);
 
         Iterator iter = set.iterator();
         while (iter.hasNext()) {

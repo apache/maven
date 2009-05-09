@@ -320,6 +320,7 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setArtifacts( result.getArtifacts() );
+        project.getArtifacts().remove( pomArtifact );
 
         return new MavenProjectBuildingResult( project, result );
     }

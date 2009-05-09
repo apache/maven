@@ -71,7 +71,7 @@ public class ProjectInheritanceTest
         Map map = project1.getArtifactMap();
         assertNotNull("No artifacts", map);
         assertTrue("No Artifacts", map.size() > 0);
-        assertTrue("Set size should be 4, is " + map.size(), map.size() == 4);
+        assertTrue("Set size should be 3, is " + map.size(), map.size() == 3);
 
         Artifact a = (Artifact) map.get("maven-test:t10-a");
         Artifact b = (Artifact) map.get("maven-test:t10-b");
