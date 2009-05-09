@@ -306,7 +306,7 @@ public class DefaultMavenProjectBuilder
         Artifact pomArtifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         pomArtifact.setFile( pomFile );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pomArtifact ).setArtifactDependencies( project.getDependencyArtifacts() )
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pomArtifact ).setResolveTransitively( true ).setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( configuration.getLocalRepository() ).setRemoteRepostories( project.getRemoteArtifactRepositories() ).setManagedVersionMap( project.getManagedVersionMap() );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );

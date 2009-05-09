@@ -65,6 +65,11 @@ public class MavenMetadataSource
     {
         Artifact pomArtifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
 
+        if ( "pom".equals( artifact.getType() ) )
+        {
+            pomArtifact.setFile( artifact.getFile() );
+        }
+
         Set<Artifact> artifacts = Collections.emptySet();
 
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
@@ -79,7 +84,15 @@ public class MavenMetadataSource
 
             if ( !artifact.getArtifactHandler().isIncludesDependencies() )
             {                
-                ArtifactFilter filter = new ScopeArtifactFilter( artifact.getScope() ); 
+                ArtifactFilter filter;
+                if ( artifact.getScope() == null )
+                {
+                    filter = null;
+                }
+                else
+                {
+                    filter = new ScopeArtifactFilter( artifact.getScope() );
+                }
                                 
                 artifacts = project.createArtifacts( filter );
                 
