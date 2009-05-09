@@ -20,26 +20,39 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 
 public class ProjectClasspathTest
     extends AbstractMavenProjectTestCase
 {
-    private String dir = "projects/scope/";
-    
-    public void setUp() throws Exception 
+    private static final String dir = "projects/scope/";
+
+    public void setUp()
+        throws Exception
     {
-		super.setUp();
-		projectBuilder = lookup(MavenProjectBuilder.class, "test");
-	}
-    
+        super.setUp();
+        projectBuilder = lookup( MavenProjectBuilder.class, "default" );
+    }
+
+    @Override
+    protected String getCustomConfigurationName()
+    {
+        return null;
+    }
+
     public void testProjectClasspath()
         throws Exception
     {
         File f = getFileForClasspathResource( dir + "project-with-scoped-dependencies.xml" );
-        
+
         MavenProject project = getProjectWithDependencies( f );
 
         Artifact artifact;
@@ -59,8 +72,8 @@ public class ProjectClasspathTest
         assertNull( "Check no test dependencies are transitive", artifact );
 
         artifact = getArtifact( project, "maven-test-test", "scope-compile" );
-        assertNotNull(artifact);
-        
+        assertNotNull( artifact );
+
         System.out.println( "a = " + artifact );
         System.out.println( "b = " + artifact.getScope() );
         assertEquals( "Check scope", "test", artifact.getScope() );
@@ -107,23 +120,72 @@ public class ProjectClasspathTest
     {
         String artifactId = "scope-" + scope;
         Artifact artifact = getArtifact( project, "maven-test", artifactId );
+        assertNotNull( artifact );
         assertEquals( "Check scope", scopeValue, artifact.getScope() );
     }
 
     private Artifact getArtifact( MavenProject project, String groupId, String artifactId )
-    {  
-    	System.out.println( "[ Looking for " + groupId + ":" + artifactId + " ]");
-        for ( Iterator i = project.getArtifacts().iterator(); i.hasNext(); )
+    {
+        System.out.println( "[ Looking for " + groupId + ":" + artifactId + " ]" );
+        for ( Iterator<Artifact> i = project.getArtifacts().iterator(); i.hasNext(); )
         {
-            Artifact a = (Artifact) i.next();
-            System.out.println(a.toString());
+            Artifact a = i.next();
+            System.out.println( a.toString() );
             if ( artifactId.equals( a.getArtifactId() ) && a.getGroupId().equals( groupId ) )
             {
-                System.out.println("RETURN");
+                System.out.println( "RETURN" );
                 return a;
             }
         }
-        System.out.println("Return null");
+        System.out.println( "Return null" );
         return null;
     }
+
+    public static class TestMavenProjectBuilder
+        extends DefaultMavenProjectBuilder
+    {
+
+        @Override
+        public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration )
+            throws ProjectBuildingException
+        {
+            if ( "maven-test".equals( artifact.getGroupId() ) )
+            {
+                String scope = artifact.getArtifactId().substring( "scope-".length() );
+                try
+                {
+                    artifact.setFile( getFileForClasspathResource( dir + "transitive-" + scope + "-dep.xml" ) );
+                }
+                catch ( FileNotFoundException e )
+                {
+                    throw new IllegalStateException( "Missing test POM for " + artifact );
+                }
+            }
+            if ( artifact.getFile() == null )
+            {
+                return new MavenProject();
+            }
+            return build( artifact.getFile(), configuration );
+        }
+    }
+
+    public static class MetadataSource
+        extends MavenMetadataSource
+    {
+
+        @Override
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                         List<ArtifactRepository> remoteRepositories )
+            throws ArtifactMetadataRetrievalException
+        {
+            ResolutionGroup rg = super.retrieve( artifact, localRepository, remoteRepositories );
+            for ( Artifact a : rg.getArtifacts() )
+            {
+                a.setResolved( true );
+            }
+            return rg;
+        }
+
+    }
+
 }

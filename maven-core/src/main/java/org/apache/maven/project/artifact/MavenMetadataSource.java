@@ -17,6 +17,7 @@ package org.apache.maven.project.artifact;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,10 +31,9 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -87,20 +87,22 @@ public class MavenMetadataSource
             project = projectBuilder.buildFromRepository( pomArtifact, configuration );
 
             if ( !artifact.getArtifactHandler().isIncludesDependencies() )
-            {                
-                ArtifactFilter filter;
-                if ( artifact.getScope() == null )
+            {
+                artifacts = new LinkedHashSet<Artifact>();
+
+                for ( Dependency d : project.getDependencies() )
                 {
-                    filter = null;
+                    String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
+
+                    if ( effectiveScope != null )
+                    {
+                        Artifact dependencyArtifact =
+                            repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
+                                                             effectiveScope, d.getType() );
+
+                        artifacts.add( dependencyArtifact );
+                    }
                 }
-                else
-                {
-                    filter = new ScopeArtifactFilter( artifact.getScope() );
-                }
-                                
-                artifacts = project.createArtifacts( filter );
-                
-                project.setArtifacts( artifacts );                
             }
         }
         catch ( ProjectBuildingException e )
@@ -112,6 +114,47 @@ public class MavenMetadataSource
         }
 
         return new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
+    }
+
+    private String getEffectiveScope( String originalScope, String inheritedScope )
+    {
+        String effectiveScope = Artifact.SCOPE_RUNTIME;
+
+        if ( originalScope == null )
+        {
+            originalScope = Artifact.SCOPE_COMPILE;
+        }
+
+        if ( inheritedScope == null )
+        {
+            // direct dependency retains its scope
+            effectiveScope = originalScope;
+        }
+        else if ( Artifact.SCOPE_TEST.equals( originalScope ) || Artifact.SCOPE_PROVIDED.equals( originalScope ) )
+        {
+            // test and provided are not transitive, so exclude them
+            effectiveScope = null;
+        }
+        else if ( Artifact.SCOPE_SYSTEM.equals( originalScope ) )
+        {
+            // system scope come through unchanged...
+            effectiveScope = Artifact.SCOPE_SYSTEM;
+        }
+        else if ( Artifact.SCOPE_COMPILE.equals( originalScope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
+        {
+            // added to retain compile scope. Remove if you want compile inherited as runtime
+            effectiveScope = Artifact.SCOPE_COMPILE;
+        }
+        else if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
+        {
+            effectiveScope = Artifact.SCOPE_TEST;
+        }
+        else if ( Artifact.SCOPE_PROVIDED.equals( inheritedScope ) )
+        {
+            effectiveScope = Artifact.SCOPE_PROVIDED;
+        }
+
+        return effectiveScope;
     }
 
     public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
@@ -166,4 +209,5 @@ public class MavenMetadataSource
 
         return versions;
     }
+
 }

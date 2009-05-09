@@ -79,8 +79,8 @@ public abstract class AbstractMavenProjectTestCase
         return markerFile.getAbsoluteFile().getParentFile();
     }
 
-    protected File getFileForClasspathResource( String resource )
-        throws FileNotFoundException, URISyntaxException
+    protected static File getFileForClasspathResource( String resource )
+        throws FileNotFoundException
     {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
@@ -91,7 +91,7 @@ public abstract class AbstractMavenProjectTestCase
             throw new FileNotFoundException( "Unable to find: " + resource );
         }
 
-        return new File( new URI( resourceUrl.toString().replaceAll( " ", "%20" ) ) );
+        return new File( URI.create( resourceUrl.toString().replaceAll( " ", "%20" ) ) );
     }
 
     protected ArtifactRepository getLocalRepository()

@@ -382,7 +382,7 @@ public class DefaultArtifactResolver
             }
             catch ( ComponentLookupException e )
             {
-                // Won't happen
+                throw new IllegalStateException( "Failed to lookup metadata source implementation", e );
             }
         }
         
