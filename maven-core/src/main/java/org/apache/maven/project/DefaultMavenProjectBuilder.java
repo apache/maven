@@ -20,10 +20,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -46,7 +44,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.interpolator.Interpolator;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.lifecycle.LifecycleBindingsInjector;
-import org.apache.maven.model.processors.PluginProcessor;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
@@ -161,14 +158,7 @@ public class DefaultMavenProjectBuilder
 
             project = this.fromDomainModelToMavenProject( model, domainModel.getParentFile(), configuration, pomFile );
 
-            Set<Plugin> pluginsFromProject = new LinkedHashSet<Plugin>();
-            for ( Plugin p : project.getModel().getBuild().getPlugins() )
-            {
-                Plugin copy = new Plugin();
-                PluginProcessor.copy2( p, copy, true );
-                copy.setDependencies( p.getDependencies() );
-                pluginsFromProject.add( copy );
-            }
+            Collection<Plugin> pluginsFromProject = project.getModel().getBuild().getPlugins();
 
             // Merge the various sources for mojo configuration:
             // 1. default values from mojo descriptor
@@ -176,34 +166,23 @@ public class DefaultMavenProjectBuilder
             // 3. POM values from per-execution configuration
             // These configuration sources are given in increasing order of dominance.
 
-            lifecycle.populateDefaultConfigurationForPlugins( pluginsFromProject, project, configuration.getLocalRepository() );
-
+            // push plugin configuration down to executions
             for ( Plugin buildPlugin : pluginsFromProject )
             {
                 Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
-                Plugin x = containsPlugin( buildPlugin, project.getModel().getBuild().getPlugins() );
 
-                for ( PluginExecution e : buildPlugin.getExecutions() )
+                if ( dom != null )
                 {
-                    if ( dom != null )
+                    for ( PluginExecution e : buildPlugin.getExecutions() )
                     {
-                        Xpp3Dom dom1 = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( dom ), (Xpp3Dom) e.getConfiguration() );
+                        Xpp3Dom dom1 = Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) e.getConfiguration(), new Xpp3Dom( dom ) );
                         e.setConfiguration( dom1 );
-                    }
-                    for ( String g : e.getGoals() )
-                    {
-                        if ( x != null )
-                        {
-                            PluginExecution pe = contains( g, x.getExecutions() );
-                            if ( pe != null )
-                            {
-                                Xpp3Dom dom2 = Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pe.getConfiguration(), (Xpp3Dom) e.getConfiguration() );
-                                e.setConfiguration( dom2 );
-                            }
-                        }
                     }
                 }
             }
+
+            // merge in default values from mojo descriptor
+            lifecycle.populateDefaultConfigurationForPlugins( pluginsFromProject, project, configuration.getLocalRepository() );
 
             project.getModel().getBuild().setPlugins( new ArrayList<Plugin>( pluginsFromProject ) );
         }
@@ -324,31 +303,6 @@ public class DefaultMavenProjectBuilder
         project.getArtifacts().remove( pomArtifact );
 
         return new MavenProjectBuildingResult( project, result );
-    }
-
-    private static PluginExecution contains( String goal, List<PluginExecution> plugins )
-    {
-        for ( PluginExecution pe : plugins )
-        {
-            if ( pe.getGoals().contains( goal ) )
-            {
-                return pe;
-            }
-        }
-        return null;
-    }
-
-    private static Plugin containsPlugin( Plugin plugin, List<Plugin> plugins )
-    {
-        for ( Plugin p : plugins )
-        {
-            if ( p.getGroupId().equals( plugin.getGroupId() ) && p.getArtifactId().equals( plugin.getArtifactId() ) )
-            {
-                return p;
-            }
-        }
-
-        return null;
     }
 
     private Model interpolateDomainModel( DomainModel domainModel, ProjectBuilderConfiguration config, File projectDescriptor )
