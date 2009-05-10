@@ -19,6 +19,7 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -71,11 +72,10 @@ public class EmptyLifecycleExecutor
         return Collections.emptySet();
     }
 
-    public Set<Plugin> populateDefaultConfigurationForPlugins( Set<Plugin> plugins, MavenProject project,
+    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, MavenProject project,
                                                                ArtifactRepository localRepository )
         throws LifecycleExecutionException
     {
-        return plugins;
     }
 
 }

@@ -647,7 +647,7 @@ public class DefaultLifecycleExecutor
         return plugin;
     }
     
-    public Set<Plugin> populateDefaultConfigurationForPlugins( Set<Plugin> plugins, MavenProject project, ArtifactRepository localRepository ) 
+    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, MavenProject project, ArtifactRepository localRepository ) 
         throws LifecycleExecutionException
     {
         for( Plugin p : plugins )
@@ -661,8 +661,6 @@ public class DefaultLifecycleExecutor
                 }
             }
         }
-        
-        return plugins;
     }    
     
     public Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository ) 

@@ -19,6 +19,7 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -63,7 +64,7 @@ public interface LifecycleExecutor
     // Given a set of {@link org.apache.maven.Plugin} objects where the GAV is set we can lookup the plugin
     // descriptor and populate the default configuration.
     //
-    Set<Plugin> populateDefaultConfigurationForPlugins( Set<Plugin> plugins, MavenProject project, ArtifactRepository localRepository )
+    void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, MavenProject project, ArtifactRepository localRepository )
         throws LifecycleExecutionException;
     
     void execute( MavenSession session )

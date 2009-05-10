@@ -176,9 +176,9 @@ public class DefaultMavenProjectBuilder
             // 3. POM values from per-execution configuration
             // These configuration sources are given in increasing order of dominance.
 
-            Set<Plugin> processedPlugins = lifecycle.populateDefaultConfigurationForPlugins( pluginsFromProject, project, configuration.getLocalRepository() );
+            lifecycle.populateDefaultConfigurationForPlugins( pluginsFromProject, project, configuration.getLocalRepository() );
 
-            for ( Plugin buildPlugin : processedPlugins )
+            for ( Plugin buildPlugin : pluginsFromProject )
             {
                 Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
                 Plugin x = containsPlugin( buildPlugin, project.getModel().getBuild().getPlugins() );
@@ -205,7 +205,7 @@ public class DefaultMavenProjectBuilder
                 }
             }
 
-            project.getModel().getBuild().setPlugins( new ArrayList<Plugin>( processedPlugins ) );
+            project.getModel().getBuild().setPlugins( new ArrayList<Plugin>( pluginsFromProject ) );
         }
         catch ( IOException e )
         {
