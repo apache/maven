@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
+import org.apache.maven.model.management.DefaultManagementInjector;
+import org.apache.maven.model.management.ManagementInjector;
 import org.apache.maven.model.processors.BuildProcessor;
 import org.apache.maven.model.processors.CiManagementProcessor;
 import org.apache.maven.model.processors.ContributorsProcessor;
@@ -288,6 +290,8 @@ public class ProcessorContext
     	p1.setArtifactId(id);
     	build.addPlugin(p1);   	
     }
+
+    private static ManagementInjector managementInjector = new DefaultManagementInjector();
     
     public static Model processManagementNodes(Model target) 
     	throws IOException
@@ -296,6 +300,12 @@ public class ProcessorContext
     //	plugin.setArtifactId("maven-compiler-plugin");
   //  	target.getBuild().addPlugin(plugin);
         // Dependency Management
+        managementInjector.injectManagement( target );
+        if ( true )
+        {
+            return target;
+        }
+
         DependencyManagementProcessor depProc = new DependencyManagementProcessor();
         if ( target.getDependencyManagement() != null )
         {

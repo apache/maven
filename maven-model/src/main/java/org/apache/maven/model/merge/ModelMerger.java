@@ -38,6 +38,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.FileSet;
 import org.apache.maven.model.IssueManagement;
@@ -1031,6 +1032,183 @@ public class ModelMerger
     protected void mergeDependency( Dependency target, Dependency source, boolean sourceDominant,
                                     Map<Object, Object> context )
     {
+        mergeDependency_GroupId( target, source, sourceDominant, context );
+        mergeDependency_ArtifactId( target, source, sourceDominant, context );
+        mergeDependency_Version( target, source, sourceDominant, context );
+        mergeDependency_Type( target, source, sourceDominant, context );
+        mergeDependency_Classifier( target, source, sourceDominant, context );
+        mergeDependency_Scope( target, source, sourceDominant, context );
+        mergeDependency_SystemPath( target, source, sourceDominant, context );
+        mergeDependency_Optional( target, source, sourceDominant, context );
+        mergeDependency_Exclusions( target, source, sourceDominant, context );
+    }
+
+    protected void mergeDependency_GroupId( Dependency target, Dependency source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+    {
+        String src = source.getGroupId();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getGroupId() == null )
+            {
+                target.setGroupId( src );
+            }
+        }
+    }
+
+    protected void mergeDependency_ArtifactId( Dependency target, Dependency source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+    {
+        String src = source.getArtifactId();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getArtifactId() == null )
+            {
+                target.setArtifactId( src );
+            }
+        }
+    }
+
+    protected void mergeDependency_Version( Dependency target, Dependency source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+    {
+        String src = source.getVersion();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getVersion() == null )
+            {
+                target.setVersion( src );
+            }
+        }
+    }
+
+    protected void mergeDependency_Type( Dependency target, Dependency source, boolean sourceDominant,
+                                         Map<Object, Object> context )
+    {
+        String src = source.getType();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getType() == null )
+            {
+                target.setType( src );
+            }
+        }
+    }
+
+    protected void mergeDependency_Classifier( Dependency target, Dependency source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+    {
+        String src = source.getClassifier();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getClassifier() == null )
+            {
+                target.setClassifier( src );
+            }
+        }
+    }
+
+    protected void mergeDependency_Scope( Dependency target, Dependency source, boolean sourceDominant,
+                                          Map<Object, Object> context )
+    {
+        String src = source.getScope();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getScope() == null )
+            {
+                target.setScope( src );
+            }
+        }
+    }
+
+    protected void mergeDependency_SystemPath( Dependency target, Dependency source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+    {
+        String src = source.getSystemPath();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getSystemPath() == null )
+            {
+                target.setSystemPath( src );
+            }
+        }
+    }
+
+    protected void mergeDependency_Optional( Dependency target, Dependency source, boolean sourceDominant,
+                                             Map<Object, Object> context )
+    {
+        String src = source.getOptional();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getOptional() == null )
+            {
+                target.setOptional( src );
+            }
+        }
+    }
+
+    protected void mergeDependency_Exclusions( Dependency target, Dependency source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+    {
+        List<Exclusion> src = source.getExclusions();
+        if ( !src.isEmpty() )
+        {
+            List<Exclusion> tgt = target.getExclusions();
+
+            Map<Object, Exclusion> merged = new LinkedHashMap<Object, Exclusion>( ( src.size() + tgt.size() ) * 2 );
+
+            for ( Iterator<Exclusion> it = tgt.iterator(); it.hasNext(); )
+            {
+                Exclusion element = it.next();
+                Object key = getExclusionKey( element );
+                merged.put( key, element );
+            }
+
+            for ( Iterator<Exclusion> it = src.iterator(); it.hasNext(); )
+            {
+                Exclusion element = it.next();
+                Object key = getExclusionKey( element );
+                if ( sourceDominant || !merged.containsKey( key ) )
+                {
+                    merged.put( key, element );
+                }
+            }
+
+            target.setExclusions( new ArrayList<Exclusion>( merged.values() ) );
+        }
+    }
+
+    protected void mergeExclusion( Exclusion target, Exclusion source, boolean sourceDominant,
+                                   Map<Object, Object> context )
+    {
+        mergeExclusion_GroupId( target, source, sourceDominant, context );
+        mergeExclusion_ArtifactId( target, source, sourceDominant, context );
+    }
+
+    protected void mergeExclusion_GroupId( Exclusion target, Exclusion source, boolean sourceDominant,
+                                           Map<Object, Object> context )
+    {
+        String src = source.getGroupId();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getGroupId() == null )
+            {
+                target.setGroupId( src );
+            }
+        }
+    }
+
+    protected void mergeExclusion_ArtifactId( Exclusion target, Exclusion source, boolean sourceDominant,
+                                              Map<Object, Object> context )
+    {
+        String src = source.getArtifactId();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getArtifactId() == null )
+            {
+                target.setArtifactId( src );
+            }
+        }
     }
 
     protected void mergeReporting( Reporting target, Reporting source, boolean sourceDominant,
@@ -2295,6 +2473,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<PluginExecution> tgt = target.getExecutions();
+
             Map<Object, PluginExecution> merged =
                 new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
 
@@ -2594,6 +2773,11 @@ public class ModelMerger
     protected Object getExtensionKey( Extension object )
     {
         return object;
+    }
+
+    protected Object getExclusionKey( Exclusion object )
+    {
+        return object.getGroupId() + ':' + object.getArtifactId();
     }
 
 }
