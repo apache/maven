@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -46,6 +45,7 @@ import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.interpolator.Interpolator;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.lifecycle.LifecycleBindingsInjector;
 import org.apache.maven.model.processors.PluginProcessor;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationException;
@@ -86,6 +86,9 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     private Interpolator interpolator;
+
+    @Requirement
+    private LifecycleBindingsInjector lifecycleBindingsInjector;
 
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
@@ -152,9 +155,7 @@ public class DefaultMavenProjectBuilder
         {
             Model model = interpolateDomainModel( domainModel, configuration, pomFile );
 
-            Set<Plugin> plugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles( model.getPackaging() );
-
-            addPluginsToModel( model, plugins );
+            lifecycleBindingsInjector.injectLifecycleBindings( model );
 
             ProcessorContext.processManagementNodes( model );
 
@@ -337,43 +338,6 @@ public class DefaultMavenProjectBuilder
         return null;
     }
 
-    public static void addPluginsToModel( Model target, Set<Plugin> plugins )
-    {
-        List<Plugin> mngPlugins = ( target.getBuild().getPluginManagement() != null ) ? target.getBuild().getPluginManagement().getPlugins() : new ArrayList<Plugin>();
-
-        List<Plugin> pomPlugins = new ArrayList<Plugin>( target.getBuild().getPlugins() );
-
-        List<Plugin> lifecyclePlugins = new ArrayList<Plugin>();
-
-        for ( Plugin p : plugins )
-        {
-            //Go ahead and add version if exists in pluginManagement - don't use default version
-            Plugin mngPlugin = containsPlugin( p, mngPlugins );
-            if ( mngPlugin != null && mngPlugin.getVersion() != null )
-            {
-                //System.out.println("Set version:" + p.getVersion() + ": To = " + mngPlugin.getVersion());
-                p.setVersion( mngPlugin.getVersion() );
-            }
-
-            Plugin pomPlugin = containsPlugin( p, pomPlugins );
-            if ( pomPlugin == null )
-            {
-                lifecyclePlugins.add( p );
-            }
-            else
-            {
-                PluginProcessor.copy2( p, pomPlugin, true );
-                if ( p.getConfiguration() != null )
-                {
-                    System.out.println( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) p.getConfiguration(), (Xpp3Dom) pomPlugin.getConfiguration() ) );
-                }
-            }
-        }
-        pomPlugins.addAll( lifecyclePlugins );
-        target.getBuild().setPlugins( pomPlugins );
-
-    }
-
     private static Plugin containsPlugin( Plugin plugin, List<Plugin> plugins )
     {
         for ( Plugin p : plugins )
@@ -473,7 +437,7 @@ public class DefaultMavenProjectBuilder
 
             if ( mavenParents.size() > 0 )
             {
-                DomainModel dm = (DomainModel) mavenParents.get( 0 );
+                DomainModel dm = mavenParents.get( 0 );
                 parentFile = dm.getFile();
                 domainModel.setParentFile( parentFile );
                 lineageCount = mavenParents.size();
@@ -487,7 +451,7 @@ public class DefaultMavenProjectBuilder
         //Process Profiles
         for ( DomainModel domain : domainModels )
         {
-            DomainModel dm = (DomainModel) domain;
+            DomainModel dm = domain;
 
             if ( !dm.getModel().getProfiles().isEmpty() )
             {
