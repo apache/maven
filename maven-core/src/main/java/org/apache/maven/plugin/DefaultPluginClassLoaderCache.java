@@ -12,12 +12,12 @@ public class DefaultPluginClassLoaderCache
 {
     private Map<String,ClassRealm> pluginClassLoaders = new HashMap<String,ClassRealm>();
     
-    public void cachePluginClassLoader( String key, ClassRealm pluginClassLoader )
+    public void put( String key, ClassRealm pluginClassLoader )
     {
         pluginClassLoaders.put(  key, pluginClassLoader );
     }
 
-    public ClassRealm getPluginClassLoader( String key )
+    public ClassRealm get( String key )
     {
         return pluginClassLoaders.get( key );
     }

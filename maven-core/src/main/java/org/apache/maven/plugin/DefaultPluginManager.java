@@ -198,7 +198,7 @@ public class DefaultPluginManager
             }
         }
         
-        //pluginRealm.display();
+        pluginRealm.display();
         
         try
         {
@@ -215,7 +215,7 @@ public class DefaultPluginManager
             throw new PluginContainerException( plugin, pluginRealm, "Error scanning plugin realm for components.", e );
         }
 
-        pluginClassLoaderCache.cachePluginClassLoader( constructPluginKey( plugin ), pluginRealm );
+        pluginClassLoaderCache.put( constructPluginKey( plugin ), pluginRealm );
         
         PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
         
@@ -345,7 +345,7 @@ public class DefaultPluginManager
             mojo = getConfiguredMojo( session, mojoExecution, project, false, mojoExecution );
 
             //pluginRealm = pluginDescriptor.getClassRealm();
-            pluginRealm = pluginClassLoaderCache.getPluginClassLoader( constructPluginKey( mojoDescriptor.getPluginDescriptor() ) );            
+            pluginRealm = pluginClassLoaderCache.get( constructPluginKey( mojoDescriptor.getPluginDescriptor() ) );            
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
 

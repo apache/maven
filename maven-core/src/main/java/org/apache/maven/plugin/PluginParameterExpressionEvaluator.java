@@ -166,7 +166,7 @@ public class PluginParameterExpressionEvaluator
             value = project.getExecutionProject();
         }
         else if ( expression.startsWith( "project" ) || expression.startsWith( "pom" ) )
-        {
+        {            
             try
             {
                 int pathSeparator = expression.indexOf( "/" );
@@ -187,7 +187,7 @@ public class PluginParameterExpressionEvaluator
                 // TODO: don't catch exception
                 throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
                                                          e );
-            }
+            }            
         }
         else if ( expression.equals( "mojo" ) )
         {

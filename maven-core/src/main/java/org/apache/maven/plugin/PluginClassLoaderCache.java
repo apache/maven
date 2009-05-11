@@ -13,7 +13,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
  */
 public interface PluginClassLoaderCache
 {
-    void cachePluginClassLoader( String key, ClassRealm pluginClassLoader );
+    void put( String key, ClassRealm pluginClassLoader );
     
-    ClassRealm getPluginClassLoader( String key );
+    ClassRealm get( String key );
 }
