@@ -218,8 +218,6 @@ public class DefaultMavenProjectBuilder
         project.setFile( pomFile );
         project.setActiveProfiles( projectProfiles );
 
-        setBuildOutputDirectoryOnParent( project );
-
         projectCache.put( pomFile.getAbsolutePath(), project );
                 
         return project;
@@ -500,16 +498,6 @@ public class DefaultMavenProjectBuilder
         }
 
         return ArtifactUtils.versionlessKey( gid, aid );
-    }
-
-    private static void setBuildOutputDirectoryOnParent( MavenProject project )
-    {
-        MavenProject parent = project.getParent();
-        if ( parent != null && parent.getFile() != null && parent.getModel().getBuild() != null )
-        {
-            parent.getModel().getBuild().setDirectory( parent.getFile().getAbsolutePath() );
-            setBuildOutputDirectoryOnParent( parent );
-        }
     }
 
     /**
