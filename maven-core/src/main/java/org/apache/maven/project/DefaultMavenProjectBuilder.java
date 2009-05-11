@@ -44,6 +44,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.interpolator.Interpolator;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.lifecycle.LifecycleBindingsInjector;
+import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
@@ -86,6 +87,9 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     private LifecycleBindingsInjector lifecycleBindingsInjector;
+
+    @Requirement
+    private PluginConfigurationExpander pluginConfigurationExpander;
 
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
@@ -168,34 +172,11 @@ public class DefaultMavenProjectBuilder
             project = this.fromDomainModelToMavenProject( model, domainModel.getParentFile(), configuration, pomFile );
 
             if ( configuration.isProcessPlugins() )
-            {            
-                Collection<Plugin> pluginsFromProject = project.getModel().getBuild().getPlugins();
+            {
+                pluginConfigurationExpander.expandPluginConfiguration( project.getModel() );
 
-                // Merge the various sources for mojo configuration:
-                // 1. default values from mojo descriptor
-                // 2. POM values from per-plugin configuration
-                // 3. POM values from per-execution configuration
-                // These configuration sources are given in increasing order of dominance.
-
-                // push plugin configuration down to executions
-                for ( Plugin buildPlugin : pluginsFromProject )
-                {
-                    Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
-
-                    if ( dom != null )
-                    {
-                        for ( PluginExecution e : buildPlugin.getExecutions() )
-                        {
-                            Xpp3Dom dom1 = Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) e.getConfiguration(), new Xpp3Dom( dom ) );
-                            e.setConfiguration( dom1 );
-                        }
-                    }
-                }
-
-                // merge in default values from mojo descriptor
-                lifecycle.populateDefaultConfigurationForPlugins( pluginsFromProject, project, configuration.getLocalRepository() );
-
-                project.getModel().getBuild().setPlugins( new ArrayList<Plugin>( pluginsFromProject ) );
+                lifecycle.populateDefaultConfigurationForPlugins( project.getModel().getBuild().getPlugins(), project,
+                                                                  configuration.getLocalRepository() );
             }
         }
         catch ( IOException e )
