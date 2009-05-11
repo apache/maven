@@ -118,6 +118,24 @@ public class MavenMetadataSource
         return new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
     }
 
+    private Set<Artifact> createArtifacts( List<Dependency> dependencies )
+    {
+        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+
+        for ( Dependency d : dependencies )
+        {                    
+            String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
+
+            if ( effectiveScope != null )
+            {
+                Artifact dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
+
+                artifacts.add( dependencyArtifact );
+            }
+        }
+        
+    }
+    
     private String getEffectiveScope( String originalScope, String inheritedScope )
     {
         String effectiveScope = Artifact.SCOPE_RUNTIME;
@@ -215,6 +233,7 @@ public class MavenMetadataSource
         return versions;
     }
     
+    /*
     // USED BY MAVEN ASSEMBLY PLUGIN                                                                                                                                                                                                    
     @Deprecated                                                                                                                                                                                                                         
     public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )                                                                                                                                                                 
@@ -228,5 +247,6 @@ public class MavenMetadataSource
         {                                                                                                                                                                                                                               
             throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile, e.getCauseException() );                                                                                                                                                       
         }                                                                                                                                                                                                                               
-    }                 
+    } 
+    */                
 }
