@@ -68,6 +68,9 @@ public class DefaultMaven
     @Requirement
     protected RuntimeInformation runtimeInformation;
     
+    @Requirement
+    List<LocalArtifactRepository> localArtifactRepositories; 
+    
     public List<String> getLifecyclePhases()
     {
         return lifecycleExecutor.getLifecyclePhases();
@@ -131,6 +134,17 @@ public class DefaultMaven
         catch ( DuplicateProjectException e )
         {
             return processResult( result, e );
+        }
+       
+        // Desired order of precedence for local artifact repositories
+        //
+        // Reactor
+        // Workspace
+        // User Local Repository
+        
+        if ( localArtifactRepositories != null && localArtifactRepositories.size() > 0 )
+        {
+            delegatingLocalArtifactRepository.addToBeginningOfSearchOrder( localArtifactRepositories.get( 0 ) );            
         }
         
         delegatingLocalArtifactRepository.addToBeginningOfSearchOrder( new ReactorArtifactRepository( projects ) );
