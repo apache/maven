@@ -511,6 +511,16 @@ public class MavenProject
                 }
             }
         }
+
+        /*
+        System.out.println( "CLASSPATH: ");
+        for( String s : list )
+        {
+            System.out.println( ">>>>> " + s );
+        }
+        */
+            
+        
         return list;
     }
 
@@ -1580,35 +1590,6 @@ public class MavenProject
         {
             return build.getExtensions();
         }
-    }
-
-    /**
-     * @return {@link Set} &lt; {@link Artifact} >
-     * @todo the lazy initialisation of this makes me uneasy.
-     */
-    //TODO: this method doesn't belong here at all
-    @Deprecated
-    public Set<Artifact> createArtifacts( ArtifactFilter filter )
-    {
-        Set<Artifact> artifacts = new HashSet<Artifact>();
-        
-        for( Dependency d : getDependencies() )
-        {
-            //TODO: something is wrong here because the scope of compile is never set correctly.
-            if ( d.getScope() == null )
-            {
-                d.setScope( Artifact.SCOPE_COMPILE );
-            }                        
-            
-            Artifact artifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() );
-            
-            if ( filter == null || filter.include( artifact ) )
-            {            
-                artifacts.add( artifact );
-            }
-        }
-        
-        return artifacts;
     }
 
     public void addProjectReference( MavenProject project )

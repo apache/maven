@@ -13,7 +13,7 @@ public class DelegatingLocalArtifactRepository
 {
     private List<LocalArtifactRepository> localRepositories;        
     
-    public void addLocalArtifactRepository( LocalArtifactRepository localRepository )
+    public void addToEndOfSearchOrder( LocalArtifactRepository localRepository )
     {
         if ( localRepositories == null )
         {
@@ -22,7 +22,17 @@ public class DelegatingLocalArtifactRepository
         
         localRepositories.add( localRepository );
     }
-    
+
+    public void addToBeginningOfSearchOrder( LocalArtifactRepository localRepository )
+    {
+        if ( localRepositories == null )
+        {
+            localRepositories = new ArrayList<LocalArtifactRepository>();
+        }
+        
+        localRepositories.add( 0, localRepository );
+    }
+           
     @Override
     public Artifact find( Artifact artifact )
     {

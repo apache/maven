@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
@@ -31,6 +32,7 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.model.Dependency;
@@ -93,7 +95,7 @@ public class MavenMetadataSource
                 artifacts = new LinkedHashSet<Artifact>();
 
                 for ( Dependency d : project.getDependencies() )
-                {
+                {                    
                     String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
 
                     if ( effectiveScope != null )
@@ -212,5 +214,19 @@ public class MavenMetadataSource
 
         return versions;
     }
-
+    
+    // USED BY MAVEN ASSEMBLY PLUGIN                                                                                                                                                                                                    
+    @Deprecated                                                                                                                                                                                                                         
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )                                                                                                                                                                 
+        throws InvalidDependencyVersionException                                                                                                                                                                                        
+    {                                                                                                                                                                                                                                   
+        try                                                                                                                                                                                                                             
+        {                                                                                                                                                                                                                               
+            return repositorySystem.createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, project );                                                                                                                                            
+        }                                                                                                                                                                                                                               
+        catch ( VersionNotFoundException e )                                                                                                                                                                                            
+        {                                                                                                                                                                                                                               
+            throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile, e.getCauseException() );                                                                                                                                                       
+        }                                                                                                                                                                                                                               
+    }                 
 }

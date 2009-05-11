@@ -198,7 +198,7 @@ public class DefaultPluginManager
             }
         }
         
-        pluginRealm.display();
+        //pluginRealm.display();
         
         try
         {
@@ -302,32 +302,9 @@ public class DefaultPluginManager
             logger.warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
         }
 
-        if ( mojoDescriptor.isDependencyResolutionRequired() != null )
-        {
-            try
-            {
-                // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
-                downloadProjectDependencies( session, mojoDescriptor.isDependencyResolutionRequired() );
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                throw new PluginExecutionException( mojoExecution, project, e.getMessage() );
-            }
-            catch ( InvalidDependencyVersionException e )
-            {
-                throw new PluginExecutionException( mojoExecution, project, e.getMessage() );
-            }
-            catch ( ArtifactNotFoundException e )
-            {
-                throw new PluginExecutionException( mojoExecution, project, e.getMessage() );
-            }
-        }
-
         String goalName = mojoDescriptor.getFullGoalName();
 
         Mojo mojo = null;
-
-        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
         String goalExecId = goalName;
         if ( mojoExecution.getExecutionId() != null )
@@ -344,7 +321,6 @@ public class DefaultPluginManager
         {
             mojo = getConfiguredMojo( session, mojoExecution, project, false, mojoExecution );
 
-            //pluginRealm = pluginDescriptor.getClassRealm();
             pluginRealm = pluginClassLoaderCache.get( constructPluginKey( mojoDescriptor.getPluginDescriptor() ) );            
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
@@ -559,47 +535,6 @@ public class DefaultPluginManager
                     logger.debug( "Failed to release plugin container - ignoring." );
                 }
             }
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    // Artifact downloading
-    // ----------------------------------------------------------------------
-
-    //TODO: This needs to be moved out of here, and there needs to be some interplay between the lifecycle executor and the plugin manager.   
-    private void downloadProjectDependencies( MavenSession session, String scope )
-        throws ArtifactResolutionException, ArtifactNotFoundException, InvalidDependencyVersionException
-    {
-        MavenProject project = session.getCurrentProject();
-
-        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
-        
-        ArtifactFilter filter = new ScopeArtifactFilter( scope );
-
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            // Here the root is not resolved because we are presumably working with a project locally.
-            .setResolveRoot( false )
-            .setResolveTransitively( true )
-            //.setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( session.getLocalRepository() )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
-            .setManagedVersionMap( project.getManagedVersionMap() )
-            .setFilter( filter );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-
-        resolutionErrorHandler.throwErrors( request, result );
-
-        //TODO: this is wrong
-        project.setArtifacts( result.getArtifacts() );
-
-        ArtifactRepository localRepository = session.getLocalRepository();
-        List<ArtifactRepository> remoteArtifactRepositories = session.getCurrentProject().getRemoteArtifactRepositories();
-
-        for ( Artifact projectArtifact : session.getCurrentProject().getArtifacts() )
-        {
-            repositorySystem.resolve( new ArtifactResolutionRequest( projectArtifact, localRepository, remoteArtifactRepositories ) );
         }
     }
 

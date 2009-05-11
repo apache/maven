@@ -36,8 +36,13 @@
           <role>org.apache.maven.plugin.PluginManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.lifecycle.mapping.LifecycleMapping
-          </role>
+          <role>org.apache.maven.artifact.resolver.ResolutionErrorHandler</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.repository.RepositorySystem</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
           <field-name>lifecycleMappings</field-name>
         </requirement>
       </requirements>

@@ -86,7 +86,7 @@ public class DefaultMaven
         MavenExecutionResult result = new DefaultMavenExecutionResult();
         
         DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository();
-        delegatingLocalArtifactRepository.addLocalArtifactRepository( new UserLocalArtifactRepository( request.getLocalRepository() ) ); 
+        delegatingLocalArtifactRepository.addToEndOfSearchOrder( new UserLocalArtifactRepository( request.getLocalRepository() ) ); 
         request.setLocalRepository( delegatingLocalArtifactRepository );        
                 
         MavenSession session;
@@ -117,7 +117,7 @@ public class DefaultMaven
         try
         {                        
             ProjectSorter projectSorter = new ProjectSorter( projects.values() );
-            
+                        
             session = new MavenSession( container, request, projectSorter.getSortedProjects() );            
         }
         catch ( CycleDetectedException e )
@@ -133,7 +133,7 @@ public class DefaultMaven
             return processResult( result, e );
         }
         
-        delegatingLocalArtifactRepository.addLocalArtifactRepository( new ReactorArtifactRepository( projects ) );
+        delegatingLocalArtifactRepository.addToBeginningOfSearchOrder( new ReactorArtifactRepository( projects ) );
         
         if ( result.hasExceptions() )
         {

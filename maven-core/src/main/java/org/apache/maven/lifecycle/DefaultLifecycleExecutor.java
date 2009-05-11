@@ -27,7 +27,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
@@ -43,6 +51,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -71,6 +81,12 @@ public class DefaultLifecycleExecutor
     @Requirement
     private PluginManager pluginManager;
 
+    @Requirement
+    protected RepositorySystem repositorySystem;
+
+    @Requirement
+    private ResolutionErrorHandler resolutionErrorHandler;
+    
     /**
      * These mappings correspond to packaging types, like WAR packaging, which configure a particular mojos
      * to run in a given phase.
@@ -124,12 +140,24 @@ public class DefaultLifecycleExecutor
                 session.setCurrentProject( currentProject );
 
                 for ( String goal : goals )
-                {
-                    
+                {                    
                     List<MojoExecution> lifecyclePlan = calculateLifecyclePlan( goal, session );        
 
                     //TODO: once we have calculated the build plan then we should accurately be able to download
-                    // the project dependencies. Having it happen in the plugin manager is a tangled mess.
+                    // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
+                    // later by looking at the build plan. Would be better to just batch download everything required by the reactor.
+                    
+                    // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
+                    try
+                    {
+                        downloadProjectDependencies( session, Artifact.SCOPE_COMPILE /**mojoDescriptor.isDependencyResolutionRequired()*/ );
+                    }
+                    catch ( ArtifactResolutionException e )
+                    {
+                    }
+                    catch ( ArtifactNotFoundException e )
+                    {
+                    }
                     
                     if ( logger.isDebugEnabled() )
                     {
@@ -278,7 +306,6 @@ public class DefaultLifecycleExecutor
                             // So for the lifecycle mapping we need a map with the phases as keys so we can easily check
                             // if this phase belongs to the given lifecycle. this shows the system is messed up. this
                             // shouldn't happen.
-                            System.out.println( execution.getPhase() + "?????????????");
                             phaseToMojoMapping.put( execution.getPhase(), new ArrayList<String>() );
                         }
                         
@@ -931,4 +958,41 @@ public class DefaultLifecycleExecutor
     }    
     
     */
+    
+    // This can ultimately be moved up to the Maven component
+    
+    private void downloadProjectDependencies( MavenSession session, String scope )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        MavenProject project = session.getCurrentProject();
+
+        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
+
+        ArtifactFilter filter = new ScopeArtifactFilter( scope );
+
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( artifact )
+            // Here the root is not resolved because we are presumably working with a project locally.
+            .setResolveRoot( false )
+            .setResolveTransitively( true )
+            //.setArtifactDependencies( project.getDependencyArtifacts() )
+            .setLocalRepository( session.getLocalRepository() )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( project.getManagedVersionMap() )
+            .setFilter( filter );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+
+        resolutionErrorHandler.throwErrors( request, result );
+
+        //TODO: this is wrong
+        project.setArtifacts( result.getArtifacts() );
+
+        ArtifactRepository localRepository = session.getLocalRepository();
+        List<ArtifactRepository> remoteArtifactRepositories = session.getCurrentProject().getRemoteArtifactRepositories();
+
+        for ( Artifact projectArtifact : session.getCurrentProject().getArtifacts() )
+        {
+            repositorySystem.resolve( new ArtifactResolutionRequest( projectArtifact, localRepository, remoteArtifactRepositories ) );
+        }
+    }    
 }

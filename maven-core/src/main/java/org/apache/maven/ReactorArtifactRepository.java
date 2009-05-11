@@ -30,42 +30,58 @@ import org.apache.maven.project.MavenProject;
 //   target/classes
 // maven-toolchain
 //   target/classes
-
 public class ReactorArtifactRepository
     extends LocalArtifactRepository
 {
-    private Map<String,MavenProject> reactorProjects;
-    
-    public ReactorArtifactRepository( Map<String,MavenProject> reactorProjects )
+    private Map<String, MavenProject> reactorProjects;
+
+    public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects )
     {
         this.reactorProjects = reactorProjects;
     }
-        
+
     @Override
     public Artifact find( Artifact artifact )
     {
         String projectKey = ArtifactUtils.key( artifact );
-                
+
         MavenProject project = reactorProjects.get( projectKey );
-                        
+
         if ( project != null )
         {
             //TODO: determine if we want to pass the artifact produced by the project if it
             // is present and under what conditions we will do such a thing.            
-            
-            File classesDirectory = new File( project.getBuild().getOutputDirectory() );
-            
-            if( classesDirectory.exists() )
+
+            if ( artifact.getType().equals( "jar" ) )
             {
-                artifact.setFile( classesDirectory );
-             
-                artifact.setFromAuthoritativeRepository( true );
+                File classesDirectory = new File( project.getBuild().getOutputDirectory() );
+
+                if ( classesDirectory.exists() )
+                {
+                    artifact.setFile( classesDirectory );
+
+                    artifact.setFromAuthoritativeRepository( true );
+
+                    artifact.setResolved( true );
+                }
+            }
+            else if ( artifact.getType().equals( "pom" ) )
+            {
+                artifact.setFile( project.getFile() );
                 
-                artifact.setResolved( true );                
-            }            
+                artifact.setFromAuthoritativeRepository( true );
+
+                artifact.setResolved( true );
+            }
         }
-        
+
         return artifact;
+    }
+
+    @Override
+    public String getId()
+    {
+        return "reactor";
     }
 
     @Override

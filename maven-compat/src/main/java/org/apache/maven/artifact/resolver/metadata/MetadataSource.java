@@ -34,8 +34,6 @@ public interface MetadataSource
 {
     String ROLE = MetadataSource.class.getName();
 
-    MetadataResolution retrieve( ArtifactMetadata artifact,
-                                 ArtifactRepository localRepository,
-                                 List<ArtifactRepository> remoteRepositories )
+    MetadataResolution retrieve( ArtifactMetadata artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws MetadataRetrievalException;
 }
