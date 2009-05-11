@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
@@ -92,8 +90,9 @@ public class DefaultMavenProjectBuilder
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
     
-    private Map<File, MavenProject> projectCache = new HashMap<File, MavenProject>();
-
+    @Requirement
+    private MavenProjectCache projectCache;
+    
     private MavenProject superProject;
 
     // ----------------------------------------------------------------------
@@ -103,8 +102,8 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-        MavenProject project = projectCache.get( pomFile );
-        
+        MavenProject project = projectCache.get( pomFile.getAbsolutePath() );
+                
         if ( project != null )
         {
             return project;
@@ -221,8 +220,8 @@ public class DefaultMavenProjectBuilder
 
         setBuildOutputDirectoryOnParent( project );
 
-        projectCache.put(  pomFile, project );
-        
+        projectCache.put( pomFile.getAbsolutePath(), project );
+                
         return project;
     }
 
