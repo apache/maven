@@ -88,6 +88,14 @@ public class DefaultLifecycleExecutor
     public void execute( MavenSession session )
         throws LifecycleExecutionException, MojoFailureException
     {
+        logger.info(  "Build Order:" );
+        logger.info( "" );
+        for( MavenProject project : session.getProjects() )
+        {
+            logger.info( project.getName() );
+        }
+        logger.info( "" );
+        
         MavenProject rootProject = session.getTopLevelProject();
 
         List<String> goals = session.getGoals();
@@ -111,16 +119,53 @@ public class DefaultLifecycleExecutor
         {
             logger.info( "Building " + currentProject.getName() );
 
-            long buildStartTime = System.currentTimeMillis();
-
             try
             {
                 session.setCurrentProject( currentProject );
 
                 for ( String goal : goals )
                 {
-                    String target = currentProject.getId() + " ( " + goal + " )";
-                    executeGoalAndHandleFailures( goal, session, currentProject, buildStartTime, target );
+                    
+                    List<MojoExecution> lifecyclePlan = calculateLifecyclePlan( goal, session );        
+
+                    //TODO: once we have calculated the build plan then we should accurately be able to download
+                    // the project dependencies. Having it happen in the plugin manager is a tangled mess.
+                    
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.debug( "=== BUILD PLAN ===" );
+                        logger.debug( "Project:       " + currentProject );
+                        for ( MojoExecution mojoExecution : lifecyclePlan )
+                        {
+                            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+                            PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+                            logger.debug( "------------------" );
+                            logger.debug( "Goal:          " + pluginDescriptor.getGroupId() + ':' + pluginDescriptor.getArtifactId() + ':'
+                                + pluginDescriptor.getVersion() + ':' + mojoDescriptor.getGoal() + ':'
+                                + mojoExecution.getExecutionId() );
+                            logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
+                        }
+                        logger.debug( "==================" );
+                    }
+
+                    for ( MojoExecution mojoExecution : lifecyclePlan )
+                    {            
+                        try
+                        {                
+                            logger.info( executionDescription( mojoExecution, currentProject ) );
+                            pluginManager.executeMojo( session, mojoExecution );
+                        }
+                        catch ( PluginExecutionException e )
+                        {
+                            // This looks like a duplicate
+                            throw new LifecycleExecutionException( "Error executing goal.", e );                                        
+                        }
+                        catch ( PluginConfigurationException e )
+                        {
+                            // If the mojo can't actually be configured
+                            throw new LifecycleExecutionException( "Error executing goal.", e );                                        
+                        }
+                    }                         
                 }
             }
             finally
@@ -128,66 +173,7 @@ public class DefaultLifecycleExecutor
                 session.setCurrentProject( null );
             }
         }        
-    }
-
-    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project, long buildStartTime, String target )
-        throws LifecycleExecutionException, MojoFailureException
-    {
-        try
-        {
-            executeGoal( task, session, project );
-        }
-        catch ( LifecycleExecutionException e )
-        {
-            //TODO: Look at the reactor manager failure behavior
-            throw e;
-        }
-    }
-    
-    private void executeGoal( String task, MavenSession session, MavenProject project )
-        throws LifecycleExecutionException, MojoFailureException
-    {
-        List<MojoExecution> lifecyclePlan = calculateLifecyclePlan( task, session );        
-
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "=== BUILD PLAN ===" );
-            logger.debug( "Project:       " + project );
-            for ( MojoExecution mojoExecution : lifecyclePlan )
-            {
-                MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-                PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-                logger.debug( "------------------" );
-                logger.debug( "Goal:          " + pluginDescriptor.getGroupId() + ':' + pluginDescriptor.getArtifactId() + ':'
-                    + pluginDescriptor.getVersion() + ':' + mojoDescriptor.getGoal() + ':'
-                    + mojoExecution.getExecutionId() );
-                logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
-            }
-            logger.debug( "==================" );
-        }
-
-        for ( MojoExecution mojoExecution : lifecyclePlan )
-        {            
-            try
-            {                
-                logger.info( executionDescription( mojoExecution, project ) );
-//                mojoExecution.getMojoDescriptor().getRealm().display();
-//                System.out.println( "!!!");
-//                System.out.println( mojoExecution.getConfiguration() );
-                pluginManager.executeMojo( session, mojoExecution );
-            }
-            catch ( PluginExecutionException e )
-            {
-                // This looks like a duplicate
-                throw new LifecycleExecutionException( "Error executing goal.", e );                                        
-            }
-            catch ( PluginConfigurationException e )
-            {
-                // If the mojo can't actually be configured
-                throw new LifecycleExecutionException( "Error executing goal.", e );                                        
-            }
-        }         
-    }
+    }    
     
     private String executionDescription( MojoExecution me, MavenProject project )
     {
