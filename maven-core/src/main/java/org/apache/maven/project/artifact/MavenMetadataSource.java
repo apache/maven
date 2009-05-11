@@ -118,6 +118,7 @@ public class MavenMetadataSource
         return new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
     }
 
+    /*
     private Set<Artifact> createArtifacts( List<Dependency> dependencies )
     {
         Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
@@ -135,6 +136,7 @@ public class MavenMetadataSource
         }
         
     }
+    */
     
     private String getEffectiveScope( String originalScope, String inheritedScope )
     {
