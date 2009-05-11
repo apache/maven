@@ -90,6 +90,12 @@ public class DefaultMaven
         
         DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository();
         delegatingLocalArtifactRepository.addToEndOfSearchOrder( new UserLocalArtifactRepository( request.getLocalRepository() ) ); 
+        
+        if ( localArtifactRepositories != null && localArtifactRepositories.size() > 0 )
+        {
+            delegatingLocalArtifactRepository.addToBeginningOfSearchOrder( localArtifactRepositories.get( 0 ) );            
+        }        
+        
         request.setLocalRepository( delegatingLocalArtifactRepository );        
                 
         MavenSession session;
@@ -141,12 +147,7 @@ public class DefaultMaven
         // Reactor
         // Workspace
         // User Local Repository
-        
-        if ( localArtifactRepositories != null && localArtifactRepositories.size() > 0 )
-        {
-            delegatingLocalArtifactRepository.addToBeginningOfSearchOrder( localArtifactRepositories.get( 0 ) );            
-        }
-        
+                
         delegatingLocalArtifactRepository.addToBeginningOfSearchOrder( new ReactorArtifactRepository( projects ) );
         
         if ( result.hasExceptions() )
