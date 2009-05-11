@@ -38,33 +38,6 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
  */
 public interface ArtifactCollector
 {
-    /**
-     * The plexus role for this component.
-     *
-     * @since 3.0
-     */
-    String ROLE = ArtifactCollector.class.getName();
-
-    // TODO: deprecate since conflict resolvers should always be specified
-    ArtifactResolutionResult collect( Set<Artifact> artifacts,
-                                      Artifact originatingArtifact,
-                                      ArtifactRepository localRepository,
-                                      List<ArtifactRepository> remoteRepositories,
-                                      ArtifactMetadataSource source,
-                                      ArtifactFilter filter,
-                                      List<ResolutionListener> listeners );
-
-    // TODO: deprecate since conflict resolvers should always be specified
-    ArtifactResolutionResult collect( Set<Artifact> artifacts,
-                                      Artifact originatingArtifact,
-                                      Map managedVersions,
-                                      ArtifactRepository localRepository,
-                                      List<ArtifactRepository> remoteRepositories,
-                                      ArtifactMetadataSource source,
-                                      ArtifactFilter filter,
-                                      List<ResolutionListener> listeners );
-
-    /** @since 3.0 */
     ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                       Artifact originatingArtifact,
                                       Map managedVersions,
@@ -73,6 +46,5 @@ public interface ArtifactCollector
                                       ArtifactMetadataSource source,
                                       ArtifactFilter filter,
                                       List<ResolutionListener> listeners,
-                                      List<ConflictResolver> conflictResolvers )
-        throws ArtifactResolutionException;
+                                      List<ConflictResolver> conflictResolvers );
 }

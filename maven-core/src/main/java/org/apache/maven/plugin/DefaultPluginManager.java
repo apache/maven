@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +105,9 @@ public class DefaultPluginManager
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
 
+    @Requirement
+    private PluginClassLoaderCache pluginClassLoaderCache;
+    
     private Map<String, PluginDescriptor> pluginDescriptors;
 
     public DefaultPluginManager()
@@ -174,9 +176,6 @@ public class DefaultPluginManager
 
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
-        //TODO: this is assuming plugins in the reactor. must be replaced with a reactor local repository implementation
-        pluginArtifact = project.replaceWithActiveArtifact( pluginArtifact );
-
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
@@ -199,6 +198,8 @@ public class DefaultPluginManager
             }
         }
         
+        //pluginRealm.display();
+        
         try
         {
             logger.debug( "Discovering components in realm: " + pluginRealm );
@@ -214,8 +215,10 @@ public class DefaultPluginManager
             throw new PluginContainerException( plugin, pluginRealm, "Error scanning plugin realm for components.", e );
         }
 
+        pluginClassLoaderCache.cachePluginClassLoader( constructPluginKey( plugin ), pluginRealm );
+        
         PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
-
+        
         // We just need to keep track of the realm, if we need to augment we will wrap the realm
         pluginDescriptor.setPluginArtifact( pluginArtifact );
         pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
@@ -266,24 +269,9 @@ public class DefaultPluginManager
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
 
-        Set<Artifact> resolved = new LinkedHashSet<Artifact>();
+        logger.debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + result.getArtifacts().toString().replace( ',', '\n' ) );
 
-        //TODO: this is also assuming artifacts in the reactor.
-        for ( Iterator<Artifact> it = result.getArtifacts().iterator(); it.hasNext(); )
-        {
-            Artifact artifact = it.next();
-
-            if ( !artifact.equals( pluginArtifact ) )
-            {
-                artifact = project.replaceWithActiveArtifact( artifact );
-            }
-
-            resolved.add( artifact );
-        }
-
-        logger.debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + resolved.toString().replace( ',', '\n' ) );
-
-        return resolved;
+        return result.getArtifacts();
     }
 
     // ----------------------------------------------------------------------
@@ -356,7 +344,8 @@ public class DefaultPluginManager
         {
             mojo = getConfiguredMojo( session, mojoExecution, project, false, mojoExecution );
 
-            pluginRealm = pluginDescriptor.getClassRealm();
+            //pluginRealm = pluginDescriptor.getClassRealm();
+            pluginRealm = pluginClassLoaderCache.getPluginClassLoader( constructPluginKey( mojoDescriptor.getPluginDescriptor() ) );            
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
 

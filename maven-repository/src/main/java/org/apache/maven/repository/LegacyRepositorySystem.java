@@ -18,33 +18,23 @@ package org.apache.maven.repository;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
@@ -53,7 +43,6 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author Jason van Zyl
@@ -62,9 +51,6 @@ import org.codehaus.plexus.util.StringUtils;
 public class LegacyRepositorySystem
     implements RepositorySystem
 {
-    @Requirement
-    private WagonManager wagonManager;
-
     @Requirement
     private ArtifactFactory artifactFactory;
 
@@ -77,9 +63,6 @@ public class LegacyRepositorySystem
     @Requirement
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
-    @Requirement
-    private ArtifactCollector artifactCollector;
-    
     @Requirement
     private MirrorBuilder mirrorBuilder;
 
@@ -281,14 +264,11 @@ public class LegacyRepositorySystem
                                                  String releaseUpdates, boolean snapshots, String snapshotUpdates,
                                                  String checksumPolicy )
     {
-        ArtifactRepositoryPolicy snapshotsPolicy =
-            new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
+        ArtifactRepositoryPolicy snapshotsPolicy = new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
 
-        ArtifactRepositoryPolicy releasesPolicy =
-            new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
+        ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
 
-        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout,
-                                                                   snapshotsPolicy, releasesPolicy );
+        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
@@ -296,16 +276,7 @@ public class LegacyRepositorySystem
         return artifactResolver.resolve( request );
     }
 
-    public void setOnline( boolean online )
-    {
-        artifactResolver.setOnline( online );
-    }
-
-    public boolean isOnline()
-    {
-        return artifactResolver.isOnline();
-    }
-
+    /*
     public void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )
     {
         ProxyInfo proxyInfo = new ProxyInfo();
@@ -320,7 +291,9 @@ public class LegacyRepositorySystem
 
         wagonManager.addProxy( protocol, host, port, username, password, nonProxyHosts );
     }
+    */
 
+    /*
     public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase )
     {
         AuthenticationInfo authInfo = new AuthenticationInfo();
@@ -333,7 +306,9 @@ public class LegacyRepositorySystem
 
         wagonManager.addAuthenticationInfo( repositoryId, username, password, privateKey, passphrase );
     }
+    */
 
+    /*
     public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
     {
         RepositoryPermissions permissions = new RepositoryPermissions();
@@ -357,6 +332,7 @@ public class LegacyRepositorySystem
             serverPermissionsMap.put( repositoryId, permissions );
         }
     }
+    */
 
     // Mirror 
 

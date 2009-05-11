@@ -43,6 +43,8 @@ public class DefaultProjectBuilderConfiguration
     
     private MavenProject topProject;
     
+    private boolean processPlugins = false;
+    
     public DefaultProjectBuilderConfiguration()
     {        
     }
@@ -115,6 +117,17 @@ public class DefaultProjectBuilderConfiguration
     public ProjectBuilderConfiguration setModelEventListeners( List<ModelEventListener> listeners )
     {
         this.listeners = listeners;
+        return this;
+    }
+
+    public boolean isProcessPlugins()
+    {
+        return processPlugins;
+    }
+
+    public ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins )
+    {
+        this.processPlugins = processPlugins;
         return this;
     }
 }

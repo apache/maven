@@ -107,7 +107,7 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( "\n\nYou must specify at least one goal. Try 'mvn install' to build or 'mvn --help' for options \nSee http://maven.apache.org for more information.\n\n" );
         }
         
-        for ( MavenProject currentProject : session.getSortedProjects() )
+        for ( MavenProject currentProject : session.getProjects() )
         {
             logger.info( "Building " + currentProject.getName() );
 
@@ -508,9 +508,7 @@ public class DefaultLifecycleExecutor
                 
         return mojoDescriptor;
     }
-        
-    private static int count = 0;
-    
+            
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository )
         throws LifecycleExecutionException
@@ -523,10 +521,7 @@ public class DefaultLifecycleExecutor
         MojoDescriptor mojoDescriptor;
     
         //need to do the active project thing as the site plugin is referencing itself
-        
-        if ( artifactId.equals( "maven-site-plugin" ) ){ count++; System.out.println( count ); };
-        
-        System.out.println( ">>> " + artifactId );
+                        
         try
         {
             mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, project, localRepository );

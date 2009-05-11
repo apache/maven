@@ -67,8 +67,7 @@ public class DefaultRepositoryLayout
         return path.toString();
     }
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
-                                                 ArtifactRepository repository )
+    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
     {
         return pathOfRepositoryMetadata( metadata, metadata.getLocalFilename( repository ) );
     }

@@ -151,7 +151,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "reactorProjects".equals( expression ) )
         {
-            value = session.getSortedProjects();
+            value = session.getProjects();
         }
         else if ("mojoExecution".equals(expression))
         {
@@ -246,7 +246,7 @@ public class PluginParameterExpressionEvaluator
                 throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
                                                          e );
             }
-        }
+        }       
         else if ( "settings".equals( expression ) )
         {
             value = session.getSettings();

@@ -47,11 +47,6 @@ public class DefaultArtifact
 
     private String artifactId;
 
-    /**
-     * The resolved version for the artifact after conflict resolution, that has not been transformed.
-     *
-     * @todo should be final
-     */
     private String baseVersion;
 
     private final String type;
@@ -86,25 +81,12 @@ public class DefaultArtifact
 
     private boolean optional;
 
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            VersionRange versionRange,
-                            String scope,
-                            String type,
-                            String classifier,
-                            ArtifactHandler artifactHandler )
+    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type, String classifier, ArtifactHandler artifactHandler )
     {
         this( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler, false );
     }
 
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            VersionRange versionRange,
-                            String scope,
-                            String type,
-                            String classifier,
-                            ArtifactHandler artifactHandler,
-                            boolean optional )
+    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type, String classifier, ArtifactHandler artifactHandler, boolean optional )
     {
         this.groupId = groupId;
 
@@ -398,6 +380,7 @@ public class DefaultArtifact
     protected void setBaseVersionInternal( String baseVersion )
     {
         Matcher m = VERSION_FILE_PATTERN.matcher( baseVersion );
+        
         if ( m.matches() )
         {
             this.baseVersion = m.group( 1 ) + "-" + SNAPSHOT_VERSION;
@@ -451,8 +434,7 @@ public class DefaultArtifact
         return result;
     }
 
-    public void updateVersion( String version,
-                               ArtifactRepository localRepository )
+    public void updateVersion( String version, ArtifactRepository localRepository )
     {
         setResolvedVersion( version );
         setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );
@@ -605,5 +587,19 @@ public class DefaultArtifact
     public void setOptional( boolean optional )
     {
         this.optional = optional;
+    }
+    
+    //
+    
+    private boolean fromAuthoritativeRepository;
+    
+    public void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository )
+    {
+        this.fromAuthoritativeRepository = fromAuthoritativeRepository;
+    }
+    
+    public boolean isFromAuthoritativeRepository()
+    {
+        return fromAuthoritativeRepository;
     }
 }

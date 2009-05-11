@@ -8,24 +8,28 @@ import org.apache.maven.profiles.ProfileManager;
 
 public interface ProjectBuilderConfiguration
 {
-    ArtifactRepository getLocalRepository();
-    
-    List<ArtifactRepository> getRemoteRepositories();
-
-    ProfileManager getGlobalProfileManager();
-
-    Properties getExecutionProperties();
-
-    ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager );
-
     ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository );
+    
+    ArtifactRepository getLocalRepository();
 
     ProjectBuilderConfiguration setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
 
+    List<ArtifactRepository> getRemoteRepositories();
+
+    ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager );
+
+    ProfileManager getGlobalProfileManager();
+
     ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties );
-    
-    MavenProject getTopLevelProjectFromReactor();
-    
+
+    Properties getExecutionProperties();
+
     void setTopLevelProjectForReactor(MavenProject mavenProject);
+
+    MavenProject getTopLevelProjectFromReactor();
+        
+    ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins );
+    
+    boolean isProcessPlugins();
     
 }

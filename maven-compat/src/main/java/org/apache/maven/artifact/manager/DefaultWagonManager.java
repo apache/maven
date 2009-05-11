@@ -21,14 +21,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -36,14 +34,10 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.ChecksumObserver;
-import org.apache.maven.wagon.proxy.ProxyInfo;
-import org.apache.maven.wagon.proxy.ProxyInfoProvider;
 import org.apache.maven.wagon.repository.Repository;
-import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -71,32 +65,11 @@ public class DefaultWagonManager
     @Requirement
     private PlexusContainer container;
 
-    // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
-    // attached to ArtifactRepository before the method is called (so AR would be composed of WR, not inherit it)
-    private Map<String, ProxyInfo> proxies = new HashMap<String, ProxyInfo>();
-
-    private static Map<String, AuthenticationInfo> authenticationInfoMap = new HashMap<String, AuthenticationInfo>();
-
-    private Map<String, RepositoryPermissions> serverPermissionsMap = new HashMap<String, RepositoryPermissions>();
-
-    //used LinkedMap to preserve the order.
-    private Map<String, ArtifactRepository> mirrors = new LinkedHashMap<String, ArtifactRepository>();
-
     /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
     private Map<String, XmlPlexusConfiguration> serverConfigurationMap = new HashMap<String, XmlPlexusConfiguration>();
 
-    private RepositoryPermissions defaultRepositoryPermissions;
-
-    // Components
-
-    @Requirement
-    private ArtifactRepositoryFactory repositoryFactory;
-
     @Requirement(role = Wagon.class)
     private Map<String,Wagon> wagons;
-
-    //@Requirement
-    private CredentialsDataSource credentialsDataSource;
 
     @Requirement
     private UpdateCheckManager updateCheckManager;
@@ -110,13 +83,10 @@ public class DefaultWagonManager
         this.downloadMonitor = downloadMonitor;
     }
 
-    // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException
     {
         String protocol = repository.getProtocol();
-
-        System.out.println( "PROTOCOL: " + protocol );
         
         if ( protocol == null )
         {
@@ -203,26 +173,10 @@ public class DefaultWagonManager
         try
         {
             try
-            {
-                Repository artifactRepository = new Repository( repository.getId(), repository.getUrl() );
-
-                AuthenticationInfo authenticationInfo = getAuthenticationInfo( repository.getId() );
-
-                wagon.connect( artifactRepository, authenticationInfo, new ProxyInfoProvider()
-                {
-                    public ProxyInfo getProxyInfo( String protocol )
-                    {
-                        return getProxy( protocol );
-                    }
-                } );
+            {                
+                wagon.connect( new Repository( repository.getId(), repository.getUrl() ) );
 
                 wagon.put( source, remotePath );
-            }
-            catch ( CredentialsDataSourceException e )
-            {
-                String err = "Problem with server credentials: " + e.getMessage();
-                logger.error( err );
-                throw new TransferFailedException( err );
             }
             finally
             {
@@ -363,6 +317,8 @@ public class DefaultWagonManager
         getArtifact( artifact, repository, downloadMonitor, true );
     }
 
+    //TODO: all of this needs to move into the repository system
+    
     public void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
@@ -500,14 +456,8 @@ public class DefaultWagonManager
         boolean downloaded = false;
 
         try
-        {
-            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider()
-            {
-                public ProxyInfo getProxyInfo( String protocol )
-                {
-                    return getProxy( protocol );
-                }
-            } );
+        {            
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ) );
 
             boolean firstRun = true;
             boolean retry = true;
@@ -645,10 +595,6 @@ public class DefaultWagonManager
         {
             throw new TransferFailedException( "Authorization failed: " + e.getMessage(), e );
         }
-        catch ( CredentialsDataSourceException e )
-        {
-            throw new TransferFailedException( "Retrieving credentials failed: " + e.getMessage(), e );
-        }
         finally
         {
             // Remove remaining TransferListener instances (checksum handlers removed in above finally clause)
@@ -785,17 +731,6 @@ public class DefaultWagonManager
         }
     }
 
-    public ProxyInfo getProxy( String protocol )
-    {
-        return proxies.get( protocol );
-    }
-
-    public AuthenticationInfo getAuthenticationInfo( String id )
-        throws CredentialsDataSourceException
-    {
-        return authenticationInfoMap.get( id );
-    }
-
     /**
      * Checks the URL to see if this repository refers to an external repository
      * 
@@ -815,70 +750,7 @@ public class DefaultWagonManager
             return false;
         }
     }
-
-    /**
-     * Set the proxy used for a particular protocol.
-     * 
-     * @param protocol the protocol (required)
-     * @param host the proxy host name (required)
-     * @param port the proxy port (required)
-     * @param username the username for the proxy, or null if there is none
-     * @param password the password for the proxy, or null if there is none
-     * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system property
-     *            format: <code>*.foo.com|localhost</code>.
-     * @todo [BP] would be nice to configure this via plexus in some way
-     */
-    public void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )
-    {
-        ProxyInfo proxyInfo = new ProxyInfo();
-        proxyInfo.setHost( host );
-        proxyInfo.setType( protocol );
-        proxyInfo.setPort( port );
-        proxyInfo.setNonProxyHosts( nonProxyHosts );
-        proxyInfo.setUserName( username );
-        proxyInfo.setPassword( password );
-
-        proxies.put( protocol, proxyInfo );
-    }
-
-    // We are leaving this method here so that we can attempt to use the new maven-artifact
-    // library from the 2.0.x code so that we aren't maintaining two lines of code
-    // for the artifact management.
-    public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase )
-    {
-        AuthenticationInfo authInfo = new AuthenticationInfo();
-        authInfo.setUserName( username );
-        authInfo.setPassword( password );
-        authInfo.setPrivateKey( privateKey );
-        authInfo.setPassphrase( passphrase );
-
-        authenticationInfoMap.put( repositoryId, authInfo );
-    }
-
-    public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
-    {
-        RepositoryPermissions permissions = new RepositoryPermissions();
-
-        boolean addPermissions = false;
-
-        if ( filePermissions != null )
-        {
-            permissions.setFileMode( filePermissions );
-            addPermissions = true;
-        }
-
-        if ( directoryPermissions != null )
-        {
-            permissions.setDirectoryMode( directoryPermissions );
-            addPermissions = true;
-        }
-
-        if ( addPermissions )
-        {
-            serverPermissionsMap.put( repositoryId, permissions );
-        }
-    }
-
+    
     /**
      * Applies the server configuration to the wagon
      * 

@@ -56,7 +56,7 @@ public abstract class AbstractRepositoryMetadata
     }
 
     public String getLocalFilename( ArtifactRepository repository )
-    {
+    {        
         return "maven-metadata-" + repository.getKey() + ".xml";
     }
 

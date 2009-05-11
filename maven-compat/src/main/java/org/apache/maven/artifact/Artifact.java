@@ -32,12 +32,6 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
-/**
- * Description of an artifact.
- *
- * @todo do we really need an interface here?
- * @todo get rid of the multiple states we can have (project, parent, etc artifacts, file == null, snapshot, etc) - construct subclasses and use accordingly?
- */
 public interface Artifact
     extends Comparable
 {
@@ -73,20 +67,12 @@ public interface Artifact
 
     void setVersion( String version );
 
-    /**
-     * Get the artifactScope of the artifact. If the artifact is a standalone rather than a dependency, it's artifactScope will be
-     * <code>null</code>. The artifactScope may not be the same as it was declared on the original dependency, as this is the
-     * result of combining it with the main project artifactScope.
-     *
-     * @return the artifactScope
-     */
     String getScope();
 
     String getType();
 
     String getClassifier();
 
-    // only providing this since classifier is *very* optional...
     boolean hasClassifier();
 
     File getFile();
@@ -95,10 +81,7 @@ public interface Artifact
 
     String getBaseVersion();
 
-    /** @todo would like to get rid of this - or at least only have one. Base version should be immutable. */
     void setBaseVersion( String baseVersion );
-
-    // ----------------------------------------------------------------------
 
     String getId();
 
@@ -112,8 +95,7 @@ public interface Artifact
 
     ArtifactRepository getRepository();
 
-    void updateVersion( String version,
-                        ArtifactRepository localRepository );
+    void updateVersion( String version, ArtifactRepository localRepository );
 
     String getDownloadUrl();
 
@@ -125,14 +107,8 @@ public interface Artifact
 
     ArtifactHandler getArtifactHandler();
 
-    /**
-     * @return {@link List} &lt; {@link String} > with artifact ids
-     */
     List<String> getDependencyTrail();
 
-    /**
-     * @param dependencyTrail {@link List} &lt; {@link String} > with artifact ids
-     */
     void setDependencyTrail( List<String> dependencyTrail );
 
     void setScope( String scope );
@@ -155,7 +131,6 @@ public interface Artifact
 
     void setResolvedVersion( String version );
 
-    /** @todo remove, a quick hack for the lifecycle executor */
     void setArtifactHandler( ArtifactHandler handler );
 
     boolean isRelease();
@@ -175,4 +150,8 @@ public interface Artifact
 
     boolean isSelectedVersionKnown()
         throws OverConstrainedVersionException;
+    
+    void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository );
+    
+    boolean isFromAuthoritativeRepository();
 }

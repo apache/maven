@@ -41,9 +41,7 @@ public interface ArtifactTransformationManager
      * @param remoteRepositories the repositories to check
      * @param localRepository    the local repository
      */
-    void transformForResolve( Artifact artifact,
-                              List<ArtifactRepository> remoteRepositories,
-                              ArtifactRepository localRepository )
+    void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
@@ -53,8 +51,7 @@ public interface ArtifactTransformationManager
      * @param artifact        Artifact to be transformed.
      * @param localRepository the local repository it will be stored in
      */
-    void transformForInstall( Artifact artifact,
-                              ArtifactRepository localRepository )
+    void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException;
 
     /**
@@ -65,11 +62,8 @@ public interface ArtifactTransformationManager
      * @param remoteRepository the repository to deploy to
      * @param localRepository  the local repository the metadata is stored in
      */
-    void transformForDeployment( Artifact artifact,
-                                 ArtifactRepository remoteRepository,
-                                 ArtifactRepository localRepository )
+    void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository, ArtifactRepository localRepository )
         throws ArtifactDeploymentException;
-
 
     List getArtifactTransformations();
 }

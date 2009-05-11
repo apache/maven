@@ -34,16 +34,13 @@ import org.apache.maven.wagon.events.TransferListener;
  */
 public interface ArtifactResolver
 {
+    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
+    // The rest is deprecated
+    
     // USED BY MAVEN ASSEMBLY PLUGIN 2.2-beta-2 
     @Deprecated
     String ROLE = ArtifactResolver.class.getName();
-
-    void setOnline( boolean online );
-
-    boolean isOnline();
-
-    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     // USED BY SUREFIRE
     @Deprecated

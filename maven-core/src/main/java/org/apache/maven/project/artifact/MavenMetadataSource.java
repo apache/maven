@@ -79,6 +79,8 @@ public class MavenMetadataSource
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
         configuration.setLocalRepository( localRepository );
         configuration.setRemoteRepositories( remoteRepositories );
+        // We don't care about processing plugins here, all we're interested in is the dependencies.
+        configuration.setProcessPlugins( false );
 
         MavenProject project;
 
@@ -96,9 +98,7 @@ public class MavenMetadataSource
 
                     if ( effectiveScope != null )
                     {
-                        Artifact dependencyArtifact =
-                            repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
-                                                             effectiveScope, d.getType() );
+                        Artifact dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
 
                         artifacts.add( dependencyArtifact );
                     }
@@ -193,10 +193,13 @@ public class MavenMetadataSource
     private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata )
     {
         List<ArtifactVersion> versions;
+        
         if ( ( repoMetadata != null ) && ( repoMetadata.getVersioning() != null ) )
         {
             List<String> metadataVersions = repoMetadata.getVersioning().getVersions();
+            
             versions = new ArrayList<ArtifactVersion>( metadataVersions.size() );
+            
             for ( String version : metadataVersions )
             {
                 versions.add( new DefaultArtifactVersion( version ) );

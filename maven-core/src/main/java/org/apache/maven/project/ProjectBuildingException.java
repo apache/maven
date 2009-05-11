@@ -41,9 +41,9 @@ public class ProjectBuildingException
 
     private File pomFile;
 
-    public ProjectBuildingException( String projectId, String message )
+    public ProjectBuildingException( String projectId, String message, Throwable cause )
     {
-        super( message );
+        super( message, cause );
         this.projectId = projectId;
     }
 

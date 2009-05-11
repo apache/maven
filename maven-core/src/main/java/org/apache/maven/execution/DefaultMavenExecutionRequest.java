@@ -701,6 +701,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration.setExecutionProperties( getProperties() );
             projectBuildingConfiguration.setGlobalProfileManager( getProfileManager() );
             projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
+            projectBuildingConfiguration.setProcessPlugins( true );
         }
 
         return projectBuildingConfiguration;

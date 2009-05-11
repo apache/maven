@@ -21,8 +21,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -69,14 +73,6 @@ public class DefaultMaven
         return lifecycleExecutor.getLifecyclePhases();
     }
 
-    // ----------------------------------------------------------------------
-    // Project execution
-    // ----------------------------------------------------------------------
-
-    // project build
-    // artifact resolution
-    // lifecycle execution
-
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         // Need a general way to inject standard properties
@@ -88,117 +84,110 @@ public class DefaultMaven
         request.setStartTime( new Date() );
         
         MavenExecutionResult result = new DefaultMavenExecutionResult();
-
-        MavenSession session = createMavenSession( request, result );        
         
+        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository();
+        delegatingLocalArtifactRepository.addLocalArtifactRepository( new UserLocalArtifactRepository( request.getLocalRepository() ) ); 
+        request.setLocalRepository( delegatingLocalArtifactRepository );        
+                
+        MavenSession session;
+        
+        Map<String,MavenProject> projects;
+
+        try
+        {
+            projects = getProjects( request );
+
+            //TODO: We really need to get rid of this requirement in here. If we know there is no project present
+            if ( projects.isEmpty() )
+            {
+                MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingConfiguration() ); 
+                projects.put( ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
+                request.setProjectPresent( false );
+            }
+        }
+        catch ( ProjectBuildingException e )
+        {
+            return processResult( result, e );
+        }
+        catch ( MavenExecutionException e )
+        {
+            return processResult( result, e );
+        }
+        
+        try
+        {                        
+            ProjectSorter projectSorter = new ProjectSorter( projects.values() );
+            
+            session = new MavenSession( container, request, projectSorter.getSortedProjects() );            
+        }
+        catch ( CycleDetectedException e )
+        {            
+            String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
+
+            ProjectCycleException error = new ProjectCycleException( message, e );
+
+            return processResult( result, error );
+        }
+        catch ( DuplicateProjectException e )
+        {
+            return processResult( result, e );
+        }
+        
+        delegatingLocalArtifactRepository.addLocalArtifactRepository( new ReactorArtifactRepository( projects ) );
+        
+        if ( result.hasExceptions() )
+        {
+            return result;
+        }        
+
         try
         {
             lifecycleExecutor.execute( session );
         }        
         catch ( Exception e )
         {            
-            ExceptionHandler handler = new DefaultExceptionHandler();
-            
-            // This will only be more then one if we have fail at end on and we collect
-            // them per project.
-            ExceptionSummary es = handler.handleException( e );                        
-         
-            result.addException( e );
-
-            result.setExceptionSummary( es );
-            
-            return result;
+            return processResult( result, e );
         }
 
-        result.setTopologicallySortedProjects( session.getSortedProjects() );
+        result.setTopologicallySortedProjects( session.getProjects() );
 
         result.setProject( session.getTopLevelProject() );
 
         return result;
     }
 
-    public MavenSession createMavenSession( MavenExecutionRequest request, MavenExecutionResult result )
+    private MavenExecutionResult processResult( MavenExecutionResult result, Exception e )
     {
-        MavenSession session;
+        ExceptionHandler handler = new DefaultExceptionHandler();
         
-        List<MavenProject> projects;
-
-        try
-        {
-            projects = getProjects( request );
-
-            if ( projects.isEmpty() )
-            {
-                projects.add( projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingConfiguration() ) );
-
-                request.setProjectPresent( false );
-            }
-        }
-        catch ( ProjectBuildingException e )
-        {
-            result.addException( e );
-            return null;
-        }
-        catch ( MavenExecutionException e )
-        {
-            result.addException( e );
-            return null;
-        }
-
-        try
-        {                        
-            ProjectSorter projectSorter = new ProjectSorter( projects );
-            
-            session = new MavenSession( container, request, projectSorter.getSortedProjects() );            
-        }
-        catch ( CycleDetectedException e )
-        {
-            String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
-
-            ProjectCycleException error = new ProjectCycleException( projects, message, e );
-
-            result.addException( error );
-
-            return null;
-        }
-        catch ( DuplicateProjectException e )
-        {
-            result.addException( e );
-
-            return null;
-        }
-
-        return session;
+        ExceptionSummary es = handler.handleException( e );                        
+     
+        result.addException( e );
+        
+        result.setExceptionSummary( es );    
+        
+        return result;
     }
-
-    protected List<MavenProject> getProjects( MavenExecutionRequest request )
-        throws MavenExecutionException
+    
+    protected Map<String,MavenProject> getProjects( MavenExecutionRequest request )
+        throws MavenExecutionException, ProjectBuildingException
     {
         List<File> files = Arrays.asList( new File[] { request.getPom() } );
 
-        List<MavenProject> projects = collectProjects( files, request );
+        Map<String,MavenProject> projects = collectProjects( files, request );
 
         return projects;
     }
 
-    private List<MavenProject> collectProjects( List<File> files, MavenExecutionRequest request )
-        throws MavenExecutionException
+    private Map<String,MavenProject> collectProjects( List<File> files, MavenExecutionRequest request )
+        throws MavenExecutionException, ProjectBuildingException
     {
-        List<MavenProject> projects = new ArrayList<MavenProject>();
+        Map<String,MavenProject> projects = new LinkedHashMap<String,MavenProject>();
 
         for ( File file : files )
         {
-            MavenProject project;
-
-            try
-            {
-                project = projectBuilder.build( file, request.getProjectBuildingConfiguration() );
-            }
-            catch ( ProjectBuildingException e )
-            {
-                throw new MavenExecutionException( "Failed to build MavenProject instance for: " + file, file, e );
-            }
-
+            MavenProject project = projectBuilder.build( file, request.getProjectBuildingConfiguration() );
+            
             if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
             {
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
@@ -253,14 +242,12 @@ public class DefaultMaven
                     moduleFiles.add( moduleFile );
                 }
 
-                List<MavenProject> collectedProjects = collectProjects( moduleFiles, request );
+                Map<String,MavenProject> collectedProjects = collectProjects( moduleFiles, request );
 
-                projects.addAll( collectedProjects );
-                
-                project.setCollectedProjects( collectedProjects );
+                projects.putAll( collectedProjects );                
             }
             
-            projects.add( project );
+            projects.put( ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
         }
 
         return projects;

@@ -66,8 +66,6 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.project.artifact.ActiveProjectArtifact;
-import org.apache.maven.repository.MavenRepositoryWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -87,7 +85,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * </ol>
  */
 public class MavenProject
-    implements Cloneable, MavenRepositoryWrapper
+    implements Cloneable
 {
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
 
@@ -109,8 +107,6 @@ public class MavenProject
 
     private List<ArtifactRepository> remoteArtifactRepositories;
 
-    private List<MavenProject> collectedProjects = Collections.emptyList();
-
     private List<Artifact> attachedArtifacts;
 
     private MavenProject executionProject;
@@ -120,8 +116,6 @@ public class MavenProject
     private List<String> testCompileSourceRoots = new ArrayList<String>();
 
     private List<String> scriptSourceRoots = new ArrayList<String>();
-
-    private List<ArtifactRepository> pluginArtifactRepositories;
 
     private ArtifactRepository releaseArtifactRepository;
 
@@ -508,14 +502,12 @@ public class MavenProject
 
         for ( Artifact a : getArtifacts() )
         {            
-            System.out.println( "++> " + a.getArtifactId() );
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
                     addArtifactPath( a, list );
-                    System.out.println( "--> " + a.getArtifactId() );
                 }
             }
         }
@@ -1323,19 +1315,8 @@ public class MavenProject
         return build;
     }
 
-    public List<MavenProject> getCollectedProjects()
-    {
-        return collectedProjects;
-    }
-
-    public void setCollectedProjects( List<MavenProject> collectedProjects )
-    {
-        this.collectedProjects = collectedProjects;
-    }
-
     public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
-        this.pluginArtifactRepositories = pluginArtifactRepositories;
     }
 
     /**
@@ -1672,157 +1653,7 @@ public class MavenProject
     {
         return getBuild() != null ? getBuild().getDefaultGoal() : null;
     }
-    
-    public Artifact find( Artifact artifact )
-    {
-        return replaceWithActiveArtifact( artifact );
-    }
-
-    public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )
-    {
-        if ( ( getProjectReferences() != null ) && !getProjectReferences().isEmpty() )
-        {
-            String refId = getProjectReferenceId( pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion() );
-            MavenProject ref = getProjectReferences().get( refId );
-            if ( ref != null )
-            {
-                if ( ref.getArtifact() != null
-                    && ref.getArtifact().getDependencyConflictId().equals( pluginArtifact.getDependencyConflictId() ) )
-                {
-                    // if the project artifact doesn't exist, don't use it. We haven't built that far.
-                    if ( ref.getArtifact().getFile() != null && ref.getArtifact().getFile().exists() )
-                    {
-                        // FIXME: Why aren't we using project.getArtifact() for the second parameter here??
-                        Artifact resultArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
-                        return resultArtifact;
-                    }
-                    else
-                    {
-                        logMissingSiblingProjectArtifact( pluginArtifact );
-                    }
-                }
-
-                Artifact attached = findMatchingArtifact( ref.getAttachedArtifacts(), pluginArtifact );
-                if ( attached != null )
-                {
-                    if ( attached.getFile() != null && attached.getFile().exists() )
-                    {
-                        Artifact resultArtifact = ArtifactUtils.copyArtifact( attached );
-                        resultArtifact.setScope( pluginArtifact.getScope() );
-                        return resultArtifact;
-                    }
-                    else
-                    {
-                        logMissingSiblingProjectArtifact( pluginArtifact );
-                    }
-                }
-
-                /**
-                 * Patch/workaround for: MNG-2871
-                 * 
-                 * We want to use orginal artifact (packaging:ejb) when we are resolving ejb-client
-                 * package and we didn't manage to find attached to project one.
-                 * 
-                 * The scenario is such that somebody run "mvn test" in composity project, and
-                 * ejb-client.jar will not be attached to ejb.jar (because it is done in package
-                 * phase)
-                 * 
-                 * We prefer in such a case use orginal sources (of ejb.jar) instead of failure
-                 */
-                if ( ( ref.getArtifactId().equals( pluginArtifact.getArtifactId() ) ) && ( ref.getGroupId().equals( pluginArtifact.getGroupId() ) ) && ( ref.getArtifact().getType().equals( "ejb" ) )
-                    && ( pluginArtifact.getType().equals( "ejb-client" ) ) && ( ( ref.getArtifact().getFile() != null ) && ref.getArtifact().getFile().exists() ) )
-                {
-                    pluginArtifact = new ActiveProjectArtifact( ref, pluginArtifact );
-                    return pluginArtifact;
-                }
-            }
-        }
-        return pluginArtifact;
-    }
-
-    /**
-     * Tries to resolve the specified artifact from the given collection of attached project artifacts.
-     * 
-     * @param artifacts The attached artifacts, may be <code>null</code>.
-     * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
-     * @return The matching artifact or <code>null</code> if not found.
-     */
-    private Artifact findMatchingArtifact( List<Artifact> artifacts, Artifact requestedArtifact )
-    {
-        if ( artifacts != null && !artifacts.isEmpty() )
-        {
-            // first try matching by dependency conflict id
-            String requestedId = requestedArtifact.getDependencyConflictId();
-            for ( Artifact artifact : artifacts )
-            {
-                if ( requestedId.equals( artifact.getDependencyConflictId() ) )
-                {
-                    return artifact;
-                }
-            }
-
-            // next try matching by repository conflict id
-            requestedId = getRepositoryConflictId( requestedArtifact );
-            for ( Artifact artifact : artifacts )
-            {
-                if ( requestedId.equals( getRepositoryConflictId( artifact ) ) )
-                {
-                    return artifact;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Gets the repository conflict id of the specified artifact. Unlike the dependency conflict id, the repository
-     * conflict id uses the artifact file extension instead of the artifact type. Hence, the repository conflict id more
-     * closely reflects the identity of artifacts as perceived by a repository.
-     * 
-     * @param artifact The artifact, must not be <code>null</code>.
-     * @return The repository conflict id, never <code>null</code>.
-     */
-    private String getRepositoryConflictId( Artifact artifact )
-    {
-        StringBuffer buffer = new StringBuffer( 128 );
-        buffer.append( artifact.getGroupId() );
-        buffer.append( ':' ).append( artifact.getArtifactId() );
-        if ( artifact.getArtifactHandler() != null )
-        {
-            buffer.append( ':' ).append( artifact.getArtifactHandler().getExtension() );
-        }
-        else
-        {
-            buffer.append( ':' ).append( artifact.getType() );
-        }
-        if ( artifact.hasClassifier() )
-        {
-            buffer.append( ':' ).append( artifact.getClassifier() );
-        }
-        return buffer.toString();
-    }
-
-    private void logMissingSiblingProjectArtifact( Artifact artifact )
-    {
-        /* TODO
-        if ( logger == null )
-        {
-            return;
-        }
-        
-        StringBuffer message = new StringBuffer();
-        message.append( "A dependency of the current project (or of one the plugins used in its build) was found in the reactor, " );
-        message.append( "\nbut had not been built at the time it was requested. It will be resolved from the repository instead." );
-        message.append( "\n\nCurrent Project: " ).append( getName() );
-        message.append( "\nRequested Dependency: " ).append( artifact.getId() );
-        message.append( "\n\nNOTE: You may need to run this build to the 'compile' lifecycle phase, or farther, in order to build the dependency artifact." );
-        message.append( "\n" );
-        
-        logger.warn( message.toString() );
-        */
-    }
-
+   
     public void clearExecutionProject()
     {
         if ( !previousExecutionProjects.isEmpty() )
@@ -1988,11 +1819,6 @@ public class MavenProject
         if ( project.getPluginArtifactRepositories() != null )
         {
             setPluginArtifactRepositories( ( Collections.unmodifiableList( project.getPluginArtifactRepositories() ) ) );
-        }
-
-        if ( project.getCollectedProjects() != null )
-        {
-            setCollectedProjects( ( Collections.unmodifiableList( project.getCollectedProjects() ) ) );
         }
 
         if ( project.getActiveProfiles() != null )

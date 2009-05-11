@@ -73,7 +73,7 @@ public class DefaultArtifactCollectorTest
 
         source = new Source();
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        artifactCollector = (ArtifactCollector) lookup( ArtifactCollector.ROLE );
+        artifactCollector = (ArtifactCollector) lookup( ArtifactCollector.class );
 
         projectArtifact = createArtifactSpec( "project", "1.0", null );
     }
@@ -726,23 +726,23 @@ public class DefaultArtifactCollectorTest
 
     private ArtifactResolutionResult collect( Set artifacts, ArtifactFilter filter )
         throws ArtifactResolutionException
-    {
-        return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, source, filter,
-                                          Collections.EMPTY_LIST );
+    {        
+        return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, null, source, filter,
+                                          Collections.EMPTY_LIST, null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a )
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          source, null, Collections.EMPTY_LIST );
+                                          null, source, null, Collections.EMPTY_LIST, null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          source, filter, Collections.EMPTY_LIST );
+                                          null, source, filter, Collections.EMPTY_LIST, null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, Artifact managedVersion )
@@ -750,7 +750,7 @@ public class DefaultArtifactCollectorTest
     {
         Map managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(), managedVersion );
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact,
-                                          managedVersions, null, null, source, null, Collections.EMPTY_LIST );
+                                          managedVersions, null, null, source, null, Collections.EMPTY_LIST, null );
     }
 
     private ArtifactSpec createArtifactSpec( String id, String version )

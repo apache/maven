@@ -21,6 +21,7 @@ package org.apache.maven.execution;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -42,6 +43,10 @@ public class MavenSession
 
     private MavenProject currentProject;
         
+    /**
+     * These projects have already been topologically sorted in the {@link org.apache.maven.Maven} component before
+     * being passed into the session.
+     */
     private List<MavenProject> projects;
     
     private MavenProject topLevelProject;
@@ -91,8 +96,8 @@ public class MavenSession
     {
         return request.getSettings();
     }
-
-    public List<MavenProject> getSortedProjects()
+    
+    public List<MavenProject> getProjects()
     {
         return projects;
     }

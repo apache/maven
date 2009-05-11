@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
@@ -89,8 +91,8 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
-
-    //private static HashMap<String, MavenProject> hm = new HashMap<String, MavenProject>();
+    
+    private Map<File, MavenProject> projectCache = new HashMap<File, MavenProject>();
 
     private MavenProject superProject;
 
@@ -101,6 +103,13 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
+        MavenProject project = projectCache.get( pomFile );
+        
+        if ( project != null )
+        {
+            return project;
+        }
+        
         DomainModel domainModel;
 
         try
@@ -124,7 +133,7 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ProfileActivationException e )
         {
-            throw new ProjectBuildingException( "", "Failed to activate pom profiles." );
+            throw new ProjectBuildingException( "", "Failed to activate pom profiles.", e );
         }
 
         try
@@ -143,56 +152,60 @@ public class DefaultMavenProjectBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "", "" );
+            throw new ProjectBuildingException( "", "", e );
         }
-
-        //Interpolation & Management
-        MavenProject project;
+        
         try
         {
             Model model = interpolateDomainModel( domainModel, configuration, pomFile );
 
-            lifecycleBindingsInjector.injectLifecycleBindings( model );
+            if ( configuration.isProcessPlugins() )
+            {                
+                lifecycleBindingsInjector.injectLifecycleBindings( model );
+            }
 
             ProcessorContext.processManagementNodes( model );
 
             project = this.fromDomainModelToMavenProject( model, domainModel.getParentFile(), configuration, pomFile );
 
-            Collection<Plugin> pluginsFromProject = project.getModel().getBuild().getPlugins();
+            if ( configuration.isProcessPlugins() )
+            {            
+                Collection<Plugin> pluginsFromProject = project.getModel().getBuild().getPlugins();
 
-            // Merge the various sources for mojo configuration:
-            // 1. default values from mojo descriptor
-            // 2. POM values from per-plugin configuration
-            // 3. POM values from per-execution configuration
-            // These configuration sources are given in increasing order of dominance.
+                // Merge the various sources for mojo configuration:
+                // 1. default values from mojo descriptor
+                // 2. POM values from per-plugin configuration
+                // 3. POM values from per-execution configuration
+                // These configuration sources are given in increasing order of dominance.
 
-            // push plugin configuration down to executions
-            for ( Plugin buildPlugin : pluginsFromProject )
-            {
-                Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
-
-                if ( dom != null )
+                // push plugin configuration down to executions
+                for ( Plugin buildPlugin : pluginsFromProject )
                 {
-                    for ( PluginExecution e : buildPlugin.getExecutions() )
+                    Xpp3Dom dom = (Xpp3Dom) buildPlugin.getConfiguration();
+
+                    if ( dom != null )
                     {
-                        Xpp3Dom dom1 = Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) e.getConfiguration(), new Xpp3Dom( dom ) );
-                        e.setConfiguration( dom1 );
+                        for ( PluginExecution e : buildPlugin.getExecutions() )
+                        {
+                            Xpp3Dom dom1 = Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) e.getConfiguration(), new Xpp3Dom( dom ) );
+                            e.setConfiguration( dom1 );
+                        }
                     }
                 }
+
+                // merge in default values from mojo descriptor
+                lifecycle.populateDefaultConfigurationForPlugins( pluginsFromProject, project, configuration.getLocalRepository() );
+
+                project.getModel().getBuild().setPlugins( new ArrayList<Plugin>( pluginsFromProject ) );
             }
-
-            // merge in default values from mojo descriptor
-            lifecycle.populateDefaultConfigurationForPlugins( pluginsFromProject, project, configuration.getLocalRepository() );
-
-            project.getModel().getBuild().setPlugins( new ArrayList<Plugin>( pluginsFromProject ) );
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( "", "" );
+            throw new ProjectBuildingException( "", "", e );
         }
         catch ( LifecycleExecutionException e )
         {
-            throw new ProjectBuildingException( "", e.getMessage() );
+            throw new ProjectBuildingException( "", e.getMessage(), e );
         }
 
         //project.setActiveProfiles( projectProfiles );
@@ -208,6 +221,8 @@ public class DefaultMavenProjectBuilder
 
         setBuildOutputDirectoryOnParent( project );
 
+        projectCache.put(  pomFile, project );
+        
         return project;
     }
 

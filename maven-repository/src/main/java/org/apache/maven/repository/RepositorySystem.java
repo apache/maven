@@ -34,7 +34,6 @@ import org.apache.maven.model.Repository;
  */
 public interface RepositorySystem
 {
-    // Default local repository 
     static final String DEFAULT_LOCAL_REPO_ID = "local";
     
     static final String userHome = System.getProperty( "user.home" );
@@ -43,7 +42,6 @@ public interface RepositorySystem
     
     static final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
     
-    // Default remote repository
     static final String DEFAULT_REMOTE_REPO_ID = "central";
 
     static final String DEFAULT_REMOTE_REPO_URL = "http://repo1.maven.org/maven2";
@@ -55,18 +53,10 @@ public interface RepositorySystem
     Artifact createPluginArtifact( Plugin plugin );
     
     Artifact createDependencyArtifact( Dependency dependency );
-    
-    //TODO: this needs a project to do anything useful
-    //Set<Artifact> createArtifacts();
-    
-    // maven model
+        
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
         
-    //!!jvz Change this to use a file
-    ArtifactRepository createLocalRepository( String url, String repositoryId )
-        throws IOException;
-
     ArtifactRepository createDefaultRemoteRepository()
         throws InvalidRepositoryException;    
     
@@ -75,9 +65,6 @@ public interface RepositorySystem
     
     ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException;
-    
-    //correct all uses to let the resolver find the deps of the root and 
-    //pass in overrides where necessary
     
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
@@ -92,15 +79,8 @@ public interface RepositorySystem
      */
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
            
-    //REMOVE
-    // These should be associated with repositories and the repositories should be examine as part of metadatda and
-    // artifact resolution. So these methods should also not be here.
-    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
-    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );
-    void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions );
-    
-    // Mirrors
-    
+    //TODO: remove the request should already be processed to select the mirror for the request instead of the processing happen internally.
+    // Mirrors    
     void addMirror( String id, String mirrorOf, String url );        
     List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );    
 }

@@ -54,9 +54,7 @@ public class SnapshotTransformation
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
 
-    public void transformForResolve( Artifact artifact,
-                                     List<ArtifactRepository> remoteRepositories,
-                                     ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         // Only select snapshots that are unresolved (eg 1.0-SNAPSHOT, not 1.0-20050607.123456)

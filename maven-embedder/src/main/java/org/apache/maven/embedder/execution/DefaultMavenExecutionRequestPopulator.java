@@ -16,7 +16,6 @@ package org.apache.maven.embedder.execution;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -37,18 +36,13 @@ import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.toolchain.ToolchainsBuilder;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 /**
  * Things that we deal with in this populator to ensure that we have a valid
@@ -63,9 +57,7 @@ public class DefaultMavenExecutionRequestPopulator
     extends AbstractLogEnabled
     implements MavenExecutionRequestPopulator
 {
-    @Requirement
-    private PlexusContainer container;
-
+    //TODO: this needs to be pushed up to the front-end
     @Requirement
     private MavenSettingsBuilder settingsBuilder;
 
@@ -74,10 +66,6 @@ public class DefaultMavenExecutionRequestPopulator
 
     @Requirement
     private ToolchainsBuilder toolchainsBuilder;
-
-    // 2009-03-05 Oleg: this component is defined sub-classed in this package
-    @Requirement(hint = "maven")
-    private SecDispatcher securityDispatcher;
 
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
@@ -226,6 +214,7 @@ public class DefaultMavenExecutionRequestPopulator
     {
         Settings settings = request.getSettings();
 
+        /*
         Proxy proxy = settings.getActiveProxy();
 
         if ( proxy != null )
@@ -257,6 +246,7 @@ public class DefaultMavenExecutionRequestPopulator
 
             repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
         }
+        */
 
         for ( Mirror mirror : settings.getMirrors() )
         {
@@ -367,9 +357,9 @@ public class DefaultMavenExecutionRequestPopulator
 
         try
         {
-            return repositorySystem.createLocalRepository( localRepositoryPath, RepositorySystem.DEFAULT_LOCAL_REPO_ID );
+            return repositorySystem.createLocalRepository( new File( localRepositoryPath ) );
         }
-        catch ( IOException e )
+        catch ( InvalidRepositoryException e )
         {
             throw new MavenEmbedderException( "Cannot create local repository.", e );
         }

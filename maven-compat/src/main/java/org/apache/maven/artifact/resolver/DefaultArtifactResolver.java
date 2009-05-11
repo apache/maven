@@ -56,13 +56,6 @@ import org.codehaus.plexus.util.FileUtils;
 public class DefaultArtifactResolver
     implements ArtifactResolver
 {
-
-    private boolean online = true;
-
-    // ----------------------------------------------------------------------
-    // Components
-    // ----------------------------------------------------------------------
-
     @Requirement 
     private Logger logger;
     
@@ -84,23 +77,6 @@ public class DefaultArtifactResolver
     @Requirement
     private PlexusContainer container;
     
-    //@Requirement 
-    private ArtifactMetadataSource metadataSource;
-    
-    // ----------------------------------------------------------------------
-    // Implementation
-    // ----------------------------------------------------------------------
-
-    public void setOnline( boolean online )
-    {
-        this.online = online;
-    }
-
-    public boolean isOnline()
-    {
-        return online;
-    }
-
     public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener resolutionListener )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
@@ -122,6 +98,7 @@ public class DefaultArtifactResolver
         }
 
         File destination;
+        
         if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
         {
             File systemFile = artifact.getFile();
@@ -142,8 +119,11 @@ public class DefaultArtifactResolver
             }
 
             artifact.setResolved( true );
+            
+            return;
         }
-        else if ( !artifact.isResolved() )
+        
+        if ( !artifact.isResolved() )
         {
             // ----------------------------------------------------------------------
             // Check for the existence of the artifact in the specified local
@@ -151,9 +131,21 @@ public class DefaultArtifactResolver
             // request for resolution has been satisfied.
             // ----------------------------------------------------------------------
 
-            String localPath = localRepository.pathOf( artifact );
+            artifact = localRepository.find( artifact );
+            
+            if ( artifact.isFromAuthoritativeRepository() )
+            {
+                return;
+            }
+            
+            if ( artifact.isSnapshot() && artifact.isResolved() )
+            {
+                return;
+            }
+            
+            //String localPath = localRepository.pathOf( artifact );
 
-            artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
+            //artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
 
             transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
 
@@ -168,15 +160,8 @@ public class DefaultArtifactResolver
             // 2. the artifact's file doesn't exist (this would be true for release or snapshot artifacts)
             // 3. the artifact is a snapshot and is not a locally installed snapshot
 
-            // TODO: Should it matter whether it's a locally installed snapshot??
-            if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy && isOnline() ) )
+            if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) )
             {
-                if ( !isOnline() )
-                {
-                    throw new ArtifactResolutionException( "The repository system is offline and the artifact "
-                        + artifact + " is not available in the local repository.", artifact );
-                }
-
                 try
                 {
                     if ( artifact.getRepository() != null )
@@ -209,18 +194,27 @@ public class DefaultArtifactResolver
 
             if ( destination.exists() )
             {
-                // locally resolved...no need to hit the remote repo.
                 artifact.setResolved( true );
             }
-
+                                        
+            // 1.0-SNAPSHOT
+            //
+            // 1)         pom = 1.0-SoNAPSHOT
+            // 2)         pom = 1.0-yyyymmdd.hhmmss
+            // 3) baseVersion = 1.0-SNAPSHOT
             if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
             {
                 String version = artifact.getVersion();
 
+                // 1.0-SNAPSHOT
                 artifact.selectVersion( artifact.getBaseVersion() );
 
+                // Make a file with a 1.0-SNAPSHOT format
                 File copy = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-
+                
+                // if the timestamped version was resolved or the copy doesn't exist then copy a version
+                // of the file like 1.0-SNAPSHOT. Even if there is a timestamped version the non-timestamped
+                // version will be created.
                 if ( resolved || !copy.exists() )
                 {
                     // recopy file if it was reresolved, or doesn't exist.
@@ -236,13 +230,15 @@ public class DefaultArtifactResolver
                     }
                 }
 
+                // We are only going to use the 1.0-SNAPSHOT version
                 artifact.setFile( copy );
 
+                // Set the version to the 1.0-SNAPSHOT version
                 artifact.selectVersion( version );
             }
         }
     }
-
+        
     private boolean isLocalCopy( Artifact artifact )
     {
         boolean localCopy = false;
@@ -427,8 +423,7 @@ public class DefaultArtifactResolver
         {
             try
             {
-                Set<Artifact> directArtifacts =
-                    source.retrieve( rootArtifact, localRepository, remoteRepositories ).getArtifacts();
+                Set<Artifact> directArtifacts = source.retrieve( rootArtifact, localRepository, remoteRepositories ).getArtifacts();
 
                 if ( artifacts == null || artifacts.isEmpty() )
                 {
@@ -467,7 +462,7 @@ public class DefaultArtifactResolver
         } 
                                 
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
-        result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
+        result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners, null );
                 
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information

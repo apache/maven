@@ -44,6 +44,10 @@ public class DefaultArtifactRepository
 
     private boolean blacklisted;
 
+    public DefaultArtifactRepository()
+    {
+    }
+    
     /**
      * Create a local repository or a test repository.
      *
@@ -170,10 +174,18 @@ public class DefaultArtifactRepository
         sb.append( "       id: " ).append( getId() ).append( "\n" );
         sb.append( "      url: " ).append( getUrl() ).append( "\n" );
         sb.append( "   layout: " ).append( layout != null ? layout.getId() : "none" ).append( "\n" );
-        sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );
-        sb.append( ", update => " ).append( snapshots.getUpdatePolicy() ).append( "]\n" );
-        sb.append( " releases: [enabled => " ).append( releases.isEnabled() );
-        sb.append( ", update => " ).append( releases.getUpdatePolicy() ).append( "]\n" );
+        
+        if ( snapshots != null )
+        {
+            sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );
+            sb.append( ", update => " ).append( snapshots.getUpdatePolicy() ).append( "]\n" );
+        }
+        
+        if ( releases != null )
+        {
+            sb.append( " releases: [enabled => " ).append( releases.isEnabled() );
+            sb.append( ", update => " ).append( releases.getUpdatePolicy() ).append( "]\n" );
+        }
 
         return sb.toString();
     }
