@@ -1966,7 +1966,10 @@ public class ModelMerger
         mergeNotifier_Type( target, source, sourceDominant, context );
         mergeNotifier_Address( target, source, sourceDominant, context );
         mergeNotifier_Configuration( target, source, sourceDominant, context );
-        // TODO
+        mergeNotifier_SendOnError( target, source, sourceDominant, context );
+        mergeNotifier_SendOnFailure( target, source, sourceDominant, context );
+        mergeNotifier_SendOnSuccess( target, source, sourceDominant, context );
+        mergeNotifier_SendOnWarning( target, source, sourceDominant, context );
     }
 
     protected void mergeNotifier_Type( Notifier target, Notifier source, boolean sourceDominant,
@@ -2010,6 +2013,42 @@ public class ModelMerger
             merged.putAll( target.getConfiguration() );
         }
         target.setConfiguration( merged );
+    }
+
+    protected void mergeNotifier_SendOnError( Notifier target, Notifier source, boolean sourceDominant,
+                                              Map<Object, Object> context )
+    {
+        if ( sourceDominant )
+        {
+            target.setSendOnError( source.isSendOnError() );
+        }
+    }
+
+    protected void mergeNotifier_SendOnFailure( Notifier target, Notifier source, boolean sourceDominant,
+                                                Map<Object, Object> context )
+    {
+        if ( sourceDominant )
+        {
+            target.setSendOnFailure( source.isSendOnFailure() );
+        }
+    }
+
+    protected void mergeNotifier_SendOnSuccess( Notifier target, Notifier source, boolean sourceDominant,
+                                                Map<Object, Object> context )
+    {
+        if ( sourceDominant )
+        {
+            target.setSendOnSuccess( source.isSendOnSuccess() );
+        }
+    }
+
+    protected void mergeNotifier_SendOnWarning( Notifier target, Notifier source, boolean sourceDominant,
+                                                Map<Object, Object> context )
+    {
+        if ( sourceDominant )
+        {
+            target.setSendOnWarning( source.isSendOnWarning() );
+        }
     }
 
     protected void mergePrerequisites( Prerequisites target, Prerequisites source, boolean sourceDominant,
