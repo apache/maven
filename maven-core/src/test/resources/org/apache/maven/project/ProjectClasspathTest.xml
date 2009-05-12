@@ -37,6 +37,11 @@
           <field-name>interpolator</field-name>
         </requirement>
         <requirement>
+          <role>org.apache.maven.model.normalization.Normalizer</role>
+          <role-hint>default</role-hint>
+          <field-name>normalizer</field-name>
+        </requirement>
+        <requirement>
           <role>org.apache.maven.model.lifecycle.LifecycleBindingsInjector</role>
           <role-hint>default</role-hint>
           <field-name>lifecycleBindingsInjector</field-name>

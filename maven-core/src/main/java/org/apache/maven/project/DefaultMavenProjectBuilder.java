@@ -42,6 +42,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.interpolator.Interpolator;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.lifecycle.LifecycleBindingsInjector;
+import org.apache.maven.model.normalization.Normalizer;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationException;
@@ -77,7 +78,10 @@ public class DefaultMavenProjectBuilder
     private RepositorySystem repositorySystem;
 
     @Requirement
-    List<ModelEventListener> listeners;
+    private List<ModelEventListener> listeners;
+
+    @Requirement
+    private Normalizer normalizer;
 
     @Requirement
     private Interpolator interpolator;
@@ -388,6 +392,11 @@ public class DefaultMavenProjectBuilder
             }
 
             domainModels.addAll( mavenParents );
+        }
+
+        for ( DomainModel domain : domainModels )
+        {
+            normalizer.mergeDuplicates( domain.getModel() );
         }
 
         domainModels.add( new DomainModel( getSuperModel(), false ) );
