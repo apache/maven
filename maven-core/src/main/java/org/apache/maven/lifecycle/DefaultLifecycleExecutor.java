@@ -41,9 +41,6 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
@@ -101,7 +98,6 @@ public class DefaultLifecycleExecutor
     private Map<String, Lifecycle> phaseToLifecycleMap;
 
     public void execute( MavenSession session )
-        throws LifecycleExecutionException, MojoFailureException
     {
         logger.info(  "Build Order:" );
         logger.info( "" );
@@ -124,11 +120,6 @@ public class DefaultLifecycleExecutor
                 goals = Collections.singletonList( goal );
             }
         }
-
-        if ( goals.isEmpty() )
-        {
-            throw new LifecycleExecutionException( "\n\nYou must specify at least one goal. Try 'mvn install' to build or 'mvn --help' for options \nSee http://maven.apache.org for more information.\n\n" );
-        }
         
         for ( MavenProject currentProject : session.getProjects() )
         {
@@ -140,7 +131,17 @@ public class DefaultLifecycleExecutor
 
                 for ( String goal : goals )
                 {                    
-                    List<MojoExecution> lifecyclePlan = calculateLifecyclePlan( goal, session );        
+                    List<MojoExecution> lifecyclePlan;
+                    
+                    try
+                    {
+                        lifecyclePlan = calculateLifecyclePlan( goal, session );
+                    }
+                    catch ( LifecycleExecutionException e )
+                    {
+                        session.getResult().addException( e );
+                        return;
+                    }        
 
                     //TODO: once we have calculated the build plan then we should accurately be able to download
                     // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
@@ -153,9 +154,13 @@ public class DefaultLifecycleExecutor
                     }
                     catch ( ArtifactResolutionException e )
                     {
+                        session.getResult().addException( e );
+                        return;
                     }
                     catch ( ArtifactNotFoundException e )
                     {
+                        session.getResult().addException( e );
+                        return;
                     }
                     
                     if ( logger.isDebugEnabled() )
@@ -182,15 +187,10 @@ public class DefaultLifecycleExecutor
                             logger.info( executionDescription( mojoExecution, currentProject ) );
                             pluginManager.executeMojo( session, mojoExecution );
                         }
-                        catch ( PluginExecutionException e )
+                        catch ( Exception e )
                         {
-                            // This looks like a duplicate
-                            throw new LifecycleExecutionException( "Error executing goal.", e );                                        
-                        }
-                        catch ( PluginConfigurationException e )
-                        {
-                            // If the mojo can't actually be configured
-                            throw new LifecycleExecutionException( "Error executing goal.", e );                                        
+                            session.getResult().addException( e );
+                            return;
                         }
                     }                         
                 }
@@ -949,40 +949,25 @@ public class DefaultLifecycleExecutor
     
     */
     
-    // This can ultimately be moved up to the Maven component
-    
     private void downloadProjectDependencies( MavenSession session, String scope )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         MavenProject project = session.getCurrentProject();
 
-        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
-
+        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );      
+        
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( artifact )
-            // Here the root is not resolved because we are presumably working with a project locally.
-            .setResolveRoot( false )
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( artifact )
             .setResolveTransitively( true )
-            //.setArtifactDependencies( project.getDependencyArtifacts() )
             .setLocalRepository( session.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() )
             .setFilter( filter );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
-
         resolutionErrorHandler.throwErrors( request, result );
-
-        //TODO: this is wrong
-        project.setArtifacts( result.getArtifacts() );
-
-        ArtifactRepository localRepository = session.getLocalRepository();
-        List<ArtifactRepository> remoteArtifactRepositories = session.getCurrentProject().getRemoteArtifactRepositories();
-
-        for ( Artifact projectArtifact : session.getCurrentProject().getArtifacts() )
-        {
-            repositorySystem.resolve( new ArtifactResolutionRequest( projectArtifact, localRepository, remoteArtifactRepositories ) );
-        }
+        project.setArtifacts( result.getArtifacts() );        
     }    
 }
