@@ -36,7 +36,6 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.model.Build;
@@ -584,9 +583,10 @@ public class MavenProject
         list.add( getBuild().getOutputDirectory() );
 
         for ( Artifact a : getArtifacts() )
-        {
+        {            
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
+                
                 File file = a.getFile();
                 if ( file == null )
                 {
@@ -595,9 +595,19 @@ public class MavenProject
                 list.add( file.getPath() );
             }
         }
+        
+        /*
+        System.out.println( "TEST CLASSPATH: ");
+        for( String s : list )
+        {
+            System.out.println( ">>>>> " + s );
+        }
+        */
+        
         return list;
     }
 
+    @Deprecated
     public List<Artifact> getTestArtifacts()
     {
         List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
@@ -613,6 +623,7 @@ public class MavenProject
         return list;
     }
 
+    @Deprecated
     public List<Dependency> getTestDependencies()
     {
         Set<Artifact> artifacts = getArtifacts();

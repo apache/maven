@@ -87,7 +87,7 @@ public class DefaultMaven
         
         MavenExecutionResult result = new DefaultMavenExecutionResult();
         
-        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository();
+        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository( request.getLocalRepository() );
         delegatingLocalArtifactRepository.addToEndOfSearchOrder( new UserLocalArtifactRepository( request.getLocalRepository() ) ); 
         
         if ( localArtifactRepositories != null && localArtifactRepositories.size() > 0 )

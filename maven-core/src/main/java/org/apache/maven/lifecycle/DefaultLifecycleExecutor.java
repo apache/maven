@@ -150,7 +150,7 @@ public class DefaultLifecycleExecutor
                     // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
                     try
                     {
-                        downloadProjectDependencies( session, Artifact.SCOPE_COMPILE /**mojoDescriptor.isDependencyResolutionRequired()*/ );
+                        downloadProjectDependencies( session, Artifact.SCOPE_TEST /**mojoDescriptor.isDependencyResolutionRequired()*/ );
                     }
                     catch ( ArtifactResolutionException e )
                     {
@@ -732,9 +732,7 @@ public class DefaultLifecycleExecutor
             if ( !parameter.isEditable() )
             {
                 
-            }
-            
-            
+            }                        
             
             try
             {
@@ -744,7 +742,6 @@ public class DefaultLifecycleExecutor
                     String e = c.getAttribute( "default-value" );
                     if ( e != null )
                     {
-                        System.out.println( ">> " + e );
                         value = expressionEvaluator.evaluate( e );
                     }                    
                 }

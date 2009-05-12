@@ -13,6 +13,13 @@ public class DelegatingLocalArtifactRepository
 {
     private List<LocalArtifactRepository> localRepositories;        
     
+    private ArtifactRepository userLocalArtifactRepository; 
+           
+    public DelegatingLocalArtifactRepository( ArtifactRepository artifactRepository )
+    {
+        this.userLocalArtifactRepository = artifactRepository;
+    }
+
     public void addToEndOfSearchOrder( LocalArtifactRepository localRepository )
     {
         if ( localRepositories == null )
@@ -65,7 +72,7 @@ public class DelegatingLocalArtifactRepository
     // This ID is necessary of the metadata lookup doesn't work correctly.
     public String getId()
     {
-        return "local";
+        return "delegating";
     }
     
     @Override
@@ -82,5 +89,11 @@ public class DelegatingLocalArtifactRepository
         }
         
         return null;
+    }
+    
+    @Override
+    public String getBasedir()
+    {
+        return userLocalArtifactRepository.getBasedir();
     }
 }

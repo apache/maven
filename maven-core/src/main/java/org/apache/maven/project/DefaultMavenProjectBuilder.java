@@ -37,8 +37,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelEventListener;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.interpolator.Interpolator;
@@ -58,7 +56,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * @version $Id$

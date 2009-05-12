@@ -42,8 +42,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 // the layout used for a particular artifact type.
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author Jason van Zyl
  */
 public class ArtifactResolverTest
     extends AbstractArtifactComponentTestCase
