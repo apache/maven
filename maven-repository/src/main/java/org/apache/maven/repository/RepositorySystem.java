@@ -46,9 +46,11 @@ public interface RepositorySystem
 
     static final String DEFAULT_REMOTE_REPO_URL = "http://repo1.maven.org/maven2";
 
+    Artifact createArtifact( String groupId, String artifactId, String version, String packaging );
+
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
 
-    Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId );
+    Artifact createProjectArtifact( String groupId, String artifactId, String version );
 
     Artifact createPluginArtifact( Plugin plugin );
     

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.exception.ExceptionHandler;
+import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
@@ -23,6 +25,7 @@ public class LifecycleExecutorTest
     {
         super.setUp();
         lifecycleExecutor = (DefaultLifecycleExecutor) lookup( LifecycleExecutor.class );
+        lookup( ExceptionHandler.class );
     }
 
     protected String getProjectsDirectory()
@@ -70,17 +73,7 @@ public class LifecycleExecutorTest
         assertEquals( "surefire:test", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "jar:jar", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );        
     }    
-    
-    public void testLifecycleExecutionUsingADefaultLifecyclePhase()
-        throws Exception
-    {
-        File pom = getProject( "project-with-additional-lifecycle-elements" );
-        MavenSession session = createMavenSession( pom );        
-        assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
-        assertEquals( "1.0", session.getCurrentProject().getVersion() );                                
-        lifecycleExecutor.execute( session );
-    }    
-    
+        
     public void testLifecyclePluginsRetrievalForDefaultLifecycle()
         throws Exception
     {

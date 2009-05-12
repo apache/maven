@@ -261,8 +261,7 @@ public class DefaultPluginManager
             .setLocalRepository( localRepository )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setFilter( filter )
-            .setResolveTransitively( true )
-            .setResolveRoot( true ); // We are setting this to false because the artifact itself has been resolved.
+            .setResolveTransitively( true );
         
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );

@@ -173,9 +173,16 @@ public class MavenCli
         {
             ExceptionSummary es = result.getExceptionSummary();
             
+            if ( es == null )
+            {
+                result.getExceptions().get( 0 ).printStackTrace();
+            }
+            else
+            {
             System.out.println( es.getMessage() );
             
             es.getException().printStackTrace();
+            }
             
             return 1;
         }

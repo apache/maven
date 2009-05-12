@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
@@ -106,7 +107,7 @@ public abstract class AbstractCoreMavenComponentTestCase
             project = createStubMavenProject();
         }
                         
-        MavenSession session = new MavenSession( getContainer(), request, project );
+        MavenSession session = new MavenSession( getContainer(), request, new DefaultMavenExecutionResult(), project );
         
         return session;
     }      

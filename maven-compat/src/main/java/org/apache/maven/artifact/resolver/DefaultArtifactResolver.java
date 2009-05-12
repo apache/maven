@@ -324,7 +324,7 @@ public class DefaultArtifactResolver
                                                          List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( originatingArtifact ).setResolveRoot( false ).setArtifactDependencies( artifacts ).setManagedVersionMap( managedVersions )
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( originatingArtifact ).setManagedVersionMap( managedVersions )
             .setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories ).setMetadataSource( source ).setFilter( filter ).setListeners( listeners );
 
         return resolveWithExceptions( request );
@@ -465,7 +465,7 @@ public class DefaultArtifactResolver
                                 
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners, null );
-                
+                        
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
         // appropriately.

@@ -176,8 +176,7 @@ public class DefaultMavenProjectBuilder
             {
                 pluginConfigurationExpander.expandPluginConfiguration( project.getModel() );
 
-                lifecycle.populateDefaultConfigurationForPlugins( project.getModel().getBuild().getPlugins(), project,
-                                                                  configuration.getLocalRepository() );
+                lifecycle.populateDefaultConfigurationForPlugins( project.getModel().getBuild().getPlugins(), project, configuration.getLocalRepository() );
             }
         }
         catch ( IOException e )
@@ -277,11 +276,14 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         MavenProject project = build( pomFile, configuration );
-        Artifact pomArtifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-        pomArtifact.setFile( pomFile );
+        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), project.getPackaging() );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( pomArtifact ).setResolveTransitively( true ).setArtifactDependencies( project.getDependencyArtifacts() )
-            .setLocalRepository( configuration.getLocalRepository() ).setRemoteRepostories( project.getRemoteArtifactRepositories() ).setManagedVersionMap( project.getManagedVersionMap() );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( artifact )
+            .setResolveTransitively( true )
+            .setLocalRepository( configuration.getLocalRepository() )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( project.getManagedVersionMap() );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
@@ -294,7 +296,7 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setArtifacts( result.getArtifacts() );
-        project.getArtifacts().remove( pomArtifact );
+        project.getArtifacts().remove( artifact );
 
         return new MavenProjectBuildingResult( project, result );
     }

@@ -2,8 +2,11 @@ package org.apache.maven;
 
 import java.io.File;
 
+import org.apache.maven.exception.ExceptionHandler;
+import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 public class MavenTest
@@ -12,11 +15,15 @@ public class MavenTest
     @Requirement
     private Maven maven;
 
+    @Requirement
+    private ExceptionHandler exceptionHandler;
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
         maven = lookup( Maven.class );
+        exceptionHandler = lookup( ExceptionHandler.class );
     }
 
     protected String getProjectsDirectory()
@@ -24,15 +31,17 @@ public class MavenTest
         return "src/test/projects/lifecycle-executor";
     }
 
-    // -----------------------------------------------------------------------------------------------
-    // 
-    // -----------------------------------------------------------------------------------------------
-
-    public void testMaven()
+    public void testLifecycleExecutionUsingADefaultLifecyclePhase()
         throws Exception
     {
         File pom = getProject( "project-with-additional-lifecycle-elements" );
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
-        MavenExecutionResult result = maven.execute( request );        
+        MavenExecutionResult result = maven.execute( request );
+        if ( result.hasExceptions() )
+        {
+            ExceptionSummary es = exceptionHandler.handleException( result.getExceptions().get( 0 ) );
+            System.out.println( es.getMessage() );
+            fail( "Maven did not execute correctly." );
+        }
     }
 }

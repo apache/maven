@@ -79,14 +79,14 @@ public class LegacyRepositorySystem
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
     }
 
+    public Artifact createArtifact( String groupId, String artifactId, String version, String packaging )
+    {
+        return artifactFactory.createBuildArtifact( groupId, artifactId, version, packaging );
+    }
+    
     public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier )
     {
         return artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
-    }
-
-    public Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging )
-    {
-        return artifactFactory.createBuildArtifact( groupId, artifactId, version, packaging );
     }
 
     public Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId )

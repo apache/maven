@@ -20,11 +20,13 @@ package org.apache.maven.execution;
  */
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.settings.Settings;
@@ -41,6 +43,8 @@ public class MavenSession
     
     private MavenExecutionRequest request;
 
+    private MavenExecutionResult result;
+    
     private MavenProject currentProject;
         
     /**
@@ -57,17 +61,18 @@ public class MavenSession
         this.request = request;
     }
 
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenProject project )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, MavenProject project )
         throws CycleDetectedException, DuplicateProjectException
     {
-        this( container, request, Arrays.asList( new MavenProject[]{ project } ) );        
+        this( container, request, result, Arrays.asList( new MavenProject[]{ project } ) );        
     }    
 
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, List<MavenProject> projects )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, List<MavenProject> projects )
         throws CycleDetectedException, DuplicateProjectException
     {
         this.container = container;
         this.request = request;
+        this.result = result;
         this.currentProject = projects.get( 0 );
         this.projects = projects;        
     }    
@@ -146,4 +151,42 @@ public class MavenSession
     {
         return topLevelProject;
     }
+
+    public MavenExecutionResult getResult()
+    {
+        return result;
+    }        
+    
+    // Backward compat
+    public Map<String,Map<String,Object>> getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
+    {
+        return new HashMap<String,Map<String,Object>>();
+    }    
+
+    /*
+    private Map pluginContextsByProjectAndPluginKey = new HashMap();
+    
+    public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
+    {
+        Map pluginContextsByKey = (Map) pluginContextsByProjectAndPluginKey.get( project.getId() );
+
+        if ( pluginContextsByKey == null )
+        {
+            pluginContextsByKey = new HashMap();
+
+            pluginContextsByProjectAndPluginKey.put( project.getId(), pluginContextsByKey );
+        }
+
+        Map pluginContext = (Map) pluginContextsByKey.get( plugin.getPluginLookupKey() );
+
+        if ( pluginContext == null )
+        {
+            pluginContext = new HashMap();
+            pluginContextsByKey.put( plugin.getPluginLookupKey(), pluginContext );
+        }
+
+        return pluginContext;
+    }
+    */
+    
 }

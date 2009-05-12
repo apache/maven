@@ -67,8 +67,7 @@ public interface LifecycleExecutor
     void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, MavenProject project, ArtifactRepository localRepository )
         throws LifecycleExecutionException;
     
-    void execute( MavenSession session )
-        throws LifecycleExecutionException, MojoFailureException, MojoExecutionException;
+    void execute( MavenSession session );
     
     Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository ) 
         throws LifecycleExecutionException;    

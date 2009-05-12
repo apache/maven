@@ -126,7 +126,7 @@ public class DefaultMaven
         {                        
             ProjectSorter projectSorter = new ProjectSorter( projects.values() );
                         
-            session = new MavenSession( container, request, projectSorter.getSortedProjects() );            
+            session = new MavenSession( container, request, result, projectSorter.getSortedProjects() );            
         }
         catch ( CycleDetectedException e )
         {            
@@ -154,13 +154,11 @@ public class DefaultMaven
             return result;
         }        
 
-        try
-        {
-            lifecycleExecutor.execute( session );
-        }        
-        catch ( Exception e )
-        {            
-            return processResult( result, e );
+        lifecycleExecutor.execute( session );
+        
+        if ( session.getResult().hasExceptions() )
+        {        
+            return processResult( result, session.getResult().getExceptions().get( 0 ) );
         }
 
         result.setTopologicallySortedProjects( session.getProjects() );

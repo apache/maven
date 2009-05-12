@@ -51,7 +51,6 @@ public class EmptyLifecycleExecutor
     }
 
     public void execute( MavenSession session )
-        throws LifecycleExecutionException, MojoFailureException, MojoExecutionException
     {
     }
 
