@@ -36,6 +36,12 @@ public class MojoExecution
 
     private Xpp3Dom configuration;
 
+    /**
+     * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase
+     * this mojo execution is going to run in.
+     */
+    private String lifecyclePhase;
+    
     public MojoExecution( MojoDescriptor mojoDescriptor )
     {
         this.mojoDescriptor = mojoDescriptor;
@@ -86,4 +92,14 @@ public class MojoExecution
         
         return sb.toString();
     }
+
+    public String getLifecyclePhase()
+    {
+        return lifecyclePhase;
+    }
+
+    public void setLifecyclePhase( String lifecyclePhase )
+    {
+        this.lifecyclePhase = lifecyclePhase;
+    }        
 }

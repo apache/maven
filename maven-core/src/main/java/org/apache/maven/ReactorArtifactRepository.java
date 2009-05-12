@@ -14,22 +14,7 @@ import org.apache.maven.project.MavenProject;
  * @author Jason van Zyl
  */
 
-// maven-compat
-//   target/classes
-// maven-core
-//   target/classes
-// maven-embedder
-//   target/classes
-// maven-model
-//   target/classes
-// maven-model-builder
-//   target/classes
-// maven-plugin-api
-//   target/classes
-// maven-repository
-//   target/classes
-// maven-toolchain
-//   target/classes
+//TODO: need phase information here to determine whether to hand back the classes/ or archive.
 public class ReactorArtifactRepository
     extends LocalArtifactRepository
 {
@@ -49,14 +34,25 @@ public class ReactorArtifactRepository
 
         if ( project != null )
         {
-            //TODO: determine if we want to pass the artifact produced by the project if it
-            // is present and under what conditions we will do such a thing.            
-
             if ( artifact.getType().equals( "jar" ) )
             {
+                File artifactFile = new File( project.getBuild().getDirectory(), project.getArtifactId() + "-" + project.getVersion() + "."+ artifact.getArtifactHandler().getExtension() );
+                
                 File classesDirectory = new File( project.getBuild().getOutputDirectory() );
 
-                if ( classesDirectory.exists() )
+                //TODO: This is really completely wrong and should probably be based on the phase that is currently being executed.
+                // If we are running before the packaging phase there is going to be no archive anyway, but if we are running prior to package
+                // we shouldn't even take the archive anyway.
+                
+                if ( artifactFile.exists() )
+                {
+                    artifact.setFile( artifactFile );
+
+                    artifact.setFromAuthoritativeRepository( true );
+
+                    artifact.setResolved( true );                    
+                }                
+                else if ( classesDirectory.exists() )
                 {
                     artifact.setFile( classesDirectory );
 

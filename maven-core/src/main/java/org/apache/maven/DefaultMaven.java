@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -78,7 +77,7 @@ public class DefaultMaven
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
-        // Need a general way to inject standard properties
+        //TODO: Need a general way to inject standard properties
         if ( request.getStartTime() != null )
         {
             request.getProperties().put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );

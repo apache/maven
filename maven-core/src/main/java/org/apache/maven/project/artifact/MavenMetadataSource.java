@@ -49,7 +49,6 @@ import org.codehaus.plexus.logging.Logger;
 /**
  * @author Jason van Zyl
  */
-//TODO: we don't need the repository metadata thing really, we can retrieve files independendently and parse
 @Component(role = ArtifactMetadataSource.class)
 public class MavenMetadataSource
     implements ArtifactMetadataSource
@@ -95,7 +94,7 @@ public class MavenMetadataSource
                 artifacts = new LinkedHashSet<Artifact>();
 
                 for ( Dependency d : project.getDependencies() )
-                {                    
+                {
                     String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
 
                     if ( effectiveScope != null )
@@ -118,26 +117,6 @@ public class MavenMetadataSource
         return new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
     }
 
-    /*
-    private Set<Artifact> createArtifacts( List<Dependency> dependencies )
-    {
-        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
-
-        for ( Dependency d : dependencies )
-        {                    
-            String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
-
-            if ( effectiveScope != null )
-            {
-                Artifact dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
-
-                artifacts.add( dependencyArtifact );
-            }
-        }
-        
-    }
-    */
-    
     private String getEffectiveScope( String originalScope, String inheritedScope )
     {
         String effectiveScope = Artifact.SCOPE_RUNTIME;
@@ -215,13 +194,13 @@ public class MavenMetadataSource
     private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata )
     {
         List<ArtifactVersion> versions;
-        
+
         if ( ( repoMetadata != null ) && ( repoMetadata.getVersioning() != null ) )
         {
             List<String> metadataVersions = repoMetadata.getVersioning().getVersions();
-            
+
             versions = new ArrayList<ArtifactVersion>( metadataVersions.size() );
-            
+
             for ( String version : metadataVersions )
             {
                 versions.add( new DefaultArtifactVersion( version ) );
@@ -234,21 +213,29 @@ public class MavenMetadataSource
 
         return versions;
     }
-    
-    /*
+
     // USED BY MAVEN ASSEMBLY PLUGIN                                                                                                                                                                                                    
     @Deprecated                                                                                                                                                                                                                         
     public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )                                                                                                                                                                 
         throws InvalidDependencyVersionException                                                                                                                                                                                        
-    {                                                                                                                                                                                                                                   
-        try                                                                                                                                                                                                                             
-        {                                                                                                                                                                                                                               
-            return repositorySystem.createArtifacts( artifactFactory, dependencies, inheritedScope, dependencyFilter, project );                                                                                                                                            
-        }                                                                                                                                                                                                                               
-        catch ( VersionNotFoundException e )                                                                                                                                                                                            
-        {                                                                                                                                                                                                                               
-            throw new InvalidDependencyVersionException( e.getProjectId(), e.getDependency(), e.getPomFile, e.getCauseException() );                                                                                                                                                       
-        }                                                                                                                                                                                                                               
-    } 
-    */                
+    {             
+        return createArtifacts( artifactFactory, dependencies, dependencyFilter );
+    }
+    
+    private static Set<Artifact> createArtifacts( ArtifactFactory factory, List<Dependency> dependencies, ArtifactFilter filter )
+    {
+        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+
+        for ( Dependency d : dependencies )
+        {
+            Artifact dependencyArtifact = factory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() );
+
+            if ( filter.include( dependencyArtifact ) )
+            {
+                artifacts.add( dependencyArtifact );
+            }
+        }
+        
+        return artifacts;
+    }    
 }
