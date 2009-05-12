@@ -46,6 +46,11 @@
           <role-hint>default</role-hint>
           <field-name>resolutionErrorHandler</field-name>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectCache</role>
+          <role-hint>default</role-hint>
+          <field-name>projectCache</field-name>
+        </requirement>
       </requirements>
     </component>
     <component>
