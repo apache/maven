@@ -51,7 +51,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
@@ -270,17 +269,12 @@ public class DefaultLifecycleExecutor
         for ( String phase : lifecycle.getPhases() )
         {               
             List<String> mojos = new ArrayList<String>(); 
-            
-            // Bind the mojos in the lifecycle mapping for the packaging to the lifecycle itself. If
-            // we can find the specified phase in the packaging them grab those mojos and add them to 
-            // the list we are going to execute.
-            String mojo = lifecyclePhasesForPackaging.get( phase );
-            
-            if ( mojo != null )
-            {
-                mojos.add( mojo );
-            }
-            
+
+            // This is just just laying out the initial structure of the mojos to run in each phase of the
+            // lifecycle. Everything is now done in the project builder correctly so this could likely
+            // go away shortly. We no longer need to pull out bits from the default lifecycle. The MavenProject
+            // comes to us intact as it should.
+                        
             phaseToMojoMapping.put( phase, mojos );                
         }
          
