@@ -60,29 +60,7 @@ public class LifecycleExecutorTest
         // plexus-component-metadata:generate-test-metadata
         // surefire:test
         // jar:jar
-        
-//        resources:resources
-//        resources:resources
-//        compiler:compile
-//        compiler:compile
-//        plexus-component-metadata:generate-metadata
-//        resources:testResources
-//        resources:testResources
-//        compiler:testCompile
-//        compiler:testCompile
-//        plexus-component-metadata:generate-test-metadata
-//        surefire:test
-//        surefire:test
-//        jar:jar
-//        jar:jar
-        
-        /*
-        for( MojoExecution e : lifecyclePlan )
-        {
-            System.out.println( e.getMojoDescriptor().getFullGoalName() );
-        }
-        */
-        
+                
         assertEquals( "resources:resources", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:compile", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
@@ -107,12 +85,7 @@ public class LifecycleExecutorTest
         throws Exception
     {
         List<Plugin> plugins = new ArrayList<Plugin>( lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles( "jar" ) );  
-        
-        for( Plugin plugin : plugins )
-        {
-            System.out.println( plugin.getArtifactId() );
-        }
-        
+                
         assertEquals( 8, plugins.size() );
     }
     
