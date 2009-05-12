@@ -54,7 +54,7 @@ public class PluginManagerTest
         assertNotNull( mojoDescriptor );
         assertEquals( "generate-metadata", mojoDescriptor.getGoal() );
         assertNotNull( mojoDescriptor.getRealm() );
-        mojoDescriptor.getRealm().display();
+        //mojoDescriptor.getRealm().display();
         
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
         assertNotNull( pluginDescriptor );

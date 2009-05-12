@@ -21,6 +21,8 @@ package org.apache.maven.artifact.manager;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -85,4 +87,6 @@ public interface WagonManager
 
     void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File file, String checksumPolicyWarn )
         throws TransferFailedException, ResourceDoesNotExistException;    
+    
+    Set<String> getSupportProtocols();
 }

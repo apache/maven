@@ -43,7 +43,7 @@ public class DefaultProjectBuilderConfiguration
     
     private MavenProject topProject;
     
-    private boolean processPlugins = false;
+    private boolean processPlugins = true;
     
     public DefaultProjectBuilderConfiguration()
     {        

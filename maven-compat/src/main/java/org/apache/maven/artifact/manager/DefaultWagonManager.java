@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -816,5 +817,10 @@ public class DefaultWagonManager
     public String getHttpUserAgent()
     {
         return httpUserAgent;
+    }
+
+    public Set<String> getSupportProtocols()
+    {
+        return wagons.keySet();
     }
 }

@@ -428,7 +428,6 @@ public class DefaultLifecycleExecutor
 
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenProject project, ArtifactRepository localRepository )
-    //MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository )
         throws LifecycleExecutionException
     {        
         String goal;
@@ -495,7 +494,7 @@ public class DefaultLifecycleExecutor
             String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or" + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
             throw new LifecycleExecutionException( message );
         }
-
+               
         for ( Plugin buildPlugin : project.getBuildPlugins() )
         {
             if ( buildPlugin.getKey().equals( plugin.getKey() ) )
@@ -511,7 +510,7 @@ public class DefaultLifecycleExecutor
         MojoDescriptor mojoDescriptor;
         
         try
-        {
+        {                        
             mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, project, localRepository );
         }
         catch ( PluginLoaderException e )

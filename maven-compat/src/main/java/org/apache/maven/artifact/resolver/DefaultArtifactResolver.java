@@ -155,6 +155,8 @@ public class DefaultArtifactResolver
 
             boolean resolved = false;
 
+            boolean destinationExists = destination.exists();
+            
             // There are three conditions in which we'll go after the artifact here:
             // 1. the force flag is set.
             // 2. the artifact's file doesn't exist (this would be true for release or snapshot artifacts)
