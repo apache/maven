@@ -188,8 +188,6 @@ public class DefaultMavenProjectBuilder
             throw new ProjectBuildingException( "", e.getMessage(), e );
         }
 
-        //project.setActiveProfiles( projectProfiles );
-
         Build build = project.getBuild();
         // NOTE: setting this script-source root before path translation, because
         // the plugin tools compose basedir and scriptSourceRoot into a single file.
@@ -198,7 +196,7 @@ public class DefaultMavenProjectBuilder
         project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
         project.setFile( pomFile );
         project.setActiveProfiles( projectProfiles );
-
+                
         projectCache.put( pomFile.getAbsolutePath(), project );
                 
         return project;
@@ -212,7 +210,11 @@ public class DefaultMavenProjectBuilder
             artifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
         }
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifact, configuration.getLocalRepository(), configuration.getRemoteRepositories() );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( artifact )
+            .setLocalRepository( configuration.getLocalRepository() )
+            .setRemoteRepostories( configuration.getRemoteRepositories() );
+        
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         try
@@ -296,6 +298,7 @@ public class DefaultMavenProjectBuilder
         }
 
         project.setArtifacts( result.getArtifacts() );
+        
         project.getArtifacts().remove( artifact );
 
         return new MavenProjectBuildingResult( project, result );
@@ -531,7 +534,11 @@ public class DefaultMavenProjectBuilder
 
         Artifact artifactParent = repositorySystem.createProjectArtifact( domainModel.getParentGroupId(), domainModel.getParentArtifactId(), domainModel.getParentVersion() );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( artifactParent, localRepository, remoteRepositories );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( artifactParent )
+            .setLocalRepository( localRepository )
+            .setRemoteRepostories( remoteRepositories );
+        
         ArtifactResolutionResult result;
         try
         {
