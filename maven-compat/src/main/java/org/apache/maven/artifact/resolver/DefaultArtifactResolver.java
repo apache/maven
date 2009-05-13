@@ -324,8 +324,16 @@ public class DefaultArtifactResolver
                                                          List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( originatingArtifact ).setManagedVersionMap( managedVersions )
-            .setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories ).setMetadataSource( source ).setFilter( filter ).setListeners( listeners );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( originatingArtifact )
+            // This is required by the surefire plugin
+            .setArtifactDependencies( artifacts )            
+            .setManagedVersionMap( managedVersions )
+            .setLocalRepository( localRepository )
+            .setRemoteRepostories( remoteRepositories )
+            .setMetadataSource( source )
+            .setFilter( filter )
+            .setListeners( listeners );
 
         return resolveWithExceptions( request );
     }
@@ -507,7 +515,7 @@ public class DefaultArtifactResolver
             // Add the root artifact
             result.addArtifact( rootArtifact );                        
         }                        
-        
+                
         return result;
     }
 
