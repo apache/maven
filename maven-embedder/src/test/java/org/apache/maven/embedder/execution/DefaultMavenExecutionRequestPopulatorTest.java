@@ -18,6 +18,12 @@ public class DefaultMavenExecutionRequestPopulatorTest
 
         populator = (MavenExecutionRequestPopulator) lookup( MavenExecutionRequestPopulator.class );
     }
+    
+    @Override
+    protected void tearDown() throws Exception {
+            populator = null;
+            super.tearDown();
+    }
 
     public void testWagonManagerOfflineFlagIsPopulatedFromSettings()
         throws MavenEmbedderException

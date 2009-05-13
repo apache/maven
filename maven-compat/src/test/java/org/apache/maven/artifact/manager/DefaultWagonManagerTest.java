@@ -73,6 +73,13 @@ public class DefaultWagonManagerTest
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
     
+    @Override
+    protected void tearDown() throws Exception {
+            wagonManager = null;
+            artifactFactory = null;
+            super.tearDown();
+    }
+    
     public void testAvailableProtocols()
         throws Exception
     {

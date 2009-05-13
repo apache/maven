@@ -70,6 +70,12 @@ public class PluginParameterExpressionEvaluatorTest
         factory = lookup( ArtifactFactory.class );        
     }
     
+    @Override
+    protected void tearDown() throws Exception {
+            factory = null;
+            super.tearDown();
+    }
+    
     public void testPluginDescriptorExpressionReference()
         throws Exception
     {

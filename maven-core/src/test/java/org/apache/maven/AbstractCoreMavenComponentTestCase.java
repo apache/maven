@@ -37,6 +37,13 @@ public abstract class AbstractCoreMavenComponentTestCase
         projectBuilder = lookup( MavenProjectBuilder.class );                
     }
 
+    @Override
+    protected void tearDown() throws Exception {
+            repositorySystem = null;
+            projectBuilder = null;
+            super.tearDown();
+    }
+
     abstract protected String getProjectsDirectory();
         
     protected File getProject( String name )

@@ -27,6 +27,12 @@ public class LifecycleExecutorTest
         lifecycleExecutor = (DefaultLifecycleExecutor) lookup( LifecycleExecutor.class );
         lookup( ExceptionHandler.class );
     }
+    
+    @Override
+    protected void tearDown() throws Exception {
+            lifecycleExecutor = null;
+            super.tearDown();
+    }
 
     protected String getProjectsDirectory()
     {

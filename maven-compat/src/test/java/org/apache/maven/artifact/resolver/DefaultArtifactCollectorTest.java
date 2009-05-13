@@ -78,6 +78,13 @@ public class DefaultArtifactCollectorTest
         projectArtifact = createArtifactSpec( "project", "1.0", null );
     }
 
+    @Override
+    protected void tearDown() throws Exception {
+            artifactCollector = null;
+            artifactFactory = null;
+            super.tearDown();
+    }
+
     // works, but we don't fail on cycles presently
     public void disabledtestCircularDependencyNotIncludingCurrentProject()
         throws ArtifactResolutionException, InvalidVersionSpecificationException

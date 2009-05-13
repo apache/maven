@@ -25,6 +25,14 @@ public class MavenTest
         maven = lookup( Maven.class );
         exceptionHandler = lookup( ExceptionHandler.class );
     }
+    
+    @Override
+    protected void tearDown() throws Exception {
+            maven = null;
+            exceptionHandler = null;
+            
+            super.tearDown();
+    }
 
     protected String getProjectsDirectory()
     {

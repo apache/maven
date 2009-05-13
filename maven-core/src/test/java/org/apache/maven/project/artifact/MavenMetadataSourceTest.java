@@ -19,22 +19,6 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.Model;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -48,6 +32,12 @@ public class MavenMetadataSourceTest
     {
         super.setUp();
         repositorySystem = lookup( RepositorySystem.class );
+    }
+    
+    @Override
+    protected void tearDown() throws Exception {
+            repositorySystem = null;
+            super.tearDown();
     }
     
     public void testShouldNotCarryExclusionsOverFromDependencyToDependency()

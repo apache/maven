@@ -22,6 +22,12 @@ public class PluginManagerTest
         super.setUp();
         pluginManager = lookup( PluginManager.class );
     }
+    
+    @Override
+    protected void tearDown() throws Exception {
+            pluginManager = null;
+            super.tearDown();
+    }
 
     protected String getProjectsDirectory()
     {

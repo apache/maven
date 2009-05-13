@@ -68,6 +68,13 @@ public class PomConstructionTest
 
         super.tearDown();
     }
+    
+    @Override
+    protected void tearDown() throws Exception {
+            mavenProjectBuilder = null;
+
+            super.tearDown();
+    }
 
     /**
      * Will throw exception if url is empty. MNG-4050 

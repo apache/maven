@@ -39,6 +39,13 @@ public class PomConstructionWithSettingsTest
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
     }
+
+    @Override
+    protected void tearDown() throws Exception {
+            mavenProjectBuilder = null;
+
+            super.tearDown();
+    }
     
     public void testSettingsNoPom() throws Exception
     {
