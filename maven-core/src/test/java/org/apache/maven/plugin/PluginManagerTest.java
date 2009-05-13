@@ -38,7 +38,6 @@ public class PluginManagerTest
         plugin.setVersion( plexusVersion );
         PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );
         assertNotNull( pluginDescriptor );
-        assertNotNull( pluginDescriptor.getClassRealm() );
     }
     
     public void testMojoDescriptorRetrieval()
@@ -61,7 +60,6 @@ public class PluginManagerTest
         assertEquals( "org.codehaus.plexus", pluginDescriptor.getGroupId() );
         assertEquals( "plexus-component-metadata", pluginDescriptor.getArtifactId() );
         assertEquals( plexusVersion, pluginDescriptor.getVersion() );
-        assertNotNull( pluginDescriptor.getClassRealm() );
     }
     
     // -----------------------------------------------------------------------------------------------
