@@ -1457,8 +1457,7 @@ public class PomConstructionTest
 
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
 
-        String localRepoUrl =
-            System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
+        String localRepoUrl = System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
         localRepoUrl = "file://" + localRepoUrl;
         config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
 

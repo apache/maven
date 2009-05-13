@@ -15,12 +15,13 @@ package org.apache.maven.plugin;
  * the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 
@@ -35,12 +36,12 @@ public interface PluginManager
     // - configure the plugin [extension point]
     // - execute the plugin    
     
-    Plugin findPluginForPrefix( String prefix, MavenProject project );
+    Plugin findPluginForPrefix( String prefix, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories );
     
-    PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, ArtifactRepository localRepository )
+    PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginLoaderException;
     
-    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenProject project, ArtifactRepository localRepository )
+    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginLoaderException;
     
     void executeMojo( MavenSession session, MojoExecution execution )

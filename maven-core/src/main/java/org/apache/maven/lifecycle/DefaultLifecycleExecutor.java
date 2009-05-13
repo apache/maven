@@ -445,7 +445,7 @@ public class DefaultLifecycleExecutor
             // Maven plugin deployment we will find the right PluginDescriptor from the remote
             // repository.
 
-            plugin = pluginManager.findPluginForPrefix( prefix, project );
+            plugin = pluginManager.findPluginForPrefix( prefix, localRepository, project.getRemoteArtifactRepositories() );
 
             // Search plugin in the current POM
             if ( plugin == null )
@@ -456,7 +456,7 @@ public class DefaultLifecycleExecutor
                     
                     try
                     {
-                        desc = pluginManager.loadPlugin( buildPlugin, project, localRepository );
+                        desc = pluginManager.loadPlugin( buildPlugin, localRepository, project.getRemoteArtifactRepositories() );
                     }
                     catch ( PluginLoaderException e )
                     {
@@ -505,7 +505,7 @@ public class DefaultLifecycleExecutor
         
         try
         {                        
-            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, project, localRepository );
+            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, localRepository, project.getRemoteArtifactRepositories() );
         }
         catch ( PluginLoaderException e )
         {
@@ -530,7 +530,7 @@ public class DefaultLifecycleExecutor
                         
         try
         {
-            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, project, localRepository );
+            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, localRepository, project.getRemoteArtifactRepositories() );
         }
         catch ( PluginLoaderException e )
         {

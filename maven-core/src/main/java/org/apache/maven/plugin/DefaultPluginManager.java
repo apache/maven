@@ -114,7 +114,7 @@ public class DefaultPluginManager
     }
 
     // This should be template method code for allowing subclasses to assist in contributing search/hint information
-    public Plugin findPluginForPrefix( String prefix, MavenProject project )
+    public Plugin findPluginForPrefix( String prefix, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
     {
         //Use the plugin managers capabilities to get information to augement the request
 
@@ -122,7 +122,7 @@ public class DefaultPluginManager
         //return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
     }
 
-    public PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, ArtifactRepository localRepository )
+    public PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginLoaderException
     {
         PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
@@ -136,7 +136,7 @@ public class DefaultPluginManager
 
         try
         {
-            return addPlugin( plugin, project, localRepository );
+            return addPlugin( plugin, localRepository, remoteRepositories );
         }
         catch ( ArtifactResolutionException e )
         // PluginResolutionException - a problem that occurs resolving the plugin artifact or its deps
@@ -167,7 +167,7 @@ public class DefaultPluginManager
         return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
     }
 
-    protected PluginDescriptor addPlugin( Plugin plugin, MavenProject project, ArtifactRepository localRepository )
+    protected PluginDescriptor addPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactNotFoundException, ArtifactResolutionException, PluginVersionResolutionException, PluginContainerException, PluginVersionNotFoundException
     {
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
@@ -175,7 +175,7 @@ public class DefaultPluginManager
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( pluginArtifact )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() );
+            .setRemoteRepostories( remoteRepositories );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
@@ -183,7 +183,7 @@ public class DefaultPluginManager
 
         ClassRealm pluginRealm = container.createChildRealm( pluginKey( plugin ) );
 
-        Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, project, localRepository );
+        Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, localRepository, remoteRepositories );
 
         for ( Artifact a : pluginArtifacts )
         {
@@ -230,7 +230,7 @@ public class DefaultPluginManager
     //   its dependencies while filtering out what's in the core
     //   layering on the project level plugin dependencies
 
-    private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedinPom, MavenProject project, ArtifactRepository localRepository )
+    private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedinPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactNotFoundException, ArtifactResolutionException
     {
         AndArtifactFilter filter = new AndArtifactFilter();
@@ -260,7 +260,7 @@ public class DefaultPluginManager
             // So this in fact are overrides ... 
             .setArtifactDependencies( dependenciesToResolveForPlugin )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setRemoteRepostories( remoteRepositories )
             .setFilter( filter )
             .setResolveTransitively( true );
         
@@ -536,10 +536,10 @@ public class DefaultPluginManager
         }
     }
 
-    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenProject project, ArtifactRepository localRepository )
+    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginLoaderException
     {
-        PluginDescriptor pluginDescriptor = loadPlugin( plugin, project, localRepository );
+        PluginDescriptor pluginDescriptor = loadPlugin( plugin, localRepository, remoteRepositories );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
 

@@ -6,6 +6,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class PluginManagerTest
     extends AbstractCoreMavenComponentTestCase
@@ -77,9 +78,15 @@ public class PluginManagerTest
     public void testRemoteResourcesPlugin()
         throws Exception
     {
+        //TODO: turn an equivalent back on when the RR plugin is released.
+        
         /*
 
         This will not work until the RR plugin is released to get rid of the binding to the reporting exception which is a mistake.
+        
+        This happpens after removing the reporting API from the core:
+        
+        java.lang.NoClassDefFoundError: org/apache/maven/reporting/MavenReportException
         
         MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
         String goal = "process";
@@ -107,9 +114,14 @@ public class PluginManagerTest
         plugin.setArtifactId( "maven-surefire-plugin" );
         plugin.setVersion( "2.4.2" );
 
+        // The project has already been fully interpolated so getting the raw mojoDescriptor is not going to have the processes configuration.
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getCurrentProject(), session.getLocalRepository() );        
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-surefire-plugin", "2.4.2" );
-        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+        
+        System.out.println( session.getCurrentProject().getBuild().getPluginsAsMap() );
+        
+        Xpp3Dom configuration = (Xpp3Dom) session.getCurrentProject().getBuild().getPluginsAsMap().get( plugin.getKey() ).getExecutions().get( 0 ).getConfiguration();
+        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, configuration );
         pluginManager.executeMojo( session, mojoExecution );
     }
     
