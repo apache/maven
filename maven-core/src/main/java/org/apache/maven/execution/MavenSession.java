@@ -55,12 +55,6 @@ public class MavenSession
     
     private MavenProject topLevelProject;
     
-    // Used by the embedder to verifyPlugin
-    public MavenSession( MavenExecutionRequest request )
-    {
-        this.request = request;
-    }
-
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, MavenProject project )
         throws CycleDetectedException, DuplicateProjectException
     {
@@ -77,6 +71,7 @@ public class MavenSession
         this.projects = projects;        
     }    
         
+    @Deprecated
     public PlexusContainer getContainer()
     {
         return container;
