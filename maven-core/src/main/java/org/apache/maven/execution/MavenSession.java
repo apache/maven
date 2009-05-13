@@ -67,7 +67,11 @@ public class MavenSession
         this.container = container;
         this.request = request;
         this.result = result;
-        this.currentProject = projects.get( 0 );
+        //TODO: Current for testing classes creating the session
+        if ( projects.size() > 0 )
+        {
+            this.currentProject = projects.get( 0 );
+        }
         this.projects = projects;        
     }    
         
