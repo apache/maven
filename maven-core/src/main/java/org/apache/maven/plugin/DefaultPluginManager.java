@@ -170,11 +170,12 @@ public class DefaultPluginManager
     protected PluginDescriptor addPlugin( Plugin plugin, MavenProject project, ArtifactRepository localRepository )
         throws ArtifactNotFoundException, ArtifactResolutionException, PluginVersionResolutionException, PluginContainerException, PluginVersionNotFoundException
     {
-        resolvePluginVersion( plugin, project );
-
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( pluginArtifact, localRepository, project.getRemoteArtifactRepositories() );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( pluginArtifact )
+            .setLocalRepository( localRepository )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
@@ -533,68 +534,6 @@ public class DefaultPluginManager
                 }
             }
         }
-    }
-
-    public void resolvePluginVersion( Plugin plugin, MavenProject project )
-        throws PluginVersionNotFoundException
-    {
-        String version = plugin.getVersion();
-
-        if ( version != null && !Artifact.RELEASE_VERSION.equals( version ) )
-        {
-            return;
-        }
-
-        String groupId = plugin.getGroupId();
-
-        String artifactId = plugin.getArtifactId();
-
-        if ( project.getBuildPlugins() != null )
-        {
-            for ( Plugin p : project.getBuildPlugins() )
-            {
-                if ( groupId.equals( p.getGroupId() ) && artifactId.equals( p.getArtifactId() ) )
-                {
-                    version = p.getVersion();
-                }
-            }
-        }
-
-        if ( StringUtils.isEmpty( version ) || Artifact.RELEASE_VERSION.equals( version ) )
-        {
-            // 1. resolve the version to be used            
-            Artifact artifact = repositorySystem.createProjectArtifact( groupId, artifactId, Artifact.RELEASE_VERSION );
-
-            String artifactVersion = artifact.getVersion();
-
-            // make sure this artifact was transformed to a real version, and actually resolved to a file in the repo...
-            if ( !Artifact.RELEASE_VERSION.equals( artifactVersion ) && ( artifact.getFile() != null ) )
-            {
-                boolean pluginValid = false;
-
-                while ( !pluginValid && ( artifactVersion != null ) )
-                {
-                    pluginValid = true;
-
-                    artifact = repositorySystem.createProjectArtifact( groupId, artifactId, artifactVersion );
-                }
-
-                version = artifactVersion;
-            }
-
-            if ( version == null )
-            {
-                version = artifactVersion;
-            }
-        }
-
-        // if we still haven't found a version, then fail early before we get into the update goop.
-        if ( StringUtils.isEmpty( version ) )
-        {
-            throw new PluginVersionNotFoundException( groupId, artifactId );
-        }
-
-        plugin.setVersion( version );
     }
 
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, MavenProject project, ArtifactRepository localRepository )
