@@ -56,6 +56,15 @@ public abstract class AbstractMavenProjectTestCase
         }
     }
 
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        projectBuilder = null;
+
+        super.tearDown();
+    }
+
     protected MavenProjectBuilder getProjectBuilder()
     {
         return projectBuilder;
@@ -113,7 +122,7 @@ public abstract class AbstractMavenProjectTestCase
     {
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
         configuration.setLocalRepository( getLocalRepository() );
-        configuration.setRemoteRepositories( Arrays.asList( new ArtifactRepository[]{} ) ); 
+        configuration.setRemoteRepositories( Arrays.asList( new ArtifactRepository[] {} ) );
         configuration.setProcessPlugins( false );
 
         try
