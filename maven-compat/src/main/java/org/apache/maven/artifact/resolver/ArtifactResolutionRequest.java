@@ -47,18 +47,7 @@ public class ArtifactResolutionRequest
     private boolean resolveRoot = true;
 
     private boolean resolveTransitively = false;
-    
-    public ArtifactResolutionRequest()
-    {  
-    }
-    
-    public ArtifactResolutionRequest( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
-    {        
-        this.artifact = artifact;
-        this.localRepository = localRepository;
-        this.remoteRepositories = remoteRepositories;
-    }
-    
+        
     public Artifact getArtifact()
     {
         return artifact;
