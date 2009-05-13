@@ -54,14 +54,7 @@ public abstract class AbstractMavenProjectTestCase
             // default over to the main project builder...
             projectBuilder = lookup( MavenProjectBuilder.class );
         }
-    }
-    
-    @Override
-    protected void tearDown() throws Exception {
-            projectBuilder = null;
-            
-            super.tearDown();
-    }
+    }    
 
     @Override
     protected void tearDown()
