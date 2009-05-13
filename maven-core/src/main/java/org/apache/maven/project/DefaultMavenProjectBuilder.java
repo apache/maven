@@ -278,7 +278,10 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         MavenProject project = build( pomFile, configuration );
-        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), project.getPackaging() );
+
+        Artifact artifact =
+            repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+        artifact.setFile( pomFile );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
