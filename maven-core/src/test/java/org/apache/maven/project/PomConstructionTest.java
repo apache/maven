@@ -59,6 +59,15 @@ public class PomConstructionTest
         testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
     }
+    
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        mavenProjectBuilder = null;
+
+        super.tearDown();
+    }
 
     /**
      * Will throw exception if url is empty. MNG-4050 
