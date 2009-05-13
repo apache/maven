@@ -36,6 +36,7 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -326,7 +327,7 @@ public class PluginParameterExpressionEvaluatorTest
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
-        return new MavenSession( request );
+        return new MavenSession( container, request, new DefaultMavenExecutionResult(), Collections.EMPTY_LIST  );
     }
 
     public void testLocalRepositoryExtraction()
