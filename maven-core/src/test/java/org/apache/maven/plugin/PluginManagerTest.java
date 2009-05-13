@@ -36,7 +36,7 @@ public class PluginManagerTest
         plugin.setGroupId( "org.codehaus.plexus" );
         plugin.setArtifactId( "plexus-component-metadata" );
         plugin.setVersion( plexusVersion );
-        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, session.getCurrentProject(), session.getLocalRepository() );
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );
         assertNotNull( pluginDescriptor );
         assertNotNull( pluginDescriptor.getClassRealm() );
     }
@@ -51,7 +51,7 @@ public class PluginManagerTest
         plugin.setArtifactId( "plexus-component-metadata" );
         plugin.setVersion( plexusVersion );
         
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getCurrentProject(), session.getLocalRepository() );        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );        
         assertNotNull( mojoDescriptor );
         assertEquals( "generate-metadata", mojoDescriptor.getGoal() );
         assertNotNull( mojoDescriptor.getRealm() );
@@ -115,7 +115,7 @@ public class PluginManagerTest
         plugin.setVersion( "2.4.2" );
 
         // The project has already been fully interpolated so getting the raw mojoDescriptor is not going to have the processes configuration.
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getCurrentProject(), session.getLocalRepository() );        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );        
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-surefire-plugin", "2.4.2" );
         
         System.out.println( session.getCurrentProject().getBuild().getPluginsAsMap() );
