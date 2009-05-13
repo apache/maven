@@ -16,4 +16,6 @@ public interface PluginClassLoaderCache
     void put( String key, ClassRealm pluginClassLoader );
     
     ClassRealm get( String key );
+    
+    int size();
 }

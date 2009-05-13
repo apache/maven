@@ -127,10 +127,6 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    // ------------------------------------------------------------------------
-    //
-    // ------------------------------------------------------------------------
-
     public ArtifactMetadataSource getMetadataSource()
     {
         return metadataSource;

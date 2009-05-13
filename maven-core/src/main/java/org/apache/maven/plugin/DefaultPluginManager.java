@@ -148,10 +148,6 @@ public class DefaultPluginManager
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
         }
-        catch ( PluginVersionResolutionException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
         catch ( PluginContainerException e )
         {
             throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
@@ -168,7 +164,7 @@ public class DefaultPluginManager
     }
 
     protected PluginDescriptor addPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginVersionResolutionException, PluginContainerException, PluginVersionNotFoundException
+        throws ArtifactNotFoundException, ArtifactResolutionException, PluginContainerException, PluginVersionNotFoundException
     {
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
@@ -181,7 +177,14 @@ public class DefaultPluginManager
 
         resolutionErrorHandler.throwErrors( request, result );
 
-        ClassRealm pluginRealm = container.createChildRealm( pluginKey( plugin ) );
+        ClassRealm pluginRealm = pluginClassLoaderCache.get( constructPluginKey( plugin ) );
+        
+        if ( pluginRealm != null )            
+        {
+            return getPluginDescriptor( plugin );            
+        }            
+            
+        pluginRealm = container.createChildRealm( pluginKey( plugin ) );
 
         Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, localRepository, remoteRepositories );
 
@@ -196,13 +199,9 @@ public class DefaultPluginManager
                 // Not going to happen
             }
         }
-        
-        //pluginRealm.display();
-        
+                
         try
         {
-            logger.debug( "Discovering components in realm: " + pluginRealm );
-
             container.discoverComponents( pluginRealm );
         }
         catch ( PlexusConfigurationException e )
@@ -215,20 +214,9 @@ public class DefaultPluginManager
         }
 
         pluginClassLoaderCache.put( constructPluginKey( plugin ), pluginRealm );
-        
-        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
-        
-        // We just need to keep track of the realm, if we need to augment we will wrap the realm
-        pluginDescriptor.setPluginArtifact( pluginArtifact );
-        pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
-        pluginDescriptor.setClassRealm( pluginRealm );
-
-        return pluginDescriptor;
+                
+        return getPluginDescriptor( plugin );
     }
-
-    // plugin artifact
-    //   its dependencies while filtering out what's in the core
-    //   layering on the project level plugin dependencies
 
     private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedinPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactNotFoundException, ArtifactResolutionException
@@ -283,23 +271,6 @@ public class DefaultPluginManager
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
-        {
-            throw new PluginExecutionException( mojoExecution, project, "Cannot execute mojo: " + mojoDescriptor.getGoal()
-                + ". It requires a project with an existing pom.xml, but the build is not using one." );
-        }
-
-        if ( mojoDescriptor.isOnlineRequired() && session.isOffline() )
-        {
-            // TODO: Should we error out, or simply warn and skip??
-            throw new PluginExecutionException( mojoExecution, project, "Mojo: " + mojoDescriptor.getGoal() + " requires online mode for execution. Maven is currently offline." );
-        }
-
-        if ( mojoDescriptor.getDeprecated() != null )
-        {
-            logger.warn( "Mojo: " + mojoDescriptor.getGoal() + " is deprecated.\n" + mojoDescriptor.getDeprecated() );
-        }
-
         String goalName = mojoDescriptor.getFullGoalName();
 
         Mojo mojo = null;
@@ -311,15 +282,13 @@ public class DefaultPluginManager
         }
 
         // by this time, the pluginDescriptor has had the correct realm setup from getConfiguredMojo(..)
-        ClassRealm pluginRealm;
+        ClassRealm pluginRealm = pluginClassLoaderCache.get( constructPluginKey( mojoDescriptor.getPluginDescriptor() ) );            
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
-        {
-            mojo = getConfiguredMojo( session, mojoExecution, project, false, mojoExecution );
-
-            pluginRealm = pluginClassLoaderCache.get( constructPluginKey( mojoDescriptor.getPluginDescriptor() ) );            
+        {                        
+            mojo = getConfiguredMojo( session, project, mojoExecution, pluginRealm );
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
 
@@ -371,14 +340,12 @@ public class DefaultPluginManager
         }
     }
 
-    private Mojo getConfiguredMojo( MavenSession session, MojoExecution MojoExecution, MavenProject project, boolean report, MojoExecution mojoExecution )
+    private Mojo getConfiguredMojo( MavenSession session, MavenProject project, MojoExecution mojoExecution, ClassRealm pluginRealm )
         throws PluginConfigurationException, PluginManagerException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-
-        ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
 
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
@@ -387,8 +354,6 @@ public class DefaultPluginManager
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader( pluginRealm );
-
-        logger.debug( "Looking up mojo " + mojoDescriptor.getRoleHint() + " in realm " + pluginRealm.getId() + " - descRealmId=" + mojoDescriptor.getRealm() );
 
         Mojo mojo;
 
@@ -434,7 +399,7 @@ public class DefaultPluginManager
 
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
 
-        populatePluginFields( mojo, mojoDescriptor, pomConfiguration, expressionEvaluator );
+        populatePluginFields( mojo, mojoDescriptor, pluginRealm, pomConfiguration, expressionEvaluator );
 
         Thread.currentThread().setContextClassLoader( oldClassLoader );
 
@@ -445,13 +410,10 @@ public class DefaultPluginManager
     // Mojo Parameter Handling
     // ----------------------------------------------------------------------
 
-    private void populatePluginFields( Mojo plugin, MojoDescriptor mojoDescriptor, PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
+    private void populatePluginFields( Mojo mojo, MojoDescriptor mojoDescriptor, ClassRealm realm, PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
         ComponentConfigurator configurator = null;
-
-        // TODO: What is the point in using the plugin realm here instead of the core realm?
-        ClassRealm realm = mojoDescriptor.getPluginDescriptor().getClassRealm();
 
         try
         {
@@ -473,7 +435,7 @@ public class DefaultPluginManager
             logger.debug( "Configuring mojo '" + mojoDescriptor.getId() + "' with " + ( configuratorId == null ? "basic" : configuratorId ) + " configurator -->" );
 
             // This needs to be able to use methods
-            configurator.configureComponent( plugin, configuration, expressionEvaluator, realm, listener );
+            configurator.configureComponent( mojo, configuration, expressionEvaluator, realm, listener );
 
             logger.debug( "-- end configuration --" );
         }

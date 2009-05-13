@@ -41,6 +41,7 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
@@ -64,6 +65,12 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 //TODO: Inside an IDE we are replacing the notion of our reactor with a workspace. In both of these cases
 //      we need to layer these as local repositories.
 //TODO: Cache the lookups of the PluginDescriptors
+//TODO: check for online status in the build plan and die if necessary
+//TODO if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
+//{
+//    throw new PluginExecutionException( mojoExecution, project, "Cannot execute mojo: " + mojoDescriptor.getGoal()
+//        + ". It requires a project with an existing pom.xml, but the build is not using one." );
+//}
 
 /**
  * @author Jason van Zyl

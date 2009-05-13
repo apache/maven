@@ -20,4 +20,9 @@ public class DefaultMavenProjectCache
     {
         projectCache.put( key, project );        
     }
+    
+    public int size()
+    {
+        return projectCache.size();
+    }
 }

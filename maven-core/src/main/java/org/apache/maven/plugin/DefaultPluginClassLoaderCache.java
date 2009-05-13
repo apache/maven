@@ -22,4 +22,8 @@ public class DefaultPluginClassLoaderCache
         return pluginClassLoaders.get( key );
     }
 
+    public int size()
+    {
+        return pluginClassLoaders.size();
+    }
 }
