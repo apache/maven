@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -104,7 +105,7 @@ public class DefaultMaven
         try
         {
             projects = getProjects( request );
-
+                                                
             //TODO: We really need to get rid of this requirement in here. If we know there is no project present
             if ( projects.isEmpty() )
             {

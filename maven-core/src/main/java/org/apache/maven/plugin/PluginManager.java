@@ -45,5 +45,5 @@ public interface PluginManager
         throws PluginLoaderException;
     
     void executeMojo( MavenSession session, MojoExecution execution )
-        throws MojoFailureException, PluginExecutionException, PluginConfigurationException;       
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginExecutionException;
 }

@@ -510,12 +510,12 @@ public class DefaultArtifactResolver
                 
         // We want to send the root artifact back in the result but we need to do this after the other dependencies
         // have been resolved.
-        if ( !isDummy( request ) )
+        if ( request.isResolveRoot() && !isDummy( request ) )
         {
             // Add the root artifact
             result.addArtifact( rootArtifact );                        
         }                        
-                
+                 
         return result;
     }
 

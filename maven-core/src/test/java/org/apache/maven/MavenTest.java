@@ -49,6 +49,7 @@ public class MavenTest
         {
             ExceptionSummary es = exceptionHandler.handleException( result.getExceptions().get( 0 ) );
             System.out.println( es.getMessage() );
+            es.getException().printStackTrace();
             fail( "Maven did not execute correctly." );
         }
     }

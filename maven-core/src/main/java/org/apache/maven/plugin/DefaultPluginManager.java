@@ -80,9 +80,10 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 // TODO: get plugin groups
-// TODO: separate out project downloading, something should decide before the plugin executes. it should not happen inside this
 // TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO: remove the coreArtifactFilterManager
+// TODO: rework the plugin classloader/plugin descriptor caching
+// TODO: surface all exceptions to the handler: get rid of generic useless exceptions
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
@@ -214,8 +215,11 @@ public class DefaultPluginManager
         }
 
         pluginClassLoaderCache.put( constructPluginKey( plugin ), pluginRealm );
-                
-        return getPluginDescriptor( plugin );
+        
+        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
+        pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
+        
+        return pluginDescriptor;
     }
 
     private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedinPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
@@ -265,8 +269,8 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public void executeMojo( MavenSession session, MojoExecution mojoExecution )
-        throws MojoFailureException, PluginExecutionException, PluginConfigurationException
-    {
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginExecutionException
+    {        
         MavenProject project = session.getCurrentProject();
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -304,15 +308,6 @@ public class DefaultPluginManager
                 throw new PluginExecutionException( mojoExecution, project, e );
             }
         }
-        catch ( MojoExecutionException e )
-        {
-            throw new PluginExecutionException( mojoExecution, project, e );
-        }
-        catch ( MojoFailureException e )
-        {
-            throw e;
-        }
-
         catch ( PluginManagerException e )
         {
             throw new PluginExecutionException( mojoExecution, project, e.getMessage() );

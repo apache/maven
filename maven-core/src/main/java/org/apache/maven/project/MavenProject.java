@@ -566,6 +566,8 @@ public class MavenProject
         return list;
     }
 
+    //TODO: this checking for file == null happens because the resolver has been confused about the root
+    // artifact or not. things like the stupid dummy artifact coming from surefire.
     public List<String> getTestClasspathElements()
         throws DependencyResolutionRequiredException
     {
@@ -578,9 +580,9 @@ public class MavenProject
         for ( Artifact a : getArtifacts() )
         {            
             if ( a.getArtifactHandler().isAddedToClasspath() )
-            {
-                
+            {                
                 File file = a.getFile();
+                                
                 if ( file == null )
                 {
                     throw new DependencyResolutionRequiredException( a );

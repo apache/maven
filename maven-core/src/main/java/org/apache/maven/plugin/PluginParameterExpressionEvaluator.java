@@ -56,8 +56,8 @@ public class PluginParameterExpressionEvaluator
         this.session = session;
         this.mojoExecution = mojoExecution;
         this.properties = session.getExecutionProperties();
-        project = session.getCurrentProject();
-
+        this.project = session.getCurrentProject();
+        
         String basedir = null;
 
         if ( project != null )
@@ -238,13 +238,12 @@ public class PluginParameterExpressionEvaluator
                 else
                 {
                     value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), pluginDescriptor );
-                }
+                }                
             }
             catch ( Exception e )
             {
-                // TODO: don't catch exception
-                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
-                                                         e );
+                e.printStackTrace();
+                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression, e );
             }
         }       
         else if ( "settings".equals( expression ) )

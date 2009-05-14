@@ -41,7 +41,6 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.PluginLoaderException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
@@ -967,13 +966,14 @@ public class DefaultLifecycleExecutor
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
+            .setResolveRoot( false )
             .setResolveTransitively( true )
             .setLocalRepository( session.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() )
             .setFilter( filter );
 
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        ArtifactResolutionResult result = repositorySystem.resolve( request );                
         resolutionErrorHandler.throwErrors( request, result );
         project.setArtifacts( result.getArtifacts() );        
     }    
