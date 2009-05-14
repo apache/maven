@@ -493,12 +493,18 @@ public class DefaultPluginManager
         }
     }
 
-    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories )
         throws PluginLoaderException
     {
         PluginDescriptor pluginDescriptor = loadPlugin( plugin, localRepository, remoteRepositories );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
+
+        if ( mojoDescriptor == null )
+        {
+            throw new PluginLoaderException( plugin, "Failed to load plugin mojo. Reason: Unknown mojo: " + goal );
+        }
 
         return mojoDescriptor;
     }
