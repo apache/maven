@@ -126,7 +126,7 @@ public class DefaultMaven
         try
         {                        
             ProjectSorter projectSorter = new ProjectSorter( projects.values() );
-                        
+                                    
             session = new MavenSession( container, request, result, projectSorter.getSortedProjects() );            
         }
         catch ( CycleDetectedException e )
@@ -163,7 +163,7 @@ public class DefaultMaven
         }
 
         result.setTopologicallySortedProjects( session.getProjects() );
-
+        
         result.setProject( session.getTopLevelProject() );
 
         return result;

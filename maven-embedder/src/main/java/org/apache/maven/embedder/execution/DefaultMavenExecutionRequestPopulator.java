@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.embedder.Configuration;
@@ -72,6 +73,8 @@ public class DefaultMavenExecutionRequestPopulator
     {
         executionProperties( request, configuration );
 
+        pom( request, configuration );
+
         settings( request, configuration );
 
         localRepository( request, configuration );
@@ -81,7 +84,7 @@ public class DefaultMavenExecutionRequestPopulator
         profileManager( request, configuration );
 
         processSettings( request, configuration );
-
+                
         return request;
     }
 
@@ -113,6 +116,34 @@ public class DefaultMavenExecutionRequestPopulator
             }
         }
     }
+    
+    private void pom( MavenExecutionRequest request, Configuration configuration )
+    {
+        // ------------------------------------------------------------------------
+        // POM
+        //
+        // If we are not given a specific POM file, but passed a base directory
+        // then we will use a release POM in the directory provide, or and then
+        // look for the standard POM.
+        // ------------------------------------------------------------------------
+
+        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
+        {
+            request.setBaseDirectory( request.getPom().getParentFile() );
+        }
+        else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
+        {
+            File pom = new File( request.getBaseDirectory(), Maven.POMv4 );
+
+            request.setPom( pom );
+        }
+        // TODO: Is this correct?
+        else if ( request.getBaseDirectory() == null )
+        {
+            request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
+        }
+    }
+    
 
     private void processSettings( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException

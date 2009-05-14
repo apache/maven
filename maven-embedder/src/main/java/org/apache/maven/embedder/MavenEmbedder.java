@@ -514,7 +514,6 @@ public class MavenEmbedder
     public boolean isOffline( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
-        // first, grab defaults including settings, in case <offline>true</offline> is set.
         request = populator.populateDefaults( request, configuration );
 
         return request.isOffline();
@@ -525,9 +524,7 @@ public class MavenEmbedder
         LoggerManager loggerManager = container.getLoggerManager();
 
         int oldThreshold = loggerManager.getThreshold();
-
-        
-        
+                
         try
         {
             loggerManager.setThresholds( request.getLoggingLevel() );

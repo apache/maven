@@ -106,7 +106,7 @@ public class DefaultMavenProjectBuilder
 
     public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
-    {                
+    {
         MavenProject project = projectCache.get( pomFile.getAbsolutePath() );
                 
         if ( project != null )

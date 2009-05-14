@@ -71,8 +71,9 @@ public class MavenSession
         if ( projects.size() > 0 )
         {
             this.currentProject = projects.get( 0 );
+            this.topLevelProject = projects.get(  0 );
         }
-        this.projects = projects;        
+        this.projects = projects;     
     }    
         
     @Deprecated
