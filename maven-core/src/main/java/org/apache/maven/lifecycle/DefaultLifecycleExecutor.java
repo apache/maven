@@ -609,51 +609,58 @@ public class DefaultLifecycleExecutor
 
                 // These are of the form:
                 //
-                // org.apache.maven.plugins:maven-compiler-plugin:compile
+                // compile -> org.apache.maven.plugins:maven-compiler-plugin:compile[,gid:aid:goal,...]
                 //
-                parseLifecyclePhaseDefinitions( plugins, lifecyclePhasesForPackaging.values() );
+                for ( Map.Entry<String, String> goalsForLifecyclePhase : lifecyclePhasesForPackaging.entrySet() )
+                {
+                    String phase = goalsForLifecyclePhase.getKey();
+                    String goals = goalsForLifecyclePhase.getValue();
+                    parseLifecyclePhaseDefinitions( plugins, phase, goals );
+                }
             }
             else if ( lifecycle.getDefaultPhases() != null )
             {
-                parseLifecyclePhaseDefinitions( plugins, lifecycle.getDefaultPhases() );
+                for ( String goals : lifecycle.getDefaultPhases() )
+                {
+                    parseLifecyclePhaseDefinitions( plugins, null, goals );
+                }
             }        
         }
 
         return plugins.keySet();
     }        
 
-    private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins,
-                                                 Collection<String> lifecyclePhaseDefinitions )
+    private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, String goals )
     {
-        for ( String lifecyclePhaseDefinition : lifecyclePhaseDefinitions )
+        for ( StringTokenizer tok = new StringTokenizer( goals, "," ); tok.hasMoreTokens(); )
         {
-            Plugin plugin = populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( lifecyclePhaseDefinition );
+            String goal = tok.nextToken().trim();
+            String[] p = StringUtils.split( goal, ":" );
+
+            PluginExecution execution = new PluginExecution();
+            // FIXME: Find a better execution id
+            execution.setId( "default-" + p[2] );
+            execution.setPhase( phase );
+            execution.getGoals().add( p[2] );
+
+            Plugin plugin = new Plugin();
+            plugin.setGroupId( p[0] );
+            plugin.setArtifactId( p[1] );
+
             Plugin existing = plugins.get( plugin );
             if ( existing != null )
             {
-                existing.getExecutions().addAll( plugin.getExecutions() );
+                plugin = existing;
             }
             else
             {
                 plugins.put( plugin, plugin );
             }
+
+            plugin.getExecutions().add( execution );
         }
     }
 
-    private Plugin populatePluginWithInformationSpecifiedInLifecyclePhaseDefinition( String lifecyclePhaseDefinition )
-    {
-        String[] p = StringUtils.split( lifecyclePhaseDefinition, ":" );
-        Plugin plugin = new Plugin();
-        plugin.setGroupId( p[0] );
-        plugin.setArtifactId( p[1] );
-        PluginExecution execution = new PluginExecution();
-        // FIXME: Find a better execution id
-        execution.setId( "default-" + p[2] );
-        execution.setGoals( new ArrayList<String>( Arrays.asList( new String[] { p[2] } ) ) );
-        plugin.setExecutions( new ArrayList<PluginExecution>( Arrays.asList( new PluginExecution[] { execution } ) ) );
-        return plugin;
-    }
-    
     public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, MavenProject project, ArtifactRepository localRepository ) 
         throws LifecycleExecutionException
     {
@@ -682,26 +689,30 @@ public class DefaultLifecycleExecutor
     }
     
     
-    public Xpp3Dom convert( MojoDescriptor mojoDescriptor  )
-    {        
+    Xpp3Dom convert( MojoDescriptor mojoDescriptor  )
+    {
         Xpp3Dom dom = new Xpp3Dom( "configuration" );
 
         PlexusConfiguration c = mojoDescriptor.getMojoConfiguration();
-                
+
         PlexusConfiguration[] ces = c.getChildren();
-        
-        for( PlexusConfiguration ce : ces )
-        {            
-            String defaultValue = ce.getAttribute( "default-value", null );
-            if ( ce.getValue( null ) != null || defaultValue != null )
+
+        if ( ces != null )
+        {
+            for ( PlexusConfiguration ce : ces )
             {
-                Xpp3Dom e = new Xpp3Dom( ce.getName() );
-                e.setValue( ce.getValue( null ) );
-                if ( defaultValue != null )
+                String value = ce.getValue( null );
+                String defaultValue = ce.getAttribute( "default-value", null );
+                if ( value != null || defaultValue != null )
                 {
-                    e.setAttribute( "default-value", defaultValue );
+                    Xpp3Dom e = new Xpp3Dom( ce.getName() );
+                    e.setValue( value );
+                    if ( defaultValue != null )
+                    {
+                        e.setAttribute( "default-value", defaultValue );
+                    }
+                    dom.addChild( e );
                 }
-                dom.addChild( e );
             }
         }
 
