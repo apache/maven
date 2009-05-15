@@ -256,7 +256,11 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {
-        return buildFromRepository( artifact, new DefaultProjectBuilderConfiguration( localRepository, remoteRepositories ) );
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
+            .setLocalRepository( localRepository )
+            .setRemoteRepositories( remoteRepositories );
+        
+        return buildFromRepository( artifact, configuration );
     }
 
     /**

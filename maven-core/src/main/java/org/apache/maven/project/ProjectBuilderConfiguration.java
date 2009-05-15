@@ -46,5 +46,7 @@ public interface ProjectBuilderConfiguration
      */
     void addProfile( Profile profile );
     
+    void setProfiles( List<Profile> profiles );
+    
     List<Profile> getProfiles();
 }

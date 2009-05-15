@@ -34,8 +34,7 @@ public class DefaultProjectBuilderConfiguration
 
     private List<ArtifactRepository> remoteRepositories;
     
-    //jvz Find out who added this. It's wrong, the execution properties are what come from the embedder setup not system properties. 
-    private Properties executionProperties = System.getProperties();
+    private Properties executionProperties;
 
     private List<ModelEventListener> listeners;
     
@@ -46,17 +45,7 @@ public class DefaultProjectBuilderConfiguration
     private List<String> activeProfileIds;
     
     private List<Profile> profiles;
-    
-    public DefaultProjectBuilderConfiguration()
-    {        
-    }
-
-    public DefaultProjectBuilderConfiguration( ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-    {        
-        this.localRepository = localRepository;
-        this.remoteRepositories = remoteRepositories;
-    }
-    
+        
     public MavenProject getTopLevelProjectFromReactor()
     {
     	return topProject;
@@ -132,6 +121,11 @@ public class DefaultProjectBuilderConfiguration
         this.activeProfileIds = activeProfileIds;      
     }
 
+    public void setProfiles( List<Profile> profiles )
+    {
+        this.profiles = profiles;
+    }
+    
     public void addProfile( Profile profile )
     {
         if ( profiles == null )

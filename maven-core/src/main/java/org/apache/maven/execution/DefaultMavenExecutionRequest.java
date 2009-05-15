@@ -515,12 +515,12 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public List getProfiles()
+    public List<Profile> getProfiles()
     {
         return profiles;
     }
 
-    public MavenExecutionRequest setProfiles( List profiles )
+    public MavenExecutionRequest setProfiles( List<Profile> profiles )
     {
         this.profiles = profiles;
 
@@ -651,6 +651,8 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration.setLocalRepository( getLocalRepository() );
             projectBuildingConfiguration.setExecutionProperties( getProperties() );
             projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
+            projectBuildingConfiguration.setActiveProfileIds( getActiveProfiles() );
+            projectBuildingConfiguration.setProfiles( getProfiles() );
             projectBuildingConfiguration.setProcessPlugins( true );
         }
 
