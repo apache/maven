@@ -970,7 +970,9 @@ public class DefaultLifecycleExecutor
     {
         MavenProject project = session.getCurrentProject();
 
-        Artifact artifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );      
+        Artifact artifact =
+            repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+        artifact.setFile( project.getFile() );
         
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
 
