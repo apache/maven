@@ -66,14 +66,6 @@ public class LegacyRepositorySystem
     @Requirement
     private MirrorBuilder mirrorBuilder;
 
-    private Map<String, ProxyInfo> proxies = new HashMap<String, ProxyInfo>();
-
-    private Map<String, AuthenticationInfo> authenticationInfoMap = new HashMap<String, AuthenticationInfo>();
-
-    private Map<String, RepositoryPermissions> serverPermissionsMap = new HashMap<String, RepositoryPermissions>();
-
-    // Artifact Creation
-
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
