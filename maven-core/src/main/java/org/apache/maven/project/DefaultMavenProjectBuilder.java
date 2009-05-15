@@ -233,7 +233,9 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ).setGlobalProfileManager( profileManager );
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
+            .setLocalRepository( localRepository )
+            .setGlobalProfileManager( profileManager );
 
         return build( project, configuration );
     }
