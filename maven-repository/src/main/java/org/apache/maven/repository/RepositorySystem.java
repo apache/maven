@@ -52,6 +52,8 @@ public interface RepositorySystem
 
     Artifact createProjectArtifact( String groupId, String artifactId, String version );
 
+    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier );
+    
     Artifact createPluginArtifact( Plugin plugin );
     
     Artifact createDependencyArtifact( Dependency dependency );
