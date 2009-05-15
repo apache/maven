@@ -383,7 +383,7 @@ public class MavenEmbedderTest
 
         Set artifacts = result.getProject().getArtifacts();
 
-        assertEquals( 2, artifacts.size() );
+        assertEquals( 1, artifacts.size() );
 
         artifacts.iterator().next();
     }
