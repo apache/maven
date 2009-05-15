@@ -37,14 +37,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
-/**
- * Things that we deal with in this populator to ensure that we have a valid
- * {@MavenExecutionRequest}
- * <p/>
- * - POM - Settings - Local Repository - Snapshot update policies - Repository checksum policies -
- * Artifact transfer mechanism configuration - Eventing/Logging configuration - Profile manager
- * configuration
- */
 @Component(role = MavenExecutionRequestPopulator.class)
 public class DefaultMavenExecutionRequestPopulator
     extends AbstractLogEnabled
