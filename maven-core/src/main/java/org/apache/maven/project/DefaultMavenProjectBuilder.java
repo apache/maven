@@ -279,12 +279,12 @@ public class DefaultMavenProjectBuilder
     {
         MavenProject project = build( pomFile, configuration );
 
-        Artifact artifact =
-            repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+        Artifact artifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         artifact.setFile( pomFile );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
+            .setResolveRoot( false )
             .setResolveTransitively( true )
             .setLocalRepository( configuration.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
@@ -302,8 +302,6 @@ public class DefaultMavenProjectBuilder
 
         project.setArtifacts( result.getArtifacts() );
         
-        project.getArtifacts().remove( artifact );
-
         return new MavenProjectBuildingResult( project, result );
     }
 
@@ -377,12 +375,8 @@ public class DefaultMavenProjectBuilder
         if ( domainModel.getParentId() != null )
         {
             List<DomainModel> mavenParents;
-            MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
-            if ( useTopLevelProjectForParent( domainModel, topProject ) )
-            {
-                mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, topProject.getFile(), projectBuilderConfiguration );
-            }
-            else if ( isParentLocal( domainModel.getRelativePathOfParent(), pomFile.getParentFile() ) )
+            
+            if ( isParentLocal( domainModel.getRelativePathOfParent(), pomFile.getParentFile() ) )
             {
                 mavenParents = getDomainModelParentsFromLocalPath( domainModel, localRepository, remoteRepositories, pomFile.getParentFile(), projectBuilderConfiguration );
             }
@@ -443,19 +437,6 @@ public class DefaultMavenProjectBuilder
         transformedDomainModel.setParentFile( parentFile );
 
         return transformedDomainModel;
-    }
-
-    private static boolean useTopLevelProjectForParent( DomainModel currentModel, MavenProject topProject )
-        throws IOException
-    {
-        if ( topProject == null || currentModel.getModel().getParent() == null )
-        {
-            return false;
-        }
-
-        return topProject.getGroupId().equals( currentModel.getParentGroupId() ) && topProject.getArtifactId().equals( currentModel.getParentArtifactId() )
-            && topProject.getVersion().equals( currentModel.getParentVersion() );
-
     }
 
     private void validateModel( Model model, File pomFile )
@@ -604,22 +585,16 @@ public class DefaultMavenProjectBuilder
         {
             parentFile = new File( parentFile.getAbsolutePath(), "pom.xml" );
         }
+        
         MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
-        boolean isTop = useTopLevelProjectForParent( domainModel, topProject );
+        
         DomainModel parentDomainModel = null;
-        if ( !isTop )
+        if ( !parentFile.isFile() )
         {
-            if ( !parentFile.isFile() )
-            {
-                throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );
-            }
-            parentDomainModel = new DomainModel( parentFile );
-            parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
+            throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );
         }
-        else
-        {
-            parentDomainModel = new DomainModel( projectBuilderConfiguration.getTopLevelProjectFromReactor().getFile() );
-        }
+        parentDomainModel = new DomainModel( parentFile );
+        parentDomainModel.setProjectDirectory( parentFile.getParentFile() );
 
         if ( !parentDomainModel.matchesParentOf( domainModel ) )
         {
@@ -639,20 +614,8 @@ public class DefaultMavenProjectBuilder
 
         domainModels.add( parentDomainModel );
         if ( domainModel.getParentId() != null )
-        {
-            if ( isTop )
-            {
-                if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
-                {
-                    domainModels
-                        .addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, topProject.getFile().getParentFile(), projectBuilderConfiguration ) );
-                }
-                else
-                {
-                    domainModels.addAll( getDomainModelParentsFromRepository( parentDomainModel, localRepository, remoteRepositories ) );
-                }
-            }
-            else if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
+        {            
+            if ( isParentLocal( parentDomainModel.getRelativePathOfParent(), parentFile.getParentFile() ) )
             {
                 domainModels.addAll( getDomainModelParentsFromLocalPath( parentDomainModel, localRepository, remoteRepositories, parentFile.getParentFile(), projectBuilderConfiguration ) );
             }

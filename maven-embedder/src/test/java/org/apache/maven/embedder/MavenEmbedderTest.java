@@ -137,6 +137,30 @@ public class MavenEmbedderTest
         assertTrue( jar.exists() );
     }
 
+    public void testWithOptionalDependencies()
+        throws Exception
+    {
+        File testDirectory = new File( basedir, "src/test/projects/optional-dep" );
+
+        File targetDirectory = new File( basedir, "target/projects/option-dep" );
+
+        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setBaseDirectory( targetDirectory )
+            .setShowErrors( true )
+            .setGoals( Arrays.asList( new String[] { "install" } ) );
+
+        MavenExecutionResult result = mavenEmbedder.execute( request );
+        
+        if (result.hasExceptions() )
+        {
+            result.getExceptions().get( 0 ).printStackTrace();
+            fail( "Project didn't execute correctly.");
+        }
+    }
+    
+    
     /*MNG-3919*/
     public void testWithInvalidGoal()
         throws Exception
@@ -147,8 +171,10 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setBaseDirectory( targetDirectory )
-            .setShowErrors( true ).setGoals( Arrays.asList( new String[]{"validate"} ) );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+            .setBaseDirectory( targetDirectory )
+            .setShowErrors( true )
+            .setGoals( Arrays.asList( new String[]{"validate"} ) );
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
         List exceptions = result.getExceptions();
@@ -199,7 +225,8 @@ public class MavenEmbedderTest
         // Check with profile not active
 
         MavenExecutionRequest requestWithoutProfile = new DefaultMavenExecutionRequest()
-            .setPom( new File( targetDirectory, "pom.xml" ) ).setShowErrors( true )
+            .setPom( new File( targetDirectory, "pom.xml" ) )
+            .setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "validate" } ) );
 
         MavenExecutionResult r0 = mavenEmbedder.execute( requestWithoutProfile );
@@ -226,6 +253,9 @@ public class MavenEmbedderTest
 
         MavenProject p1 = r1.getProject();
 
+        System.out.println( p1 );
+        System.out.println( p1.getProperties() );
+        
         assertEquals( "true", p1.getProperties().getProperty( "embedderProfile" ) );
 
         assertEquals( "jason", p1.getProperties().getProperty( "name" ) );

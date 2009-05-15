@@ -17,7 +17,6 @@ package org.apache.maven.lifecycle;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -986,6 +985,6 @@ public class DefaultLifecycleExecutor
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );                
         resolutionErrorHandler.throwErrors( request, result );
-        project.setArtifacts( result.getArtifacts() );        
+        project.setArtifacts( result.getArtifacts() );      
     }    
 }

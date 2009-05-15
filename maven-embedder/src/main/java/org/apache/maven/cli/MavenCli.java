@@ -54,8 +54,7 @@ public class MavenCli
     }
 
     /** @noinspection ConfusingMainMethod */
-    public static int main( String[] args,
-                            ClassWorld classWorld )
+    public static int main( String[] args, ClassWorld classWorld )
     {
         MavenCli cli = new MavenCli();
 

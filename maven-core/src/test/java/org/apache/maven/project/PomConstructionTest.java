@@ -20,8 +20,6 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +27,10 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class PomConstructionTest
     extends PlexusTestCase
@@ -50,13 +45,11 @@ public class PomConstructionTest
 
     private File testDirectory;
 
-    private File testMixinDirectory;
-
     protected void setUp()
         throws Exception
     {
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
-        testMixinDirectory = new File( getBasedir(), BASE_MIXIN_DIR );
+        new File( getBasedir(), BASE_MIXIN_DIR );
         mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
     }
     
@@ -1470,10 +1463,11 @@ public class PomConstructionTest
         localRepoUrl = "file://" + localRepoUrl;
         config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
 
-        ProfileActivationContext pCtx = new ProfileActivationContext( null, true );
+        ProfileActivationContext profileActivationContext = new ProfileActivationContext( null, true );
+        
         if ( profileIds != null )
         {
-            pCtx.setExplicitlyActiveProfileIds( Arrays.asList( profileIds ) );
+            profileActivationContext.setExplicitlyActiveProfileIds( Arrays.asList( profileIds ) );
         }
 
         if ( executionProperties != null )
@@ -1481,7 +1475,7 @@ public class PomConstructionTest
             config.setExecutionProperties( executionProperties );
         }
 
-        config.setGlobalProfileManager( new DefaultProfileManager( pCtx ) );
+        config.setGlobalProfileManager( new DefaultProfileManager( profileActivationContext ) );
 
         return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
     }
