@@ -107,7 +107,9 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-        MavenProject project = projectCache.get( pomFile.getAbsolutePath() );
+        String cacheKey = getCacheKey( pomFile, configuration );
+
+        MavenProject project = projectCache.get( cacheKey );
                 
         if ( project != null )
         {
@@ -211,9 +213,17 @@ public class DefaultMavenProjectBuilder
         project.setFile( pomFile );
         project.setActiveProfiles( projectProfiles );
                 
-        projectCache.put( pomFile.getAbsolutePath(), project );
+        projectCache.put( cacheKey, project );
                 
         return project;
+    }
+
+    private String getCacheKey( File pomFile, ProjectBuilderConfiguration configuration )
+    {
+        StringBuilder buffer = new StringBuilder( 256 );
+        buffer.append( pomFile.getAbsolutePath() );
+        buffer.append( '/' ).append( pomFile.lastModified() );
+        return buffer.toString();
     }
 
     public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration )
