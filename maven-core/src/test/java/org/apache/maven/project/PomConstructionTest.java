@@ -1486,19 +1486,6 @@ public class PomConstructionTest
         return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
     }
 
-    private Model buildMixin( String mixinPath )
-        throws IOException, XmlPullParserException
-    {
-        File mixinFile = new File( testMixinDirectory , mixinPath );
-        if ( mixinFile.isDirectory() )
-        {
-            mixinFile = new File( mixinFile, "mixin.xml" );
-        }
-        FileInputStream pluginStream = new FileInputStream( mixinFile );
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-        return reader.read(pluginStream, false);
-    }
-
     protected void assertModelEquals( PomTestWrapper pom, Object expected, String expression )
     {
         assertEquals( expected, pom.getValue( expression ) );        
