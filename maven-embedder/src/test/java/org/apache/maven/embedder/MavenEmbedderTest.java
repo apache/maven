@@ -85,6 +85,7 @@ public class MavenEmbedderTest
         throws Exception
     {
         mavenEmbedder.stop();
+        mavenEmbedder = null;
     }
 
     protected void assertNoExceptions( MavenExecutionResult result )
