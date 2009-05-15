@@ -17,9 +17,7 @@ package org.apache.maven.embedder.execution;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.Maven;
