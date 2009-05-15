@@ -99,7 +99,16 @@ public class MavenMetadataSource
 
                     if ( effectiveScope != null )
                     {
-                        Artifact dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
+                        Artifact dependencyArtifact;
+                        
+                        if ( d.getClassifier() != null )
+                        {
+                            dependencyArtifact = repositorySystem.createArtifactWithClassifier( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getClassifier() );                            
+                        }
+                        else
+                        {
+                            dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
+                        }
 
                         artifacts.add( dependencyArtifact );
                     }
