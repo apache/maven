@@ -28,12 +28,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.Repository;
-import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.profiles.ProfileActivationException;
-import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
@@ -80,8 +74,6 @@ public class DefaultMavenExecutionRequestPopulator
         localRepository( request, configuration );
 
         toolchains( request, configuration );
-
-        profileManager( request, configuration );
 
         processSettings( request, configuration );
                 
@@ -144,72 +136,34 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
     
-
+    // Process plugin groups
+    // Get profile models
+    // Get active profiles
     private void processSettings( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
     {
-        ProfileManager profileManager = request.getProfileManager();
-
         Settings settings = request.getSettings();
 
         request.setPluginGroups( settings.getPluginGroups() );
         
         List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
 
-        List<String> settingsActiveProfileIds = settings.getActiveProfiles();
-
-        if ( settingsActiveProfileIds != null )
-        {
-            for ( String profileId : settingsActiveProfileIds )
-            {
-                profileManager.getProfileActivationContext().setActive( profileId );
-            }
-        }
-
+        // We just need to keep track of what profiles are being activated by the settings. We don't need to process
+        // them here. This should be taken care of by the project builder.
+        //
+        request.addActiveProfiles( settings.getActiveProfiles() );        
+        
+        // We only need to take the profiles and make sure they are available when the calculation of the active profiles
+        // is determined.
+        //
         if ( ( settingsProfiles != null ) && !settingsProfiles.isEmpty() )
         {
             for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
             {
-                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
-
-                profileManager.addProfile( profile );
-            }
-
-            // We need to convert profile repositories to artifact repositories
-            try
-            {
-                for ( Profile profile : profileManager.getActiveProfiles() )
-                {
-                    for ( Repository r : profile.getRepositories() )
-                    {
-                        try
-                        {
-                            request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
-                        }
-                        catch ( InvalidRepositoryException e )
-                        {
-                            throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
-                        }
-                    }
-                    for ( Repository r : profile.getPluginRepositories() )
-                    {
-                        try
-                        {
-                            request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
-                        }
-                        catch ( InvalidRepositoryException e )
-                        {
-                            throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
-                        }
-                    }                    
-                }
-            }
-            catch ( ProfileActivationException e )
-            {
-                throw new MavenEmbedderException( "Cannot determine active profiles", e );
+                request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );                
             }
         }
-
+        
         injectDefaultRepositories( request );
 
         processRepositoriesInSettings( request, configuration );
@@ -394,31 +348,6 @@ public class DefaultMavenExecutionRequestPopulator
         {
             throw new MavenEmbedderException( "Cannot create local repository.", e );
         }
-    }
-
-    // ------------------------------------------------------------------------
-    // Profile Manager
-    // ------------------------------------------------------------------------
-
-    private void profileManager( MavenExecutionRequest request, Configuration configuration )
-    {
-        // ------------------------------------------------------------------------
-        // Profile Manager
-        // ------------------------------------------------------------------------
-
-        ProfileActivationContext activationContext = request.getProfileActivationContext();
-        if ( activationContext == null )
-        {
-            activationContext = new ProfileActivationContext( request.getProperties(), false );
-        }
-
-        activationContext.setExplicitlyActiveProfileIds( request.getActiveProfiles() );
-        activationContext.setExplicitlyInactiveProfileIds( request.getInactiveProfiles() );
-
-        ProfileManager globalProfileManager = new DefaultProfileManager( activationContext );
-
-        request.setProfileManager( globalProfileManager );
-        request.setProfileActivationContext( activationContext );
     }
 
     private void toolchains( MavenExecutionRequest request, Configuration configuration )
