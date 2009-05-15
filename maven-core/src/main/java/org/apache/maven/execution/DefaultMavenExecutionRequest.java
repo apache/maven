@@ -179,6 +179,11 @@ public class DefaultMavenExecutionRequest
 
     public Properties getProperties()
     {
+        if ( properties == null )
+        {
+            properties = new Properties();
+        }
+
         return properties;
     }
 
