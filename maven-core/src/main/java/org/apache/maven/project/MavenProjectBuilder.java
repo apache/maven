@@ -30,7 +30,7 @@ public interface MavenProjectBuilder
     MavenProject buildFromRepository( Artifact projectArtifact, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
-    //TODO maven-site-plugin
+    //TODO maven-site-plugin -- Vincent, Dennis and Lukas are checking but this doesn't appear to be required anymore.
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;
 
