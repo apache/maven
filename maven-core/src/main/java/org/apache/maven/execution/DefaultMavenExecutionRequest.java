@@ -25,8 +25,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.settings.Settings;
@@ -52,7 +51,7 @@ public class DefaultMavenExecutionRequest
 
     private List mirrors;
 
-    private List profiles;
+    private List<Profile> profiles;
 
     private List<String> pluginGroups = new ArrayList<String>();
 
@@ -92,8 +91,6 @@ public class DefaultMavenExecutionRequest
 
     private Properties properties;
 
-    private Properties userProperties;
-
     private Date startTime;
 
     private boolean showErrors = false;
@@ -109,8 +106,6 @@ public class DefaultMavenExecutionRequest
     private String globalChecksumPolicy = CHECKSUM_POLICY_WARN;
 
     private boolean updateSnapshots = false;
-
-    private ProfileManager profileManager;
 
     private List<ArtifactRepository> remoteRepositories;
 
@@ -152,7 +147,6 @@ public class DefaultMavenExecutionRequest
         copy.setLoggingLevel( original.getLoggingLevel());
         copy.setGlobalChecksumPolicy( original.getGlobalChecksumPolicy());
         copy.setUpdateSnapshots( original.isUpdateSnapshots());
-        copy.setProfileManager( original.getProfileManager() );
         copy.setRemoteRepositories( original.getRemoteRepositories() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         return original;        
@@ -364,13 +358,6 @@ public class DefaultMavenExecutionRequest
 
         properties.setProperty( key, value );
 
-        if ( userProperties == null )
-        {
-            userProperties = new Properties();
-        }
-
-        userProperties.setProperty( key, value );
-
         return this;
     }
 
@@ -573,8 +560,6 @@ public class DefaultMavenExecutionRequest
 
     private Settings settings;
 
-    private ProfileActivationContext profileActivationContext;
-
     // calculated from request attributes.
     private ProjectBuilderConfiguration projectBuildingConfiguration;
 
@@ -588,18 +573,6 @@ public class DefaultMavenExecutionRequest
     public Settings getSettings()
     {
         return settings;
-    }
-
-    public ProfileManager getProfileManager()
-    {
-        return profileManager;
-    }
-
-    public MavenExecutionRequest setProfileManager( ProfileManager profileManager )
-    {
-        this.profileManager = profileManager;
-
-        return this;
     }
 
     public boolean isProjectPresent()
@@ -669,28 +642,6 @@ public class DefaultMavenExecutionRequest
         return remoteRepositories;
     }
 
-    public ProfileActivationContext getProfileActivationContext()
-    {
-        return profileActivationContext;
-    }
-
-    public MavenExecutionRequest setProfileActivationContext( ProfileActivationContext profileActivationContext )
-    {
-        this.profileActivationContext = profileActivationContext;
-        return this;
-    }
-
-    public Properties getUserProperties()
-    {
-        return userProperties;
-    }
-
-    public MavenExecutionRequest setUserProperties( Properties userProperties )
-    {
-        this.userProperties = userProperties;
-        return this;
-    }
-
     //TODO: this does not belong here.
     public ProjectBuilderConfiguration getProjectBuildingConfiguration()
     {
@@ -699,7 +650,6 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration = new DefaultProjectBuilderConfiguration();
             projectBuildingConfiguration.setLocalRepository( getLocalRepository() );
             projectBuildingConfiguration.setExecutionProperties( getProperties() );
-            projectBuildingConfiguration.setGlobalProfileManager( getProfileManager() );
             projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
             projectBuildingConfiguration.setProcessPlugins( true );
         }
@@ -719,5 +669,11 @@ public class DefaultMavenExecutionRequest
     		plugins = new HashSet<Plugin>();
     	}
     	return plugins;
-    }    
+    }
+
+    public MavenExecutionRequest addProfile( Profile profile )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

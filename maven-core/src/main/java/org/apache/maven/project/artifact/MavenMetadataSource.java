@@ -101,6 +101,7 @@ public class MavenMetadataSource
                     {
                         Artifact dependencyArtifact;
                         
+                        //TODO: deal with this in a unified way, probably just looking at the dependency.                        
                         if ( d.getClassifier() != null )
                         {
                             dependencyArtifact = repositorySystem.createArtifactWithClassifier( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getClassifier() );                            

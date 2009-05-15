@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.ProfileManager;
 
 public interface ProjectBuilderConfiguration
@@ -16,10 +17,6 @@ public interface ProjectBuilderConfiguration
 
     List<ArtifactRepository> getRemoteRepositories();
 
-    ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager );
-
-    ProfileManager getGlobalProfileManager();
-
     ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties );
 
     Properties getExecutionProperties();
@@ -31,5 +28,23 @@ public interface ProjectBuilderConfiguration
     ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins );
     
     boolean isProcessPlugins();
+        
+    // Profiles
     
+    /**
+     * Set any active profiles that the {@link MavenProjectBuilder} should consider while constructing
+     * a {@link MavenProject}.
+     */
+    void setActiveProfileIds( List<String> activeProfileIds );
+        
+    List<String> getActiveProfileIds();
+    
+    /**
+     * Add a {@link org.apache.maven.model.Profile} that has come from an external source. This may be from a custom configuration
+     * like the MavenCLI settings.xml file, or from a custom dialog in an IDE integration like M2Eclipse.
+     * @param profile
+     */
+    void addProfile( Profile profile );
+    
+    List<Profile> getProfiles();
 }

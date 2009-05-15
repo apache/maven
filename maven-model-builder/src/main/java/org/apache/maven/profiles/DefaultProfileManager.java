@@ -174,26 +174,6 @@ public class DefaultProfileManager
         }
         return allActive;
     }
-    
-    public static List<Profile> getActiveProfilesFrom(ProfileManager globalProfileManager, Properties properties, Model model)
-		throws ProfileActivationException
-	{
-	    List<Profile> projectProfiles = new ArrayList<Profile>();
-	    
-	    ProfileActivationContext profileActivationContext = (globalProfileManager == null) ? new ProfileActivationContext( new Properties(), false ):
-	        globalProfileManager.getProfileActivationContext();
-	    profileActivationContext.getExecutionProperties().putAll(properties);
-	    
-	    if(globalProfileManager != null)
-	    {           
-	    	projectProfiles.addAll( globalProfileManager.getActiveProfiles() );    
-	    }
-
-	    ProfileManager profileManager = new DefaultProfileManager( profileActivationContext );
-	    profileManager.addProfiles( model.getProfiles() );
-	    projectProfiles.addAll( profileManager.getActiveProfiles() ); 
-	    return projectProfiles;
-	}   
  
     public static Collection<Profile> getActiveProfiles(List<Profile> profiles, ProfileManagerInfo profileContextInfo)
     {

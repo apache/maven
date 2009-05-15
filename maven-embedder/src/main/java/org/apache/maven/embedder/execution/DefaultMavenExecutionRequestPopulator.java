@@ -65,8 +65,6 @@ public class DefaultMavenExecutionRequestPopulator
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
     {
-        executionProperties( request, configuration );
-
         pom( request, configuration );
 
         settings( request, configuration );
@@ -78,35 +76,6 @@ public class DefaultMavenExecutionRequestPopulator
         processSettings( request, configuration );
                 
         return request;
-    }
-
-    private void executionProperties( MavenExecutionRequest request, Configuration configuration )
-    {
-        Properties requestProperties = request.getProperties();
-
-        if ( requestProperties == null )
-        {
-            requestProperties = configuration.getSystemProperties();
-            if ( requestProperties == null )
-            {
-                requestProperties = System.getProperties();
-            }
-
-            request.setProperties( requestProperties );
-        }
-
-        Properties userProperties = request.getUserProperties();
-        if ( userProperties != null )
-        {
-            for ( Iterator<?> it = userProperties.keySet().iterator(); it.hasNext(); )
-            {
-                String key = (String) it.next();
-                if ( !requestProperties.containsKey( key ) )
-                {
-                    requestProperties.setProperty( key, userProperties.getProperty( key ) );
-                }
-            }
-        }
     }
     
     private void pom( MavenExecutionRequest request, Configuration configuration )

@@ -19,24 +19,22 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.ModelEventListener;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.model.Profile;
 
 public class DefaultProjectBuilderConfiguration
     implements ProjectBuilderConfiguration
 {
-    private ProfileManager globalProfileManager;
-
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
     
-    //!!jvz Find out who added this. It's wrong, the execution properties are what come from the embedder setup not system properties. 
+    //jvz Find out who added this. It's wrong, the execution properties are what come from the embedder setup not system properties. 
     private Properties executionProperties = System.getProperties();
 
     private List<ModelEventListener> listeners;
@@ -44,6 +42,10 @@ public class DefaultProjectBuilderConfiguration
     private MavenProject topProject;
     
     private boolean processPlugins = true;
+    
+    private List<String> activeProfileIds;
+    
+    private List<Profile> profiles;
     
     public DefaultProjectBuilderConfiguration()
     {        
@@ -63,18 +65,7 @@ public class DefaultProjectBuilderConfiguration
     public void setTopLevelProjectForReactor(MavenProject mavenProject)
     {
     	this.topProject = mavenProject;
-    }
-        
-    public ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager )
-    {
-        this.globalProfileManager = globalProfileManager;
-        return this;
-    }
-
-    public ProfileManager getGlobalProfileManager()
-    {
-        return globalProfileManager;
-    }
+    }       
 
     public ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository )
     {
@@ -129,5 +120,30 @@ public class DefaultProjectBuilderConfiguration
     {
         this.processPlugins = processPlugins;
         return this;
+    }
+
+    public List<String> getActiveProfileIds()
+    {
+        return activeProfileIds;        
+    }
+
+    public void setActiveProfileIds( List<String> activeProfileIds )
+    {
+        this.activeProfileIds = activeProfileIds;      
+    }
+
+    public void addProfile( Profile profile )
+    {
+        if ( profiles == null )
+        {
+            profiles = new ArrayList<Profile>();
+        }
+        
+        profiles.add( profile );
+    }
+
+    public List<Profile> getProfiles()
+    {
+        return profiles;
     }
 }

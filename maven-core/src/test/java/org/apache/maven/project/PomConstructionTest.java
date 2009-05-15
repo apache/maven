@@ -27,8 +27,6 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -1462,21 +1460,9 @@ public class PomConstructionTest
         String localRepoUrl = System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
         localRepoUrl = "file://" + localRepoUrl;
         config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
-
-        ProfileActivationContext profileActivationContext = new ProfileActivationContext( null, true );
+        config.setActiveProfileIds( Arrays.asList( profileIds ) );
+        config.setExecutionProperties( executionProperties );
         
-        if ( profileIds != null )
-        {
-            profileActivationContext.setExplicitlyActiveProfileIds( Arrays.asList( profileIds ) );
-        }
-
-        if ( executionProperties != null )
-        {
-            config.setExecutionProperties( executionProperties );
-        }
-
-        config.setGlobalProfileManager( new DefaultProfileManager( profileActivationContext ) );
-
         return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
     }
 

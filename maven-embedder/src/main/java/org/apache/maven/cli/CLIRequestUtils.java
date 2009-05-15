@@ -237,7 +237,6 @@ public final class CLIRequestUtils
             .setBaseDirectory( baseDirectory )
             .setGoals( goals )
             .setProperties( executionProperties ) // optional
-            .setUserProperties( userProperties ) // optional
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setShowErrors( showErrors ) // default: false

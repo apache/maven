@@ -149,11 +149,10 @@ public abstract class AbstractMavenProjectTestCase
         Properties props = System.getProperties();
         ProfileActivationContext ctx = new ProfileActivationContext( props, false );
 
-        ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
-        pbc.setLocalRepository( getLocalRepository() );
-        pbc.setGlobalProfileManager( new DefaultProfileManager( ctx ) );
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+        configuration.setLocalRepository( getLocalRepository() );
 
-        return projectBuilder.build( pom, pbc );
+        return projectBuilder.build( pom, configuration );
     }
 
 }

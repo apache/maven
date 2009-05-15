@@ -32,7 +32,7 @@ public interface ProfileManager
     void addProfiles( List<Profile> profiles );
 
     Map<String, Profile> getProfilesById();
-
+    
     @Deprecated
     List<Profile> getActiveProfiles( Model model )
         throws ProfileActivationException;

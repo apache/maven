@@ -28,8 +28,7 @@ import java.util.Set;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
@@ -96,9 +95,6 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setProperty( String key, String value );
     Properties getProperties();
 
-    MavenExecutionRequest setUserProperties( Properties userProperties );
-    Properties getUserProperties();
-
     // Reactor
     MavenExecutionRequest setReactorFailureBehavior( String failureBehavior );
     String getReactorFailureBehavior();
@@ -149,8 +145,9 @@ public interface MavenExecutionRequest
     boolean isOffline();
 
     // Profiles
-    List getProfiles();
-    MavenExecutionRequest setProfiles( List profiles );
+    List<Profile> getProfiles();
+    MavenExecutionRequest addProfile( Profile profile );
+    MavenExecutionRequest setProfiles( List<Profile> profiles );
     MavenExecutionRequest addActiveProfile( String profile );
     MavenExecutionRequest addActiveProfiles( List<String> profiles );
     List<String> getActiveProfiles();
@@ -181,12 +178,6 @@ public interface MavenExecutionRequest
     // Setting
     Settings getSettings();
     MavenExecutionRequest setSettings( Settings settings );
-
-    ProfileManager getProfileManager();
-    MavenExecutionRequest setProfileManager( ProfileManager profileManager );
-
-    ProfileActivationContext getProfileActivationContext();
-    MavenExecutionRequest setProfileActivationContext( ProfileActivationContext profileActivationContext );
 
     boolean isProjectPresent();
     MavenExecutionRequest setProjectPresent( boolean isProjectPresent );

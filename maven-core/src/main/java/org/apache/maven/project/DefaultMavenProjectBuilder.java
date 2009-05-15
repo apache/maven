@@ -21,7 +21,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -45,6 +44,7 @@ import org.apache.maven.model.lifecycle.LifecycleBindingsInjector;
 import org.apache.maven.model.normalization.Normalizer;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.profiles.DefaultProfileManager;
+import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.profiles.ProfileActivationException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.ProfileManagerInfo;
@@ -116,9 +116,17 @@ public class DefaultMavenProjectBuilder
         
         DomainModel domainModel;
 
+        ProfileActivationContext profileActivationContext = new ProfileActivationContext( configuration.getExecutionProperties(), true );
+        profileActivationContext.setExplicitlyActiveProfileIds( configuration.getActiveProfileIds() );
+        if (configuration.getExecutionProperties() != null )
+        {
+            profileActivationContext.getExecutionProperties().putAll( configuration.getExecutionProperties() );
+        }
+        ProfileManager profileManager = new DefaultProfileManager( profileActivationContext );
+        
         try
         {
-            domainModel = build( "unknown", pomFile, configuration );
+            domainModel = build( "unknown", pomFile, profileManager, configuration );
         }
         catch ( IOException e )
         {
@@ -126,14 +134,20 @@ public class DefaultMavenProjectBuilder
         }
 
         //Profiles
+        //
+        // Active profiles can be contributed to the MavenExecutionRequest as well as from the POM
 
         List<Profile> projectProfiles;
-        Properties props = new Properties();
-        props.putAll( configuration.getExecutionProperties() );
 
         try
         {
-            projectProfiles = DefaultProfileManager.getActiveProfilesFrom( configuration.getGlobalProfileManager(), props, domainModel.getModel() );
+            projectProfiles = new ArrayList<Profile>();            
+            profileManager.addProfiles( domainModel.getModel().getProfiles() );
+            if ( configuration.getProfiles() != null )
+            {
+                profileManager.addProfiles( configuration.getProfiles() );
+            }
+            projectProfiles.addAll( profileManager.getActiveProfiles() );                         
         }
         catch ( ProfileActivationException e )
         {
@@ -234,8 +248,7 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
-            .setLocalRepository( localRepository )
-            .setGlobalProfileManager( profileManager );
+            .setLocalRepository( localRepository );
 
         return build( project, configuration );
     }
@@ -351,15 +364,14 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private DomainModel build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
+    private DomainModel build( String projectId, File pomFile, ProfileManager profileManager, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
     {
-        List<String> activeProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration.getGlobalProfileManager()
-            .getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyActiveProfileIds() : new ArrayList<String>();
+        List<String> activeProfileIds = ( projectBuilderConfiguration != null && profileManager != null && profileManager.getProfileActivationContext() != null ) ? profileManager
+            .getProfileActivationContext().getExplicitlyActiveProfileIds() : new ArrayList<String>();
 
-        List<String> inactiveProfileIds = ( projectBuilderConfiguration != null && projectBuilderConfiguration.getGlobalProfileManager() != null && projectBuilderConfiguration
-            .getGlobalProfileManager().getProfileActivationContext() != null ) ? projectBuilderConfiguration.getGlobalProfileManager().getProfileActivationContext().getExplicitlyInactiveProfileIds()
-                                                                              : new ArrayList<String>();
+        List<String> inactiveProfileIds = ( projectBuilderConfiguration != null && profileManager != null && profileManager.getProfileActivationContext() != null ) ? profileManager
+            .getProfileActivationContext().getExplicitlyInactiveProfileIds() : new ArrayList<String>();
 
         ProfileManagerInfo profileInfo = new ProfileManagerInfo( projectBuilderConfiguration.getExecutionProperties(), activeProfileIds, inactiveProfileIds );
         DomainModel domainModel = new DomainModel( pomFile );
@@ -587,8 +599,6 @@ public class DefaultMavenProjectBuilder
         {
             parentFile = new File( parentFile.getAbsolutePath(), "pom.xml" );
         }
-        
-        MavenProject topProject = projectBuilderConfiguration.getTopLevelProjectFromReactor();
         
         DomainModel parentDomainModel = null;
         if ( !parentFile.isFile() )

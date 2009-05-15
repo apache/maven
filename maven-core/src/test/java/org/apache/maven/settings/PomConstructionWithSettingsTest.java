@@ -3,6 +3,7 @@ package org.apache.maven.settings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
@@ -72,43 +73,26 @@ public class PomConstructionWithSettingsTest
     }       
 
     private PomTestWrapper buildPom( String pomPath )
-    throws Exception
+        throws Exception
 	{
 	    File pomFile = new File( testDirectory + File.separator + pomPath , "pom.xml" );
-	    File settingsFile = new File( testDirectory + File.separator + pomPath, "settings.xml" );
-	    
+	    File settingsFile = new File( testDirectory + File.separator + pomPath, "settings.xml" );	    
 	    Settings settings = readSettingsFile(settingsFile);
-	    
-	    ProfileActivationContext pCtx = new ProfileActivationContext(null, true);
-	    ProfileManager profileManager = new DefaultProfileManager(pCtx);
+	    	    
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
 	    
 	    for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
 	    {
 	        Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
-	
-	        profileManager.addProfile( profile );
+	        config.addProfile( profile );
 	    }    
-
-        List<String> settingsActiveProfileIds = settings.getActiveProfiles();
-
-        if ( settingsActiveProfileIds != null )
-        {
-            for ( String profileId : settingsActiveProfileIds )
-            {
-                profileManager.getProfileActivationContext().setActive( profileId );
-            }
-        }	    
 	    
-	    ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
-
-        String localRepoUrl =
-            System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
+        String localRepoUrl = System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
         localRepoUrl = "file://" + localRepoUrl;
         config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
-	
-	    config.setGlobalProfileManager(profileManager);
-
-	    return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
+        config.setActiveProfileIds( settings.getActiveProfiles() );
+        
+        return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );        
 	}  
     
     private static Settings readSettingsFile(File settingsFile) 
