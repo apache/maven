@@ -42,8 +42,8 @@ public class MavenEmbedderBehaviorTest
 
         MavenEmbedder maven = new MavenEmbedder( configuration );
 
-        String expectedPath = ( new File( "/global/maven/local-repository" ) ).getCanonicalPath();
-        String actualPath = maven.getLocalRepository().getBasedir();
+        File expectedPath = new File( "/global/maven/local-repository" ).getCanonicalFile();
+        File actualPath = new File( maven.getLocalRepository().getBasedir() );
         assertEquals( expectedPath, actualPath );
 
         maven.stop();

@@ -191,18 +191,11 @@ public class LegacyRepositorySystem
     public ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException
     {
-        try
-        {
-            return createRepository( localRepository.toURI().toURL().toString(),
-                                     RepositorySystem.DEFAULT_LOCAL_REPO_ID, true,
-                                     ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
-                                     ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                                     ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new InvalidRepositoryException( "Error creating local repository.", RepositorySystem.DEFAULT_LOCAL_REPO_ID, e );
-        }
+        return createRepository( "file://" + localRepository.toURI().getRawPath(),
+                                 RepositorySystem.DEFAULT_LOCAL_REPO_ID, true,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
     }
 
     public ArtifactRepository createDefaultRemoteRepository()
