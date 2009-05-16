@@ -37,7 +37,8 @@ public class MavenITmng3271DefaultReportsSuppressionTest
 
     public MavenITmng3271DefaultReportsSuppressionTest()
     {
-        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" );
+        // reporting is not supported in 3.x core (see MNG-4162)
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,3.0-alpha-1)" );
     }
 
     /**

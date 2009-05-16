@@ -36,7 +36,8 @@ public class MavenITmng2878DefaultReportXmlImportTest
 {
     public MavenITmng2878DefaultReportXmlImportTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        // reporting is not supported in 3.x core (see MNG-4162)
+        super( "(,3.0-alpha-1)" );
     }
 
     /**

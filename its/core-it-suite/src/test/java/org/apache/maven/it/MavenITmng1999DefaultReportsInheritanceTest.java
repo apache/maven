@@ -37,7 +37,8 @@ public class MavenITmng1999DefaultReportsInheritanceTest
 
     public MavenITmng1999DefaultReportsInheritanceTest()
     {
-        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // 2.0.10+, excluding 2.1.0-M1
+        // reporting not supported by Maven 3.x core as per MNG-4162
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,3.0-alpha-1)" ); // 2.0.10+, excluding 2.1.0-M1
     }
 
     /**
