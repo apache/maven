@@ -89,8 +89,16 @@ public class MavenITmng2387InactiveProxyTest
     {
         super.tearDown();
 
-        server.stop();
-        proxyServer.stop();
+        if ( server != null )
+        {
+            server.stop();
+            server = null;
+        }
+        if ( proxyServer != null )
+        {
+            proxyServer.stop();
+            proxyServer = null;
+        }
     }
 
     /**

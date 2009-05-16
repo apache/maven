@@ -121,6 +121,7 @@ public class MavenITmng3953AuthenticatedDeploymentTest
         if ( server != null )
         {
             server.stop();
+            server = null;
         }
 
         super.tearDown();

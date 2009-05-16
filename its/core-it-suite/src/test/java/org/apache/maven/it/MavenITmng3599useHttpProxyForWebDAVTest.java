@@ -130,6 +130,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         if ( server != null )
         {
             server.stop();
+            server = null;
         }
     }
 

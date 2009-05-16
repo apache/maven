@@ -85,7 +85,11 @@ public class MavenITmng3652UserAgentHeaderTest
     {
         super.tearDown();
 
-        server.stop();
+        if ( server != null)
+        {
+            server.stop();
+            server = null;
+        }
     }
 
     /**

@@ -99,6 +99,7 @@ public class MavenITmng4068AuthenticatedMirrorTest
         if ( server != null )
         {
             server.stop();
+            server = null;
         }
 
         super.tearDown();
