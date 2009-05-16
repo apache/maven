@@ -28,19 +28,19 @@ import java.io.File;
 public class MavenITmng1491ReactorArtifactIdCollisionTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng1491ReactorArtifactIdCollisionTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
-    public void testitMNG1491 ()
+    public void testitMNG1491()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1491" );
 
-        Verifier verifier;
-
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         try
         {
@@ -55,4 +55,5 @@ public class MavenITmng1491ReactorArtifactIdCollisionTest
             // expected.
         }
     }
+
 }

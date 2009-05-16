@@ -52,6 +52,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         try
         {
@@ -92,6 +93,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         try
         {

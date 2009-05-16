@@ -49,6 +49,7 @@ public class MavenITmng1995InterpolateBooleanModelElementsTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1995" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
