@@ -30,28 +30,38 @@ import java.io.File;
  * @author Brett Porter
  * @version $Id$
  */
-public class MavenITmng1088ReactorDepResolutionTest
+public class MavenITmng1088ReactorPluginResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng1088ReactorDepResolutionTest()
+
+    public MavenITmng1088ReactorPluginResolutionTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Test that the reactor can establish the artifact location of known projects for dependencies
-     * using process-sources to see that it works even when they aren't compiled
+     * Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
+     * (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
+     * the plugin (i.e. a phase before "compile").
      */
     public void testitMNG1088()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1088" );
+
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "process-sources" );
-        verifier.assertFilePresent( "test-component-c/target/my-test" );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "client/target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng1088" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        // NOTE: It's essential part of the test to invoke a phase before "compile"
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        verifier.assertFilePresent( "client/target/touch.txt" );
     }
-}
 
+}

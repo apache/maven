@@ -302,7 +302,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1349ChecksumFormatsTest.class );
         suite.addTestSuite( MavenITmng1323AntrunDependenciesTest.class );
         suite.addTestSuite( MavenITmng1233WarDepWithProvidedScopeTest.class );
-        suite.addTestSuite( MavenITmng1088ReactorDepResolutionTest.class );
+        suite.addTestSuite( MavenITmng1088ReactorPluginResolutionTest.class );
         suite.addTestSuite( MavenITmng1052PluginMngtConfigTest.class );
         suite.addTestSuite( MavenITmng1021EqualAttachmentBuildNumberTest.class );
         suite.addTestSuite( MavenITmng0985NonExecutedPluginMngtGoalsTest.class );

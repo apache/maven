@@ -23,19 +23,49 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng1088</groupId>
-  <artifactId>aggregator</artifactId>
-  <version>0.1</version>
-  <packaging>pom</packaging>
+  <artifactId>p</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test :: MNG-1088</name> 
+  <name>Maven Integration Test :: MNG-1088 :: Plugin</name> 
   <description>
     Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
     (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
     the plugin (i.e. a phase before "compile").
   </description>
 
-  <modules>
-    <module>plugin</module>
-    <module>client</module>
-  </modules>
+  <distributionManagement>
+    <repository>
+      <id>maven-core-it</id>
+      <url>file:///${basedir}/repo</url>
+      <uniqueVersion>false</uniqueVersion>
+    </repository>
+  </distributionManagement>
+
+  <properties>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>pom.xml</include>
+          <include>src/**</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+  </build>
 </project>

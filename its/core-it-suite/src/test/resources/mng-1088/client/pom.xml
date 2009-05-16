@@ -23,19 +23,37 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng1088</groupId>
-  <artifactId>aggregator</artifactId>
-  <version>0.1</version>
-  <packaging>pom</packaging>
+  <artifactId>client</artifactId>
+  <version>0.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-1088</name> 
+  <name>Maven Integration Test :: MNG-1088 :: Plugin Client</name> 
   <description>
     Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
     (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
     the plugin (i.e. a phase before "compile").
   </description>
 
-  <modules>
-    <module>plugin</module>
-    <module>client</module>
-  </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- NOTE: That's exactly the same plugin as produced by the sibling project -->
+        <groupId>org.apache.maven.its.mng1088</groupId>
+        <artifactId>p</artifactId>
+        <version>0.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+            <configuration>
+              <file>target/touch.txt</file>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
