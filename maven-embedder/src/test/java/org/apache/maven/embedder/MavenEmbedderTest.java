@@ -389,7 +389,6 @@ public class MavenEmbedderTest
         artifacts.iterator().next();
     }
 
-    /**TODO - FIX
     public void testProjectReading_FromChildLevel_ScmInheritanceCalculations()
         throws Exception
     {
@@ -397,11 +396,11 @@ public class MavenEmbedderTest
 
         MavenProject project = mavenEmbedder.readProject( pomFile );
         assertNotNull(project.getScm());
-        assertEquals( "http://host/viewer?path=/trunk/parent/child1", project.getScm().getUrl() );
-        assertEquals( "scm:svn:http://host/trunk/parent/child1", project.getScm().getConnection() );
-        assertEquals( "scm:svn:https://host/trunk/parent/child1", project.getScm().getDeveloperConnection() );
+        assertEquals( "http://host/viewer?path=/trunk/parent/modules/child1", project.getScm().getUrl() );
+        assertEquals( "scm:svn:http://host/trunk/parent/modules/child1", project.getScm().getConnection() );
+        assertEquals( "scm:svn:https://host/trunk/parent/modules/child1", project.getScm().getDeveloperConnection() );
     }
-*/
+
     public void testProjectReading_SkipMissingModuleSilently()
         throws Exception
     {
@@ -411,19 +410,18 @@ public class MavenEmbedderTest
         mavenEmbedder.readProject( pomFile );
     }
 
-    /*
     public void testProjectReadingWithDistributionStatus()
         throws Exception
     {
         File pom = new File( basedir, "src/test/resources/pom-with-distribution-status.xml" );
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
-            .setPomFile( pom.getAbsolutePath() );
+            .setPom( pom );
 
-        MavenProject project = maven.readProject( pom );
+        MavenProject project = mavenEmbedder.readProject( pom );
 
         assertEquals( "deployed", project.getDistributionManagement().getStatus() );
 
-        MavenExecutionResult result = maven.readProjectWithDependencies( request );
+        MavenExecutionResult result = mavenEmbedder.readProjectWithDependencies( request );
 
         assertNoExceptions( result );
 
@@ -431,7 +429,6 @@ public class MavenEmbedderTest
 
         assertEquals( "deployed", result.getProject().getDistributionManagement().getStatus() );
     }
-    */
 
     // ----------------------------------------------------------------------------
     // Model Writing
