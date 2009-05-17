@@ -680,7 +680,19 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest addProfile( Profile profile )
     {
-        // TODO Auto-generated method stub
-        return null;
+        if ( profile == null )
+        {
+            throw new IllegalArgumentException( "profile missing" );
+        }
+
+        if ( profiles == null )
+        {
+            profiles = new ArrayList<Profile>();
+        }
+
+        profiles.add( profile );
+
+        return this;
     }
+
 }

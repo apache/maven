@@ -231,24 +231,35 @@ public class MavenProject
         this.repositorySystem = repositorySystem;
         originalModel = model;
         
-        setRemoteArtifactRepositories( (projectBuilderConfiguration.getRemoteRepositories() != null) ? new ArrayList<ArtifactRepository>(projectBuilderConfiguration.getRemoteRepositories()) : new ArrayList<ArtifactRepository>());
- 
-        for(Repository r: model.getPluginRepositories())
-		{
-			try {
-				remoteArtifactRepositories.add(repositorySystem.buildArtifactRepository( r ));
-			} catch (InvalidRepositoryException e) {
+        remoteArtifactRepositories = new ArrayList<ArtifactRepository>();
 
-			}
-		}   
-        for(Repository r: model.getPluginRepositories())
-		{
-			try {
-				remoteArtifactRepositories.add(repositorySystem.buildArtifactRepository( r ));
-			} catch (InvalidRepositoryException e) {
+        for ( Repository r : model.getRepositories() )
+        {
+            try
+            {
+                remoteArtifactRepositories.add( repositorySystem.buildArtifactRepository( r ) );
+            }
+            catch ( InvalidRepositoryException e )
+            {
 
-			}
-		}        
+            }
+        }
+        for ( Repository r : model.getPluginRepositories() )
+        {
+            try
+            {
+                remoteArtifactRepositories.add( repositorySystem.buildArtifactRepository( r ) );
+            }
+            catch ( InvalidRepositoryException e )
+            {
+
+            }
+        }
+
+        if ( projectBuilderConfiguration.getRemoteRepositories() != null )
+        {
+            remoteArtifactRepositories.addAll( projectBuilderConfiguration.getRemoteRepositories() );
+        }
     }
 
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
