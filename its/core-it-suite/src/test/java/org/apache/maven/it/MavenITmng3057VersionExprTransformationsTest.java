@@ -60,6 +60,10 @@ public class MavenITmng3057VersionExprTransformationsTest
         File remoteRepo = new File( testDir, "target/deployment" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "level2/target" );
+        verifier.deleteDirectory( "level2/level3/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3057" );
         
         Properties properties = verifier.newDefaultFilterProperties();
@@ -78,7 +82,7 @@ public class MavenITmng3057VersionExprTransformationsTest
 //        envars.put( "MAVEN_OPTS", "-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=5005 -Djava.compiler=NONE" );
 //        verifier.executeGoal( "deploy", envars );
         
-        verifier.executeGoal( "deploy" );
+        verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
@@ -107,4 +111,5 @@ public class MavenITmng3057VersionExprTransformationsTest
             assertNull( parent );
         }
     }    
+
 }
