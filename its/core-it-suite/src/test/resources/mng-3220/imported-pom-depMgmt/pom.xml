@@ -23,6 +23,13 @@ under the License.
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.apache.maven.its.mng3220</groupId>
+    <artifactId>parent</artifactId>
+    <version>1</version>
+    <relativePath>parent.xml</relativePath>
+  </parent>
+
   <groupId>org.apache.maven.its.mng3220</groupId>
   <artifactId>project</artifactId>
   <version>1</version>
@@ -30,26 +37,15 @@ under the License.
 
   <name>Maven Integration Test :: MNG-3220</name>
   <description>
-    Verify that the dependency management from a dependency of type "pom" but without scope "import" does not
-    contribute to this project's dependency management.
+    Verify that the dependency management from a dependency of type "pom" and with scope "import" contributes to
+    this project's dependency management.
   </description>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.maven.its.mng3220</groupId>
-        <artifactId>dm-pom</artifactId>
-        <version>1</version>
-        <type>pom</type>
-        <!-- NOTE: Not using "import" scope here is the essential part of this test. -->
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <!-- Version should be managed by imported POM -->
     </dependency>
   </dependencies>
 </project>

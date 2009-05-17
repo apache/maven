@@ -24,14 +24,14 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng3220</groupId>
-  <artifactId>project</artifactId>
+  <artifactId>parent</artifactId>
   <version>1</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3220</name>
   <description>
-    Verify that the dependency management from a dependency of type "pom" but without scope "import" does not
-    contribute to this project's dependency management.
+    Verify that the dependency management from a dependency of type "pom" and with scope "import" contributes to
+    this project's dependency management.
   </description>
 
   <dependencyManagement>
@@ -41,15 +41,8 @@ under the License.
         <artifactId>dm-pom</artifactId>
         <version>1</version>
         <type>pom</type>
-        <!-- NOTE: Not using "import" scope here is the essential part of this test. -->
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-  </dependencies>
 </project>

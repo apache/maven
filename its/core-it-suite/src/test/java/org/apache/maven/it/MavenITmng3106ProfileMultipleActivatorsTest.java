@@ -53,12 +53,14 @@ public class MavenITmng3106ProfileMultipleActivatorsTest
         Verifier verifier;
 
         verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dprofile1.on=true" );
 
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "package" );
+        verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
         verifier.assertFilePresent( "target/profile1/touch.txt" );

@@ -38,21 +38,18 @@ public class MavenITmng3220ImportScopeTest
     public void testitMNG3220a()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3220/imported-pom-depMgmt" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3220" );
 
-        File dmDir = new File( testDir, "dm-pom" );
-        Verifier verifier = new Verifier( dmDir.getAbsolutePath() );
+        testDir = new File( testDir, "imported-pom-depMgmt" );
 
-        verifier.executeGoal( "install" );
-
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        File projectDir = new File( testDir, "project" );
-        verifier = new Verifier( projectDir.getAbsolutePath() );
-
-        verifier.executeGoal( "package" );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3220" );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
@@ -60,18 +57,27 @@ public class MavenITmng3220ImportScopeTest
     public void testitMNG3220b()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3220/depMgmt-pom-module-notImported" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3220" );
+
+        testDir = new File( testDir, "depMgmt-pom-module-notImported" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3220" );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
 
         try
         {
-            verifier.executeGoal( "install" );
+            verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
             fail( "Should fail to build with missing junit version." );
         }
         catch ( VerificationException e )
         {
+            // expected
         }
 
         verifier.resetStreams();
