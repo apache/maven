@@ -22,17 +22,13 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
  * Deploys the project artifacts to the distribution repository. This is the essence of the Maven Deploy Plugin.
- * <strong>Note:</strong> Unlike the production plugin, this plugin does not handle projects with "pom" packaging for
- * the sake of simplicity.
  * 
  * @goal deploy
  * @phase deploy
@@ -41,35 +37,8 @@ import java.util.Iterator;
  * @version $Id$
  */
 public class DeployMojo
-    extends AbstractMojo
+    extends AbstractRepoMojo
 {
-
-    /**
-     * The project's main artifact.
-     * 
-     * @parameter default-value="${project.artifact}"
-     * @readonly
-     * @required
-     */
-    private Artifact mainArtifact;
-
-    /**
-     * The project's attached artifact.
-     * 
-     * @parameter default-value="${project.attachedArtifacts}"
-     * @readonly
-     * @required
-     */
-    private Collection attachedArtifacts;
-
-    /**
-     * The local repository.
-     * 
-     * @parameter default-value="${localRepository}"
-     * @readonly
-     * @required
-     */
-    private ArtifactRepository localRepository;
 
     /**
      * The distribution repository.
@@ -99,7 +68,14 @@ public class DeployMojo
 
         try
         {
-            deployer.deploy( mainArtifact.getFile(), mainArtifact, deploymentRepository, localRepository );
+            if ( isPomArtifact() )
+            {
+                deployer.deploy( pomFile, mainArtifact, deploymentRepository, localRepository );
+            }
+            else
+            {
+                deployer.deploy( mainArtifact.getFile(), mainArtifact, deploymentRepository, localRepository );
+            }
 
             if ( attachedArtifacts != null )
             {
