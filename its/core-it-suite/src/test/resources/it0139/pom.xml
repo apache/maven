@@ -31,6 +31,6 @@ under the License.
   <description>Test POM interpolation with expressions of the form $ { project.* }</description>
 
   <modules>
-    <module>parent/child</module>
+    <module>child</module>
   </modules>
 </project>

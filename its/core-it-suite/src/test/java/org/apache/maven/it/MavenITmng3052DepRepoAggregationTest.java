@@ -45,6 +45,7 @@ import java.util.Properties;
 public class MavenITmng3052DepRepoAggregationTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3052DepRepoAggregationTest()
     {
         // TODO: fate of POM repositories in 3.x is unclear, disabled for now
@@ -56,64 +57,20 @@ public class MavenITmng3052DepRepoAggregationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3052" ).getCanonicalFile();
 
-        File foo = new File( testDir, "foo" );
-        File bar = new File( testDir, "bar" );
-        File wombat = new File( testDir, "wombat" );
-
-        // Since this test relies on artifact deployment, we need to provide two
-        // "remote" repository locations into which the foo and bar project builds
-        // can be deployed, for eventual resolution from the wombat project build.
-        //
-        // To do this, we're using "remote" locations in the testDir/target directory,
-        // do they will be cleaned up when the test directory is cleaned. The
-        // commands below substitute the current testDir location into the
-        // repository declarations, to make them absolute file references on the
-        // local filesystem.
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3052" );
         Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "foo/pom.xml", "foo/pom.xml", "UTF-8", filterProps );
-        verifier.filterFile( "bar/pom.xml", "bar/pom.xml", "UTF-8", filterProps );
-        verifier.filterFile( "wombat/pom.xml", "wombat/pom.xml", "UTF-8", filterProps );
-        verifier.resetStreams();
-
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-X" );
-
-        // First, build the two levels of dependencies that will be resolved.
-
-        // This one is a transitive dependency, and will be deployed to a
-        // repository that is NOT listed in the main project's POM (wombat).
-        verifier = new Verifier( foo.getAbsolutePath() );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "deploy" );
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
+        verifier.filterFile( "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/template.pom", 
+            "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/direct-0.1-20090517.133956-1.pom", "UTF-8", filterProps );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        // This one is a direct dependency that will be deployed to a repository
-        // that IS listed in the main project's POM (wombat). It lists its own
-        // repository entry that should enable resolution of the transitive
-        // dependency it lists (foo, above).
-        verifier = new Verifier( bar.getAbsolutePath() );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "deploy" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        String artifactPath = verifier.getArtifactPath( "org.mule", "mule-foo", "1.0-SNAPSHOT", "jar" );
-        File artifact = new File( artifactPath );
-
-        File dir = artifact.getParentFile().getParentFile().getParentFile();
-        FileUtils.deleteDirectory( dir );
-
-        // This is the main project, which lists a repository where the bar
-        // project (above) was deployed. It should be able to use the
-        // repositories declared in the bar POM to find the transitive dependency
-        // (foo, top).
-        verifier = new Verifier( wombat.getAbsolutePath() );
-        verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "package" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng3052", "direct", "0.1-SNAPSHOT", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng3052", "trans", "0.1-SNAPSHOT", "jar" );
     }
 
 }
