@@ -51,7 +51,7 @@ public class PropertyMatcher implements ProfileMatcher
 
         for ( Entry<Object, Object> ip : properties.entrySet() )
         {
-        	if(ip.getKey().equals("${" + name + "}"))
+        	if(ip.getKey().equals( name ))
         	{
         		return ((String) ip.getValue()).equals(value);
         	}         

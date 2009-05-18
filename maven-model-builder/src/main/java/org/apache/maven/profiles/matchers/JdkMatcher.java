@@ -12,7 +12,7 @@ public class JdkMatcher
 	implements ProfileMatcher 
 	{
 	
-    private static final String JDK_VERSION = "${java.version}";
+    private static final String JDK_VERSION = "java.version";
 
 	public boolean isMatch(Profile profile,
 			Properties properties) {

@@ -55,7 +55,8 @@ public class DefaultInterpolator
         List<InterpolatorProperty>  interpolatorProperties = new ArrayList<InterpolatorProperty>();
         for ( Entry<Object, Object> e : properties.entrySet() )
         {
-        	 interpolatorProperties.add( new InterpolatorProperty( (String) e.getKey(), (String) e.getValue(), PomInterpolatorTag.EXECUTION_PROPERTIES.toString() ) );
+            interpolatorProperties.add( new InterpolatorProperty( "${" + e.getKey() + "}", (String) e.getValue(),
+                                                                  PomInterpolatorTag.EXECUTION_PROPERTIES.toString() ) );
         }
 
         if ( !containsProjectVersion( interpolatorProperties ) )

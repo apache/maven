@@ -1332,7 +1332,7 @@ public class PomConstructionTest
     	throws Exception
 	{
     	Properties props = new Properties();
-	    props.put("${java.version}", "1.5.0_15");
+	    props.put("java.version", "1.5.0_15");
 	    	
 	    PomTestWrapper pom = buildPom( "jdk-activation",  props ); 
 	    assertEquals(3, pom.getMavenProject().getActiveProfiles().size());	
@@ -1427,6 +1427,15 @@ public class PomConstructionTest
 	{
 	    PomTestWrapper pom = buildPom( "dependency-management-with-interpolation/sub" );
 	}   
+
+    public void testInterpolationWithSystemProperty()
+        throws Exception
+    {
+        Properties sysProps = new Properties();
+        sysProps.setProperty( "system.property", "PASSED" );
+        PomTestWrapper pom = buildPom( "sytem-property-interpolation", sysProps );
+        assertEquals( "PASSED", pom.getValue( "name" ) );
+    }    
 
     private void assertPathSuffixEquals( String expected, Object actual )
     {

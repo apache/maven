@@ -19,7 +19,7 @@ public class JdkMatcherTest extends TestCase
 		
 		JdkMatcher m = new JdkMatcher();
 		Properties props = new Properties();
-		props.setProperty("${java.version}", "1.5.0_16");
+		props.setProperty("java.version", "1.5.0_16");
 		
 		assertTrue(m.isMatch(p, props ));
 	}
