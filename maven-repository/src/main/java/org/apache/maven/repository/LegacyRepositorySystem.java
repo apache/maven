@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -38,7 +39,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.component.annotations.Component;
@@ -66,6 +70,9 @@ public class LegacyRepositorySystem
     @Requirement
     private MirrorBuilder mirrorBuilder;
 
+    @Requirement
+    private WagonManager wagonManager;
+    
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
@@ -346,5 +353,17 @@ public class LegacyRepositorySystem
         
 //        ArtifactResolutionResult result = artifactCollector.
         return null;
+    }
+
+    public void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        wagonManager.getRemoteFile( repository, destination, remotePath, downloadMonitor, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, true );
+    }
+
+    public void publish( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
+        throws TransferFailedException
+    {
+        wagonManager.putRemoteFile( repository, source, remotePath, downloadMonitor );
     }
 }

@@ -89,4 +89,11 @@ public interface WagonManager
         throws TransferFailedException, ResourceDoesNotExistException;    
     
     Set<String> getSupportProtocols();
+    
+    void getRemoteFile( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor, String checksumPolicy, boolean force )
+        throws TransferFailedException, ResourceDoesNotExistException;
+    
+    void putRemoteFile( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
+        throws TransferFailedException;
+    
 }

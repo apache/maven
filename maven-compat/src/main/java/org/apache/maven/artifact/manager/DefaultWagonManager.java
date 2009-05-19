@@ -139,7 +139,7 @@ public class DefaultWagonManager
         putRemoteFile( repository, source, repository.pathOfRemoteRepositoryMetadata( artifactMetadata ), null );
     }
 
-    private void putRemoteFile( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
+    public void putRemoteFile( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
         throws TransferFailedException
     {
         String protocol = repository.getProtocol();
@@ -427,7 +427,7 @@ public class DefaultWagonManager
         getRemoteFile( repository, destination, remotePath, null, checksumPolicy, true );
     }
 
-    private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor, String checksumPolicy, boolean force )
+    public void getRemoteFile( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor, String checksumPolicy, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String protocol = repository.getProtocol();

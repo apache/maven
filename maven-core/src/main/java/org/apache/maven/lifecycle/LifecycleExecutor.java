@@ -26,9 +26,14 @@ import java.util.Set;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -48,7 +53,7 @@ public interface LifecycleExecutor
      * @throws LifecycleExecutionException
      */
     List<MojoExecution> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
-        throws LifecycleExecutionException;
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException;
         
     // For a given project packaging find all the plugins that are bound to any registered
     // lifecycles. The project builder needs to now what default plugin information needs to be
@@ -64,11 +69,8 @@ public interface LifecycleExecutor
     // Given a set of {@link org.apache.maven.Plugin} objects where the GAV is set we can lookup the plugin
     // descriptor and populate the default configuration.
     //
-    void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, MavenProject project, ArtifactRepository localRepository )
+    void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws LifecycleExecutionException;
     
     void execute( MavenSession session );
-    
-    Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, MavenProject project, ArtifactRepository localRepository ) 
-        throws LifecycleExecutionException;    
 }

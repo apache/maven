@@ -192,7 +192,7 @@ public class DefaultMavenProjectBuilder
             {
                 pluginConfigurationExpander.expandPluginConfiguration( project.getModel() );
 
-                lifecycle.populateDefaultConfigurationForPlugins( project.getModel().getBuild().getPlugins(), project, configuration.getLocalRepository() );
+                lifecycle.populateDefaultConfigurationForPlugins( project.getModel().getBuild().getPlugins(), configuration.getLocalRepository(), project.getRemoteArtifactRepositories() );
             }
         }
         catch ( IOException e )

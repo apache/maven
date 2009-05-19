@@ -16,9 +16,7 @@ package org.apache.maven.repository;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -28,6 +26,9 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * @author Jason van Zyl
@@ -72,19 +73,23 @@ public interface RepositorySystem
     
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
-    /**
-     * this is the new metadata-based entry point into repository system. By default - it will transitively resolve metadata
-     * for the supplied root GAV and return a flat set of dependency metadatas. Tweaking the request allows user to ask for 
-     * various formats of the response - resolved tree, resolved graph or dirty tree. Only the resolved tree is implemented now
-     * in MercuryRepositorySystem, LegacyRepositorySystem ignores this call for now.  
-     * 
-     * @param request - supplies all necessary details for the resolution configuration
-     * @return
-     */
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
            
     //TODO: remove the request should already be processed to select the mirror for the request instead of the processing happen internally.
     // Mirrors    
     void addMirror( String id, String mirrorOf, String url );        
-    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );    
+    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );  
+    
+    // Install
+    
+    // Deploy
+    
+    // Map types of artifacts
+    
+    // Raw file transfers
+    void publish( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
+        throws TransferFailedException;
+    
+    void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
+        throws TransferFailedException, ResourceDoesNotExistException;        
 }

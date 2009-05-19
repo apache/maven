@@ -55,6 +55,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
@@ -66,7 +67,6 @@ import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -114,17 +114,25 @@ public class DefaultPluginManager
         pluginDescriptors = new HashMap<String, PluginDescriptor>();
     }
 
-    // This should be template method code for allowing subclasses to assist in contributing search/hint information
-    public Plugin findPluginForPrefix( String prefix, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    private String pluginKey( Plugin plugin )
     {
-        //Use the plugin managers capabilities to get information to augement the request
-
-        return null;
-        //return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
+        return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
     }
 
+    /**
+     * 
+     * @param plugin
+     * @param localRepository
+     * @param remoteRepositories
+     * @return PluginDescriptor The component descriptor for the Maven plugin.
+     * @throws PluginNotFoundException The plugin could not be found in any repositories.
+     * @throws PluginResolutionException The plugin could be found but could not be resolved.
+     * @throws PlexusConfigurationException A discovered component descriptor cannot be read, or or can't be parsed correctly. Shouldn't 
+     *                                      happen but if someone has made a descriptor by hand it's possible.
+     * @throws CycleDetectedInComponentGraphException A cycle has been detected in the component graph for a plugin that has been dynamically loaded.
+     */
     public PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws PluginLoaderException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException
     {
         PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
 
@@ -133,40 +141,8 @@ public class DefaultPluginManager
         if ( pluginDescriptor != null && pluginDescriptor.getClassRealm() != null )
         {
             return pluginDescriptor;
-        }
-
-        try
-        {
-            return addPlugin( plugin, localRepository, remoteRepositories );
-        }
-        catch ( ArtifactResolutionException e )
-        // PluginResolutionException - a problem that occurs resolving the plugin artifact or its deps
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( ArtifactNotFoundException e )
-        // PluginNotFoundException - the plugin itself cannot be found in any repositories
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginContainerException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-        catch ( PluginVersionNotFoundException e )
-        {
-            throw new PluginLoaderException( plugin, "Failed to load plugin. Reason: " + e.getMessage(), e );
-        }
-    }
-
-    private String pluginKey( Plugin plugin )
-    {
-        return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
-    }
-
-    protected PluginDescriptor addPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactNotFoundException, ArtifactResolutionException, PluginContainerException, PluginVersionNotFoundException
-    {
+        }        
+        
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
@@ -176,7 +152,15 @@ public class DefaultPluginManager
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
-        resolutionErrorHandler.throwErrors( request, result );
+        try
+        {
+            resolutionErrorHandler.throwErrors( request, result );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new PluginResolutionException( plugin, e );            
+        }
+        
 
         ClassRealm pluginRealm = pluginClassLoaderCache.get( constructPluginKey( plugin ) );
         
@@ -187,7 +171,20 @@ public class DefaultPluginManager
             
         pluginRealm = container.createChildRealm( pluginKey( plugin ) );
 
-        Set<Artifact> pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, localRepository, remoteRepositories );
+        Set<Artifact> pluginArtifacts;
+        
+        try
+        {
+            pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, localRepository, remoteRepositories );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new PluginNotFoundException( plugin, e );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new PluginResolutionException( plugin, e );
+        }
 
         for ( Artifact a : pluginArtifacts )
         {
@@ -200,23 +197,23 @@ public class DefaultPluginManager
                 // Not going to happen
             }
         }
-                
+                 
         try
         {
             container.discoverComponents( pluginRealm );
         }
         catch ( PlexusConfigurationException e )
         {
-            throw new PluginContainerException( plugin, pluginRealm, "Error scanning plugin realm for components.", e );
+            throw new PluginDescriptorParsingException( plugin, e );
         }
-        catch ( ComponentRepositoryException e )
+        catch ( CycleDetectedInComponentGraphException e )
         {
-            throw new PluginContainerException( plugin, pluginRealm, "Error scanning plugin realm for components.", e );
+            throw new CycleDetectedInPluginGraphException( plugin, e );
         }
 
         pluginClassLoaderCache.put( constructPluginKey( plugin ), pluginRealm );
         
-        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
+        pluginDescriptor = getPluginDescriptor( plugin );
         pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
         
         return pluginDescriptor;
@@ -493,9 +490,19 @@ public class DefaultPluginManager
         }
     }
 
-    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories )
-        throws PluginLoaderException
+    public MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
+    {
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( groupId );        
+        plugin.setArtifactId( artifactId );
+        plugin.setVersion( version );
+        
+        return getMojoDescriptor( plugin, goal, localRepository, remoteRepositories );
+    }
+        
+    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
     {
         PluginDescriptor pluginDescriptor = loadPlugin( plugin, localRepository, remoteRepositories );
 
@@ -503,7 +510,7 @@ public class DefaultPluginManager
 
         if ( mojoDescriptor == null )
         {
-            throw new PluginLoaderException( plugin, "Failed to load plugin mojo. Reason: Unknown mojo: " + goal );
+            throw new MojoNotFoundException( goal, pluginDescriptor );
         }
 
         return mojoDescriptor;

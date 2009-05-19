@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.manager;
+package org.apache.maven.plugin;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,28 +19,24 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
-public class CredentialsDataSourceException
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
+
+/**
+ * @author Jason van Zyl
+ */
+public class PluginDescriptorParsingException
     extends Exception
 {
+    private Plugin plugin;
 
-    public CredentialsDataSourceException()
+    public PluginDescriptorParsingException( Plugin plugin, PlexusConfigurationException e )
     {
+        super( e );
+        this.plugin = plugin;
     }
-
-    public CredentialsDataSourceException( String message )
-    {
-        super( message );
-    }
-
-    public CredentialsDataSourceException( Throwable cause )
-    {
-        super( cause );
-    }
-
-    public CredentialsDataSourceException( String message,
-                                           Throwable cause )
-    {
-        super( message, cause );
-    }
-
 }

@@ -587,17 +587,13 @@ public class MavenProject
         list.add( getBuild().getTestOutputDirectory() );
 
         list.add( getBuild().getOutputDirectory() );
-
-        System.out.println( ">>>>> " + getArtifacts() );
         
         for ( Artifact a : getArtifacts() )
         {            
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {                
                 File file = a.getFile();
-                                
-                System.out.println( ">> " + a.getArtifactId() );
-                
+                                                
                 if ( file == null )
                 {
                     throw new DependencyResolutionRequiredException( a );

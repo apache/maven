@@ -29,9 +29,14 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -45,7 +50,7 @@ public class EmptyLifecycleExecutor
 {
 
     public List<MojoExecution> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
-        throws LifecycleExecutionException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
     {
         return Collections.emptyList();
     }
@@ -71,10 +76,8 @@ public class EmptyLifecycleExecutor
         return Collections.emptySet();
     }
 
-    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, MavenProject project,
-                                                               ArtifactRepository localRepository )
+    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws LifecycleExecutionException
     {
     }
-
 }
