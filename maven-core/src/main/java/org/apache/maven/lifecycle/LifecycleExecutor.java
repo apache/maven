@@ -52,8 +52,8 @@ public interface LifecycleExecutor
      * @return
      * @throws LifecycleExecutionException
      */
-    List<MojoExecution> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException;
+    List<MojoExecution> calculateBuildPlan( String lifecyclePhase, MavenSession session )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException;
         
     // For a given project packaging find all the plugins that are bound to any registered
     // lifecycles. The project builder needs to now what default plugin information needs to be

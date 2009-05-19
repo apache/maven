@@ -16,6 +16,9 @@ package org.apache.maven.lifecycle;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +31,9 @@ import java.util.StringTokenizer;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -52,6 +58,8 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -59,8 +67,11 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 //TODO: The configuration for the lifecycle needs to be externalized so that I can use the annotations
 //      properly for the wiring and reference and external source for the lifecycle configuration.
@@ -141,7 +152,7 @@ public class DefaultLifecycleExecutor
                     
                     try
                     {
-                        lifecyclePlan = calculateLifecyclePlan( goal, session );
+                        lifecyclePlan = calculateBuildPlan( goal, session );
                     }
                     catch ( Exception e )
                     {
@@ -221,178 +232,219 @@ public class DefaultLifecycleExecutor
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
     // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
     // 5. Bind mojos specified in the project itself to the lifecycle
-    public List<MojoExecution> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
+    public List<MojoExecution> calculateBuildPlan( String task, MavenSession session )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException
     {        
-        // Extract the project from the session
         MavenProject project = session.getCurrentProject();
         
-        // 1.
-        //
-        // Based on the lifecycle phase we are given, let's find the corresponding lifecycle.
-        //
-        Lifecycle lifecycle = phaseToLifecycleMap.get( lifecyclePhase );                
+        List<String> phasesWithMojosToExecute = new ArrayList<String>();
         
-        // 2. 
-        //
-        // If we are dealing with the "clean" or "site" lifecycle then there are currently no lifecycle mappings but there are default phases
-        // that need to be run instead.
-        //
-        // Now we need to take into account the packaging type of the project. For a project of type WAR, the lifecycle where mojos are mapped
-        // on to the given phases in the lifecycle are going to be a little different then, say, a project of type JAR.
-        //
-           
-        Map<String, String> lifecyclePhasesForPackaging;
-        
-        if ( lifecyclePhase.equals( "clean" ) )
+        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
+                
+        if ( task.indexOf( ":" ) > 0 )
         {
-            lifecyclePhasesForPackaging = new HashMap<String,String>();
+            MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
+                        
+            MojoExecution mojoExecution = getMojoExecution( project, mojoDescriptor );
             
-            for( String phase : lifecycle.getDefaultPhases() )
-            {
-                lifecyclePhasesForPackaging.put( "clean", "org.apache.maven.plugins:maven-clean-plugin:clean" );
-            }
+            lifecyclePlan.add( mojoExecution );            
         }
         else
         {
-            LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( project.getPackaging() );
-          
-            lifecyclePhasesForPackaging = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() ).getPhases();            
-        }
-                
-        // 3.
-        //
-        // Once we have the lifecycle mapping for the given packaging, we need to know whats phases we need to worry about executing.
-        //
-                        
-        // Create an ordered Map of the phases in the lifecycle to a list of mojos to execute.
-        Map<String,List<String>> phaseToMojoMapping = new LinkedHashMap<String,List<String>>();
-        
-        // 4.
-        
-        //TODO: need to separate the lifecycles
-        
-        for ( String phase : lifecycle.getPhases() )
-        {               
-            List<String> mojos = new ArrayList<String>(); 
 
-            // This is just just laying out the initial structure of the mojos to run in each phase of the
-            // lifecycle. Everything is now done in the project builder correctly so this could likely
-            // go away shortly. We no longer need to pull out bits from the default lifecycle. The MavenProject
-            // comes to us intact as it should.
-                        
-            phaseToMojoMapping.put( phase, mojos );                
-        }
-         
-        // 5. Just build up the list of mojos that will execute for every phase.
-        //
-        // This will be useful for having the complete build plan and then we can filter/optimize later.
-        //
-        for( Plugin plugin : project.getBuild().getPlugins() )
-        {            
-            for( PluginExecution execution : plugin.getExecutions() )
+            // 1.
+            //
+            // Based on the lifecycle phase we are given, let's find the corresponding lifecycle.
+            //
+            Lifecycle lifecycle = phaseToLifecycleMap.get( task );
+
+            // 2. 
+            //
+            // If we are dealing with the "clean" or "site" lifecycle then there are currently no lifecycle mappings but there are default phases
+            // that need to be run instead.
+            //
+            // Now we need to take into account the packaging type of the project. For a project of type WAR, the lifecycle where mojos are mapped
+            // on to the given phases in the lifecycle are going to be a little different then, say, a project of type JAR.
+            //
+
+            Map<String, String> lifecyclePhasesForPackaging;
+
+            if ( task.equals( "clean" ) )
             {
-                // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
-                // to examine the phase it is associated to.                
-                if ( execution.getPhase() != null )
-                {
-                    for( String goal : execution.getGoals() )
-                    {
-                        String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
+                lifecyclePhasesForPackaging = new HashMap<String, String>();
 
-                        if ( phaseToMojoMapping.get( execution.getPhase() ) == null )
-                        {
-                            // This is happening because executions in the POM are getting mixed into the clean lifecycle
-                            // So for the lifecycle mapping we need a map with the phases as keys so we can easily check
-                            // if this phase belongs to the given lifecycle. this shows the system is messed up. this
-                            // shouldn't happen.
-                            phaseToMojoMapping.put( execution.getPhase(), new ArrayList<String>() );
-                        }
-                        
-                        phaseToMojoMapping.get( execution.getPhase() ).add( s );                        
-                    }                    
-                }                
-                // if not then i need to grab the mojo descriptor and look at the phase that is specified
-                else
+                for ( String phase : lifecycle.getDefaultPhases() )
                 {
-                    for( String goal : execution.getGoals() )
+                    lifecyclePhasesForPackaging.put( "clean", "org.apache.maven.plugins:maven-clean-plugin:clean" );
+                }
+            }
+            else
+            {
+                LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( project.getPackaging() );
+
+                lifecyclePhasesForPackaging = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() ).getPhases();
+            }
+
+            // 3.
+            //
+            // Once we have the lifecycle mapping for the given packaging, we need to know whats phases we need to worry about executing.
+            //
+
+            // Create an ordered Map of the phases in the lifecycle to a list of mojos to execute.
+            Map<String, List<String>> phaseToMojoMapping = new LinkedHashMap<String, List<String>>();
+
+            // 4.
+
+            //TODO: need to separate the lifecycles
+
+            for ( String phase : lifecycle.getPhases() )
+            {
+                List<String> mojos = new ArrayList<String>();
+
+                // This is just just laying out the initial structure of the mojos to run in each phase of the
+                // lifecycle. Everything is now done in the project builder correctly so this could likely
+                // go away shortly. We no longer need to pull out bits from the default lifecycle. The MavenProject
+                // comes to us intact as it should.
+
+                phaseToMojoMapping.put( phase, mojos );
+            }
+
+            // 5. Just build up the list of mojos that will execute for every phase.
+            //
+            // This will be useful for having the complete build plan and then we can filter/optimize later.
+            //
+            for ( Plugin plugin : project.getBuild().getPlugins() )
+            {
+                for ( PluginExecution execution : plugin.getExecutions() )
+                {
+                    // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
+                    // to examine the phase it is associated to.                
+                    if ( execution.getPhase() != null )
                     {
-                        String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
-                        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
-                                                
-                        if ( mojoDescriptor.getPhase() != null && phaseToMojoMapping.get( mojoDescriptor.getPhase() ) != null )
+                        for ( String goal : execution.getGoals() )
                         {
-                            phaseToMojoMapping.get( mojoDescriptor.getPhase() ).add( s );
+                            String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
+
+                            if ( phaseToMojoMapping.get( execution.getPhase() ) == null )
+                            {
+                                // This is happening because executions in the POM are getting mixed into the clean lifecycle
+                                // So for the lifecycle mapping we need a map with the phases as keys so we can easily check
+                                // if this phase belongs to the given lifecycle. this shows the system is messed up. this
+                                // shouldn't happen.
+                                phaseToMojoMapping.put( execution.getPhase(), new ArrayList<String>() );
+                            }
+
+                            phaseToMojoMapping.get( execution.getPhase() ).add( s );
+                        }
+                    }
+                    // if not then i need to grab the mojo descriptor and look at the phase that is specified
+                    else
+                    {
+                        for ( String goal : execution.getGoals() )
+                        {
+                            String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
+                            MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
+
+                            if ( mojoDescriptor.getPhase() != null && phaseToMojoMapping.get( mojoDescriptor.getPhase() ) != null )
+                            {
+                                phaseToMojoMapping.get( mojoDescriptor.getPhase() ).add( s );
+                            }
                         }
                     }
                 }
             }
-        }
 
-        // 6. 
-        //
-        // We are only interested in the phases that correspond to the lifecycle we are trying to run. If we are running the "clean"
-        // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
-        //        
-                
-        List<String> phasesWithMojosToExecute = new ArrayList<String>();
-        
-        for( String phase : phaseToMojoMapping.keySet() )
-        {
-            phasesWithMojosToExecute.addAll( phaseToMojoMapping.get( phase ) );
-            
-            if ( phase.equals( lifecyclePhase ) )
-            {
-                break;
-            }
-        }        
-        
-        
-        // 7. Now we create the correct configuration for the mojo to execute.
-        //TODO: this needs to go to the model builder.
-        
-        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
-
-        for ( String mojo : phasesWithMojosToExecute )
-        {
-            // These are bits that look like this:
+            // 6. 
             //
-            // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
-            //
-            
-            String[] s = StringUtils.split( mojo, ":" );
-            
-            MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, session );
+            // We are only interested in the phases that correspond to the lifecycle we are trying to run. If we are running the "clean"
+            // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
+            //        
 
-            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-
-            String g = mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId();
-
-            String a = mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId();
-
-            Plugin p = project.getPlugin( g + ":" + a );
-
-            for ( PluginExecution e : p.getExecutions() )
+            for ( String phase : phaseToMojoMapping.keySet() )
             {
-                for ( String goal : e.getGoals() )
+                phasesWithMojosToExecute.addAll( phaseToMojoMapping.get( phase ) );
+
+                if ( phase.equals( task ) )
                 {
-                    if ( mojoDescriptor.getGoal().equals( goal ) )
-                    {
-                        Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
-
-                        Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoDescriptor );
-
-                        mojoExecution.setConfiguration( mojoConfiguration );
-                    }
+                    break;
                 }
             }
+                
+            // 7. Now we create the correct configuration for the mojo to execute.
+            //TODO: this needs to go to the model builder.
 
-            lifecyclePlan.add( mojoExecution );
+            for ( String mojo : phasesWithMojosToExecute )
+            {
+                // These are bits that look like this:
+                //
+                // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
+                //
+
+                MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, session );
+
+                MojoExecution mojoExecution = getMojoExecution( project, mojoDescriptor );
+                
+                /*
+                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+
+                String g = mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId();
+
+                String a = mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId();
+
+                Plugin p = project.getPlugin( g + ":" + a );
+
+                for ( PluginExecution e : p.getExecutions() )
+                {
+                    for ( String goal : e.getGoals() )
+                    {
+                        if ( mojoDescriptor.getGoal().equals( goal ) )
+                        {
+                            Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
+
+                            Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoDescriptor );
+
+                            mojoExecution.setConfiguration( mojoConfiguration );
+                        }
+                    }
+                }
+                */
+
+                lifecyclePlan.add( mojoExecution );
+            }
         }
                 
         return lifecyclePlan;
     }  
 
+    private MojoExecution getMojoExecution( MavenProject project, MojoDescriptor mojoDescriptor )
+    {
+        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+                
+        String g = mojoDescriptor.getPluginDescriptor().getGroupId();
+
+        String a = mojoDescriptor.getPluginDescriptor().getArtifactId();
+
+        Plugin p = project.getPlugin( g + ":" + a );
+
+        for ( PluginExecution e : p.getExecutions() )
+        {
+            for ( String goal : e.getGoals() )
+            {
+                if ( mojoDescriptor.getGoal().equals( goal ) )
+                {
+                    Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
+
+                    Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoDescriptor );
+
+                    mojoExecution.setConfiguration( mojoConfiguration );
+                }
+            }
+        }
+        
+        return mojoExecution;        
+    }
+    
+    
     /**
      * Extracts the configuration for a single mojo from the specified execution configuration by discarding any
      * non-applicable parameters. This is necessary because a plugin execution can have multiple goals with different
@@ -421,10 +473,10 @@ public class DefaultLifecycleExecutor
 
         return mojoConfiguration;
     }
-
+   
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenSession session ) 
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException
     {        
         MavenProject project = session.getCurrentProject();
         
@@ -464,7 +516,69 @@ public class DefaultLifecycleExecutor
 
             goal = tok.nextToken();
         }
-               
+                     
+        if ( plugin.getVersion() == null )
+        {
+            // We need to get it from the POM first before anything else
+            //
+            for ( Plugin pluginInPom : project.getBuildPlugins() )
+            {
+                if ( pluginInPom.getArtifactId().equals( plugin.getArtifactId() ) )
+                {
+                    plugin.setVersion( pluginInPom.getVersion() );
+                    break;
+                }
+            }
+            
+            // If there is no version to be found then we need to look in the repository metadata for
+            // this plugin and see what's specified as the latest release.
+            //
+            if ( plugin.getVersion() == null )
+            {
+                for ( ArtifactRepository repository : session.getCurrentProject().getRemoteArtifactRepositories() )
+                {
+                    String localPath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-" + repository.getId() + ".xml";
+
+                    File destination = new File( session.getLocalRepository().getBasedir(), localPath );
+
+                    if ( !destination.exists() )
+                    {
+                        try
+                        {
+                            String remotePath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata.xml";
+
+                            repositorySystem.retrieve( repository, destination, remotePath, session.getRequest().getTransferListener() );
+                        }
+                        catch ( TransferFailedException e )
+                        {
+                            continue;
+                        }
+                        catch ( ResourceDoesNotExistException e )
+                        {
+                            continue;
+                        }
+                    }
+
+                    // We have retrieved the metadata
+                    try
+                    {
+                        Metadata pluginMetadata = readMetadata( destination );
+
+                        String release = pluginMetadata.getVersioning().getRelease();
+
+                        if ( release != null )
+                        {
+                            plugin.setVersion( release );
+                        }
+                    }
+                    catch ( RepositoryMetadataReadException e )
+                    {
+                        logger.warn( "Error reading plugin metadata: ", e );
+                    }
+                }
+            }
+        }        
+        
         return pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
     }
                 
@@ -715,7 +829,142 @@ public class DefaultLifecycleExecutor
         
         return mojoExecution.getConfiguration();
     }
+           
+    private void downloadProjectDependencies( MavenSession session, String scope )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        MavenProject project = session.getCurrentProject();
+
+        Artifact artifact =
+            repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+        artifact.setFile( project.getFile() );
+        
+        ArtifactFilter filter = new ScopeArtifactFilter( scope );
+
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( artifact )
+            .setResolveRoot( false )
+            .setResolveTransitively( true )
+            .setLocalRepository( session.getLocalRepository() )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( project.getManagedVersionMap() )
+            .setFilter( filter );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( request );                
+        resolutionErrorHandler.throwErrors( request, result );
+        project.setArtifacts( result.getArtifacts() );      
+    }  
     
+    private Map<String,Plugin> pluginPrefixes = new HashMap<String,Plugin>();
+    
+    public Plugin findPluginForPrefix( String prefix, MavenSession session )
+        throws NoPluginFoundForPrefixException
+    {
+        // [prefix]:[goal]
+
+        Plugin plugin = pluginPrefixes.get( prefix );
+        
+        if ( plugin != null )
+        {
+            return plugin;
+        }
+                
+        for ( ArtifactRepository repository : session.getCurrentProject().getRemoteArtifactRepositories() )
+        {
+            for ( String pluginGroup : session.getPluginGroups() )
+            {
+                // org.apache.maven.plugins
+                // org/apache/maven/plugins/maven-metadata.xml
+                
+                String localPath = pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata-" + repository.getId() + ".xml";
+                                
+                File destination = new File( session.getLocalRepository().getBasedir(), localPath );                
+                                
+                if ( !destination.exists() )
+                {
+                    try
+                    {                        
+                        String remotePath = pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata.xml";
+                        
+                        repositorySystem.retrieve( repository, destination, remotePath, session.getRequest().getTransferListener() );
+                    }
+                    catch ( TransferFailedException e )
+                    {
+                        continue;
+                    }
+                    catch ( ResourceDoesNotExistException e )
+                    {
+                        continue;
+                    }
+                }
+
+                // We have retrieved the metadata
+                try
+                {
+                    Metadata pluginGroupMetadata = readMetadata( destination );
+                    
+                    List<org.apache.maven.artifact.repository.metadata.Plugin> plugins = pluginGroupMetadata.getPlugins();
+                                        
+                    if ( plugins != null )
+                    {
+                        for ( org.apache.maven.artifact.repository.metadata.Plugin metadataPlugin : plugins )
+                        {
+                            Plugin p = new Plugin();
+                            p.setGroupId(  pluginGroup );
+                            p.setArtifactId( metadataPlugin.getArtifactId() );                            
+                            pluginPrefixes.put( metadataPlugin.getPrefix(), p );
+                        }
+                    }                    
+                }
+                catch ( RepositoryMetadataReadException e )
+                {
+                    logger.warn( "Error reading plugin group metadata: ", e );
+                }
+            }            
+        }
+                    
+        plugin = pluginPrefixes.get( prefix );
+        
+        if ( plugin != null )
+        {
+            return plugin;
+        }
+        
+        throw new NoPluginFoundForPrefixException( prefix );
+    }  
+    
+    protected Metadata readMetadata( File mappingFile )
+        throws RepositoryMetadataReadException
+    {
+        Metadata result;
+
+        Reader reader = null;
+        try
+        {
+            reader = ReaderFactory.newXmlReader( mappingFile );
+
+            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+
+            result = mappingReader.read( reader, false );
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "'", e );
+        }
+        catch ( IOException e )
+        {
+            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
+        return result;
+    }    
     
     // These are checks that should be available in real time to IDEs
 
@@ -912,42 +1161,5 @@ public class DefaultLifecycleExecutor
         }
     }    
     
-    */
-    
-    private void downloadProjectDependencies( MavenSession session, String scope )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        MavenProject project = session.getCurrentProject();
-
-        Artifact artifact =
-            repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-        artifact.setFile( project.getFile() );
-        
-        ArtifactFilter filter = new ScopeArtifactFilter( scope );
-
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setResolveRoot( false )
-            .setResolveTransitively( true )
-            .setLocalRepository( session.getLocalRepository() )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
-            .setManagedVersionMap( project.getManagedVersionMap() )
-            .setFilter( filter );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );                
-        resolutionErrorHandler.throwErrors( request, result );
-        project.setArtifacts( result.getArtifacts() );      
-    }  
-    
-    // This would ideally be kept up
-    public Plugin findPluginForPrefix( String prefix, MavenSession session )
-    {
-        // [prefix]:[goal]
-        //
-        // eclipse:eclipse
-        // idea:idea
-        
-        return null;
-        //return getByPrefix( prefix, session.getPluginGroups(), project.getRemoteArtifactRepositories(), session.getLocalRepository() );
-    }    
+    */    
 }

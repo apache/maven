@@ -49,7 +49,7 @@ public class EmptyLifecycleExecutor
     implements LifecycleExecutor
 {
 
-    public List<MojoExecution> calculateLifecyclePlan( String lifecyclePhase, MavenSession session )
+    public List<MojoExecution> calculateBuildPlan( String lifecyclePhase, MavenSession session )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
     {
         return Collections.emptyList();

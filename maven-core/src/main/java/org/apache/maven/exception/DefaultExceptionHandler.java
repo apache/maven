@@ -2,6 +2,7 @@ package org.apache.maven.exception;
 
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.lifecycle.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -81,7 +82,11 @@ public class DefaultExceptionHandler
         {
             message = exception.getMessage();           
         }        
-
+        else if ( exception instanceof NoPluginFoundForPrefixException )
+        {
+            message = exception.getMessage();                       
+        }
+        
         // Project dependency downloading problems.
         else if ( exception instanceof ArtifactNotFoundException )
         {
