@@ -1,4 +1,4 @@
-package org.apache.maven.project.artifact;
+package org.apache.maven.project.interpolation;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,18 +19,9 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.transform.ArtifactTransformation;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -45,8 +36,9 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
+import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -62,20 +54,23 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-public class VersionExpressionTransformationTest
+public abstract class AbstractCoordinateInterpolationTest
     extends PlexusTestCase
 {
 
     private static final String VERSION = "blah";
 
-    private VersionExpressionTransformation transformation;
+    private CoordinateInterpolator interpolator;
+    
+    private MavenProjectBuilder projectBuilder;
 
     private Set<File> toDelete = new HashSet<File>();
+
+    protected abstract String getRoleHint();
 
     public void setUp()
         throws Exception
@@ -84,8 +79,8 @@ public class VersionExpressionTransformationTest
 
         // getContainer().getLoggerManager().setThreshold( Logger.LEVEL_DEBUG );
 
-        transformation =
-            (VersionExpressionTransformation) lookup( ArtifactTransformation.class.getName(), "version-expression" );
+        interpolator = (DefaultCoordinateInterpolator) lookup( CoordinateInterpolator.class.getName(), getRoleHint() );
+        projectBuilder = (MavenProjectBuilder) lookup( MavenProjectBuilder.class.getName() );
     }
 
     public void tearDown()
@@ -110,56 +105,25 @@ public class VersionExpressionTransformationTest
         }
     }
 
-    public void testTransformForInstall_AbortOnInvalidPOM()
-        throws URISyntaxException, IOException, XmlPullParserException, ModelInterpolationException
+    private Model readModel( File pomFile )
+        throws IOException, XmlPullParserException
     {
-        String pomResource = "version-expressions/invalid-pom.xml";
-        File pomFile = getPom( pomResource );
-
-        File projectDir;
-        if ( pomFile != null )
+        FileReader reader = null;
+        try
         {
-            projectDir = pomFile.getParentFile();
+            reader = new FileReader( pomFile );
+            return new MavenXpp3Reader().read( reader );
         }
-        else
+        finally
         {
-            projectDir = File.createTempFile( "VersionExpressionTransformationTest.project.", ".tmp.dir" );
-            projectDir.delete();
-            projectDir.mkdirs();
-
-            toDelete.add( projectDir );
-
-            File newPomFile = new File( projectDir, "pom.xml" );
-            FileUtils.copyFile( pomFile, newPomFile );
-
-            pomFile = newPomFile;
+            IOUtil.close( reader );
         }
-
-        File repoDir = File.createTempFile( "VersionExpressionTransformationTest.repo.", ".tmp.dir" );
-        repoDir.delete();
-        repoDir.mkdirs();
-
-        toDelete.add( repoDir );
-
-        Artifact a =
-            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersion( "1" ), null, "jar", null,
-                                 new DefaultArtifactHandler( "jar" ) );
-
-        ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
-        a.addMetadata( pam );
-
-        ArtifactRepository localRepository =
-            new DefaultArtifactRepository( "local", repoDir.getAbsolutePath(), new DefaultRepositoryLayout() );
-
-        transformation.transformVersions( pomFile, a, localRepository );
-
-        assertEquals( pomFile, pam.getFile() );
     }
 
     public void testTransform_MaintainEncoding()
         throws URISyntaxException, IOException, XmlPullParserException, ModelInterpolationException
     {
-        String pomResource = "version-expressions/alternative-encoding-pom.xml";
+        String pomResource = "coord-expressions/alternative-encoding-pom.xml";
         File pomFile = getPom( pomResource );
 
         File projectDir;
@@ -169,7 +133,7 @@ public class VersionExpressionTransformationTest
         }
         else
         {
-            projectDir = File.createTempFile( "VersionExpressionTransformationTest.project.", ".tmp.dir" );
+            projectDir = File.createTempFile( "CoordinateInterpolationTest.project.", ".tmp.dir" );
             projectDir.delete();
             projectDir.mkdirs();
 
@@ -181,35 +145,36 @@ public class VersionExpressionTransformationTest
             pomFile = newPomFile;
         }
 
-        File repoDir = File.createTempFile( "VersionExpressionTransformationTest.repo.", ".tmp.dir" );
+        File repoDir = File.createTempFile( "CoordinateInterpolationTest.repo.", ".tmp.dir" );
         repoDir.delete();
         repoDir.mkdirs();
 
         toDelete.add( repoDir );
 
-        Artifact a =
-            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersion( "1" ), null, "jar", null,
-                                 new DefaultArtifactHandler( "jar" ) );
-
-        ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
-        a.addMetadata( pam );
-
         ArtifactRepository localRepository =
             new DefaultArtifactRepository( "local", repoDir.getAbsolutePath(), new DefaultRepositoryLayout() );
 
-        File result = transformation.transformVersions( pomFile, a, localRepository );
-        
-        String xml = FileUtils.fileRead( result );
-        
-        System.out.println( xml );
-        
+        MavenProject project = new MavenProject( readModel( pomFile ) );
+        project.setOriginalModel( project.getModel() );
+        project.setFile( pomFile );
+
+        ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
+        pbc.setLocalRepository( localRepository );
+
+        project.setProjectBuilderConfiguration( pbc );
+
+        interpolator.interpolateArtifactCoordinates( project );
+
+        assertNotSame( pomFile, project.getFile() );
+        String xml = FileUtils.fileRead( project.getFile() );
+
         assertTrue( xml.indexOf( "encoding=\"ISO-8859-1\"" ) > -1 );
     }
 
     public void testTransformForInstall_PreserveComments()
         throws URISyntaxException, IOException, XmlPullParserException, ModelInterpolationException
     {
-        String pomResource = "version-expressions/pom-with-comments.xml";
+        String pomResource = "coord-expressions/pom-with-comments.xml";
         File pomFile = getPom( pomResource );
 
         Model model;
@@ -278,7 +243,7 @@ public class VersionExpressionTransformationTest
             fail( "POM classpath resource not found: '" + pom + "'." );
         }
 
-        File tempDir = File.createTempFile( "VersionExpressionTransformationTest.", ".dir.tmp" );
+        File tempDir = File.createTempFile( "CoordinateInterpolationTest.", ".dir.tmp" );
         tempDir.delete();
         tempDir.mkdirs();
 
@@ -290,68 +255,16 @@ public class VersionExpressionTransformationTest
         return pomFile;
     }
 
-    public void testTransformForResolve_DoNothing()
-        throws IOException, XmlPullParserException, ArtifactResolutionException, ArtifactNotFoundException
-    {
-        Model model = buildTestModel();
-
-        File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
-        pomDir.delete();
-        pomDir.mkdirs();
-
-        toDelete.add( pomDir );
-
-        File pomFile = new File( pomDir, "pom.xml" );
-
-        FileWriter writer = null;
-        try
-        {
-            writer = new FileWriter( pomFile );
-            new MavenXpp3Writer().write( writer, model );
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
-
-        Artifact a =
-            new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
-                                 new DefaultArtifactHandler( "jar" ), false );
-        ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
-
-        a.addMetadata( pam );
-
-        transformation.transformForResolve( a, Collections.EMPTY_LIST, null );
-
-        assertFalse( pam.isVersionExpressionsResolved() );
-        assertEquals( pomFile, pam.getFile() );
-
-        assertFalse( new File( pomDir, "target/pom-transformed.xml" ).exists() );
-
-        FileReader reader = null;
-        try
-        {
-            reader = new FileReader( pomFile );
-            model = new MavenXpp3Reader().read( reader );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        assertEquals( "${testVersion}", model.getVersion() );
-    }
-
     public void testTransformForInstall_TransformBasedOnModelProperties()
-        throws IOException, ArtifactInstallationException, XmlPullParserException
+        throws IOException, ModelInterpolationException, XmlPullParserException
     {
-        Model model = buildTestModel();
-
-        File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
+        File pomDir = File.createTempFile( "CoordinateInterpolationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
 
         toDelete.add( pomDir );
+
+        Model model = buildTestModel( pomDir );
 
         File pomFile = new File( pomDir, "pom.xml" );
 
@@ -366,25 +279,27 @@ public class VersionExpressionTransformationTest
             IOUtil.close( writer );
         }
 
-        Artifact a =
-            new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
-                                 new DefaultArtifactHandler( "jar" ), false );
+        MavenProject project = new MavenProject( model );
+        project.setOriginalModel( model );
+        project.setFile( pomFile );
 
-        ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
+        ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
 
-        a.addMetadata( pam );
+        project.setProjectBuilderConfiguration( pbc );
 
-        transformation.transformForInstall( a, null );
+        interpolator.interpolateArtifactCoordinates( project );
 
-        File transformedFile = new File( pomDir, "target/pom-transformed.xml" );
+        assertNotSame( pomFile, project.getFile() );
+
+        File transformedFile = new File( pomDir, CoordinateInterpolator.COORDINATE_INTERPOLATED_POMFILE );
 
         assertTrue( transformedFile.exists() );
-        assertEquals( transformedFile, pam.getFile() );
+        assertEquals( transformedFile, project.getFile() );
 
         FileReader reader = null;
         try
         {
-            reader = new FileReader( pam.getFile() );
+            reader = new FileReader( project.getFile() );
             StringWriter swriter = new StringWriter();
             IOUtil.copy( reader, swriter );
 
@@ -402,15 +317,15 @@ public class VersionExpressionTransformationTest
     }
 
     public void testTransformForDeploy_TransformBasedOnModelProperties()
-        throws IOException, XmlPullParserException, ArtifactDeploymentException
+        throws IOException, XmlPullParserException, ModelInterpolationException
     {
-        Model model = buildTestModel();
-
-        File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
+        File pomDir = File.createTempFile( "CoordinateInterpolationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
 
         toDelete.add( pomDir );
+
+        Model model = buildTestModel( pomDir );
 
         File pomFile = new File( pomDir, "pom.xml" );
 
@@ -425,25 +340,27 @@ public class VersionExpressionTransformationTest
             IOUtil.close( writer );
         }
 
-        Artifact a =
-            new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
-                                 new DefaultArtifactHandler( "jar" ), false );
+        MavenProject project = new MavenProject( model );
+        project.setOriginalModel( model );
+        project.setFile( pomFile );
 
-        ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
+        ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
 
-        a.addMetadata( pam );
+        project.setProjectBuilderConfiguration( pbc );
 
-        transformation.transformForDeployment( a, null, null );
+        interpolator.interpolateArtifactCoordinates( project );
 
-        File transformedFile = new File( pomDir, "target/pom-transformed.xml" );
+        assertNotSame( pomFile, project.getFile() );
+
+        File transformedFile = new File( pomDir, CoordinateInterpolator.COORDINATE_INTERPOLATED_POMFILE );
 
         assertTrue( transformedFile.exists() );
-        assertEquals( transformedFile, pam.getFile() );
+        assertEquals( transformedFile, project.getFile() );
 
         FileReader reader = null;
         try
         {
-            reader = new FileReader( pam.getFile() );
+            reader = new FileReader( project.getFile() );
             model = new MavenXpp3Reader().read( reader );
         }
         finally
@@ -454,130 +371,18 @@ public class VersionExpressionTransformationTest
         assertTransformedVersions( model );
     }
 
-    // FIXME: We can't be this smart (yet) since the deployment step transforms from the
-    // original POM once again and re-installs over the top of the install step.
-    // public void testTransformForInstall_SkipIfProjectArtifactMetadataResolvedFlagIsSet()
-    // throws IOException, ArtifactInstallationException, XmlPullParserException
-    // {
-    // Model model = buildTestModel();
-    //
-    // File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
-    // pomDir.delete();
-    // pomDir.mkdirs();
-    // try
-    // {
-    // File pomFile = new File( pomDir, "pom.xml" );
-    // pomFile.deleteOnExit();
-    //
-    // FileWriter writer = null;
-    // try
-    // {
-    // writer = new FileWriter( pomFile );
-    // new MavenXpp3Writer().write( writer, model );
-    // }
-    // finally
-    // {
-    // IOUtil.close( writer );
-    // }
-    //
-    // Artifact a =
-    // new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
-    // new DefaultArtifactHandler( "jar" ), false );
-    // ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
-    // pam.setVersionExpressionsResolved( true );
-    //
-    // a.addMetadata( pam );
-    //
-    // transformation.transformForInstall( a, null );
-    //
-    // assertEquals( pomFile, pam.getFile() );
-    //
-    // assertFalse( new File( pomDir, "target/pom-transformed.xml" ).exists() );
-    //
-    // FileReader reader = null;
-    // try
-    // {
-    // reader = new FileReader( pomFile );
-    // model = new MavenXpp3Reader().read( reader );
-    // }
-    // finally
-    // {
-    // IOUtil.close( reader );
-    // }
-    //
-    // assertEquals( "${testVersion}", model.getVersion() );
-    // }
-    // finally
-    // {
-    // FileUtils.forceDelete( pomDir );
-    // }
-    // }
-
-    // FIXME: We can't be this smart (yet) since the deployment step transforms from the
-    // original POM once again and re-installs over the top of the install step.
-    // public void testTransformForDeploy_SkipIfProjectArtifactMetadataResolvedFlagIsSet()
-    // throws IOException, XmlPullParserException, ArtifactDeploymentException
-    // {
-    // Model model = buildTestModel();
-    //
-    // File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
-    // pomDir.delete();
-    // pomDir.mkdirs();
-    // try
-    // {
-    // File pomFile = new File( pomDir, "pom.xml" );
-    // pomFile.deleteOnExit();
-    //
-    // FileWriter writer = null;
-    // try
-    // {
-    // writer = new FileWriter( pomFile );
-    // new MavenXpp3Writer().write( writer, model );
-    // }
-    // finally
-    // {
-    // IOUtil.close( writer );
-    // }
-    //
-    // Artifact a =
-    // new DefaultArtifact( "group", "artifact", VersionRange.createFromVersion( "1" ), null, "jar", null,
-    // new DefaultArtifactHandler( "jar" ), false );
-    // ProjectArtifactMetadata pam = new ProjectArtifactMetadata( a, pomFile );
-    // pam.setVersionExpressionsResolved( true );
-    //
-    // a.addMetadata( pam );
-    //
-    // transformation.transformForDeployment( a, null, null );
-    //
-    // assertEquals( pomFile, pam.getFile() );
-    //
-    // assertFalse( new File( pomDir, "target/pom-transformed.xml" ).exists() );
-    //
-    // FileReader reader = null;
-    // try
-    // {
-    // reader = new FileReader( pomFile );
-    // model = new MavenXpp3Reader().read( reader );
-    // }
-    // finally
-    // {
-    // IOUtil.close( reader );
-    // }
-    //
-    // assertEquals( "${testVersion}", model.getVersion() );
-    // }
-    // finally
-    // {
-    // FileUtils.forceDelete( pomDir );
-    // }
-    // }
-
     public void testTransformVersion_ShouldInterpolate_VanillaArtifact_ModelProperties()
         throws IOException, XmlPullParserException, ModelInterpolationException
     {
-        Model model = buildTestModel();
+        File pomDir = File.createTempFile( "CoordinateInterpolationTest.", ".tmp.dir" );
+        pomDir.delete();
+        pomDir.mkdirs();
 
-        File newPom = runTransformVersion_VanillaArtifact( model, null );
+        toDelete.add( pomDir );
+
+        Model model = buildTestModel( pomDir );
+
+        File newPom = runTransformVersion_VanillaArtifact( model, new File( pomDir, "pom.xml" ) );
 
         FileReader reader = null;
         try
@@ -597,9 +402,17 @@ public class VersionExpressionTransformationTest
     public void testTransformVersion_ShouldInterpolate_ArtifactWithProject_ModelProperties()
         throws IOException, XmlPullParserException, ModelInterpolationException
     {
-        Model model = buildTestModel();
+        File pomDir = File.createTempFile( "CoordinateInterpolationTest.", ".tmp.dir" );
+        pomDir.delete();
+        pomDir.mkdirs();
 
-        File newPom = runTransformVersion_ArtifactWithProject( model, new DefaultProjectBuilderConfiguration(), null );
+        toDelete.add( pomDir );
+
+        Model model = buildTestModel( pomDir );
+
+        File newPom =
+            runTransformVersion_ArtifactWithProject( model, new DefaultProjectBuilderConfiguration(),
+                                                     new File( pomDir, "pom.xml" ) );
 
         FileReader reader = null;
         try
@@ -619,7 +432,13 @@ public class VersionExpressionTransformationTest
     public void testTransformVersion_ShouldInterpolate_ArtifactWithProject_CLIProperties()
         throws IOException, XmlPullParserException, ModelInterpolationException
     {
-        Model model = buildTestModel();
+        File pomDir = File.createTempFile( "CoordinateInterpolationTest.", ".tmp.dir" );
+        pomDir.delete();
+        pomDir.mkdirs();
+
+        toDelete.add( pomDir );
+
+        Model model = buildTestModel( pomDir );
 
         Properties props = model.getProperties();
         model.setProperties( new Properties() );
@@ -628,7 +447,7 @@ public class VersionExpressionTransformationTest
             runTransformVersion_ArtifactWithProject(
                                                      model,
                                                      new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
-                                                     null );
+                                                     new File( pomDir, "pom.xml" ) );
 
         FileReader reader = null;
         try
@@ -648,21 +467,11 @@ public class VersionExpressionTransformationTest
     private File runTransformVersion_VanillaArtifact( Model model, File pomFile )
         throws IOException, XmlPullParserException, ModelInterpolationException
     {
-        File projectDir;
-        if ( pomFile != null )
+        File projectDir = pomFile.getParentFile();
+
+        if ( !pomFile.exists() )
         {
-            projectDir = pomFile.getParentFile();
-        }
-        else
-        {
-            projectDir = File.createTempFile( "VersionExpressionTransformationTest.project.", ".tmp.dir" );
-            projectDir.delete();
             projectDir.mkdirs();
-
-            toDelete.add( projectDir );
-
-            pomFile = new File( projectDir, "pom.xml" );
-
             FileWriter writer = null;
             try
             {
@@ -675,7 +484,7 @@ public class VersionExpressionTransformationTest
             }
         }
 
-        File repoDir = File.createTempFile( "VersionExpressionTransformationTest.repo.", ".tmp.dir" );
+        File repoDir = File.createTempFile( "CoordinateInterpolationTest.repo.", ".tmp.dir" );
         repoDir.delete();
         repoDir.mkdirs();
 
@@ -691,39 +500,34 @@ public class VersionExpressionTransformationTest
 
         model.getBuild().setDirectory( dir.getAbsolutePath() );
 
-        Artifact a =
-            new DefaultArtifact( model.getGroupId(), model.getArtifactId(), VersionRange.createFromVersion( "1" ),
-                                 null, "jar", null, new DefaultArtifactHandler( "jar" ) );
-
-        a.addMetadata( new ProjectArtifactMetadata( a, pomFile ) );
-
         ArtifactRepository localRepository =
             new DefaultArtifactRepository( "local", repoDir.getAbsolutePath(), new DefaultRepositoryLayout() );
 
-        transformation.transformVersions( pomFile, a, localRepository );
+        MavenProject project = new MavenProject( model );
+        project.setOriginalModel( model );
+        project.setFile( pomFile );
 
-        return new File( projectDir, "target/pom-transformed.xml" );
+        ProjectBuilderConfiguration pbc = new DefaultProjectBuilderConfiguration();
+        pbc.setLocalRepository( localRepository );
+
+        project.setProjectBuilderConfiguration( pbc );
+
+        interpolator.interpolateArtifactCoordinates( project );
+
+        assertNotSame( pomFile, project.getFile() );
+
+        return new File( projectDir, CoordinateInterpolator.COORDINATE_INTERPOLATED_POMFILE );
     }
 
     private File runTransformVersion_ArtifactWithProject( Model model, ProjectBuilderConfiguration pbConfig,
                                                           File pomFile )
         throws IOException, XmlPullParserException, ModelInterpolationException
     {
-        File projectDir;
-        if ( pomFile != null )
+        File projectDir = pomFile.getParentFile();
+
+        if ( !pomFile.exists() )
         {
-            projectDir = pomFile.getParentFile();
-        }
-        else
-        {
-            projectDir = File.createTempFile( "VersionExpressionTransformationTest.project.", ".tmp.dir" );
-            projectDir.delete();
             projectDir.mkdirs();
-
-            toDelete.add( projectDir );
-
-            pomFile = new File( projectDir, "pom.xml" );
-
             FileWriter writer = null;
             try
             {
@@ -736,7 +540,7 @@ public class VersionExpressionTransformationTest
             }
         }
 
-        File repoDir = File.createTempFile( "VersionExpressionTransformationTest.repo.", ".tmp.dir" );
+        File repoDir = File.createTempFile( "CoordinateInterpolationTest.repo.", ".tmp.dir" );
         repoDir.delete();
         repoDir.mkdirs();
 
@@ -753,38 +557,39 @@ public class VersionExpressionTransformationTest
         model.getBuild().setDirectory( dir.getAbsolutePath() );
 
         MavenProject project = new MavenProject( model );
+        project.setOriginalModel( model );
         project.setFile( pomFile );
         project.setBasedir( projectDir );
         project.setProjectBuilderConfiguration( pbConfig );
 
-        ArtifactWithProject a =
-            new ArtifactWithProject( project, "jar", null, new DefaultArtifactHandler( "jar" ), false );
-
-        a.addMetadata( new ProjectArtifactMetadata( a, pomFile ) );
-
         ArtifactRepository localRepository =
             new DefaultArtifactRepository( "local", repoDir.getAbsolutePath(), new DefaultRepositoryLayout() );
 
-        transformation.transformVersions( pomFile, a, localRepository );
+        pbConfig.setLocalRepository( localRepository );
 
-        return new File( project.getBuild().getDirectory(), "pom-transformed.xml" );
+        interpolator.interpolateArtifactCoordinates( project );
+
+        assertNotSame( pomFile, project.getFile() );
+
+        return new File( projectDir, CoordinateInterpolator.COORDINATE_INTERPOLATED_POMFILE );
     }
 
     public void testInterpolate_ShouldNotInterpolateNonVersionFields()
         throws ModelInterpolationException, IOException, XmlPullParserException
     {
-        Model model = buildTestModel();
+        File pomDir = File.createTempFile( "CoordinateInterpolationTest.", ".tmp.dir" );
+        pomDir.delete();
+        pomDir.mkdirs();
+
+        toDelete.add( pomDir );
+
+        Model model = buildTestModel( pomDir );
 
         Scm scm = new Scm();
         scm.setUrl( "http://${testVersion}" );
 
         model.setScm( scm );
 
-        File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
-        pomDir.delete();
-        pomDir.mkdirs();
-
-        toDelete.add( pomDir );
         File pomFile = new File( pomDir, "pom.xml" );
 
         FileWriter writer = null;
@@ -798,20 +603,18 @@ public class VersionExpressionTransformationTest
             IOUtil.close( writer );
         }
 
-        File output = new File( pomDir, "output.xml" );
+        File output = new File( pomDir, CoordinateInterpolator.COORDINATE_INTERPOLATED_POMFILE );
 
-        transformation.interpolateVersions( pomFile, output, model, pomDir, new DefaultProjectBuilderConfiguration() );
+        MavenProject project = new MavenProject( model );
+        project.setOriginalModel( model );
+        project.setFile( pomFile );
+        project.setProjectBuilderConfiguration( new DefaultProjectBuilderConfiguration() );
 
-        FileReader reader = null;
-        try
-        {
-            reader = new FileReader( output );
-            model = new MavenXpp3Reader().read( reader );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
+        interpolator.interpolateArtifactCoordinates( project );
+
+        assertTrue( output.exists() );
+
+        model = readModel( output );
 
         // /project/scm/url
         assertFalse( model.getScm().getUrl().indexOf( VERSION ) > -1 );
@@ -820,12 +623,14 @@ public class VersionExpressionTransformationTest
     public void testInterpolate_ShouldInterpolateAllVersionsUsingPOMProperties()
         throws ModelInterpolationException, IOException, XmlPullParserException
     {
-        Model model = buildTestModel();
-        File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
+        File pomDir = File.createTempFile( "CoordinateInterpolationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
 
         toDelete.add( pomDir );
+
+        Model model = buildTestModel( pomDir );
+
         File pomFile = new File( pomDir, "pom.xml" );
 
         FileWriter writer = null;
@@ -839,9 +644,16 @@ public class VersionExpressionTransformationTest
             IOUtil.close( writer );
         }
 
-        File output = new File( pomDir, "output.xml" );
+        File output = new File( pomDir, CoordinateInterpolator.COORDINATE_INTERPOLATED_POMFILE );
 
-        transformation.interpolateVersions( pomFile, output, model, pomDir, new DefaultProjectBuilderConfiguration() );
+        MavenProject project = new MavenProject( model );
+        project.setOriginalModel( model );
+        project.setFile( pomFile );
+        project.setProjectBuilderConfiguration( new DefaultProjectBuilderConfiguration() );
+
+        interpolator.interpolateArtifactCoordinates( project );
+
+        assertTrue( output.exists() );
 
         FileReader reader = null;
         try
@@ -926,12 +738,13 @@ public class VersionExpressionTransformationTest
     public void testInterpolate_ShouldInterpolateAllVersionsUsingCLIProperties()
         throws ModelInterpolationException, IOException, XmlPullParserException
     {
-        Model model = buildTestModel();
-        File pomDir = File.createTempFile( "VersionExpressionTransformationTest.", ".tmp.dir" );
+        File pomDir = File.createTempFile( "CoordinateInterpolationTest.", ".tmp.dir" );
         pomDir.delete();
         pomDir.mkdirs();
 
         toDelete.add( pomDir );
+
+        Model model = buildTestModel( pomDir );
 
         File pomFile = new File( pomDir, "pom.xml" );
 
@@ -949,10 +762,16 @@ public class VersionExpressionTransformationTest
         Properties props = model.getProperties();
         model.setProperties( new Properties() );
 
-        File output = new File( pomDir, "output.xml" );
+        File output = new File( pomDir, CoordinateInterpolator.COORDINATE_INTERPOLATED_POMFILE );
 
-        transformation.interpolateVersions( pomFile, output, model, pomDir,
-                                            new DefaultProjectBuilderConfiguration().setExecutionProperties( props ) );
+        MavenProject project = new MavenProject( model );
+        project.setOriginalModel( model );
+        project.setFile( pomFile );
+        project.setProjectBuilderConfiguration( new DefaultProjectBuilderConfiguration().setExecutionProperties( props ) );
+
+        interpolator.interpolateArtifactCoordinates( project );
+
+        assertTrue( output.exists() );
 
         FileReader reader = null;
         try
@@ -968,7 +787,7 @@ public class VersionExpressionTransformationTest
         assertTransformedVersions( model );
     }
 
-    public Model buildTestModel()
+    public Model buildTestModel( File pomDir )
     {
         Model model = new Model();
 
@@ -1004,6 +823,11 @@ public class VersionExpressionTransformationTest
 
         Build build = new Build();
         model.setBuild( build );
+
+        File dir = new File( pomDir, "target" );
+        dir.mkdirs();
+
+        build.setDirectory( dir.getAbsolutePath() );
 
         Plugin plugin = new Plugin();
         plugin.setGroupId( "plugin.group" );

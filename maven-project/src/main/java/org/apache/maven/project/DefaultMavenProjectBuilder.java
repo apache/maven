@@ -82,6 +82,7 @@ import org.apache.maven.project.artifact.ProjectArtifactFactory;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.injection.ProfileInjector;
+import org.apache.maven.project.interpolation.CoordinateInterpolator;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
@@ -171,6 +172,8 @@ public class DefaultMavenProjectBuilder
     private ModelDefaultsInjector modelDefaultsInjector;
 
     private ModelInterpolator modelInterpolator;
+    
+    private CoordinateInterpolator coordinateInterpolator;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
@@ -905,17 +908,21 @@ public class DefaultMavenProjectBuilder
 
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
+
+            try
+            {
+                coordinateInterpolator.interpolateArtifactCoordinates( project );
+            }
+            catch ( IOException e )
+            {
+                throw new ProjectBuildingException( project.getId(), "Failed to write POM with interpolated coordinate expressions.", e );
+            }
+            catch ( ModelInterpolationException e )
+            {
+                throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
+            }
         }
-
-//        try
-//        {
-//            calculateConcreteState( project, config );
-//        }
-//        catch ( ModelInterpolationException e )
-//        {
-//            throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
-//        }
-
+        
         project.setManagedVersionMap( createManagedVersionMap( projectId,
                                                                project.getDependencyManagement(),
                                                                project.getParent() ) );

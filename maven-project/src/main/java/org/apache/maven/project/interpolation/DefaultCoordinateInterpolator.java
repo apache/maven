@@ -1,4 +1,4 @@
-package org.apache.maven.project.artifact;
+package org.apache.maven.project.interpolation;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,20 +19,9 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
-import org.apache.maven.artifact.installer.ArtifactInstallationException;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.transform.ArtifactTransformation;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.project.interpolation.ModelInterpolationException;
-import org.apache.maven.project.interpolation.StringSearchModelInterpolator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -40,13 +29,11 @@ import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.interpolation.SimpleRecursionInterceptor;
 import org.codehaus.plexus.interpolation.ValueSource;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.XmlStreamWriter;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -56,7 +43,6 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -82,9 +68,9 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-public class VersionExpressionTransformation
+public class DefaultCoordinateInterpolator
     extends StringSearchModelInterpolator
-    implements Initializable, ArtifactTransformation
+    implements CoordinateInterpolator
 {
 
     private static final List<String> VERSION_INTERPOLATION_TARGET_XPATHS;
@@ -121,201 +107,53 @@ public class VersionExpressionTransformation
         VERSION_INTERPOLATION_TARGET_XPATHS = targets;
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
-                                        ArtifactRepository localRepository )
-        throws ArtifactDeploymentException
-    {
-        ProjectArtifactMetadata metadata = ArtifactWithProject.getProjectArtifactMetadata( artifact );
-        File pomFile;
-        boolean pomArtifact = false;
-        if ( "pom".equals( artifact.getType() ) )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "On Deploy: Using artifact file for POM: " + artifact );
-            }
-            pomFile = artifact.getFile();
-            pomArtifact = true;
-        }
-        // FIXME: We can't be this smart (yet) since the deployment step transforms from the
-        // original POM once again and re-installs over the top of the install step.
-        // else if ( metadata == null || metadata.isVersionExpressionsResolved() )
-        // {
-        // return;
-        // }
-        else if ( metadata != null )
-        {
-            pomFile = metadata.getFile();
-        }
-        else
-        {
-            return;
-        }
-
-        try
-        {
-            File outFile = transformVersions( pomFile, artifact, localRepository );
-
-            if ( pomArtifact )
-            {
-                // FIXME: We need a way to mark a POM artifact as resolved WRT version expressions, so we don't
-                // reprocess...
-                artifact.setFile( outFile );
-            }
-            else
-            {
-                metadata.setFile( outFile );
-                metadata.setVersionExpressionsResolved( true );
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactDeploymentException( "Failed to read or write POM for version transformation.", e );
-        }
-        catch ( ModelInterpolationException e )
-        {
-            throw new ArtifactDeploymentException( "Failed to interpolate POM versions.", e );
-        }
-    }
-
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
-        throws ArtifactInstallationException
-    {
-        ProjectArtifactMetadata metadata =
-            (ProjectArtifactMetadata) artifact.getMetadata( ProjectArtifactMetadata.class );
-        File pomFile;
-        boolean pomArtifact = false;
-        if ( "pom".equals( artifact.getType() ) )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "On Install: Using artifact file for POM: " + artifact );
-            }
-            pomFile = artifact.getFile();
-            pomArtifact = true;
-        }
-        // FIXME: We can't be this smart (yet) since the deployment step transforms from the
-        // original POM once again and re-installs over the top of the install step.
-        // else if ( metadata == null || metadata.isVersionExpressionsResolved() )
-        // {
-        // return;
-        // }
-        else if ( metadata != null )
-        {
-            pomFile = metadata.getFile();
-        }
-        else
-        {
-            return;
-        }
-
-        try
-        {
-            File outFile = transformVersions( pomFile, artifact, localRepository );
-
-            if ( pomArtifact )
-            {
-                // FIXME: We need a way to mark a POM artifact as resolved WRT version expressions, so we don't
-                // reprocess...
-                artifact.setFile( outFile );
-            }
-            else
-            {
-                metadata.setFile( outFile );
-                metadata.setVersionExpressionsResolved( true );
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactInstallationException( "Failed to read or write POM for version transformation.", e );
-        }
-        catch ( ModelInterpolationException e )
-        {
-            throw new ArtifactInstallationException( "Failed to interpolate POM versions.", e );
-        }
-    }
-
-    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                                     ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        return;
-    }
-
-    protected File transformVersions( File pomFile, Artifact artifact, ArtifactRepository localRepository )
+    public synchronized void interpolateArtifactCoordinates( MavenProject project )
         throws IOException, ModelInterpolationException
     {
-        ProjectBuilderConfiguration pbConfig;
-        File projectDir;
-        File outputFile;
-        if ( artifact instanceof ArtifactWithProject )
-        {
-            MavenProject project = ( (ArtifactWithProject) artifact ).getProject();
+        ProjectBuilderConfiguration config = project.getProjectBuilderConfiguration();
+        Model model = project.getOriginalModel();
+        File projectDir = project.getBasedir();
+        File pomFile = project.getFile();
+        
+        File outputFile = new File( projectDir, COORDINATE_INTERPOLATED_POMFILE );
+        outputFile.deleteOnExit();
+        
+        getLogger().debug( "POM artifact coordinates are being interpolated. New POM will be stored at: " + outputFile );
 
-            projectDir = project.getBasedir();
-            pbConfig = project.getProjectBuilderConfiguration();
-            outputFile = new File( project.getBuild().getDirectory(), "pom-transformed.xml" );
-        }
-        else
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                                   "WARNING: Artifact: "
-                                       + artifact
-                                       + " does not have project-builder metadata (ProjectBuilderConfiguration) associated with it.\n"
-                                       + "Cannot access CLI properties for version transformation." );
-            }
+        List<ValueSource> valueSources = createValueSources( model, projectDir, config );
+        List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
-            pbConfig = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
-            projectDir = pomFile.getAbsoluteFile().getParentFile();
-            outputFile = new File( projectDir, "target/pom-transformed.xml" );
-        }
+        String pomContents = doInterpolation( pomFile, valueSources, postProcessors );
 
-        Reader reader = null;
-        Model model;
+        Writer writer = null;
         try
         {
-            reader = ReaderFactory.newXmlReader( pomFile );
-            model = new MavenXpp3Reader().read( reader );
+            if ( outputFile.getParentFile() != null )
+            {
+                outputFile.getParentFile().mkdirs();
+            }
 
-            interpolateVersions( pomFile, outputFile, model, projectDir, pbConfig );
+            writer = WriterFactory.newXmlWriter( outputFile );
+
+            IOUtil.copy( pomContents, writer );
         }
-        catch ( XmlPullParserException e )
+        catch ( IOException e )
         {
-            String message =
-                "Failed to parse POM for version transformation. Proceeding with original (non-interpolated) POM file.";
-
-            String detail =
-                "\n\nNOTE: Error was in file: " + pomFile + ", at line: " + e.getLineNumber() + ", column: "
-                    + e.getColumnNumber();
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( message + detail, e );
-            }
-            else
-            {
-                getLogger().warn( message + " See debug output for details." );
-            }
-
-            outputFile = pomFile;
+            throw new ModelInterpolationException( "Failed to write transformed POM: "
+                + outputFile.getAbsolutePath(), e );
         }
         finally
         {
-            IOUtil.close( reader );
+            IOUtil.close( writer );
         }
-
-        return outputFile;
+        
+        project.setFile( outputFile );
     }
 
-    @SuppressWarnings("unchecked")
-    protected void interpolateVersions( File pomFile, File outputFile, Model model, File projectDir,
-                                        ProjectBuilderConfiguration config )
+    private String doInterpolation( File pomFile, List<ValueSource> valueSources,
+                                    List<InterpolationPostProcessor> postProcessors )
         throws ModelInterpolationException
     {
-        boolean debugEnabled = getLogger().isDebugEnabled();
-
         // NOTE: We want to interpolate version expressions ONLY, and want to do so without requiring the
         // use of the XPP3 Model reader/writers, which have a tendency to lose XML comments and such.
         // SOOO, we're using a two-stage string interpolation here. The first stage selects all XML 'version'
@@ -333,130 +171,110 @@ public class VersionExpressionTransformation
         // once we've isolated the version elements from the input XML.
         interpolator.addValueSource( new SecondaryInterpolationValueSource( secondaryInterpolator, recursionInterceptor ) );
 
-        List<ValueSource> valueSources = createValueSources( model, projectDir, config );
-        List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
+        for ( ValueSource vs : valueSources )
+        {
+            secondaryInterpolator.addValueSource( vs );
+        }
 
-        synchronized ( this )
+        for ( InterpolationPostProcessor postProcessor : postProcessors )
+        {
+            secondaryInterpolator.addPostProcessor( postProcessor );
+        }
+        
+        String pomContents;
+        try
+        {
+            XmlStreamReader reader = null;
+            try
+            {
+                reader = ReaderFactory.newXmlReader( pomFile );
+                pomContents = IOUtil.toString( reader );
+                interpolator.setEncoding( reader.getEncoding() );
+            }
+            catch ( IOException e )
+            {
+                throw new ModelInterpolationException( "Error reading POM for version-expression interpolation: "
+                    + e.getMessage(), e );
+            }
+            finally
+            {
+                IOUtil.close( reader );
+            }
+
+            try
+            {
+                pomContents = interpolator.interpolate( pomContents );
+            }
+            catch ( InterpolationException e )
+            {
+                throw new ModelInterpolationException( e.getMessage(), e );
+            }
+
+            giveFeedback( interpolator );
+
+            interpolator.clearFeedback();
+        }
+        finally
         {
             for ( ValueSource vs : valueSources )
             {
-                secondaryInterpolator.addValueSource( vs );
+                secondaryInterpolator.removeValuesSource( vs );
             }
 
             for ( InterpolationPostProcessor postProcessor : postProcessors )
             {
-                secondaryInterpolator.addPostProcessor( postProcessor );
+                secondaryInterpolator.removePostProcessor( postProcessor );
             }
 
-            String pomContents;
-            try
+            getInterpolator().clearAnswers();
+        }
+        
+        return pomContents;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void giveFeedback( Interpolator interpolator )
+    {
+        if ( getLogger() == null || !getLogger().isDebugEnabled() )
+        {
+            return;
+        }
+        
+        List<Object> feedback = interpolator.getFeedback();
+        if ( feedback != null && !feedback.isEmpty() )
+        {
+            getLogger().debug( "Maven encountered the following problems while transforming POM versions:" );
+
+            Object last = null;
+            for ( Object next : feedback )
             {
-                XmlStreamReader reader = null;
-                try
+                if ( next instanceof Throwable )
                 {
-                    reader = ReaderFactory.newXmlReader( pomFile );
-                    pomContents = IOUtil.toString( reader );
-                    interpolator.setEncoding( reader.getEncoding() );
-                }
-                catch ( IOException e )
-                {
-                    throw new ModelInterpolationException( "Error reading POM for version-expression interpolation: "
-                        + e.getMessage(), e );
-                }
-                finally
-                {
-                    IOUtil.close( reader );
-                }
-
-                try
-                {
-                    pomContents = interpolator.interpolate( pomContents );
-                }
-                catch ( InterpolationException e )
-                {
-                    throw new ModelInterpolationException( e.getMessage(), e );
-                }
-
-                if ( debugEnabled )
-                {
-                    List<Object> feedback = (List<Object>) interpolator.getFeedback();
-                    if ( feedback != null && !feedback.isEmpty() )
+                    if ( last == null )
                     {
-                        getLogger().debug( "Maven encountered the following problems while transforming POM versions:" );
-
-                        Object last = null;
-                        for ( Object next : feedback )
-                        {
-                            if ( next instanceof Throwable )
-                            {
-                                if ( last == null )
-                                {
-                                    getLogger().debug( "", ( (Throwable) next ) );
-                                }
-                                else
-                                {
-                                    getLogger().debug( String.valueOf( last ), ( (Throwable) next ) );
-                                }
-                            }
-                            else
-                            {
-                                if ( last != null )
-                                {
-                                    getLogger().debug( String.valueOf( last ) );
-                                }
-
-                                last = next;
-                            }
-                        }
-
-                        if ( last != null )
-                        {
-                            getLogger().debug( String.valueOf( last ) );
-                        }
+                        getLogger().debug( "", ( (Throwable) next ) );
+                    }
+                    else
+                    {
+                        getLogger().debug( String.valueOf( last ), ( (Throwable) next ) );
                     }
                 }
-
-                interpolator.clearFeedback();
-            }
-            finally
-            {
-                for ( ValueSource vs : valueSources )
+                else
                 {
-                    secondaryInterpolator.removeValuesSource( vs );
+                    if ( last != null )
+                    {
+                        getLogger().debug( String.valueOf( last ) );
+                    }
+
+                    last = next;
                 }
-
-                for ( InterpolationPostProcessor postProcessor : postProcessors )
-                {
-                    secondaryInterpolator.removePostProcessor( postProcessor );
-                }
-
-                getInterpolator().clearAnswers();
             }
 
-            Writer writer = null;
-            try
+            if ( last != null )
             {
-                outputFile.getParentFile().mkdirs();
-
-                writer = WriterFactory.newXmlWriter( outputFile );
-
-                IOUtil.copy( pomContents, writer );
-            }
-            catch ( IOException e )
-            {
-                throw new ModelInterpolationException( "Failed to write transformed POM: "
-                    + outputFile.getAbsolutePath(), e );
-            }
-            finally
-            {
-                IOUtil.close( writer );
+                getLogger().debug( String.valueOf( last ) );
             }
         }
-
-        // if ( error != null )
-        // {
-        // throw error;
-        // }
     }
 
     private static final class SecondaryInterpolationValueSource
@@ -595,12 +413,12 @@ public class VersionExpressionTransformation
             {
                 if ( encoding != null )
                 {
-                    logger.info( "Writing transformed POM using encoding: " + encoding );
+                    logger.debug( "Writing transformed POM using encoding: " + encoding );
                     transformer.setOutputProperty( OutputKeys.ENCODING, encoding );
                 }
                 else
                 {
-                    logger.info( "Writing transformed POM using default encoding" );
+                    logger.debug( "Writing transformed POM using default encoding" );
                 }
                 
                 transformer.transform( s, r );
