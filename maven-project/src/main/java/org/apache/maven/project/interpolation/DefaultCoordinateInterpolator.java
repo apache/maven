@@ -79,6 +79,55 @@ public class DefaultCoordinateInterpolator
     {
         List<String> targets = new ArrayList<String>();
 
+        // groupId
+        targets.add( "/project/parent/groupId/text()" );
+        targets.add( "/project/groupId/text()" );
+        
+        targets.add( "/project/dependencies/dependency/groupId/text()" );
+        targets.add( "/project/dependencyManagement/dependencies/dependency/groupId/text()" );
+        
+        targets.add( "/project/build/plugins/plugin/groupId/text()" );
+        targets.add( "/project/build/pluginManagement/plugins/plugin/groupId/text()" );
+        targets.add( "/project/build/plugins/plugin/dependencies/dependency/groupId/text()" );
+        targets.add( "/project/build/pluginManagement/plugins/plugin/dependencies/dependency/groupId/text()" );
+        
+        targets.add( "/project/reporting/plugins/plugin/groupId/text()" );
+
+        targets.add( "/project/profiles/profile/dependencies/dependency/groupId/text()" );
+        targets.add( "/project/profiles/profile/dependencyManagement/dependencies/dependency/groupId/text()" );
+        
+        targets.add( "/project/profiles/profile/build/plugins/plugin/groupId/text()" );
+        targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/groupId/text()" );
+        targets.add( "/project/profiles/profile/build/plugins/plugin/dependencies/dependency/groupId/text()" );
+        targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/groupId/text()" );
+        
+        targets.add( "/project/profiles/profile/reporting/plugins/plugin/groupId/text()" );
+
+        // artifactId
+        targets.add( "/project/parent/artifactId/text()" );
+        targets.add( "/project/artifactId/text()" );
+        
+        targets.add( "/project/dependencies/dependency/artifactId/text()" );
+        targets.add( "/project/dependencyManagement/dependencies/dependency/artifactId/text()" );
+        
+        targets.add( "/project/build/plugins/plugin/artifactId/text()" );
+        targets.add( "/project/build/pluginManagement/plugins/plugin/artifactId/text()" );
+        targets.add( "/project/build/plugins/plugin/dependencies/dependency/artifactId/text()" );
+        targets.add( "/project/build/pluginManagement/plugins/plugin/dependencies/dependency/artifactId/text()" );
+        
+        targets.add( "/project/reporting/plugins/plugin/artifactId/text()" );
+
+        targets.add( "/project/profiles/profile/dependencies/dependency/artifactId/text()" );
+        targets.add( "/project/profiles/profile/dependencyManagement/dependencies/dependency/artifactId/text()" );
+        
+        targets.add( "/project/profiles/profile/build/plugins/plugin/artifactId/text()" );
+        targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/artifactId/text()" );
+        targets.add( "/project/profiles/profile/build/plugins/plugin/dependencies/dependency/artifactId/text()" );
+        targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/artifactId/text()" );
+        
+        targets.add( "/project/profiles/profile/reporting/plugins/plugin/artifactId/text()" );
+
+        // version
         targets.add( "/project/parent/version/text()" );
         targets.add( "/project/version/text()" );
         
@@ -101,7 +150,34 @@ public class DefaultCoordinateInterpolator
         targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/version/text()" );
         
         targets.add( "/project/profiles/profile/reporting/plugins/plugin/version/text()" );
+        
+        // other dependency-specific elements
+        // classifier
+        targets.add( "/project/dependencies/dependency/classifier/text()" );
+        targets.add( "/project/dependencyManagement/dependencies/dependency/classifier/text()" );
+        
+        targets.add( "/project/build/plugins/plugin/dependencies/dependency/classifier/text()" );
+        targets.add( "/project/build/pluginManagement/plugins/plugin/dependencies/dependency/classifier/text()" );
+        
+        targets.add( "/project/profiles/profile/dependencies/dependency/classifier/text()" );
+        targets.add( "/project/profiles/profile/dependencyManagement/dependencies/dependency/classifier/text()" );
+        
+        targets.add( "/project/profiles/profile/build/plugins/plugin/dependencies/dependency/classifier/text()" );
+        targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/classifier/text()" );
 
+        // type
+        targets.add( "/project/dependencies/dependency/type/text()" );
+        targets.add( "/project/dependencyManagement/dependencies/dependency/type/text()" );
+        
+        targets.add( "/project/build/plugins/plugin/dependencies/dependency/type/text()" );
+        targets.add( "/project/build/pluginManagement/plugins/plugin/dependencies/dependency/type/text()" );
+        
+        targets.add( "/project/profiles/profile/dependencies/dependency/type/text()" );
+        targets.add( "/project/profiles/profile/dependencyManagement/dependencies/dependency/type/text()" );
+        
+        targets.add( "/project/profiles/profile/build/plugins/plugin/dependencies/dependency/type/text()" );
+        targets.add( "/project/profiles/profile/build/pluginManagement/plugins/plugin/dependencies/dependency/type/text()" );
+        
         targets = Collections.unmodifiableList( targets );
 
         VERSION_INTERPOLATION_TARGET_XPATHS = targets;
