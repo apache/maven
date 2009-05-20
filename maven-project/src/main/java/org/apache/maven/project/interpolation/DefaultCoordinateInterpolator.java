@@ -78,6 +78,9 @@ public class DefaultCoordinateInterpolator
     static
     {
         List<String> targets = new ArrayList<String>();
+        
+        // packaging
+        targets.add( "/project/packaging/text()" );
 
         // groupId
         targets.add( "/project/parent/groupId/text()" );
