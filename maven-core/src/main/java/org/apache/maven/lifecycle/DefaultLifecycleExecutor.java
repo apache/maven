@@ -267,24 +267,6 @@ public class DefaultLifecycleExecutor
             // on to the given phases in the lifecycle are going to be a little different then, say, a project of type JAR.
             //
 
-            Map<String, String> lifecyclePhasesForPackaging;
-
-            if ( task.equals( "clean" ) )
-            {
-                lifecyclePhasesForPackaging = new HashMap<String, String>();
-
-                for ( String phase : lifecycle.getDefaultPhases() )
-                {
-                    lifecyclePhasesForPackaging.put( "clean", "org.apache.maven.plugins:maven-clean-plugin:clean" );
-                }
-            }
-            else
-            {
-                LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( project.getPackaging() );
-
-                lifecyclePhasesForPackaging = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() ).getPhases();
-            }
-
             // 3.
             //
             // Once we have the lifecycle mapping for the given packaging, we need to know whats phases we need to worry about executing.
@@ -300,7 +282,12 @@ public class DefaultLifecycleExecutor
             for ( String phase : lifecycle.getPhases() )
             {
                 List<String> mojos = new ArrayList<String>();
-
+                                
+                if ( phase.equals( "clean" ) )
+                {
+                    mojos.add( "org.apache.maven.plugins:maven-clean-plugin:clean" );
+                }
+                
                 // This is just just laying out the initial structure of the mojos to run in each phase of the
                 // lifecycle. Everything is now done in the project builder correctly so this could likely
                 // go away shortly. We no longer need to pull out bits from the default lifecycle. The MavenProject
@@ -384,31 +371,6 @@ public class DefaultLifecycleExecutor
 
                 MojoExecution mojoExecution = getMojoExecution( project, mojoDescriptor );
                 
-                /*
-                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
-
-                String g = mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId();
-
-                String a = mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId();
-
-                Plugin p = project.getPlugin( g + ":" + a );
-
-                for ( PluginExecution e : p.getExecutions() )
-                {
-                    for ( String goal : e.getGoals() )
-                    {
-                        if ( mojoDescriptor.getGoal().equals( goal ) )
-                        {
-                            Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
-
-                            Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoDescriptor );
-
-                            mojoExecution.setConfiguration( mojoConfiguration );
-                        }
-                    }
-                }
-                */
-
                 lifecyclePlan.add( mojoExecution );
             }
         }
