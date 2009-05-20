@@ -462,7 +462,7 @@ public class DefaultLifecycleExecutor
             // From the metadata stored on the server which has been created as part of a standard
             // Maven plugin deployment we will find the right PluginDescriptor from the remote
             // repository.
-
+            
             plugin = findPluginForPrefix( prefix, session );
         }
         else if ( numTokens == 3 || numTokens == 4 )
@@ -819,20 +819,23 @@ public class DefaultLifecycleExecutor
     
     private Map<String,Plugin> pluginPrefixes = new HashMap<String,Plugin>();
     
+    //TODO: take repo mans into account as one may be aggregating prefixes of many
+    //TODO: collect at the root of the repository, read the one at the root, and fetch remote if something is missing
+    //      or the user forces the issue
     public Plugin findPluginForPrefix( String prefix, MavenSession session )
         throws NoPluginFoundForPrefixException
     {
         // [prefix]:[goal]
-
+        
         Plugin plugin = pluginPrefixes.get( prefix );
         
         if ( plugin != null )
         {
             return plugin;
         }
-                
+                        
         for ( ArtifactRepository repository : session.getCurrentProject().getRemoteArtifactRepositories() )
-        {
+        {            
             for ( String pluginGroup : session.getPluginGroups() )
             {
                 // org.apache.maven.plugins
@@ -862,7 +865,7 @@ public class DefaultLifecycleExecutor
 
                 // We have retrieved the metadata
                 try
-                {
+                {                    
                     Metadata pluginGroupMetadata = readMetadata( destination );
                     
                     List<org.apache.maven.artifact.repository.metadata.Plugin> plugins = pluginGroupMetadata.getPlugins();

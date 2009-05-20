@@ -16,6 +16,7 @@ package org.apache.maven.embedder.execution;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +58,8 @@ public class DefaultMavenExecutionRequestPopulator
     {
         pom( request, configuration );
 
+        populateDefaultPluginGroups( request, configuration );
+        
         settings( request, configuration );
 
         localRepository( request, configuration );
@@ -94,6 +97,14 @@ public class DefaultMavenExecutionRequestPopulator
             request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
         }
     }
+        
+    private void populateDefaultPluginGroups( MavenExecutionRequest request, Configuration configuration )
+    {
+        List<String> pluginGroups = new ArrayList<String>();
+        pluginGroups.add( "org.apache.maven.plugins" );
+        pluginGroups.add( "org.codehaus.mojo" );
+        request.setPluginGroups( pluginGroups );        
+    }
     
     // Process plugin groups
     // Get profile models
@@ -102,8 +113,8 @@ public class DefaultMavenExecutionRequestPopulator
         throws MavenEmbedderException
     {
         Settings settings = request.getSettings();
-
-        request.setPluginGroups( settings.getPluginGroups() );
+        
+        request.getPluginGroups().addAll( settings.getPluginGroups() );
         
         List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
 

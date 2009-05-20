@@ -162,4 +162,15 @@ public class LifecycleExecutorTest
         assertEquals( "org.apache.maven.plugins", plugin.getGroupId() );
         assertEquals( "maven-resources-plugin", plugin.getArtifactId() );
     }    
+    
+    // Prefixes
+    
+    public void testFindingPluginPrefixforCleanClean()
+        throws Exception
+    {
+        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        MavenSession session = createMavenSession( pom );
+        Plugin plugin = lifecycleExecutor.findPluginForPrefix( "clean", session );
+        assertNotNull( plugin );
+    }
 }
