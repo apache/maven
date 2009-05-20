@@ -20,7 +20,6 @@
 package org.apache.maven.it;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.integrationtests.AbstractMavenIntegrationTestCase;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -56,7 +55,9 @@ public class MavenITmng4167PluginAndCoordXFormPOMTest
         verifier.deleteArtifact( "org.apache.maven.its.mng4167", "mng-4167", "1", "pom" );
 
 		String specVersion = System.getProperty( "java.specification.version" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng4167", "mng-4167", "1-" + specVersion, "pom" );
+		
+        verifier.deleteArtifact( "org.apache.maven.its.mng4167." + specVersion, "mng-4167-" + specVersion, "1-"
+            + specVersion, "pom" );
         
         verifier.setCliOptions( Collections.singletonList( "-X" ) );
 
@@ -68,7 +69,9 @@ public class MavenITmng4167PluginAndCoordXFormPOMTest
         
         assertFalse( derivedPomLines.equals( originalPomLines ) );
         
-        File repoPomPath = new File( verifier.getArtifactPath( "org.apache.maven.its.mng4167", "mng-4167", "1-" + specVersion, "pom" ) );
+        File repoPomPath =
+            new File( verifier.getArtifactPath( "org.apache.maven.its.mng4167." + specVersion, "mng-4167-"
+                + specVersion, "1-" + specVersion, "pom" ) );
         
         List repoPomLines = verifier.loadFile( repoPomPath, false );
         
