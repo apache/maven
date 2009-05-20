@@ -43,7 +43,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public interface LifecycleExecutor
 {    
     List<String> getLifecyclePhases();
-        
+       
     /**
      * Calculate the list of {@link org.apache.maven.plugin.descriptor.MojoDescriptor} objects to run for the selected lifecycle phase.
      * 
@@ -52,7 +52,7 @@ public interface LifecycleExecutor
      * @return
      * @throws LifecycleExecutionException
      */
-    List<MojoExecution> calculateBuildPlan( String lifecyclePhase, MavenSession session )
+    List<MojoExecution> calculateBuildPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException;
         
     // For a given project packaging find all the plugins that are bound to any registered

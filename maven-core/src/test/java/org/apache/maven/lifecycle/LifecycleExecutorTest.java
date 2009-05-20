@@ -62,7 +62,7 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( "resources:resources", session );
+        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "resources:resources" );
         assertEquals( 1, lifecyclePlan.size() );
         MojoExecution mojoExecution = lifecyclePlan.get( 0 );
         assertNotNull( mojoExecution );
@@ -80,7 +80,7 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( "clean", session );
+        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean" );
         assertEquals( 1, lifecyclePlan.size() );
         MojoExecution mojoExecution = lifecyclePlan.get( 0 );
         assertNotNull( mojoExecution );
@@ -89,6 +89,42 @@ public class LifecycleExecutorTest
         assertEquals( "2.2", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
     }
 
+    // We need to take in multiple lifecycles
+    public void testCalculationOfBuildPlanTasksOfTheCleanLifecycleAndTheInstallLifecycle()
+        throws Exception
+    {
+        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        MavenSession session = createMavenSession( pom );
+        assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
+        assertEquals( "1.0", session.getCurrentProject().getVersion() );
+        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean", "install" );        
+                        
+        //[01] clean:clean
+        //[02] resources:resources
+        //[03] compiler:compile
+        //[04] plexus-component-metadata:generate-metadata
+        //[05] resources:testResources
+        //[06] compiler:testCompile
+        //[07] plexus-component-metadata:generate-test-metadata
+        //[08] surefire:test
+        //[09] jar:jar
+        //[10] install:install
+        //
+        assertEquals( 10, lifecyclePlan.size() );
+                
+        assertEquals( "clean:clean", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:resources", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:compile", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:testResources", lifecyclePlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:testCompile", lifecyclePlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-test-metadata", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "surefire:test", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "jar:jar", lifecyclePlan.get( 8 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "install:install", lifecyclePlan.get( 9 ).getMojoDescriptor().getFullGoalName() );                
+    }
+    
+    
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal()
         throws Exception
     {
@@ -98,7 +134,7 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( "clean:clean", session );
+        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean:clean" );
         assertEquals( 1, lifecyclePlan.size() );
         MojoExecution mojoExecution = lifecyclePlan.get( 0 );
         assertNotNull( mojoExecution );
@@ -114,16 +150,18 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( "package", session );
+        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "package" );
         
-        // resources:resources
-        // compiler:compile
-        // plexus-component-metadata:generate-metadata
-        // resources:testResources
-        // compiler:testCompile
-        // plexus-component-metadata:generate-test-metadata
-        // surefire:test
-        // jar:jar
+        //[01] resources:resources
+        //[02] compiler:compile
+        //[03] plexus-component-metadata:generate-metadata
+        //[04] resources:testResources
+        //[05] compiler:testCompile
+        //[06] plexus-component-metadata:generate-test-metadata
+        //[07] surefire:test
+        //[08] jar:jar
+        //
+        assertEquals( 8, lifecyclePlan.size() );
                 
         assertEquals( "resources:resources", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:compile", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );

@@ -116,12 +116,17 @@ public class DefaultLifecycleExecutor
 
     public void execute( MavenSession session )
     {
+        // TODO: Use a listener here instead of loggers
+        
         logger.info(  "Build Order:" );
+        
         logger.info( "" );
+        
         for( MavenProject project : session.getProjects() )
         {
             logger.info( project.getName() );
         }
+        
         logger.info( "" );
         
         MavenProject rootProject = session.getTopLevelProject();
@@ -146,79 +151,231 @@ public class DefaultLifecycleExecutor
             {
                 session.setCurrentProject( currentProject );
 
-                for ( String goal : goals )
-                {                    
-                    List<MojoExecution> lifecyclePlan;
-                    
+                List<MojoExecution> lifecyclePlan;
+
+                try
+                {
+                    lifecyclePlan = calculateBuildPlan( session, goals.toArray( new String[] {} ) );
+                }
+                catch ( Exception e )
+                {
+                    session.getResult().addException( e );
+                    return;
+                }
+
+                //TODO: once we have calculated the build plan then we should accurately be able to download
+                // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
+                // later by looking at the build plan. Would be better to just batch download everything required by the reactor.
+
+                // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
+                try
+                {
+                    downloadProjectDependencies( session, Artifact.SCOPE_TEST /** mojoDescriptor.isDependencyResolutionRequired()*/ );
+                }
+                catch ( ArtifactNotFoundException e )
+                {
+                    session.getResult().addException( e );
+                    return;
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    session.getResult().addException( e );
+                    return;
+                }
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "=== BUILD PLAN ===" );
+                    logger.debug( "Project:       " + currentProject );
+                    for ( MojoExecution mojoExecution : lifecyclePlan )
+                    {
+                        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+                        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+                        logger.debug( "------------------" );
+                        logger.debug( "Goal:          " + pluginDescriptor.getGroupId() + ':' + pluginDescriptor.getArtifactId() + ':' + pluginDescriptor.getVersion() + ':' + mojoDescriptor.getGoal()
+                            + ':' + mojoExecution.getExecutionId() );
+                        logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
+                    }
+                    logger.debug( "==================" );
+                }
+
+                for ( MojoExecution mojoExecution : lifecyclePlan )
+                {
                     try
                     {
-                        lifecyclePlan = calculateBuildPlan( goal, session );
+                        logger.info( executionDescription( mojoExecution, currentProject ) );
+                        pluginManager.executeMojo( session, mojoExecution );
                     }
                     catch ( Exception e )
                     {
                         session.getResult().addException( e );
                         return;
-                    }        
-
-                    //TODO: once we have calculated the build plan then we should accurately be able to download
-                    // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
-                    // later by looking at the build plan. Would be better to just batch download everything required by the reactor.
-                    
-                    // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
-                    try
-                    {
-                        downloadProjectDependencies( session, Artifact.SCOPE_TEST /**mojoDescriptor.isDependencyResolutionRequired()*/ );
                     }
-                    catch ( ArtifactNotFoundException e )
-                    {
-                        session.getResult().addException( e );
-                        return;
-                    }
-                    catch ( ArtifactResolutionException e )
-                    {
-                        session.getResult().addException( e );
-                        return;
-                    }
-                    
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.debug( "=== BUILD PLAN ===" );
-                        logger.debug( "Project:       " + currentProject );
-                        for ( MojoExecution mojoExecution : lifecyclePlan )
-                        {
-                            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-                            PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-                            logger.debug( "------------------" );
-                            logger.debug( "Goal:          " + pluginDescriptor.getGroupId() + ':' + pluginDescriptor.getArtifactId() + ':'
-                                + pluginDescriptor.getVersion() + ':' + mojoDescriptor.getGoal() + ':'
-                                + mojoExecution.getExecutionId() );
-                            logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
-                        }
-                        logger.debug( "==================" );
-                    }
-
-                    for ( MojoExecution mojoExecution : lifecyclePlan )
-                    {            
-                        try
-                        {                
-                            logger.info( executionDescription( mojoExecution, currentProject ) );
-                            pluginManager.executeMojo( session, mojoExecution );
-                        }
-                        catch ( Exception e )
-                        {
-                            session.getResult().addException( e );
-                            return;
-                        }
-                    }                         
-                }
+                }                         
+                
             }
             finally
             {
                 session.setCurrentProject( null );
             }
         }        
-    }    
+    }        
     
+    // 1. Find the lifecycle given the phase (default lifecycle when given install)
+    // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
+    // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
+    // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
+    // 5. Bind mojos specified in the project itself to the lifecycle
+    public List<MojoExecution> calculateBuildPlan(  MavenSession session, String... tasks )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException
+    {        
+        MavenProject project = session.getCurrentProject();
+                
+        List<String> phasesWithMojosToExecute = new ArrayList<String>();
+        
+        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
+                
+        for ( String task : tasks )
+        {
+
+            if ( task.indexOf( ":" ) > 0 )
+            {
+                MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
+
+                MojoExecution mojoExecution = getMojoExecution( project, mojoDescriptor );
+
+                lifecyclePlan.add( mojoExecution );
+            }
+            else
+            {
+                // 1.
+                //
+                // Based on the lifecycle phase we are given, let's find the corresponding lifecycle.
+                //
+                Lifecycle lifecycle = phaseToLifecycleMap.get( task );
+
+                // 2. 
+                //
+                // If we are dealing with the "clean" or "site" lifecycle then there are currently no lifecycle mappings but there are default phases
+                // that need to be run instead.
+                //
+                // Now we need to take into account the packaging type of the project. For a project of type WAR, the lifecycle where mojos are mapped
+                // on to the given phases in the lifecycle are going to be a little different then, say, a project of type JAR.
+                //
+
+                // 3.
+                //
+                // Once we have the lifecycle mapping for the given packaging, we need to know whats phases we need to worry about executing.
+                //
+
+                // Create an ordered Map of the phases in the lifecycle to a list of mojos to execute.
+                Map<String, List<String>> phaseToMojoMapping = new LinkedHashMap<String, List<String>>();
+
+                // 4.
+
+                //TODO: need to separate the lifecycles
+
+                for ( String phase : lifecycle.getPhases() )
+                {
+                    List<String> mojos = new ArrayList<String>();
+
+                    if ( phase.equals( "clean" ) )
+                    {
+                        mojos.add( "org.apache.maven.plugins:maven-clean-plugin:clean" );
+                    }
+
+                    // This is just just laying out the initial structure of the mojos to run in each phase of the
+                    // lifecycle. Everything is now done in the project builder correctly so this could likely
+                    // go away shortly. We no longer need to pull out bits from the default lifecycle. The MavenProject
+                    // comes to us intact as it should.
+
+                    phaseToMojoMapping.put( phase, mojos );
+                }
+
+                // 5. Just build up the list of mojos that will execute for every phase.
+                //
+                // This will be useful for having the complete build plan and then we can filter/optimize later.
+                //
+                for ( Plugin plugin : project.getBuild().getPlugins() )
+                {
+                    for ( PluginExecution execution : plugin.getExecutions() )
+                    {
+                        // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
+                        // to examine the phase it is associated to.                
+                        if ( execution.getPhase() != null )
+                        {
+                            for ( String goal : execution.getGoals() )
+                            {
+                                String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
+
+                                if ( phaseToMojoMapping.get( execution.getPhase() ) == null )
+                                {
+                                    // This is happening because executions in the POM are getting mixed into the clean lifecycle
+                                    // So for the lifecycle mapping we need a map with the phases as keys so we can easily check
+                                    // if this phase belongs to the given lifecycle. this shows the system is messed up. this
+                                    // shouldn't happen.
+                                    phaseToMojoMapping.put( execution.getPhase(), new ArrayList<String>() );
+                                }
+
+                                phaseToMojoMapping.get( execution.getPhase() ).add( s );
+                            }
+                        }
+                        // if not then i need to grab the mojo descriptor and look at the phase that is specified
+                        else
+                        {
+                            for ( String goal : execution.getGoals() )
+                            {
+                                String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
+                                MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
+
+                                if ( mojoDescriptor.getPhase() != null && phaseToMojoMapping.get( mojoDescriptor.getPhase() ) != null )
+                                {
+                                    phaseToMojoMapping.get( mojoDescriptor.getPhase() ).add( s );
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 6. 
+                //
+                // We are only interested in the phases that correspond to the lifecycle we are trying to run. If we are running the "clean"
+                // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
+                //        
+
+                for ( String phase : phaseToMojoMapping.keySet() )
+                {
+                    phasesWithMojosToExecute.addAll( phaseToMojoMapping.get( phase ) );
+
+                    if ( phase.equals( task ) )
+                    {
+                        break;
+                    }
+                }
+
+            }
+        }
+              
+        // 7. Now we create the correct configuration for the mojo to execute.
+        //TODO: this needs to go to the model builder.
+
+        for ( String mojo : phasesWithMojosToExecute )
+        {
+            // These are bits that look like this:
+            //
+            // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
+            //
+
+            MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, session );
+
+            MojoExecution mojoExecution = getMojoExecution( project, mojoDescriptor );
+
+            lifecyclePlan.add( mojoExecution );
+        }        
+        
+        return lifecyclePlan;
+    }  
+
     private String executionDescription( MojoExecution me, MavenProject project )
     {
         PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
@@ -227,157 +384,6 @@ public class DefaultLifecycleExecutor
         return sb.toString();
     }
     
-    // 1. Find the lifecycle given the phase (default lifecycle when given install)
-    // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
-    // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
-    // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
-    // 5. Bind mojos specified in the project itself to the lifecycle
-    public List<MojoExecution> calculateBuildPlan( String task, MavenSession session )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException
-    {        
-        MavenProject project = session.getCurrentProject();
-        
-        List<String> phasesWithMojosToExecute = new ArrayList<String>();
-        
-        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
-                
-        if ( task.indexOf( ":" ) > 0 )
-        {
-            MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
-                        
-            MojoExecution mojoExecution = getMojoExecution( project, mojoDescriptor );
-            
-            lifecyclePlan.add( mojoExecution );            
-        }
-        else
-        {
-
-            // 1.
-            //
-            // Based on the lifecycle phase we are given, let's find the corresponding lifecycle.
-            //
-            Lifecycle lifecycle = phaseToLifecycleMap.get( task );
-
-            // 2. 
-            //
-            // If we are dealing with the "clean" or "site" lifecycle then there are currently no lifecycle mappings but there are default phases
-            // that need to be run instead.
-            //
-            // Now we need to take into account the packaging type of the project. For a project of type WAR, the lifecycle where mojos are mapped
-            // on to the given phases in the lifecycle are going to be a little different then, say, a project of type JAR.
-            //
-
-            // 3.
-            //
-            // Once we have the lifecycle mapping for the given packaging, we need to know whats phases we need to worry about executing.
-            //
-
-            // Create an ordered Map of the phases in the lifecycle to a list of mojos to execute.
-            Map<String, List<String>> phaseToMojoMapping = new LinkedHashMap<String, List<String>>();
-
-            // 4.
-
-            //TODO: need to separate the lifecycles
-
-            for ( String phase : lifecycle.getPhases() )
-            {
-                List<String> mojos = new ArrayList<String>();
-                                
-                if ( phase.equals( "clean" ) )
-                {
-                    mojos.add( "org.apache.maven.plugins:maven-clean-plugin:clean" );
-                }
-                
-                // This is just just laying out the initial structure of the mojos to run in each phase of the
-                // lifecycle. Everything is now done in the project builder correctly so this could likely
-                // go away shortly. We no longer need to pull out bits from the default lifecycle. The MavenProject
-                // comes to us intact as it should.
-
-                phaseToMojoMapping.put( phase, mojos );
-            }
-
-            // 5. Just build up the list of mojos that will execute for every phase.
-            //
-            // This will be useful for having the complete build plan and then we can filter/optimize later.
-            //
-            for ( Plugin plugin : project.getBuild().getPlugins() )
-            {
-                for ( PluginExecution execution : plugin.getExecutions() )
-                {
-                    // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
-                    // to examine the phase it is associated to.                
-                    if ( execution.getPhase() != null )
-                    {
-                        for ( String goal : execution.getGoals() )
-                        {
-                            String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
-
-                            if ( phaseToMojoMapping.get( execution.getPhase() ) == null )
-                            {
-                                // This is happening because executions in the POM are getting mixed into the clean lifecycle
-                                // So for the lifecycle mapping we need a map with the phases as keys so we can easily check
-                                // if this phase belongs to the given lifecycle. this shows the system is messed up. this
-                                // shouldn't happen.
-                                phaseToMojoMapping.put( execution.getPhase(), new ArrayList<String>() );
-                            }
-
-                            phaseToMojoMapping.get( execution.getPhase() ).add( s );
-                        }
-                    }
-                    // if not then i need to grab the mojo descriptor and look at the phase that is specified
-                    else
-                    {
-                        for ( String goal : execution.getGoals() )
-                        {
-                            String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
-                            MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
-
-                            if ( mojoDescriptor.getPhase() != null && phaseToMojoMapping.get( mojoDescriptor.getPhase() ) != null )
-                            {
-                                phaseToMojoMapping.get( mojoDescriptor.getPhase() ).add( s );
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 6. 
-            //
-            // We are only interested in the phases that correspond to the lifecycle we are trying to run. If we are running the "clean"
-            // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
-            //        
-
-            for ( String phase : phaseToMojoMapping.keySet() )
-            {
-                phasesWithMojosToExecute.addAll( phaseToMojoMapping.get( phase ) );
-
-                if ( phase.equals( task ) )
-                {
-                    break;
-                }
-            }
-                
-            // 7. Now we create the correct configuration for the mojo to execute.
-            //TODO: this needs to go to the model builder.
-
-            for ( String mojo : phasesWithMojosToExecute )
-            {
-                // These are bits that look like this:
-                //
-                // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
-                //
-
-                MojoDescriptor mojoDescriptor = getMojoDescriptor( mojo, session );
-
-                MojoExecution mojoExecution = getMojoExecution( project, mojoDescriptor );
-                
-                lifecyclePlan.add( mojoExecution );
-            }
-        }
-                
-        return lifecyclePlan;
-    }  
-
     private MojoExecution getMojoExecution( MavenProject project, MojoDescriptor mojoDescriptor )
     {
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
@@ -742,63 +748,13 @@ public class DefaultLifecycleExecutor
 
         return dom;
     }
-    
-    // assign all values
-    // validate everything is fine
-    private Xpp3Dom processConfiguration( MavenSession session, MojoExecution mojoExecution )
-    {
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
-
-        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-        
-        Map<String,Parameter> parameters = mojoDescriptor.getParameterMap();
-
-        Xpp3Dom configuration = mojoExecution.getConfiguration();
-        
-        for( Xpp3Dom c : configuration.getChildren() )
-        {
-            String configurationName = c.getName();
-            
-            Parameter parameter = parameters.get( configurationName );
-            
-            // Read-only
-            
-            if ( !parameter.isEditable() )
-            {
-                
-            }                        
-            
-            try
-            {
-                Object value = expressionEvaluator.evaluate( c.getValue() );
-                if ( value == null )
-                {
-                    String e = c.getAttribute( "default-value" );
-                    if ( e != null )
-                    {
-                        value = expressionEvaluator.evaluate( e );
-                    }                    
-                }
-                
-                if ( value instanceof String || value instanceof File )
-                c.setValue( value.toString() );
-            }
-            catch ( ExpressionEvaluationException e )
-            {
-                // do nothing
-            }
-        }
-        
-        return mojoExecution.getConfiguration();
-    }
-           
+               
     private void downloadProjectDependencies( MavenSession session, String scope )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         MavenProject project = session.getCurrentProject();
 
-        Artifact artifact =
-            repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+        Artifact artifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
         artifact.setFile( project.getFile() );
         
         ArtifactFilter filter = new ScopeArtifactFilter( scope );
