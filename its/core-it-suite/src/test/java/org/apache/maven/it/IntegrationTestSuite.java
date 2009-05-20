@@ -91,6 +91,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4167PluginAndCoordXFormPOMTest.class );
         suite.addTestSuite( MavenITmng4150VersionRangeTest.class );
         suite.addTestSuite( MavenITmng4129PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng4126ParentProfilesXmlTest.class );
