@@ -75,7 +75,7 @@ public class DefaultArtifactResolver
     private ResolutionErrorHandler resolutionErrorHandler;
 
     @Requirement
-    private PlexusContainer container;
+    private ArtifactMetadataSource source;
     
     public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener resolutionListener )
         throws ArtifactResolutionException, ArtifactNotFoundException
@@ -331,7 +331,6 @@ public class DefaultArtifactResolver
             .setManagedVersionMap( managedVersions )
             .setLocalRepository( localRepository )
             .setRemoteRepostories( remoteRepositories )
-            .setMetadataSource( source )
             .setFilter( filter )
             .setListeners( listeners );
 
@@ -368,7 +367,6 @@ public class DefaultArtifactResolver
         Map managedVersions = request.getManagedVersionMap();
         ArtifactRepository localRepository = request.getLocalRepository();
         List<ArtifactRepository> remoteRepositories = request.getRemoteRepostories();
-        ArtifactMetadataSource source = request.getMetadataSource();
         List<ResolutionListener> listeners = request.getListeners();
         ArtifactFilter filter = request.getFilter();                       
         
@@ -379,19 +377,7 @@ public class DefaultArtifactResolver
         {
             request.setResolveRoot( false );
         }
-        
-        if ( source == null )
-        {
-            try
-            {
-                source = container.lookup( ArtifactMetadataSource.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new IllegalStateException( "Failed to lookup metadata source implementation", e );
-            }
-        }
-        
+                
         if ( listeners == null )
         {
             listeners = new ArrayList<ResolutionListener>();

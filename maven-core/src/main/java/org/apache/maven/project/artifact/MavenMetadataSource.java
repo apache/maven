@@ -41,10 +41,13 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
 /**
  * @author Jason van Zyl
@@ -56,12 +59,17 @@ public class MavenMetadataSource
     @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
 
+    //TODO: this will also cause a cycle so we need to refactor some code
     @Requirement
-    private RepositorySystem repositorySystem;
+    private ArtifactFactory repositorySystem;
 
-    @Requirement
+    //TODO: This prevents a cycle in the composition which shows us another problem we need to deal with. 
+    //@Requirement
     private MavenProjectBuilder projectBuilder;
 
+    @Requirement
+    private PlexusContainer container;
+    
     @Requirement
     private Logger logger;
 
@@ -87,7 +95,7 @@ public class MavenMetadataSource
 
         try
         {
-            project = projectBuilder.buildFromRepository( pomArtifact, configuration );
+            project = getProjectBuilder().buildFromRepository( pomArtifact, configuration );
 
             if ( !artifact.getArtifactHandler().isIncludesDependencies() )
             {
@@ -247,5 +255,24 @@ public class MavenMetadataSource
         }
         
         return artifacts;
+    }    
+    
+    public MavenProjectBuilder getProjectBuilder()
+    {
+        if ( projectBuilder != null )
+        {
+            return projectBuilder;
+        }
+        
+        try
+        {
+            projectBuilder = container.lookup( MavenProjectBuilder.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            // Won't happen
+        }
+        
+        return projectBuilder;
     }    
 }

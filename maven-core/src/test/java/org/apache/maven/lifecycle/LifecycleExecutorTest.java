@@ -70,7 +70,25 @@ public class LifecycleExecutorTest
         assertEquals( "maven-resources-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
         assertEquals( "2.3", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
     }
-    
+
+    public void testCalculationOfBuildPlanWithIndividualTaskWherePluginIsNotSpecifiedInThePom()
+        throws Exception
+    {
+        // We are doing something like "mvn clean:clean" where no version is specified but this
+        // project we are working on has the version specified in the POM so the version should come from there.
+        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        MavenSession session = createMavenSession( pom );
+        assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
+        assertEquals( "1.0", session.getCurrentProject().getVersion() );
+        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( "clean:clean", session );
+        assertEquals( 1, lifecyclePlan.size() );
+        MojoExecution mojoExecution = lifecyclePlan.get( 0 );
+        assertNotNull( mojoExecution );
+        assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
+        assertEquals( "maven-clean-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
+        assertEquals( "2.2", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
+    }
+        
     public void testLifecycleQueryingUsingADefaultLifecyclePhase()
         throws Exception
     {   

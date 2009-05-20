@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.wagon.events.TransferListener;
@@ -38,9 +37,6 @@ public class ArtifactResolutionRequest
 
     // This is like a filter but overrides all transitive versions 
     private Map managedVersionMap;
-
-    // This should not be in here, it's a component
-    private ArtifactMetadataSource metadataSource;
 
     private TransferListener transferListener;
     
@@ -127,18 +123,6 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public ArtifactMetadataSource getMetadataSource()
-    {
-        return metadataSource;
-    }
-
-    public ArtifactResolutionRequest setMetadataSource( ArtifactMetadataSource metadataSource )
-    {
-        this.metadataSource = metadataSource;
-
-        return this;
-    }
-
     public Map getManagedVersionMap()
     {
         return managedVersionMap;
@@ -193,8 +177,7 @@ public class ArtifactResolutionRequest
                 .append( "artifact: " ).append( artifact ).append(  "\n" )
                 .append( artifactDependencies ).append(  "\n" )
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
-                .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
-                .append( "metadataSource: " ).append(  metadataSource ).append(  "\n" );
+                .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" );
         
         return sb.toString();
     }
