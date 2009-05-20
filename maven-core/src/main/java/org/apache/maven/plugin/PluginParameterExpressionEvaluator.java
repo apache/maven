@@ -26,8 +26,10 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 /**
@@ -46,6 +48,12 @@ public class PluginParameterExpressionEvaluator
 
     private Properties properties;    
 
+    @Deprecated //TODO: used by the Enforcer plugin
+    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution, PathTranslator pathTranslator, Logger logger, MavenProject project, Properties properties )    
+    {
+        this( session, mojoExecution );
+    }
+    
     public PluginParameterExpressionEvaluator( MavenSession session )
     {
         this( session, null );

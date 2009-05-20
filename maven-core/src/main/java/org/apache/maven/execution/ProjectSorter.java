@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
@@ -106,6 +105,10 @@ public class ProjectSorter
                 }
             }
             
+            /*
+            
+            TODO: Now that the build plan is fully fleshed out we have cycles
+            
             if ( project.getBuildPlugins() != null )
             {
                 for( Plugin plugin : project.getBuildPlugins() )
@@ -118,6 +121,7 @@ public class ProjectSorter
                     }
                 }
             }
+            */
         }
 
         List<MavenProject> sortedProjects = new ArrayList<MavenProject>();

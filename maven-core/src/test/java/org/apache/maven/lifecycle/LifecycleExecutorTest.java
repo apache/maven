@@ -123,6 +123,49 @@ public class LifecycleExecutorTest
         assertEquals( "jar:jar", lifecyclePlan.get( 8 ).getMojoDescriptor().getFullGoalName() );                
         assertEquals( "install:install", lifecyclePlan.get( 9 ).getMojoDescriptor().getFullGoalName() );                
     }
+
+    // We need to take in multiple lifecycles
+    public void testCalculationOfBuildPlanWithMultipleExecutionsOfModello()
+        throws Exception
+    {
+        File pom = getProject( "project-with-multiple-executions" );
+        MavenSession session = createMavenSession( pom );
+        assertEquals( "project-with-multiple-executions", session.getCurrentProject().getArtifactId() );
+        assertEquals( "1.0", session.getCurrentProject().getVersion() );
+        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean", "install" );        
+
+        for ( MojoExecution me : lifecyclePlan )
+        {
+            System.out.println( me.getExecutionId() );
+        }
+        
+        /*
+        //[01] clean:clean
+        //[02] resources:resources
+        //[03] compiler:compile
+        //[04] plexus-component-metadata:generate-metadata
+        //[05] resources:testResources
+        //[06] compiler:testCompile
+        //[07] plexus-component-metadata:generate-test-metadata
+        //[08] surefire:test
+        //[09] jar:jar
+        //[10] install:install
+        //
+        assertEquals( 10, lifecyclePlan.size() );
+                
+        assertEquals( "clean:clean", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:resources", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:compile", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:testResources", lifecyclePlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:testCompile", lifecyclePlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-test-metadata", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "surefire:test", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "jar:jar", lifecyclePlan.get( 8 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "install:install", lifecyclePlan.get( 9 ).getMojoDescriptor().getFullGoalName() );
+        */                
+    }
+    
     
     
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal()

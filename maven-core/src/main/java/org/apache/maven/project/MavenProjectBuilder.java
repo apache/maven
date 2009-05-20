@@ -31,11 +31,18 @@ public interface MavenProjectBuilder
         throws ProjectBuildingException;
 
     //TODO maven-site-plugin -- Vincent, Dennis and Lukas are checking but this doesn't appear to be required anymore.
+    @Deprecated
     MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;
 
-    //TODO remote-resources-plugin    
+    //TODO remote-resources-plugin
+    @Deprecated
     MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+        throws ProjectBuildingException;
+
+    //TODO remote-resources-plugin
+    @Deprecated
+    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean force )
         throws ProjectBuildingException;
 
     // TODO: This also doesn't really belong here as it's a mix of project builder and artifact resolution and belongs

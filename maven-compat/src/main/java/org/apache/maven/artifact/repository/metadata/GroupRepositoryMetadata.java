@@ -21,6 +21,9 @@ package org.apache.maven.artifact.repository.metadata;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Metadata for the group directory of the repository.
  *
@@ -61,6 +64,38 @@ public class GroupRepositoryMetadata
     public String getBaseVersion()
     {
         return null;
+    }
+
+    public void addPluginMapping( String goalPrefix,
+                                  String artifactId )
+    {
+        addPluginMapping( goalPrefix, artifactId, artifactId );
+    }
+
+    public void addPluginMapping( String goalPrefix,
+                                  String artifactId,
+                                  String name )
+    {
+        List plugins = getMetadata().getPlugins();
+        boolean found = false;
+        for ( Iterator i = plugins.iterator(); i.hasNext() && !found; )
+        {
+            Plugin plugin = (Plugin) i.next();
+            if ( plugin.getPrefix().equals( goalPrefix ) )
+            {
+                found = true;
+            }
+        }
+        if ( !found )
+        {
+            Plugin plugin = new Plugin();
+            plugin.setPrefix( goalPrefix );
+            plugin.setArtifactId( artifactId );
+            plugin.setName( name );
+
+
+            getMetadata().addPlugin( plugin );
+        }
     }
 
     public Object getKey()

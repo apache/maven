@@ -263,6 +263,12 @@ public class DefaultMavenProjectBuilder
         return build( project, configuration );
     }
 
+    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean force )
+        throws ProjectBuildingException
+    {
+        return buildFromRepository( artifact, remoteRepositories, localRepository );        
+    }
+
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ProjectBuildingException
     {

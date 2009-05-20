@@ -42,8 +42,10 @@ import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.events.TransferListener;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -74,6 +76,9 @@ public class DefaultArtifactResolver
 
     @Requirement
     private ArtifactMetadataSource source;
+    
+    @Requirement
+    private PlexusContainer container;
     
     public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener resolutionListener )
         throws ArtifactResolutionException, ArtifactNotFoundException
@@ -367,6 +372,20 @@ public class DefaultArtifactResolver
         List<ArtifactRepository> remoteRepositories = request.getRemoteRepostories();
         List<ResolutionListener> listeners = request.getListeners();
         ArtifactFilter filter = request.getFilter();                       
+        
+        //TODO: hack because metadata isn't generated in m2e correctly and i want to run the maven i have in the workspace
+        if ( source == null )
+        {
+            try
+            {
+                source = container.lookup( ArtifactMetadataSource.class );
+            }
+            catch ( ComponentLookupException e )
+            {
+                e.printStackTrace();
+                // won't happen
+            }
+        }
         
         // This is an extreme hack because of the ridiculous APIs we have a root that is disconnected and
         // useless. The SureFire plugin passes in a dummy root artifact that is actually used in the production
