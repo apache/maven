@@ -1,9 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its.mng4167</groupId>
-  <artifactId>mng-4167</artifactId>
+  <groupId>org.apache.maven.its.mng4167.${java.specification.version}</groupId>
+  <artifactId>mng-4167-${java.specification.version}</artifactId>
   <packaging>pom</packaging>
   <version>1-${java.specification.version}</version>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>some.group.id.${java.specification.version}</groupId>
+        <artifactId>some-artifact-id-${java.specification.version}</artifactId>
+        <version>1-${java.specification.version}</version>
+        <classifier>cls-${java.specification.version}</classifier>
+        <type>jni-${java.specification.version}</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   
   <build>
     <plugins>
