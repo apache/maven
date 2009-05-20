@@ -18,13 +18,10 @@ package org.apache.maven.execution;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuilderConfiguration;
@@ -71,8 +68,6 @@ public class DefaultMavenExecutionRequest
 
     private File userToolchainsFile;
     
-    private Set<Plugin> plugins;
-
     // ----------------------------------------------------------------------------
     // Request
     // ----------------------------------------------------------------------------
@@ -664,20 +659,6 @@ public class DefaultMavenExecutionRequest
         return projectBuildingConfiguration;
     }
     
-    public void setPlugins(Set<Plugin> plugins)
-    {
-    	this.plugins = plugins;
-    }
-    
-    public Set<Plugin> getPlugins()
-    {
-    	if(plugins == null)
-    	{
-    		plugins = new HashSet<Plugin>();
-    	}
-    	return plugins;
-    }
-
     public MavenExecutionRequest addProfile( Profile profile )
     {
         if ( profile == null )

@@ -203,9 +203,5 @@ public interface MavenExecutionRequest
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
-    ProjectBuilderConfiguration getProjectBuildingConfiguration();
-    
-    void setPlugins(Set<Plugin> plugins);
-    
-    Set<Plugin> getPlugins();   
+    ProjectBuilderConfiguration getProjectBuildingConfiguration();    
 }
