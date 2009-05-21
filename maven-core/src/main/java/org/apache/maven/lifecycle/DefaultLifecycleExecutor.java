@@ -46,6 +46,7 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
@@ -216,14 +217,14 @@ public class DefaultLifecycleExecutor
             }
         }        
     }        
-    
+        
     // 1. Find the lifecycle given the phase (default lifecycle when given install)
     // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
     // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
     // 5. Bind mojos specified in the project itself to the lifecycle
     public List<MojoExecution> calculateBuildPlan(  MavenSession session, String... tasks )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
     {        
         MavenProject project = session.getCurrentProject();
                 
@@ -414,8 +415,7 @@ public class DefaultLifecycleExecutor
     }
         
     private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution )
-    {
-        
+    {        
         String g = mojoExecution.getGroupId();
 
         String a = mojoExecution.getArtifactId();
@@ -472,7 +472,7 @@ public class DefaultLifecycleExecutor
    
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenSession session ) 
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
     {        
         MavenProject project = session.getCurrentProject();
         
@@ -692,20 +692,26 @@ public class DefaultLifecycleExecutor
             plugin.getExecutions().add( execution );
         }
     }
-
+    
+    private void populateDefaultConfigurationForPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+        throws LifecycleExecutionException
+    {
+        for( PluginExecution pluginExecution : plugin.getExecutions() )
+        {
+            for( String goal : pluginExecution.getGoals() )
+            {
+                Xpp3Dom dom = getDefaultPluginConfiguration( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), goal, localRepository, remoteRepositories );
+                pluginExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pluginExecution.getConfiguration(), dom, Boolean.TRUE ) );
+            }
+        }
+    }
+    
     public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
         throws LifecycleExecutionException
     {
-        for( Plugin p : plugins )
+        for( Plugin plugin : plugins )
         {            
-            for( PluginExecution e : p.getExecutions() )
-            {
-                for( String goal : e.getGoals() )
-                {
-                    Xpp3Dom dom = getDefaultPluginConfiguration( p.getGroupId(), p.getArtifactId(), p.getVersion(), goal, localRepository, remoteRepositories );
-                    e.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) e.getConfiguration(), dom, Boolean.TRUE ) );
-                }
-            }
+            populateDefaultConfigurationForPlugin( plugin, localRepository, remoteRepositories );
         }
     }    
     
@@ -735,6 +741,10 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
         }
         catch ( MojoNotFoundException e )
+        {
+            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+        }
+        catch ( InvalidPluginDescriptorException e )
         {
             throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
         } 

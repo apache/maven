@@ -127,12 +127,13 @@ public class DefaultPluginManager
      * @return PluginDescriptor The component descriptor for the Maven plugin.
      * @throws PluginNotFoundException The plugin could not be found in any repositories.
      * @throws PluginResolutionException The plugin could be found but could not be resolved.
+     * @throws InvalidPluginDescriptorException 
      * @throws PlexusConfigurationException A discovered component descriptor cannot be read, or or can't be parsed correctly. Shouldn't 
      *                                      happen but if someone has made a descriptor by hand it's possible.
      * @throws CycleDetectedInComponentGraphException A cycle has been detected in the component graph for a plugin that has been dynamically loaded.
      */
     public PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException
     {
         PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
 
@@ -197,10 +198,18 @@ public class DefaultPluginManager
                 // Not going to happen
             }
         }
-                 
+        
+        String pluginKey = constructPluginKey( plugin );
+        
+        // Check the internal consistent of a plugin descriptor when it is discovered. Most of the time the plugin descriptor is generated
+        // by the maven-plugin-plugin, but if you happened to have created one by hand and it's incorrect this validator will report
+        // the problem to the user.
+        //
+        MavenPluginValidator validator = new MavenPluginValidator( pluginArtifact );
+        
         try
         {
-            container.discoverComponents( pluginRealm );
+            container.discoverComponents( pluginRealm, validator );
         }
         catch ( PlexusConfigurationException e )
         {
@@ -211,7 +220,12 @@ public class DefaultPluginManager
             throw new CycleDetectedInPluginGraphException( plugin, e );
         }
 
-        pluginClassLoaderCache.put( constructPluginKey( plugin ), pluginRealm );
+        if ( validator.hasErrors() )                                                                                                                        
+        {          
+            throw new InvalidPluginDescriptorException( "Invalid Plugin Descriptor for " + pluginKey, validator.getErrors() );
+        }        
+        
+        pluginClassLoaderCache.put( pluginKey, pluginRealm );
         
         pluginDescriptor = getPluginDescriptor( plugin );
         pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
@@ -491,7 +505,7 @@ public class DefaultPluginManager
     }
 
     public MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException
     {
         Plugin plugin = new Plugin();
         plugin.setGroupId( groupId );        
@@ -502,7 +516,7 @@ public class DefaultPluginManager
     }
         
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException
     {
         PluginDescriptor pluginDescriptor = loadPlugin( plugin, localRepository, remoteRepositories );
 
@@ -614,6 +628,15 @@ public class DefaultPluginManager
         {
             PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
 
+            MavenPluginValidator validator = (MavenPluginValidator) event.getData();
+            
+            validator.validate( pluginDescriptor );
+            
+            if ( validator.hasErrors() )
+            {
+                return;
+            }
+            
             String key = constructPluginKey( pluginDescriptor );
 
             if ( !pluginsInProcess.contains( key ) )
