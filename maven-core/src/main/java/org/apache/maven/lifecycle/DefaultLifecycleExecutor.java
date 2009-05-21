@@ -385,7 +385,6 @@ public class DefaultLifecycleExecutor
         
     private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution )
     {
-        //System.out.println( mojoExecution.getGoal() + " : executionid: " + mojoExecution.getExecutionId() );
         
         String g = mojoExecution.getGroupId();
 
@@ -397,17 +396,11 @@ public class DefaultLifecycleExecutor
         {
             if ( mojoExecution.getExecutionId().equals( e.getId() ) )
             {
-                for ( String goal : e.getGoals() )
-                {
-                    if ( mojoExecution.getGoal().equals( goal ) )
-                    {
-                        Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
+                Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
 
-                        Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
+                Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
 
-                        mojoExecution.setConfiguration( mojoConfiguration );
-                    }
-                }
+                mojoExecution.setConfiguration( mojoConfiguration );
             }
         }
     }    
