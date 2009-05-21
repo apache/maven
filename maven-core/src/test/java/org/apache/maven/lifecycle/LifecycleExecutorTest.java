@@ -8,6 +8,7 @@ import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -131,13 +132,24 @@ public class LifecycleExecutorTest
         File pom = getProject( "project-with-multiple-executions" );
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-multiple-executions", session.getCurrentProject().getArtifactId() );
-        assertEquals( "1.0", session.getCurrentProject().getVersion() );
+        assertEquals( "1.0.1", session.getCurrentProject().getVersion() );
         List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean", "install" );        
 
+        /*
+        for ( Plugin p : session.getCurrentProject().getBuildPlugins() )
+        {
+            for ( PluginExecution pe : p.getExecutions() )
+            {
+                System.out.println( pe.getConfiguration() );
+            }
+        }
+        
         for ( MojoExecution me : lifecyclePlan )
         {
-            System.out.println( me.getExecutionId() );
+            System.out.println( me.getMojoDescriptor().getFullGoalName() );
+            //System.out.println( me.getConfiguration() ) ;
         }
+        */
         
         /*
         //[01] clean:clean
