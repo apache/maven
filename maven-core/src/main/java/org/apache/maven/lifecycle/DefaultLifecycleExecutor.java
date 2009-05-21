@@ -305,8 +305,6 @@ public class DefaultLifecycleExecutor
                         {
                             for ( String goal : execution.getGoals() )
                             {
-                                String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
-
                                 if ( phaseToMojoMapping.get( execution.getPhase() ) == null )
                                 {
                                     // This is happening because executions in the POM are getting mixed into the clean lifecycle
@@ -325,7 +323,6 @@ public class DefaultLifecycleExecutor
                         {
                             for ( String goal : execution.getGoals() )
                             {
-                                String s = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() + ":" + goal;
                                 MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
 
                                 if ( mojoDescriptor.getPhase() != null && phaseToMojoMapping.get( mojoDescriptor.getPhase() ) != null )
