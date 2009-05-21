@@ -44,6 +44,8 @@ public class DefaultProjectBuilderConfiguration
     
     private List<String> activeProfileIds;
     
+    private List<String> inactiveProfileIds;
+    
     private List<Profile> profiles;
         
     public MavenProject getTopLevelProjectFromReactor()
@@ -119,6 +121,16 @@ public class DefaultProjectBuilderConfiguration
     public void setActiveProfileIds( List<String> activeProfileIds )
     {
         this.activeProfileIds = activeProfileIds;      
+    }
+
+    public List<String> getInactiveProfileIds()
+    {
+        return inactiveProfileIds;
+    }
+
+    public void setInactiveProfileIds( List<String> inactiveProfileIds )
+    {
+        this.inactiveProfileIds = inactiveProfileIds;
     }
 
     public void setProfiles( List<Profile> profiles )

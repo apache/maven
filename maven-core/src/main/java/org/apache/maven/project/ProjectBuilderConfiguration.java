@@ -37,6 +37,10 @@ public interface ProjectBuilderConfiguration
     void setActiveProfileIds( List<String> activeProfileIds );
         
     List<String> getActiveProfileIds();
+
+    void setInactiveProfileIds( List<String> inactiveProfileIds );
+
+    List<String> getInactiveProfileIds();
     
     /**
      * Add a {@link org.apache.maven.model.Profile} that has come from an external source. This may be from a custom configuration

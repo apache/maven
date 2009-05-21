@@ -120,10 +120,8 @@ public class DefaultMavenProjectBuilder
 
         ProfileActivationContext profileActivationContext = new ProfileActivationContext( configuration.getExecutionProperties(), true );
         profileActivationContext.setExplicitlyActiveProfileIds( configuration.getActiveProfileIds() );
-        if (configuration.getExecutionProperties() != null )
-        {
-            profileActivationContext.getExecutionProperties().putAll( configuration.getExecutionProperties() );
-        }
+        profileActivationContext.setExplicitlyInactiveProfileIds( configuration.getInactiveProfileIds() );
+
         ProfileManager profileManager = new DefaultProfileManager( profileActivationContext );
         
         try
@@ -483,7 +481,7 @@ public class DefaultMavenProjectBuilder
 
         if ( validationResult.getMessageCount() > 0 )
         {
-            for ( String s : (List<String>) validationResult.getMessages() )
+            for ( String s : validationResult.getMessages() )
             {
                 logger.error( s );
             }

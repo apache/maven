@@ -715,6 +715,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingConfiguration.setExecutionProperties( getProperties() );
             projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
             projectBuildingConfiguration.setActiveProfileIds( getActiveProfiles() );
+            projectBuildingConfiguration.setInactiveProfileIds( getInactiveProfiles() );
             projectBuildingConfiguration.setProfiles( getProfiles() );
             projectBuildingConfiguration.setProcessPlugins( true );
         }
