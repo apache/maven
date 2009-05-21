@@ -151,7 +151,6 @@ public interface MavenExecutionRequest
     MavenExecutionRequest addActiveProfile( String profile );
     MavenExecutionRequest addActiveProfiles( List<String> profiles );
     List<String> getActiveProfiles();
-    //MAPI: do we really need to do this? deactivate active profile? seems confusing.
     MavenExecutionRequest addInactiveProfile( String profile );
     MavenExecutionRequest addInactiveProfiles( List<String> profiles );
     List<String> getInactiveProfiles();
@@ -171,6 +170,7 @@ public interface MavenExecutionRequest
     // Plugin groups
     List<String> getPluginGroups();
     MavenExecutionRequest setPluginGroups( List<String> pluginGroups );
+    MavenExecutionRequest addPluginGroup( String pluginGroup );
 
     boolean isUsePluginUpdateOverride();
     MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );

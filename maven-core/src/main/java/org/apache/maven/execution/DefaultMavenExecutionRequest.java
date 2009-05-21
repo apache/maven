@@ -34,6 +34,7 @@ import org.apache.maven.wagon.events.TransferListener;
 public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
 {
+
     private ArtifactRepository localRepository;
     
     private File localRepositoryPath;
@@ -50,7 +51,7 @@ public class DefaultMavenExecutionRequest
 
     private List<Profile> profiles;
 
-    private List<String> pluginGroups = new ArrayList<String>();
+    private List<String> pluginGroups;
 
     private boolean usePluginUpdateOverride;
 
@@ -118,7 +119,7 @@ public class DefaultMavenExecutionRequest
         DefaultMavenExecutionRequest copy = new DefaultMavenExecutionRequest();
         copy.setLocalRepository( original.getLocalRepository() );
         copy.setLocalRepositoryPath( original.getLocalRepositoryPath() );
-        copy.setOffline(  original.isOffline() );
+        copy.setOffline( original.isOffline() );
         copy.setInteractiveMode( original.isInteractiveMode() );
         copy.setProxies( original.getProxies() );
         copy.setServers( original.getServers() );
@@ -136,12 +137,12 @@ public class DefaultMavenExecutionRequest
         copy.setPom( original.getPom() );
         copy.setProperties( original.getProperties() );
         copy.setShowErrors( original.isShowErrors() );
-        copy.setActiveProfiles( original.getActiveProfiles());
-        copy.setInactiveProfiles(  original.getInactiveProfiles());
-        copy.setTransferListener( original.getTransferListener());
-        copy.setLoggingLevel( original.getLoggingLevel());
-        copy.setGlobalChecksumPolicy( original.getGlobalChecksumPolicy());
-        copy.setUpdateSnapshots( original.isUpdateSnapshots());
+        copy.setActiveProfiles( original.getActiveProfiles() );
+        copy.setInactiveProfiles( original.getInactiveProfiles() );
+        copy.setTransferListener( original.getTransferListener() );
+        copy.setLoggingLevel( original.getLoggingLevel() );
+        copy.setGlobalChecksumPolicy( original.getGlobalChecksumPolicy() );
+        copy.setUpdateSnapshots( original.isUpdateSnapshots() );
         copy.setRemoteRepositories( original.getRemoteRepositories() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         return original;        
@@ -169,6 +170,10 @@ public class DefaultMavenExecutionRequest
 
     public List<String> getGoals()
     {
+        if ( goals == null )
+        {
+            goals = new ArrayList<String>();
+        }
         return goals;
     }
 
@@ -209,17 +214,20 @@ public class DefaultMavenExecutionRequest
 
     public void setActiveProfiles( List<String> activeProfiles )
     {
-        this.activeProfiles = activeProfiles;
+        getActiveProfiles().clear();
+        getActiveProfiles().addAll( activeProfiles );
     }
 
     public void setInactiveProfiles( List<String> inactiveProfiles )
     {
-        this.inactiveProfiles = inactiveProfiles;
+        getInactiveProfiles().clear();
+        getInactiveProfiles().addAll( inactiveProfiles );
     }
 
     public MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
-        this.remoteRepositories = remoteRepositories;
+        getRemoteRepositories().clear();
+        getRemoteRepositories().addAll( remoteRepositories );
         
         return this;
     }
@@ -309,7 +317,8 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setGoals( List<String> goals )
     {
-        this.goals = goals;
+        getGoals().clear();
+        getGoals().addAll( goals );
 
         return this;
     }
@@ -337,26 +346,15 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setProperties( Properties properties )
     {
-        if ( this.properties == null )
-        {
-            this.properties = properties;
-        }
-        else
-        {
-            this.properties.putAll( properties );
-        }
+        getProperties().clear();
+        getProperties().putAll( properties );
 
         return this;
     }
 
     public MavenExecutionRequest setProperty( String key, String value )
     {
-        if ( properties == null )
-        {
-            properties = new Properties();
-        }
-
-        properties.setProperty( key, value );
+        getProperties().setProperty( key, value );
 
         return this;
     }
@@ -370,28 +368,40 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest addActiveProfile( String profile )
     {
-        getActiveProfiles().add( profile );
+        if ( !getActiveProfiles().contains( profile ) )
+        {
+            getActiveProfiles().add( profile );
+        }
 
         return this;
     }
 
     public MavenExecutionRequest addInactiveProfile( String profile )
     {
-        getInactiveProfiles().add( profile );
+        if ( !getInactiveProfiles().contains( profile ) )
+        {
+            getInactiveProfiles().add( profile );
+        }
 
         return this;
     }
 
     public MavenExecutionRequest addActiveProfiles( List<String> profiles )
     {
-        getActiveProfiles().addAll( profiles );
+        for ( String profile : profiles )
+        {
+            addActiveProfile( profile );
+        }
 
         return this;
     }
 
     public MavenExecutionRequest addInactiveProfiles( List<String> profiles )
     {
-        getInactiveProfiles().addAll( profiles );
+        for ( String profile : profiles )
+        {
+            addInactiveProfile( profile );
+        }
 
         return this;
     }
@@ -481,60 +491,96 @@ public class DefaultMavenExecutionRequest
 
     public List getProxies()
     {
+        if ( proxies == null )
+        {
+            proxies = new ArrayList();
+        }
         return proxies;
     }
 
     public MavenExecutionRequest setProxies( List proxies )
     {
-        this.proxies = proxies;
+        getProxies().clear();
+        getProxies().addAll( proxies );
 
         return this;
     }
 
     public List getServers()
     {
+        if ( servers == null )
+        {
+            servers = new ArrayList();
+        }
         return servers;
     }
 
     public MavenExecutionRequest setServers( List servers )
     {
-        this.servers = servers;
+        getServers().clear();
+        getServers().addAll( servers );
 
         return this;
     }
 
     public List getMirrors()
     {
+        if ( mirrors == null )
+        {
+            mirrors = new ArrayList();
+        }
         return mirrors;
     }
 
     public MavenExecutionRequest setMirrors( List mirrors )
     {
-        this.mirrors = mirrors;
+        getMirrors().clear();
+        getMirrors().addAll( mirrors );
 
         return this;
     }
 
     public List<Profile> getProfiles()
     {
+        if ( profiles == null )
+        {
+            profiles = new ArrayList<Profile>();
+        }
         return profiles;
     }
 
     public MavenExecutionRequest setProfiles( List<Profile> profiles )
     {
-        this.profiles = profiles;
+        getProfiles().clear();
+        getProfiles().addAll( profiles );
 
         return this;
     }
 
     public List<String> getPluginGroups()
     {
+        if ( pluginGroups == null )
+        {
+            pluginGroups = new ArrayList<String>();
+        }
+
         return pluginGroups;
     }
 
     public MavenExecutionRequest setPluginGroups( List<String> pluginGroups )
     {
-        this.pluginGroups = pluginGroups;
+        getPluginGroups().clear();
+        getPluginGroups().addAll( pluginGroups );
+
+        return this;
+    }
+
+    public MavenExecutionRequest addPluginGroup( String pluginGroup )
+    {
+        if ( !getPluginGroups().contains( pluginGroup ) )
+        {
+            getPluginGroups().add( pluginGroup );
+        }
 
         return this;
     }
@@ -627,18 +673,25 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest addRemoteRepository( ArtifactRepository repository )
     {
-        if ( remoteRepositories == null )
+        for ( ArtifactRepository repo : getRemoteRepositories() )
         {
-            remoteRepositories = new ArrayList<ArtifactRepository>();
+            if ( repo.getId() != null && repo.getId().equals( repository.getId() ) )
+            {
+                return this;
+            }
         }
 
-        remoteRepositories.add( repository );
+        getRemoteRepositories().add( repository );
 
         return this;
     }
 
     public List<ArtifactRepository> getRemoteRepositories()
     {
+        if ( remoteRepositories == null )
+        {
+            remoteRepositories = new ArrayList<ArtifactRepository>();
+        }
         return remoteRepositories;
     }
 
@@ -666,12 +719,15 @@ public class DefaultMavenExecutionRequest
             throw new IllegalArgumentException( "profile missing" );
         }
 
-        if ( profiles == null )
+        for ( Profile p : getProfiles() )
         {
-            profiles = new ArrayList<Profile>();
+            if ( p.getId() != null && p.getId().equals( profile.getId() ) )
+            {
+                return this;
+            }
         }
 
-        profiles.add( profile );
+        getProfiles().add( profile );
 
         return this;
     }
