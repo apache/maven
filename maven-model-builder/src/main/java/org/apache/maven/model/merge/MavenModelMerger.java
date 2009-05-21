@@ -76,6 +76,19 @@ public class MavenModelMerger
 
         super.mergeModel( target, source, sourceDominant, context );
     }
+    
+    @Override
+    protected void mergeModel_Name( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        String src = source.getName();
+        if ( src != null )
+        {
+            if ( sourceDominant )
+            {
+                target.setName( src );
+            }
+        }
+    }
 
     @Override
     protected void mergeModel_Url( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
