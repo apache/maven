@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author Benjamin Bentmann
  * @version $Id: Xpp3DomPointerFactory.java 737056 2009-01-23 15:35:43Z bentmann $
  */
-class Xpp3DomPointerFactory
+public class Xpp3DomPointerFactory
     implements NodePointerFactory
 {
 

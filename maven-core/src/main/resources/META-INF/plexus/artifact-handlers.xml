@@ -227,22 +227,12 @@ problem.
               <generate-resources>org.apache.maven.plugins:maven-plugin-plugin:descriptor</generate-resources>
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:testResources
-              </process-test-resources>
-              <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
+              <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources
+              </process-test-resources><test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
               <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-              <package>
-                org.apache.maven.plugins:maven-jar-plugin:jar,
-                org.apache.maven.plugins:maven-plugin-plugin:addPluginArtifactMetadata
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:install,
-                org.apache.maven.plugins:maven-plugin-plugin:updateRegistry
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:deploy
-              </deploy>
+              <package>org.apache.maven.plugins:maven-jar-plugin:jar,org.apache.maven.plugins:maven-plugin-plugin:addPluginArtifactMetadata</package>
+              <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+              <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
             </phases>
             <!-- END SNIPPET: maven-plugin-lifecycle -->
           </lifecycle>

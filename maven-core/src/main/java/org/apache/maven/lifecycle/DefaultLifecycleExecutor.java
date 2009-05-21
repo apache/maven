@@ -238,7 +238,7 @@ public class DefaultLifecycleExecutor
             {
                 MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
 
-                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
+                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-" + mojoDescriptor.getGoal() );
                 
                 populateMojoExecutionConfiguration( project, mojoExecution );
 
@@ -280,7 +280,7 @@ public class DefaultLifecycleExecutor
                     //TODO: remove hard coding
                     if ( phase.equals( "clean" ) )
                     {
-                        mojos.add( new MojoExecution( "org.apache.maven.plugins", "maven-clean-plugin", "2.3", "clean", null ) );
+                        mojos.add( new MojoExecution( "org.apache.maven.plugins", "maven-clean-plugin", "2.3", "clean", "default-clean" ) );
                     }
 
                     // This is just just laying out the initial structure of the mojos to run in each phase of the
@@ -385,11 +385,11 @@ public class DefaultLifecycleExecutor
         sb.append( "Executing " + pd.getArtifactId() + "[" + pd.getVersion() + "]: " + me.getMojoDescriptor().getGoal() + " on " + project.getArtifactId() );        
         return sb.toString();
     }
-    
-    //this will get the wrong configuration because it's only matching the goal not the execution id
-    
+        
     private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution )
-    {                
+    {
+        //System.out.println( mojoExecution.getGoal() + " : executionid: " + mojoExecution.getExecutionId() );
+        
         String g = mojoExecution.getGroupId();
 
         String a = mojoExecution.getArtifactId();
@@ -398,20 +398,22 @@ public class DefaultLifecycleExecutor
 
         for ( PluginExecution e : p.getExecutions() )
         {
-            for ( String goal : e.getGoals() )
+            if ( mojoExecution.getExecutionId().equals( e.getId() ) )
             {
-                if ( mojoExecution.getGoal().equals( goal ) )
+                for ( String goal : e.getGoals() )
                 {
-                    Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
+                    if ( mojoExecution.getGoal().equals( goal ) )
+                    {
+                        Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
 
-                    Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
+                        Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
 
-                    mojoExecution.setConfiguration( mojoConfiguration );
+                        mojoExecution.setConfiguration( mojoConfiguration );
+                    }
                 }
             }
         }
-    }
-    
+    }    
     
     /**
      * Extracts the configuration for a single mojo from the specified execution configuration by discarding any

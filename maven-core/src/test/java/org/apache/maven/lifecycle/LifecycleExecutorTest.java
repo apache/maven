@@ -134,51 +134,47 @@ public class LifecycleExecutorTest
         assertEquals( "project-with-multiple-executions", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0.1", session.getCurrentProject().getVersion() );
         List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean", "install" );        
-
-        /*
-        for ( Plugin p : session.getCurrentProject().getBuildPlugins() )
-        {
-            for ( PluginExecution pe : p.getExecutions() )
-            {
-                System.out.println( pe.getConfiguration() );
-            }
-        }
         
-        for ( MojoExecution me : lifecyclePlan )
-        {
-            System.out.println( me.getMojoDescriptor().getFullGoalName() );
-            //System.out.println( me.getConfiguration() ) ;
-        }
-        */
-        
-        /*
         //[01] clean:clean
-        //[02] resources:resources
-        //[03] compiler:compile
-        //[04] plexus-component-metadata:generate-metadata
-        //[05] resources:testResources
-        //[06] compiler:testCompile
-        //[07] plexus-component-metadata:generate-test-metadata
-        //[08] surefire:test
-        //[09] jar:jar
-        //[10] install:install
+        //[02] modello:xpp3-writer
+        //[03] modello:java
+        //[04] modello:xpp3-reader
+        //[05] modello:xpp3-writer
+        //[06] modello:java
+        //[07] modello:xpp3-reader
+        //[08] plugin:descriptor        
+        //[09] resources:resources
+        //[10] compiler:compile
+        //[11] resources:testResources
+        //[12] compiler:testCompile
+        //[13] surefire:test
+        //[14] plugin:addPluginArtifactMetadata        
+        //[15] jar:jar
+        //[16] install:install
         //
-        assertEquals( 10, lifecyclePlan.size() );
+        
+        assertEquals( 16, lifecyclePlan.size() );        
                 
         assertEquals( "clean:clean", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "resources:resources", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:compile", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "resources:testResources", lifecyclePlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:testCompile", lifecyclePlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-test-metadata", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "surefire:test", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "jar:jar", lifecyclePlan.get( 8 ).getMojoDescriptor().getFullGoalName() );                
-        assertEquals( "install:install", lifecyclePlan.get( 9 ).getMojoDescriptor().getFullGoalName() );
-        */                
-    }
-    
-    
+        assertEquals( "modello:xpp3-writer", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:java", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:xpp3-reader", lifecyclePlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:xpp3-writer", lifecyclePlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:java", lifecyclePlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:xpp3-reader", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plugin:descriptor", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:resources", lifecyclePlan.get( 8 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:compile", lifecyclePlan.get( 9 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:testResources", lifecyclePlan.get( 10 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:testCompile", lifecyclePlan.get( 11 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "surefire:test", lifecyclePlan.get( 12 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plugin:addPluginArtifactMetadata", lifecyclePlan.get( 13 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "jar:jar", lifecyclePlan.get( 14 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "install:install", lifecyclePlan.get( 15 ).getMojoDescriptor().getFullGoalName() );
+        
+        assertEquals( "src/main/mdo/remote-resources.mdo", new MojoExecutionXPathContainer( lifecyclePlan.get( 1 ) ).getValue( "configuration/models[1]/model" ) );
+        assertEquals( "src/main/mdo/supplemental-model.mdo", new MojoExecutionXPathContainer( lifecyclePlan.get( 4 ) ).getValue( "configuration/models[1]/model" ) );
+    }        
     
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal()
         throws Exception
