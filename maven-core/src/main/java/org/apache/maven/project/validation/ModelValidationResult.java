@@ -33,11 +33,11 @@ public class ModelValidationResult
     private final static String NEWLINE = System.getProperty( "line.separator" );
 
     /** */
-    private List messages;
+    private List<String> messages;
 
     public ModelValidationResult()
     {
-        messages = new ArrayList();
+        messages = new ArrayList<String>();
     }
 
     public int getMessageCount()
@@ -50,7 +50,7 @@ public class ModelValidationResult
         return messages.get( i ).toString();
     }
 
-    public List getMessages()
+    public List<String> getMessages()
     {
         return Collections.unmodifiableList( messages );
     }
