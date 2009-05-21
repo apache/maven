@@ -22,25 +22,36 @@ package org.apache.maven.plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-/**
- * Describes a single mojo invocation.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- */
 public class MojoExecution
 {
-    private final String executionId;
-
-    private final MojoDescriptor mojoDescriptor;
+    private String groupId;
+    
+    private String artifactId;
+    
+    private String version;
+    
+    private String goal;
+    
+    private String executionId;
+    
+    private MojoDescriptor mojoDescriptor;
 
     private Xpp3Dom configuration;
-
+        
     /**
      * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase
      * this mojo execution is going to run in.
      */
     private String lifecyclePhase;
+    
+    public MojoExecution( String groupId, String artifactId, String version, String goal, String executionId )
+    {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+        this.goal = goal;
+        this.executionId = executionId;
+    }
     
     public MojoExecution( MojoDescriptor mojoDescriptor )
     {
@@ -115,4 +126,48 @@ public class MojoExecution
         return buffer.toString();
     }
 
+    public String getGroupId()
+    {
+        if ( mojoDescriptor != null )
+        {
+            return mojoDescriptor.getPluginDescriptor().getGroupId();
+        }
+        
+        return groupId;
+    }
+
+    public String getArtifactId()
+    {
+        if ( mojoDescriptor != null )
+        {
+            return mojoDescriptor.getPluginDescriptor().getArtifactId();
+        }
+        
+        return artifactId;
+    }
+
+    public String getVersion()
+    {
+        if ( mojoDescriptor != null )
+        {
+            return mojoDescriptor.getPluginDescriptor().getVersion();
+        }        
+        
+        return version;
+    }
+
+    public String getGoal()
+    {
+        if ( mojoDescriptor != null )
+        {
+            return mojoDescriptor.getGoal();
+        }
+        
+        return goal;
+    }
+
+    public void setMojoDescriptor( MojoDescriptor mojoDescriptor )
+    {
+        this.mojoDescriptor = mojoDescriptor;
+    }
 }

@@ -87,7 +87,7 @@ public class LifecycleExecutorTest
         assertNotNull( mojoExecution );
         assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
         assertEquals( "maven-clean-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
-        assertEquals( "2.2", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
+        assertEquals( "2.3", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
     }
 
     // We need to take in multiple lifecycles
