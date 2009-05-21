@@ -260,8 +260,11 @@ public class DefaultLifecycleExecutor
                 //   </build>
                 // </project>                
                 //
-                // We want to take the plugin/configuration and attach it to the MojoExecution we are creating. We are also
-                // going to give the MojoExecution an id of default-<goal>.
+                // We want to 
+                //
+                // - take the plugin/configuration in the POM and merge it with the plugin's default configuration found in its plugin.xml
+                // - attach that to the MojoExecution for its configuration
+                // - give the MojoExecution an id of default-<goal>.
                 
                 MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
 
