@@ -585,6 +585,16 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
+    public MavenExecutionRequest addPluginGroups( List<String> pluginGroups )
+    {
+        for ( String pluginGroup : pluginGroups )
+        {
+            addPluginGroup( pluginGroup );
+        }
+
+        return this;
+    }
+
     public boolean isUsePluginUpdateOverride()
     {
         return usePluginUpdateOverride;

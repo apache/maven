@@ -23,11 +23,9 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.settings.Settings;
@@ -171,6 +169,7 @@ public interface MavenExecutionRequest
     List<String> getPluginGroups();
     MavenExecutionRequest setPluginGroups( List<String> pluginGroups );
     MavenExecutionRequest addPluginGroup( String pluginGroup );
+    MavenExecutionRequest addPluginGroups( List<String> pluginGroups );
 
     boolean isUsePluginUpdateOverride();
     MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );
