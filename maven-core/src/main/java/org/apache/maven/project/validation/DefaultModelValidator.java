@@ -163,6 +163,13 @@ public class DefaultModelValidator
                 validateStringNotEmpty( "build.plugins.plugin.artifactId", result, p.getArtifactId() );
 
                 validateStringNotEmpty( "build.plugins.plugin.groupId", result, p.getGroupId() );
+                
+                /*
+                 * FIXME: Enforce the existence of a version, no more guessing but reproducibility. We can't do this
+                 * right now as it would affect dependency resolution via the metadata source. As a prerequisite, we
+                 * need to tell the validator which level of strictness we want or alternatively disable validation
+                 * completely for the metadata source.
+                 */
             }
 
             for ( Iterator it = build.getResources().iterator(); it.hasNext(); )
