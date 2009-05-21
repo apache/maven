@@ -1,11 +1,10 @@
-package org.apache.maven;
+package org.apache.maven.repository;
 
 import java.io.File;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 
 public class UserLocalArtifactRepository
     extends LocalArtifactRepository

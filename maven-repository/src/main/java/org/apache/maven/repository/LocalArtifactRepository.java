@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.repository;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
@@ -6,6 +6,8 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 public abstract class LocalArtifactRepository
     extends DefaultArtifactRepository
 {   
+    public static final String IDE_WORKSPACE = "ide-workspace";
+
     public abstract Artifact find( Artifact artifact );
     
     /** 

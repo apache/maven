@@ -7,6 +7,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.LocalArtifactRepository;
 
 /**
  * An implementation of a repository that knows how to search the Maven reactor for artifacts.

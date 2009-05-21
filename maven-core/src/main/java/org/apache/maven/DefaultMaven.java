@@ -42,6 +42,7 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -68,9 +69,6 @@ public class DefaultMaven
     @Requirement
     protected RuntimeInformation runtimeInformation;
     
-    @Requirement
-    List<LocalArtifactRepository> localArtifactRepositories; 
-    
     public List<String> getLifecyclePhases()
     {
         return lifecycleExecutor.getLifecyclePhases();
@@ -89,12 +87,6 @@ public class DefaultMaven
         MavenExecutionResult result = new DefaultMavenExecutionResult();
         
         DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository( request.getLocalRepository() );
-        delegatingLocalArtifactRepository.addToEndOfSearchOrder( new UserLocalArtifactRepository( request.getLocalRepository() ) ); 
-        
-        if ( localArtifactRepositories != null && localArtifactRepositories.size() > 0 )
-        {
-            delegatingLocalArtifactRepository.addToBeginningOfSearchOrder( localArtifactRepositories.get( 0 ) );            
-        }        
         
         request.setLocalRepository( delegatingLocalArtifactRepository );        
                 
@@ -148,7 +140,7 @@ public class DefaultMaven
         // Workspace
         // User Local Repository
                 
-        delegatingLocalArtifactRepository.addToBeginningOfSearchOrder( new ReactorArtifactRepository( projects ) );
+        delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projects ) );
         
         if ( result.hasExceptions() )
         {

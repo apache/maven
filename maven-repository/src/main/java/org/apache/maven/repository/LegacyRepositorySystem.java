@@ -17,10 +17,7 @@ package org.apache.maven.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -41,12 +38,11 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
-import org.apache.maven.wagon.proxy.ProxyInfo;
-import org.apache.maven.wagon.repository.RepositoryPermissions;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * @author Jason van Zyl
@@ -72,7 +68,10 @@ public class LegacyRepositorySystem
 
     @Requirement
     private WagonManager wagonManager;
-    
+
+    @Requirement
+    private PlexusContainer plexus;
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
@@ -264,7 +263,53 @@ public class LegacyRepositorySystem
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {                
+    {
+        /*
+         * Probably is not worth it, but here I make sure I restore request
+         * to its original state. 
+         */
+        try
+        {
+            LocalArtifactRepository ideWorkspace = plexus.lookup( LocalArtifactRepository.class, LocalArtifactRepository.IDE_WORKSPACE );
+
+            if ( request.getLocalRepository() instanceof DelegatingLocalArtifactRepository )
+            {
+                DelegatingLocalArtifactRepository delegatingLocalRepository = (DelegatingLocalArtifactRepository) request.getLocalRepository();
+
+                LocalArtifactRepository orig = delegatingLocalRepository.getIdeWorspace();
+
+                delegatingLocalRepository.setIdeWorkspace( ideWorkspace );
+
+                try
+                {
+                    return artifactResolver.resolve( request );
+                }
+                finally
+                {
+                    delegatingLocalRepository.setIdeWorkspace( orig );
+                }
+            }
+            else
+            {
+                ArtifactRepository localRepository = request.getLocalRepository();
+                DelegatingLocalArtifactRepository delegatingLocalRepository = new DelegatingLocalArtifactRepository( localRepository );
+                delegatingLocalRepository.setIdeWorkspace( ideWorkspace );
+                request.setLocalRepository( delegatingLocalRepository );
+                try
+                {
+                    return artifactResolver.resolve( request );
+                }
+                finally
+                {
+                    request.setLocalRepository( localRepository );
+                }
+            }
+        }
+        catch ( ComponentLookupException e )
+        {
+            // no ide workspace artifact resolution
+        }
+
         return artifactResolver.resolve( request );
     }
 
