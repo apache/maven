@@ -185,7 +185,7 @@ public class DefaultMaven
     protected Map<String,MavenProject> getProjects( MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
-        List<File> files = Arrays.asList( new File[] { request.getPom() } );
+        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
 
         Map<String,MavenProject> projects = collectProjects( files, request );
 
