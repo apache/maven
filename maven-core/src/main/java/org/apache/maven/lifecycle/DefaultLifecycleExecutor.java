@@ -422,6 +422,12 @@ public class DefaultLifecycleExecutor
 
         Plugin p = project.getPlugin( g + ":" + a );
 
+        if ( p == null )
+        {
+            // goal was invoked directly from command line and has no declaration in the POM itself
+            return;
+        }
+
         for ( PluginExecution e : p.getExecutions() )
         {
             if ( mojoExecution.getExecutionId().equals( e.getId() ) )
