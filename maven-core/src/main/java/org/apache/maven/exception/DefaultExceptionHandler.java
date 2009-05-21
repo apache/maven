@@ -94,7 +94,7 @@ public class DefaultExceptionHandler
         }
         else if ( exception instanceof ArtifactResolutionException )
         {
-            message = ((MojoExecutionException)exception).getLongMessage();
+            message = exception.getMessage();
         }        
         
         // Mojo problems
