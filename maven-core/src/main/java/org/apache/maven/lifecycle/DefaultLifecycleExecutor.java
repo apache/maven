@@ -236,6 +236,33 @@ public class DefaultLifecycleExecutor
 
             if ( task.indexOf( ":" ) > 0 )
             {
+                // If this is a goal like "mvn modello:java" and the POM looks like the following:
+                
+                // <project>
+                //   <modelVersion>4.0.0</modelVersion>
+                //   <groupId>org.apache.maven.plugins</groupId>
+                //   <artifactId>project-plugin-level-configuration-only</artifactId>
+                //   <version>1.0.1</version>
+                //   <build>
+                //     <plugins>
+                //       <plugin>
+                //         <groupId>org.codehaus.modello</groupId>
+                //         <artifactId>modello-maven-plugin</artifactId>
+                //         <version>1.0.1</version>
+                //         <configuration>
+                //           <version>1.1.0</version>
+                //           <models>
+                //             <model>src/main/mdo/remote-resources.mdo</model>
+                //           </models>
+                //         </configuration>
+                //       </plugin>
+                //     </plugins>
+                //   </build>
+                // </project>                
+                //
+                // We want to take the plugin/configuration and attach it to the MojoExecution we are creating. We are also
+                // going to give the MojoExecution an id of default-<goal>.
+                
                 MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
 
                 MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-" + mojoDescriptor.getGoal() );
