@@ -412,14 +412,15 @@ public class MavenModelMerger
                 Plugin element = it.next();
                 Object key = getPluginKey( element );
                 Plugin existing = merged.get( key );
-                if ( existing != null )
+                if ( existing == null )
                 {
-                    mergePlugin( existing, element, sourceDominant, context );
+                    // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
+                    existing = new Plugin();
+                    existing.setGroupId( element.getGroupId() );
+                    existing.setArtifactId( element.getArtifactId() );
+                    merged.put( key, existing );
                 }
-                else
-                {
-                    merged.put( key, element );
-                }
+                mergePlugin( existing, element, sourceDominant, context );
             }
 
             target.setPlugins( new ArrayList<Plugin>( merged.values() ) );
@@ -449,14 +450,15 @@ public class MavenModelMerger
                 ReportPlugin element = it.next();
                 Object key = getReportPluginKey( element );
                 ReportPlugin existing = merged.get( key );
-                if ( existing != null )
+                if ( existing == null )
                 {
-                    mergeReportPlugin( existing, element, sourceDominant, context );
+                    // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
+                    existing = new ReportPlugin();
+                    existing.setGroupId( element.getGroupId() );
+                    existing.setArtifactId( element.getArtifactId() );
+                    merged.put( key, existing );
                 }
-                else
-                {
-                    merged.put( key, element );
-                }
+                mergeReportPlugin( existing, element, sourceDominant, context );
             }
 
             target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );

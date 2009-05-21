@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -1435,6 +1436,27 @@ public class PomConstructionTest
         sysProps.setProperty( "system.property", "PASSED" );
         PomTestWrapper pom = buildPom( "sytem-property-interpolation", sysProps );
         assertEquals( "PASSED", pom.getValue( "name" ) );
+    }    
+
+    /* MNG-4129 */
+    public void testPluginExecutionInheritanceWhenChildDoesNotDeclarePlugin()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-inheritance/wo-merge" );
+        List<PluginExecution> executions =
+            (List<PluginExecution>) pom.getValue( "build/pluginsAsMap[@name='org.apache.maven.its.plugins:maven-it-plugin-log-file']/executions" );
+        assertEquals( 1, executions.size() );
+        assertEquals( "inherited-execution", executions.get( 0 ).getId() );
+    }
+
+    public void testPluginExecutionInheritanceWhenChildDoesDeclarePluginAsWell()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-exec-inheritance/w-merge" );
+        List<PluginExecution> executions =
+            (List<PluginExecution>) pom.getValue( "build/pluginsAsMap[@name='org.apache.maven.its.plugins:maven-it-plugin-log-file']/executions" );
+        assertEquals( 1, executions.size() );
+        assertEquals( "inherited-execution", executions.get( 0 ).getId() );
     }    
 
     private void assertPathSuffixEquals( String expected, Object actual )
