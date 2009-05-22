@@ -29,4 +29,8 @@ public interface MavenExecutionRequestPopulator
 
     MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException;
+
+    MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
+        throws MavenEmbedderException;
+
 }

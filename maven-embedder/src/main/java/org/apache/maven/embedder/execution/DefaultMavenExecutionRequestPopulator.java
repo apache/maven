@@ -24,6 +24,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.embedder.Configuration;
+import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.repository.RepositorySystem;
@@ -55,20 +56,36 @@ public class DefaultMavenExecutionRequestPopulator
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
     {
-        pom( request, configuration );
+        // copy configuration to request
         
-        settings( request, configuration );
+        if ( configuration.getGlobalSettingsFile() != null )
+        {
+            request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+        }
 
-        localRepository( request, configuration );
+        if ( configuration.getUserSettingsFile() != null )
+        {
+            request.setUserSettingsFile( configuration.getUserSettingsFile() );
+        }
 
-        toolchains( request, configuration );
+        String localRepositoryPath = null;
 
-        processSettings( request, configuration );
-                
-        return request;
+        if ( request.getLocalRepositoryPath() != null )
+        {
+            localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
+        }
+
+        if ( StringUtils.isEmpty( localRepositoryPath ) && ( configuration.getLocalRepository() != null ) )
+        {
+            localRepositoryPath = configuration.getLocalRepository().getAbsolutePath();
+        }
+        
+        // populate the defaults
+
+        return populateDefaults( request );
     }
-    
-    private void pom( MavenExecutionRequest request, Configuration configuration )
+
+    private void pom( MavenExecutionRequest request )
     {
         // ------------------------------------------------------------------------
         // POM
@@ -100,7 +117,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
         
-    private void populateDefaultPluginGroups( MavenExecutionRequest request, Configuration configuration )
+    private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
         request.addPluginGroup( "org.apache.maven.plugins" );
         request.addPluginGroup( "org.codehaus.mojo" );
@@ -109,14 +126,14 @@ public class DefaultMavenExecutionRequestPopulator
     // Process plugin groups
     // Get profile models
     // Get active profiles
-    private void processSettings( MavenExecutionRequest request, Configuration configuration )
+    private void processSettings( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
         Settings settings = request.getSettings();
         
         request.addPluginGroups( settings.getPluginGroups() );
 
-        populateDefaultPluginGroups( request, configuration );
+        populateDefaultPluginGroups( request );
         
         List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
 
@@ -138,7 +155,7 @@ public class DefaultMavenExecutionRequestPopulator
         
         injectDefaultRepositories( request );
 
-        processRepositoriesInSettings( request, configuration );
+        processRepositoriesInSettings( request );
     }
 
     private void injectDefaultRepositories( MavenExecutionRequest request )
@@ -166,7 +183,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void processRepositoriesInSettings( MavenExecutionRequest request, Configuration configuration )
+    private void processRepositoriesInSettings( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
         Settings settings = request.getSettings();
@@ -225,7 +242,7 @@ public class DefaultMavenExecutionRequestPopulator
     // Settings
     // ------------------------------------------------------------------------
 
-    private void settings( MavenExecutionRequest request, Configuration configuration )
+    private void settings( MavenExecutionRequest request )
     {
         // ------------------------------------------------------------------------
         // Settings
@@ -238,14 +255,14 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.getSettings() == null )
         {
-            if ( configuration.getGlobalSettingsFile() != null )
+            if ( request.getGlobalSettingsFile() == null )
             {
-                request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+                request.setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE );
             }
 
-            if ( configuration.getUserSettingsFile() != null )
+            if ( request.getUserSettingsFile() == null )
             {
-                request.setUserSettingsFile( configuration.getUserSettingsFile() );
+                request.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
             }
 
             try
@@ -261,7 +278,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void localRepository( MavenExecutionRequest request, Configuration configuration )
+    private void localRepository( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
         // ------------------------------------------------------------------------
@@ -274,7 +291,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.getLocalRepository() == null )
         {
-            request.setLocalRepository( createLocalRepository( request, request.getSettings(), configuration ) );
+            request.setLocalRepository( createLocalRepository( request, request.getSettings() ) );
         }
 
         if ( request.getLocalRepositoryPath() == null )
@@ -287,7 +304,7 @@ public class DefaultMavenExecutionRequestPopulator
     // Artifact Transfer Mechanism
     // ------------------------------------------------------------------------
 
-    public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings, Configuration configuration )
+    public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings )
         throws MavenEmbedderException
     {
         String localRepositoryPath = null;
@@ -295,11 +312,6 @@ public class DefaultMavenExecutionRequestPopulator
         if ( request.getLocalRepositoryPath() != null )
         {
             localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
-        }
-
-        if ( StringUtils.isEmpty( localRepositoryPath ) && ( configuration.getLocalRepository() != null ) )
-        {
-            localRepositoryPath = configuration.getLocalRepository().getAbsolutePath();
         }
 
         if ( StringUtils.isEmpty( localRepositoryPath ) )
@@ -322,9 +334,25 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void toolchains( MavenExecutionRequest request, Configuration configuration )
+    private void toolchains( MavenExecutionRequest request )
     {
+        // FIXME individual requests must not change global state
         toolchainsBuilder.setUserToolchainsFile( request.getUserToolchainsFile() );
     }
 
+    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
+        throws MavenEmbedderException
+    {
+        pom( request );
+        
+        settings( request );
+
+        localRepository( request );
+
+        toolchains( request );
+
+        processSettings( request );
+                
+        return request;
+    }
 }
