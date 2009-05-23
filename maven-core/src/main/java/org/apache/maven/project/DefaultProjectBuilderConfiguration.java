@@ -82,6 +82,10 @@ public class DefaultProjectBuilderConfiguration
     
     public Properties getExecutionProperties()
     {
+        if ( executionProperties == null )
+        {
+            executionProperties = new Properties();
+        }
         return executionProperties;
     }
 
@@ -115,6 +119,10 @@ public class DefaultProjectBuilderConfiguration
 
     public List<String> getActiveProfileIds()
     {
+        if ( activeProfileIds == null )
+        {
+            activeProfileIds = new ArrayList<String>();
+        }
         return activeProfileIds;        
     }
 
@@ -125,6 +133,10 @@ public class DefaultProjectBuilderConfiguration
 
     public List<String> getInactiveProfileIds()
     {
+        if ( inactiveProfileIds == null )
+        {
+            inactiveProfileIds = new ArrayList<String>();
+        }
         return inactiveProfileIds;
     }
 
@@ -150,6 +162,11 @@ public class DefaultProjectBuilderConfiguration
 
     public List<Profile> getProfiles()
     {
+        if ( profiles == null )
+        {
+            profiles = new ArrayList<Profile>();
+        }
         return profiles;
     }
+
 }
