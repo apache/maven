@@ -57,15 +57,17 @@ public class DefaultMavenExecutionRequestPopulator
         throws MavenEmbedderException
     {
         // copy configuration to request
-        
-        if ( configuration.getGlobalSettingsFile() != null )
+        if ( request.getSettings() == null )
         {
-            request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
-        }
-
-        if ( configuration.getUserSettingsFile() != null )
-        {
-            request.setUserSettingsFile( configuration.getUserSettingsFile() );
+            if ( configuration.getGlobalSettingsFile() != null )
+            {
+                request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+            }
+    
+            if ( configuration.getUserSettingsFile() != null )
+            {
+                request.setUserSettingsFile( configuration.getUserSettingsFile() );
+            }
         }
 
         String localRepositoryPath = null;
@@ -79,7 +81,12 @@ public class DefaultMavenExecutionRequestPopulator
         {
             localRepositoryPath = configuration.getLocalRepository().getAbsolutePath();
         }
-        
+
+        if ( !StringUtils.isEmpty( localRepositoryPath ) )
+        {
+            request.setLocalRepositoryPath( localRepositoryPath );
+        }
+
         // populate the defaults
 
         return populateDefaults( request );
