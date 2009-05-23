@@ -3028,9 +3028,13 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public static final String SOURCE_POM = "pom";
+
+    public static final String SOURCE_SETTINGS = "settings.xml";
+
     // We don't want this to be parseable...it's sort of 'hidden'
     // default source for this profile is in the pom itself.
-    private String source = "pom";
+    private String source = SOURCE_POM;
 
     public void setSource( String source )
     {
