@@ -36,9 +36,9 @@ import org.codehaus.plexus.component.annotations.Component;
  * 
  * @author Benjamin Bentmann
  */
-@Component( role = Normalizer.class )
-public class DefaultNormalizer
-    implements Normalizer
+@Component( role = ModelNormalizer.class )
+public class DefaultModelNormalizer
+    implements ModelNormalizer
 {
 
     private DuplicateMerger merger = new DuplicateMerger();
