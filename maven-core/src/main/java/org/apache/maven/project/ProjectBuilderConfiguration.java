@@ -5,8 +5,10 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.profile.ProfileActivationContext;
 
 public interface ProjectBuilderConfiguration
+    extends ProfileActivationContext
 {
     ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository );
     
