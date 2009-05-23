@@ -25,7 +25,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+@Deprecated
 public class ProfileActivationContext
+    implements org.apache.maven.model.profile.ProfileActivationContext
 {
     private boolean isCustomActivatorFailureSuppressed;
 
@@ -146,6 +148,16 @@ public class ProfileActivationContext
     public void setActiveByDefaultProfileIds( List<String> activeByDefault )
     {
         this.activeByDefault = activeByDefault;
+    }
+
+    public List<String> getActiveProfileIds()
+    {
+        return getExplicitlyActiveProfileIds();
+    }
+
+    public List<String> getInactiveProfileIds()
+    {
+        return getExplicitlyInactiveProfileIds();
     }
 
 }

@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 
+@Deprecated
 public interface ProfileManager
 {
     void addProfile( Profile profile );
@@ -33,7 +34,6 @@ public interface ProfileManager
 
     Map<String, Profile> getProfilesById();
     
-    @Deprecated
     List<Profile> getActiveProfiles( Model model )
         throws ProfileActivationException;
     

@@ -21,13 +21,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.ProfileActivationContext;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -146,9 +143,6 @@ public abstract class AbstractMavenProjectTestCase
     protected MavenProject getProject( File pom )
         throws Exception
     {
-        Properties props = System.getProperties();
-        ProfileActivationContext ctx = new ProfileActivationContext( props, false );
-
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
         configuration.setLocalRepository( getLocalRepository() );
 

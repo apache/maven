@@ -19,6 +19,7 @@ package org.apache.maven.profiles;
  * under the License.
  */
 
+@Deprecated
 public class ProfileActivationException
     extends Exception
 {

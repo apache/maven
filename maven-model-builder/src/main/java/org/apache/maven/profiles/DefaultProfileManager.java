@@ -21,22 +21,20 @@ package org.apache.maven.profiles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.matchers.DefaultMatcher;
-import org.apache.maven.profiles.matchers.FileMatcher;
-import org.apache.maven.profiles.matchers.JdkMatcher;
-import org.apache.maven.profiles.matchers.ProfileMatcher;
-import org.apache.maven.profiles.matchers.PropertyMatcher;
+import org.apache.maven.model.profile.activator.FileProfileActivator;
+import org.apache.maven.model.profile.activator.JdkVersionProfileActivator;
+import org.apache.maven.model.profile.activator.OperatingSystemProfileActivator;
+import org.apache.maven.model.profile.activator.ProfileActivator;
+import org.apache.maven.model.profile.activator.PropertyProfileActivator;
 
+@Deprecated
 public class DefaultProfileManager
     implements ProfileManager
 {
@@ -44,11 +42,10 @@ public class DefaultProfileManager
     private Map<String, Profile> profilesById = new LinkedHashMap<String, Profile>();
 
     private ProfileActivationContext profileActivationContext;
-    
-    private static final ProfileMatcher defaultMatcher = new DefaultMatcher();
 
-    private static final List<ProfileMatcher> matchers =
-        Collections.unmodifiableList( Arrays.asList( new PropertyMatcher(), new FileMatcher(), new JdkMatcher() ) );    
+    private static final List<ProfileActivator> activators =
+        Arrays.asList( new PropertyProfileActivator(), new OperatingSystemProfileActivator(),
+                       new FileProfileActivator(), new JdkVersionProfileActivator() );
 
     /**
      * the properties passed to the profile manager are the props that
@@ -174,50 +171,6 @@ public class DefaultProfileManager
         }
         return allActive;
     }
- 
-    public static Collection<Profile> getActiveProfiles(List<Profile> profiles, ProfileManagerInfo profileContextInfo)
-    {
-        Properties properties = profileContextInfo.getInterpolatorProperties();
-        Collection<String> activeProfileIds = profileContextInfo.getActiveProfileIds();
-        Collection<String> inactiveProfileIds = profileContextInfo.getInactiveProfileIds();
-        
-        List<Profile> matchedProfiles = new ArrayList<Profile>();
-        List<Profile> defaultProfiles = new ArrayList<Profile>();
-        for ( Profile profile : profiles )
-        {
-            String profileId = profile.getId();
-
-            if ( !inactiveProfileIds.contains( profileId ) )
-            {
-                if ( activeProfileIds.contains( profileId ) )
-                {
-                    matchedProfiles.add( profile );
-                }
-                else if ( defaultMatcher.isMatch( profile, properties ) )
-                {
-                    defaultProfiles.add( profile );
-                }
-                else
-                {
-                    for ( ProfileMatcher matcher : matchers )
-                    {
-                        if ( matcher.isMatch( profile, properties ) )
-                        {
-                            matchedProfiles.add( profile );
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ( matchedProfiles.isEmpty() )
-        {
-            matchedProfiles = defaultProfiles;
-        }
-
-        return matchedProfiles;
-    }    
 
     /* (non-Javadoc)
      * @see org.apache.maven.project.ProfileManager#addProfiles(java.util.List)
@@ -246,11 +199,18 @@ public class DefaultProfileManager
     private boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
-        for(ProfileMatcher matcher : matchers)
+        for ( ProfileActivator activator : activators )
         {
-            if(matcher.isMatch(profile, context.getExecutionProperties()))
+            try
             {
-                return true;
+                if ( activator.isActive( profile, context ) )
+                {
+                    return true;
+                }
+            }
+            catch ( org.apache.maven.model.profile.ProfileActivationException e )
+            {
+                throw new ProfileActivationException( e.getMessage(), e.getCause() );
             }
         }
         return false;
@@ -265,4 +225,5 @@ public class DefaultProfileManager
             profileActivationContext.setActiveByDefault( profileId );
         }
     }
+
 }

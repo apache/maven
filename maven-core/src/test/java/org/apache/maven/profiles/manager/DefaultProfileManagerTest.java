@@ -61,7 +61,7 @@ public class DefaultProfileManagerTest
 
         defaultActivated.setActivation( defaultActivation );
 
-        Properties props = new Properties();
+        Properties props = System.getProperties();
         ProfileActivationContext ctx = new ProfileActivationContext( props, false );
 
         ProfileManager profileManager = new DefaultProfileManager( ctx );
