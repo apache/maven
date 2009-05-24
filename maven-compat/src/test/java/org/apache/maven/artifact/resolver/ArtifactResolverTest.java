@@ -231,6 +231,7 @@ public class ArtifactResolverTest
             artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
 
         Iterator i = result.getArtifacts().iterator();
+        i.next();
         assertEquals( "n should be first", n, i.next() );
         assertEquals( "m should be second", m, i.next() );
 
@@ -243,6 +244,7 @@ public class ArtifactResolverTest
             artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
 
         i = result.getArtifacts().iterator();
+        i.next();
         assertEquals( "m should be first", m, i.next() );
         assertEquals( "n should be second", n, i.next() );
     }
