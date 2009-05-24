@@ -67,6 +67,7 @@
               <phase>test-compile</phase>
               <phase>process-test-classes</phase>
               <phase>test</phase>
+              <phase>prepare-package</phase>
               <phase>package</phase>
               <phase>pre-integration-test</phase>
               <phase>integration-test</phase>
