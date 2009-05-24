@@ -54,6 +54,7 @@ import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
@@ -471,16 +472,49 @@ public class DefaultLifecycleExecutor
      */
     private Xpp3Dom extractMojoConfiguration( Xpp3Dom executionConfiguration, MojoDescriptor mojoDescriptor )
     {
-        Xpp3Dom mojoConfiguration = new Xpp3Dom( executionConfiguration );
+        Xpp3Dom mojoConfiguration = new Xpp3Dom( executionConfiguration.getName() );
 
         Collection<String> mojoParameters = mojoDescriptor.getParameterMap().keySet();
 
-        for ( int i = mojoConfiguration.getChildCount() - 1; i >= 0; i-- )
+        Map<String, String> aliases = new HashMap<String, String>();
+        if ( mojoDescriptor.getParameters() != null )
         {
-            String mojoParameter = mojoConfiguration.getChild( i ).getName();
-            if ( !mojoParameters.contains( mojoParameter ) )
+            for ( Parameter parameter : mojoDescriptor.getParameters() )
             {
-                mojoConfiguration.removeChild( i );
+                String alias = parameter.getAlias();
+                if ( StringUtils.isNotEmpty( alias ) )
+                {
+                    aliases.put( alias, parameter.getName() );
+                }
+            }
+        }
+
+        for ( int i = 0; i < executionConfiguration.getChildCount(); i++ )
+        {
+            Xpp3Dom executionDom = executionConfiguration.getChild( i );
+            String paramName = executionDom.getName();
+
+            if ( mojoParameters.contains( paramName ) )
+            {
+                Xpp3Dom mojoDom = new Xpp3Dom( executionDom );
+                mojoConfiguration.addChild( mojoDom );
+            }
+            else if ( aliases.containsKey( paramName ) )
+            {
+                Xpp3Dom mojoDom = new Xpp3Dom( aliases.get( paramName ) );
+                mojoDom.setValue( executionDom.getValue() );
+
+                for ( String attributeName : executionDom.getAttributeNames() )
+                {
+                    mojoDom.setAttribute( attributeName, executionDom.getAttribute( attributeName ) );
+                }
+
+                for ( Xpp3Dom child : executionDom.getChildren() )
+                {
+                    mojoDom.addChild( new Xpp3Dom( child ) );
+                }
+
+                mojoConfiguration.addChild( mojoDom );
             }
         }
 
