@@ -71,6 +71,10 @@ public class DefaultProjectBuilderConfiguration
         
     public List<ArtifactRepository> getRemoteRepositories()
     {
+        if ( remoteRepositories == null )
+        {
+            remoteRepositories = new ArrayList<ArtifactRepository>();
+        }
         return remoteRepositories;
     }
 
