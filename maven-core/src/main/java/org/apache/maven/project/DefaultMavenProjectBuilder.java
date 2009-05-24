@@ -38,6 +38,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelEventListener;
 import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.interpolator.Interpolator;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.lifecycle.LifecycleBindingsInjector;
@@ -387,8 +388,35 @@ public class DefaultMavenProjectBuilder
         List<DomainModel> domainModels = new ArrayList<DomainModel>();
 
         domainModels.add( domainModel );
+
         ArtifactRepository localRepository = projectBuilderConfiguration.getLocalRepository();
-        List<ArtifactRepository> remoteRepositories = projectBuilderConfiguration.getRemoteRepositories();
+
+        List<ArtifactRepository> remoteRepositories = new ArrayList<ArtifactRepository>();
+        try
+        {
+            for ( Profile profile : profileSelector.getActiveProfiles( projectBuilderConfiguration.getProfiles(),
+                                                                       projectBuilderConfiguration ) )
+            {
+                for ( Repository repository : profile.getRepositories() )
+                {
+                    try
+                    {
+                        remoteRepositories.add( repositorySystem.buildArtifactRepository( repository ) );
+                    }
+                    catch ( InvalidRepositoryException e )
+                    {
+                        throw new ProjectBuildingException( projectId, "Failed to create remote repository "
+                            + repository, pomFile, e );
+                    }
+                }
+            }
+            remoteRepositories = repositorySystem.getMirrors( remoteRepositories );
+        }
+        catch ( ProfileActivationException e )
+        {
+            throw new ProjectBuildingException( projectId, "Failed to determine active profiles", pomFile, e );
+        }
+        remoteRepositories.addAll( projectBuilderConfiguration.getRemoteRepositories() );
 
         File parentFile = null;
         int lineageCount = 0;
