@@ -329,6 +329,7 @@ public class DefaultArtifactResolver
     {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( originatingArtifact )
+            .setResolveRoot( false )
             // This is required by the surefire plugin
             .setArtifactDependencies( artifacts )            
             .setManagedVersionMap( managedVersions )
@@ -357,11 +358,6 @@ public class DefaultArtifactResolver
     // ------------------------------------------------------------------------
     //
     // ------------------------------------------------------------------------
-
-    private boolean isDummy( ArtifactResolutionRequest request )
-    {
-        return request.getArtifact().getArtifactId().equals( "dummy" ) && request.getArtifact().getGroupId().equals( "dummy" );        
-    }
     
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
@@ -386,15 +382,7 @@ public class DefaultArtifactResolver
                 // won't happen
             }
         }
-        
-        // This is an extreme hack because of the ridiculous APIs we have a root that is disconnected and
-        // useless. The SureFire plugin passes in a dummy root artifact that is actually used in the production
-        // plugin ... We have no choice but to put this hack in the core.
-        if ( isDummy( request ) )
-        {
-            request.setResolveRoot( false );
-        }
-                
+
         if ( listeners == null )
         {
             listeners = new ArrayList<ResolutionListener>();
@@ -513,7 +501,7 @@ public class DefaultArtifactResolver
                 
         // We want to send the root artifact back in the result but we need to do this after the other dependencies
         // have been resolved.
-        if ( request.isResolveRoot() && !isDummy( request ) )
+        if ( request.isResolveRoot() )
         {
             // Add the root artifact (as the first artifact to retain logical order of class path!)
             Set<Artifact> allArtifacts = new LinkedHashSet<Artifact>();
