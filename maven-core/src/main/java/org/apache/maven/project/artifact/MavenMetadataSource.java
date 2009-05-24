@@ -15,6 +15,7 @@ package org.apache.maven.project.artifact;
  * the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -46,8 +47,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
 /**
  * @author Jason van Zyl
@@ -90,6 +89,8 @@ public class MavenMetadataSource
         configuration.setRemoteRepositories( remoteRepositories );
         // We don't care about processing plugins here, all we're interested in is the dependencies.
         configuration.setProcessPlugins( false );
+        // FIXME: We actually need the execution properties here...
+        configuration.setExecutionProperties( System.getProperties() );
 
         MavenProject project;
 
@@ -117,6 +118,11 @@ public class MavenMetadataSource
                         else
                         {
                             dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
+                        }
+
+                        if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
+                        {
+                            dependencyArtifact.setFile( new File( d.getSystemPath() ) );
                         }
 
                         artifacts.add( dependencyArtifact );
