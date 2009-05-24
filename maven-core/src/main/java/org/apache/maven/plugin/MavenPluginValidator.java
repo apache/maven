@@ -27,6 +27,8 @@ public class MavenPluginValidator
 
     private List<String> errors = new ArrayList<String>();
 
+    private boolean firstDescriptor = true;
+
     public MavenPluginValidator( Artifact pluginArtifact )
     {
         this.pluginArtifact = pluginArtifact;
@@ -34,6 +36,16 @@ public class MavenPluginValidator
 
     public void validate( PluginDescriptor pluginDescriptor )
     {
+        /*
+         * NOTE: For plugins that depend on other plugin artifacts the plugin realm contains more than one plugin
+         * descriptor. However, only the first descriptor is of interest.
+         */
+        if ( !firstDescriptor )
+        {
+            return;
+        }
+        firstDescriptor = false;
+
         if ( !pluginArtifact.getGroupId().equals( pluginDescriptor.getGroupId() ) )
         {
             errors.add( "Plugin's descriptor contains the wrong group ID: " + pluginDescriptor.getGroupId() );
