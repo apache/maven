@@ -456,12 +456,15 @@ public class DefaultArtifactResolver
             }
         }
         
-        if ( artifacts == null || artifacts.size() == 0 )
+        if ( artifacts == null || artifacts.isEmpty() )
         {
-            result.addArtifact( rootArtifact );            
+            if ( request.isResolveRoot() )
+            {
+                result.addArtifact( rootArtifact );
+            }
             return result;
         } 
-                                
+
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners, null );
                         

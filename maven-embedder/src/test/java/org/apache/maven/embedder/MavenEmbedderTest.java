@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -389,6 +390,20 @@ public class MavenEmbedderTest
         artifacts.iterator().next();
     }
 
+    public void testProjectReadingNoDependencies()
+        throws Exception
+    {
+        MavenExecutionRequest request =
+            new DefaultMavenExecutionRequest().setShowErrors( true ).setPom(
+                                                                             getPomFile( "pom-without-dependencies.xml" ) );
+
+        MavenExecutionResult result = mavenEmbedder.readProjectWithDependencies( request );
+
+        assertNoExceptions( result );
+
+        assertEquals( new ArrayList<Artifact>(), new ArrayList<Artifact>( result.getProject().getArtifacts() ) );
+    }
+
     public void testProjectReading_FromChildLevel_ScmInheritanceCalculations()
         throws Exception
     {
@@ -600,6 +615,12 @@ public class MavenEmbedderTest
 
     protected File getPomFile()
     {
-        return new File( basedir, "src/test/resources/pom.xml" );
+        return getPomFile( "pom.xml" );
     }
+
+    protected File getPomFile( String name )
+    {
+        return new File( basedir, "src/test/resources/" + name );
+    }
+
 }
