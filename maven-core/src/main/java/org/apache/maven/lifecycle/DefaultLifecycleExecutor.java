@@ -271,7 +271,7 @@ public class DefaultLifecycleExecutor
 
                 MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-" + mojoDescriptor.getGoal() );
                 
-                populateMojoExecutionConfiguration( project, mojoExecution );
+                populateMojoExecutionConfiguration( project, mojoExecution, true );
 
                 lifecyclePlan.add( mojoExecution );
             }
@@ -398,7 +398,7 @@ public class DefaultLifecycleExecutor
 
             mojoExecution.setMojoDescriptor( mojoDescriptor );
             
-            populateMojoExecutionConfiguration( project, mojoExecution );
+            populateMojoExecutionConfiguration( project, mojoExecution, false );
 
             lifecyclePlan.add( mojoExecution );
         }        
@@ -414,33 +414,50 @@ public class DefaultLifecycleExecutor
         return sb.toString();
     }
         
-    private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution )
-    {        
+    private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution,
+                                                     boolean directInvocation )
+    {
         String g = mojoExecution.getGroupId();
 
         String a = mojoExecution.getArtifactId();
 
         Plugin p = project.getPlugin( g + ":" + a );
 
-        if ( p == null )
+        if ( p != null )
         {
-            // goal was invoked directly from command line and has no declaration in the POM itself
-            return;
+            for ( PluginExecution e : p.getExecutions() )
+            {
+                if ( mojoExecution.getExecutionId().equals( e.getId() ) )
+                {
+                    Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
+
+                    Xpp3Dom mojoConfiguration =
+                        extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
+
+                    mojoExecution.setConfiguration( mojoConfiguration );
+
+                    return;
+                }
+            }
         }
 
-        for ( PluginExecution e : p.getExecutions() )
+        if ( directInvocation )
         {
-            if ( mojoExecution.getExecutionId().equals( e.getId() ) )
+            Xpp3Dom defaultDom = convert( mojoExecution.getMojoDescriptor() );
+
+            if ( p != null && p.getConfiguration() != null )
             {
-                Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
-
-                Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
-
-                mojoExecution.setConfiguration( mojoConfiguration );
+                Xpp3Dom projectDom = (Xpp3Dom) p.getConfiguration();
+                projectDom = extractMojoConfiguration( projectDom, mojoExecution.getMojoDescriptor() );
+                mojoExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( projectDom, defaultDom, Boolean.TRUE ) );
+            }
+            else
+            {
+                mojoExecution.setConfiguration( defaultDom );
             }
         }
     }    
-    
+
     /**
      * Extracts the configuration for a single mojo from the specified execution configuration by discarding any
      * non-applicable parameters. This is necessary because a plugin execution can have multiple goals with different
