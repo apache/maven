@@ -89,6 +89,11 @@ public class ArtifactResolutionResult
         return ( artifacts != null ) ? artifacts : Collections.<Artifact> emptySet();
     }
 
+    public void setArtifacts( Set<Artifact> artifacts )
+    {
+        this.artifacts = artifacts;
+    }
+
     public void addRequestedArtifact( Artifact artifact )
     {
         if ( requestedArtifacts == null )

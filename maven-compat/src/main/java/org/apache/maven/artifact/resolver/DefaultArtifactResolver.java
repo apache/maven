@@ -515,8 +515,11 @@ public class DefaultArtifactResolver
         // have been resolved.
         if ( request.isResolveRoot() && !isDummy( request ) )
         {
-            // Add the root artifact
-            result.addArtifact( rootArtifact );                        
+            // Add the root artifact (as the first artifact to retain logical order of class path!)
+            Set<Artifact> allArtifacts = new LinkedHashSet<Artifact>();
+            allArtifacts.add( rootArtifact );
+            allArtifacts.addAll( result.getArtifacts() );
+            result.setArtifacts( allArtifacts );
         }                        
                  
         return result;
