@@ -576,6 +576,18 @@ public class DefaultLifecycleExecutor
                     break;
                 }
             }
+
+            if ( plugin.getVersion() == null && project.getPluginManagement() != null )
+            {
+                for ( Plugin pluginInPom : project.getPluginManagement().getPlugins() )
+                {
+                    if ( pluginInPom.getArtifactId().equals( plugin.getArtifactId() ) )
+                    {
+                        plugin.setVersion( pluginInPom.getVersion() );
+                        break;
+                    }
+                }
+            }
             
             // If there is no version to be found then we need to look in the repository metadata for
             // this plugin and see what's specified as the latest release.
