@@ -356,13 +356,13 @@ public class DefaultMavenProjectBuilder
     private MavenProject fromDomainModelToMavenProject( Model model, File parentFile, ProjectBuilderConfiguration config, File projectDescriptor )
         throws InvalidProjectModelException, IOException
     {
+        validateModel( model, projectDescriptor, config.istLenientValidation() );
+
         MavenProject project;
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
         try
         {
             project = new MavenProject( model, repositorySystem, this, config );
-
-            validateModel( model, projectDescriptor, config.istLenientValidation() );
 
             Artifact projectArtifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
             project.setArtifact( projectArtifact );
