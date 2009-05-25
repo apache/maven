@@ -48,7 +48,8 @@ public interface ModelWriter
         throws IOException;
 
     /**
-     * Writes the supplied model to the specified character writer.
+     * Writes the supplied model to the specified character writer. The writer will be automatically closed before the
+     * method returns.
      * 
      * @param output The writer to serialize the model to, must not be {@code null}.
      * @param options The options to use for serialization, may be {@code null} to use the default values.
@@ -59,7 +60,8 @@ public interface ModelWriter
         throws IOException;
 
     /**
-     * Writes the supplied model to the specified byte stream.
+     * Writes the supplied model to the specified byte stream. The stream will be automatically closed before the method
+     * returns.
      * 
      * @param output The stream to serialize the model to, must not be {@code null}.
      * @param options The options to use for serialization, may be {@code null} to use the default values.

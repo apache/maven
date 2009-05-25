@@ -53,7 +53,8 @@ public interface ModelReader
         throws IOException;
 
     /**
-     * Reads the model from the specified character reader.
+     * Reads the model from the specified character reader. The reader will be automatically closed before the method
+     * returns.
      * 
      * @param input The reader to deserialize the model from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
@@ -64,7 +65,8 @@ public interface ModelReader
         throws IOException;
 
     /**
-     * Reads the model from the specified byte stream.
+     * Reads the model from the specified byte stream. The stream will be automatically closed before the method
+     * returns.
      * 
      * @param input The stream to deserialize the model from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
