@@ -100,14 +100,23 @@ public class DefaultInterpolator
 
         List<InterpolatorProperty> standardInterpolatorProperties = new ArrayList<InterpolatorProperty>();
 
-        String basedir = projectDirectory.getAbsolutePath();
-        standardInterpolatorProperties.add( new InterpolatorProperty( "${project.basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        standardInterpolatorProperties.add( new InterpolatorProperty( "${basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.basedir}", basedir, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+        String basedir = null;
+        if ( projectDirectory != null )
+        {
+            basedir = projectDirectory.getAbsolutePath();
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${project.basedir}", basedir,
+                                                                          PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${basedir}", basedir,
+                                                                          PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.basedir}", basedir,
+                                                                          PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
 
-        String baseuri = projectDirectory.toURI().toString();
-        standardInterpolatorProperties.add( new InterpolatorProperty( "${project.baseUri}", baseuri, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
-        standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.baseUri}", baseuri, PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+            String baseuri = projectDirectory.toURI().toString();
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${project.baseUri}", baseuri,
+                                                                          PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+            standardInterpolatorProperties.add( new InterpolatorProperty( "${pom.baseUri}", baseuri,
+                                                                          PomInterpolatorTag.PROJECT_PROPERTIES.name() ) );
+        }
 
         for ( ModelProperty mp : modelProperties )
         {
@@ -144,7 +153,8 @@ public class DefaultInterpolator
         	if ( mp.getUri().startsWith( ProjectUri.Build.xUri ) || mp.getUri().equals( ProjectUri.Reporting.outputDirectory ) )
         	{
         		File file = new File( mp.getResolvedValue() );
-        		if ( !file.isAbsolute() && !mp.getResolvedValue().startsWith( "${project.build." ) && !mp.getResolvedValue().equals( "${project.basedir}" ) )
+        		if ( !file.isAbsolute() && !mp.getResolvedValue().startsWith( "${project.build." )
+                    && !mp.getResolvedValue().equals( "${project.basedir}" ) && basedir != null )
         		{
         			buildDirectories.put( mp, new ModelProperty( mp.getUri(), new File( basedir, file.getPath() ).getAbsolutePath() ) );
         		}
