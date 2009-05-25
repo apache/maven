@@ -256,6 +256,8 @@ public class MavenProject
             }
         }
 
+        remoteArtifactRepositories = repositorySystem.getMirrors( remoteArtifactRepositories );
+
         if ( projectBuilderConfiguration.getRemoteRepositories() != null )
         {
             remoteArtifactRepositories.addAll( projectBuilderConfiguration.getRemoteRepositories() );
