@@ -20,7 +20,6 @@ package org.apache.maven.project.validation;
  */
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -82,10 +81,8 @@ public class DefaultModelValidator
 
         validateStringNotEmpty( "version", result, model.getVersion() );
 
-        for ( Iterator it = model.getDependencies().iterator(); it.hasNext(); )
+        for ( Dependency d : model.getDependencies() )
         {
-            Dependency d = (Dependency) it.next();
-
             validateId( "dependencies.dependency.artifactId", result, d.getArtifactId() );
 
             validateId( "dependencies.dependency.groupId", result, d.getGroupId() );
@@ -122,10 +119,8 @@ public class DefaultModelValidator
         DependencyManagement mgmt = model.getDependencyManagement();
         if ( mgmt != null )
         {
-            for ( Iterator it = mgmt.getDependencies().iterator(); it.hasNext(); )
+            for ( Dependency d : mgmt.getDependencies() )
             {
-                Dependency d = (Dependency) it.next();
-
                 validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.artifactId", result,
                                                   d.getArtifactId() );
 
@@ -161,10 +156,8 @@ public class DefaultModelValidator
         Build build = model.getBuild();
         if ( build != null )
         {
-            for ( Iterator it = build.getPlugins().iterator(); it.hasNext(); )
+            for ( Plugin p : build.getPlugins() )
             {
-                Plugin p = (Plugin) it.next();
-
                 validateStringNotEmpty( "build.plugins.plugin.artifactId", result, p.getArtifactId() );
 
                 validateStringNotEmpty( "build.plugins.plugin.groupId", result, p.getGroupId() );
@@ -177,17 +170,13 @@ public class DefaultModelValidator
                  */
             }
 
-            for ( Iterator it = build.getResources().iterator(); it.hasNext(); )
+            for ( Resource r : build.getResources() )
             {
-                Resource r = (Resource) it.next();
-
                 validateStringNotEmpty( "build.resources.resource.directory", result, r.getDirectory() );
             }
 
-            for ( Iterator it = build.getTestResources().iterator(); it.hasNext(); )
+            for ( Resource r : build.getTestResources() )
             {
-                Resource r = (Resource) it.next();
-
                 validateStringNotEmpty( "build.testResources.testResource.directory", result, r.getDirectory() );
             }
         }
@@ -195,10 +184,8 @@ public class DefaultModelValidator
         Reporting reporting = model.getReporting();
         if ( reporting != null )
         {
-            for ( Iterator it = reporting.getPlugins().iterator(); it.hasNext(); )
+            for ( ReportPlugin p : reporting.getPlugins())
             {
-                ReportPlugin p = (ReportPlugin) it.next();
-
                 validateStringNotEmpty( "reporting.plugins.plugin.artifactId", result, p.getArtifactId() );
 
                 validateStringNotEmpty( "reporting.plugins.plugin.groupId", result, p.getGroupId() );
@@ -231,12 +218,10 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateRepositories( ModelValidationResult result, List repositories, String prefix )
+    private void validateRepositories( ModelValidationResult result, List<Repository> repositories, String prefix )
     {
-        for ( Iterator it = repositories.iterator(); it.hasNext(); )
+        for ( Repository repository :  repositories )
         {
-            Repository repository = (Repository) it.next();
-
             validateStringNotEmpty( prefix + ".id", result, repository.getId() );
 
             validateStringNotEmpty( prefix + ".url", result, repository.getUrl() );
@@ -249,14 +234,12 @@ public class DefaultModelValidator
 
         if ( build != null )
         {
-            List plugins = build.getPlugins();
+            List<Plugin> plugins = build.getPlugins();
 
             if ( plugins != null )
             {
-                for ( Iterator it = plugins.iterator(); it.hasNext(); )
+                for ( Plugin plugin : plugins )
                 {
-                    Plugin plugin = (Plugin) it.next();
-
                     // this will force an IllegalStateException, even if we don't have to do inheritance assembly.
                     try
                     {
