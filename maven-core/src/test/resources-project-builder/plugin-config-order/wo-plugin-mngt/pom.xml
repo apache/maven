@@ -37,6 +37,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-configuration</artifactId>
+        <version>1.0</version>
         <configuration>
           <stringParams>
             <stringParam>one</stringParam>

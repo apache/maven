@@ -153,50 +153,50 @@ public class DefaultModelValidator
             }
         }
 
-        Build build = model.getBuild();
-        if ( build != null )
+        if ( !lenient )
         {
-            for ( Plugin p : build.getPlugins() )
+            Build build = model.getBuild();
+            if ( build != null )
             {
-                validateStringNotEmpty( "build.plugins.plugin.artifactId", result, p.getArtifactId() );
+                for ( Plugin p : build.getPlugins() )
+                {
+                    validateStringNotEmpty( "build.plugins.plugin.artifactId", result, p.getArtifactId() );
 
-                validateStringNotEmpty( "build.plugins.plugin.groupId", result, p.getGroupId() );
-                
-                /*
-                 * FIXME: Enforce the existence of a version, no more guessing but reproducibility. We can't do this
-                 * right now as it would affect dependency resolution via the metadata source. As a prerequisite, we
-                 * need to tell the validator which level of strictness we want or alternatively disable validation
-                 * completely for the metadata source.
-                 */
+                    validateStringNotEmpty( "build.plugins.plugin.groupId", result, p.getGroupId() );
+
+                    validateStringNotEmpty( "build.plugins.plugin.version", result, p.getVersion(), p.getKey() );
+                }
+
+                for ( Resource r : build.getResources() )
+                {
+                    validateStringNotEmpty( "build.resources.resource.directory", result, r.getDirectory() );
+                }
+
+                for ( Resource r : build.getTestResources() )
+                {
+                    validateStringNotEmpty( "build.testResources.testResource.directory", result, r.getDirectory() );
+                }
             }
 
-            for ( Resource r : build.getResources() )
+            Reporting reporting = model.getReporting();
+            if ( reporting != null )
             {
-                validateStringNotEmpty( "build.resources.resource.directory", result, r.getDirectory() );
+                for ( ReportPlugin p : reporting.getPlugins() )
+                {
+                    validateStringNotEmpty( "reporting.plugins.plugin.artifactId", result, p.getArtifactId() );
+
+                    validateStringNotEmpty( "reporting.plugins.plugin.groupId", result, p.getGroupId() );
+
+                    validateStringNotEmpty( "reporting.plugins.plugin.version", result, p.getVersion(), p.getKey() );
+                }
             }
 
-            for ( Resource r : build.getTestResources() )
-            {
-                validateStringNotEmpty( "build.testResources.testResource.directory", result, r.getDirectory() );
-            }
+            validateRepositories( result, model.getRepositories(), "repositories.repository" );
+
+            // validateRepositories( result, model.getPluginRepositories(), "pluginRepositories.pluginRepository" );
+
+            forcePluginExecutionIdCollision( model, result );
         }
-
-        Reporting reporting = model.getReporting();
-        if ( reporting != null )
-        {
-            for ( ReportPlugin p : reporting.getPlugins())
-            {
-                validateStringNotEmpty( "reporting.plugins.plugin.artifactId", result, p.getArtifactId() );
-
-                validateStringNotEmpty( "reporting.plugins.plugin.groupId", result, p.getGroupId() );
-            }
-        }
-
-        validateRepositories( result, model.getRepositories(), "repositories.repository" );
-
-//        validateRepositories( result, model.getPluginRepositories(), "pluginRepositories.pluginRepository" );
-
-        forcePluginExecutionIdCollision( model, result );
 
         return result;
     }

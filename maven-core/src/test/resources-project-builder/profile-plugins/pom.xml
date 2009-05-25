@@ -27,6 +27,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.3</version>
       </plugin>
     </plugins>
   </build>
@@ -42,6 +43,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly2-plugin</artifactId>
+            <version>2.0</version>
           </plugin>
         </plugins>
       </build>
