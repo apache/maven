@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -36,15 +37,17 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelEventListener;
-import org.apache.maven.model.ProcessorContext;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolator.Interpolator;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.lifecycle.LifecycleBindingsInjector;
+import org.apache.maven.model.management.ManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.profile.ProfileActivationException;
+import org.apache.maven.model.profile.ProfileInjector;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.validation.ModelValidationResult;
@@ -83,10 +86,19 @@ public class DefaultMavenProjectBuilder
     private ModelNormalizer normalizer;
 
     @Requirement
+    private InheritanceAssembler inheritanceAssembler;
+
+    @Requirement
     private Interpolator interpolator;
 
     @Requirement
     private ProfileSelector profileSelector;
+
+    @Requirement
+    private ProfileInjector profileInjector;
+
+    @Requirement
+    private ManagementInjector managementInjector;
 
     @Requirement
     private LifecycleBindingsInjector lifecycleBindingsInjector;
@@ -152,17 +164,15 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            List<Profile> externalProfiles = new ArrayList<Profile>();
             for ( Profile p : projectProfiles )
             {
                 if ( !"pom".equals( p.getSource() ) )
                 {
-                    logger.debug( "Merging profile into model (build): Model = " + domainModel.getId() + ", Profile = " + p.getId() );
-                    externalProfiles.add( p );
+                    logger.debug( "Merging profile into model (build): Model = " + domainModel.getId() + ", Profile = "
+                        + p.getId() );
+                    profileInjector.injectProfile( domainModel.getModel(), p );
                 }
             }
-
-            domainModel = ProcessorContext.mergeProfilesIntoModel( externalProfiles, domainModel );
         }
         catch ( IOException e )
         {
@@ -178,7 +188,7 @@ public class DefaultMavenProjectBuilder
                 lifecycleBindingsInjector.injectLifecycleBindings( model );
             }
 
-            ProcessorContext.processManagementNodes( model );
+            managementInjector.injectManagement( model );
 
             project = this.fromDomainModelToMavenProject( model, domainModel.getParentFile(), configuration, pomFile );
 
@@ -473,27 +483,103 @@ public class DefaultMavenProjectBuilder
                     for ( Profile p : profiles )
                     {
                         logger.debug( "Merging profile into model: Model = " + dm.getId() + ", Profile = " + p.getId() );
+                        profileInjector.injectProfile( dm.getModel(), p );
                     }
-                    profileModels.add( ProcessorContext.mergeProfilesIntoModel( profiles, dm ) );
-                }
-                else
-                {
-                    profileModels.add( dm );
                 }
             }
-            else
-            {
-                profileModels.add( dm );
-            }
+            profileModels.add( dm );
         }
 
-        DomainModel transformedDomainModel = ProcessorContext.build( profileModels, listeners );
+        DomainModel transformedDomainModel = build( profileModels, listeners );
 
         // Lineage count is inclusive to add the POM read in itself.
         transformedDomainModel.setLineageCount( lineageCount + 1 );
         transformedDomainModel.setParentFile( parentFile );
 
         return transformedDomainModel;
+    }
+
+    /**
+     * Parent domain models on bottom.
+     * 
+     * @param domainModels
+     * @param listeners
+     * @return
+     * @throws IOException
+     */
+    private DomainModel build( List<DomainModel> domainModels, List<ModelEventListener> listeners )
+        throws IOException
+    {
+        DomainModel child = null;
+        for ( DomainModel domainModel : domainModels )
+        {
+            if ( domainModel.isMostSpecialized() )
+            {
+                child = domainModel;
+            }
+        }
+        if ( child == null )
+        {
+            throw new IOException( "Could not find child model" );
+        }
+
+        Model target = processModelsForInheritance( convertDomainModelsToMavenModels( domainModels ) );
+        if ( listeners != null )
+        {
+            for ( ModelEventListener listener : listeners )
+            {
+                listener.fire( target );
+            }
+        }
+        DomainModel domainModel = new DomainModel( target, child.isMostSpecialized() );
+        domainModel.setProjectDirectory( child.getProjectDirectory() );
+        domainModel.setParentFile( child.getParentFile() );
+
+        return domainModel;
+    }
+
+    private List<Model> convertDomainModelsToMavenModels( List<DomainModel> domainModels )
+        throws IOException
+    {
+        List<Model> models = new ArrayList<Model>();
+        for ( DomainModel domainModel : domainModels )
+        {
+            DomainModel dm = domainModel;
+            if ( dm.getModel() != null )
+            {
+                if ( dm.isMostSpecialized() )
+                {
+                    models.add( 0, dm.getModel() );
+                }
+                else
+                {
+                    models.add( dm.getModel() );
+                }
+
+            }
+            else
+            {
+                throw new IOException( "model: null" );
+            }
+
+        }
+
+        return models;
+    }
+
+    private Model processModelsForInheritance( List<Model> models )
+    {
+        Collections.reverse( models );
+
+        Model previousModel = null;
+
+        for ( Model currentModel : models )
+        {
+            inheritanceAssembler.assembleModelInheritance( currentModel, previousModel );
+            previousModel = currentModel;
+        }
+
+        return previousModel;
     }
 
     private void validateModel( Model model, File pomFile, boolean lenient )
