@@ -65,14 +65,14 @@ public class ProjectInheritanceTest
         Set set = project1.getArtifacts();
         assertNotNull("No artifacts", set);
         assertTrue("No Artifacts", set.size() > 0);
-        assertTrue("Set size should be 4, is " + set.size(), set.size() == 4 );
+        assertTrue("Set size should be 3, is " + set.size(), set.size() == 3 );
 
         Iterator iter = set.iterator();
 
         while (iter.hasNext())
         {
             Artifact artifact = (Artifact)iter.next();
-            assertFalse("", artifact.getArtifactId().equals("maven-test-d"));
+            assertFalse( "", artifact.getArtifactId().equals( "t07-d" ) );
             System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion() + " Optional=" + (artifact.isOptional() ? "true" : "false"));
             assertTrue("Incorrect version for " + artifact.getDependencyConflictId(), artifact.getVersion().equals("1.0"));
         }
