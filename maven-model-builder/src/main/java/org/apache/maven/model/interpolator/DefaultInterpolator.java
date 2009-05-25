@@ -1,12 +1,12 @@
 package org.apache.maven.model.interpolator;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.Writer;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,15 +22,15 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.maven.model.Build;
-import org.apache.maven.model.DomainModel;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.model.io.ModelReader;
+import org.apache.maven.model.io.ModelWriter;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -39,6 +39,13 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class DefaultInterpolator
     implements Interpolator
 {
+
+    @Requirement
+    private ModelReader modelReader;
+
+    @Requirement
+    private ModelWriter modelWriter;
+
     public Model interpolateModel( Model model, Properties properties, File projectDirectory )
         throws IOException
     {
@@ -173,7 +180,7 @@ public class DefaultInterpolator
         try
         {
             String xml = unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
-            Model m = new DomainModel( new ByteArrayInputStream( xml.getBytes( "UTF-8" ) ) ).getModel();
+            Model m = modelReader.read( new StringReader( xml ), null );
             if ( projectDirectory != null )
             {
                 alignPaths( m, projectDirectory );
@@ -336,25 +343,11 @@ public class DefaultInterpolator
     }
 
     
-    private static List<ModelProperty> getModelProperties( Model model )
+    private List<ModelProperty> getModelProperties( Model model )
         throws IOException
     {
-    	
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer out = null;
-        MavenXpp3Writer writer = new MavenXpp3Writer();
-        try
-        {
-            out = WriterFactory.newXmlWriter( baos );
-            writer.write( out, model );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                out.close();
-            }
-        }
+        StringWriter writer = new StringWriter();
+        modelWriter.write( writer, null, model );
   	
         Set<String> s = new HashSet<String>();
         //TODO: Should add all collections from ProjectUri
@@ -381,7 +374,7 @@ public class DefaultInterpolator
         s.add( ProjectUri.Profiles.Profile.Dependencies.xUri );
         s.add( ProjectUri.Profiles.Profile.Build.Plugins.Plugin.configuration );
 
-        return new ArrayList<ModelProperty>( marshallXmlToModelProperties(  new ByteArrayInputStream(baos.toByteArray()), ProjectUri.baseUri, s ) );
+        return new ArrayList<ModelProperty>( marshallXmlToModelProperties( new ByteArrayInputStream(writer.toString().getBytes( "UTF-8" )), ProjectUri.baseUri, s ) );
     }
 
     /**
