@@ -138,7 +138,6 @@ public class PomConstructionTest
         throws Exception
     {
       PomTestWrapper tester = buildPom("micromailer");
-      assertEquals( 2, tester.getDomainModel().getLineageCount() );
       assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
@@ -147,7 +146,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "dependency-scope/sub" );
-        System.out.println(pom.getDomainModel().asString());
 
     }
 
@@ -278,7 +276,6 @@ public class PomConstructionTest
     throws Exception
 {
     PomTestWrapper pom = buildPom( "plugin-config-duplicate/dup" );
-    System.out.println(pom.getDomainModel().asString());
 } 
 */
 
@@ -331,7 +328,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "consecutive_empty_elements" );
-        pom.getDomainModel().asString();
     }
 
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
@@ -1289,7 +1285,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "inherited-properties-interpolation/active-profile/sub" );
 
-        assertEquals(1, pom.getDomainModel().getModel().getProfiles().size());
+        assertEquals(1, pom.getMavenProject().getModel().getProfiles().size());
 
         buildPom( "inherited-properties-interpolation/active-profile/sub", "it-parent", "it-child" );
         assertEquals( "CHILD", pom.getValue( "properties/overridden" ) );
@@ -1411,7 +1407,6 @@ public class PomConstructionTest
 	    PomTestWrapper pom = buildPom( "dependency-scope-inheritance/sub" );
 	    String scope = (String) pom.getValue("dependencies[1]/scope");
 	    assertNull("Scope not null: " + scope, scope);
-	    System.out.println(pom.getDomainModel().asString());
 	
 	}   
     
@@ -1419,7 +1414,6 @@ public class PomConstructionTest
 	    throws Exception
 	{
 	    PomTestWrapper pom = buildPom( "dependency-scope/sub" );
-	 //   System.out.println(pom.getDomainModel().asString());	
 	}   
  
     //This will fail on a validation error if incorrect

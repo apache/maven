@@ -26,13 +26,10 @@ import java.util.Iterator;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.maven.model.DomainModel;
 import org.apache.maven.project.MavenProject;
 
 public class PomTestWrapper
 {
-
-    private DomainModel domainModel;
 
     private File pomFile;
 
@@ -43,24 +40,6 @@ public class PomTestWrapper
     static
     {
         JXPathContextReferenceImpl.addNodePointerFactory( new Xpp3DomPointerFactory() );
-    }
-
-    public PomTestWrapper( DomainModel domainModel )
-        throws IOException
-    {
-        this( null, domainModel );
-    }
-
-    public PomTestWrapper( File pomFile, DomainModel domainModel )
-        throws IOException
-    {
-        if ( domainModel == null )
-        {
-            throw new IllegalArgumentException( "domainModel: null" );
-        }
-        this.domainModel = domainModel;
-        this.pomFile = pomFile;
-        context = JXPathContext.newContext( domainModel.getModel());
     }
 
     public PomTestWrapper( File pomFile, MavenProject mavenProject )
@@ -86,37 +65,9 @@ public class PomTestWrapper
         context = JXPathContext.newContext( mavenProject.getModel() );
     }
 
-    public PomTestWrapper( File file )
-        throws IOException
-    {
-        if ( file == null )
-        {
-            throw new IllegalArgumentException( "file: null" );
-        }
-
-        this.domainModel = new DomainModel( file );
-        context = JXPathContext.newContext( domainModel.getModel() );
-    }
-
     public MavenProject getMavenProject()
     {
         return mavenProject;
-    }
-
-    public DomainModel getDomainModel()
-    	throws IOException {
-        if ( domainModel == null && mavenProject != null )
-        {
-                domainModel = new DomainModel( mavenProject.getModel() );
-                int lineageCount = 1;
-                for ( MavenProject parent = mavenProject.getParent(); parent != null; parent = parent.getParent() )
-                {
-                    lineageCount++;
-                }
-                domainModel.setLineageCount( lineageCount );
-        }
-
-        return this.domainModel;
     }
 
     public File getBasedir()
