@@ -567,22 +567,66 @@
           <code>
             <![CDATA[
     /**
+     * The POM from which this model originated. This is transient runtime state and therefore not managed by Modello.
+     */
+    private java.io.File pomFile;
+
+    /**
+     * Gets the POM file from which this model originated. This can either be a {@code pom.xml} of some project being
+     * built or the {@code *.pom} of some artifact being resolved from the repository.
+     * 
+     * @return The POM file from which this model originated or {@code null} if unknown.
+     */
+    public java.io.File getPomFile()
+    {
+        return pomFile;
+    }
+
+    public void setPomFile( java.io.File pomFile )
+    {
+        this.pomFile = pomFile;
+    }
+
+    /**
+     * The base directory for the corresponding project (if any). This is transient runtime state and therefore not
+     * managed by Modello.
+     */
+    private java.io.File projectDirectory;
+
+    /**
+     * Gets the base directory for the corresponding project (if any). Note that this is really a separate piece of
+     * information and not necessarily equivalent to the parent directory of {@link #getPomFile()}.
+     * 
+     * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
+     *         project but describes the metadata of some artifact from the repository.
+     */
+    public java.io.File getProjectDirectory()
+    {
+        return projectDirectory;
+    }
+
+    public void setProjectDirectory( java.io.File projectDirectory )
+    {
+        this.projectDirectory = projectDirectory;
+    }
+
+    /**
      * @return the model id as <code>groupId:artifactId:packaging:version</code>
      */
-      public String getId()
-      {
-          StringBuffer id = new StringBuffer();
+    public String getId()
+    {
+        StringBuilder id = new StringBuilder( 64 );
 
-          id.append( getGroupId() == null ? "[inherited]" : getGroupId() );
-          id.append( ":" );
-          id.append( getArtifactId() );
-          id.append( ":" );
-          id.append( getPackaging() );
-          id.append( ":" );
-          id.append( getVersion() == null ? "[inherited]" : getVersion() );
+        id.append( ( getGroupId() == null ) ? "[inherited]" : getGroupId() );
+        id.append( ":" );
+        id.append( getArtifactId() );
+        id.append( ":" );
+        id.append( getPackaging() );
+        id.append( ":" );
+        id.append( ( getVersion() == null ) ? "[inherited]" : getVersion() );
 
-          return id.toString();
-      }
+        return id.toString();
+    }
 
     @Override
     public String toString()
@@ -1878,7 +1922,7 @@
      */
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder( 128 );
 
         sb.append("PatternSet [includes: {");
         for (java.util.Iterator i = getIncludes().iterator(); i.hasNext(); )
@@ -1963,14 +2007,13 @@
      */
     public String getId()
     {
-        StringBuffer id = new StringBuffer();
+        StringBuilder id = new StringBuilder( 64 );
 
         id.append( getGroupId() );
         id.append( ":" );
         id.append( getArtifactId() );
         id.append( ":" );
         id.append( "pom" );
-      //  id.append( getPackaging() );
         id.append( ":" );
         id.append( getVersion() );
 

@@ -50,7 +50,11 @@ public class DefaultModelReader
             throw new IllegalArgumentException( "input file missing" );
         }
 
-        return read( ReaderFactory.newXmlReader( input ), options );
+        Model model = read( ReaderFactory.newXmlReader( input ), options );
+
+        model.setPomFile( input );
+
+        return model;
     }
 
     public Model read( Reader input, Map<String, Object> options )
