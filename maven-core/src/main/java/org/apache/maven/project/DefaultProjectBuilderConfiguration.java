@@ -41,7 +41,9 @@ public class DefaultProjectBuilderConfiguration
     private MavenProject topProject;
     
     private boolean processPlugins = true;
-    
+
+    private boolean lenientValidation;
+
     private List<String> activeProfileIds;
     
     private List<String> inactiveProfileIds;
@@ -119,6 +121,17 @@ public class DefaultProjectBuilderConfiguration
     {
         this.processPlugins = processPlugins;
         return this;
+    }
+
+    public ProjectBuilderConfiguration setLenientValidation( boolean lenientValidation )
+    {
+        this.lenientValidation = lenientValidation;
+        return this;
+    }
+
+    public boolean istLenientValidation()
+    {
+        return lenientValidation;
     }
 
     public List<String> getActiveProfileIds()

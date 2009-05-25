@@ -87,6 +87,7 @@ public class MavenMetadataSource
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
         configuration.setLocalRepository( localRepository );
         configuration.setRemoteRepositories( remoteRepositories );
+        configuration.setLenientValidation( true );
         // We don't care about processing plugins here, all we're interested in is the dependencies.
         configuration.setProcessPlugins( false );
         // FIXME: We actually need the execution properties here...

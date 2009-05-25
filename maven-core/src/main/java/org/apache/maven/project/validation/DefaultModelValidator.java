@@ -49,6 +49,11 @@ public class DefaultModelValidator
 
     public ModelValidationResult validate( Model model )
     {
+        return validate( model, false );
+    }
+
+    public ModelValidationResult validate( Model model, boolean lenient )
+    {
         ModelValidationResult result = new ModelValidationResult();
 
         validateStringNotEmpty( "modelVersion", result, model.getModelVersion() );

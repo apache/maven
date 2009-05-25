@@ -29,7 +29,25 @@ public interface ProjectBuilderConfiguration
     ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins );
     
     boolean isProcessPlugins();
-        
+
+    /**
+     * Controls the level of validation to perform on processed models. By default, models are validated in strict mode.
+     * 
+     * @param lenientValidation A flag whether validation should be lenient instead of strict. For building of projects,
+     *            strict validation should be used to ensure proper building. For the mere retrievel of dependencies
+     *            during artifact resolution, lenient validation should be used to account for models of poor quality.
+     * @return This configuration, never {@code null}.
+     */
+    ProjectBuilderConfiguration setLenientValidation( boolean lenientValidation );
+
+    /**
+     * Gets the level of validation to perform on processed models.
+     * 
+     * @return {@code true} if lenient validation is enabled and only the dependency information is to be validated,
+     *         {@code false} if strict validation is enabled and the entire model is validated.
+     */
+    boolean istLenientValidation();
+
     // Profiles
     
     /**

@@ -362,7 +362,7 @@ public class DefaultMavenProjectBuilder
         {
             project = new MavenProject( model, repositorySystem, this, config );
 
-            validateModel( model, projectDescriptor );
+            validateModel( model, projectDescriptor, config.istLenientValidation() );
 
             Artifact projectArtifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
             project.setArtifact( projectArtifact );
@@ -496,11 +496,11 @@ public class DefaultMavenProjectBuilder
         return transformedDomainModel;
     }
 
-    private void validateModel( Model model, File pomFile )
+    private void validateModel( Model model, File pomFile, boolean lenient )
         throws InvalidProjectModelException
     {
         // Must validate before artifact construction to make sure dependencies are good
-        ModelValidationResult validationResult = validator.validate( model );
+        ModelValidationResult validationResult = validator.validate( model, lenient );
 
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 

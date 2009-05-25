@@ -22,12 +22,27 @@ package org.apache.maven.project.validation;
 import org.apache.maven.model.Model;
 
 /**
+ * Checks the model for missing or invalid values.
+ * 
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
 public interface ModelValidator
 {
+
     String ROLE = ModelValidator.class.getName();
 
     ModelValidationResult validate( Model model );
+
+    /**
+     * Checks the specified model for missing or invalid values.
+     * 
+     * @param model The model to validate, must not be {@code null}.
+     * @param lenient A flag whether validation should be lenient instead of strict. For building of projects, strict
+     *            validation should be used to ensure proper building. For the mere retrievel of dependencies during
+     *            artifact resolution, lenient validation should be used to account for models of poor quality.
+     * @return The result of the validation, never {@code null}.
+     */
+    ModelValidationResult validate( Model model, boolean lenient );
+
 }
