@@ -52,10 +52,6 @@ under the License.
           </models>
         </configuration>
       </plugin>
-    </plugins>
-  </build>
-  <reporting>
-    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
@@ -68,7 +64,7 @@ under the License.
         </configuration>
       </plugin>
     </plugins>
-  </reporting>
+  </build>
 
   <profiles>
     <profile>
