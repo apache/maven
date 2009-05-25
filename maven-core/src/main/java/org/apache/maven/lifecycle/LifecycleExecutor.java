@@ -28,7 +28,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -50,7 +49,7 @@ public interface LifecycleExecutor
      * @throws InvalidPluginDescriptorException 
      * @throws LifecycleExecutionException
      */
-    List<MojoExecution> calculateBuildPlan( MavenSession session, String... tasks )
+    MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException;
         
     // For a given project packaging find all the plugins that are bound to any registered

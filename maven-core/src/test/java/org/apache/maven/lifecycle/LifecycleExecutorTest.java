@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -63,9 +63,9 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "resources:resources" );
-        assertEquals( 1, lifecyclePlan.size() );
-        MojoExecution mojoExecution = lifecyclePlan.get( 0 );
+        List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "resources:resources" ).getExecutions();
+        assertEquals( 1, executionPlan.size() );
+        MojoExecution mojoExecution = executionPlan.get( 0 );
         assertNotNull( mojoExecution );
         assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
         assertEquals( "maven-resources-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
@@ -81,9 +81,9 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean" );
-        assertEquals( 1, lifecyclePlan.size() );
-        MojoExecution mojoExecution = lifecyclePlan.get( 0 );
+        List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "clean" ).getExecutions();
+        assertEquals( 1, executionPlan.size() );
+        MojoExecution mojoExecution = executionPlan.get( 0 );
         assertNotNull( mojoExecution );
         assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
         assertEquals( "maven-clean-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
@@ -98,7 +98,7 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean", "install" );        
+        List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "clean", "install" ).getExecutions();        
                         
         //[01] clean:clean
         //[02] resources:resources
@@ -111,18 +111,18 @@ public class LifecycleExecutorTest
         //[09] jar:jar
         //[10] install:install
         //
-        assertEquals( 10, lifecyclePlan.size() );
+        assertEquals( 10, executionPlan.size() );
                 
-        assertEquals( "clean:clean", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "resources:resources", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:compile", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "resources:testResources", lifecyclePlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:testCompile", lifecyclePlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-test-metadata", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "surefire:test", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "jar:jar", lifecyclePlan.get( 8 ).getMojoDescriptor().getFullGoalName() );                
-        assertEquals( "install:install", lifecyclePlan.get( 9 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "clean:clean", executionPlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:resources", executionPlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:compile", executionPlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-metadata", executionPlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:testResources", executionPlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:testCompile", executionPlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-test-metadata", executionPlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "surefire:test", executionPlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "jar:jar", executionPlan.get( 8 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "install:install", executionPlan.get( 9 ).getMojoDescriptor().getFullGoalName() );                
     }
 
     // We need to take in multiple lifecycles
@@ -133,7 +133,12 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-multiple-executions", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0.1", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean", "install" );        
+        
+        MavenExecutionPlan plan = lifecycleExecutor.calculateExecutionPlan( session, "clean", "install" );
+        
+        assertEquals( Artifact.SCOPE_TEST, plan.getRequiredResolutionScope() );
+        
+        List<MojoExecution> executions = plan.getExecutions();        
         
         //[01] clean:clean
         //[02] modello:xpp3-writer
@@ -153,27 +158,27 @@ public class LifecycleExecutorTest
         //[16] install:install
         //
         
-        assertEquals( 16, lifecyclePlan.size() );        
+        assertEquals( 16, executions.size() );        
                 
-        assertEquals( "clean:clean", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:xpp3-writer", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:java", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:xpp3-reader", lifecyclePlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:xpp3-writer", lifecyclePlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:java", lifecyclePlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:xpp3-reader", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plugin:descriptor", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "resources:resources", lifecyclePlan.get( 8 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:compile", lifecyclePlan.get( 9 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "resources:testResources", lifecyclePlan.get( 10 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:testCompile", lifecyclePlan.get( 11 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "surefire:test", lifecyclePlan.get( 12 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plugin:addPluginArtifactMetadata", lifecyclePlan.get( 13 ).getMojoDescriptor().getFullGoalName() );                
-        assertEquals( "jar:jar", lifecyclePlan.get( 14 ).getMojoDescriptor().getFullGoalName() );                
-        assertEquals( "install:install", lifecyclePlan.get( 15 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "clean:clean", executions.get( 0 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:xpp3-writer", executions.get( 1 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:java", executions.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:xpp3-reader", executions.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:xpp3-writer", executions.get( 4 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:java", executions.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "modello:xpp3-reader", executions.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plugin:descriptor", executions.get( 7 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:resources", executions.get( 8 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:compile", executions.get( 9 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:testResources", executions.get( 10 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:testCompile", executions.get( 11 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "surefire:test", executions.get( 12 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plugin:addPluginArtifactMetadata", executions.get( 13 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "jar:jar", executions.get( 14 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "install:install", executions.get( 15 ).getMojoDescriptor().getFullGoalName() );
         
-        assertEquals( "src/main/mdo/remote-resources.mdo", new MojoExecutionXPathContainer( lifecyclePlan.get( 1 ) ).getValue( "configuration/models[1]/model" ) );
-        assertEquals( "src/main/mdo/supplemental-model.mdo", new MojoExecutionXPathContainer( lifecyclePlan.get( 4 ) ).getValue( "configuration/models[1]/model" ) );
+        assertEquals( "src/main/mdo/remote-resources.mdo", new MojoExecutionXPathContainer( executions.get( 1 ) ).getValue( "configuration/models[1]/model" ) );
+        assertEquals( "src/main/mdo/supplemental-model.mdo", new MojoExecutionXPathContainer( executions.get( 4 ) ).getValue( "configuration/models[1]/model" ) );
     }        
     
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal()
@@ -185,9 +190,9 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "clean:clean" );
-        assertEquals( 1, lifecyclePlan.size() );
-        MojoExecution mojoExecution = lifecyclePlan.get( 0 );
+        List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "clean:clean" ).getExecutions();
+        assertEquals( 1, executionPlan.size() );
+        MojoExecution mojoExecution = executionPlan.get( 0 );
         assertNotNull( mojoExecution );
         assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
         assertEquals( "maven-clean-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
@@ -201,7 +206,7 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> lifecyclePlan = lifecycleExecutor.calculateBuildPlan( session, "package" );
+        List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "package" ).getExecutions();
         
         //[01] resources:resources
         //[02] compiler:compile
@@ -212,16 +217,16 @@ public class LifecycleExecutorTest
         //[07] surefire:test
         //[08] jar:jar
         //
-        assertEquals( 8, lifecyclePlan.size() );
+        assertEquals( 8, executionPlan.size() );
                 
-        assertEquals( "resources:resources", lifecyclePlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:compile", lifecyclePlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-metadata", lifecyclePlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "resources:testResources", lifecyclePlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:testCompile", lifecyclePlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-test-metadata", lifecyclePlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "surefire:test", lifecyclePlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "jar:jar", lifecyclePlan.get( 7 ).getMojoDescriptor().getFullGoalName() );        
+        assertEquals( "resources:resources", executionPlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:compile", executionPlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-metadata", executionPlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:testResources", executionPlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:testCompile", executionPlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plexus-component-metadata:generate-test-metadata", executionPlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "surefire:test", executionPlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "jar:jar", executionPlan.get( 7 ).getMojoDescriptor().getFullGoalName() );        
     }    
         
     public void testLifecyclePluginsRetrievalForDefaultLifecycle()
@@ -261,5 +266,19 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         Plugin plugin = lifecycleExecutor.findPluginForPrefix( "clean", session );
         assertNotNull( plugin );
+    }
+    
+    //
+    
+    public void testRequiredDependencyResolutionScopeCalculation()
+        throws Exception
+    {
+        assertEquals( Artifact.SCOPE_COMPILE, lifecycleExecutor.calculateRequiredDependencyResolutionScope( null, Artifact.SCOPE_COMPILE ) );
+        assertEquals( Artifact.SCOPE_COMPILE, lifecycleExecutor.calculateRequiredDependencyResolutionScope( Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE ) );
+        assertEquals( Artifact.SCOPE_RUNTIME, lifecycleExecutor.calculateRequiredDependencyResolutionScope( null, Artifact.SCOPE_RUNTIME ) );
+        assertEquals( Artifact.SCOPE_RUNTIME, lifecycleExecutor.calculateRequiredDependencyResolutionScope( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME ) );
+        assertEquals( Artifact.SCOPE_TEST, lifecycleExecutor.calculateRequiredDependencyResolutionScope( null, Artifact.SCOPE_TEST ) );
+        assertEquals( Artifact.SCOPE_TEST, lifecycleExecutor.calculateRequiredDependencyResolutionScope( Artifact.SCOPE_TEST, Artifact.SCOPE_TEST ) );
+        assertEquals( Artifact.SCOPE_RUNTIME, lifecycleExecutor.calculateRequiredDependencyResolutionScope( Artifact.SCOPE_COMPILE, Artifact.SCOPE_RUNTIME) );                
     }
 }

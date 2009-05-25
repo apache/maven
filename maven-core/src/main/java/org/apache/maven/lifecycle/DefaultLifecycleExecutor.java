@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+ package org.apache.maven.lifecycle;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -149,11 +149,11 @@ public class DefaultLifecycleExecutor
             {
                 session.setCurrentProject( currentProject );
 
-                List<MojoExecution> lifecyclePlan;
+                MavenExecutionPlan executionPlan;
 
                 try
                 {
-                    lifecyclePlan = calculateBuildPlan( session, goals.toArray( new String[] {} ) );
+                    executionPlan = calculateExecutionPlan( session, goals.toArray( new String[] {} ) );
                 }
                 catch ( Exception e )
                 {
@@ -168,7 +168,7 @@ public class DefaultLifecycleExecutor
                 // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
                 try
                 {
-                    downloadProjectDependencies( session, Artifact.SCOPE_TEST /** mojoDescriptor.isDependencyResolutionRequired()*/ );
+                    downloadProjectDependencies( session, executionPlan.getRequiredResolutionScope() );
                 }
                 catch ( ArtifactNotFoundException e )
                 {
@@ -185,7 +185,7 @@ public class DefaultLifecycleExecutor
                 {
                     logger.debug( "=== BUILD PLAN ===" );
                     logger.debug( "Project:       " + currentProject );
-                    for ( MojoExecution mojoExecution : lifecyclePlan )
+                    for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                     {
                         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
                         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
@@ -197,7 +197,7 @@ public class DefaultLifecycleExecutor
                     logger.debug( "==================" );
                 }
 
-                for ( MojoExecution mojoExecution : lifecyclePlan )
+                for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                 {
                     try
                     {
@@ -224,7 +224,7 @@ public class DefaultLifecycleExecutor
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
     // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
     // 5. Bind mojos specified in the project itself to the lifecycle
-    public List<MojoExecution> calculateBuildPlan(  MavenSession session, String... tasks )
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
     {        
         MavenProject project = session.getCurrentProject();
@@ -233,6 +233,8 @@ public class DefaultLifecycleExecutor
         
         List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
                 
+        String requiredDependencyResolutionScope = null;
+        
         for ( String task : tasks )
         {
 
@@ -381,7 +383,6 @@ public class DefaultLifecycleExecutor
                         break;
                     }
                 }
-
             }
         }
               
@@ -397,6 +398,8 @@ public class DefaultLifecycleExecutor
             MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( 
                 mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getVersion(), mojoExecution.getGoal(), session.getLocalRepository(), project.getRemoteArtifactRepositories() );
 
+            requiredDependencyResolutionScope = calculateRequiredDependencyResolutionScope( requiredDependencyResolutionScope, mojoDescriptor.isDependencyResolutionRequired() );          
+            
             mojoExecution.setMojoDescriptor( mojoDescriptor );
             
             populateMojoExecutionConfiguration( project, mojoExecution, false );
@@ -404,9 +407,40 @@ public class DefaultLifecycleExecutor
             lifecyclePlan.add( mojoExecution );
         }        
         
-        return lifecyclePlan;
+        return new MavenExecutionPlan( lifecyclePlan, requiredDependencyResolutionScope );        
     }  
 
+    // SCOPE_COMPILE
+    // SCOPE_TEST
+    // SCOPE_RUNTIME
+    //
+    String calculateRequiredDependencyResolutionScope( String currentRequiredDependencyResolutionScope, String inputScope )
+    {
+        if ( inputScope == null )
+        {
+            return currentRequiredDependencyResolutionScope;
+        }
+                
+        if ( currentRequiredDependencyResolutionScope == null && inputScope != null )
+        {
+            return inputScope;
+        }
+
+        if ( currentRequiredDependencyResolutionScope.equals( Artifact.SCOPE_COMPILE ) && ( inputScope.equals(  Artifact.SCOPE_RUNTIME ) || inputScope.equals( Artifact.SCOPE_TEST ) ) )
+        {
+            return inputScope;
+        }
+
+        if ( currentRequiredDependencyResolutionScope.equals( Artifact.SCOPE_RUNTIME ) && inputScope.equals(  Artifact.SCOPE_TEST ) )
+        {
+            return inputScope;
+        }        
+        
+        // Nothing changed we return what we were
+        //
+        return currentRequiredDependencyResolutionScope;
+    }
+    
     private String executionDescription( MojoExecution me, MavenProject project )
     {
         PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
@@ -415,25 +449,23 @@ public class DefaultLifecycleExecutor
         return sb.toString();
     }
         
-    private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution,
-                                                     boolean directInvocation )
+    private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution, boolean directInvocation )
     {
         String g = mojoExecution.getGroupId();
 
         String a = mojoExecution.getArtifactId();
 
-        Plugin p = project.getPlugin( g + ":" + a );
+        Plugin plugin = project.getPlugin( g + ":" + a );
 
-        if ( p != null )
+        if ( plugin != null )
         {
-            for ( PluginExecution e : p.getExecutions() )
+            for ( PluginExecution e : plugin.getExecutions() )
             {
                 if ( mojoExecution.getExecutionId().equals( e.getId() ) )
                 {
                     Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
 
-                    Xpp3Dom mojoConfiguration =
-                        extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
+                    Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
 
                     mojoExecution.setConfiguration( mojoConfiguration );
 
@@ -446,9 +478,9 @@ public class DefaultLifecycleExecutor
         {
             Xpp3Dom defaultDom = convert( mojoExecution.getMojoDescriptor() );
 
-            if ( p != null && p.getConfiguration() != null )
+            if ( plugin != null && plugin.getConfiguration() != null )
             {
-                Xpp3Dom projectDom = (Xpp3Dom) p.getConfiguration();
+                Xpp3Dom projectDom = (Xpp3Dom) plugin.getConfiguration();
                 projectDom = extractMojoConfiguration( projectDom, mojoExecution.getMojoDescriptor() );
                 mojoExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( projectDom, defaultDom, Boolean.TRUE ) );
             }
@@ -986,7 +1018,7 @@ public class DefaultLifecycleExecutor
             IOUtil.close( reader );
         }
         return result;
-    }    
+    }
     
     // These are checks that should be available in real time to IDEs
 

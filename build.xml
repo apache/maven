@@ -7,7 +7,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -31,210 +31,210 @@ END SNIPPET: ant-bootstrap -->
 
 <project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
-  <property name="it.workdir.version" value="3.0.x"/>
+<property name="it.workdir.version" value="3.0.x"/>
 
-  <target name="initTaskDefs">
-    <xmlproperty file="pom.xml" prefix="pom.xml" />
-    <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.1-SNAPSHOT.jar"/>
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
-  </target>
+<target name="initTaskDefs">
+<xmlproperty file="pom.xml" prefix="pom.xml" />
+<path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.1-SNAPSHOT.jar"/>
+<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
+</target>
 
-  <target name="isMavenHomeSet" depends="initTaskDefs">
-    <property environment="env"/>
-    <condition property="maven.home" value="${env.M2_HOME}">
-      <isset property="env.M2_HOME"/>
-    </condition>
-    <fail message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script">
-      <condition>
-        <or>
-          <not>
-            <isset property="maven.home" />
-          </not>
-          <equals arg1="${maven.home}" arg2="" trim="true" />
-        </or>
-      </condition>
-    </fail>
-  </target>
+<target name="isMavenHomeSet" depends="initTaskDefs">
+<property environment="env"/>
+<condition property="maven.home" value="${env.M2_HOME}">
+<isset property="env.M2_HOME"/>
+</condition>
+<fail message="You must set the M2_HOME environment variable or specify a maven.home property to this Ant script">
+<condition>
+<or>
+<not>
+<isset property="maven.home" />
+</not>
+<equals arg1="${maven.home}" arg2="" trim="true" />
+</or>
+</condition>
+</fail>
+</target>
 
-  <target name="init" depends="isMavenHomeSet">
-    <xmlproperty prefix="pom" file="pom.xml"/>
-    <dirname file="${maven.home}" property="maven.home.dirname"/>
-    <!-- Initialize properties -->
-    <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
-    <property name="maven.home.effective" location="${maven.home.dirname}/${maven.home.basename.expected}"/>
-    <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
-    <property name="maven.repo.local" value="${user.home}/.m2/repository"/>
-    <property name="maven.debug" value="-e"/>
-    <property name="maven.test.skip" value="true"/> <!-- TODO: Change this default back to false once we're done -->
-    <property name="surefire.useFile" value="true"/>
-    <echo>maven.home = ${maven.home.effective}</echo>
-    <echo>maven.repo.local = ${maven.repo.local}</echo>
-  </target>
+<target name="init" depends="isMavenHomeSet">
+<xmlproperty prefix="pom" file="pom.xml"/>
+<dirname file="${maven.home}" property="maven.home.dirname"/>
+<!-- Initialize properties -->
+<property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
+<property name="maven.home.effective" location="${maven.home.dirname}/${maven.home.basename.expected}"/>
+<property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
+<property name="maven.repo.local" value="${user.home}/.m2/repository"/>
+<property name="maven.debug" value="-e"/>
+<property name="maven.test.skip" value="false"/> <!-- TODO: Change this default back to false once we're done -->
+<property name="surefire.useFile" value="true"/>
+<echo>maven.home = ${maven.home.effective}</echo>
+<echo>maven.repo.local = ${maven.repo.local}</echo>
+</target>
 
-  <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
-    <delete dir="bootstrap"/>
-  </target>
+<target name="clean-bootstrap" description="cleans up generated bootstrap classes">
+<delete dir="bootstrap"/>
+</target>
 
-  <target name="pull" depends="init" unless="skip.pull">
-    <property name="verbose" value="false"/>
-    <!-- Pull the dependencies that Maven needs to build -->
-    <copy file="pom.xml" tofile="dependencies.xml"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-start-comment--&gt;" value="&lt;!--"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-end-comment--&gt;" value="--&gt;"/>
-    <artifact:pom file="${basedir}/dependencies.xml" id="pom"/>
-    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}" useScope="compile">
-       <localRepository path="${maven.repo.local}"/>
-       <pom refid="pom"/>
-    </artifact:dependencies>
-    <delete file="${basedir}/dependencies.xml"/>
+<target name="pull" depends="init" unless="skip.pull">
+<property name="verbose" value="false"/>
+<!-- Pull the dependencies that Maven needs to build -->
+<copy file="pom.xml" tofile="dependencies.xml"/>
+<replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-start-comment--&gt;" value="&lt;!--"/>
+<replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-end-comment--&gt;" value="--&gt;"/>
+<artifact:pom file="${basedir}/dependencies.xml" id="pom"/>
+<artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}" useScope="compile">
+<localRepository path="${maven.repo.local}"/>
+<pom refid="pom"/>
+</artifact:dependencies>
+<delete file="${basedir}/dependencies.xml"/>
 
-    <!-- Pull the dependencies for Modello -->
-    <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
-      <localRepository path="${maven.repo.local}"/>
-      <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
-    </artifact:dependencies>
+<!-- Pull the dependencies for Modello -->
+<artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
+<localRepository path="${maven.repo.local}"/>
+<dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}"/>
+</artifact:dependencies>
 
-    <!-- Pull the dependencies for the MetadataGenerator CLI -->
-    <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
-       <localRepository path="${maven.repo.local}"/>
-       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
-    </artifact:dependencies>
+<!-- Pull the dependencies for the MetadataGenerator CLI -->
+<artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
+<localRepository path="${maven.repo.local}"/>
+<dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}"/>
+</artifact:dependencies>
 
-  </target>
+</target>
 
-  <target name="process-classes" depends="pull" description="generates plexus component metadata.">
-    <mkdir dir="${basedir}/bootstrap/target"/>
-    <mkdir dir="${basedir}/bootstrap/target/classes"/>
+<target name="process-classes" depends="pull" description="generates plexus component metadata.">
+<mkdir dir="${basedir}/bootstrap/target"/>
+<mkdir dir="${basedir}/bootstrap/target/classes"/>
 
-    <path id="maven.classpath">
-      <pathelement location="bootstrap/target/classes"/>
-      <path refid="sources"/>
-      <path refid="pom.pathid"/>
-      <path refid="pmdg.pathid"/>
-    </path>
+<path id="maven.classpath">
+<pathelement location="bootstrap/target/classes"/>
+<path refid="sources"/>
+<path refid="pom.pathid"/>
+<path refid="pmdg.pathid"/>
+</path>
 
-    <echo>Using plexus version ${pom.properties.plexusVersion}</echo>
-    <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
-      <classpath refid="maven.classpath"/>
-      <!-- We need to generate component descriptors from the maven-artifact sources which use javadoc annotations. -->
-      <arg value="--source"/>
-      <arg value="${basedir}/maven-compat/src/main/java"/>
-      <!-- We have separated the artifact handlers and lifecycle mappings into a separate file. -->
-      <arg value="--descriptors"/>
-      <arg value="${basedir}/maven-core/src/main/resources/META-INF/plexus"/>
-      <!-- Search the classes for annotations that we've compiled. -->
-      <arg value="--classes"/>
-      <arg value="${basedir}/bootstrap/target/classes"/>
-      <!-- We'll make one big fat components descriptor. -->
-      <arg value="--output"/>
-      <arg value="${basedir}/bootstrap/target/classes/META-INF/plexus/components.xml"/>
-    </java>
-  </target>
+<echo>Using plexus version ${pom.properties.plexusVersion}</echo>
+<java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
+<classpath refid="maven.classpath"/>
+<!-- We need to generate component descriptors from the maven-artifact sources which use javadoc annotations. -->
+<arg value="--source"/>
+<arg value="${basedir}/maven-compat/src/main/java"/>
+<!-- We have separated the artifact handlers and lifecycle mappings into a separate file. -->
+<arg value="--descriptors"/>
+<arg value="${basedir}/maven-core/src/main/resources/META-INF/plexus"/>
+<!-- Search the classes for annotations that we've compiled. -->
+<arg value="--classes"/>
+<arg value="${basedir}/bootstrap/target/classes"/>
+<!-- We'll make one big fat components descriptor. -->
+<arg value="--output"/>
+<arg value="${basedir}/bootstrap/target/classes/META-INF/plexus/components.xml"/>
+</java>
+</target>
 
-  <target name="generate-sources" depends="pull" description="generates Java sources from Modello mdo model files">
-    <mkdir dir="bootstrap/target"/>
-    <mkdir dir="bootstrap/target/generated-sources"/>
+<target name="generate-sources" depends="pull" description="generates Java sources from Modello mdo model files">
+<mkdir dir="bootstrap/target"/>
+<mkdir dir="bootstrap/target/generated-sources"/>
 
-    <macrodef name="modello-single-mode">
-      <attribute name="file"/>
-      <attribute name="mode"/>
-      <attribute name="version"/>
-      <sequential>
-        <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true">
-          <classpath refid="modello.pathid"/>
-          <arg file="@{file}"/> <!-- model file -->
-          <arg value="@{mode}"/> <!-- output type -->
-          <arg file="bootstrap/target/generated-sources"/> <!-- output directory -->
-          <arg value="@{version}"/> <!-- model version -->
-          <arg value="false"/> <!-- package with version -->
-          <arg value="true"/> <!-- use Java 5 -->
-          <arg value="UTF-8"/> <!-- encoding -->
-        </java>
-      </sequential>
-    </macrodef>
+<macrodef name="modello-single-mode">
+<attribute name="file"/>
+<attribute name="mode"/>
+<attribute name="version"/>
+<sequential>
+<java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true">
+<classpath refid="modello.pathid"/>
+<arg file="@{file}"/> <!-- model file -->
+<arg value="@{mode}"/> <!-- output type -->
+<arg file="bootstrap/target/generated-sources"/> <!-- output directory -->
+<arg value="@{version}"/> <!-- model version -->
+<arg value="false"/> <!-- package with version -->
+<arg value="true"/> <!-- use Java 5 -->
+<arg value="UTF-8"/> <!-- encoding -->
+</java>
+</sequential>
+</macrodef>
 
-    <macrodef name="modello">
-      <attribute name="file"/>
-      <attribute name="version" default="1.0.0"/>
-      <sequential>
-        <echo taskname="modello" message="Generating sources for @{file}"/>
-        <modello-single-mode file="@{file}" version="@{version}" mode="java"/>
-        <modello-single-mode file="@{file}" version="@{version}" mode="xpp3-reader"/>
-        <modello-single-mode file="@{file}" version="@{version}" mode="xpp3-writer"/>
-      </sequential>
-    </macrodef>
+<macrodef name="modello">
+<attribute name="file"/>
+<attribute name="version" default="1.0.0"/>
+<sequential>
+<echo taskname="modello" message="Generating sources for @{file}"/>
+<modello-single-mode file="@{file}" version="@{version}" mode="java"/>
+<modello-single-mode file="@{file}" version="@{version}" mode="xpp3-reader"/>
+<modello-single-mode file="@{file}" version="@{version}" mode="xpp3-writer"/>
+</sequential>
+</macrodef>
 
-    <modello file="maven-model/src/main/mdo/maven.mdo" version="4.0.0"/>
-    <modello file="maven-plugin-api/src/main/mdo/lifecycle.mdo"/>
-    <modello file="maven-model-builder/src/main/mdo/profiles.mdo"/>
-    <modello file="maven-core/src/main/mdo/settings.mdo"/>
-    <modello file="maven-toolchain/src/main/mdo/toolchains.mdo"/>
-    <modello file="maven-compat/src/main/mdo/metadata.mdo"/>
-  </target>
+<modello file="maven-model/src/main/mdo/maven.mdo" version="4.0.0"/>
+<modello file="maven-plugin-api/src/main/mdo/lifecycle.mdo"/>
+<modello file="maven-model-builder/src/main/mdo/profiles.mdo"/>
+<modello file="maven-core/src/main/mdo/settings.mdo"/>
+<modello file="maven-toolchain/src/main/mdo/toolchains.mdo"/>
+<modello file="maven-compat/src/main/mdo/metadata.mdo"/>
+</target>
 
-  <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
-    <path id="sources">
-      <dirset dir=".">
-        <include name="bootstrap/target/generated-sources"/>
-        <include name="*/src/main/*"/>
-      </dirset>
-    </path>
+<target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
+<path id="sources">
+<dirset dir=".">
+<include name="bootstrap/target/generated-sources"/>
+<include name="*/src/main/*"/>
+</dirset>
+</path>
 
-    <mkdir dir="bootstrap/target/classes"/>
-    <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.5" target="1.5" debug="true">
-      <src refid="sources"/>
-      <classpath refid="pom.pathid"/>
-    </javac>
+<mkdir dir="bootstrap/target/classes"/>
+<javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.5" target="1.5" debug="true">
+<src refid="sources"/>
+<classpath refid="pom.pathid"/>
+</javac>
 
-    <path id="maven.classpath">
-      <pathelement location="bootstrap/target/classes"/>
-      <pathelement location="maven-compat/src/main/resources"/>
-      <path refid="sources"/>
-      <path refid="pom.pathid"/>
-    </path>
-  </target>
+<path id="maven.classpath">
+<pathelement location="bootstrap/target/classes"/>
+<pathelement location="maven-compat/src/main/resources"/>
+<path refid="sources"/>
+<path refid="pom.pathid"/>
+</path>
+</target>
 
-  <target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
-    <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
-      <classpath refid="maven.classpath"/>
-      <arg value="${maven.debug}"/>
-      <arg value="-B"/>
-      <arg value="-X"/>
-          <arg value="-e"/>
-      <arg value="clean"/>
-      <arg value="install"/>
-      <arg value="-Dmaven.test.skip=${maven.test.skip}"/>
-      <arg value="-Dmaven.repo.local=${maven.repo.local}"/>
-      <arg value="-Dsurefire.useFile=${surefire.useFile}"/>
-    </java>
-  </target>
+<target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
+<java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
+<classpath refid="maven.classpath"/>
+<arg value="${maven.debug}"/>
+<arg value="-B"/>
+<arg value="-X"/>
+<arg value="-e"/>
+<arg value="clean"/>
+<arg value="install"/>
+<arg value="-Dmaven.test.skip=${maven.test.skip}"/>
+<arg value="-Dmaven.repo.local=${maven.repo.local}"/>
+<arg value="-Dsurefire.useFile=${surefire.useFile}"/>
+</java>
+</target>
 
-  <target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">
-    <echo>
-    The new Maven distribution was created as part of the MAVEN-COMPILE step, above.
-    This goal just validates the presence of that distribution.
-    </echo>
-    <condition property="build.failed">
-      <not>
-        <available file="${maven.assembly}"/>
-      </not>
-    </condition>
-    <fail if="build.failed" message="Assembly task seemed to succeed, but couldn't find assembly file: ${maven.assembly}"/>
-  </target>
+<target name="maven-assembly" depends="maven-compile" description="generates the Maven installation assembly using the bootstrap Maven">
+<echo>
+The new Maven distribution was created as part of the MAVEN-COMPILE step, above.
+This goal just validates the presence of that distribution.
+</echo>
+<condition property="build.failed">
+<not>
+<available file="${maven.assembly}"/>
+</not>
+</condition>
+<fail if="build.failed" message="Assembly task seemed to succeed, but couldn't find assembly file: ${maven.assembly}"/>
+</target>
 
-  <target name="extract-assembly" depends="init,maven-assembly" description="extracts the maven assembly into maven.home">
-    <echo>Extracting assembly to ${maven.home.dirname} ...</echo>
-    <!-- If we are starting from scratch make sure the directory is created -->
-    <delete dir="${maven.home.effective}"/>
-    <mkdir dir="${maven.home.effective}"/>
-    <unzip src="${maven.assembly}" dest="${maven.home.dirname}"/>
-    <chmod perm="+x">
-      <fileset dir="${maven.home.effective}/bin">
-        <include name="mvn"/>
-      </fileset>
-    </chmod>
-  </target>
+<target name="extract-assembly" depends="init,maven-assembly" description="extracts the maven assembly into maven.home">
+<echo>Extracting assembly to ${maven.home.dirname} ...</echo>
+<!-- If we are starting from scratch make sure the directory is created -->
+<delete dir="${maven.home.effective}"/>
+<mkdir dir="${maven.home.effective}"/>
+<unzip src="${maven.assembly}" dest="${maven.home.dirname}"/>
+<chmod perm="+x">
+<fileset dir="${maven.home.effective}/bin">
+<include name="mvn"/>
+</fileset>
+</chmod>
+</target>
 
-  <target name="all" depends="clean-bootstrap,init,extract-assembly"/>
+<target name="all" depends="clean-bootstrap,init,extract-assembly"/>
 
 </project>

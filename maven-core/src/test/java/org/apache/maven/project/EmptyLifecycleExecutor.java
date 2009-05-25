@@ -28,11 +28,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -49,10 +48,10 @@ public class EmptyLifecycleExecutor
     implements LifecycleExecutor
 {
 
-    public List<MojoExecution> calculateBuildPlan( MavenSession session, String... tasks )
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
     {
-        return Collections.emptyList();
+        return new MavenExecutionPlan( Collections.<MojoExecution>emptyList(), null );
     }
 
     public void execute( MavenSession session )
