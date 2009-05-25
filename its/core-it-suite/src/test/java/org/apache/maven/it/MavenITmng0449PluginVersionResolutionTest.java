@@ -46,6 +46,9 @@ public class MavenITmng0449PluginVersionResolutionTest
     public void testitLifecycleInvocation()
         throws Exception
     {
+        // automatic version resolution no longer supported in 3.x (see MNG-4173)
+        requiresMavenVersion( "(,3.0-alpha-1)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0449" );
         testDir = new File( testDir, "lifecycle" );
 
