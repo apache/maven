@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -393,7 +394,7 @@ public class DefaultMavenProjectBuilder
     private List<Model> build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
     {
-        Model mainModel = modelReader.read( pomFile, null );
+        Model mainModel = readModel( projectId, pomFile, true );
         mainModel.setProjectDirectory( pomFile.getParentFile() );
 
         List<Model> domainModels = new ArrayList<Model>();
@@ -559,7 +560,7 @@ public class DefaultMavenProjectBuilder
     }
 
     private List<Model> getDomainModelParentsFromRepository( Model model, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws IOException
+        throws IOException, ProjectBuildingException
     {
         List<Model> models = new ArrayList<Model>();
 
@@ -599,7 +600,7 @@ public class DefaultMavenProjectBuilder
             throw (IOException) new IOException( "The parent POM " + artifactParent + " could not be retrieved from any repository" ).initCause( e );
         }
         
-        Model parentModel = modelReader.read( artifactParent.getFile(), null );
+        Model parentModel = readModel( parent.getId(), artifactParent.getFile(), true );
 
         if ( !isMatchingParent( parentModel, parent ) )
         {
@@ -624,10 +625,11 @@ public class DefaultMavenProjectBuilder
      * @param projectDirectory
      * @return
      * @throws IOException
+     * @throws ProjectBuildingException 
      */
     private List<Model> getDomainModelParentsFromLocalPath( Model model, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, File projectDirectory,
                                                                   ProjectBuilderConfiguration projectBuilderConfiguration )
-        throws IOException
+        throws IOException, ProjectBuildingException
     {
         List<Model> models = new ArrayList<Model>();
 
@@ -649,7 +651,7 @@ public class DefaultMavenProjectBuilder
             throw new IOException( "File does not exist: File = " + parentFile.getAbsolutePath() );
         }
         
-        Model parentModel = modelReader.read( parentFile, null );
+        Model parentModel = readModel( parent.getId(), parentFile, true );
         parentModel.setProjectDirectory( parentFile.getParentFile() );
 
         if ( !isMatchingParent( parentModel, parent ) )
@@ -716,6 +718,22 @@ public class DefaultMavenProjectBuilder
             return false;
         }
         return true;
+    }
+
+    private Model readModel( String projectId, File pomFile, boolean strict )
+        throws ProjectBuildingException
+    {
+        Map<String, Object> options =
+            Collections.<String, Object> singletonMap( ModelReader.IS_STRICT, Boolean.valueOf( strict ) );
+        try
+        {
+            return modelReader.read( pomFile, options );
+        }
+        catch ( IOException e )
+        {
+            throw new ProjectBuildingException( projectId, "Failed to read POM for " + projectId + " from " + pomFile
+                + ": " + e.getMessage(), pomFile, e );
+        }
     }
 
     // Super Model Handling
