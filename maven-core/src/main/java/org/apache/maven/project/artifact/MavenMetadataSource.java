@@ -120,6 +120,8 @@ public class MavenMetadataSource
                             dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
                         }
 
+                        dependencyArtifact.setOptional( d.isOptional() );
+
                         if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
                         {
                             dependencyArtifact.setFile( new File( d.getSystemPath() ) );
