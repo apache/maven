@@ -47,6 +47,7 @@ public class MavenITmng0449PluginVersionResolutionTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0449" );
+        testDir = new File( testDir, "lifecycle" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -54,8 +55,7 @@ public class MavenITmng0449PluginVersionResolutionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng0449" );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
-        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.setLogFileName( "log-lifecycle.txt" );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -67,12 +67,13 @@ public class MavenITmng0449PluginVersionResolutionTest
 
     /**
      * Verify that versions for plugins are automatically resolved if not given in the POM by checking first LATEST and
-     * then RELEASE in the repo metadata when the plugin is invoked from the command line.
+     * then RELEASE in the repo metadata when the plugin is invoked directly from the command line.
      */
     public void testitCliInvocation()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0449" );
+        testDir = new File( testDir, "direct" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -80,8 +81,7 @@ public class MavenITmng0449PluginVersionResolutionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng0449" );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
-        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.setLogFileName( "log-cli.txt" );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "org.apache.maven.its.mng0449:maven-it-plugin-a:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
