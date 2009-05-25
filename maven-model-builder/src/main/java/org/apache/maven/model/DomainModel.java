@@ -15,6 +15,7 @@ import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+// TODO: Delete this class
 public class DomainModel
 {
 
@@ -91,6 +92,7 @@ public class DomainModel
     {
     	this( new FileInputStream( file ) );
         this.file = file;
+        this.model.setPomFile( file );
     }
     
     public DomainModel( InputStream is )
