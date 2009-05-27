@@ -72,7 +72,7 @@ public class DefaultModelReader
         }
         catch ( XmlPullParserException e )
         {
-            throw (IOException) new IOException( "Failed to parse POM" ).initCause( e );
+            throw new ModelParseException( e.getMessage(), e, e.getLineNumber(), e.getColumnNumber() );
         }
         finally
         {
@@ -95,7 +95,7 @@ public class DefaultModelReader
         }
         catch ( XmlPullParserException e )
         {
-            throw (IOException) new IOException( "Failed to parse POM" ).initCause( e );
+            throw new ModelParseException( e.getMessage(), e, e.getLineNumber(), e.getColumnNumber() );
         }
         finally
         {

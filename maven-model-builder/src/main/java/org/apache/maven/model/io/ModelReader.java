@@ -48,9 +48,10 @@ public interface ModelReader
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized model, never {@code null}.
      * @throws IOException If the model could not be deserialized.
+     * @throws ModelParseException If the input format could not be parsed.
      */
     Model read( File input, Map<String, Object> options )
-        throws IOException;
+        throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified character reader. The reader will be automatically closed before the method
@@ -60,9 +61,10 @@ public interface ModelReader
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized model, never {@code null}.
      * @throws IOException If the model could not be deserialized.
+     * @throws ModelParseException If the input format could not be parsed.
      */
     Model read( Reader input, Map<String, Object> options )
-        throws IOException;
+        throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified byte stream. The stream will be automatically closed before the method
@@ -72,8 +74,9 @@ public interface ModelReader
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized model, never {@code null}.
      * @throws IOException If the model could not be deserialized.
+     * @throws ModelParseException If the input format could not be parsed.
      */
     Model read( InputStream input, Map<String, Object> options )
-        throws IOException;
+        throws IOException, ModelParseException;
 
 }
