@@ -50,10 +50,10 @@ import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.profile.ProfileActivationException;
 import org.apache.maven.model.profile.ProfileInjector;
 import org.apache.maven.model.profile.ProfileSelector;
+import org.apache.maven.model.validation.ModelValidationResult;
+import org.apache.maven.model.validation.ModelValidator;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.artifact.ProjectArtifact;
-import org.apache.maven.project.validation.ModelValidationResult;
-import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -509,7 +509,7 @@ public class DefaultMavenProjectBuilder
         throws InvalidProjectModelException
     {
         // Must validate before artifact construction to make sure dependencies are good
-        ModelValidationResult validationResult = validator.validate( model, lenient );
+        ModelValidationResult validationResult = validator.validateEffectiveModel( model, lenient );
 
         String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
@@ -574,8 +574,6 @@ public class DefaultMavenProjectBuilder
         {
             return models;
         }
-
-        // FIXME: Validate the parent coordinate and throw proper exceptions
         
         Artifact artifactParent =
             repositorySystem.createProjectArtifact( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
@@ -727,17 +725,23 @@ public class DefaultMavenProjectBuilder
     private Model readModel( String projectId, File pomFile, boolean strict )
         throws ProjectBuildingException
     {
+        Model model;
+
         Map<String, Object> options =
             Collections.<String, Object> singletonMap( ModelReader.IS_STRICT, Boolean.valueOf( strict ) );
         try
         {
-            return modelReader.read( pomFile, options );
+            model = modelReader.read( pomFile, options );
         }
         catch ( IOException e )
         {
             throw new ProjectBuildingException( projectId, "Failed to read POM for " + projectId + " from " + pomFile
                 + ": " + e.getMessage(), pomFile, e );
         }
+
+        validator.validateRawModel( model, !strict );
+
+        return model;
     }
 
     // Super Model Handling

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.project.validation.ModelValidationResult;
+import org.apache.maven.model.validation.ModelValidationResult;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**

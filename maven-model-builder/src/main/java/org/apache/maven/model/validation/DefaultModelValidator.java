@@ -1,4 +1,4 @@
-package org.apache.maven.project.validation;
+package org.apache.maven.model.validation;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,7 +22,6 @@ package org.apache.maven.project.validation;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -46,12 +45,30 @@ public class DefaultModelValidator
 {
     private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
 
-    public ModelValidationResult validate( Model model )
+    public ModelValidationResult validateRawModel( Model model, boolean lenient )
     {
-        return validate( model, false );
+        ModelValidationResult result = new ModelValidationResult();
+
+        Parent parent = model.getParent();
+        if ( parent != null )
+        {
+            validateStringNotEmpty( "parent.groupId", result, parent.getGroupId() );
+
+            validateStringNotEmpty( "parent.artifactId", result, parent.getArtifactId() );
+
+            validateStringNotEmpty( "parent.version", result, parent.getVersion() );
+
+            if ( parent.getGroupId().equals( model.getGroupId() )
+                && parent.getArtifactId().equals( model.getArtifactId() ) )
+            {
+                result.addMessage( "The parent element cannot have the same ID as the project." );
+            }
+        }
+
+        return result;
     }
 
-    public ModelValidationResult validate( Model model, boolean lenient )
+    public ModelValidationResult validateEffectiveModel( Model model, boolean lenient )
     {
         ModelValidationResult result = new ModelValidationResult();
 
@@ -92,7 +109,7 @@ public class DefaultModelValidator
             validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion(),
                                     d.getManagementKey() );
 
-            if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) )
+            if ( "system".equals( d.getScope() ) )
             {
                 String systemPath = d.getSystemPath();
 
@@ -127,7 +144,7 @@ public class DefaultModelValidator
                 validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.groupId", result,
                                                   d.getGroupId() );
 
-                if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) )
+                if ( "system".equals( d.getScope() ) )
                 {
                     String systemPath = d.getSystemPath();
 
@@ -367,4 +384,5 @@ public class DefaultModelValidator
 
         return false;
     }
+
 }

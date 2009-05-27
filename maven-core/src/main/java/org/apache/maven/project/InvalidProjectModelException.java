@@ -22,7 +22,7 @@ package org.apache.maven.project;
 import java.io.File;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.project.validation.ModelValidationResult;
+import org.apache.maven.model.validation.ModelValidationResult;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class InvalidProjectModelException

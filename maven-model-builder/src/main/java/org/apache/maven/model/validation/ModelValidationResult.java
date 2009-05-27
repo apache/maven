@@ -1,4 +1,4 @@
-package org.apache.maven.project.validation;
+package org.apache.maven.model.validation;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -47,7 +47,7 @@ public class ModelValidationResult
 
     public String getMessage( int i )
     {
-        return messages.get( i ).toString();
+        return messages.get( i );
     }
 
     public List<String> getMessages()
