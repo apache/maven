@@ -34,8 +34,17 @@ import org.apache.maven.artifact.Artifact;
 public class AndArtifactFilter
     implements ArtifactFilter
 {
-    private final List<ArtifactFilter> filters = new ArrayList<ArtifactFilter>();
+    private List<ArtifactFilter> filters; 
 
+    public AndArtifactFilter()
+    {        
+    }
+    
+    public AndArtifactFilter( List<ArtifactFilter> filters )
+    {
+        this.filters = filters;
+    }
+    
     public boolean include( Artifact artifact )
     {
         boolean include = true;
@@ -52,6 +61,11 @@ public class AndArtifactFilter
 
     public void add( ArtifactFilter artifactFilter )
     {
+        if ( filters == null )
+        {
+            filters = new ArrayList<ArtifactFilter>();
+        }
+        
         filters.add( artifactFilter );
     }
 }

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -36,11 +37,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadExcep
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Plugin;
@@ -95,15 +91,15 @@ public class DefaultLifecycleExecutor
     @Requirement
     protected RepositorySystem repositorySystem;
 
-    @Requirement
-    private ResolutionErrorHandler resolutionErrorHandler;
-    
     /**
      * These mappings correspond to packaging types, like WAR packaging, which configure a particular mojos
      * to run in a given phase.
      */
     @Requirement
     private Map<String, LifecycleMapping> lifecycleMappings;
+    
+    @Requirement
+    private ProjectDependenciesResolver projectDependenciesResolver;
     
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")    
     private List<Lifecycle> lifecycles;
@@ -168,7 +164,8 @@ public class DefaultLifecycleExecutor
                 // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
                 try
                 {
-                    downloadProjectDependencies( session, executionPlan.getRequiredResolutionScope() );
+                    Set<Artifact> projectDependencies = projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScope(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
+                    currentProject.setArtifacts( projectDependencies );    
                 }
                 catch ( ArtifactNotFoundException e )
                 {
@@ -881,31 +878,7 @@ public class DefaultLifecycleExecutor
 
         return dom;
     }
-               
-    private void downloadProjectDependencies( MavenSession session, String scope )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        MavenProject project = session.getCurrentProject();
-
-        Artifact artifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-        artifact.setFile( project.getFile() );
-        
-        ArtifactFilter filter = new ScopeArtifactFilter( scope );
-
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setResolveRoot( false )
-            .setResolveTransitively( true )
-            .setLocalRepository( session.getLocalRepository() )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
-            .setManagedVersionMap( project.getManagedVersionMap() )
-            .setFilter( filter );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );                
-        resolutionErrorHandler.throwErrors( request, result );
-        project.setArtifacts( result.getArtifacts() );      
-    }  
-    
+                   
     private Map<String,Plugin> pluginPrefixes = new HashMap<String,Plugin>();
     
     //TODO: take repo mans into account as one may be aggregating prefixes of many

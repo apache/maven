@@ -58,7 +58,6 @@ public class MavenMetadataSource
     @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    //TODO: this will also cause a cycle so we need to refactor some code
     @Requirement
     private ArtifactFactory repositorySystem;
 
@@ -68,77 +67,92 @@ public class MavenMetadataSource
 
     @Requirement
     private PlexusContainer container;
-    
+
     @Requirement
     private Logger logger;
 
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        Artifact pomArtifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-
-        if ( "pom".equals( artifact.getType() ) )
-        {
-            pomArtifact.setFile( artifact.getFile() );
-        }
-
-        Set<Artifact> artifacts = Collections.emptySet();
-
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
-        configuration.setLocalRepository( localRepository );
-        configuration.setRemoteRepositories( remoteRepositories );
-        configuration.setLenientValidation( true );
-        // We don't care about processing plugins here, all we're interested in is the dependencies.
-        configuration.setProcessPlugins( false );
-        // FIXME: We actually need the execution properties here...
-        configuration.setExecutionProperties( System.getProperties() );
-
         MavenProject project;
 
-        try
+        Artifact pomArtifact;
+
+        //TODO: Not even sure this is really required as the project will be cached in the builder, we'll see this
+        // is currently the biggest hotspot
+        if ( artifact instanceof ProjectArtifact )
         {
-            project = getProjectBuilder().buildFromRepository( pomArtifact, configuration );
+            pomArtifact = artifact;
 
-            if ( !artifact.getArtifactHandler().isIncludesDependencies() )
+            project = ((ProjectArtifact)artifact).getProject();
+        }
+        else
+        {
+            pomArtifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+
+            if ( "pom".equals( artifact.getType() ) )
             {
-                artifacts = new LinkedHashSet<Artifact>();
+                pomArtifact.setFile( artifact.getFile() );
+            }
 
-                for ( Dependency d : project.getDependencies() )
+            ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+            configuration.setLocalRepository( localRepository );
+            configuration.setRemoteRepositories( remoteRepositories );
+            configuration.setLenientValidation( true );
+            // We don't care about processing plugins here, all we're interested in is the dependencies.
+            configuration.setProcessPlugins( false );
+            // FIXME: We actually need the execution properties here...
+            configuration.setExecutionProperties( System.getProperties() );
+
+            try
+            {
+                project = getProjectBuilder().buildFromRepository( pomArtifact, configuration );
+            }
+            catch ( ProjectBuildingException e )
+            {
+                // When this happens we have a Maven 1.x POM, or some invalid POM. There is still a pile of
+                // shit in the Maven 2.x repository that should have never found its way into the repository
+                // but it did.
+                logger.debug( "Failed to resolve artifact dependencies: " + e.getMessage() );
+                
+                return new ResolutionGroup( pomArtifact, Collections.<Artifact>emptySet(), remoteRepositories );                            
+            }            
+        }
+
+        Set<Artifact> artifacts = Collections.<Artifact>emptySet();       
+        
+        if ( !artifact.getArtifactHandler().isIncludesDependencies() )
+        {
+            artifacts = new LinkedHashSet<Artifact>();
+
+            for ( Dependency d : project.getDependencies() )
+            {
+                String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
+
+                if ( effectiveScope != null )
                 {
-                    String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
+                    Artifact dependencyArtifact;
 
-                    if ( effectiveScope != null )
+                    //TODO: deal with this in a unified way, probably just looking at the dependency.                        
+                    if ( d.getClassifier() != null )
                     {
-                        Artifact dependencyArtifact;
-                        
-                        //TODO: deal with this in a unified way, probably just looking at the dependency.                        
-                        if ( d.getClassifier() != null )
-                        {
-                            dependencyArtifact = repositorySystem.createArtifactWithClassifier( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getClassifier() );                            
-                        }
-                        else
-                        {
-                            dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
-                        }
-
-                        dependencyArtifact.setOptional( d.isOptional() );
-
-                        if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
-                        {
-                            dependencyArtifact.setFile( new File( d.getSystemPath() ) );
-                        }
-
-                        artifacts.add( dependencyArtifact );
+                        dependencyArtifact = repositorySystem.createArtifactWithClassifier( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getClassifier() );
                     }
+                    else
+                    {
+                        dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
+                    }
+
+                    dependencyArtifact.setOptional( d.isOptional() );
+
+                    if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
+                    {
+                        dependencyArtifact.setFile( new File( d.getSystemPath() ) );
+                    }                    
+                    
+                    artifacts.add( dependencyArtifact );
                 }
             }
-        }
-        catch ( ProjectBuildingException e )
-        {
-            // When this happens we have a Maven 1.x POM, or some invalid POM. There is still a pile of
-            // shit in the Maven 2.x repository that should have never found its way into the repository
-            // but it did.
-            logger.debug( "Failed to resolve artifact dependencies: " + e.getMessage() );
         }
 
         return new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
@@ -242,13 +256,13 @@ public class MavenMetadataSource
     }
 
     // USED BY MAVEN ASSEMBLY PLUGIN                                                                                                                                                                                                    
-    @Deprecated                                                                                                                                                                                                                         
-    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )                                                                                                                                                                 
-        throws InvalidDependencyVersionException                                                                                                                                                                                        
-    {             
+    @Deprecated
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
+        throws InvalidDependencyVersionException
+    {
         return createArtifacts( artifactFactory, dependencies, dependencyFilter );
     }
-    
+
     private static Set<Artifact> createArtifacts( ArtifactFactory factory, List<Dependency> dependencies, ArtifactFilter filter )
     {
         Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
@@ -262,17 +276,17 @@ public class MavenMetadataSource
                 artifacts.add( dependencyArtifact );
             }
         }
-        
+
         return artifacts;
-    }    
-    
+    }
+
     public MavenProjectBuilder getProjectBuilder()
     {
         if ( projectBuilder != null )
         {
             return projectBuilder;
         }
-        
+
         try
         {
             projectBuilder = container.lookup( MavenProjectBuilder.class );
@@ -281,7 +295,7 @@ public class MavenMetadataSource
         {
             // Won't happen
         }
-        
+
         return projectBuilder;
-    }    
+    }
 }

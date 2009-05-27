@@ -83,7 +83,7 @@ public class ResolutionNode
     public void addDependencies( Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories, ArtifactFilter filter )
         throws CyclicDependencyException, OverConstrainedVersionException
     {
-        if ( !artifacts.isEmpty() )
+        if ( artifacts != null && !artifacts.isEmpty() )
         {
             children = new ArrayList<ResolutionNode>( artifacts.size() );
 

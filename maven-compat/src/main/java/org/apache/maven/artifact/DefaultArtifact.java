@@ -78,9 +78,14 @@ public class DefaultArtifact
     private List<ArtifactVersion> availableVersions;
 
     private Map<Object,ArtifactMetadata> metadataMap;
-
+    
     private boolean optional;
 
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type, String classifier, ArtifactHandler artifactHandler )
+    {
+        this( groupId, artifactId, VersionRange.createFromVersion( version ), scope, type, classifier, artifactHandler, false );
+    }
+    
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type, String classifier, ArtifactHandler artifactHandler )
     {
         this( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler, false );

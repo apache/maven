@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -50,6 +51,7 @@ import org.apache.maven.model.profile.ProfileActivationException;
 import org.apache.maven.model.profile.ProfileInjector;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.apache.maven.project.validation.ModelValidator;
 import org.apache.maven.repository.RepositorySystem;
@@ -112,6 +114,9 @@ public class DefaultMavenProjectBuilder
     
     @Requirement
     private MavenProjectCache projectCache;
+    
+    @Requirement 
+    private ProjectDependenciesResolver projectDependenciesResolver;
     
     private MavenProject superProject;
 
@@ -326,9 +331,8 @@ public class DefaultMavenProjectBuilder
     {
         MavenProject project = build( pomFile, configuration );
 
-        Artifact artifact = repositorySystem.createProjectArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-        artifact.setFile( pomFile );
-
+        Artifact artifact = new ProjectArtifact( project );                     
+        
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
             .setResolveRoot( false )
