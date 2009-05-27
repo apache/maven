@@ -1,4 +1,4 @@
-package org.apache.maven.project.validation;
+package org.apache.maven.model.validation;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,24 +19,55 @@ package org.apache.maven.project.validation;
  * under the License.
  */
 
-import java.io.Reader;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.AbstractMavenProjectTestCase;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.PlexusTestCase;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
 public class DefaultModelValidatorTest
-    extends AbstractMavenProjectTestCase
+    extends PlexusTestCase
 {
-    private Model model;
 
-    private ModelValidator validator;
+    private DefaultModelValidator validator;
+
+    private Model read( String pom )
+        throws Exception
+    {
+        String resource = "/poms/validation/" + pom;
+        InputStream is = getClass().getResourceAsStream( resource );
+        assertNotNull( "missing resource: " + resource, is );
+        return new MavenXpp3Reader().read( is );
+    }
+
+    private ModelValidationResult validate( String pom )
+        throws Exception
+    {
+        return validator.validateEffectiveModel( read( pom ), false );
+    }
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        validator = (DefaultModelValidator) lookup( ModelValidator.class );
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        this.validator = null;
+
+        super.tearDown();
+    }
 
     public void testMissingModelVersion()
         throws Exception
@@ -148,7 +179,7 @@ public class DefaultModelValidatorTest
         assertEquals( 1, result.getMessageCount() );
 
         assertTrue( result.getMessage( 0 ).indexOf(
-            "'dependencyManagement.dependencies.dependency.artifactId' is missing." ) > -1 );
+                                                    "'dependencyManagement.dependencies.dependency.artifactId' is missing." ) > -1 );
     }
 
     public void testMissingDependencyManagementGroupId()
@@ -159,7 +190,7 @@ public class DefaultModelValidatorTest
         assertEquals( 1, result.getMessageCount() );
 
         assertTrue( result.getMessage( 0 ).indexOf(
-            "'dependencyManagement.dependencies.dependency.groupId' is missing." ) > -1 );
+                                                    "'dependencyManagement.dependencies.dependency.groupId' is missing." ) > -1 );
     }
 
     public void testMissingAll()
@@ -169,7 +200,7 @@ public class DefaultModelValidatorTest
 
         assertEquals( 4, result.getMessageCount() );
 
-        List messages = result.getMessages();
+        List<String> messages = result.getMessages();
 
         assertTrue( messages.contains( "\'modelVersion\' is missing." ) );
         assertTrue( messages.contains( "\'groupId\' is missing." ) );
@@ -209,10 +240,6 @@ public class DefaultModelValidatorTest
         assertEquals( "'repositories.repository.id' is missing.", result.getMessage( 0 ) );
 
         assertEquals( "'repositories.repository.url' is missing.", result.getMessage( 1 ) );
-//
-//        assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getMessage( 2 ) );
-//
-//        assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getMessage( 3 ) );
     }
 
     public void testMissingResourceDirectory()
@@ -227,23 +254,4 @@ public class DefaultModelValidatorTest
         assertEquals( "'build.testResources.testResource.directory' is missing.", result.getMessage( 1 ) );
     }
 
-    private ModelValidationResult validate( String testName )
-        throws Exception
-    {
-        Reader input = ReaderFactory.newXmlReader( getFileForClasspathResource( "validation/" + testName ) );
-
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-
-        validator = lookup( ModelValidator.class );
-
-        model = reader.read( input );
-
-        ModelValidationResult result = validator.validate( model );
-
-        assertNotNull( result );
-
-        input.close();
-
-        return result;
-    }
 }
