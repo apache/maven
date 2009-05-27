@@ -36,8 +36,8 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.model.io.ModelReader;
+import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -101,9 +101,9 @@ public class MavenEmbedder
 
     private MavenProjectBuilder mavenProjectBuilder;
 
-    private MavenXpp3Reader modelReader;
+    private ModelReader modelReader;
 
-    private MavenXpp3Writer modelWriter;
+    private ModelWriter modelWriter;
     
     private MavenExecutionRequestPopulator populator;
         
@@ -189,20 +189,20 @@ public class MavenEmbedder
     public Model readModel( Reader reader )
         throws XmlPullParserException, IOException
     {
-    	return modelReader.read( reader );
+    	return modelReader.read( reader, null );
     }
 
     public void writeModel( Writer writer, Model model, boolean namespaceDeclaration )
         throws IOException
     {
-        modelWriter.write( writer, model );
+        modelWriter.write( writer, null, model );
     }
 
     public void writeModel( Writer writer,
                             Model model )
         throws IOException
     {
-        modelWriter.write( writer, model );
+        modelWriter.write( writer, null, model );
     }
 
     // ----------------------------------------------------------------------
@@ -392,9 +392,9 @@ public class MavenEmbedder
             // client interface.
             // ----------------------------------------------------------------------
 
-            modelReader = new MavenXpp3Reader();
+            modelReader = container.lookup( ModelReader.class );
 
-            modelWriter = new MavenXpp3Writer();
+            modelWriter = container.lookup( ModelWriter.class );
 
             maven = container.lookup( Maven.class );
 
