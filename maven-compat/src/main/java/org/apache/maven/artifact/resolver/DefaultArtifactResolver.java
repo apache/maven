@@ -86,10 +86,10 @@ public class DefaultArtifactResolver
         resolve( artifact, remoteRepositories, localRepository, resolutionListener, false );
     }
 
-    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor )
+    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        resolve( artifact, remoteRepositories, localRepository, downloadMonitor, true );
+        resolve( artifact, remoteRepositories, localRepository, null, true );
     }
 
     private void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor, boolean force )

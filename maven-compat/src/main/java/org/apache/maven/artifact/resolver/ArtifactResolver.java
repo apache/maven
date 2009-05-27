@@ -67,5 +67,9 @@ public interface ArtifactResolver
     @Deprecated
     void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor )
         throws ArtifactResolutionException, ArtifactNotFoundException;
-    
+
+    // USED BY ARCHETYPE DOWNLOADER
+    @Deprecated
+    void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+        throws ArtifactResolutionException, ArtifactNotFoundException;    
 }
