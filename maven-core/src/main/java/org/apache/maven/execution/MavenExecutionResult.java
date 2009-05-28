@@ -19,12 +19,11 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.lifecycle.plan.BuildPlan;
-import org.apache.maven.project.MavenProject;
-
 import java.util.List;
-import java.util.Map;
+
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.project.MavenProject;
 
 /**
  * @author Jason van Zyl
@@ -34,23 +33,23 @@ public interface MavenExecutionResult
     MavenExecutionResult setProject( MavenProject project );
     MavenProject getProject();
 
-    MavenExecutionResult setTopologicallySortedProjects( List projects );
-    List getTopologicallySortedProjects();
+    MavenExecutionResult setTopologicallySortedProjects( List<MavenProject> projects );
+    List<MavenProject> getTopologicallySortedProjects();
 
     MavenExecutionResult setArtifactResolutionResult( ArtifactResolutionResult result );
     ArtifactResolutionResult getArtifactResolutionResult();
-
-    MavenExecutionResult setReactorManager( ReactorManager reactorManager );
-    ReactorManager getReactorManager();
 
     // for each exception
     // - knowing what artifacts are missing
     // - project building exception
     // - invalid project model exception: list of markers
     // - xmlpull parser exception
-    List getExceptions();
+    List<Exception> getExceptions();
 
     MavenExecutionResult addException( Throwable e );
 
     boolean hasExceptions();
+        
+    MavenExecutionResult setExceptionSummary( ExceptionSummary exceptionSummary );
+    ExceptionSummary getExceptionSummary();
 }

@@ -19,45 +19,56 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.maven.BuildFailureException;
-import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.monitor.event.EventDispatcher;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Responsible for orchestrating the process of building the ordered list of
- * steps required to achieve the specified set of tasks passed into Maven, then
- * executing these mojos in order. This class also manages the various error messages
- * that may occur during this process, and directing the behavior of the build
- * according to what's specified in {@link MavenExecutionRequest#getReactorFailureBehavior()}.
- *
- * @author Jason van Zyl
- * @author jdcasey
+ * @author Jason van  Zyl
  */
 public interface LifecycleExecutor
-{
+{    
+    List<String> getLifecyclePhases();
+       
     /**
-     * Provides a fail-fast way to check that all goals specified in {@link MavenExecutionRequest#getGoals()}
-     * or {@link MavenSession#getGoals()} is valid.
+     * Calculate the list of {@link org.apache.maven.plugin.descriptor.MojoDescriptor} objects to run for the selected lifecycle phase.
+     * 
+     * @param phase
+     * @param session
+     * @return
+     * @throws InvalidPluginDescriptorException 
+     * @throws LifecycleExecutionException
      */
-    TaskValidationResult isTaskValid( String task, MavenSession session, MavenProject rootProject );
+    MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException;
+        
+    // For a given project packaging find all the plugins that are bound to any registered
+    // lifecycles. The project builder needs to now what default plugin information needs to be
+    // merged into POM being built. Once the POM builder has this plugin information, versions can be assigned
+    // by the POM builder because they will have to be defined in plugin management. Once this is done then it
+    // can be passed back so that the default configuraiton information can be populated.
+    //
+    // We need to know the specific version so that we can lookup the right version of the plugin descriptor
+    // which tells us what the default configuration is.
+    //
+    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging );
 
-    /**
-     * Order and execute mojos associated with the current set of projects in the
-     * reactor. Specific lifecycle phases and mojo invocations that determine what
-     * phases and mojos this method will attempt to execute are provided in {@link MavenSession#getGoals()},
-     * which is populated from {@link MavenExecutionRequest#getGoals()}.
-     */
-    void execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
-        throws LifecycleExecutionException, BuildFailureException;
-
-    /**
-     * @since 2.0.10
-     */
-    List getLifecycles();
-
+    // Given a set of {@link org.apache.maven.Plugin} objects where the GAV is set we can lookup the plugin
+    // descriptor and populate the default configuration.
+    //
+    void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws LifecycleExecutionException;
+    
+    void execute( MavenSession session );
 }

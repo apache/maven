@@ -19,11 +19,11 @@ package org.apache.maven.embedder.execution;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Settings;
-
-import java.util.List;
 
 /**
  * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core.

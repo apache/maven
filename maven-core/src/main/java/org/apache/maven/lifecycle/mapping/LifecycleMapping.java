@@ -19,17 +19,9 @@ package org.apache.maven.lifecycle.mapping;
  * under the License.
  */
 
-import java.util.List;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- */
 public interface LifecycleMapping
-{
-    String ROLE = LifecycleMapping.class.getName();
-
-    List getOptionalMojos( String lifecycle );
-    
-    Map getPhases( String lifecycle );
+{        
+    Map<String,Lifecycle> getLifecycles();
 }

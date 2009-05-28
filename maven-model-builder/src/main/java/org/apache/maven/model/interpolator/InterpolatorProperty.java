@@ -1,6 +1,5 @@
 package org.apache.maven.model.interpolator;
 
-import java.util.*;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,7 +23,7 @@ import java.util.*;
 /**
  * Provides interpolator property information.
  */
-public final class InterpolatorProperty
+final class InterpolatorProperty
 {
     /**
      * The key (or name) of the property
@@ -99,20 +98,6 @@ public final class InterpolatorProperty
     {
         this.tag = tag;
     }
-    public static List<InterpolatorProperty> toInterpolatorProperties( Map<String, String> properties, String tag )
-    {
-            if( properties == null )
-            {
-                throw new IllegalArgumentException( "properties: null" );
-            }
-    
-            List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-            for ( Map.Entry<String, String> e : properties.entrySet() )
-            {
-                interpolatorProperties.add( new InterpolatorProperty( "${" + e.getKey() +"}", e.getValue(), tag) );
-            }
-            return interpolatorProperties;
-     }
 
     /**
      * Returns true if key values match, otherwise returns false.
@@ -155,21 +140,6 @@ public final class InterpolatorProperty
     {
         return "Key = " + key + ", Value = " + value +  ", Hash = " +
             this.hashCode();
-    }
-
-    public static List<InterpolatorProperty> toInterpolatorProperties( Properties properties, String tag )
-    {
-        if( properties == null )
-        {
-            throw new IllegalArgumentException( "properties: null" );
-        }
-
-        List<InterpolatorProperty> interpolatorProperties = new ArrayList<InterpolatorProperty>();
-        for ( Map.Entry<Object, Object> e : properties.entrySet() )
-        {
-            interpolatorProperties.add( new InterpolatorProperty( "${" + e.getKey() +"}", (String) e.getValue(), tag) );
-        }
-        return interpolatorProperties;
     }
 }
 

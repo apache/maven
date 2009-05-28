@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +29,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -53,13 +56,6 @@ import org.codehaus.plexus.util.FileUtils;
 public class DefaultArtifactResolver
     implements ArtifactResolver
 {
-
-    private boolean online = true;
-
-    // ----------------------------------------------------------------------
-    // Components
-    // ----------------------------------------------------------------------
-
     @Requirement 
     private Logger logger;
     
@@ -79,35 +75,21 @@ public class DefaultArtifactResolver
     private ResolutionErrorHandler resolutionErrorHandler;
 
     @Requirement
+    private ArtifactMetadataSource source;
+    
+    @Requirement
     private PlexusContainer container;
     
-    //@Requirement 
-    private ArtifactMetadataSource metadataSource;
-    
-    // ----------------------------------------------------------------------
-    // Implementation
-    // ----------------------------------------------------------------------
-
-    public void setOnline( boolean online )
-    {
-        this.online = online;
-    }
-
-    public boolean isOnline()
-    {
-        return online;
-    }
-
     public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener resolutionListener )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         resolve( artifact, remoteRepositories, localRepository, resolutionListener, false );
     }
 
-    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor )
+    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        resolve( artifact, remoteRepositories, localRepository, downloadMonitor, true );
+        resolve( artifact, remoteRepositories, localRepository, null, true );
     }
 
     private void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor, boolean force )
@@ -119,6 +101,7 @@ public class DefaultArtifactResolver
         }
 
         File destination;
+        
         if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
         {
             File systemFile = artifact.getFile();
@@ -139,8 +122,11 @@ public class DefaultArtifactResolver
             }
 
             artifact.setResolved( true );
+            
+            return;
         }
-        else if ( !artifact.isResolved() )
+        
+        if ( !artifact.isResolved() )
         {
             // ----------------------------------------------------------------------
             // Check for the existence of the artifact in the specified local
@@ -148,9 +134,21 @@ public class DefaultArtifactResolver
             // request for resolution has been satisfied.
             // ----------------------------------------------------------------------
 
-            String localPath = localRepository.pathOf( artifact );
+            artifact = localRepository.find( artifact );
+            
+            if ( artifact.isFromAuthoritativeRepository() )
+            {
+                return;
+            }
+            
+            if ( artifact.isSnapshot() && artifact.isResolved() )
+            {
+                return;
+            }
+            
+            //String localPath = localRepository.pathOf( artifact );
 
-            artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
+            //artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
 
             transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
 
@@ -160,20 +158,15 @@ public class DefaultArtifactResolver
 
             boolean resolved = false;
 
+            boolean destinationExists = destination.exists();
+            
             // There are three conditions in which we'll go after the artifact here:
             // 1. the force flag is set.
             // 2. the artifact's file doesn't exist (this would be true for release or snapshot artifacts)
             // 3. the artifact is a snapshot and is not a locally installed snapshot
 
-            // TODO: Should it matter whether it's a locally installed snapshot??
-            if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy && isOnline() ) )
+            if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) )
             {
-                if ( !isOnline() )
-                {
-                    throw new ArtifactResolutionException( "The repository system is offline and the artifact "
-                        + artifact + " is not available in the local repository.", artifact );
-                }
-
                 try
                 {
                     if ( artifact.getRepository() != null )
@@ -206,18 +199,27 @@ public class DefaultArtifactResolver
 
             if ( destination.exists() )
             {
-                // locally resolved...no need to hit the remote repo.
                 artifact.setResolved( true );
             }
-
+                                        
+            // 1.0-SNAPSHOT
+            //
+            // 1)         pom = 1.0-SoNAPSHOT
+            // 2)         pom = 1.0-yyyymmdd.hhmmss
+            // 3) baseVersion = 1.0-SNAPSHOT
             if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
             {
                 String version = artifact.getVersion();
 
+                // 1.0-SNAPSHOT
                 artifact.selectVersion( artifact.getBaseVersion() );
 
+                // Make a file with a 1.0-SNAPSHOT format
                 File copy = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-
+                
+                // if the timestamped version was resolved or the copy doesn't exist then copy a version
+                // of the file like 1.0-SNAPSHOT. Even if there is a timestamped version the non-timestamped
+                // version will be created.
                 if ( resolved || !copy.exists() )
                 {
                     // recopy file if it was reresolved, or doesn't exist.
@@ -233,13 +235,15 @@ public class DefaultArtifactResolver
                     }
                 }
 
+                // We are only going to use the 1.0-SNAPSHOT version
                 artifact.setFile( copy );
 
+                // Set the version to the 1.0-SNAPSHOT version
                 artifact.selectVersion( version );
             }
         }
     }
-
+        
     private boolean isLocalCopy( Artifact artifact )
     {
         boolean localCopy = false;
@@ -323,8 +327,16 @@ public class DefaultArtifactResolver
                                                          List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest().setArtifact( originatingArtifact ).setResolveRoot( false ).setArtifactDependencies( artifacts ).setManagedVersionMap( managedVersions )
-            .setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories ).setMetadataSource( source ).setFilter( filter ).setListeners( listeners );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( originatingArtifact )
+            .setResolveRoot( false )
+            // This is required by the surefire plugin
+            .setArtifactDependencies( artifacts )            
+            .setManagedVersionMap( managedVersions )
+            .setLocalRepository( localRepository )
+            .setRemoteRepostories( remoteRepositories )
+            .setFilter( filter )
+            .setListeners( listeners );
 
         return resolveWithExceptions( request );
     }
@@ -346,7 +358,7 @@ public class DefaultArtifactResolver
     // ------------------------------------------------------------------------
     //
     // ------------------------------------------------------------------------
-
+    
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
         Artifact rootArtifact = request.getArtifact();
@@ -354,10 +366,10 @@ public class DefaultArtifactResolver
         Map managedVersions = request.getManagedVersionMap();
         ArtifactRepository localRepository = request.getLocalRepository();
         List<ArtifactRepository> remoteRepositories = request.getRemoteRepostories();
-        ArtifactMetadataSource source = request.getMetadataSource();
         List<ResolutionListener> listeners = request.getListeners();
-        ArtifactFilter filter = request.getFilter();
+        ArtifactFilter filter = request.getFilter();                       
         
+        //TODO: hack because metadata isn't generated in m2e correctly and i want to run the maven i have in the workspace
         if ( source == null )
         {
             try
@@ -366,10 +378,11 @@ public class DefaultArtifactResolver
             }
             catch ( ComponentLookupException e )
             {
-                // Won't happen
+                e.printStackTrace();
+                // won't happen
             }
         }
-        
+
         if ( listeners == null )
         {
             listeners = new ArrayList<ResolutionListener>();
@@ -388,13 +401,12 @@ public class DefaultArtifactResolver
         // This is often an artifact like a POM that is taken from disk and we already have hold of the
         // file reference. But this may be a Maven Plugin that we need to resolve from a remote repository
         // as well as its dependencies.
-        
+                        
         if ( request.isResolveRoot() && rootArtifact.getFile() == null )
-        {
+        {            
             try
             {
                 resolve( rootArtifact, remoteRepositories, localRepository );
-                result.addArtifact( rootArtifact );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -407,15 +419,55 @@ public class DefaultArtifactResolver
                 return result;
             }
         }
-
-        if ( artifacts == null || artifacts.size() == 0 )
+        
+        if ( request.isResolveTransitively() )
         {
+            try
+            {
+                Set<Artifact> directArtifacts = source.retrieve( rootArtifact, localRepository, remoteRepositories ).getArtifacts();
+
+                if ( artifacts == null || artifacts.isEmpty() )
+                {
+                    artifacts = directArtifacts;
+                }
+                else
+                {
+                    List<Artifact> allArtifacts = new ArrayList<Artifact>();
+                    allArtifacts.addAll( artifacts );
+                    allArtifacts.addAll( directArtifacts );
+
+                    Map<String, Artifact> mergedArtifacts = new LinkedHashMap<String, Artifact>();
+                    for ( Artifact artifact : allArtifacts )
+                    {
+                        String conflictId = artifact.getDependencyConflictId();
+                        if ( !mergedArtifacts.containsKey( conflictId ) )
+                        {
+                            mergedArtifacts.put( conflictId, artifact );
+                        }
+                    }
+
+                    artifacts = new LinkedHashSet<Artifact>( mergedArtifacts.values() );
+                }
+            }
+            catch ( ArtifactMetadataRetrievalException e )
+            {
+                // need to add metadata resolution exception
+                return result;
+            }
+        }
+        
+        if ( artifacts == null || artifacts.isEmpty() )
+        {
+            if ( request.isResolveRoot() )
+            {
+                result.addArtifact( rootArtifact );
+            }
             return result;
         } 
-        
-        // After the collection we will have the artifact object in the result but they will not be resolved yet.
-        result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners );
 
+        // After the collection we will have the artifact object in the result but they will not be resolved yet.
+        result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners, null );
+                        
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
         // appropriately.
@@ -424,7 +476,7 @@ public class DefaultArtifactResolver
         {
             return result;
         }
-
+                
         if ( result.getArtifacts() != null )
         {
             for ( Artifact artifact : result.getArtifacts() )
@@ -449,7 +501,18 @@ public class DefaultArtifactResolver
                 }
             }
         }
-
+                
+        // We want to send the root artifact back in the result but we need to do this after the other dependencies
+        // have been resolved.
+        if ( request.isResolveRoot() )
+        {            
+            // Add the root artifact (as the first artifact to retain logical order of class path!)
+            Set<Artifact> allArtifacts = new LinkedHashSet<Artifact>();
+            allArtifacts.add( rootArtifact );
+            allArtifacts.addAll( result.getArtifacts() );
+            result.setArtifacts( allArtifacts );
+        }                        
+                 
         return result;
     }
 

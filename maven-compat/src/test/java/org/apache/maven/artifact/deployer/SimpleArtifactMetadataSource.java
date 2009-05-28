@@ -19,16 +19,17 @@ package org.apache.maven.artifact.deployer;
  * under the License.
  */
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-
-import java.util.Collections;
-import java.util.List;
 
 /** @author Jason van Zyl */
 public class SimpleArtifactMetadataSource

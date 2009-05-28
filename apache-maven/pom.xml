@@ -23,11 +23,8 @@
     <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>apache-maven</artifactId>
-
   <name>Maven Distribution</name>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -36,10 +33,6 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -61,14 +54,6 @@
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-http-lightweight</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-ssh</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-ssh-external</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>

@@ -16,11 +16,8 @@ package org.apache.maven.embedder.execution;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.Maven;
@@ -29,51 +26,24 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
-import org.apache.maven.errors.DefaultCoreErrorReporter;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.RepositoryPolicy;
-import org.apache.maven.monitor.event.DefaultEventMonitor;
-import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.profiles.ProfileActivationException;
-import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.realm.DefaultMavenRealmManager;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.toolchain.ToolchainsBuilder;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
-/**
- * Things that we deal with in this populator to ensure that we have a valid
- * {@MavenExecutionRequest}
- * <p/>
- * - POM - Settings - Local Repository - Snapshot update policies - Repository checksum policies -
- * Artifact transfer mechanism configuration - Eventing/Logging configuration - Profile manager
- * configuration
- */
 @Component(role = MavenExecutionRequestPopulator.class)
 public class DefaultMavenExecutionRequestPopulator
     extends AbstractLogEnabled
     implements MavenExecutionRequestPopulator
 {
-    @Requirement
-    private PlexusContainer container;
-
+    //TODO: this needs to be pushed up to the front-end
     @Requirement
     private MavenSettingsBuilder settingsBuilder;
 
@@ -83,165 +53,116 @@ public class DefaultMavenExecutionRequestPopulator
     @Requirement
     private ToolchainsBuilder toolchainsBuilder;
 
-    // 2009-03-05 Oleg: this component is defined sub-classed in this package
-    @Requirement(hint = "maven")
-    private SecDispatcher securityDispatcher;
-
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
         throws MavenEmbedderException
     {
-        eventing( request, configuration );
+        // copy configuration to request
+        if ( request.getSettings() == null )
+        {
+            if ( configuration.getGlobalSettingsFile() != null )
+            {
+                request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+            }
+    
+            if ( configuration.getUserSettingsFile() != null )
+            {
+                request.setUserSettingsFile( configuration.getUserSettingsFile() );
+            }
+        }
 
-        reporter( request, configuration );
+        String localRepositoryPath = null;
 
-        executionProperties( request, configuration );
+        if ( request.getLocalRepositoryPath() != null )
+        {
+            localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
+        }
 
-        pom( request, configuration );
+        if ( StringUtils.isEmpty( localRepositoryPath ) && ( configuration.getLocalRepository() != null ) )
+        {
+            localRepositoryPath = configuration.getLocalRepository().getAbsolutePath();
+        }
 
-        settings( request, configuration );
+        if ( !StringUtils.isEmpty( localRepositoryPath ) )
+        {
+            request.setLocalRepositoryPath( localRepositoryPath );
+        }
 
-        localRepository( request, configuration );
+        // populate the defaults
 
-        toolchains( request, configuration );
-
-        artifactTransferMechanism( request, configuration );
-
-        realmManager( request, configuration );
-
-        profileManager( request, configuration );
-
-        processSettings( request, configuration );
-
-        return request;
+        return populateDefaults( request );
     }
 
-    private void reporter( MavenExecutionRequest request, Configuration configuration )
+    private void pom( MavenExecutionRequest request )
     {
-        if ( request.getErrorReporter() == null )
+        // ------------------------------------------------------------------------
+        // POM
+        //
+        // If we are not given a specific POM file, but passed a base directory
+        // then we will use a release POM in the directory provided, and then
+        // look for the standard POM.
+        // ------------------------------------------------------------------------
+
+        if ( request.getPom() != null && !request.getPom().isAbsolute() )
         {
-            if ( configuration.getErrorReporter() != null )
-            {
-                request.setErrorReporter( configuration.getErrorReporter() );
-            }
-            else
-            {
-                request.setErrorReporter( new DefaultCoreErrorReporter() );
-            }
+            request.setPom( request.getPom().getAbsoluteFile() );
+        }
+
+        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
+        {
+            request.setBaseDirectory( request.getPom().getParentFile() );
+        }
+        else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
+        {
+            File pom = new File( request.getBaseDirectory(), Maven.POMv4 );
+
+            request.setPom( pom );
+        }
+        // TODO: Is this correct?
+        else if ( request.getBaseDirectory() == null )
+        {
+            request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
         }
     }
-
-    private void executionProperties( MavenExecutionRequest request, Configuration configuration )
+        
+    private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
-        Properties requestProperties = request.getProperties();
-
-        if ( requestProperties == null )
-        {
-            requestProperties = configuration.getSystemProperties();
-            if ( requestProperties == null )
-            {
-                requestProperties = System.getProperties();
-            }
-
-            request.setProperties( requestProperties );
-        }
-
-        Properties userProperties = request.getUserProperties();
-        if ( userProperties != null )
-        {
-            for ( Iterator<?> it = userProperties.keySet().iterator(); it.hasNext(); )
-            {
-                String key = (String) it.next();
-                if ( !requestProperties.containsKey( key ) )
-                {
-                    requestProperties.setProperty( key, userProperties.getProperty( key ) );
-                }
-            }
-        }
+        request.addPluginGroup( "org.apache.maven.plugins" );
+        request.addPluginGroup( "org.codehaus.mojo" );
     }
-
-    private void realmManager( MavenExecutionRequest request, Configuration configuration )
-    {
-        if ( request.getRealmManager() == null )
-        {
-            if ( configuration.getRealmManager() == null )
-            {
-                request.setRealmManager( new DefaultMavenRealmManager( container, getLogger() ) );
-            }
-            else
-            {
-                request.setRealmManager( configuration.getRealmManager() );
-            }
-        }
-    }
-
-    private void processSettings( MavenExecutionRequest request, Configuration configuration )
+    
+    // Process plugin groups
+    // Get profile models
+    // Get active profiles
+    private void processSettings( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
-        ProfileManager profileManager = request.getProfileManager();
-
         Settings settings = request.getSettings();
+        
+        request.addPluginGroups( settings.getPluginGroups() );
 
-        request.setPluginGroups( settings.getPluginGroups() );
-
+        populateDefaultPluginGroups( request );
+        
         List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
 
-        List<String> settingsActiveProfileIds = settings.getActiveProfiles();
-
-        if ( settingsActiveProfileIds != null )
-        {
-            for ( String profileId : settingsActiveProfileIds )
-            {
-                profileManager.getProfileActivationContext().setActive( profileId );
-            }
-        }
-
+        // We just need to keep track of what profiles are being activated by the settings. We don't need to process
+        // them here. This should be taken care of by the project builder.
+        //
+        request.addActiveProfiles( settings.getActiveProfiles() );        
+        
+        // We only need to take the profiles and make sure they are available when the calculation of the active profiles
+        // is determined.
+        //
         if ( ( settingsProfiles != null ) && !settingsProfiles.isEmpty() )
         {
             for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
             {
-                Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
-
-                profileManager.addProfile( profile );
-            }
-
-            // We need to convert profile repositories to artifact repositories
-            try
-            {
-                for ( Profile profile : profileManager.getActiveProfiles() )
-                {
-                    for ( Repository r : profile.getRepositories() )
-                    {
-                        try
-                        {
-                            request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
-                        }
-                        catch ( InvalidRepositoryException e )
-                        {
-                            throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
-                        }
-                    }
-                    for ( Repository r : profile.getPluginRepositories() )
-                    {
-                        try
-                        {
-                            request.addRemoteRepository( repositorySystem.buildArtifactRepository( r ) );
-                        }
-                        catch ( InvalidRepositoryException e )
-                        {
-                            throw new MavenEmbedderException( "Cannot create remote repository " + r.getId(), e );
-                        }
-                    }                    
-                }
-            }
-            catch ( ProfileActivationException e )
-            {
-                throw new MavenEmbedderException( "Cannot determine active profiles", e );
+                request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );                
             }
         }
-
+        
         injectDefaultRepositories( request );
 
-        processRepositoriesInSettings( request, configuration );
+        processRepositoriesInSettings( request );
     }
 
     private void injectDefaultRepositories( MavenExecutionRequest request )
@@ -256,32 +177,25 @@ public class DefaultMavenExecutionRequestPopulator
             }
         }
 
-        if ( !definedRepositories.contains( "central" ) )
-        {
-            Repository repo = new Repository();
-            repo.setId( "central" );
-            repo.setUrl( "http://repo1.maven.org/maven2" );
-            repo.setName( "Maven Repository Switchboard" );
-            RepositoryPolicy snapshotPolicy = new RepositoryPolicy();
-            snapshotPolicy.setEnabled( false );
-            repo.setSnapshots( snapshotPolicy );
+        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
+        {            
             try
             {
-                ArtifactRepository ar = repositorySystem.buildArtifactRepository( repo );
-                request.addRemoteRepository( ar );
+                request.addRemoteRepository( repositorySystem.createDefaultRemoteRepository() );
             }
             catch ( InvalidRepositoryException e )
             {
-                throw new MavenEmbedderException( "Cannot create remote repository " + repo.getId(), e );
+                throw new MavenEmbedderException( "Cannot create default remote repository.", e );
             }
         }
     }
 
-    private void processRepositoriesInSettings( MavenExecutionRequest request, Configuration configuration )
+    private void processRepositoriesInSettings( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
         Settings settings = request.getSettings();
 
+        /*
         Proxy proxy = settings.getActiveProxy();
 
         if ( proxy != null )
@@ -313,6 +227,7 @@ public class DefaultMavenExecutionRequestPopulator
 
             repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
         }
+        */
 
         for ( Mirror mirror : settings.getMirrors() )
         {
@@ -331,47 +246,10 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
     // ------------------------------------------------------------------------
-    // POM
-    // ------------------------------------------------------------------------
-
-    private void pom( MavenExecutionRequest request, Configuration configuration )
-    {
-        // ------------------------------------------------------------------------
-        // POM
-        //
-        // If we are not given a specific POM file, but passed a base directory
-        // then we will use a release POM in the directory provide, or and then
-        // look for the standard POM.
-        // ------------------------------------------------------------------------
-
-        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
-        {
-            request.setBaseDirectory( request.getPom().getParentFile() );
-        }
-        else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
-        {
-            // Look for a release POM
-            File pom = new File( request.getBaseDirectory(), Maven.RELEASE_POMv4 );
-
-            if ( !pom.exists() )
-            {
-                pom = new File( request.getBaseDirectory(), Maven.POMv4 );
-            }
-
-            request.setPom( pom );
-        }
-        // TODO: Is this correct?
-        else if ( request.getBaseDirectory() == null )
-        {
-            request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
-        }
-    }
-
-    // ------------------------------------------------------------------------
     // Settings
     // ------------------------------------------------------------------------
 
-    private void settings( MavenExecutionRequest request, Configuration configuration )
+    private void settings( MavenExecutionRequest request )
     {
         // ------------------------------------------------------------------------
         // Settings
@@ -384,14 +262,14 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.getSettings() == null )
         {
-            if ( configuration.getGlobalSettingsFile() != null )
+            if ( request.getGlobalSettingsFile() == null )
             {
-                request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+                request.setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE );
             }
 
-            if ( configuration.getUserSettingsFile() != null )
+            if ( request.getUserSettingsFile() == null )
             {
-                request.setUserSettingsFile( configuration.getUserSettingsFile() );
+                request.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
             }
 
             try
@@ -407,7 +285,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void localRepository( MavenExecutionRequest request, Configuration configuration )
+    private void localRepository( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
         // ------------------------------------------------------------------------
@@ -420,7 +298,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.getLocalRepository() == null )
         {
-            request.setLocalRepository( createLocalRepository( request, request.getSettings(), configuration ) );
+            request.setLocalRepository( createLocalRepository( request, request.getSettings() ) );
         }
 
         if ( request.getLocalRepositoryPath() == null )
@@ -433,28 +311,7 @@ public class DefaultMavenExecutionRequestPopulator
     // Artifact Transfer Mechanism
     // ------------------------------------------------------------------------
 
-    private void artifactTransferMechanism( MavenExecutionRequest request, Configuration configuration )
-        throws MavenEmbedderException
-    {
-        // ------------------------------------------------------------------------
-        // Artifact Transfer Mechanism
-        // ------------------------------------------------------------------------
-
-        if ( request.isOffline() )
-        {
-            repositorySystem.setOnline( false );
-        }
-        else if ( ( request.getSettings() != null ) && request.getSettings().isOffline() )
-        {
-            repositorySystem.setOnline( false );
-        }
-        else
-        {
-            repositorySystem.setOnline( true );
-        }
-    }
-
-    public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings, Configuration configuration )
+    public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings )
         throws MavenEmbedderException
     {
         String localRepositoryPath = null;
@@ -464,11 +321,6 @@ public class DefaultMavenExecutionRequestPopulator
             localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
         }
 
-        if ( StringUtils.isEmpty( localRepositoryPath ) && ( configuration.getLocalRepository() != null ) )
-        {
-            localRepositoryPath = configuration.getLocalRepository().getAbsolutePath();
-        }
-
         if ( StringUtils.isEmpty( localRepositoryPath ) )
         {
             localRepositoryPath = settings.getLocalRepository();
@@ -476,76 +328,38 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( StringUtils.isEmpty( localRepositoryPath ) )
         {
-            localRepositoryPath = MavenEmbedder.defaultUserLocalRepository.getAbsolutePath();
+            localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
         }
 
         try
         {
-            return repositorySystem.createLocalRepository( localRepositoryPath, MavenEmbedder.DEFAULT_LOCAL_REPO_ID );
+            return repositorySystem.createLocalRepository( new File( localRepositoryPath ) );
         }
-        catch ( IOException e )
+        catch ( InvalidRepositoryException e )
         {
             throw new MavenEmbedderException( "Cannot create local repository.", e );
         }
     }
 
-    // ------------------------------------------------------------------------
-    // Eventing
-    // ------------------------------------------------------------------------
-
-    private void eventing( MavenExecutionRequest request, Configuration configuration )
+    private void toolchains( MavenExecutionRequest request )
     {
-        // ------------------------------------------------------------------------
-        // Event Monitor/Logging
-        //
-        //
-        // ------------------------------------------------------------------------
-
-        if ( ( request.getEventMonitors() == null ) || request.getEventMonitors().isEmpty() )
-        {
-            request.addEventMonitor( new DefaultEventMonitor( getLogger() ) );
-        }
-
-        // Now, add in any event monitors from the Configuration instance.
-        List<EventMonitor> configEventMonitors = configuration.getEventMonitors();
-
-        if ( ( configEventMonitors != null ) && !configEventMonitors.isEmpty() )
-        {
-            for ( EventMonitor monitor : configEventMonitors )
-            {
-                request.addEventMonitor( monitor );
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // Profile Manager
-    // ------------------------------------------------------------------------
-
-    private void profileManager( MavenExecutionRequest request, Configuration configuration )
-    {
-        // ------------------------------------------------------------------------
-        // Profile Manager
-        // ------------------------------------------------------------------------
-
-        ProfileActivationContext activationContext = request.getProfileActivationContext();
-        if ( activationContext == null )
-        {
-            activationContext = new ProfileActivationContext( request.getProperties(), false );
-        }
-
-        activationContext.setExplicitlyActiveProfileIds( request.getActiveProfiles() );
-        activationContext.setExplicitlyInactiveProfileIds( request.getInactiveProfiles() );
-
-        ProfileManager globalProfileManager = new DefaultProfileManager( activationContext );
-
-        request.setProfileManager( globalProfileManager );
-        request.setProfileActivationContext( activationContext );
-    }
-
-    private void toolchains( MavenExecutionRequest request, Configuration configuration )
-    {
+        // FIXME individual requests must not change global state
         toolchainsBuilder.setUserToolchainsFile( request.getUserToolchainsFile() );
     }
 
+    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
+        throws MavenEmbedderException
+    {
+        pom( request );
+        
+        settings( request );
+
+        localRepository( request );
+
+        toolchains( request );
+
+        processSettings( request );
+                
+        return request;
+    }
 }

@@ -15,25 +15,19 @@ package org.apache.maven.repository;
  * the License.
  */
 
-import java.io.IOException;
+import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.events.TransferListener;
 
 /**
@@ -41,57 +35,61 @@ import org.apache.maven.wagon.events.TransferListener;
  */
 public interface RepositorySystem
 {
+    static final String DEFAULT_LOCAL_REPO_ID = "local";
+    
+    static final String userHome = System.getProperty( "user.home" );
+    
+    static final File userMavenConfigurationHome = new File( userHome, ".m2" );
+    
+    static final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
+    
+    static final String DEFAULT_REMOTE_REPO_ID = "central";
+
+    static final String DEFAULT_REMOTE_REPO_URL = "http://repo1.maven.org/maven2";
+
+    Artifact createArtifact( String groupId, String artifactId, String version, String packaging );
+
     Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
 
-    Artifact createProjectArtifact( String groupId, String artifactId, String metaVersionId );
+    Artifact createProjectArtifact( String groupId, String artifactId, String version );
 
+    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier );
+    
     Artifact createPluginArtifact( Plugin plugin );
     
     Artifact createDependencyArtifact( Dependency dependency );
-    
-    //REMOVE
-    // This will disappear when we actually deal with resolving a root dependency and its dependencies. This is used everywhere because of that
-    // deficiency
-    Set<Artifact> createArtifacts( List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenRepositoryWrapper reactor )
-        throws VersionNotFoundException;
-
-    // Repository creation
-
-    // maven model
+        
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
         
-    ArtifactRepository createLocalRepository( String url, String repositoryId )
-        throws IOException;
-
+    ArtifactRepository createDefaultRemoteRepository()
+        throws InvalidRepositoryException;    
+    
+    ArtifactRepository createDefaultLocalRepository()
+        throws InvalidRepositoryException;
+    
+    ArtifactRepository createLocalRepository( File localRepository )
+        throws InvalidRepositoryException;
+    
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
-    /**
-     * this is the new metadata-based entry point into repository system. By default - it will transitively resolve metadata
-     * for the supplied root GAV and return a flat set of dependency metadatas. Tweaking the request allows user to ask for 
-     * various formats of the response - resolved tree, resolved graph or dirty tree. Only the resolved tree is implemented now
-     * in MercuryRepositorySystem, LegacyRepositorySystem ignores this call for now.  
-     * 
-     * @param request - supplies all necessary details for the resolution configuration
-     * @return
-     */
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
-       
-    //REMOVE
-    // Network enablement: this needs to go as we will know at a higher level from the embedder if the system is offline or not, we should not have to
-    // deal with this here.
-    void setOnline( boolean online );
-    boolean isOnline();
-    
-    //REMOVE
-    // These should be associated with repositories and the repositories should be examine as part of metadatda and
-    // artifact resolution. So these methods should also not be here.
-    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
-    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );
-    void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions );
-    
-    // Mirrors
-    
+           
+    //TODO: remove the request should already be processed to select the mirror for the request instead of the processing happen internally.
+    // Mirrors    
     void addMirror( String id, String mirrorOf, String url );        
-    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );    
+    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );  
+    
+    // Install
+    
+    // Deploy
+    
+    // Map types of artifacts
+    
+    // Raw file transfers
+    void publish( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
+        throws TransferFailedException;
+    
+    void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
+        throws TransferFailedException, ResourceDoesNotExistException;        
 }

@@ -19,9 +19,9 @@ package org.apache.maven.artifact.resolver.metadata;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
 import java.util.List;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Provides some metadata operations, like querying the remote repository for a list of versions available for an
@@ -34,8 +34,6 @@ public interface MetadataSource
 {
     String ROLE = MetadataSource.class.getName();
 
-    MetadataResolution retrieve( ArtifactMetadata artifact,
-                                 ArtifactRepository localRepository,
-                                 List<ArtifactRepository> remoteRepositories )
+    MetadataResolution retrieve( ArtifactMetadata artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws MetadataRetrievalException;
 }

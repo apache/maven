@@ -19,19 +19,17 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 // This class needs to stick around because it was exposed the the remote resources plugin started using it instead of
 // getting the repositories from the project.

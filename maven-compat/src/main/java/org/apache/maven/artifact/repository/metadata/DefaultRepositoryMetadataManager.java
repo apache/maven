@@ -53,17 +53,6 @@ public class DefaultRepositoryMetadataManager
     @Requirement
     private UpdateCheckManager updateCheckManager;
 
-    protected DefaultRepositoryMetadataManager( WagonManager wagonManager, UpdateCheckManager updateCheckManager, Logger logger )
-    {
-        this.wagonManager = wagonManager;
-        this.updateCheckManager = updateCheckManager;
-        enableLogging( logger );
-    }
-
-    public DefaultRepositoryMetadataManager()
-    {
-    }
-
     public void resolve( RepositoryMetadata metadata, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {

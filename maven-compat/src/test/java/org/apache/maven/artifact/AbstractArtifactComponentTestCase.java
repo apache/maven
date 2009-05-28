@@ -19,13 +19,6 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.codehaus.plexus.PlexusTestCase;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,6 +26,13 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.codehaus.plexus.PlexusTestCase;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -71,7 +71,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository badLocalRepository()
         throws Exception
     {
-        String path = "target/test-classes/repositories/" + component() + "/bad-local-repository";
+        String path = "target/test-repositories/" + component() + "/bad-local-repository";
 
         File f = new File( getBasedir(), path );
 
@@ -91,7 +91,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository localRepository()
         throws Exception
     {
-        String path = "target/test-classes/repositories/" + component() + "/local-repository";
+        String path = "target/test-repositories/" + component() + "/local-repository";
 
         File f = new File( getBasedir(), path );
 
@@ -104,7 +104,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository remoteRepository()
         throws Exception
     {
-        String path = "target/test-classes/repositories/" + component() + "/remote-repository";
+        String path = "target/test-repositories/" + component() + "/remote-repository";
 
         File f = new File( getBasedir(), path );
 
@@ -268,7 +268,9 @@ public abstract class AbstractArtifactComponentTestCase
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
         throws Exception
     {
-        return artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
+        Artifact a = artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
+                
+        return a;
     }
 
     protected void deleteLocalArtifact( Artifact artifact )

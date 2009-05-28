@@ -3,7 +3,7 @@ package org.apache.maven.artifact.resolver.conflict;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.codehaus.plexus.component.annotations.Component;                                                                            
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 
 /**

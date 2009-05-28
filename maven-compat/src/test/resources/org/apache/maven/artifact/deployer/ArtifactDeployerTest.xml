@@ -20,10 +20,6 @@ under the License.
 <plexus>
   <components>
     <component>
-      <role>org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider</role>
-      <implementation>org.apache.maven.artifact.repository.authentication.DummyAuthenticationInfoProvider</implementation>
-    </component>
-    <component>
       <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
       <implementation>org.apache.maven.artifact.deployer.SimpleArtifactMetadataSource</implementation>      
     </component>

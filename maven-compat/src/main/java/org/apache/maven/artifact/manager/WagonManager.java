@@ -19,6 +19,11 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -28,9 +33,6 @@ import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.repository.Repository;
-
-import java.io.File;
-import java.util.List;
 
 /**
  * Manages <a href="http://maven.apache.org/wagon">Wagon</a> related operations in Maven.
@@ -84,10 +86,14 @@ public interface WagonManager
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File file, String checksumPolicyWarn )
+        throws TransferFailedException, ResourceDoesNotExistException;    
+    
+    Set<String> getSupportProtocols();
+    
+    void getRemoteFile( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor, String checksumPolicy, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException;
-
-    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase );
-
-    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
-
+    
+    void putRemoteFile( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
+        throws TransferFailedException;
+    
 }

@@ -24,9 +24,9 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-
 import junit.framework.TestCase;
+
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 
 /**
  * Tests that the global settings.xml shipped with the distribution is in good state.

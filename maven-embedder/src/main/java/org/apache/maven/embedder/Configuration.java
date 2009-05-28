@@ -18,16 +18,13 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.realm.MavenRealmManager;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
-
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
+
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Configuration of embedder, used when starting up.
@@ -129,26 +126,4 @@ public interface Configuration
     void addExtension( URL url );
 
     List<URL> getExtensions();
-
-    Configuration setRealmManager( MavenRealmManager realmManager );
-
-    MavenRealmManager getRealmManager();
-
-    // ----------------------------------------------------------------------------
-    // Error Reporter
-    // ----------------------------------------------------------------------------
-
-    Configuration setErrorReporter( CoreErrorReporter errorReporter );
-
-    CoreErrorReporter getErrorReporter();
-
-    // ----------------------------------------------------------------------------
-    // Event Monitors
-    // ----------------------------------------------------------------------------
-
-    Configuration addEventMonitor( EventMonitor eventMonitor );
-
-    Configuration setEventMonitors( List<EventMonitor> eventMonitors );
-
-    List<EventMonitor> getEventMonitors();
 }

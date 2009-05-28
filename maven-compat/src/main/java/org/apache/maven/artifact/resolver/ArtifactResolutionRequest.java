@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.wagon.events.TransferListener;
@@ -22,15 +21,14 @@ public class ArtifactResolutionRequest
     private Artifact artifact;
 
     // Needs to go away
+    // These are really overrides now, projects defining dependencies for a plugin that override what is
+    // specified in the plugin itself.
     private Set<Artifact> artifactDependencies;
 
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
 
-    // Not sure what to do with this?
-    // Scope
-    // Lock down lists
     private ArtifactFilter filter;
 
     // Needs to go away
@@ -39,24 +37,12 @@ public class ArtifactResolutionRequest
     // This is like a filter but overrides all transitive versions 
     private Map managedVersionMap;
 
-    // This should not be in here, it's a component
-    private ArtifactMetadataSource metadataSource;
-
     private TransferListener transferListener;
     
     private boolean resolveRoot = true;
-    
-    public ArtifactResolutionRequest()
-    {  
-    }
-    
-    public ArtifactResolutionRequest( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
-    {        
-        this.artifact = artifact;
-        this.localRepository = localRepository;
-        this.remoteRepositories = remoteRepositories;
-    }
-    
+
+    private boolean resolveTransitively = false;
+        
     public Artifact getArtifact()
     {
         return artifact;
@@ -136,22 +122,6 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    // ------------------------------------------------------------------------
-    //
-    // ------------------------------------------------------------------------
-
-    public ArtifactMetadataSource getMetadataSource()
-    {
-        return metadataSource;
-    }
-
-    public ArtifactResolutionRequest setMetadataSource( ArtifactMetadataSource metadataSource )
-    {
-        this.metadataSource = metadataSource;
-
-        return this;
-    }
-
     public Map getManagedVersionMap()
     {
         return managedVersionMap;
@@ -175,6 +145,18 @@ public class ArtifactResolutionRequest
     {
         return resolveRoot;
     }        
+
+    public ArtifactResolutionRequest setResolveTransitively( boolean resolveDependencies )
+    {
+        this.resolveTransitively = resolveDependencies;
+        
+        return this;
+    }
+    
+    public boolean isResolveTransitively()
+    {
+        return resolveTransitively;
+    }        
     
     public TransferListener getTransferListener()
     {
@@ -194,8 +176,7 @@ public class ArtifactResolutionRequest
                 .append( "artifact: " ).append( artifact ).append(  "\n" )
                 .append( artifactDependencies ).append(  "\n" )
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
-                .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
-                .append( "metadataSource: " ).append(  metadataSource ).append(  "\n" );
+                .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" );
         
         return sb.toString();
     }

@@ -19,6 +19,11 @@ package org.apache.maven.artifact.repository.metadata;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -28,11 +33,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 
 /**
  * Shared methods of the repository metadata handling.
@@ -56,7 +56,7 @@ public abstract class AbstractRepositoryMetadata
     }
 
     public String getLocalFilename( ArtifactRepository repository )
-    {
+    {        
         return "maven-metadata-" + repository.getKey() + ".xml";
     }
 

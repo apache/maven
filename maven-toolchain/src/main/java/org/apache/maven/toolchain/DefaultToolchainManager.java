@@ -21,6 +21,7 @@ package org.apache.maven.toolchain;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -35,9 +36,7 @@ import org.codehaus.plexus.logging.Logger;
 @Component( role = ToolchainManager.class )
 public class DefaultToolchainManager
     implements ToolchainManager
-
 {
-
     @Requirement
     Logger logger;
 
@@ -85,9 +84,11 @@ public class DefaultToolchainManager
             desc.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( "toolchains" ) );
 
             MavenProject current = session.getCurrentProject();
+            
             if ( current != null )
             {
-                context = session.getPluginContext( desc, current );
+                //TODO: why is this using the context
+                //context = session.getPluginContext( desc, current );
             }
         }
 

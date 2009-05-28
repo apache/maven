@@ -19,6 +19,8 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -31,6 +33,7 @@ import org.apache.maven.wagon.repository.Repository;
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
  */
+//TODO: this needs to be decoupled from Wagon
 public class DefaultArtifactRepository
     extends Repository
     implements ArtifactRepository
@@ -41,10 +44,12 @@ public class DefaultArtifactRepository
 
     private ArtifactRepositoryPolicy releases;
 
-    private boolean uniqueVersion = true;
-
     private boolean blacklisted;
 
+    public DefaultArtifactRepository()
+    {
+    }
+    
     /**
      * Create a local repository or a test repository.
      *
@@ -69,7 +74,6 @@ public class DefaultArtifactRepository
     {
         super( id, url );
         this.layout = layout;
-        this.uniqueVersion = uniqueVersion;
     }
 
     /**
@@ -155,11 +159,6 @@ public class DefaultArtifactRepository
         return getId();
     }
 
-    public boolean isUniqueVersion()
-    {
-        return uniqueVersion;
-    }
-
     public boolean isBlacklisted()
     {
         return blacklisted;
@@ -177,11 +176,35 @@ public class DefaultArtifactRepository
         sb.append( "       id: " ).append( getId() ).append( "\n" );
         sb.append( "      url: " ).append( getUrl() ).append( "\n" );
         sb.append( "   layout: " ).append( layout != null ? layout.getId() : "none" ).append( "\n" );
-        sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );
-        sb.append( ", update => " ).append( snapshots.getUpdatePolicy() ).append( "]\n" );
-        sb.append( " releases: [enabled => " ).append( releases.isEnabled() );
-        sb.append( ", update => " ).append( releases.getUpdatePolicy() ).append( "]\n" );
+        
+        if ( snapshots != null )
+        {
+            sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );
+            sb.append( ", update => " ).append( snapshots.getUpdatePolicy() ).append( "]\n" );
+        }
+        
+        if ( releases != null )
+        {
+            sb.append( " releases: [enabled => " ).append( releases.isEnabled() );
+            sb.append( ", update => " ).append( releases.getUpdatePolicy() ).append( "]\n" );
+        }
 
         return sb.toString();
+    }
+
+    public Artifact find( Artifact artifact )
+    {
+        File artifactFile = new File( getBasedir(), pathOf( artifact ) );
+        
+        // We need to set the file here or the resolver will fail with an NPE, not fully equipped to deal
+        // with multiple local repository implementations yet.
+        artifact.setFile( artifactFile );
+        
+        if( artifactFile.exists() )
+        {            
+            artifact.setResolved( true );            
+        }
+                
+        return artifact;
     }
 }

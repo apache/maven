@@ -19,16 +19,16 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author jdcasey

@@ -1,5 +1,8 @@
 package org.apache.maven.artifact.manager;
 
+import org.apache.maven.wagon.Wagon;
+import org.codehaus.plexus.component.annotations.Component;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,6 +29,7 @@ package org.apache.maven.artifact.manager;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
+@Component(role=Wagon.class,hint="a")
 public class WagonA
     extends WagonMock
 {

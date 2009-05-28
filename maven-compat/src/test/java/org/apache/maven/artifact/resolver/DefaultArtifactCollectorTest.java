@@ -19,6 +19,17 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -34,17 +45,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Test the default artifact collector.
@@ -73,9 +73,16 @@ public class DefaultArtifactCollectorTest
 
         source = new Source();
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        artifactCollector = (ArtifactCollector) lookup( ArtifactCollector.ROLE );
+        artifactCollector = (ArtifactCollector) lookup( ArtifactCollector.class );
 
         projectArtifact = createArtifactSpec( "project", "1.0", null );
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+            artifactCollector = null;
+            artifactFactory = null;
+            super.tearDown();
     }
 
     // works, but we don't fail on cycles presently
@@ -726,23 +733,23 @@ public class DefaultArtifactCollectorTest
 
     private ArtifactResolutionResult collect( Set artifacts, ArtifactFilter filter )
         throws ArtifactResolutionException
-    {
-        return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, source, filter,
-                                          Collections.EMPTY_LIST );
+    {        
+        return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, null, source, filter,
+                                          Collections.EMPTY_LIST, null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a )
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          source, null, Collections.EMPTY_LIST );
+                                          null, source, null, Collections.EMPTY_LIST, null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          source, filter, Collections.EMPTY_LIST );
+                                          null, source, filter, Collections.EMPTY_LIST, null );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, Artifact managedVersion )
@@ -750,7 +757,7 @@ public class DefaultArtifactCollectorTest
     {
         Map managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(), managedVersion );
         return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact,
-                                          managedVersions, null, null, source, null, Collections.EMPTY_LIST );
+                                          managedVersions, null, null, source, null, Collections.EMPTY_LIST, null );
     }
 
     private ArtifactSpec createArtifactSpec( String id, String version )

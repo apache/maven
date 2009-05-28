@@ -19,18 +19,18 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
 public class ResolutionNode
 {
@@ -83,7 +83,7 @@ public class ResolutionNode
     public void addDependencies( Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories, ArtifactFilter filter )
         throws CyclicDependencyException, OverConstrainedVersionException
     {
-        if ( !artifacts.isEmpty() )
+        if ( artifacts != null && !artifacts.isEmpty() )
         {
             children = new ArrayList<ResolutionNode>( artifacts.size() );
 

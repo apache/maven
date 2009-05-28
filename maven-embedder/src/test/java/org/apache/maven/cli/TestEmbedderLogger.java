@@ -1,9 +1,9 @@
 package org.apache.maven.cli;
 
-import org.apache.maven.embedder.AbstractMavenEmbedderLogger;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.embedder.AbstractMavenEmbedderLogger;
 
 public class TestEmbedderLogger
     extends AbstractMavenEmbedderLogger

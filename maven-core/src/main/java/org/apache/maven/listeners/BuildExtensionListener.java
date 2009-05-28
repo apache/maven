@@ -1,14 +1,12 @@
 package org.apache.maven.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ProjectUri;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 
@@ -37,11 +35,6 @@ public class BuildExtensionListener
     public void fire(Model model)
     {
     	buildExtensions.addAll(new ArrayList<Extension>(model.getBuild().getExtensions()));
-    }
-           
-    public List<String> getUris()
-    {
-        return Arrays.asList( ProjectUri.Build.Extensions.Extension.xUri );
     }
     
     /**

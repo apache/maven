@@ -19,12 +19,12 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.util.Iterator;
-import java.util.List;
 
 public class PluginParameterException
     extends PluginConfigurationException

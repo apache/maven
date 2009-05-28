@@ -1,116 +1,133 @@
-package org.apache.maven.lifecycle;
+ package org.apache.maven.lifecycle;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Stack;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
-import org.apache.maven.AggregatedBuildFailureException;
-import org.apache.maven.BuildFailureException;
-import org.apache.maven.NoGoalsSpecifiedException;
-import org.apache.maven.ProjectBuildFailureException;
+import org.apache.maven.ProjectDependenciesResolver;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.lifecycle.binding.LifecycleBindingManager;
-import org.apache.maven.lifecycle.binding.MojoBindingFactory;
-import org.apache.maven.lifecycle.model.MojoBinding;
-import org.apache.maven.lifecycle.plan.BuildPlan;
-import org.apache.maven.lifecycle.plan.BuildPlanUtils;
-import org.apache.maven.lifecycle.plan.BuildPlanner;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.monitor.event.MavenEvents;
-import org.apache.maven.plugin.InvalidPluginException;
+import org.apache.maven.lifecycle.mapping.LifecycleMapping;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginLoaderException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Component;
+import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+//TODO: The configuration for the lifecycle needs to be externalized so that I can use the annotations
+//      properly for the wiring and reference and external source for the lifecycle configuration.
+//TODO: check for online status in the build plan and die if necessary
+//TODO if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
+//{
+//    throw new PluginExecutionException( mojoExecution, project, "Cannot execute mojo: " + mojoDescriptor.getGoal()
+//        + ". It requires a project with an existing pom.xml, but the build is not using one." );
+//}
 
 /**
- * Responsible for orchestrating the process of building the ordered list of
- * steps required to achieve the specified set of tasks passed into Maven, then
- * executing these mojos in order. This class also manages the various error messages
- * that may occur during this process, and directing the behavior of the build
- * according to what's specified in {@link MavenExecutionRequest#getReactorFailureBehavior()}.
- *
  * @author Jason van Zyl
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @author jdcasey
- * @todo because of aggregation, we ended up with cli-ish stuff in here (like line() and the project logging, without
- * much of the event handling)
  */
-
-@Component(role = LifecycleExecutor.class)
 public class DefaultLifecycleExecutor
-    extends AbstractLogEnabled
-    implements LifecycleExecutor
+    implements LifecycleExecutor, Initializable
 {
+    @Requirement
+    private Logger logger;
+
     @Requirement
     private PluginManager pluginManager;
 
     @Requirement
-    private BuildPlanner buildPlanner;
-
-    @Requirement
-    private MojoBindingFactory mojoBindingFactory;
-    
-    @Requirement
-    private LifecycleBindingManager lifecycleBindingManager;
-    
-    @Requirement
-    private PlexusContainer container;
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
+    protected RepositorySystem repositorySystem;
 
     /**
-     * {@inheritDoc}
+     * These mappings correspond to packaging types, like WAR packaging, which configure a particular mojos
+     * to run in a given phase.
      */
-    public void execute( MavenSession session, ReactorManager reactorManager, EventDispatcher dispatcher )
-        throws BuildFailureException, LifecycleExecutionException
+    @Requirement
+    private Map<String, LifecycleMapping> lifecycleMappings;
+    
+    @Requirement
+    private ProjectDependenciesResolver projectDependenciesResolver;
+    
+    // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")    
+    private List<Lifecycle> lifecycles;
+
+    private Map<String,Lifecycle> lifecycleMap;
+    
+    private Map<String, Lifecycle> phaseToLifecycleMap;
+
+    public void execute( MavenSession session )
     {
-        // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
-        // within the same reactor (using an inclusion pattern to gather them up)...
-        MavenProject rootProject = reactorManager.getTopLevelProject();
+        // TODO: Use a listener here instead of loggers
+        
+        logger.info(  "Build Order:" );
+        
+        logger.info( "" );
+        
+        for( MavenProject project : session.getProjects() )
+        {
+            logger.info( project.getName() );
+        }
+        
+        logger.info( "" );
+        
+        MavenProject rootProject = session.getTopLevelProject();
 
-        List goals = session.getGoals();
+        List<String> goals = session.getGoals();
 
-        if ( ( ( goals == null ) || goals.isEmpty() ) && ( rootProject != null ) )
+        if ( goals.isEmpty() && rootProject != null )
         {
             String goal = rootProject.getDefaultGoal();
 
@@ -119,786 +136,1057 @@ public class DefaultLifecycleExecutor
                 goals = Collections.singletonList( goal );
             }
         }
-
-        if ( ( goals == null ) || goals.isEmpty() )
+                
+        for ( MavenProject currentProject : session.getProjects() )
         {
-            StringBuffer buffer = new StringBuffer( 1024 );
-
-            buffer.append( "\n\n" );
-            buffer.append( "You must specify at least one goal or lifecycle phase to perform build steps.\n" );
-            buffer.append( "The following list illustrates some commonly used build commands:\n\n" );
-            buffer.append( "  mvn clean\n" );
-            buffer.append( "    Deletes any build output (e.g. class files or JARs).\n" );
-            buffer.append( "  mvn test\n" );
-            buffer.append( "    Runs the unit tests for the project.\n" );
-            buffer.append( "  mvn install\n" );
-            buffer.append( "    Copies the project artifacts into your local repository.\n" );
-            buffer.append( "  mvn deploy\n" );
-            buffer.append( "    Copies the project artifacts into the remote repository.\n" );
-            buffer.append( "  mvn site\n" );
-            buffer.append( "    Creates project documentation (e.g. reports or Javadoc).\n\n" );
-            buffer.append( "Please see\n" );
-            buffer.append( "http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html\n" );
-            buffer.append( "for a complete description of available lifecycle phases.\n\n" );
-            buffer.append( "Use \"mvn --help\" to show general usage information about Maven's command line.\n\n" );
-
-            throw new NoGoalsSpecifiedException( buffer.toString() );
-        }
-
-        List taskSegments = segmentTaskListByAggregationNeeds( goals, session, rootProject );
-
-        executeTaskSegments( taskSegments, reactorManager, session, rootProject, dispatcher );
-    }
-
-    /**
-     * After the list of goals from {@link MavenSession#getGoals()} is segmented into
-     * contiguous sets of aggregated and non-aggregated mojos and lifecycle phases,
-     * this method is used to execute each task-segment. Its logic has a top-level fork
-     * for each segment, which basically varies the project used to run the execution
-     * according to aggregation needs. If the segment is aggregated, the root project
-     * will be used to construct and execute the mojo bindings. Otherwise, this
-     * method will iterate through each project, and execute all the goals implied
-     * by the current task segment.
-     */
-    private void executeTaskSegments( List taskSegments, ReactorManager reactorManager, MavenSession session, MavenProject rootProject, EventDispatcher dispatcher )
-        throws LifecycleExecutionException, BuildFailureException
-    {
-        for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
-        {
-            TaskSegment segment = (TaskSegment) it.next();
-
-            if ( segment.aggregate() )
-            {
-                executeTaskSegmentForProject( segment, rootProject, reactorManager, dispatcher, session );
-            }
-            else
-            {
-                List sortedProjects = session.getSortedProjects();
-
-                // iterate over projects, and execute on each...
-                for ( Iterator projectIterator = sortedProjects.iterator(); projectIterator.hasNext(); )
-                {
-                    MavenProject currentProject = (MavenProject) projectIterator.next();
-                    
-                    executeTaskSegmentForProject( segment, currentProject, reactorManager, dispatcher, session );
-                }
-            }
-        }
-    }
-
-    private void executeTaskSegmentForProject( TaskSegment segment,
-                                    MavenProject project,
-                                    ReactorManager reactorManager,
-                                    EventDispatcher dispatcher,
-                                    MavenSession session )
-        throws LifecycleExecutionException, BuildFailureException
-    {
-        if ( !reactorManager.isBlackListed( project ) )
-        {
-            String target = project.getName() + "\nId: " + project.getId() + "\n" + segment;
-
-            getLogger().debug( "Constructing build plan for " + target );
-
-            String event = MavenEvents.PROJECT_EXECUTION;
-
-            long buildStartTime = System.currentTimeMillis();
-
-            dispatcher.dispatchStart( event, target );
-
-            ClassRealm oldLookupRealm = setProjectLookupRealm( session, project );
+            logger.info( "Building " + currentProject.getName() );
 
             try
             {
-                session.setCurrentProject( project );
+                session.setCurrentProject( currentProject );
 
-                // NEW: Build up the execution plan, including configuration.
-                List mojoBindings = getLifecycleBindings( segment.getTasks(), project, session, target );
+                MavenExecutionPlan executionPlan;
 
-                String currentPhase = null;
-
-                // NEW: Then, iterate over each binding in that plan, and execute the associated mojo.
-                // only call once, with the top-level project (assumed to be provided as a parameter)...
-                for ( Iterator mojoIterator = mojoBindings.iterator(); mojoIterator.hasNext(); )
+                try
                 {
-                    MojoBinding binding = (MojoBinding) mojoIterator.next();
+                    executionPlan = calculateExecutionPlan( session, goals.toArray( new String[] {} ) );
+                }
+                catch ( Exception e )
+                {
+                    session.getResult().addException( e );
+                    return;
+                }
 
-                    String phase = binding.getPhase() == null ? null : binding.getPhase().getName();
+                //TODO: once we have calculated the build plan then we should accurately be able to download
+                // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
+                // later by looking at the build plan. Would be better to just batch download everything required by the reactor.
 
-                    if ( ( currentPhase != null ) && !currentPhase.equals( phase ) )
+                // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
+                try
+                {
+                    Set<Artifact> projectDependencies = projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScope(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
+                    currentProject.setArtifacts( projectDependencies );    
+                }
+                catch ( ArtifactNotFoundException e )
+                {
+                    session.getResult().addException( e );
+                    return;
+                }
+                catch ( ArtifactResolutionException e )
+                {
+                    session.getResult().addException( e );
+                    return;
+                }
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "=== BUILD PLAN ===" );
+                    logger.debug( "Project:       " + currentProject );
+                    for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                     {
-                        dispatcher.dispatchEnd( MavenEvents.PHASE_EXECUTION, currentPhase );
-                        currentPhase = null;
+                        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+                        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+                        logger.debug( "------------------" );
+                        logger.debug( "Goal:          " + pluginDescriptor.getGroupId() + ':' + pluginDescriptor.getArtifactId() + ':' + pluginDescriptor.getVersion() + ':' + mojoDescriptor.getGoal()
+                            + ':' + mojoExecution.getExecutionId() );
+                        logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
                     }
+                    logger.debug( "==================" );
+                }
 
-                    if ( ( currentPhase == null ) && ( phase != null ) )
-                    {
-                        currentPhase = phase;
-                        dispatcher.dispatchStart( MavenEvents.PHASE_EXECUTION, currentPhase );
-                    }
-
+                for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
+                {
                     try
                     {
-                        executeGoalAndHandleFailures(
-                            binding,
-                            session,
-                            dispatcher,
-                            event,
-                            reactorManager,
-                            buildStartTime,
-                            target,
-                            segment.aggregate() );
+                        logger.info( executionDescription( mojoExecution, currentProject ) );
+                        pluginManager.executeMojo( session, mojoExecution );
                     }
-                    catch ( MojoFailureException e )
+                    catch ( Exception e )
                     {
-                        if ( segment.aggregate() )
-                        {
-                            AggregatedBuildFailureException error = new AggregatedBuildFailureException(
-                                                                                                        session.getExecutionRootDirectory(),
-                                                                                                        binding,
-                                                                                                        e );
-
-                           dispatcher.dispatchError( event, target, error );
-
-                           if ( handleExecutionFailure( reactorManager, project, error, binding, buildStartTime ) )
-                           {
-                               throw error;
-                           }
-                        }
-                        else
-                        {
-                            ProjectBuildFailureException error = new ProjectBuildFailureException(
-                                                                                                  project.getId(),
-                                                                                                  binding,
-                                                                                                  e );
-
-                           dispatcher.dispatchError( event, target, error );
-
-                           if ( handleExecutionFailure( reactorManager, project, error, binding, buildStartTime ) )
-                           {
-                               throw error;
-                           }
-                        }
+                        session.getResult().addException( e );
+                        return;
                     }
-                }
-
-                if ( currentPhase != null )
-                {
-                    dispatcher.dispatchEnd( MavenEvents.PHASE_EXECUTION, currentPhase );
-                }
+                }                         
+                
             }
             finally
             {
                 session.setCurrentProject( null );
-                restoreLookupRealm( oldLookupRealm );
             }
-
-
-            reactorManager.registerBuildSuccess(
-                project,
-                System.currentTimeMillis() - buildStartTime );
-
-            dispatcher.dispatchEnd(
-                event,
-                target );
-        }
-        else
-        {
-            line();
-
-            getLogger().info( "SKIPPING " + project.getName() );
-
-            getLogger().info( "  " + segment );
-
-            getLogger().info( "This project has been banned from further executions due to previous failures." );
-
-            line();
-        }
-    }
-
-    /**
-     * Since each project can have its own {@link ClassRealm} instance that inherits
-     * from the core Maven realm, and contains the specific build-extension
-     * components referenced in that project, the lookup realms must be managed for
-     * each project that's used to fire off a mojo execution. This helps ensure
-     * that unsafe {@link PlexusContainer#lookup} and related calls will
-     * have access to these build-extension components.
-     * <br />
-     * This method simply restores the original Maven-core lookup realm when a
-     * project-specific realm is in use.
-     */
-    private void restoreLookupRealm( ClassRealm oldLookupRealm )
-    {
-        if ( oldLookupRealm != null )
-        {
-            container.setLookupRealm( oldLookupRealm );
-        }
-    }
-
-    /**
-     * Since each project can have its own {@link ClassRealm} instance that inherits
-     * from the core Maven realm, and contains the specific build-extension
-     * components referenced in that project, the lookup realms must be managed for
-     * each project that's used to fire off a mojo execution. This helps ensure
-     * that unsafe {@link PlexusContainer#lookup} and related calls will
-     * have access to these build-extension components.
-     * <br />
-     * This method is meant to find a project-specific realm, if one exists, for
-     * use as the lookup realm for unsafe component lookups, using {@link PlexusContainer#setLookupRealm(ClassRealm)}.
-     */
-    private ClassRealm setProjectLookupRealm( MavenSession session,
-                                              MavenProject rootProject )
-        throws LifecycleExecutionException
-    {
-        ClassRealm projectRealm = session.getRealmManager().getProjectRealm( rootProject.getGroupId(), rootProject.getArtifactId(), rootProject.getVersion() );
-
-        if ( projectRealm != null )
-        {
-            return container.setLookupRealm( projectRealm );
-        }
-
-        return container.getLookupRealm();
-    }
-
-    /**
-     * Retrieves the build plan for the current project, given the specified list of tasks. This build plan will consist
-     * of MojoBindings, each fully configured to execute, which enables us to enumerate the full build plan to the debug
-     * log-level, complete with the configuration each mojo will use.
-     */
-    private List getLifecycleBindings( List tasks, MavenProject project, MavenSession session, String targetDescription )
-        throws LifecycleExecutionException
-    {
-        List mojoBindings;
-        try
-        {
-            BuildPlan plan = buildPlanner.constructBuildPlan( tasks, project, session, false );
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "\n\nOur build plan is:\n" + BuildPlanUtils.listBuildPlan(
-                        plan,
-                        false ) + "\n\nfor task-segment: " + targetDescription );
-            }
-
-            mojoBindings = plan.renderExecutionPlan( new Stack() );
-        }
-        catch ( LifecycleException e )
-        {
-            throw new LifecycleExecutionException(
-                "Failed to construct build plan for: " + targetDescription
-                    + ". Reason: " + e.getMessage(), project,
-                e );
-        }
-
-        return mojoBindings;
-    }
-
-    /**
-     * Lookup the plugin containing the referenced mojo, validate that it is
-     * allowed to execute in the current environment (according to whether
-     * it's a direct-invocation-only or aggregator mojo, and the allowAggregators
-     * flag), and execute the mojo. If any of these steps fails, this method will
-     * consult with the {@link ReactorManager} to determine whether the build
-     * should be stopped.
-     * <br />
-     * <b>NOTE:</b> If the binding is an aggregator mojo, and the specified project
-     * is not the root project of the reactor (using {@link ReactorManager#getTopLevelProject()},
-     * then print a DEBUG message and skip that execution.
-     */
-    private void executeGoalAndHandleFailures( MojoBinding mojoBinding, MavenSession session, EventDispatcher dispatcher, String event, ReactorManager rm,
-                                               long buildStartTime,
-                                               String target,
-                                               boolean allowAggregators )
-        throws LifecycleExecutionException, MojoFailureException
-    {
+        }        
+    }        
+        
+    // 1. Find the lifecycle given the phase (default lifecycle when given install)
+    // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
+    // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
+    // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
+    // 5. Bind mojos specified in the project itself to the lifecycle
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
+    {        
         MavenProject project = session.getCurrentProject();
-
-        // NEW: Since the MojoBinding instances are configured when the build plan is constructed,
-        // all that remains to be done here is to load the PluginDescriptor, construct a MojoExecution
-        // instance, and call PluginManager.executeMojo( execution ). The MojoExecutor is constructed
-        // using both the PluginDescriptor and the MojoBinding.
-        try
+                
+        List<MojoExecution> phasesWithMojosToExecute = new ArrayList<MojoExecution>();
+        
+        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
+                
+        String requiredDependencyResolutionScope = null;
+        
+        for ( String task : tasks )
         {
-            PluginDescriptor pluginDescriptor;
-            try
+
+            if ( task.indexOf( ":" ) > 0 )
             {
-                pluginDescriptor = pluginManager.loadPlugin( mojoBinding, project, session );
+                // If this is a goal like "mvn modello:java" and the POM looks like the following:
+                
+                // <project>
+                //   <modelVersion>4.0.0</modelVersion>
+                //   <groupId>org.apache.maven.plugins</groupId>
+                //   <artifactId>project-plugin-level-configuration-only</artifactId>
+                //   <version>1.0.1</version>
+                //   <build>
+                //     <plugins>
+                //       <plugin>
+                //         <groupId>org.codehaus.modello</groupId>
+                //         <artifactId>modello-maven-plugin</artifactId>
+                //         <version>1.0.1</version>
+                //         <configuration>
+                //           <version>1.1.0</version>
+                //           <models>
+                //             <model>src/main/mdo/remote-resources.mdo</model>
+                //           </models>
+                //         </configuration>
+                //       </plugin>
+                //     </plugins>
+                //   </build>
+                // </project>                
+                //
+                // We want to 
+                //
+                // - take the plugin/configuration in the POM and merge it with the plugin's default configuration found in its plugin.xml
+                // - attach that to the MojoExecution for its configuration
+                // - give the MojoExecution an id of default-<goal>.
+                
+                MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
+
+                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-" + mojoDescriptor.getGoal() );
+                
+                populateMojoExecutionConfiguration( project, mojoExecution, true );
+
+                lifecyclePlan.add( mojoExecution );
             }
-            catch ( PluginLoaderException e )
+            else
             {
-                if ( mojoBinding.isOptional() )
+                // 1.
+                //
+                // Based on the lifecycle phase we are given, let's find the corresponding lifecycle.
+                //
+                Lifecycle lifecycle = phaseToLifecycleMap.get( task );
+
+                // 2. 
+                //
+                // If we are dealing with the "clean" or "site" lifecycle then there are currently no lifecycle mappings but there are default phases
+                // that need to be run instead.
+                //
+                // Now we need to take into account the packaging type of the project. For a project of type WAR, the lifecycle where mojos are mapped
+                // on to the given phases in the lifecycle are going to be a little different then, say, a project of type JAR.
+                //
+
+                // 3.
+                //
+                // Once we have the lifecycle mapping for the given packaging, we need to know whats phases we need to worry about executing.
+                //
+
+                // Create an ordered Map of the phases in the lifecycle to a list of mojos to execute.
+                Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<String, List<MojoExecution>>();
+
+                // 4.
+
+                //TODO: need to separate the lifecycles
+
+                for ( String phase : lifecycle.getPhases() )
                 {
-                    getLogger().debug( "Skipping optional mojo execution: " + MojoBindingUtils.toString( mojoBinding ), e );
+                    List<MojoExecution> mojos = new ArrayList<MojoExecution>();
+
+                    //TODO: remove hard coding
+                    if ( phase.equals( "clean" ) )
+                    {
+                        mojos.add( new MojoExecution( "org.apache.maven.plugins", "maven-clean-plugin", "2.3", "clean", "default-clean" ) );
+                    }
+
+                    // This is just just laying out the initial structure of the mojos to run in each phase of the
+                    // lifecycle. Everything is now done in the project builder correctly so this could likely
+                    // go away shortly. We no longer need to pull out bits from the default lifecycle. The MavenProject
+                    // comes to us intact as it should.
+
+                    phaseToMojoMapping.put( phase, mojos );
+                }
+
+                // 5. Just build up the list of mojos that will execute for every phase.
+                //
+                // This will be useful for having the complete build plan and then we can filter/optimize later.
+                //
+                for ( Plugin plugin : project.getBuild().getPlugins() )
+                {
+                    for ( PluginExecution execution : plugin.getExecutions() )
+                    {
+                        // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
+                        // to examine the phase it is associated to.                
+                        if ( execution.getPhase() != null )
+                        {
+                            for ( String goal : execution.getGoals() )
+                            {
+                                if ( phaseToMojoMapping.get( execution.getPhase() ) == null )
+                                {
+                                    // This is happening because executions in the POM are getting mixed into the clean lifecycle
+                                    // So for the lifecycle mapping we need a map with the phases as keys so we can easily check
+                                    // if this phase belongs to the given lifecycle. this shows the system is messed up. this
+                                    // shouldn't happen.
+                                    phaseToMojoMapping.put( execution.getPhase(), new ArrayList<MojoExecution>() );
+                                }
+
+                                MojoExecution mojoExecution = new MojoExecution( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), goal, execution.getId() );
+                                phaseToMojoMapping.get( execution.getPhase() ).add( mojoExecution );
+                            }
+                        }
+                        // if not then i need to grab the mojo descriptor and look at the phase that is specified
+                        else
+                        {
+                            for ( String goal : execution.getGoals() )
+                            {
+                                MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
+
+                                if ( mojoDescriptor.getPhase() != null && phaseToMojoMapping.get( mojoDescriptor.getPhase() ) != null )
+                                {
+                                    MojoExecution mojoExecution = new MojoExecution( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), goal, execution.getId() );
+                                    phaseToMojoMapping.get( mojoDescriptor.getPhase() ).add( mojoExecution );
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 6. 
+                //
+                // We are only interested in the phases that correspond to the lifecycle we are trying to run. If we are running the "clean"
+                // lifecycle we are not interested in goals -- like "generate-sources -- that belong to the default lifecycle.
+                //        
+                for ( String phase : phaseToMojoMapping.keySet() )
+                {
+                    phasesWithMojosToExecute.addAll( phaseToMojoMapping.get( phase ) );
+
+                    if ( phase.equals( task ) )
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+              
+        // 7. Now we create the correct configuration for the mojo to execute.
+        //TODO: this needs to go to the model builder.
+        //TODO: just used a hollowed out MojoExecution
+        for ( MojoExecution mojoExecution : phasesWithMojosToExecute )
+        {
+            // These are bits that look like this:
+            //
+            // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
+            //                        
+            MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( 
+                mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getVersion(), mojoExecution.getGoal(), session.getLocalRepository(), project.getRemoteArtifactRepositories() );
+
+            requiredDependencyResolutionScope = calculateRequiredDependencyResolutionScope( requiredDependencyResolutionScope, mojoDescriptor.isDependencyResolutionRequired() );          
+            
+            mojoExecution.setMojoDescriptor( mojoDescriptor );
+            
+            populateMojoExecutionConfiguration( project, mojoExecution, false );
+
+            lifecyclePlan.add( mojoExecution );
+        }        
+        
+        return new MavenExecutionPlan( lifecyclePlan, requiredDependencyResolutionScope );        
+    }  
+
+    // SCOPE_COMPILE
+    // SCOPE_TEST
+    // SCOPE_RUNTIME
+    //
+    String calculateRequiredDependencyResolutionScope( String currentRequiredDependencyResolutionScope, String inputScope )
+    {
+        if ( inputScope == null )
+        {
+            return currentRequiredDependencyResolutionScope;
+        }
+                
+        if ( currentRequiredDependencyResolutionScope == null && inputScope != null )
+        {
+            return inputScope;
+        }
+
+        if ( currentRequiredDependencyResolutionScope.equals( Artifact.SCOPE_COMPILE ) && ( inputScope.equals(  Artifact.SCOPE_RUNTIME ) || inputScope.equals( Artifact.SCOPE_TEST ) ) )
+        {
+            return inputScope;
+        }
+
+        if ( currentRequiredDependencyResolutionScope.equals( Artifact.SCOPE_RUNTIME ) && inputScope.equals(  Artifact.SCOPE_TEST ) )
+        {
+            return inputScope;
+        }        
+        
+        // Nothing changed we return what we were
+        //
+        return currentRequiredDependencyResolutionScope;
+    }
+    
+    private String executionDescription( MojoExecution me, MavenProject project )
+    {
+        PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
+        StringBuffer sb = new StringBuffer();
+        sb.append( "Executing " + pd.getArtifactId() + "[" + pd.getVersion() + "]: " + me.getMojoDescriptor().getGoal() + " on " + project.getArtifactId() );        
+        return sb.toString();
+    }
+        
+    private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution, boolean directInvocation )
+    {
+        String g = mojoExecution.getGroupId();
+
+        String a = mojoExecution.getArtifactId();
+
+        Plugin plugin = project.getPlugin( g + ":" + a );
+
+        if ( plugin != null )
+        {
+            for ( PluginExecution e : plugin.getExecutions() )
+            {
+                if ( mojoExecution.getExecutionId().equals( e.getId() ) )
+                {
+                    Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
+
+                    Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
+
+                    mojoExecution.setConfiguration( mojoConfiguration );
+
                     return;
                 }
-                else
-                {
-                    throw new LifecycleExecutionException(
-                        "Failed to load plugin for: "
-                            + MojoBindingUtils.toString( mojoBinding ) + ". Reason: " + e.getMessage(),
-                            project,
-                        e );
-                }
-            }
-
-            MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( mojoBinding.getGoal() );
-
-            // TODO: Figure out how to make this logic produce the same result when the binding is in a module.
-            // At times, the module will build in isolation, in which case this logic would allow the aggregator to run.
-            // In other cases, the module will be part of a reactor build, and the aggregator won't run, because it's not
-            // bound to the root project.
-//            if ( mojoDescriptor.isAggregator() && ( project != rm.getTopLevelProject() ) )
-//            {
-//                getLogger().debug( "Skipping mojo execution: " + MojoBindingUtils.toString( mojoBinding ) + "\nfor project: " + project.getId() + "\n\nIt is an aggregator mojo, and the current project is not the root project for the reactor." );
-//                return;
-//            }
-
-            validateMojoExecution( mojoBinding, mojoDescriptor, project, allowAggregators );
-
-            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, mojoBinding.getExecutionId() );
-
-            mojoExecution.setConfiguration( (Xpp3Dom) mojoBinding.getConfiguration() );
-
-            try
-            {
-                pluginManager.executeMojo(
-                    project,
-                    mojoExecution,
-                    session );
-            }
-            catch ( PluginManagerException e )
-            {
-                throw new LifecycleExecutionException(
-                    "Internal error in the plugin manager executing goal '"
-                        + mojoDescriptor.getId() + "': " + e.getMessage(),
-                        project,
-                    e );
-            }
-            catch ( ArtifactNotFoundException e )
-            {
-                throw new LifecycleExecutionException(
-                    e.getMessage(),
-                    project,
-                    e );
-            }
-            catch ( InvalidDependencyVersionException e )
-            {
-                throw new LifecycleExecutionException(
-                    e.getMessage(),
-                    project,
-                    e );
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                throw new LifecycleExecutionException(
-                    e.getMessage(),
-                    project,
-                    e );
-            }
-            catch ( PluginConfigurationException e )
-            {
-                throw new LifecycleExecutionException(
-                    e.getMessage(),
-                    project,
-                    e );
             }
         }
-        catch ( LifecycleExecutionException e )
+
+        if ( directInvocation )
         {
-            dispatcher.dispatchError( event, target, e );
+            Xpp3Dom defaultDom = convert( mojoExecution.getMojoDescriptor() );
 
-            if ( handleExecutionFailure( rm, project, e, mojoBinding, buildStartTime ) )
+            if ( plugin != null && plugin.getConfiguration() != null )
             {
-                throw e;
-            }
-        }
-    }
-
-    /**
-     * Verify that the specified {@link MojoBinding} is legal for execution under
-     * the current circumstances. Currently, this mainly checks that aggregator
-     * mojos and direct-invocation-only mojos are not bound to lifecycle phases.
-     * <br/>
-     * If an invalid mojo is detected, and it is brought in via the user's POM
-     * (this will be checked using {@link MojoBinding#POM_ORIGIN} and {@link MojoBinding#getOrigin()}),
-     * then a {@link LifecycleExecutionException} will be thrown. Otherwise, the mojo
-     * was brought in via a lifecycle mapping or overlay, or as part of a forked execution.
-     * In these cases, the error will be logged to the console, using the ERROR log-level (since the
-     * user cannot fix this sort of problem easily).
-     */
-    private void validateMojoExecution( MojoBinding mojoBinding,
-                                        MojoDescriptor mojoDescriptor,
-                                        MavenProject project,
-                                        boolean allowAggregators )
-        throws LifecycleExecutionException
-    {
-        if ( mojoDescriptor.isAggregator() && !allowAggregators )
-        {
-            if ( MojoBinding.POM_ORIGIN.equals( mojoBinding.getOrigin() ) )
-            {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append( "\n\nDEPRECATED: Binding aggregator mojos to lifecycle phases in the POM is considered dangerous." );
-                buffer.append( "\nThis feature has been deprecated. Please adjust your POM files accordingly." );
-                buffer.append( "\n\nOffending mojo:\n\n" );
-                buffer.append( MojoBindingUtils.toString( mojoBinding ) );
-                buffer.append( "\n\nProject: " ).append( project.getId() );
-                buffer.append( "\nPOM File: " ).append( String.valueOf( project.getFile() ) );
-                buffer.append( "\n" );
-
-                getLogger().warn( buffer.toString() );
+                Xpp3Dom projectDom = (Xpp3Dom) plugin.getConfiguration();
+                projectDom = extractMojoConfiguration( projectDom, mojoExecution.getMojoDescriptor() );
+                mojoExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( projectDom, defaultDom, Boolean.TRUE ) );
             }
             else
             {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append( "\n\nDEPRECATED: An aggregator mojo has been bound to your project's build lifecycle." );
-                buffer.append( "\nThis feature is dangerous, and has been deprecated." );
-                buffer.append( "\n\nOffending mojo:\n\n" );
-                buffer.append( MojoBindingUtils.toString( mojoBinding ) );
-                buffer.append( "\n\nDirect binding of aggregator mojos to the lifecycle is not allowed, but this binding was not configured from within in your POM." );
-                buffer.append( "\n\nIts origin was: " ).append( mojoBinding.getOrigin() );
-                if ( mojoBinding.getOriginDescription() != null )
-                {
-                    buffer.append( " (" ).append( mojoBinding.getOriginDescription() ).append( ")" );
-                }
-
-                buffer.append( "\n" );
-
-                getLogger().warn( buffer.toString() );
+                mojoExecution.setConfiguration( defaultDom );
             }
         }
-        else if ( mojoDescriptor.isDirectInvocationOnly() && !MojoBinding.DIRECT_INVOCATION_ORIGIN.equals( mojoBinding.getOrigin() ) )
-        {
-            if ( MojoBinding.POM_ORIGIN.equals( mojoBinding.getOrigin() ) )
-            {
-                throw new LifecycleExecutionException( "Mojo:\n\n" + MojoBindingUtils.toString( mojoBinding ) + "\n\ncan only be invoked directly by the user. Binding it to lifecycle phases in the POM is not allowed.", project );
-            }
-            else
-            {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append( "\n\nSKIPPING execution of mojo:\n\n" ).append( MojoBindingUtils.toString( mojoBinding ) );
-                buffer.append( "\n\nIt specifies direct-invocation only, but has been bound to the build lifecycle." );
-                buffer.append( "\n\nDirect-invocation mojos can only be called by the user. This binding was not configured from within in your POM." );
-                buffer.append( "\n\nIts origin was: " ).append( mojoBinding.getOrigin() );
-                if ( mojoBinding.getOriginDescription() != null )
-                {
-                    buffer.append( " (" ).append( mojoBinding.getOriginDescription() ).append( ")" );
-                }
-
-                buffer.append( "\n" );
-
-                getLogger().error( buffer.toString() );
-            }
-        }
-    }
+    }    
 
     /**
-     * In the event that an error occurs during executeGoalAndHandleFailure(..),
-     * this method is called to handle logging the error in the {@link ReactorManager},
-     * then determining (again, from the reactor-manager) whether to stop the build.
-     *
-     * @return true if the build should stop, false otherwise.
+     * Extracts the configuration for a single mojo from the specified execution configuration by discarding any
+     * non-applicable parameters. This is necessary because a plugin execution can have multiple goals with different
+     * parametes whose default configurations are all aggregated into the execution configuration. However, the
+     * underlying configurator will error out when trying to configure a mojo parameter that is specified in the
+     * configuration but not present in the mojo instance.
+     * 
+     * @param executionConfiguration The configuration from the plugin execution, must not be {@code null}.
+     * @param mojoDescriptor The descriptor for the mojo being configured, must not be {@code null}.
+     * @return The configuration for the mojo, never {@code null}.
      */
-    private boolean handleExecutionFailure( final ReactorManager rm,
-                                            final MavenProject project,
-                                            final Exception e,
-                                            final MojoBinding mojoBinding,
-                                            final long buildStartTime )
+    private Xpp3Dom extractMojoConfiguration( Xpp3Dom executionConfiguration, MojoDescriptor mojoDescriptor )
     {
-        rm.registerBuildFailure(
-            project,
-            e,
-            MojoBindingUtils.toString( mojoBinding ),
-            System.currentTimeMillis()
-                - buildStartTime );
+        Xpp3Dom mojoConfiguration = new Xpp3Dom( executionConfiguration.getName() );
 
-        if ( ReactorManager.FAIL_FAST.equals( rm.getFailureBehavior() ) )
+        Collection<String> mojoParameters = mojoDescriptor.getParameterMap().keySet();
+
+        Map<String, String> aliases = new HashMap<String, String>();
+        if ( mojoDescriptor.getParameters() != null )
         {
-            return true;
-        }
-        else if ( ReactorManager.FAIL_AT_END.equals( rm.getFailureBehavior() ) )
-        {
-            rm.blackList( project );
-        }
-        // if NEVER, don't blacklist
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public TaskValidationResult isTaskValid( String task,
-                                             MavenSession session,
-                                             MavenProject rootProject )
-    {
-        //jvz: have to investigate plugins that are run without a root project or using Maven in reactor mode. Looks like we
-        // were never validating these anyway if you look in the execution code.
-
-        if ( rootProject != null )
-        {
-
-            if ( !LifecycleUtils.isValidPhaseName( task ) )
+            for ( Parameter parameter : mojoDescriptor.getParameters() )
             {
-                // definitely a CLI goal, can use prefix
-                try
+                String alias = parameter.getAlias();
+                if ( StringUtils.isNotEmpty( alias ) )
                 {
-                    getMojoDescriptorForDirectInvocation(
-                        task,
-                        session,
-                        rootProject );
-
-                    return new TaskValidationResult();
-                }
-                catch ( PluginLoaderException e )
-                {
-                    // TODO: shouldn't hit this, investigate using the same resolution logic as
-                    // others for plugins in the reactor
-
-                    return new TaskValidationResult(
-                        task,
-                        "Cannot find mojo descriptor for: \'" + task
-                            + "\' - Treating as non-aggregator.", e );
-                }
-                catch ( LifecycleSpecificationException e )
-                {
-                    String message =
-                        "Invalid task '"
-                            + task
-                            + "': you must specify a valid lifecycle phase, or"
-                            + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
-
-                    return new TaskValidationResult(
-                        task,
-                        message, e );
-
-                }
-                catch ( LifecycleLoaderException e )
-                {
-                    String message = "Failed to load one or more lifecycle definitions which may contain task: '" + task + "'.";
-
-                    return new TaskValidationResult(
-                        task,
-                        message, e );
-                }
-                catch ( InvalidPluginException e )
-                {
-                    return new TaskValidationResult(
-                        task,
-                        e.getMessage(), e );
+                    aliases.put( alias, parameter.getName() );
                 }
             }
         }
 
-        return new TaskValidationResult();
-    }
-
-    /**
-     * Split up the list of goals from {@link MavenSession#getGoals()} according
-     * to aggregation needs. Each adjacent goal in the list is included in a single
-     * task segment. When the next goal references a different type of mojo or
-     * lifecycle phase (eg. previous goal wasn't an aggregator, but next one is...or the reverse),
-     * a new task segment is started and the new goal is added to that.
-     *
-     * @return the list of task-segments, each flagged according to aggregation needs.
-     */
-    private List segmentTaskListByAggregationNeeds( final List tasks,
-                                                    final MavenSession session,
-                                                    final MavenProject rootProject )
-    {
-        List segments = new ArrayList();
-
-        if ( rootProject != null )
+        for ( int i = 0; i < executionConfiguration.getChildCount(); i++ )
         {
-            TaskSegment currentSegment = null;
+            Xpp3Dom executionDom = executionConfiguration.getChild( i );
+            String paramName = executionDom.getName();
 
-            for ( Iterator it = tasks.iterator(); it.hasNext(); )
+            if ( mojoParameters.contains( paramName ) )
             {
-                String task = (String) it.next();
+                Xpp3Dom mojoDom = new Xpp3Dom( executionDom );
+                mojoConfiguration.addChild( mojoDom );
+            }
+            else if ( aliases.containsKey( paramName ) )
+            {
+                Xpp3Dom mojoDom = new Xpp3Dom( aliases.get( paramName ) );
+                mojoDom.setValue( executionDom.getValue() );
 
-                // if it's a phase, then we don't need to check whether it's an aggregator.
-                // simply add it to the current task partition.
-                if ( LifecycleUtils.isValidPhaseName( task ) )
+                for ( String attributeName : executionDom.getAttributeNames() )
                 {
-                    if ( ( currentSegment != null ) && currentSegment.aggregate() )
+                    mojoDom.setAttribute( attributeName, executionDom.getAttribute( attributeName ) );
+                }
+
+                for ( Xpp3Dom child : executionDom.getChildren() )
+                {
+                    mojoDom.addChild( new Xpp3Dom( child ) );
+                }
+
+                mojoConfiguration.addChild( mojoDom );
+            }
+        }
+
+        return mojoConfiguration;
+    }
+   
+    // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
+    MojoDescriptor getMojoDescriptor( String task, MavenSession session ) 
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
+    {        
+        MavenProject project = session.getCurrentProject();
+        
+        String goal = null;
+        
+        Plugin plugin = null;
+
+        StringTokenizer tok = new StringTokenizer( task, ":" );
+        int numTokens = tok.countTokens();
+        
+        if ( numTokens == 2 )
+        {
+            String prefix = tok.nextToken();
+            goal = tok.nextToken();
+
+            // This is the case where someone has executed a single goal from the command line
+            // of the form:
+            //
+            // mvn remote-resources:process
+            //
+            // From the metadata stored on the server which has been created as part of a standard
+            // Maven plugin deployment we will find the right PluginDescriptor from the remote
+            // repository.
+            
+            plugin = findPluginForPrefix( prefix, session );
+        }
+        else if ( numTokens == 3 || numTokens == 4 )
+        {
+            plugin = new Plugin();
+            plugin.setGroupId( tok.nextToken() );
+            plugin.setArtifactId( tok.nextToken() );
+
+            if ( numTokens == 4 )
+            {
+                plugin.setVersion( tok.nextToken() );
+            }
+
+            goal = tok.nextToken();
+        }
+                     
+        if ( plugin.getVersion() == null )
+        {
+            // We need to get it from the POM first before anything else
+            //
+            for ( Plugin pluginInPom : project.getBuildPlugins() )
+            {
+                if ( pluginInPom.getArtifactId().equals( plugin.getArtifactId() ) )
+                {
+                    plugin.setVersion( pluginInPom.getVersion() );
+                    break;
+                }
+            }
+
+            if ( plugin.getVersion() == null && project.getPluginManagement() != null )
+            {
+                for ( Plugin pluginInPom : project.getPluginManagement().getPlugins() )
+                {
+                    if ( pluginInPom.getArtifactId().equals( plugin.getArtifactId() ) )
                     {
-                        segments.add( currentSegment );
-                        currentSegment = null;
+                        plugin.setVersion( pluginInPom.getVersion() );
+                        break;
+                    }
+                }
+            }
+            
+            // If there is no version to be found then we need to look in the repository metadata for
+            // this plugin and see what's specified as the latest release.
+            //
+            if ( plugin.getVersion() == null )
+            {
+                for ( ArtifactRepository repository : session.getCurrentProject().getRemoteArtifactRepositories() )
+                {
+                    String localPath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-" + repository.getId() + ".xml";
+
+                    File destination = new File( session.getLocalRepository().getBasedir(), localPath );
+
+                    if ( !destination.exists() )
+                    {
+                        try
+                        {
+                            String remotePath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata.xml";
+
+                            repositorySystem.retrieve( repository, destination, remotePath, session.getRequest().getTransferListener() );
+                        }
+                        catch ( TransferFailedException e )
+                        {
+                            continue;
+                        }
+                        catch ( ResourceDoesNotExistException e )
+                        {
+                            continue;
+                        }
                     }
 
-                    if ( currentSegment == null )
-                    {
-                        currentSegment = new TaskSegment();
-                    }
-
-                    currentSegment.add( task );
-                }
-                else
-                {
-                    MojoDescriptor mojo = null;
-
+                    // We have retrieved the metadata
                     try
                     {
-                        mojo = getMojoDescriptorForDirectInvocation(
-                            task,
-                            session,
-                            rootProject );
+                        Metadata pluginMetadata = readMetadata( destination );
+
+                        String release = pluginMetadata.getVersioning().getRelease();
+
+                        if ( release != null )
+                        {
+                            plugin.setVersion( release );
+                        }
                     }
-                    catch ( Exception e )
+                    catch ( RepositoryMetadataReadException e )
                     {
-                        // Won't happen as we've validated. So we need to change the code so that
-                        // we don't have to do this.
-                    }
-
-                    // if the mojo descriptor was found, determine aggregator status according to:
-                    // 1. whether the mojo declares itself an aggregator
-                    // 2. whether the mojo DOES NOT require a project to function (implicitly avoid reactor)
-                    if ( ( mojo != null ) && ( mojo.isAggregator() || !mojo.isProjectRequired() ) )
-                    {
-                        if ( ( currentSegment != null ) && !currentSegment.aggregate() )
-                        {
-                            segments.add( currentSegment );
-                            currentSegment = null;
-                        }
-
-                        if ( currentSegment == null )
-                        {
-                            currentSegment = new TaskSegment( true );
-                        }
-
-                        currentSegment.add( task );
-                    }
-                    else
-                    {
-                        if ( ( currentSegment != null ) && currentSegment.aggregate() )
-                        {
-                            segments.add( currentSegment );
-                            currentSegment = null;
-                        }
-
-                        if ( currentSegment == null )
-                        {
-                            currentSegment = new TaskSegment();
-                        }
-
-                        currentSegment.add( task );
+                        logger.warn( "Error reading plugin metadata: ", e );
                     }
                 }
             }
-
-            segments.add( currentSegment );
-        }
-        else
-        {
-            TaskSegment segment = new TaskSegment( false );
-            for ( Iterator i = tasks.iterator(); i.hasNext(); )
-            {
-                segment.add( (String) i.next() );
-            }
-            segments.add( segment );
-        }
-
-        return segments;
+        }        
+        
+        return pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
     }
-
-    /**
-     * Retrieve the {@link MojoDescriptor} that corresponds to a given direct mojo
-     * invocation. This is used during the fail-fast method isTaskValid(..), and also
-     * during task-segmentation, to allow the lifecycle executor to determine whether
-     * the mojo is an aggregator.
-     */
-    private MojoDescriptor getMojoDescriptorForDirectInvocation( String task,
-                                                                 MavenSession session,
-                                                                 MavenProject project )
-        throws LifecycleSpecificationException, PluginLoaderException, LifecycleLoaderException,
-        InvalidPluginException
+                
+    public void initialize()
+        throws InitializationException
     {
-        // we don't need to include report configuration here, since we're just looking for
-        // an @aggregator flag...
-        MojoBinding binding = mojoBindingFactory.parseMojoBinding(
-            task,
-            project,
-            session,
-            true );
+        lifecycleMap = new HashMap<String,Lifecycle>();
+        
+        // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly so
+        // that they don't interfere with internally defined lifecycles.
 
-        PluginDescriptor descriptor = pluginManager.loadPlugin( binding, project, session );
+        phaseToLifecycleMap = new HashMap<String,Lifecycle>();
 
-        MojoDescriptor mojoDescriptor = descriptor.getMojo( binding.getGoal() );
-
-        if ( mojoDescriptor == null )
-        {
-            throw new InvalidPluginException( "Plugin: " + descriptor.getId() + " does not contain referenced mojo: " + binding.getGoal() );
-        }
-
-        return mojoDescriptor;
-    }
-
-    protected void line()
-    {
-        getLogger().info( "------------------------------------------------------------------------" );
-    }
-
-    private static class TaskSegment
-    {
-        private boolean aggregate;
-
-        private final List tasks = new ArrayList();
-
-        TaskSegment()
-        {
-
-        }
-
-        TaskSegment( final boolean aggregate )
-        {
-            this.aggregate = aggregate;
-        }
-
-        @Override
-        public String toString()
-        {
-            StringBuffer message = new StringBuffer();
-
-            message.append( "task-segment: [" );
-
-            for ( Iterator it = tasks.iterator(); it.hasNext(); )
-            {
-                String task = (String) it.next();
-
-                message.append( task );
-
-                if ( it.hasNext() )
+        for ( Lifecycle lifecycle : lifecycles )
+        {                        
+            for ( String phase : lifecycle.getPhases() )
+            {                
+                // The first definition wins.
+                if ( !phaseToLifecycleMap.containsKey( phase ) )
                 {
-                    message.append( ", " );
+                    phaseToLifecycleMap.put( phase, lifecycle );
                 }
             }
-
-            message.append( "]" );
-
-            if ( aggregate )
+            
+            lifecycleMap.put( lifecycle.getId(), lifecycle );
+        }
+    }   
+    
+    public List<String> getLifecyclePhases()
+    {
+        for ( Lifecycle lifecycle : lifecycles )
+        {
+            if ( lifecycle.getId().equals( "default" ) )
             {
-                message.append( " (aggregator-style)" );
+                return lifecycle.getPhases();
+            }
+        }
+
+        return null;
+    }   
+    
+    // These methods deal with construction intact Plugin object that look like they come from a standard
+    // <plugin/> block in a Maven POM. We have to do some wiggling to pull the sources of information
+    // together and this really shows the problem of constructing a sensible default configuration but
+    // it's all encapsulated here so it appears normalized to the POM builder.
+    
+    // We are going to take the project packaging and find all plugin in the default lifecycle and create
+    // fully populated Plugin objects, including executions with goals and default configuration taken
+    // from the plugin.xml inside a plugin.
+    //
+    public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
+    {
+        Map<Plugin, Plugin> plugins = new LinkedHashMap<Plugin, Plugin>();
+        
+        for ( Lifecycle lifecycle : lifecycles )
+        {
+            LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
+
+            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );                                                           
+            
+            if ( lifecycleConfiguration != null )
+            {
+                Map<String, String> lifecyclePhasesForPackaging = lifecycleConfiguration.getPhases();
+
+                // These are of the form:
+                //
+                // compile -> org.apache.maven.plugins:maven-compiler-plugin:compile[,gid:aid:goal,...]
+                //
+                for ( Map.Entry<String, String> goalsForLifecyclePhase : lifecyclePhasesForPackaging.entrySet() )
+                {
+                    String phase = goalsForLifecyclePhase.getKey();
+                    String goals = goalsForLifecyclePhase.getValue();
+                    parseLifecyclePhaseDefinitions( plugins, phase, goals );
+                }
+            }
+            else if ( lifecycle.getDefaultPhases() != null )
+            {
+                for ( String goals : lifecycle.getDefaultPhases() )
+                {
+                    parseLifecyclePhaseDefinitions( plugins, null, goals );
+                }
+            }        
+        }
+
+        return plugins.keySet();
+    }        
+
+    private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, String goals )
+    {
+        for ( StringTokenizer tok = new StringTokenizer( goals, "," ); tok.hasMoreTokens(); )
+        {
+            String goal = tok.nextToken().trim();
+            String[] p = StringUtils.split( goal, ":" );
+
+            PluginExecution execution = new PluginExecution();
+            // FIXME: Find a better execution id
+            execution.setId( "default-" + p[2] );
+            execution.setPhase( phase );
+            execution.getGoals().add( p[2] );
+
+            Plugin plugin = new Plugin();
+            plugin.setGroupId( p[0] );
+            plugin.setArtifactId( p[1] );
+
+            Plugin existing = plugins.get( plugin );
+            if ( existing != null )
+            {
+                plugin = existing;
+            }
+            else
+            {
+                plugins.put( plugin, plugin );
             }
 
-            return message.toString();
-        }
-
-        boolean aggregate()
-        {
-            return aggregate;
-        }
-
-        void add( final String task )
-        {
-            tasks.add( task );
-        }
-
-        List getTasks()
-        {
-            return tasks;
+            plugin.getExecutions().add( execution );
         }
     }
     
-    public List getLifecycles()
+    private void populateDefaultConfigurationForPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+        throws LifecycleExecutionException
     {
-        return lifecycleBindingManager.getLifecycles();
+        for( PluginExecution pluginExecution : plugin.getExecutions() )
+        {
+            for( String goal : pluginExecution.getGoals() )
+            {
+                Xpp3Dom dom = getDefaultPluginConfiguration( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), goal, localRepository, remoteRepositories );
+                pluginExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pluginExecution.getConfiguration(), dom, Boolean.TRUE ) );
+            }
+        }
     }
+    
+    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+        throws LifecycleExecutionException
+    {
+        for( Plugin plugin : plugins )
+        {            
+            populateDefaultConfigurationForPlugin( plugin, localRepository, remoteRepositories );
+        }
+    }    
+    
+    private Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+        throws LifecycleExecutionException
+    {
+        MojoDescriptor mojoDescriptor;
+        
+        try
+        {
+            mojoDescriptor = pluginManager.getMojoDescriptor( groupId, artifactId, version, goal, localRepository, remoteRepositories );
+        }
+        catch ( PluginNotFoundException e )
+        {
+            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+        }
+        catch ( PluginResolutionException e )
+        {
+            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+        }
+        catch ( PluginDescriptorParsingException e )
+        {
+            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+        }
+        catch ( CycleDetectedInPluginGraphException e )
+        {
+            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+        }
+        catch ( MojoNotFoundException e )
+        {
+            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+        }
+        catch ( InvalidPluginDescriptorException e )
+        {
+            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+        } 
+        
+        return convert( mojoDescriptor );
+    }
+    
+    public Xpp3Dom getMojoConfiguration( MojoDescriptor mojoDescriptor )
+    {
+        return convert( mojoDescriptor );
+    }
+        
+    Xpp3Dom convert( MojoDescriptor mojoDescriptor  )
+    {
+        Xpp3Dom dom = new Xpp3Dom( "configuration" );
+
+        PlexusConfiguration c = mojoDescriptor.getMojoConfiguration();
+
+        PlexusConfiguration[] ces = c.getChildren();
+
+        if ( ces != null )
+        {
+            for ( PlexusConfiguration ce : ces )
+            {
+                String value = ce.getValue( null );
+                String defaultValue = ce.getAttribute( "default-value", null );
+                if ( value != null || defaultValue != null )
+                {
+                    Xpp3Dom e = new Xpp3Dom( ce.getName() );
+                    e.setValue( value );
+                    if ( defaultValue != null )
+                    {
+                        e.setAttribute( "default-value", defaultValue );
+                    }
+                    dom.addChild( e );
+                }
+            }
+        }
+
+        return dom;
+    }
+                   
+    private Map<String,Plugin> pluginPrefixes = new HashMap<String,Plugin>();
+    
+    //TODO: take repo mans into account as one may be aggregating prefixes of many
+    //TODO: collect at the root of the repository, read the one at the root, and fetch remote if something is missing
+    //      or the user forces the issue
+    public Plugin findPluginForPrefix( String prefix, MavenSession session )
+        throws NoPluginFoundForPrefixException
+    {
+        // [prefix]:[goal]
+        
+        Plugin plugin = pluginPrefixes.get( prefix );
+        
+        if ( plugin != null )
+        {
+            return plugin;
+        }
+                        
+        for ( ArtifactRepository repository : session.getCurrentProject().getRemoteArtifactRepositories() )
+        {            
+            for ( String pluginGroup : session.getPluginGroups() )
+            {
+                // org.apache.maven.plugins
+                // org/apache/maven/plugins/maven-metadata.xml
+                
+                String localPath = pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata-" + repository.getId() + ".xml";
+                                
+                File destination = new File( session.getLocalRepository().getBasedir(), localPath );                
+                                
+                if ( !destination.exists() )
+                {
+                    try
+                    {                        
+                        String remotePath = pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata.xml";
+                        
+                        repositorySystem.retrieve( repository, destination, remotePath, session.getRequest().getTransferListener() );
+                    }
+                    catch ( TransferFailedException e )
+                    {
+                        continue;
+                    }
+                    catch ( ResourceDoesNotExistException e )
+                    {
+                        continue;
+                    }
+                }
+
+                // We have retrieved the metadata
+                try
+                {                    
+                    Metadata pluginGroupMetadata = readMetadata( destination );
+                    
+                    List<org.apache.maven.artifact.repository.metadata.Plugin> plugins = pluginGroupMetadata.getPlugins();
+                                        
+                    if ( plugins != null )
+                    {
+                        for ( org.apache.maven.artifact.repository.metadata.Plugin metadataPlugin : plugins )
+                        {
+                            Plugin p = new Plugin();
+                            p.setGroupId(  pluginGroup );
+                            p.setArtifactId( metadataPlugin.getArtifactId() );                            
+                            pluginPrefixes.put( metadataPlugin.getPrefix(), p );
+                        }
+                    }                    
+                }
+                catch ( RepositoryMetadataReadException e )
+                {
+                    logger.warn( "Error reading plugin group metadata: ", e );
+                }
+            }            
+        }
+                    
+        plugin = pluginPrefixes.get( prefix );
+        
+        if ( plugin != null )
+        {
+            return plugin;
+        }
+        
+        throw new NoPluginFoundForPrefixException( prefix );
+    }  
+    
+    protected Metadata readMetadata( File mappingFile )
+        throws RepositoryMetadataReadException
+    {
+        Metadata result;
+
+        Reader reader = null;
+        try
+        {
+            reader = ReaderFactory.newXmlReader( mappingFile );
+
+            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+
+            result = mappingReader.read( reader, false );
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "'", e );
+        }
+        catch ( IOException e )
+        {
+            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
+        return result;
+    }
+    
+    // These are checks that should be available in real time to IDEs
+
+    /*
+    checkRequiredMavenVersion( plugin, localRepository, project.getRemoteArtifactRepositories() );
+        // Validate against non-editable (@readonly) parameters, to make sure users aren't trying to override in the POM.
+        //validatePomConfiguration( mojoDescriptor, pomConfiguration );            
+        //checkDeprecatedParameters( mojoDescriptor, pomConfiguration );
+        //checkRequiredParameters( mojoDescriptor, pomConfiguration, expressionEvaluator );        
+    
+    public void checkRequiredMavenVersion( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws PluginVersionResolutionException, InvalidPluginException
+    {
+        // if we don't have the required Maven version, then ignore an update
+        if ( ( pluginProject.getPrerequisites() != null ) && ( pluginProject.getPrerequisites().getMaven() != null ) )
+        {
+            DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion( pluginProject.getPrerequisites().getMaven() );
+
+            if ( runtimeInformation.getApplicationInformation().getVersion().compareTo( requiredVersion ) < 0 )
+            {
+                throw new PluginVersionResolutionException( plugin.getGroupId(), plugin.getArtifactId(), "Plugin requires Maven version " + requiredVersion );
+            }
+        }
+    }
+    
+   private void checkDeprecatedParameters( MojoDescriptor mojoDescriptor, PlexusConfiguration extractedMojoConfiguration )
+        throws PlexusConfigurationException
+    {
+        if ( ( extractedMojoConfiguration == null ) || ( extractedMojoConfiguration.getChildCount() < 1 ) )
+        {
+            return;
+        }
+
+        List<Parameter> parameters = mojoDescriptor.getParameters();
+
+        if ( ( parameters != null ) && !parameters.isEmpty() )
+        {
+            for ( Parameter param : parameters )
+            {
+                if ( param.getDeprecated() != null )
+                {
+                    boolean warnOfDeprecation = false;
+                    PlexusConfiguration child = extractedMojoConfiguration.getChild( param.getName() );
+
+                    if ( ( child != null ) && ( child.getValue() != null ) )
+                    {
+                        warnOfDeprecation = true;
+                    }
+                    else if ( param.getAlias() != null )
+                    {
+                        child = extractedMojoConfiguration.getChild( param.getAlias() );
+                        if ( ( child != null ) && ( child.getValue() != null ) )
+                        {
+                            warnOfDeprecation = true;
+                        }
+                    }
+
+                    if ( warnOfDeprecation )
+                    {
+                        StringBuffer buffer = new StringBuffer();
+                        buffer.append( "In mojo: " ).append( mojoDescriptor.getGoal() ).append( ", parameter: " ).append( param.getName() );
+
+                        if ( param.getAlias() != null )
+                        {
+                            buffer.append( " (alias: " ).append( param.getAlias() ).append( ")" );
+                        }
+
+                        buffer.append( " is deprecated:" ).append( "\n\n" ).append( param.getDeprecated() ).append( "\n" );
+
+                        logger.warn( buffer.toString() );
+                    }
+                }
+            }
+        }
+    }    
+    
+   private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
+        throws PluginConfigurationException
+    {
+        // TODO: this should be built in to the configurator, as we presently double process the expressions
+
+        List<Parameter> parameters = goal.getParameters();
+
+        if ( parameters == null )
+        {
+            return;
+        }
+
+        List<Parameter> invalidParameters = new ArrayList<Parameter>();
+
+        for ( int i = 0; i < parameters.size(); i++ )
+        {
+            Parameter parameter = parameters.get( i );
+
+            if ( parameter.isRequired() )
+            {
+                // the key for the configuration map we're building.
+                String key = parameter.getName();
+
+                Object fieldValue = null;
+                String expression = null;
+                PlexusConfiguration value = configuration.getChild( key, false );
+                try
+                {
+                    if ( value != null )
+                    {
+                        expression = value.getValue( null );
+
+                        fieldValue = expressionEvaluator.evaluate( expression );
+
+                        if ( fieldValue == null )
+                        {
+                            fieldValue = value.getAttribute( "default-value", null );
+                        }
+                    }
+
+                    if ( ( fieldValue == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
+                    {
+                        value = configuration.getChild( parameter.getAlias(), false );
+                        if ( value != null )
+                        {
+                            expression = value.getValue( null );
+                            fieldValue = expressionEvaluator.evaluate( expression );
+                            if ( fieldValue == null )
+                            {
+                                fieldValue = value.getAttribute( "default-value", null );
+                            }
+                        }
+                    }
+                }
+                catch ( ExpressionEvaluationException e )
+                {
+                    throw new PluginConfigurationException( goal.getPluginDescriptor(), e.getMessage(), e );
+                }
+
+                // only mark as invalid if there are no child nodes
+                if ( ( fieldValue == null ) && ( ( value == null ) || ( value.getChildCount() == 0 ) ) )
+                {
+                    parameter.setExpression( expression );
+                    invalidParameters.add( parameter );
+                }
+            }
+        }
+
+        if ( !invalidParameters.isEmpty() )
+        {
+            throw new PluginParameterException( goal, invalidParameters );
+        }
+    }
+
+    private void validatePomConfiguration( MojoDescriptor goal, PlexusConfiguration pomConfiguration )
+        throws PluginConfigurationException
+    {
+        List<Parameter> parameters = goal.getParameters();
+
+        if ( parameters == null )
+        {
+            return;
+        }
+
+        for ( int i = 0; i < parameters.size(); i++ )
+        {
+            Parameter parameter = parameters.get( i );
+
+            // the key for the configuration map we're building.
+            String key = parameter.getName();
+
+            PlexusConfiguration value = pomConfiguration.getChild( key, false );
+
+            if ( ( value == null ) && StringUtils.isNotEmpty( parameter.getAlias() ) )
+            {
+                key = parameter.getAlias();
+                value = pomConfiguration.getChild( key, false );
+            }
+
+            if ( value != null )
+            {
+                // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM
+                if ( !parameter.isEditable() )
+                {
+                    StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " );
+                    errorMessage.append( key );
+                    errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
+
+                    throw new PluginConfigurationException( goal.getPluginDescriptor(), errorMessage.toString() );
+                }
+
+                String deprecated = parameter.getDeprecated();
+                if ( StringUtils.isNotEmpty( deprecated ) )
+                {
+                    logger.warn( "DEPRECATED [" + parameter.getName() + "]: " + deprecated );
+                }
+            }
+        }
+    }    
+    
+    */    
 }

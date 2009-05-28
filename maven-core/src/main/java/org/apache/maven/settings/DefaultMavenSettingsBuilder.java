@@ -216,4 +216,32 @@ public class DefaultMavenSettingsBuilder
             throw new IOException( "Failed to validate Settings file at " + location + "\n" + validationResult.render( "\n" ) );
         }
     }
+
+    public SettingsValidationResult validateSettings( File settingsFile )
+    {
+        SettingsValidationResult result = new SettingsValidationResult();
+        if ( settingsFile != null && !settingsFile.canRead() )
+        {
+            try
+            {
+                Settings settings = readSettings( settingsFile );
+
+                return validator.validate( settings );
+            }
+            catch ( IOException e )
+            {
+                result.addMessage( e.getMessage() );
+            }
+            catch ( XmlPullParserException e )
+            {
+                result.addMessage( e.getMessage() );
+            }
+        }
+        else
+        {
+            // TODO do we have anything to say?
+        }
+
+        return result;
+    }
 }

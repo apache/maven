@@ -19,6 +19,9 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Properties;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -29,64 +32,40 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 /**
  * @author Jason van Zyl
- * @version $Id$
- * @todo belong in MavenSession, so it only gets created once?
  */
 public class PluginParameterExpressionEvaluator
     implements ExpressionEvaluator
 {
-    private static final Map BANNED_EXPRESSIONS;
+    private MavenSession session;
 
-    private static final Map DEPRECATED_EXPRESSIONS;
+    private MojoExecution mojoExecution;
 
-    static
+    private MavenProject project;
+
+    private String basedir;
+
+    private Properties properties;    
+
+    @Deprecated //TODO: used by the Enforcer plugin
+    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution, PathTranslator pathTranslator, Logger logger, MavenProject project, Properties properties )    
     {
-        Map deprecated = new HashMap();
-
-        deprecated.put( "project.build.resources", "project.resources" );
-        deprecated.put( "project.build.testResources", "project.testResources" );
-
-        DEPRECATED_EXPRESSIONS = deprecated;
-
-        Map banned = new HashMap();
-
-        BANNED_EXPRESSIONS = banned;
+        this( session, mojoExecution );
+    }
+    
+    public PluginParameterExpressionEvaluator( MavenSession session )
+    {
+        this( session, null );
     }
 
-    private final PathTranslator pathTranslator;
-
-    private final MavenSession context;
-
-    private final Logger logger;
-
-    private final MojoExecution mojoExecution;
-
-    private final MavenProject project;
-
-    private final String basedir;
-
-    private final Properties properties;
-
-    public PluginParameterExpressionEvaluator( MavenSession context,
-                                               MojoExecution mojoExecution,
-                                               PathTranslator pathTranslator,
-                                               Logger logger,
-                                               Properties properties )
+    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution )
     {
-        this.context = context;
+        this.session = session;
         this.mojoExecution = mojoExecution;
-        this.pathTranslator = pathTranslator;
-        this.logger = logger;
-        this.properties = properties;
-        project = context.getCurrentProject();
-
+        this.properties = session.getExecutionProperties();
+        this.project = session.getCurrentProject();
+        
         String basedir = null;
 
         if ( project != null )
@@ -100,50 +79,9 @@ public class PluginParameterExpressionEvaluator
             }
         }
 
-        if ( ( basedir == null ) && ( context != null ) )
+        if ( ( basedir == null ) && ( session != null ) )
         {
-            basedir = context.getExecutionRootDirectory();
-        }
-
-        if ( basedir == null )
-        {
-            basedir = System.getProperty( "user.dir" );
-        }
-
-        this.basedir = basedir;
-    }
-
-    /**
-     * @deprecated Use {@link PluginParameterExpressionEvaluator#PluginParameterExpressionEvaluator(MavenSession, MojoExecution, PathTranslator, LifecycleExecutionContext, Logger, Properties)}
-     * instead.
-     */
-    @Deprecated
-    public PluginParameterExpressionEvaluator( MavenSession context,
-                                               MojoExecution mojoExecution,
-                                               PathTranslator pathTranslator,
-                                               Logger logger,
-                                               MavenProject project,
-                                               Properties properties )
-    {
-        this.context = context;
-        this.mojoExecution = mojoExecution;
-        this.pathTranslator = pathTranslator;
-        this.logger = logger;
-        this.properties = properties;
-
-        this.project = project;
-
-        String basedir = null;
-
-        if ( project != null )
-        {
-            File projectFile = project.getFile();
-
-            // this should always be the case for non-super POM instances...
-            if ( projectFile != null )
-            {
-                basedir = projectFile.getParentFile().getAbsolutePath();
-            }
+            basedir = session.getExecutionRootDirectory();
         }
 
         if ( basedir == null )
@@ -210,34 +148,18 @@ public class PluginParameterExpressionEvaluator
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-        if ( BANNED_EXPRESSIONS.containsKey( expression ) )
-        {
-            throw new ExpressionEvaluationException( "The parameter expression: \'" + expression +
-                "\' used in mojo: \'" + mojoDescriptor.getGoal() + "\' is banned. Use \'" +
-                BANNED_EXPRESSIONS.get( expression ) + "\' instead." );
-        }
-        else if ( DEPRECATED_EXPRESSIONS.containsKey( expression ) )
-        {
-            logger.warn( "The parameter expression: \'" + expression + "\' used in mojo: \'" +
-                mojoDescriptor.getGoal() + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression ) +
-                "\' instead." );
-        }
 
         if ( "localRepository".equals( expression ) )
         {
-            value = context.getLocalRepository();
+            value = session.getLocalRepository();
         }
         else if ( "session".equals( expression ) )
         {
-            value = context;
+            value = session;
         }
         else if ( "reactorProjects".equals( expression ) )
         {
-            value = context.getSortedProjects();
-        }
-        else if ( "reports".equals( expression ) )
-        {
-            value = context.getReports();
+            value = session.getProjects();
         }
         else if ("mojoExecution".equals(expression))
         {
@@ -252,7 +174,7 @@ public class PluginParameterExpressionEvaluator
             value = project.getExecutionProject();
         }
         else if ( expression.startsWith( "project" ) || expression.startsWith( "pom" ) )
-        {
+        {            
             try
             {
                 int pathSeparator = expression.indexOf( "/" );
@@ -273,7 +195,7 @@ public class PluginParameterExpressionEvaluator
                 // TODO: don't catch exception
                 throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
                                                          e );
-            }
+            }            
         }
         else if ( expression.equals( "mojo" ) )
         {
@@ -324,18 +246,17 @@ public class PluginParameterExpressionEvaluator
                 else
                 {
                     value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), pluginDescriptor );
-                }
+                }                
             }
             catch ( Exception e )
             {
-                // TODO: don't catch exception
-                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
-                                                         e );
+                e.printStackTrace();
+                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression, e );
             }
-        }
+        }       
         else if ( "settings".equals( expression ) )
         {
-            value = context.getSettings();
+            value = session.getSettings();
         }
         else if ( expression.startsWith( "settings" ) )
         {
@@ -346,12 +267,12 @@ public class PluginParameterExpressionEvaluator
                 if ( pathSeparator > 0 )
                 {
                     String pathExpression = expression.substring( 1, pathSeparator );
-                    value = ReflectionValueExtractor.evaluate( pathExpression, context.getSettings() );
+                    value = ReflectionValueExtractor.evaluate( pathExpression, session.getSettings() );
                     value = value + expression.substring( pathSeparator );
                 }
                 else
                 {
-                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), context.getSettings() );
+                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), session.getSettings() );
                 }
             }
             catch ( Exception e )
@@ -372,10 +293,6 @@ public class PluginParameterExpressionEvaluator
             if ( pathSeparator > 0 )
             {
                 value = basedir + expression.substring( pathSeparator );
-            }
-            else
-            {
-                logger.error( "Got expression '" + expression + "' that was not recognised" );
             }
         }
 
@@ -435,22 +352,26 @@ public class PluginParameterExpressionEvaluator
 
     public File alignToBaseDirectory( File file )
     {
-        File basedir;
-
-        if ( ( project != null ) && ( project.getFile() != null ) )
+        // TODO: Copied from the DefaultInterpolator. We likely want to resurrect the PathTranslator or at least a
+        // similar component for re-usage
+        if ( file != null )
         {
-            basedir = project.getFile().getParentFile();
+            if ( file.isAbsolute() )
+            {
+                // path was already absolute, just normalize file separator and we're done
+            }
+            else if ( file.getPath().startsWith( File.separator ) )
+            {
+                // drive-relative Windows path, don't align with project directory but with drive root
+                file = file.getAbsoluteFile();
+            }
+            else
+            {
+                // an ordinary relative path, align with project directory
+                file = new File( new File( basedir, file.getPath() ).toURI().normalize() ).getAbsoluteFile();
+            }
         }
-        else if ( ( context != null ) && ( context.getExecutionRootDirectory() != null ) )
-        {
-            basedir = new File( context.getExecutionRootDirectory() ).getAbsoluteFile();
-        }
-        else
-        {
-            basedir = new File( "." ).getAbsoluteFile().getParentFile();
-        }
-
-        return new File( pathTranslator.alignToBaseDirectory( file.getPath(), basedir ) );
+        return file;
     }
 
 }

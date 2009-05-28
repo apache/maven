@@ -19,6 +19,10 @@ package org.apache.maven.artifact.resolver.conflict;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
+
 import org.apache.maven.artifact.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
@@ -27,10 +31,6 @@ import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
 import org.apache.maven.artifact.resolver.metadata.MetadataResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
 
 /**
  * Default conflict resolver.Implements closer newer first policy by default, but could be configured via plexus

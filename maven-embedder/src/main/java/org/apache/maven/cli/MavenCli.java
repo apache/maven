@@ -19,6 +19,8 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.embedder.Configuration;
@@ -29,12 +31,10 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
-import org.apache.maven.errors.DefaultCoreErrorReporter;
+import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
-
-import java.io.File;
 
 /**
  * @author jason van zyl
@@ -54,8 +54,7 @@ public class MavenCli
     }
 
     /** @noinspection ConfusingMainMethod */
-    public static int main( String[] args,
-                            ClassWorld classWorld )
+    public static int main( String[] args, ClassWorld classWorld )
     {
         MavenCli cli = new MavenCli();
 
@@ -132,20 +131,21 @@ public class MavenCli
 
         if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
         {
-            CLIReportingUtils.showError( "Error reading user settings: ", cvr.getUserSettingsException(), showErrors );
+            //TODO: CLIReportingUtils.showError( "Error reading user settings: ", cvr.getUserSettingsException(), showErrors );
 
             return 1;
         }
 
         if ( cvr.isGlobalSettingsFilePresent() && !cvr.isGlobalSettingsFileParses() )
         {
-            CLIReportingUtils.showError( "Error reading global settings: ", cvr.getGlobalSettingsException(), showErrors );
+            //TODO: CLIReportingUtils.showError( "Error reading global settings: ", cvr.getGlobalSettingsException(), showErrors );
 
             return 1;
         }
 
         MavenEmbedder mavenEmbedder;
         MavenEmbedderLogger logger;
+        
         try
         {
             mavenEmbedder = new MavenEmbedder( configuration );
@@ -159,17 +159,30 @@ public class MavenCli
         }
         catch ( MavenEmbedderException e )
         {
-            CLIReportingUtils.showError( "Unable to start the embedder: ", e, showErrors );
+            //TODO: CLIReportingUtils.showError( "Unable to start the embedder: ", e, showErrors );
 
             return 1;
         }
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
-
-        CLIReportingUtils.logResult( request, result, logger );
-
+        
+        // The exception handling should be handled in Maven itself.
+        
         if ( result.hasExceptions() )
         {
+            ExceptionSummary es = result.getExceptionSummary();
+            
+            if ( es == null )
+            {
+                result.getExceptions().get( 0 ).printStackTrace();
+            }
+            else
+            {
+            System.out.println( es.getMessage() );
+            
+            es.getException().printStackTrace();
+            }
+            
             return 1;
         }
         else
@@ -203,7 +216,6 @@ public class MavenCli
         }
 
         Configuration configuration = new DefaultConfiguration()
-            .setErrorReporter( new DefaultCoreErrorReporter() )
             .setUserSettingsFile( userSettingsFile )
             .setGlobalSettingsFile( globalSettingsFile )
             .setClassWorld( classWorld );
@@ -227,7 +239,7 @@ public class MavenCli
         {
             configuration.setLocalRepository( new File( localRepoProperty ) );
         }
-
+        
         return configuration;
     }
 

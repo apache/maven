@@ -19,14 +19,14 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import org.apache.maven.model.ActivationFile;
-import org.codehaus.plexus.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.model.ActivationFile;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Several convenience methods to handle settings

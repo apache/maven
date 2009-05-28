@@ -34,16 +34,13 @@ import org.apache.maven.wagon.events.TransferListener;
  */
 public interface ArtifactResolver
 {
+    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
+    // The rest is deprecated
+    
     // USED BY MAVEN ASSEMBLY PLUGIN 2.2-beta-2 
     @Deprecated
     String ROLE = ArtifactResolver.class.getName();
-
-    void setOnline( boolean online );
-
-    boolean isOnline();
-
-    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     // USED BY SUREFIRE
     @Deprecated
@@ -70,5 +67,9 @@ public interface ArtifactResolver
     @Deprecated
     void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor )
         throws ArtifactResolutionException, ArtifactNotFoundException;
-    
+
+    // USED BY ARCHETYPE DOWNLOADER
+    @Deprecated
+    void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+        throws ArtifactResolutionException, ArtifactNotFoundException;    
 }

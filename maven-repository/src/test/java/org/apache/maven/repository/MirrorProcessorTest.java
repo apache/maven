@@ -17,6 +17,12 @@ public class MirrorProcessorTest
         mirrorBuilder.clearMirrors();
     }
     
+    @Override
+    protected void tearDown() throws Exception {
+            mirrorBuilder = null;
+            super.tearDown();
+    }
+    
     public void testAddMirrorWithNullRepositoryId()
     {
         mirrorBuilder.addMirror( null, "test", "http://www.nowhere.com/" );

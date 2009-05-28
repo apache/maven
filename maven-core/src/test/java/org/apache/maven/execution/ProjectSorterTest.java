@@ -19,18 +19,18 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import junit.framework.TestCase;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
-import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Test sorting projects by dependencies.
@@ -64,7 +64,7 @@ public class ProjectSorterTest
 
         build.addExtension( extension );
 
-        new ReactorManager.ProjectSorter( Collections.singletonList( project ) );
+        new ProjectSorter( Collections.singletonList( project ) );
     }
 
     public void testMatchingArtifactIdsDifferentGroupIds()
@@ -77,7 +77,7 @@ public class ProjectSorterTest
         projects.add( project2 );
         project1.getDependencies().add( createDependency( project2 ) );
 
-        projects = new ReactorManager.ProjectSorter( projects ).getSortedProjects();
+        projects = new ProjectSorter( projects ).getSortedProjects();
 
         assertEquals( project2, projects.get( 0 ) );
         assertEquals( project1, projects.get( 1 ) );
@@ -93,7 +93,7 @@ public class ProjectSorterTest
         projects.add( project2 );
         project1.getDependencies().add( createDependency( project2 ) );
 
-        projects = new ReactorManager.ProjectSorter( projects ).getSortedProjects();
+        projects = new ProjectSorter( projects ).getSortedProjects();
 
         assertEquals( project2, projects.get( 0 ) );
         assertEquals( project1, projects.get( 1 ) );
@@ -110,7 +110,7 @@ public class ProjectSorterTest
 
         try
         {
-            projects = new ReactorManager.ProjectSorter( projects ).getSortedProjects();
+            projects = new ProjectSorter( projects ).getSortedProjects();
             fail( "Duplicate projects should fail" );
         }
         catch ( DuplicateProjectException e )
@@ -131,7 +131,7 @@ public class ProjectSorterTest
 
         try
         {
-            projects = new ReactorManager.ProjectSorter( projects ).getSortedProjects();
+            projects = new ProjectSorter( projects ).getSortedProjects();
             fail( "Duplicate projects should fail" );
         }
         catch ( DuplicateProjectException e )

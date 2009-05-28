@@ -19,16 +19,6 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.codehaus.plexus.util.StringUtils;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,10 +27,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.codehaus.plexus.util.StringUtils;
+
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id$
- * @todo this should possibly be replaced by type handler
+ * @author Jason van Zyl
  */
 public class DefaultArtifact
     implements Artifact
@@ -49,11 +47,6 @@ public class DefaultArtifact
 
     private String artifactId;
 
-    /**
-     * The resolved version for the artifact after conflict resolution, that has not been transformed.
-     *
-     * @todo should be final
-     */
     private String baseVersion;
 
     private final String type;
@@ -85,28 +78,20 @@ public class DefaultArtifact
     private List<ArtifactVersion> availableVersions;
 
     private Map<Object,ArtifactMetadata> metadataMap;
-
+    
     private boolean optional;
 
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            VersionRange versionRange,
-                            String scope,
-                            String type,
-                            String classifier,
-                            ArtifactHandler artifactHandler )
+    public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type, String classifier, ArtifactHandler artifactHandler )
+    {
+        this( groupId, artifactId, VersionRange.createFromVersion( version ), scope, type, classifier, artifactHandler, false );
+    }
+    
+    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type, String classifier, ArtifactHandler artifactHandler )
     {
         this( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler, false );
     }
 
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            VersionRange versionRange,
-                            String scope,
-                            String type,
-                            String classifier,
-                            ArtifactHandler artifactHandler,
-                            boolean optional )
+    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type, String classifier, ArtifactHandler artifactHandler, boolean optional )
     {
         this.groupId = groupId;
 
@@ -400,6 +385,7 @@ public class DefaultArtifact
     protected void setBaseVersionInternal( String baseVersion )
     {
         Matcher m = VERSION_FILE_PATTERN.matcher( baseVersion );
+        
         if ( m.matches() )
         {
             this.baseVersion = m.group( 1 ) + "-" + SNAPSHOT_VERSION;
@@ -453,8 +439,7 @@ public class DefaultArtifact
         return result;
     }
 
-    public void updateVersion( String version,
-                               ArtifactRepository localRepository )
+    public void updateVersion( String version, ArtifactRepository localRepository )
     {
         setResolvedVersion( version );
         setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );
@@ -607,5 +592,19 @@ public class DefaultArtifact
     public void setOptional( boolean optional )
     {
         this.optional = optional;
+    }
+    
+    //
+    
+    private boolean fromAuthoritativeRepository;
+    
+    public void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository )
+    {
+        this.fromAuthoritativeRepository = fromAuthoritativeRepository;
+    }
+    
+    public boolean isFromAuthoritativeRepository()
+    {
+        return fromAuthoritativeRepository;
     }
 }

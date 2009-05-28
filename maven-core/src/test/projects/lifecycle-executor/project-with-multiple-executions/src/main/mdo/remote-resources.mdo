@@ -1,0 +1,61 @@
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<model>
+  <id>remoteResourcesBundle</id>
+  <name>RemoteResourcesBundle</name>
+  <description><![CDATA[
+    A bundle of remote resources.
+    This is the model specification for remote-resources.xml.
+  ]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.plugin.resources.remote</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="remoteResourcesBundle">
+      <name>RemoteResourcesBundle</name>
+      <version>1.1.0</version>
+      <description>Root element of the remote-resources.xml file.</description>
+      <fields>
+        <field>
+          <name>remoteResources</name>
+          <version>1.1.0</version>
+          <description><![CDATA[
+            Remote resources that are contained in a remote resources bundle.
+          ]]></description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>sourceEncoding</name>
+          <version>1.1.0</version>
+          <description><![CDATA[
+            Source encoding of the remote resources contained in the bundle.
+          ]]></description>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>

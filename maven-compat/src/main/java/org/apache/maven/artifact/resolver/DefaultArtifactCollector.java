@@ -19,6 +19,15 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -33,64 +42,29 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * Default implementation of the artifact collector.
- *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author Jason van Zyl
- * @version $Id$
- * @todo This needs to collect all errors and not die on the first error. If there are problems retrieving the metadata
- *       then we need all the information so that we can tell users about what we attempted to do.
- * @todo there 8 places where we can can range exceptions which is bad, again the result of not using a graph.
  */
 @Component(role=ArtifactCollector.class)
 public class DefaultArtifactCollector
-    implements ArtifactCollector, LogEnabled
+    implements ArtifactCollector
 {
-    /**
-     * The conflict resolver to use when none is specified.
-     */
 	@Requirement(hint="nearest")
     private ConflictResolver defaultConflictResolver;
 
+	@Requirement
     private Logger logger;
 
-    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, 
+                                             Artifact originatingArtifact,
+                                             Map managedVersions, 
                                              ArtifactRepository localRepository,
                                              List<ArtifactRepository> remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
-                                             List<ResolutionListener> listeners )
-    {
-        return collect( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository, remoteRepositories,
-                        source, filter, listeners );
-    }
-
-    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                             Map managedVersions, ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
-                                             List<ResolutionListener> listeners )
-    {
-        return collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source,
-                        filter, listeners, null );
-    }
-
-    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                             Map managedVersions, ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
+                                             ArtifactMetadataSource source, 
+                                             ArtifactFilter filter,
                                              List<ResolutionListener> listeners,
                                              List<ConflictResolver> conflictResolvers )
     {
@@ -100,8 +74,6 @@ public class DefaultArtifactCollector
 
         if ( conflictResolvers == null )
         {
-            // TODO: warn that we're using the default conflict resolver
-
             conflictResolvers = Collections.singletonList( defaultConflictResolver );
         }
 
@@ -130,8 +102,7 @@ public class DefaultArtifactCollector
 
         try
         {
-            recurse( result, root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
-                     listeners, conflictResolvers );
+            recurse( result, root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter, listeners, conflictResolvers );
         }
         catch ( CyclicDependencyException e )
         {
@@ -224,10 +195,15 @@ public class DefaultArtifactCollector
         return versionMap;
     }
 
-    private void recurse( ArtifactResolutionResult result, ResolutionNode node,
-                          Map<Object, List<ResolutionNode>> resolvedArtifacts, ManagedVersionMap managedVersions,
-                          ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                          ArtifactMetadataSource source, ArtifactFilter filter, List<ResolutionListener> listeners,
+    private void recurse( ArtifactResolutionResult result, 
+                          ResolutionNode node,
+                          Map<Object, List<ResolutionNode>> resolvedArtifacts, 
+                          ManagedVersionMap managedVersions,
+                          ArtifactRepository localRepository, 
+                          List<ArtifactRepository> remoteRepositories,
+                          ArtifactMetadataSource source, 
+                          ArtifactFilter filter, 
+                          List<ResolutionListener> listeners,
                           List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException
     {
@@ -293,26 +269,19 @@ public class DefaultArtifactCollector
                                     {
                                         try
                                         {
-                                            versions =
-                                                source.retrieveAvailableVersions( resetArtifact, localRepository,
-                                                                                  remoteRepositories );
+                                            versions = source.retrieveAvailableVersions( resetArtifact, localRepository, remoteRepositories );
                                             resetArtifact.setAvailableVersions( versions );
                                         }
                                         catch ( ArtifactMetadataRetrievalException e )
                                         {
                                             resetArtifact.setDependencyTrail( node.getDependencyTrail() );
-                                            throw new ArtifactResolutionException(
-                                                                                   "Unable to get dependency information: "
-                                                                                       + e.getMessage(), resetArtifact,
-                                                                                   remoteRepositories, e );
+                                            throw new ArtifactResolutionException( "Unable to get dependency information: " + e.getMessage(), resetArtifact, remoteRepositories, e );
                                         }
                                     }
                                     // end hack
 
                                     // MNG-2861: match version can return null
-                                    ArtifactVersion selectedVersion =
-                                        resetArtifact.getVersionRange().matchVersion(
-                                                                                      resetArtifact.getAvailableVersions() );
+                                    ArtifactVersion selectedVersion = resetArtifact.getVersionRange().matchVersion( resetArtifact.getAvailableVersions() );
                                     if ( selectedVersion != null )
                                     {
                                         resetArtifact.selectVersion( selectedVersion.toString() );
@@ -341,20 +310,15 @@ public class DefaultArtifactCollector
                         if ( resolved == null )
                         {
                             // TODO: add better exception that can detail the two conflicting artifacts
-                            result.addVersionRangeViolation( new ArtifactResolutionException(
-                                                                                              "Cannot resolve artifact version conflict between "
-                                                                                                  + previous.getArtifact().getVersion()
-                                                                                                  + " and "
-                                                                                                  + node.getArtifact().getVersion(),
-                                                                                              previous.getArtifact() ) );
+                            ArtifactResolutionException are = new ArtifactResolutionException( "Cannot resolve artifact version conflict between " + previous.getArtifact().getVersion()
+                                                                                              + " and " + node.getArtifact().getVersion(), previous.getArtifact() ); 
+                            result.addVersionRangeViolation( are );
                         }
 
                         if ( ( resolved != previous ) && ( resolved != node ) )
                         {
                             // TODO: add better exception
-                            result.addVersionRangeViolation( new ArtifactResolutionException(
-                                                                                              "Conflict resolver returned unknown resolution node: ",
-                                                                                              resolved.getArtifact() ) );
+                            result.addVersionRangeViolation( new ArtifactResolutionException( "Conflict resolver returned unknown resolution node: ", resolved.getArtifact() ) );
                         }
 
                         // TODO: should this be part of mediation?
@@ -512,13 +476,6 @@ public class DefaultArtifactCollector
                                     artifact.selectVersion( version.toString() );
                                     fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                                 }
-
-                                Artifact relocated = source.retrieveRelocatedArtifact( artifact, localRepository, childRemoteRepositories );
-                                if ( !artifact.equals( relocated ) )
-                                {
-                                    artifact = relocated;
-                                    child.setArtifact( artifact );
-                                }
                             }
                             while( !childKey.equals( child.getKey() ) );
 
@@ -572,8 +529,7 @@ public class DefaultArtifactCollector
         }
     }
 
-    private void manageArtifact( ResolutionNode node, ManagedVersionMap managedVersions,
-                                 List<ResolutionListener> listeners )
+    private void manageArtifact( ResolutionNode node, ManagedVersionMap managedVersions, List<ResolutionListener> listeners )
     {
         Artifact artifact = (Artifact) managedVersions.get( node.getKey() );
 
@@ -743,10 +699,5 @@ public class DefaultArtifactCollector
                     throw new IllegalStateException( "Unknown event: " + event );
             }
         }
-    }
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
     }
 }

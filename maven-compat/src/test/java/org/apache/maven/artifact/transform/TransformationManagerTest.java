@@ -1,8 +1,8 @@
 package org.apache.maven.artifact.transform;
 
-import org.codehaus.plexus.PlexusTestCase;
-
 import java.util.List;
+
+import org.codehaus.plexus.PlexusTestCase;
 
 /** @author Jason van Zyl */
 public class TransformationManagerTest

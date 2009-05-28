@@ -19,25 +19,19 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.ReactorManager;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface Maven
 {
-    static String ROLE = Maven.class.getName();
-
-    //!! CLI pollution
     String POMv4 = "pom.xml";
 
-    //!! release plugin pollution
-    String RELEASE_POMv4 = "release-pom.xml";
-
     MavenExecutionResult execute( MavenExecutionRequest request );
-
-    ReactorManager createReactorManager( MavenExecutionRequest request, MavenExecutionResult result );
+    
+    List<String> getLifecyclePhases();
 }

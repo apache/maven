@@ -19,6 +19,8 @@ package org.apache.maven.artifact.transform;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -28,8 +30,6 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
-
-import java.util.List;
 
 /**
  * Change the version <code>RELEASE</code> to the appropriate release version from the remote repository.

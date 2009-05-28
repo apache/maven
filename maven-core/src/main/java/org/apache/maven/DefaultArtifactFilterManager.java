@@ -19,12 +19,12 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.codehaus.plexus.component.annotations.Component;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Jason van Zyl
@@ -36,7 +36,7 @@ public class DefaultArtifactFilterManager
     implements ArtifactFilterManager
 {
 
-    private static final Set DEFAULT_EXCLUSIONS;
+    private static final Set<String> DEFAULT_EXCLUSIONS;
 
     static
     {
@@ -59,17 +59,15 @@ public class DefaultArtifactFilterManager
         artifacts.add( "maven-plugin-api" );
         artifacts.add( "maven-plugin-descriptor" );
         artifacts.add( "maven-plugin-parameter-documenter" );
+        artifacts.add( "maven-plugin-registry" );
         artifacts.add( "maven-profile" );
         artifacts.add( "maven-project" );
-        artifacts.add( "maven-reporting-api" );
         artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-settings" );
-        //adding shared/maven-toolchain project here, even though not part of the default
-        //distro yet.
-        artifacts.add( "maven-toolchain" );
         artifacts.add( "plexus-component-api" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-interactivity-api" );
+        //artifacts.add( "plexus-interpolation" );        
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
@@ -80,7 +78,7 @@ public class DefaultArtifactFilterManager
         DEFAULT_EXCLUSIONS = artifacts;
     }
 
-    protected Set excludedArtifacts = new HashSet( DEFAULT_EXCLUSIONS );
+    protected Set<String> excludedArtifacts = new HashSet<String>( DEFAULT_EXCLUSIONS );
 
     /**
      * @deprecated Use this class as a component instead, and then use getArtifactFilter().

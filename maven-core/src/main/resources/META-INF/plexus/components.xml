@@ -1,58 +1,50 @@
-<!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  <!--
+    Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+    file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+    applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+    governing permissions and limitations under the License.
+  -->
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
--->
+  <!--
 
-<!-- 
-
-There is currently only one component descriptor that cannot be generated from annotations because
-of the accompanying configurationl. Our options are to embed this information programatically or
-use a configuration source to pull in the lifecycle information.
-
--->
+    There is currently only one component descriptor that cannot be generated from annotations because of the
+    accompanying configurationl. Our options are to embed this information programatically or use a configuration source
+    to pull in the lifecycle information.
+  -->
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.lifecycle.binding.LifecycleBindingManager</role>
-      <role-hint>default</role-hint>
-      <implementation>org.apache.maven.lifecycle.binding.DefaultLifecycleBindingManager</implementation>
+      <role>org.apache.maven.plugin.MavenPluginCollector</role>
+      <implementation>org.apache.maven.plugin.MavenPluginCollector
+      </implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
+      <implementation>org.apache.maven.lifecycle.DefaultLifecycleExecutor
+      </implementation>
       <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.logging.Logger</role>
+          <role-hint>default</role-hint>
+          <field-name>logger</field-name>
+        </requirement>
         <requirement>
           <role>org.apache.maven.plugin.PluginManager</role>
         </requirement>
         <requirement>
-          <role>org.apache.maven.lifecycle.LifecycleBindingLoader</role>
-          <field-name>bindingsByPackaging</field-name>
+          <role>org.apache.maven.ProjectDependenciesResolver</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.repository.RepositorySystem</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-          <field-name>legacyMappingsByPackaging</field-name>
+          <field-name>lifecycleMappings</field-name>
         </requirement>
-        <requirement>
-          <role>org.apache.maven.lifecycle.binding.MojoBindingFactory</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.lifecycle.binding.LegacyLifecycleMappingParser</role>
-        </requirement>
-         <requirement>                                                                                                                                        
-           <role>org.codehaus.plexus.PlexusContainer</role>                                                                                                   
-           <role-hint>default</role-hint>                                                                                                                     
-           <field-name>container</field-name>                                                                                                                 
-         </requirement>              
       </requirements>
       <configuration>
         <lifecycles>
@@ -94,7 +86,8 @@ use a configuration source to pull in the lifecycle information.
               <phase>post-clean</phase>
             </phases>
             <default-phases>
-              <clean>org.apache.maven.plugins:maven-clean-plugin:clean</clean>
+              <clean>org.apache.maven.plugins:maven-clean-plugin:clean
+              </clean>
             </default-phases>
           </lifecycle>
           <lifecycle>
@@ -106,43 +99,33 @@ use a configuration source to pull in the lifecycle information.
               <phase>site-deploy</phase>
             </phases>
             <default-phases>
-              <site>org.apache.maven.plugins:maven-site-plugin:site</site>
-              <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy</site-deploy>
+              <site>org.apache.maven.plugins:maven-site-plugin:site
+              </site>
+              <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy
+              </site-deploy>
             </default-phases>
           </lifecycle>
         </lifecycles>
-        <!-- START SNIPPET: default-reports -->
-        <defaultReports>
-          <report>org.apache.maven.plugins:maven-project-info-reports-plugin:2.0.1</report>
-          <!-- TODO: currently in mojo - should they be defaults any more?
-          <report>org.apache.maven.plugins:maven-checkstyle-plugin</report>
-          <report>org.apache.maven.plugins:maven-javadoc-plugin</report>
-                    <report>org.apache.maven.plugins:maven-changelog-plugin</report>
-                    <report>org.apache.maven.plugins:maven-surefire-report-plugin</report>
-                    <report>org.apache.maven.plugins:maven-jdepend-plugin</report>
-                    <report>org.apache.maven.plugins:maven-jxr-plugin</report>
-                    <report>org.apache.maven.plugins:maven-taglist-plugin</report>
-          -->
-        </defaultReports>
-        <!-- END SNIPPET: default-reports -->
       </configuration>
-    </component> 
+    </component>
 
     <component>
-      <role>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher</role>
+      <role>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher
+      </role>
       <role-hint>maven</role-hint>
-      <implementation>org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher</implementation>
+      <implementation>org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher
+      </implementation>
       <description>Maven Security dispatcher</description>
       <requirements>
         <requirement>
-          <role>org.sonatype.plexus.components.cipher.PlexusCipher</role>
+          <role>org.sonatype.plexus.components.cipher.PlexusCipher
+          </role>
           <field-name>_cipher</field-name>
         </requirement>
       </requirements>
       <configuration>
         <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
       </configuration>
-    </component>          
-     
+    </component>
   </components>
 </component-set>

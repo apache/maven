@@ -19,9 +19,9 @@ package org.apache.maven.artifact.handler.manager;
  * under the License.
  */
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
-
 import java.util.Map;
+
+import org.apache.maven.artifact.handler.ArtifactHandler;
 
 /**
  * @author Jason van Zyl

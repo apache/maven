@@ -19,6 +19,9 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
+import java.io.File;
+import java.util.Map;
+
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -29,9 +32,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-
-import java.io.File;
-import java.util.Map;
 
 /** @author Jason van Zyl */
 public class MavenEmbedderProjectWithExtensionReadingTest

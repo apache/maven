@@ -19,12 +19,6 @@ package org.apache.maven.project.inheritance;
  * under the License.
  */
 
-import org.apache.maven.model.*;
-import org.apache.maven.project.ModelUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -34,6 +28,25 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.DeploymentRepository;
+import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Extension;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
+import org.apache.maven.model.Reporting;
+import org.apache.maven.model.Resource;
+import org.apache.maven.model.Scm;
+import org.apache.maven.model.Site;
+import org.apache.maven.project.ModelUtils;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 @Component(role = ModelInheritanceAssembler.class)
 public class DefaultModelInheritanceAssembler

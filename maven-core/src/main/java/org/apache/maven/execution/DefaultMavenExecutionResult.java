@@ -19,14 +19,13 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.lifecycle.plan.BuildPlan;
-import org.apache.maven.project.MavenProject;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.project.MavenProject;
 
 /** @author Jason van Zyl */
 public class DefaultMavenExecutionResult
@@ -34,14 +33,14 @@ public class DefaultMavenExecutionResult
 {
     private MavenProject project;
 
-    private List topologicallySortedProjects;
+    private List<MavenProject> topologicallySortedProjects;
 
     private ArtifactResolutionResult artifactResolutionResult;
 
-    private List exceptions;
+    private List<Throwable> exceptions;
 
-    private ReactorManager reactorManager;
-
+    private ExceptionSummary exceptionSummary;
+    
     public MavenExecutionResult setProject( MavenProject project )
     {
         this.project = project;
@@ -54,7 +53,7 @@ public class DefaultMavenExecutionResult
         return project;
     }
 
-    public MavenExecutionResult setTopologicallySortedProjects( List topologicallySortedProjects )
+    public MavenExecutionResult setTopologicallySortedProjects( List<MavenProject> topologicallySortedProjects )
     {
         this.topologicallySortedProjects = topologicallySortedProjects;
 
@@ -100,15 +99,15 @@ public class DefaultMavenExecutionResult
         return !getExceptions().isEmpty();
     }
 
-    public ReactorManager getReactorManager()
+    public MavenExecutionResult setExceptionSummary( ExceptionSummary exceptionSummary )
     {
-        return reactorManager;
-    }
-
-    public MavenExecutionResult setReactorManager( ReactorManager reactorManager )
-    {
-        this.reactorManager = reactorManager;
+        this.exceptionSummary = exceptionSummary;
 
         return this;
+    }
+    
+    public ExceptionSummary getExceptionSummary()
+    {
+        return exceptionSummary;
     }
 }

@@ -15,86 +15,42 @@ package org.apache.maven.plugin;
  * the License.
  */
 
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.model.MojoBinding;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.reporting.MavenReport;
+import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
+import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface PluginManager
+    extends ComponentDiscoverer, ComponentDiscoveryListener
 {
-    void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
-        throws ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException, InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException;
+    // - find the plugin [extension point: any client may wish to do whatever they choose]
+    // - load the plugin into a classloader [extension point: we want to take them from a repository, some may take from disk or whatever]
+    // - configure the plugin [extension point] -- actually this should happen before the plugin manager gets anything i.e. do whatever you want to get the information
+    // - execute the plugin    
+        
+    // Use more meaningful exceptions
+    // plugin not found
+    // plugin resolution exception
+    // plugin configuration can't be parsed -- and this may be a result of client insertion of configuration
+    // plugin component deps have a cycle -- this should be prevented for the most part but client code may inject an override component which itself has a cycle
+    PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException;
 
-    MavenReport getReport( MavenProject project, MojoExecution mojoExecution, MavenSession session )
-        throws ArtifactNotFoundException, PluginConfigurationException, PluginManagerException, ArtifactResolutionException;
-
-    Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project );
-
-    PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException;
-
-    PluginDescriptor verifyReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
-        throws PluginVersionResolutionException, ArtifactResolutionException, ArtifactNotFoundException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException;
-
-    Plugin findPluginForPrefix( String prefix, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-
-    Collection<MojoExecution> getMojoExecutionsForGoal( String goal )
-        throws Exception;
-
-    /*
-    Object getMojoParameterFor( MojoExecution mojoExecution, String xPath )
-        throws Exception;
-    */
+    MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
     
-    void executeMojo( MojoExecution mojoExecution, MavenSession session )
-        throws Exception;
+    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
     
-    // Plugin Loader
-    
-    /**
-     * Load the {@link PluginDescriptor} instance for the specified plugin, using the project for
-     * the {@link ArtifactRepository} and other supplemental plugin information as necessary.
-     */
-    PluginDescriptor loadPlugin( Plugin plugin, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-
-    /**
-     * Load the {@link PluginDescriptor} instance for the plugin implied by the specified MojoBinding,
-     * using the project for {@link ArtifactRepository} and other supplemental plugin information as
-     * necessary.
-     */
-    PluginDescriptor loadPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-
-    /**
-     * Load the {@link PluginDescriptor} instance for the specified report plugin, using the project for
-     * the {@link ArtifactRepository} and other supplemental report/plugin information as necessary.
-     */
-    PluginDescriptor loadReportPlugin( ReportPlugin reportPlugin, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-
-    /**
-     * Load the {@link PluginDescriptor} instance for the report plugin implied by the specified MojoBinding,
-     * using the project for {@link ArtifactRepository} and other supplemental report/plugin information as
-     * necessary.
-     */
-    PluginDescriptor loadReportPlugin( MojoBinding mojoBinding, MavenProject project, MavenSession session )
-        throws PluginLoaderException;
-    
+    // Why do we have a plugin execution exception as well?
+    void executeMojo( MavenSession session, MojoExecution execution )
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginExecutionException;
 }

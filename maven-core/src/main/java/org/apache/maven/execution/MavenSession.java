@@ -19,27 +19,19 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.Stack;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.realm.MavenRealmManager;
-import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * @author Jason van Zyl
@@ -48,43 +40,43 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 public class MavenSession
 {
     private PlexusContainer container;
-
-    private EventDispatcher eventDispatcher;
-
-    private ReactorManager reactorManager;
-
-    private boolean usingPOMsFromFilesystem = true;
-
+    
     private MavenExecutionRequest request;
 
+    private MavenExecutionResult result;
+    
     private MavenProject currentProject;
+        
+    /**
+     * These projects have already been topologically sorted in the {@link org.apache.maven.Maven} component before
+     * being passed into the session.
+     */
+    private List<MavenProject> projects;
+    
+    private MavenProject topLevelProject;
+    
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, MavenProject project )
+        throws CycleDetectedException, DuplicateProjectException
+    {
+        this( container, request, result, Arrays.asList( new MavenProject[]{ project } ) );        
+    }    
 
-    private Stack forkedProjectStack = new Stack();
-
-    private Map reports = new LinkedHashMap();
-
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, EventDispatcher eventDispatcher, ReactorManager reactorManager )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, List<MavenProject> projects )
+        throws CycleDetectedException, DuplicateProjectException
     {
         this.container = container;
-
         this.request = request;
-
-        this.eventDispatcher = eventDispatcher;
-
-        this.reactorManager = reactorManager;
-    }
-
-    public MavenRealmManager getRealmManager()
-    {
-        return request.getRealmManager();
-    }
-
-    public Map getPluginContext( PluginDescriptor pluginDescriptor,
-                                 MavenProject project )
-    {
-        return reactorManager.getPluginContext( pluginDescriptor, project );
-    }
-
+        this.result = result;
+        //TODO: Current for testing classes creating the session
+        if ( projects.size() > 0 )
+        {
+            this.currentProject = projects.get( 0 );
+            this.topLevelProject = projects.get(  0 );
+        }
+        this.projects = projects;     
+    }    
+        
+    @Deprecated
     public PlexusContainer getContainer()
     {
         return container;
@@ -95,7 +87,7 @@ public class MavenSession
         return request.getLocalRepository();
     }
 
-    public List getGoals()
+    public List<String> getGoals()
     {
         return request.getGoals();
     }
@@ -105,60 +97,14 @@ public class MavenSession
         return request.getProperties();
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    public Object lookup( String role )
-        throws ComponentLookupException
-    {
-        return container.lookup( role );
-    }
-
-    public Object lookup( String role,
-                          String roleHint )
-        throws ComponentLookupException
-    {
-        return container.lookup( role, roleHint );
-    }
-
-    public <T> T lookup( Class<T> type )
-        throws ComponentLookupException
-    {
-        return container.lookup( type );
-    }
-
-    public <T> T lookup( Class<T> type, String roleHint )
-        throws ComponentLookupException
-    {
-        return container.lookup( type, roleHint );
-    }
-
-    public List lookupList( String role )
-        throws ComponentLookupException
-    {
-        return container.lookupList( role );
-    }
-
-    public Map lookupMap( String role )
-        throws ComponentLookupException
-    {
-        return container.lookupMap( role );
-    }
-
-    public EventDispatcher getEventDispatcher()
-    {
-        return eventDispatcher;
-    }
-
     public Settings getSettings()
     {
         return request.getSettings();
     }
-
-    public List<MavenProject> getSortedProjects()
+    
+    public List<MavenProject> getProjects()
     {
-        return reactorManager.getSortedProjects();
+        return projects;
     }
 
     public String getExecutionRootDirectory()
@@ -171,41 +117,9 @@ public class MavenSession
         return request.isProjectPresent();
     }
 
-    public Date getStartTime()
-    {
-        return request.getStartTime();
-    }
-
     public MavenExecutionRequest getRequest()
     {
         return request;
-    }
-
-    /**
-     * Push the existing currentProject onto the forked-project stack, and set the specified project
-     * as the new current project. This signifies the beginning of a new forked-execution context.
-     */
-    public void addForkedProject( MavenProject project )
-    {
-        forkedProjectStack.push( currentProject );
-        currentProject = project;
-    }
-
-    /**
-     * Peel off the last forked project from the stack, and restore it as the currentProject. This
-     * signifies the cleanup of a completed forked-execution context.
-     */
-    public MavenProject removeForkedProject()
-    {
-        if ( !forkedProjectStack.isEmpty() )
-        {
-            MavenProject lastCurrent = currentProject;
-            currentProject = (MavenProject) forkedProjectStack.pop();
-
-            return lastCurrent;
-        }
-
-        return null;
     }
 
     public void setCurrentProject( MavenProject currentProject )
@@ -213,53 +127,9 @@ public class MavenSession
         this.currentProject = currentProject;
     }
 
-    /**
-     * Return the current project for use in a mojo execution.
-     */
     public MavenProject getCurrentProject()
     {
         return currentProject;
-    }
-
-    /**
-     * Retrieve the list of reports ({@link MavenReport} instances) that have been executed against
-     * this project, for use in another mojo's execution.
-     */
-    public List getReports()
-    {
-        if ( reports == null )
-        {
-            return Collections.EMPTY_LIST;
-        }
-
-        return new ArrayList( reports.values() );
-    }
-
-    /**
-     * Clear the reports for this project
-     */
-    public void clearReports()
-    {
-        reports.clear();
-    }
-
-    /**
-     * Add a newly-executed report ({@link MavenReport} instance) to the reports collection, for
-     * future reference.
-     */
-    public void addReport( MojoDescriptor mojoDescriptor, MavenReport report )
-    {
-        reports.put( mojoDescriptor, report );
-    }
-
-    public Set getReportMojoDescriptors()
-    {
-        if ( reports == null )
-        {
-            return Collections.EMPTY_SET;
-        }
-
-        return reports.keySet();
     }
 
     public ProjectBuilderConfiguration getProjectBuilderConfiguration()
@@ -275,5 +145,48 @@ public class MavenSession
     public boolean isOffline()
     {
         return request.isOffline();
+    }        
+
+    public MavenProject getTopLevelProject()
+    {
+        return topLevelProject;
     }
+
+    public MavenExecutionResult getResult()
+    {
+        return result;
+    }        
+    
+    // Backward compat
+    public Map<String,Map<String,Object>> getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
+    {
+        return new HashMap<String,Map<String,Object>>();
+    }    
+
+    /*
+    private Map pluginContextsByProjectAndPluginKey = new HashMap();
+    
+    public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
+    {
+        Map pluginContextsByKey = (Map) pluginContextsByProjectAndPluginKey.get( project.getId() );
+
+        if ( pluginContextsByKey == null )
+        {
+            pluginContextsByKey = new HashMap();
+
+            pluginContextsByProjectAndPluginKey.put( project.getId(), pluginContextsByKey );
+        }
+
+        Map pluginContext = (Map) pluginContextsByKey.get( plugin.getPluginLookupKey() );
+
+        if ( pluginContext == null )
+        {
+            pluginContext = new HashMap();
+            pluginContextsByKey.put( plugin.getPluginLookupKey(), pluginContext );
+        }
+
+        return pluginContext;
+    }
+    */
+    
 }

@@ -23,45 +23,26 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.Maven;
+import org.apache.maven.MavenExecutionException;
+import org.apache.maven.MissingModuleException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
-import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.errors.CoreReporterManager;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ReactorManager;
-import org.apache.maven.lifecycle.LifecycleUtils;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.apache.maven.monitor.event.DefaultEventDispatcher;
-import org.apache.maven.monitor.event.EventDispatcher;
-import org.apache.maven.plugin.InvalidPluginException;
-import org.apache.maven.plugin.MavenPluginCollector;
-import org.apache.maven.plugin.MavenPluginDiscoverer;
-import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.model.io.ModelReader;
+import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.PluginVersionNotFoundException;
-import org.apache.maven.plugin.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.reactor.MavenExecutionException;
-import org.apache.maven.reactor.MissingModuleException;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsConfigurationException;
@@ -77,7 +58,6 @@ import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
@@ -90,15 +70,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author Jason van Zyl
  */
+//TODO: just turn this into a component
 public class MavenEmbedder
 {
-    public static final String DEFAULT_LOCAL_REPO_ID = "local";
-
     public static final String userHome = System.getProperty( "user.home" );
 
     public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
-
-    public static final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
 
@@ -111,6 +88,7 @@ public class MavenEmbedder
     //
     // ----------------------------------------------------------------------------
 
+    //TODO: this needs to be the standard container
     private MutablePlexusContainer container;
 
     // ----------------------------------------------------------------------
@@ -123,11 +101,9 @@ public class MavenEmbedder
 
     private MavenProjectBuilder mavenProjectBuilder;
 
-    private RepositorySystem repositorySystem;
-    
-    private MavenXpp3Reader modelReader;
+    private ModelReader modelReader;
 
-    private MavenXpp3Writer modelWriter;
+    private ModelWriter modelWriter;
     
     private MavenExecutionRequestPopulator populator;
         
@@ -136,8 +112,6 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private ClassWorld classWorld;
-
-    private ClassRealm realm;
 
     private MavenEmbedderLogger logger;
 
@@ -148,6 +122,10 @@ public class MavenEmbedder
     // ----------------------------------------------------------------------
 
     private Configuration configuration;
+
+    private MavenExecutionRequest request;
+    
+    private LifecycleExecutor lifecycleExecutor;
 
     // ----------------------------------------------------------------------------
     // Constructors
@@ -162,26 +140,6 @@ public class MavenEmbedder
     public MavenExecutionRequest getDefaultRequest()
     {
         return request;
-    }
-
-    public Collection<MojoExecution> getMojoExecutionsForGoal(String goal) 
-        throws Exception
-    {
-        return pluginManager.getMojoExecutionsForGoal( goal );
-    }
-
-    /*
-    public Object getMojoParameterFor(MojoExecution mojoExecution, String xPath) 
-        throws Exception
-    {
-        return pluginManager.getMojoParameterFor( mojoExecution, xPath);
-    }
-    */
-
-    public void executeMojo(MojoExecution mojoExecution, MavenSession mavenSession ) 
-        throws Exception
-    {
-        pluginManager.executeMojo( mojoExecution, mavenSession );
     }
 
     // ----------------------------------------------------------------------
@@ -231,20 +189,20 @@ public class MavenEmbedder
     public Model readModel( Reader reader )
         throws XmlPullParserException, IOException
     {
-    	return modelReader.read( reader );
+    	return modelReader.read( reader, null );
     }
 
     public void writeModel( Writer writer, Model model, boolean namespaceDeclaration )
         throws IOException
     {
-        modelWriter.write( writer, model );
+        modelWriter.write( writer, null, model );
     }
 
     public void writeModel( Writer writer,
                             Model model )
         throws IOException
     {
-        modelWriter.write( writer, model );
+        modelWriter.write( writer, null, model );
     }
 
     // ----------------------------------------------------------------------
@@ -310,20 +268,6 @@ public class MavenEmbedder
         }
     }
 
-    /**
-     * mkleint: protected so that IDE integrations can selectively allow downloading artifacts
-     * from remote repositories (if they prohibit by default on project loading)
-     */
-    protected void verifyPlugin( Plugin plugin, MavenProject project )
-        throws ComponentLookupException, ArtifactResolutionException, PluginVersionResolutionException,
-        ArtifactNotFoundException, InvalidPluginException, PluginManagerException,
-        PluginNotFoundException, PluginVersionNotFoundException
-    {
-        PluginManager pluginManager = container.lookup( PluginManager.class );
-        MavenSession session = new MavenSession( container, request, null, null );
-        pluginManager.verifyPlugin( plugin, project, session );
-    }
-
     // ----------------------------------------------------------------------
     // Project
     // ----------------------------------------------------------------------
@@ -331,11 +275,6 @@ public class MavenEmbedder
     public MavenProject readProject( File mavenProject )
         throws ProjectBuildingException, MavenExecutionException
     {
-        CoreErrorReporter errorReporter = request.getErrorReporter();
-        errorReporter.clearErrors();
-
-        CoreReporterManager.setReporter( errorReporter );
-
         return readProject( mavenProject, request );
     }
 
@@ -352,6 +291,13 @@ public class MavenEmbedder
      * can be populated. For example, a list of libraries that are used by an Eclipse, Netbeans, or
      * IntelliJ project.
      */
+    
+    // currently in m2eclipse each project is read read a single project for dependencies
+    // Project
+    // Exceptions
+    // explicit for exceptions where coordinate are involved.
+    // m2eclipse is not using the topological sorting at all because it keeps track itself.
+    
     public MavenExecutionResult readProjectWithDependencies( MavenExecutionRequest request )
     {
         MavenExecutionResult result = new DefaultMavenExecutionResult();
@@ -359,114 +305,31 @@ public class MavenEmbedder
         try
         {
             request = populator.populateDefaults( request, configuration );
-
-            CoreErrorReporter errorReporter = request.getErrorReporter();
-            errorReporter.clearErrors();
-
-            CoreReporterManager.setReporter( errorReporter );
-
-            readProject( request.getPom(), request );
         }
         catch ( MavenEmbedderException e )
         {
             return result.addException( e );
         }
-        catch ( ProjectBuildingException e )
-        {
-            return result.addException( e );
-        }
-        catch ( MissingModuleException e )
-        {
-            return result.addException( e );
-        }
-
-        ReactorManager reactorManager = maven.createReactorManager( request, result );
-
-        if ( result.hasExceptions() )
-        {
-            return result;
-        }
-
-        MavenProjectBuildingResult projectBuildingResult;
 
         try
         {
-            projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies(
-                request.getPom(),
-                request.getProjectBuildingConfiguration() );
+            MavenProjectBuildingResult projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuildingConfiguration() );
+            
+            result.setProject( projectBuildingResult.getProject() );
+
+            result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
+
+            return result;
         }
         catch ( ProjectBuildingException e )
         {
             return result.addException( e );
         }
-
-        if ( reactorManager.hasMultipleProjects() )
-        {
-            result.setProject( projectBuildingResult.getProject() );
-
-            result.setTopologicallySortedProjects( reactorManager.getSortedProjects() );
-        }
-        else
-        {
-            result.setProject( projectBuildingResult.getProject() );
-
-            result.setTopologicallySortedProjects( Arrays.asList( new MavenProject[]{ projectBuildingResult.getProject()} ) );
-        }
-
-        result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
-
-        // From this I could produce something that would help IDE integrators create importers:
-        // - topo sorted list of projects
-        // - binary dependencies
-        // - source dependencies (projects in the reactor)
-        //
-        // We could create a layer approach here. As to do anything you must resolve a projects artifacts,
-        // and with that set you could then subsequently execute goals for each of those project.
-
-        return result;
-    }
-
-    // ----------------------------------------------------------------------
-    // Lifecycle information
-    // ----------------------------------------------------------------------
-
-    public List getLifecyclePhases()
-    {
-        return getBuildLifecyclePhases();
-    }
-
-    public List getAllLifecyclePhases()
-    {
-        return LifecycleUtils.getValidPhaseNames();
-    }
-
-    public List getDefaultLifecyclePhases()
-    {
-        return getBuildLifecyclePhases();
-    }
-
-    public List getBuildLifecyclePhases()
-    {
-        return LifecycleUtils.getValidBuildPhaseNames();
-    }
-
-    public List getCleanLifecyclePhases()
-    {
-        return LifecycleUtils.getValidCleanPhaseNames();
-    }
-
-    public List getSiteLifecyclePhases()
-    {
-        return LifecycleUtils.getValidSitePhaseNames();
     }
 
     // ----------------------------------------------------------------------
     //  Lifecycle
     // ----------------------------------------------------------------------
-
-    private MavenExecutionRequest request;
-
-    private EventDispatcher dispatcher;
 
     private void start( Configuration configuration )
         throws MavenEmbedderException
@@ -497,9 +360,10 @@ public class MavenEmbedder
         try
         {
             ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .addComponentDiscoverer( new MavenPluginDiscoverer() )
-                .addComponentDiscoveryListener( new MavenPluginCollector() )
-                .setClassWorld( classWorld ).setName( "embedder" );
+                .addComponentDiscoverer( PluginManager.class )
+                .addComponentDiscoveryListener( PluginManager.class )
+                .setClassWorld( classWorld )
+                .setName( "embedder" );
 
             container = new DefaultPlexusContainer( cc );
         }
@@ -528,9 +392,9 @@ public class MavenEmbedder
             // client interface.
             // ----------------------------------------------------------------------
 
-            modelReader = new MavenXpp3Reader();
+            modelReader = container.lookup( ModelReader.class );
 
-            modelWriter = new MavenXpp3Writer();
+            modelWriter = container.lookup( ModelWriter.class );
 
             maven = container.lookup( Maven.class );
 
@@ -538,15 +402,15 @@ public class MavenEmbedder
 
             populator = container.lookup( MavenExecutionRequestPopulator.class );
 
-            repositorySystem = container.lookup( RepositorySystem.class );
+            container.lookup( RepositorySystem.class );
+            
+            lifecycleExecutor = container.lookup( LifecycleExecutor.class );
             
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.
             request = new DefaultMavenExecutionRequest();
 
             populator.populateDefaults( request, configuration );
-
-            dispatcher = new DefaultEventDispatcher( request.getEventMonitors() );
         }
         catch ( ComponentLookupException e )
         {
@@ -650,7 +514,6 @@ public class MavenEmbedder
     public boolean isOffline( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
-        // first, grab defaults including settings, in case <offline>true</offline> is set.
         request = populator.populateDefaults( request, configuration );
 
         return request.isOffline();
@@ -661,7 +524,7 @@ public class MavenEmbedder
         LoggerManager loggerManager = container.getLoggerManager();
 
         int oldThreshold = loggerManager.getThreshold();
-
+                
         try
         {
             loggerManager.setThresholds( request.getLoggingLevel() );
@@ -679,11 +542,6 @@ public class MavenEmbedder
                 return result;
             }
 
-            CoreErrorReporter errorReporter = request.getErrorReporter();
-            errorReporter.clearErrors();
-
-            CoreReporterManager.setReporter( errorReporter );
-
             return maven.execute( request );
         }
         finally
@@ -700,5 +558,10 @@ public class MavenEmbedder
     public PlexusContainer getPlexusContainer()
     {
         return container;
+    }
+
+    public List<String> getLifecyclePhases()
+    {       
+        return maven.getLifecyclePhases();
     }
 }

@@ -19,10 +19,10 @@ package org.apache.maven.artifact.deployer;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-
-import java.io.File;
 
 public interface ArtifactDeployer
 {

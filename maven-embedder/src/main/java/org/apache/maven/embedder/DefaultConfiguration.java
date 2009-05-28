@@ -18,17 +18,14 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.realm.MavenRealmManager;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
-
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Default implementation of Configuration intefrace.
@@ -59,12 +56,6 @@ public class DefaultConfiguration
     private PlexusContainer parentContainer;
 
     private File localRepository;
-
-    private MavenRealmManager realmManager;
-
-    private CoreErrorReporter errorReporter;
-
-    private List<EventMonitor> eventMonitors;
 
     /** Creates a new instance of DefaultConfiguration */
     public DefaultConfiguration()
@@ -225,50 +216,5 @@ public class DefaultConfiguration
     public File getLocalRepository()
     {
         return localRepository;
-    }
-
-    public MavenRealmManager getRealmManager()
-    {
-        return realmManager;
-    }
-
-    public Configuration setRealmManager( MavenRealmManager realmManager )
-    {
-        this.realmManager = realmManager;
-        return this;
-    }
-
-    public CoreErrorReporter getErrorReporter()
-    {
-        return errorReporter;
-    }
-
-    public Configuration setErrorReporter( CoreErrorReporter errorReporter )
-    {
-        this.errorReporter = errorReporter;
-        return this;
-    }
-
-    public Configuration addEventMonitor( EventMonitor eventMonitor )
-    {
-        if ( eventMonitors == null )
-        {
-            eventMonitors = new ArrayList<EventMonitor>();
-        }
-
-        eventMonitors.add( eventMonitor );
-
-        return this;
-    }
-
-    public List<EventMonitor> getEventMonitors()
-    {
-        return eventMonitors;
-    }
-
-    public Configuration setEventMonitors( List<EventMonitor> eventMonitors )
-    {
-        this.eventMonitors = eventMonitors;
-        return this;
     }
 }

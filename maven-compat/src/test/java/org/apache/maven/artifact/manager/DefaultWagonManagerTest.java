@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -71,6 +72,20 @@ public class DefaultWagonManagerTest
         
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
+    
+    @Override
+    protected void tearDown() throws Exception {
+            wagonManager = null;
+            artifactFactory = null;
+            super.tearDown();
+    }
+    
+    public void testAvailableProtocols()
+        throws Exception
+    {
+        Set<String> protocols = wagonManager.getSupportProtocols();
+        System.out.println( protocols );
+    }    
     
     public void testUnnecessaryRepositoryLookup() throws Exception {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
@@ -278,9 +293,7 @@ public class DefaultWagonManagerTest
     {
         assertWagon( "a" );
 
-        assertWagon( "b1" );
-
-        assertWagon( "b2" );
+        assertWagon( "b" );
 
         assertWagon( "c" );
 

@@ -33,6 +33,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 // It would be cool if there was a hook that i could use to setup a test environment.
@@ -42,8 +43,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 // the layout used for a particular artifact type.
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ * @author Jason van Zyl
  */
 public class ArtifactResolverTest
     extends AbstractArtifactComponentTestCase
@@ -61,6 +61,15 @@ public class ArtifactResolverTest
         artifactResolver = (DefaultArtifactResolver) lookup( ArtifactResolver.class );
 
         projectArtifact = createLocalArtifact( "project", "3.0" );
+    }
+    
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        artifactFactory = null;
+        projectArtifact = null;
+        super.tearDown();
     }
 
     @Override
@@ -84,9 +93,7 @@ public class ArtifactResolverTest
     {
         Artifact b = createRemoteArtifact( "b", "1.0-SNAPSHOT" );
         deleteLocalArtifact( b );
-
         artifactResolver.resolve( b, remoteRepositories(), localRepository() );
-
         assertLocalArtifactPresent( b );
     }
 
@@ -105,59 +112,7 @@ public class ArtifactResolverTest
 
         Artifact h = createLocalArtifact( "h", "1.0" );
 
-        ArtifactMetadataSource mds = new ArtifactMetadataSource()
-        {
-            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                Set dependencies = new HashSet();
-
-                if ( "g".equals( artifact.getArtifactId() ) )
-                {
-                    Artifact a = null;
-                    try
-                    {
-                        a = createArtifact( "org.apache.maven", "h", "1.0", "jar" );
-                        dependencies.add( a );
-                    }
-                    catch ( Exception e )
-                    {
-                        throw new ArtifactMetadataRetrievalException( "Error retrieving metadata", e, a );
-                    }
-                }
-
-                return new ResolutionGroup( artifact, dependencies, remoteRepositories );
-            }
-
-            public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact,
-                                                                    ArtifactRepository localRepository,
-                                                                    List<ArtifactRepository> remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
-            }
-
-            public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
-                                                                                            Artifact artifact,
-                                                                                            ArtifactRepository localRepository,
-                                                                                            ArtifactRepository remoteRepository )
-                throws ArtifactMetadataRetrievalException
-            {
-                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
-            }
-
-            public Artifact retrieveRelocatedArtifact( Artifact artifact,
-                                                       ArtifactRepository localRepository,
-                                                       List<ArtifactRepository> remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                return artifact;
-            }
-        };
-
-        ArtifactResolutionResult result =
-            artifactResolver.resolveTransitively( Collections.singleton( g ), projectArtifact, remoteRepositories(), localRepository(), mds );
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( g ), projectArtifact, remoteRepositories(), localRepository(), null );
 
         assertEquals( 2, result.getArtifacts().size() );
 
@@ -179,60 +134,7 @@ public class ArtifactResolverTest
         Artifact j = createRemoteArtifact( "j", "1.0-SNAPSHOT" );
         deleteLocalArtifact( j );
 
-        ArtifactMetadataSource mds = new ArtifactMetadataSource()
-        {
-            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                Set dependencies = new HashSet();
-
-                if ( "i".equals( artifact.getArtifactId() ) )
-                {
-                    Artifact a = null;
-                    try
-                    {
-                        a = createArtifact( "org.apache.maven", "j", "1.0-SNAPSHOT", "jar" );
-                        dependencies.add( a );
-                    }
-                    catch ( Exception e )
-                    {
-                        throw new ArtifactMetadataRetrievalException( "Error retrieving metadata", e, a );
-                    }
-                }
-
-                return new ResolutionGroup( artifact, dependencies, remoteRepositories );
-            }
-
-            public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact,
-                                                                    ArtifactRepository localRepository,
-                                                                    List<ArtifactRepository> remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
-            }
-
-            public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
-                                                                                            Artifact artifact,
-                                                                                            ArtifactRepository localRepository,
-                                                                                            ArtifactRepository remoteRepository )
-                throws ArtifactMetadataRetrievalException
-            {
-                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
-            }
-
-            public Artifact retrieveRelocatedArtifact( Artifact artifact,
-                                                       ArtifactRepository localRepository,
-                                                       List<ArtifactRepository> remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                return artifact;
-            }
-        };
-
-        ArtifactResolutionResult result =
-            artifactResolver.resolveTransitively( Collections.singleton( i ), projectArtifact, remoteRepositories(),
-                                                  localRepository(), mds );
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( i ), projectArtifact, remoteRepositories(), localRepository(), null );
 
         assertEquals( 2, result.getArtifacts().size() );
 

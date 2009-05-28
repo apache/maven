@@ -19,8 +19,6 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.versioning.VersionRange;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -28,21 +26,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.apache.maven.artifact.versioning.VersionRange;
+
 public final class ArtifactUtils
 {
-    private ArtifactUtils()
-    {
-    }
-
-    public static boolean isSnapshot( String version )
-    {
-        return ( version != null ) &&
-            ( version.toUpperCase().endsWith( Artifact.SNAPSHOT_VERSION ) || Artifact.VERSION_FILE_PATTERN.matcher( version )
-                .matches() );
-    }
-
     public static String toSnapshotVersion( String version )
     {
+    	if(version == null)
+    	{
+    		throw new IllegalArgumentException("version: null");
+    	}
+    	
         Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
         if ( m.matches() )
         {
@@ -53,66 +47,57 @@ public final class ArtifactUtils
             return version;
         }
     }
-
+        
     public static String versionlessKey( Artifact artifact )
     {
         return versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
     }
 
-    public static String versionlessKey( String groupId,
-                                         String artifactId )
+    public static String versionlessKey( String groupId, String artifactId )
     {
         if ( groupId == null )
         {
-            throw new NullPointerException( "groupId was null" );
+            throw new NullPointerException( "groupId is null" );
         }
         if ( artifactId == null )
         {
-            throw new NullPointerException( "artifactId was null" );
+            throw new NullPointerException( "artifactId is null" );
         }
         return groupId + ":" + artifactId;
     }
 
-    public static String artifactId( String groupId,
-                                     String artifactId,
-                                     String type,
-                                     String version )
+    public static String key( Artifact artifact )
     {
-        return artifactId( groupId, artifactId, type, null, version );
-    }
+        return key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+    }    
 
-    public static String artifactId( String groupId,
-                                     String artifactId,
-                                     String type,
-                                     String classifier,
-                                     String baseVersion )
+    public static String key( String groupId, String artifactId, String version )
     {
-        return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" ) + ":" +
-            baseVersion;
-    }
-
+        if ( groupId == null )
+        {
+            throw new NullPointerException( "groupId is null" );
+        }
+        if ( artifactId == null )
+        {
+            throw new NullPointerException( "artifactId is null" );
+        }
+        if ( version == null )
+        {
+            throw new NullPointerException( "version is null" );
+        }
+        
+        return groupId + ":" + artifactId + ":" + version;
+    }    
+    
     public static Map<String,Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
     {
         Map<String,Artifact> artifactMap = new LinkedHashMap<String,Artifact>();
 
         if ( artifacts != null )
         {
-            for (Artifact artifact : artifacts) {
+            for (Artifact artifact : artifacts) 
+            {
                 artifactMap.put(versionlessKey(artifact), artifact);
-            }
-        }
-
-        return artifactMap;
-    }
-
-    public static Map<String,Artifact> artifactMapByArtifactId( Collection<Artifact> artifacts )
-    {
-        Map<String,Artifact> artifactMap = new LinkedHashMap<String,Artifact>();
-
-        if ( artifacts != null )
-        {
-            for (Artifact artifact : artifacts) {
-                artifactMap.put(artifact.getId(), artifact);
             }
         }
 

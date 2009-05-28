@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.maven.Maven;
 import org.apache.maven.MavenTransferListener;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -236,10 +237,8 @@ public final class CLIRequestUtils
             .setBaseDirectory( baseDirectory )
             .setGoals( goals )
             .setProperties( executionProperties ) // optional
-            .setUserProperties( userProperties ) // optional
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
-            .setUseReactor( useReactor ) // default: false
             .setShowErrors( showErrors ) // default: false
             .setInteractiveMode( interactive ) // default: true
             .setOffline( offline ) // default: false
@@ -257,7 +256,10 @@ public final class CLIRequestUtils
         if ( alternatePomFile != null )
         {
             request.setPom( new File( alternatePomFile ) );
-            System.out.println( "Request pom set to: " + request.getPom() );
+        }
+        else
+        {
+            request.setPom( new File( baseDirectory, Maven.POMv4 ) );
         }
 
         return request;

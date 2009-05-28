@@ -23,7 +23,6 @@ import org.apache.maven.MavenTransferListener;
 import org.apache.maven.wagon.WagonConstants;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Abstract console download progress meter.

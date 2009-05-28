@@ -30,10 +30,6 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-toolchain</artifactId>
     </dependency>
     <dependency>
@@ -55,23 +51,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-ssh</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-ssh-external</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
     </dependency>
     <dependency>
       <groupId>easymock</groupId>
       <artifactId>easymock</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-jxpath</groupId>
-      <artifactId>commons-jxpath</artifactId>
     </dependency>
   </dependencies>
 

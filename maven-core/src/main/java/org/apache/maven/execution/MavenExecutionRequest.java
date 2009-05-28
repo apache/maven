@@ -26,12 +26,8 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.errors.CoreErrorReporter;
-import org.apache.maven.monitor.event.EventMonitor;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.realm.MavenRealmManager;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
@@ -62,11 +58,11 @@ public interface MavenExecutionRequest
     // Reactor Failure Mode
     // ----------------------------------------------------------------------
 
-    static final String REACTOR_FAIL_FAST = ReactorManager.FAIL_FAST;
+    static final String REACTOR_FAIL_FAST = "FAIL_FAST";    
 
-    static final String REACTOR_FAIL_AT_END = ReactorManager.FAIL_AT_END;
+    static final String REACTOR_FAIL_AT_END = "FAIL_AT_END";
 
-    static final String REACTOR_FAIL_NEVER = ReactorManager.FAIL_NEVER;
+    static final String REACTOR_FAIL_NEVER = "FAIL_NEVER";
 
     // ----------------------------------------------------------------------
     // Artifactr repository policies
@@ -97,28 +93,13 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setProperty( String key, String value );
     Properties getProperties();
 
-    MavenExecutionRequest setUserProperties( Properties userProperties );
-    Properties getUserProperties();
-
     // Reactor
     MavenExecutionRequest setReactorFailureBehavior( String failureBehavior );
     String getReactorFailureBehavior();
 
-    MavenExecutionRequest setUseReactor( boolean useReactor );
-    boolean useReactor();
-
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );
     boolean isRecursive();
-
-    // Event monitors
-    MavenExecutionRequest addEventMonitor( EventMonitor monitor );
-    List<EventMonitor> getEventMonitors();
-
-    // Pom
-    MavenExecutionRequest setPomFile( String pomFilename );
-
-    String getPomFile();
 
     MavenExecutionRequest setPom( File pom );
     File getPom();
@@ -162,12 +143,12 @@ public interface MavenExecutionRequest
     boolean isOffline();
 
     // Profiles
-    List getProfiles();
-    MavenExecutionRequest setProfiles( List profiles );
+    List<Profile> getProfiles();
+    MavenExecutionRequest addProfile( Profile profile );
+    MavenExecutionRequest setProfiles( List<Profile> profiles );
     MavenExecutionRequest addActiveProfile( String profile );
     MavenExecutionRequest addActiveProfiles( List<String> profiles );
     List<String> getActiveProfiles();
-    //MAPI: do we really need to do this? deactivate active profile? seems confusing.
     MavenExecutionRequest addInactiveProfile( String profile );
     MavenExecutionRequest addInactiveProfiles( List<String> profiles );
     List<String> getInactiveProfiles();
@@ -187,6 +168,8 @@ public interface MavenExecutionRequest
     // Plugin groups
     List<String> getPluginGroups();
     MavenExecutionRequest setPluginGroups( List<String> pluginGroups );
+    MavenExecutionRequest addPluginGroup( String pluginGroup );
+    MavenExecutionRequest addPluginGroups( List<String> pluginGroups );
 
     boolean isUsePluginUpdateOverride();
     MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );
@@ -194,12 +177,6 @@ public interface MavenExecutionRequest
     // Setting
     Settings getSettings();
     MavenExecutionRequest setSettings( Settings settings );
-
-    ProfileManager getProfileManager();
-    MavenExecutionRequest setProfileManager( ProfileManager profileManager );
-
-    ProfileActivationContext getProfileActivationContext();
-    MavenExecutionRequest setProfileActivationContext( ProfileActivationContext profileActivationContext );
 
     boolean isProjectPresent();
     MavenExecutionRequest setProjectPresent( boolean isProjectPresent );
@@ -222,16 +199,8 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> repositories );
     List<ArtifactRepository> getRemoteRepositories();
 
-    MavenExecutionRequest setRealmManager( MavenRealmManager realmManager );
-    MavenRealmManager getRealmManager();
-
-    MavenExecutionRequest clearAccumulatedBuildState();
-
-    MavenExecutionRequest setErrorReporter( CoreErrorReporter reporter );
-    CoreErrorReporter getErrorReporter();
-
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
-    ProjectBuilderConfiguration getProjectBuildingConfiguration();
+    ProjectBuilderConfiguration getProjectBuildingConfiguration();    
 }

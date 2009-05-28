@@ -20,6 +20,7 @@ package org.apache.maven.settings.validation;
  */
 
 import junit.framework.TestCase;
+
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;

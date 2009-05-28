@@ -19,6 +19,8 @@ package org.apache.maven.artifact.transform;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -31,9 +33,6 @@ import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryM
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.component.annotations.Component;
-
-import java.util.List;
 
 /**
  * Describes a version transformation during artifact resolution.
@@ -52,9 +51,7 @@ public abstract class AbstractVersionTransformation
     @Requirement
     protected WagonManager wagonManager;
 
-    protected String resolveVersion( Artifact artifact,
-                                     ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories )
+    protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws RepositoryMetadataResolutionException
     {
         RepositoryMetadata metadata;
@@ -111,6 +108,5 @@ public abstract class AbstractVersionTransformation
         return version;
     }
 
-    protected abstract String constructVersion( Versioning versioning,
-                                                String baseVersion );
+    protected abstract String constructVersion( Versioning versioning, String baseVersion );
 }

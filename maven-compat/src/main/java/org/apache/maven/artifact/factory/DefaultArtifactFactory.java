@@ -34,123 +34,67 @@ public class DefaultArtifactFactory
     @Requirement
     private ArtifactHandlerManager artifactHandlerManager;
 
-    public DefaultArtifactFactory()
-    {
-    }
-
-    public Artifact createArtifact( String groupId,
-                                    String artifactId,
-                                    String version,
-                                    String scope,
-                                    String type )
+    public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return createArtifact( groupId, artifactId, version, scope, type, null, null );
     }
 
-    public Artifact createArtifactWithClassifier( String groupId,
-                                                  String artifactId,
-                                                  String version,
-                                                  String type,
-                                                  String classifier )
+    public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier )
     {
         return createArtifact( groupId, artifactId, version, null, type, classifier, null );
     }
 
-    public Artifact createDependencyArtifact( String groupId,
-                                              String artifactId,
-                                              VersionRange versionRange,
-                                              String type,
-                                              String classifier,
-                                              String scope )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, null );
     }
 
-    public Artifact createDependencyArtifact( String groupId,
-                                              String artifactId,
-                                              VersionRange versionRange,
-                                              String type,
-                                              String classifier,
-                                              String scope,
-                                              boolean optional )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, boolean optional )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, null, optional );
     }
 
-    public Artifact createDependencyArtifact( String groupId,
-                                              String artifactId,
-                                              VersionRange versionRange,
-                                              String type,
-                                              String classifier,
-                                              String scope,
-                                              String inheritedScope )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, String inheritedScope )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
     }
 
-    public Artifact createDependencyArtifact( String groupId,
-                                              String artifactId,
-                                              VersionRange versionRange,
-                                              String type,
-                                              String classifier,
-                                              String scope,
-                                              String inheritedScope,
-                                              boolean optional )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, String inheritedScope, boolean optional )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, optional );
     }
 
-    public Artifact createBuildArtifact( String groupId,
-                                         String artifactId,
-                                         String version,
-                                         String packaging )
+    public Artifact createBuildArtifact( String groupId, String artifactId, String version, String packaging )
     {
         return createArtifact( groupId, artifactId, version, null, packaging, null, null );
     }
 
-    public Artifact createProjectArtifact( String groupId,
-                                           String artifactId,
-                                           String version )
+    public Artifact createProjectArtifact( String groupId, String artifactId, String version )
     {
         return createProjectArtifact( groupId, artifactId, version, null );
     }
 
-    public Artifact createParentArtifact( String groupId,
-                                          String artifactId,
-                                          String version )
+    public Artifact createParentArtifact( String groupId, String artifactId, String version )
     {
         return createProjectArtifact( groupId, artifactId, version );
     }
 
-    public Artifact createPluginArtifact( String groupId,
-                                          String artifactId,
-                                          VersionRange versionRange )
+    public Artifact createPluginArtifact( String groupId, String artifactId, VersionRange versionRange )
     {
         return createArtifact( groupId, artifactId, versionRange, "maven-plugin", null, Artifact.SCOPE_RUNTIME, null );
     }
 
-    public Artifact createProjectArtifact( String groupId,
-                                           String artifactId,
-                                           String version,
-                                           String scope )
+    public Artifact createProjectArtifact( String groupId, String artifactId, String version, String scope )
     {
         return createArtifact( groupId, artifactId, version, scope, "pom" );
     }
 
-    public Artifact createExtensionArtifact( String groupId,
-                                             String artifactId,
-                                             VersionRange versionRange )
+    public Artifact createExtensionArtifact( String groupId, String artifactId, VersionRange versionRange )
     {
         return createArtifact( groupId, artifactId, versionRange, "jar", null, Artifact.SCOPE_RUNTIME, null );
     }
 
-    private Artifact createArtifact( String groupId,
-                                     String artifactId,
-                                     String version,
-                                     String scope,
-                                     String type,
-                                     String classifier,
-                                     String inheritedScope )
+    private Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type, String classifier, String inheritedScope )
     {
         VersionRange versionRange = null;
         if ( version != null )
@@ -160,29 +104,15 @@ public class DefaultArtifactFactory
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
     }
 
-    private Artifact createArtifact( String groupId,
-                                     String artifactId,
-                                     VersionRange versionRange,
-                                     String type,
-                                     String classifier,
-                                     String scope,
-                                     String inheritedScope )
+    private Artifact createArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, String inheritedScope )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, false );
     }
 
-    private Artifact createArtifact( String groupId,
-                                     String artifactId,
-                                     VersionRange versionRange,
-                                     String type,
-                                     String classifier,
-                                     String scope,
-                                     String inheritedScope,
-                                     boolean optional )
+    private Artifact createArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, String scope, String inheritedScope, boolean optional )
     {
-        // TODO: can refactor - inherited artifactScope calculation belongs in the collector, use artifactScope handler
-
         String desiredScope = Artifact.SCOPE_RUNTIME;
+        
         if ( inheritedScope == null )
         {
             desiredScope = scope;
@@ -215,7 +145,6 @@ public class DefaultArtifactFactory
 
         ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
 
-        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
-            optional );
+        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler, optional );
     }
 }

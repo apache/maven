@@ -567,22 +567,66 @@
           <code>
             <![CDATA[
     /**
+     * The POM from which this model originated. This is transient runtime state and therefore not managed by Modello.
+     */
+    private java.io.File pomFile;
+
+    /**
+     * Gets the POM file from which this model originated. This can either be a {@code pom.xml} of some project being
+     * built or the {@code *.pom} of some artifact being resolved from the repository.
+     * 
+     * @return The POM file from which this model originated or {@code null} if unknown.
+     */
+    public java.io.File getPomFile()
+    {
+        return pomFile;
+    }
+
+    public void setPomFile( java.io.File pomFile )
+    {
+        this.pomFile = pomFile;
+    }
+
+    /**
+     * The base directory for the corresponding project (if any). This is transient runtime state and therefore not
+     * managed by Modello.
+     */
+    private java.io.File projectDirectory;
+
+    /**
+     * Gets the base directory for the corresponding project (if any). Note that this is really a separate piece of
+     * information and not necessarily equivalent to the parent directory of {@link #getPomFile()}.
+     * 
+     * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
+     *         project but describes the metadata of some artifact from the repository.
+     */
+    public java.io.File getProjectDirectory()
+    {
+        return projectDirectory;
+    }
+
+    public void setProjectDirectory( java.io.File projectDirectory )
+    {
+        this.projectDirectory = projectDirectory;
+    }
+
+    /**
      * @return the model id as <code>groupId:artifactId:packaging:version</code>
      */
-      public String getId()
-      {
-          StringBuffer id = new StringBuffer();
+    public String getId()
+    {
+        StringBuilder id = new StringBuilder( 64 );
 
-          id.append( getGroupId() == null ? "[inherited]" : getGroupId() );
-          id.append( ":" );
-          id.append( getArtifactId() );
-          id.append( ":" );
-          id.append( getPackaging() );
-          id.append( ":" );
-          id.append( getVersion() == null ? "[inherited]" : getVersion() );
+        id.append( ( getGroupId() == null ) ? "[inherited]" : getGroupId() );
+        id.append( ":" );
+        id.append( getArtifactId() );
+        id.append( ":" );
+        id.append( getPackaging() );
+        id.append( ":" );
+        id.append( ( getVersion() == null ) ? "[inherited]" : getVersion() );
 
-          return id.toString();
-      }
+        return id.toString();
+    }
 
     @Override
     public String toString()
@@ -1356,11 +1400,16 @@
         <field>
           <name>optional</name>
           <version>4.0.0</version>
-          <description>Indicates the dependency is optional for use of this library. While the
+          <description>
+            <![CDATA[
+            Indicates the dependency is optional for use of this library. While the
             version of the dependency will be taken into account for dependency calculation if the
-            library is used elsewhere, it will not be passed on transitively.</description>
-          <type>boolean</type>
-          <defaultValue>false</defaultValue>
+            library is used elsewhere, it will not be passed on transitively. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>false</code>.
+            ]]>
+          </description>
+          <type>String</type>
         </field>
       </fields>
       <codeSegments>
@@ -1382,6 +1431,16 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public boolean isOptional()
+    {
+        return ( optional != null ) ? Boolean.parseBoolean( optional ) : false;
+    }
+
+    public void setOptional( boolean optional )
+    {
+        this.optional = String.valueOf( optional );
+    }
+
     /**
      * @see java.lang.Object#toString()
      */
@@ -1863,7 +1922,7 @@
      */
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder( 128 );
 
         sb.append("PatternSet [includes: {");
         for (java.util.Iterator i = getIncludes().iterator(); i.hasNext(); )
@@ -1948,14 +2007,13 @@
      */
     public String getId()
     {
-        StringBuffer id = new StringBuffer();
+        StringBuilder id = new StringBuilder( 64 );
 
         id.append( getGroupId() );
         id.append( ":" );
         id.append( getArtifactId() );
         id.append( ":" );
         id.append( "pom" );
-      //  id.append( getPackaging() );
         id.append( ":" );
         id.append( getVersion() );
 
@@ -2116,14 +2174,16 @@
           </description>
           <type>String</type>
         </field>
-        <field xml.tagName="filtering">
-          <name>filteringValue</name>
+        <field>
+          <name>filtering</name>
           <version>3.0.0+</version>
           <description>
             <![CDATA[
             Whether resources are filtered to replace tokens with parameterised values or not.
             The values are taken from the <code>properties</code> element and from the
-            properties in the files listed in the <code>filters</code> element.
+            properties in the files listed in the <code>filters</code> element. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>false</code>.
             ]]>
           </description>
           <type>String</type>
@@ -2160,12 +2220,12 @@
     
     public boolean isFiltering()
     {
-        return filteringValue != null ? (new Boolean(filteringValue)).booleanValue() : false;
+        return ( filtering != null ) ? Boolean.parseBoolean( filtering ) : false;
     }
 
     public void setFiltering( boolean filtering )
     {
-        filteringValue = String.valueOf(filtering);
+        this.filtering = String.valueOf( filtering );
     }  
     
     /**
@@ -2359,6 +2419,12 @@
 
         return false;
     }
+
+    @Override
+    public String toString()
+    {
+        return ( getId() != null ) ? getId() : "[null]";
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2448,10 +2514,16 @@
       <version>4.0.0</version>
       <description>Download policy.</description>
       <fields>
-        <field xml.tagName="enabled">
-          <name>enabledValue</name>
+        <field>
+          <name>enabled</name>
           <version>4.0.0</version>
-          <description>Whether to use this repository for downloading this type of artifact.</description>
+          <description>
+            <![CDATA[
+            Whether to use this repository for downloading this type of artifact. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>true</code>.
+            ]]>
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -2496,12 +2568,12 @@
 
     public boolean isEnabled()
     {
-        return enabledValue != null ? (new Boolean(enabledValue)).booleanValue() : false;
+        return ( enabled != null ) ? Boolean.parseBoolean( enabled ) : true;
     }
 
     public void setEnabled( boolean enabled )
     {
-        enabledValue = String.valueOf(enabled);
+        this.enabled = String.valueOf( enabled );
     }
 
             ]]>
@@ -2554,7 +2626,13 @@
         <field>
           <name>inherited</name>
           <version>4.0.0</version>
-          <description>Whether any configuration should be propagated to child POMs.</description>
+          <description>
+            <![CDATA[
+            Whether any configuration should be propagated to child POMs. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>true</code>.
+            ]]>
+          </description>
           <type>String</type>
         </field>
         <field>
@@ -2568,6 +2646,16 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public boolean isInherited()
+    {
+        return ( inherited != null ) ? Boolean.parseBoolean( inherited ) : true;
+    }
+
+    public void setInherited( boolean inherited )
+    {
+        this.inherited = String.valueOf( inherited );
+    }
+
     private boolean inheritanceApplied = true;
 
     public void unsetInheritanceApplied()
@@ -2617,10 +2705,15 @@
         <field>
           <name>extensions</name>
           <version>4.0.0</version>
-          <type>boolean</type>
-          <description>Whether to load Maven extensions (such as packaging and type handlers) from
-            this plugin. For performance reasons, this should only be enabled when necessary.</description>
-          <defaultValue>false</defaultValue>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            Whether to load Maven extensions (such as packaging and type handlers) from
+            this plugin. For performance reasons, this should only be enabled when necessary. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>false</code>.
+            ]]>
+          </description>
         </field>
         <field>
           <name>executions</name>
@@ -2658,6 +2751,16 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public boolean isExtensions()
+    {
+        return ( extensions != null ) ? Boolean.parseBoolean( extensions ) : false;
+    }
+
+    public void setExtensions( boolean extensions )
+    {
+        this.extensions = String.valueOf( extensions );
+    }
+
     private java.util.Map<String, PluginExecution> executionMap = null;
 
     /**
@@ -2797,6 +2900,12 @@
           <code>
             <![CDATA[
     public static final String DEFAULT_EXECUTION_ID = "default";
+
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2836,10 +2945,15 @@
         <field>
           <name>excludeDefaults</name>
           <version>4.0.0</version>
-          <type>boolean</type>
-          <description>If true, then the default reports are not included in the site generation.
-            This includes the reports in the "Project Info" menu.</description>
-          <defaultValue>false</defaultValue>
+          <type>String</type>
+          <description>
+            <![CDATA[
+            If true, then the default reports are not included in the site generation.
+            This includes the reports in the "Project Info" menu. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>. Default value is <code>false</code>.
+            ]]>
+          </description>
         </field>
         <field>
           <name>outputDirectory</name>
@@ -2869,6 +2983,16 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public boolean isExcludeDefaults()
+    {
+        return ( excludeDefaults != null ) ? Boolean.parseBoolean( excludeDefaults ) : false;
+    }
+
+    public void setExcludeDefaults( boolean excludeDefaults )
+    {
+        this.excludeDefaults = String.valueOf( excludeDefaults );
+    }
+
     java.util.Map<String, ReportPlugin> reportPluginMap;
 
     /**
@@ -2947,9 +3071,13 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    public static final String SOURCE_POM = "pom";
+
+    public static final String SOURCE_SETTINGS = "settings.xml";
+
     // We don't want this to be parseable...it's sort of 'hidden'
     // default source for this profile is in the pom itself.
-    private String source = "pom";
+    private String source = SOURCE_POM;
 
     public void setSource( String source )
     {
@@ -3332,6 +3460,12 @@
     public boolean isInheritanceApplied()
     {
         return inheritanceApplied;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getId();
     }
             ]]>
           </code>
