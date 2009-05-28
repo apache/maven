@@ -21,15 +21,14 @@ public class ArtifactResolutionRequest
     private Artifact artifact;
 
     // Needs to go away
+    // These are really overrides now, projects defining dependencies for a plugin that override what is
+    // specified in the plugin itself.
     private Set<Artifact> artifactDependencies;
 
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
 
-    // Not sure what to do with this?
-    // Scope
-    // Lock down lists
     private ArtifactFilter filter;
 
     // Needs to go away

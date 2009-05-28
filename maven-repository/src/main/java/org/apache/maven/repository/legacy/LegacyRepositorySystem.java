@@ -1,4 +1,4 @@
-package org.apache.maven.repository;
+package org.apache.maven.repository.legacy;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -36,6 +36,12 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
+import org.apache.maven.repository.DelegatingLocalArtifactRepository;
+import org.apache.maven.repository.LocalArtifactRepository;
+import org.apache.maven.repository.MetadataResolutionRequest;
+import org.apache.maven.repository.MetadataResolutionResult;
+import org.apache.maven.repository.MirrorBuilder;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.events.TransferListener;
