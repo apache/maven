@@ -431,11 +431,6 @@ public class DefaultArtifactResolver
             try
             {
                 resolveArtifact( node );
-                if ( i.hasNext() )
-                {
-                    pool.execute( new ResolveArtifactTask( pool, latch, nodes, localRepository, resolvedArtifacts,
-                                                           missingArtifacts, resolutionExceptions ) );
-                }
             }
             catch ( ArtifactResolutionException e )
             {
@@ -444,6 +439,12 @@ public class DefaultArtifactResolver
             finally 
             {
                 latch.countDown();
+
+                if ( i.hasNext() )
+                {
+                    pool.execute( new ResolveArtifactTask( pool, latch, nodes, localRepository, resolvedArtifacts,
+                                                           missingArtifacts, resolutionExceptions ) );
+                }
             }
         }
 
