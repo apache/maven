@@ -71,9 +71,21 @@ public class MavenMetadataSource
     @Requirement
     private Logger logger;
 
+    @Requirement
+    private MavenMetadataCache cache;    
+    
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
+        /*
+        ResolutionGroup cached = cache.get( artifact, localRepository, remoteRepositories );
+
+        if ( cached != null )
+        {
+            return cached;
+        }
+        */
+                
         List<Dependency> dependencies;
 
         Artifact pomArtifact;
@@ -155,7 +167,11 @@ public class MavenMetadataSource
             }
         }
 
-        return new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
+        ResolutionGroup result = new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
+
+        //cache.put( artifact, localRepository, remoteRepositories, result );
+
+        return result;
     }
 
     private String getEffectiveScope( String originalScope, String inheritedScope )
