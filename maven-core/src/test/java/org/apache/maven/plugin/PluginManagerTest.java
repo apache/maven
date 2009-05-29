@@ -1,6 +1,5 @@
 package org.apache.maven.plugin;
 
-import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
@@ -218,12 +217,14 @@ public class PluginManagerTest
         Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin-class-loader" );                
         Artifact pluginArtifact = project.getPluginArtifactMap().get( "org.apache.maven.its.plugins:maven-it-plugin-class-loader" ); 
         
+        /*
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( pluginArtifact )
             .setLocalRepository( getLocalRepository() )
             .setRemoteRepostories( getRemoteRepositories() );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
+        */
         
         Set<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getRemoteRepositories() );   
         assertEquals( 4, artifacts.size() );
