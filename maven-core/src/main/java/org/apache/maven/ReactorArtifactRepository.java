@@ -35,41 +35,44 @@ public class ReactorArtifactRepository
 
         if ( project != null )
         {
-            File artifactFile = project.getArtifact().getFile();
-                        
-            if ( artifactFile != null && artifactFile.exists() )
-            {
-                //TODO: This is really completely wrong and should probably be based on the phase that is currently being executed.
-                // If we are running before the packaging phase there is going to be no archive anyway, but if we are running prior to package
-                // we shouldn't even take the archive anyway.
-
-                artifact.setFile( artifactFile );
-
-                artifact.setFromAuthoritativeRepository( true );
-
-                artifact.setResolved( true );
-            }            
-            /*
-            
-            TODO: This is being left out because Maven 2.x does not set this internally and it is only done by the compiler
-            plugin and not done generally. This should be done generally but currently causes problems with MNG-3023
-            
-            else if ( new File( project.getBuild().getOutputDirectory() ).exists() )
-            {
-                artifact.setFile( new File( project.getBuild().getOutputDirectory() ) );
-
-                artifact.setFromAuthoritativeRepository( true );
-
-                artifact.setResolved( true );
-            }
-            */
-            else if ( artifact.getType().equals( "pom" ) )
+            if ( artifact.getType().equals( "pom" ) )
             {
                 artifact.setFile( project.getFile() );
 
                 artifact.setFromAuthoritativeRepository( true );
 
                 artifact.setResolved( true );
+            }
+            else
+            {
+                File artifactFile = project.getArtifact().getFile();
+
+                if ( artifactFile != null && artifactFile.exists() )
+                {
+                    //TODO: This is really completely wrong and should probably be based on the phase that is currently being executed.
+                    // If we are running before the packaging phase there is going to be no archive anyway, but if we are running prior to package
+                    // we shouldn't even take the archive anyway.
+
+                    artifact.setFile( artifactFile );
+
+                    artifact.setFromAuthoritativeRepository( true );
+
+                    artifact.setResolved( true );
+                }
+                /*
+                
+                TODO: This is being left out because Maven 2.x does not set this internally and it is only done by the compiler
+                plugin and not done generally. This should be done generally but currently causes problems with MNG-3023
+                
+                else if ( new File( project.getBuild().getOutputDirectory() ).exists() )
+                {
+                    artifact.setFile( new File( project.getBuild().getOutputDirectory() ) );
+
+                    artifact.setFromAuthoritativeRepository( true );
+
+                    artifact.setResolved( true );
+                }
+                */
             }
         }
 
