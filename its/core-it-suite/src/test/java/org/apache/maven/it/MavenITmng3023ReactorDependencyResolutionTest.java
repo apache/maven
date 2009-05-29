@@ -136,6 +136,9 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         List compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
         assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
+
+        // The IT doesn't actually run the compiler but merely mimics its effect, i.e. the creation of the output dir
+        new File( testDir, "dependency/dependency-classes" ).mkdirs();
         
         verifier.deleteDirectory( "consumer/target" );
         verifier.setLogFileName( "log-c-2.txt" );
