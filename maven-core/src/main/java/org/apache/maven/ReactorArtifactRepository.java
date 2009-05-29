@@ -35,37 +35,38 @@ public class ReactorArtifactRepository
 
         if ( project != null )
         {
-            if ( artifact.getType().equals( "jar" ) )
+            File artifactFile = project.getArtifact().getFile();
+                        
+            if ( artifactFile != null && artifactFile.exists() )
             {
-                File artifactFile = new File( project.getBuild().getDirectory(), project.getArtifactId() + "-" + project.getVersion() + "."+ artifact.getArtifactHandler().getExtension() );
-                
-                File classesDirectory = new File( project.getBuild().getOutputDirectory() );
-
                 //TODO: This is really completely wrong and should probably be based on the phase that is currently being executed.
                 // If we are running before the packaging phase there is going to be no archive anyway, but if we are running prior to package
                 // we shouldn't even take the archive anyway.
-                
-                if ( artifactFile.exists() )
-                {
-                    artifact.setFile( artifactFile );
 
-                    artifact.setFromAuthoritativeRepository( true );
+                artifact.setFile( artifactFile );
 
-                    artifact.setResolved( true );                    
-                }                
-                else if ( classesDirectory.exists() )
-                {
-                    artifact.setFile( classesDirectory );
+                artifact.setFromAuthoritativeRepository( true );
 
-                    artifact.setFromAuthoritativeRepository( true );
+                artifact.setResolved( true );
+            }            
+            /*
+            
+            TODO: This is being left out because Maven 2.x does not set this internally and it is only done by the compiler
+            plugin and not done generally. This should be done generally but currently causes problems with MNG-3023
+            
+            else if ( new File( project.getBuild().getOutputDirectory() ).exists() )
+            {
+                artifact.setFile( new File( project.getBuild().getOutputDirectory() ) );
 
-                    artifact.setResolved( true );
-                }
+                artifact.setFromAuthoritativeRepository( true );
+
+                artifact.setResolved( true );
             }
+            */
             else if ( artifact.getType().equals( "pom" ) )
             {
                 artifact.setFile( project.getFile() );
-                
+
                 artifact.setFromAuthoritativeRepository( true );
 
                 artifact.setResolved( true );
