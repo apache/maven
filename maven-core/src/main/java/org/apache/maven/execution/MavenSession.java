@@ -28,7 +28,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -132,9 +132,9 @@ public class MavenSession
         return currentProject;
     }
 
-    public ProjectBuilderConfiguration getProjectBuilderConfiguration()
+    public ProjectBuildingRequest getProjectBuilderRequest()
     {
-        return request.getProjectBuildingConfiguration();
+        return request.getProjectBuilderRequest();
     }
     
     public List<String> getPluginGroups()

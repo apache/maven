@@ -34,14 +34,13 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectBuildingResult;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
@@ -97,9 +96,7 @@ public class MavenEmbedder
 
     private Maven maven;
 
-    private PluginManager pluginManager;
-
-    private MavenProjectBuilder mavenProjectBuilder;
+    private ProjectBuilder projectBuilder;
 
     private ModelReader modelReader;
 
@@ -124,8 +121,6 @@ public class MavenEmbedder
     private Configuration configuration;
 
     private MavenExecutionRequest request;
-    
-    private LifecycleExecutor lifecycleExecutor;
 
     // ----------------------------------------------------------------------------
     // Constructors
@@ -283,7 +278,7 @@ public class MavenEmbedder
     {
         getLogger().debug( "Building MavenProject instance: " + mavenProject );
 
-        return mavenProjectBuilder.build( mavenProject, request.getProjectBuildingConfiguration() );
+        return projectBuilder.build( mavenProject, request.getProjectBuilderRequest() );
     }
 
     /**
@@ -313,7 +308,7 @@ public class MavenEmbedder
 
         try
         {
-            MavenProjectBuildingResult projectBuildingResult = mavenProjectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuildingConfiguration() );
+            MavenProjectBuildingResult projectBuildingResult = projectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuilderRequest() );
             
             result.setProject( projectBuildingResult.getProject() );
 
@@ -398,13 +393,11 @@ public class MavenEmbedder
 
             maven = container.lookup( Maven.class );
 
-            mavenProjectBuilder = container.lookup( MavenProjectBuilder.class );
+            projectBuilder = container.lookup( ProjectBuilder.class );
 
             populator = container.lookup( MavenExecutionRequestPopulator.class );
 
             container.lookup( RepositorySystem.class );
-            
-            lifecycleExecutor = container.lookup( LifecycleExecutor.class );
             
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.

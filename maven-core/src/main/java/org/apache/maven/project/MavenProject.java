@@ -153,7 +153,7 @@ public class MavenProject
 
     private ProjectBuilder mavenProjectBuilder;
 
-    private ProjectBuilderConfiguration projectBuilderConfiguration;
+    private ProjectBuildingRequest projectBuilderConfiguration;
 
     private RepositorySystem repositorySystem;
     //
@@ -212,7 +212,7 @@ public class MavenProject
      * @param projectBuilderConfiguration
      * @throws InvalidRepositoryException
      */
-    public MavenProject( Model model, RepositorySystem repositorySystem, ProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
+    public MavenProject( Model model, RepositorySystem repositorySystem, ProjectBuilder mavenProjectBuilder, ProjectBuildingRequest projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
         if ( model == null )
@@ -291,7 +291,7 @@ public class MavenProject
             {
                 for ( Iterator<String> it = modules.iterator(); it.hasNext(); )
                 {
-                    String modulePath = (String) it.next();
+                    String modulePath = it.next();
                     String moduleName = modulePath;
 
                     if ( moduleName.endsWith( "/" ) || moduleName.endsWith( "\\" ) )
@@ -319,7 +319,7 @@ public class MavenProject
             }
         }
 
-        return (String) moduleAdjustments.get( module );
+        return moduleAdjustments.get( module );
     }
 
     // ----------------------------------------------------------------------
@@ -1672,7 +1672,7 @@ public class MavenProject
 
     public Plugin getPlugin( String pluginKey )
     {
-        return (Plugin) getBuild().getPluginsAsMap().get( pluginKey );
+        return getBuild().getPluginsAsMap().get( pluginKey );
     }
 
     /**
@@ -1904,7 +1904,7 @@ public class MavenProject
         else
         {
             String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
-            MavenProject project = (MavenProject) projectReferences.get( refId );
+            MavenProject project = projectReferences.get( refId );
 
             boolean projectDirFound = false;
             if ( project != null )

@@ -8,9 +8,9 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuilder;
-import org.apache.maven.project.DefaultProjectBuilderConfiguration;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
@@ -73,7 +73,7 @@ public class PomConstructionWithSettingsTest
 	    File settingsFile = new File( testDirectory + File.separator + pomPath, "settings.xml" );	    
 	    Settings settings = readSettingsFile(settingsFile);
 	    	    
-        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+        ProjectBuildingRequest config = new DefaultProjectBuildingRequest();
 	    
 	    for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
 	    {

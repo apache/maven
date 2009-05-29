@@ -18,9 +18,9 @@ import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.project.DefaultProjectBuilderConfiguration;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
@@ -103,7 +103,7 @@ public abstract class AbstractCoreMavenComponentTestCase
     {
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
 
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest()
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( request.getRemoteRepositories() );
 

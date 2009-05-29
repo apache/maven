@@ -37,10 +37,10 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.project.DefaultProjectBuilderConfiguration;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -107,7 +107,7 @@ public class MavenMetadataSource
                 pomArtifact.setFile( artifact.getFile() );
             }
 
-            ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+            ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
             configuration.setLocalRepository( localRepository );
             configuration.setRemoteRepositories( remoteRepositories );
             configuration.setLenientValidation( true );

@@ -50,6 +50,7 @@ import org.apache.maven.model.profile.ProfileInjector;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.validation.ModelValidationResult;
 import org.apache.maven.model.validation.ModelValidator;
+import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -114,13 +115,13 @@ public class DefaultProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
+    public MavenProject build( File pomFile, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
         return build( pomFile, pomFile.getParentFile(), configuration );
     }
 
-    private MavenProject build( File pomFile, File projectDirectory, ProjectBuilderConfiguration configuration )
+    private MavenProject build( File pomFile, File projectDirectory, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
         String cacheKey = getCacheKey( pomFile, configuration );
@@ -225,7 +226,7 @@ public class DefaultProjectBuilder
         return project;
     }
 
-    private String getCacheKey( File pomFile, ProjectBuilderConfiguration configuration )
+    private String getCacheKey( File pomFile, ProjectBuildingRequest configuration )
     {
         StringBuilder buffer = new StringBuilder( 256 );
         buffer.append( pomFile.getAbsolutePath() );
@@ -233,7 +234,7 @@ public class DefaultProjectBuilder
         return buffer.toString();
     }
 
-    public MavenProject build( Artifact artifact, ProjectBuilderConfiguration configuration )
+    public MavenProject build( Artifact artifact, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
         if ( !artifact.getType().equals( "pom" ) )
@@ -266,7 +267,7 @@ public class DefaultProjectBuilder
      * I am taking out the profile handling and the interpolation of the base directory until we
      * spec this out properly.
      */
-    public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
+    public MavenProject buildStandaloneSuperProject( ProjectBuildingRequest config )
         throws ProjectBuildingException
     {
         if ( superProject != null )
@@ -290,7 +291,37 @@ public class DefaultProjectBuilder
         return superProject;
     }
 
-    private Model interpolateModel( Model model, ProjectBuilderConfiguration config, File projectDescriptor )
+    public MavenProjectBuildingResult buildProjectWithDependencies( File pomFile, ProjectBuildingRequest request )
+        throws ProjectBuildingException
+    {
+        MavenProject project = build( pomFile, request );
+
+        Artifact artifact = new ProjectArtifact( project );                     
+        
+        ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest()
+            .setArtifact( artifact )
+            .setResolveRoot( false )
+            .setResolveTransitively( true )
+            .setLocalRepository( request.getLocalRepository() )
+            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setManagedVersionMap( project.getManagedVersionMap() );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( artifactRequest );
+
+        if ( result.hasExceptions() )
+        {
+            Exception e = result.getExceptions().get( 0 );
+
+            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(),
+                                                pomFile, e );
+        }
+
+        project.setArtifacts( result.getArtifacts() );
+        
+        return new MavenProjectBuildingResult( project, result );
+    }
+
+    private Model interpolateModel( Model model, ProjectBuildingRequest config, File projectDescriptor )
         throws ProjectBuildingException
     {
         try
@@ -306,7 +337,7 @@ public class DefaultProjectBuilder
         return model;
     }
 
-    private MavenProject fromModelToMavenProject( Model model, File parentFile, ProjectBuilderConfiguration config, File projectDescriptor )
+    private MavenProject fromModelToMavenProject( Model model, File parentFile, ProjectBuildingRequest config, File projectDescriptor )
         throws InvalidProjectModelException, IOException
     {
         MavenProject project;
@@ -329,7 +360,7 @@ public class DefaultProjectBuilder
         return project;
     }
 
-    private List<Model> build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
+    private List<Model> build( String projectId, File pomFile, ProjectBuildingRequest projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
     {
         Model mainModel = readModel( projectId, pomFile, !projectBuilderConfiguration.istLenientValidation() );
@@ -564,7 +595,7 @@ public class DefaultProjectBuilder
      * @throws ProjectBuildingException 
      */
     private List<Model> getDomainModelParentsFromLocalPath( Model model, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories, File projectDirectory,
-                                                                  ProjectBuilderConfiguration projectBuilderConfiguration )
+                                                                  ProjectBuildingRequest projectBuilderConfiguration )
         throws IOException, ProjectBuildingException
     {
         List<Model> models = new ArrayList<Model>();

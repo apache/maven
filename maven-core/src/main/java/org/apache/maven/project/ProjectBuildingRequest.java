@@ -5,19 +5,20 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.profile.ProfileActivationContext;
 
-public interface ProjectBuilderConfiguration
-    extends ProjectBuildingRequest
+public interface ProjectBuildingRequest
+    extends ProfileActivationContext
 {
-    ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository );
+    ProjectBuildingRequest setLocalRepository( ArtifactRepository localRepository );
     
     ArtifactRepository getLocalRepository();
 
-    ProjectBuilderConfiguration setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
+    ProjectBuildingRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
 
     List<ArtifactRepository> getRemoteRepositories();
 
-    ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties );
+    ProjectBuildingRequest setExecutionProperties( Properties executionProperties );
 
     Properties getExecutionProperties();
 
@@ -25,7 +26,7 @@ public interface ProjectBuilderConfiguration
 
     MavenProject getTopLevelProjectFromReactor();
         
-    ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins );
+    ProjectBuildingRequest setProcessPlugins( boolean processPlugins );
     
     boolean isProcessPlugins();
 
@@ -37,7 +38,7 @@ public interface ProjectBuilderConfiguration
      *            during artifact resolution, lenient validation should be used to account for models of poor quality.
      * @return This configuration, never {@code null}.
      */
-    ProjectBuilderConfiguration setLenientValidation( boolean lenientValidation );
+    ProjectBuildingRequest setLenientValidation( boolean lenientValidation );
 
     /**
      * Gets the level of validation to perform on processed models.

@@ -27,7 +27,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.model.Profile;
-import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
@@ -202,5 +202,5 @@ public interface MavenExecutionRequest
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
-    ProjectBuilderConfiguration getProjectBuildingConfiguration();    
+    ProjectBuildingRequest getProjectBuilderRequest();    
 }

@@ -19,16 +19,10 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.project.artifact.ProjectArtifact;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @version $Id$
@@ -40,9 +34,6 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     private ProjectBuilder projectBuilder;
-
-    @Requirement
-    private RepositorySystem repositorySystem;
 
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -101,50 +92,7 @@ public class DefaultMavenProjectBuilder
     public MavenProjectBuildingResult buildProjectWithDependencies( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-        MavenProject project = projectBuilder.build( pomFile, configuration );
-
-        Artifact artifact = new ProjectArtifact( project );                     
-        
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setResolveRoot( false )
-            .setResolveTransitively( true )
-            .setLocalRepository( configuration.getLocalRepository() )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
-            .setManagedVersionMap( project.getManagedVersionMap() );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-
-        if ( result.hasExceptions() )
-        {
-            Exception e = result.getExceptions().get( 0 );
-
-            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(),
-                                                pomFile, e );
-        }
-
-        project.setArtifacts( result.getArtifacts() );
-        
-        return new MavenProjectBuildingResult( project, result );
-    }
-
-    private static String safeVersionlessKey( String groupId, String artifactId )
-    {
-        String gid = groupId;
-
-        if ( StringUtils.isEmpty( gid ) )
-        {
-            gid = "unknown";
-        }
-
-        String aid = artifactId;
-
-        if ( StringUtils.isEmpty( aid ) )
-        {
-            aid = "unknown";
-        }
-
-        return ArtifactUtils.versionlessKey( gid, aid );
+        return projectBuilder.buildProjectWithDependencies( pomFile, configuration );
     }
 
 }

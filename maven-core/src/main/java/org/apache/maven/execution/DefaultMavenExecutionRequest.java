@@ -23,8 +23,8 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
-import org.apache.maven.project.DefaultProjectBuilderConfiguration;
-import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 
@@ -232,9 +232,9 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public void setProjectBuildingConfiguration( ProjectBuilderConfiguration projectBuildingConfiguration )
+    public void setProjectBuildingConfiguration( ProjectBuildingRequest projectBuildingConfiguration )
     {
-        this.projectBuildingConfiguration = projectBuildingConfiguration;
+        this.projectBuilderRequest = projectBuildingConfiguration;
     }
 
     public List<String> getActiveProfiles()
@@ -617,7 +617,7 @@ public class DefaultMavenExecutionRequest
     private Settings settings;
 
     // calculated from request attributes.
-    private ProjectBuilderConfiguration projectBuildingConfiguration;
+    private ProjectBuildingRequest projectBuilderRequest;
 
     public MavenExecutionRequest setSettings( Settings settings )
     {
@@ -706,21 +706,21 @@ public class DefaultMavenExecutionRequest
     }
 
     //TODO: this does not belong here.
-    public ProjectBuilderConfiguration getProjectBuildingConfiguration()
+    public ProjectBuildingRequest getProjectBuilderRequest()
     {
-        if ( projectBuildingConfiguration == null )
+        if ( projectBuilderRequest == null )
         {
-            projectBuildingConfiguration = new DefaultProjectBuilderConfiguration();
-            projectBuildingConfiguration.setLocalRepository( getLocalRepository() );
-            projectBuildingConfiguration.setExecutionProperties( getProperties() );
-            projectBuildingConfiguration.setRemoteRepositories( getRemoteRepositories() );
-            projectBuildingConfiguration.setActiveProfileIds( getActiveProfiles() );
-            projectBuildingConfiguration.setInactiveProfileIds( getInactiveProfiles() );
-            projectBuildingConfiguration.setProfiles( getProfiles() );
-            projectBuildingConfiguration.setProcessPlugins( true );
+            projectBuilderRequest = new DefaultProjectBuildingRequest();
+            projectBuilderRequest.setLocalRepository( getLocalRepository() );
+            projectBuilderRequest.setExecutionProperties( getProperties() );
+            projectBuilderRequest.setRemoteRepositories( getRemoteRepositories() );
+            projectBuilderRequest.setActiveProfileIds( getActiveProfiles() );
+            projectBuilderRequest.setInactiveProfileIds( getInactiveProfiles() );
+            projectBuilderRequest.setProfiles( getProfiles() );
+            projectBuilderRequest.setProcessPlugins( true );
         }
 
-        return projectBuildingConfiguration;
+        return projectBuilderRequest;
     }
     
     public MavenExecutionRequest addProfile( Profile profile )

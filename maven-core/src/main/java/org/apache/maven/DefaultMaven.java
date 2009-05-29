@@ -100,7 +100,7 @@ public class DefaultMaven
             //TODO: We really need to get rid of this requirement in here. If we know there is no project present
             if ( projects.isEmpty() )
             {
-                MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingConfiguration() ); 
+                MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuilderRequest() ); 
                 projects.put( ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
                 request.setProjectPresent( false );
             }
@@ -190,7 +190,7 @@ public class DefaultMaven
 
         for ( File file : files )
         {
-            MavenProject project = projectBuilder.build( file, request.getProjectBuildingConfiguration() );
+            MavenProject project = projectBuilder.build( file, request.getProjectBuilderRequest() );
             
             if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
             {
