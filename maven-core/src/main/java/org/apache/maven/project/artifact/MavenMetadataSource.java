@@ -74,17 +74,17 @@ public class MavenMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        MavenProject project;
+        List<Dependency> dependencies;
 
         Artifact pomArtifact;
 
         //TODO: Not even sure this is really required as the project will be cached in the builder, we'll see this
         // is currently the biggest hotspot
-        if ( artifact instanceof ProjectArtifact )
+        if ( artifact instanceof ArtifactWithDependencies )
         {
             pomArtifact = artifact;
 
-            project = ((ProjectArtifact)artifact).getProject();
+            dependencies = ((ArtifactWithDependencies)artifact).getDependencies();
         }
         else
         {
@@ -106,7 +106,7 @@ public class MavenMetadataSource
 
             try
             {
-                project = getProjectBuilder().buildFromRepository( pomArtifact, configuration );
+                dependencies = getProjectBuilder().buildFromRepository( pomArtifact, configuration ).getDependencies();
             }
             catch ( ProjectBuildingException e )
             {
@@ -125,7 +125,7 @@ public class MavenMetadataSource
         {
             artifacts = new LinkedHashSet<Artifact>();
 
-            for ( Dependency d : project.getDependencies() )
+            for ( Dependency d : dependencies )
             {
                 String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
 

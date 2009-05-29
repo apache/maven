@@ -1,18 +1,24 @@
 package org.apache.maven.plugin;
 
+import java.util.List;
+import java.util.Set;
+
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class PluginManagerTest
     extends AbstractCoreMavenComponentTestCase
 {
     @Requirement
-    private PluginManager pluginManager;
+    private DefaultPluginManager pluginManager;
     
     private String plexusVersion = "1.0-beta-3.0.7-SNAPSHOT";
     
@@ -20,18 +26,20 @@ public class PluginManagerTest
         throws Exception
     {
         super.setUp();
-        pluginManager = lookup( PluginManager.class );
+        pluginManager = (DefaultPluginManager) lookup( PluginManager.class );
     }
     
     @Override
-    protected void tearDown() throws Exception {
-            pluginManager = null;
-            super.tearDown();
+    protected void tearDown()
+        throws Exception
+    {
+        pluginManager = null;
+        super.tearDown();
     }
 
     protected String getProjectsDirectory()
     {
-        return "src/test/projects/lifecycle-executor";
+        return "src/test/projects/plugin-manager";
     }
                 
     public void testPluginLoading()
@@ -179,6 +187,58 @@ public class PluginManagerTest
     // test interpolation of basedir values in mojo configuration
     
     // test a build where projects use different versions of the same plugin
+    
+    public void testThatPluginDependencyThatHasSystemScopeIsResolved()
+        throws Exception
+    {
+        /*
+        File systemPath = new File( getBasedir(), "pom.xml" );
+
+        Plugin plugin = new PluginBuilder( "org.apache.maven", "project-test", "1.0" )
+            .addDependency( "org.apache.maven", "system-dependency", "1.0", Artifact.SCOPE_SYSTEM, systemPath.getAbsolutePath() )
+            .get();        
+
+        MavenProject pluginProject = new ProjectBuilder( "org.apache.maven", "project-test", "1.0" )
+            .addPlugin( plugin )
+            .addDependency( "junit", "junit", "3.8.1", Artifact.SCOPE_COMPILE )
+            .get();        
+        
+        // i'm making this artifact which is assumed to come from a pom in the metadata processor, then it tries to create a POM artifact
+        // and parse it for the dependencies and it blows up.
+        //
+        // we need to pass this through as is so it doesn't get parsed again.
+        Artifact pluginArtifact = new ProjectArtifact( pluginProject );
+        
+        Set<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getRemoteRepositories() );
+        System.out.println( artifacts );
+        */
+        
+        MavenSession session = createMavenSession( getProject( "project-contributing-system-scope-plugin-dep" ) );
+        MavenProject project = session.getCurrentProject();
+        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin-class-loader" );                
+        Artifact pluginArtifact = project.getPluginArtifactMap().get( "org.apache.maven.its.plugins:maven-it-plugin-class-loader" ); 
+        
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+            .setArtifact( pluginArtifact )
+            .setLocalRepository( getLocalRepository() )
+            .setRemoteRepostories( getRemoteRepositories() );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        
+        Set<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getRemoteRepositories() );   
+        assertEquals( 4, artifacts.size() );
+        
+        for ( Artifact a : artifacts )
+        {
+            if ( a.getGroupId().equals( "org.apache.maven.its.mng3586" ) && a.getArtifactId().equals( "tools" ) )
+            {
+                // The system scoped dependencies will be present in the classloader for the plugin
+                return;
+            }
+        }
+        
+        fail( "Can't find the system scoped dependency in the plugin artifacts." );
+    }
     
     // -----------------------------------------------------------------------------------------------
     // Testing help

@@ -2,41 +2,38 @@ package org.apache.maven.project.artifact;
 
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
-public class ProjectArtifact
+public class PluginArtifact
     extends DefaultArtifact
     implements ArtifactWithDependencies
 {
-    private MavenProject project;
+    private Plugin plugin;
 
-    public ProjectArtifact( MavenProject project )
+    public PluginArtifact( Plugin plugin, Artifact pluginArtifact )
     {
-        super( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, "pom", null, new PomArtifactHandler() );
-        this.project = project;
-        setFile( project.getFile() );
+        super( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null, "maven-plugin", null, new PluginArtifactHandler() );
+        this.plugin = plugin;
+        setFile( pluginArtifact.getFile() );
         setResolved( true );
     }
 
-    public MavenProject getProject()
-    {
-        return project;
-    }
-    
     public List<Dependency> getDependencies()
     {
-        return project.getDependencies();
+        return plugin.getDependencies();
     }
     
-    static class PomArtifactHandler
+    static class PluginArtifactHandler
         implements ArtifactHandler
     {
         public String getClassifier()
         {
-            return "pom";
+            return null;
         }
 
         public String getDirectory()
@@ -46,7 +43,7 @@ public class ProjectArtifact
 
         public String getExtension()
         {
-            return "pom";
+            return "jar";
         }
 
         public String getLanguage()
@@ -56,12 +53,12 @@ public class ProjectArtifact
 
         public String getPackaging()
         {
-            return "pom";
+            return "maven-plugin";
         }
 
         public boolean isAddedToClasspath()
         {
-            return false;
+            return true;
         }
 
         public boolean isIncludesDependencies()

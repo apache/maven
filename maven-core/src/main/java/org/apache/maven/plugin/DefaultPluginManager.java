@@ -15,6 +15,7 @@ package org.apache.maven.plugin;
  * the License.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.MalformedURLException;
@@ -233,7 +234,9 @@ public class DefaultPluginManager
         return pluginDescriptor;
     }
 
-    private Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedinPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    // TODO: Turn this into a component so it can be tested.
+    //
+    Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedInPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactNotFoundException, ArtifactResolutionException
     {
         AndArtifactFilter filter = new AndArtifactFilter();
@@ -253,9 +256,17 @@ public class DefaultPluginManager
         // We would almost always want the everything to be resolved from the root but we have this special case
         // of overrides from the project itself which confused the interface.
         
-        for( Dependency dependencySpecifiedInProject : pluginAsSpecifiedinPom.getDependencies() )
+        for( Dependency dependencySpecifiedInProject : pluginAsSpecifiedInPom.getDependencies() )
         {
-            dependenciesToResolveForPlugin.add( repositorySystem.createDependencyArtifact( dependencySpecifiedInProject ) );
+            // Right now if you add override dependencies they will not be operated on by the metadata source. The metadata source first grabs the plugins
+            // defined dependencies and then the result is merged with the overrides. The overrides don't pass through the metadata source which is where the
+            // Artifact.setFile( file ) method is called. We should eventually take care of this in the resolver.
+            Artifact a = repositorySystem.createDependencyArtifact( dependencySpecifiedInProject );
+            if ( a.getScope().equals(  Artifact.SCOPE_SYSTEM ) )
+            {
+                a.setFile( new File( dependencySpecifiedInProject.getSystemPath() ) );
+            }
+            dependenciesToResolveForPlugin.add( a );                            
         }
         
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
@@ -266,6 +277,7 @@ public class DefaultPluginManager
             .setRemoteRepostories( remoteRepositories )
             .setFilter( filter )
             .setResolveTransitively( true );
+            //.setResolveRoot( false );
         
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
@@ -653,13 +665,13 @@ public class DefaultPluginManager
         return pluginDescriptors.get( constructPluginKey( plugin ) );
     }
 
-    private String constructPluginKey( Plugin plugin )
+    public String constructPluginKey( Plugin plugin )
     {
         String version = ArtifactUtils.toSnapshotVersion( plugin.getVersion() );
         return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + version;
     }
 
-    private String constructPluginKey( PluginDescriptor pluginDescriptor )
+    public String constructPluginKey( PluginDescriptor pluginDescriptor )
     {
         String version = ArtifactUtils.toSnapshotVersion( pluginDescriptor.getVersion() );
         return pluginDescriptor.getGroupId() + ":" + pluginDescriptor.getArtifactId() + ":" + version;

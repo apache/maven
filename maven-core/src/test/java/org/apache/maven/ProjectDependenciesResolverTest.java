@@ -1,17 +1,10 @@
 package org.apache.maven;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -41,10 +34,16 @@ public class ProjectDependenciesResolverTest
         return "src/test/projects/project-dependencies-resolver";
     }
 
-    public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal()
+    public void testExclusionsInDependencies()
         throws Exception
     {
-        MavenProject project = createProject();
+        Exclusion exclusion = new Exclusion();
+        exclusion.setGroupId( "commons-lang" );
+        exclusion.setArtifactId( "commons-lang" );        
+        
+        MavenProject project = new ProjectBuilder( "org.apache.maven", "project-test", "1.0" )
+            .addDependency( "org.apache.maven.its", "maven-core-it-support", "1.3", Artifact.SCOPE_RUNTIME, exclusion  )
+            .get();        
         
         Set<Artifact> artifactDependencies = resolver.resolve( project, Artifact.SCOPE_COMPILE, getLocalRepository(), getRemoteRepositories() );
         assertEquals( 0, artifactDependencies.size() );
@@ -54,34 +53,14 @@ public class ProjectDependenciesResolverTest
         assertEquals( "maven-core-it-support" , artifactDependencies.iterator().next().getArtifactId() );
     }
     
-    private MavenProject createProject()
+    public void testSystemScopeDependencies()
+        throws Exception
     {
-        Model model = new Model();
-        model.setModelVersion( "4.0.0" );
-        model.setGroupId( "org.apache.maven" );
-        model.setArtifactId( "project-test" );
-        model.setVersion( "1.0" );  
-        
-        List<Dependency> dependencies = new ArrayList<Dependency>();
-        dependencies.add( d( "org.apache.maven.its", "maven-core-it-support", "1.3" ) );
-        model.setDependencies( dependencies );        
-        
-        return new MavenProject( model );
-    }
-    
-    private Dependency d( String g, String a, String v )
-    {
-        Dependency d = new Dependency();
-        d.setGroupId( g );
-        d.setArtifactId( a );
-        d.setVersion( v );
-        d.setScope( Artifact.SCOPE_RUNTIME );
-        
-        Exclusion e = new Exclusion();
-        e.setGroupId( "commons-lang" );
-        e.setArtifactId( "commons-lang" );        
-        d.addExclusion( e );
-        
-        return d;
-    }    
+        MavenProject project = new ProjectBuilder( "org.apache.maven", "project-test", "1.0" )
+            .addDependency( "com.mycompany", "system-dependency", "1.0", Artifact.SCOPE_SYSTEM, new File( getBasedir(), "pom.xml" ).getAbsolutePath() )
+            .get();
+
+        Set<Artifact> artifactDependencies = resolver.resolve( project, Artifact.SCOPE_COMPILE, getLocalRepository(), getRemoteRepositories() );                
+        assertEquals( 1, artifactDependencies.size() );        
+    }  
 }

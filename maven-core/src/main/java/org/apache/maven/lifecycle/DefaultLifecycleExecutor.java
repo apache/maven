@@ -215,7 +215,7 @@ public class DefaultLifecycleExecutor
             }
         }        
     }        
-        
+               
     // 1. Find the lifecycle given the phase (default lifecycle when given install)
     // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
