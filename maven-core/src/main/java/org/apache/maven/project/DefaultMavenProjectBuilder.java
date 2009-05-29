@@ -398,7 +398,7 @@ public class DefaultMavenProjectBuilder
     private List<Model> build( String projectId, File pomFile, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws ProjectBuildingException, IOException
     {
-        Model mainModel = readModel( projectId, pomFile, true );
+        Model mainModel = readModel( projectId, pomFile, !projectBuilderConfiguration.istLenientValidation() );
         mainModel.setProjectDirectory( pomFile.getParentFile() );
 
         List<Model> domainModels = new ArrayList<Model>();
