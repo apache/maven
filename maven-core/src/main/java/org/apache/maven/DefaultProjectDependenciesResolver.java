@@ -51,7 +51,6 @@ public class DefaultProjectDependenciesResolver
         }
         
         ArtifactFilter scopeFilter = new ScopeArtifactFilter( scope );
-        // ArtifactFilter scopeFilter = new AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{ new ScopeArtifactFilter( scope ), new ScopeArtifactFilter( Artifact.SCOPE_SYSTEM ) } ) );
         
         ArtifactFilter filter; 
 
