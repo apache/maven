@@ -35,21 +35,21 @@ import org.codehaus.plexus.PlexusTestCase;
 public abstract class AbstractMavenProjectTestCase
     extends PlexusTestCase
 {
-    protected MavenProjectBuilder projectBuilder;
+    protected ProjectBuilder projectBuilder;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
-        if ( getContainer().hasComponent( MavenProjectBuilder.class, "test" ) )
+        if ( getContainer().hasComponent( ProjectBuilder.class, "test" ) )
         {
-            projectBuilder = lookup( MavenProjectBuilder.class, "test" );
+            projectBuilder = lookup( ProjectBuilder.class, "test" );
         }
         else
         {
             // default over to the main project builder...
-            projectBuilder = lookup( MavenProjectBuilder.class );
+            projectBuilder = lookup( ProjectBuilder.class );
         }
     }    
 
@@ -62,7 +62,7 @@ public abstract class AbstractMavenProjectTestCase
         super.tearDown();
     }
 
-    protected MavenProjectBuilder getProjectBuilder()
+    protected ProjectBuilder getProjectBuilder()
     {
         return projectBuilder;
     }
@@ -117,7 +117,7 @@ public abstract class AbstractMavenProjectTestCase
     protected MavenProject getProjectWithDependencies( File pom )
         throws Exception
     {
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( getLocalRepository() );
         configuration.setRemoteRepositories( Arrays.asList( new ArtifactRepository[] {} ) );
         configuration.setProcessPlugins( false );
@@ -143,7 +143,7 @@ public abstract class AbstractMavenProjectTestCase
     protected MavenProject getProject( File pom )
         throws Exception
     {
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( getLocalRepository() );
 
         return projectBuilder.build( pom, configuration );

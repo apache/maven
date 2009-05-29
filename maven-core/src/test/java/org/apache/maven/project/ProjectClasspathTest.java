@@ -33,7 +33,7 @@ public class ProjectClasspathTest
         throws Exception
     {
         //super.setUp();
-        projectBuilder = lookup( MavenProjectBuilder.class, "classpath" );
+        projectBuilder = lookup( ProjectBuilder.class, "classpath" );
     }
    
     @Override

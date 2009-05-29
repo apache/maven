@@ -27,14 +27,13 @@ import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.FileUtils;
 
 public class DefaultMavenProjectBuilderTest
     extends AbstractMavenProjectTestCase
 {
 
-    private List filesToDelete = new ArrayList();
+    private List<File> filesToDelete = new ArrayList<File>();
 
     private File localRepoDir;
 
@@ -44,7 +43,7 @@ public class DefaultMavenProjectBuilderTest
     {
         super.setUp();
 
-        projectBuilder = lookup( MavenProjectBuilder.class );
+        projectBuilder = lookup( ProjectBuilder.class );
 
         localRepoDir = new File( System.getProperty( "java.io.tmpdir" ), "local-repo." + System.currentTimeMillis() );
         localRepoDir.mkdirs();
@@ -60,9 +59,9 @@ public class DefaultMavenProjectBuilderTest
 
         if ( !filesToDelete.isEmpty() )
         {
-            for ( Iterator it = filesToDelete.iterator(); it.hasNext(); )
+            for ( Iterator<File> it = filesToDelete.iterator(); it.hasNext(); )
             {
-                File file = (File) it.next();
+                File file = it.next();
 
                 if ( file.exists() )
                 {

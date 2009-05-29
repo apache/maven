@@ -6,19 +6,15 @@ package org.apache.maven.project;
 import java.io.FileNotFoundException;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component(role=MavenProjectBuilder.class,hint="classpath")
-public class TestMavenProjectBuilder
-    extends DefaultMavenProjectBuilder
+@Component(role=ProjectBuilder.class,hint="classpath")
+public class TestProjectBuilder
+    extends DefaultProjectBuilder
 {    
-    @Requirement(hint="classpath")
-    private RepositorySystem repositorySystem;
     
     @Override
-    public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration )
+    public MavenProject build( Artifact artifact, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {                       
         if ( "maven-test".equals( artifact.getGroupId() ) )
@@ -38,6 +34,6 @@ public class TestMavenProjectBuilder
         {
             return new MavenProject();
         }
-        return build( artifact.getFile(), configuration );
+        return build( artifact.getFile(), request );
     }
 }
