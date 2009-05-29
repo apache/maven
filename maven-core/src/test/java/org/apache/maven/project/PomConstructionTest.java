@@ -40,7 +40,7 @@ public class PomConstructionTest
 
     private static String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
 
-    private DefaultMavenProjectBuilder mavenProjectBuilder;
+    private DefaultProjectBuilder projectBuilder;
 
     private File testDirectory;
 
@@ -49,14 +49,14 @@ public class PomConstructionTest
     {
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         new File( getBasedir(), BASE_MIXIN_DIR );
-        mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
+        projectBuilder = (DefaultProjectBuilder) lookup( ProjectBuilder.class );
     }
     
     @Override
     protected void tearDown()
         throws Exception
     {
-        mavenProjectBuilder = null;
+        projectBuilder = null;
 
         super.tearDown();
     }
@@ -1488,7 +1488,7 @@ public class PomConstructionTest
         config.setActiveProfileIds( Arrays.asList( profileIds ) );
         config.setExecutionProperties( executionProperties );
         
-        return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );
+        return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ) );
     }
 
     protected void assertModelEquals( PomTestWrapper pom, Object expected, String expression )

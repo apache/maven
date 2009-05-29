@@ -20,7 +20,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -35,13 +34,13 @@ public abstract class AbstractCoreMavenComponentTestCase
     protected RepositorySystem repositorySystem;
 
     @Requirement
-    protected MavenProjectBuilder projectBuilder;
+    protected org.apache.maven.project.ProjectBuilder projectBuilder;
 
     protected void setUp()
         throws Exception
     {
         repositorySystem = lookup( RepositorySystem.class );
-        projectBuilder = lookup( MavenProjectBuilder.class );
+        projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
     }
 
     @Override

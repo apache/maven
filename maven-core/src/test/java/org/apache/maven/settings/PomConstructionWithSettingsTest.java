@@ -3,18 +3,13 @@ package org.apache.maven.settings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.DefaultProfileManager;
-import org.apache.maven.profiles.ProfileActivationContext;
-import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.project.DefaultMavenProjectBuilder;
+import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
@@ -30,7 +25,7 @@ public class PomConstructionWithSettingsTest
 
     private static String BASE_POM_DIR = BASE_DIR + "/resources-settings";
 
-    private DefaultMavenProjectBuilder mavenProjectBuilder;
+    private DefaultProjectBuilder projectBuilder;
 
     private File testDirectory;
 
@@ -38,12 +33,12 @@ public class PomConstructionWithSettingsTest
         throws Exception
     {
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
-        mavenProjectBuilder = (DefaultMavenProjectBuilder) lookup( MavenProjectBuilder.class );
+        projectBuilder = (DefaultProjectBuilder) lookup( ProjectBuilder.class );
     }
 
     @Override
     protected void tearDown() throws Exception {
-            mavenProjectBuilder = null;
+            projectBuilder = null;
 
             super.tearDown();
     }
@@ -91,7 +86,7 @@ public class PomConstructionWithSettingsTest
         config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
         config.setActiveProfileIds( settings.getActiveProfiles() );
         
-        return new PomTestWrapper( pomFile, mavenProjectBuilder.build( pomFile, config ) );        
+        return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ) );        
 	}  
     
     private static Settings readSettingsFile(File settingsFile) 

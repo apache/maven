@@ -151,7 +151,7 @@ public class MavenProject
 
     private Stack<MavenProject> previousExecutionProjects = new Stack<MavenProject>();
 
-    private MavenProjectBuilder mavenProjectBuilder;
+    private ProjectBuilder mavenProjectBuilder;
 
     private ProjectBuilderConfiguration projectBuilderConfiguration;
 
@@ -212,7 +212,7 @@ public class MavenProject
      * @param projectBuilderConfiguration
      * @throws InvalidRepositoryException
      */
-    public MavenProject( Model model, RepositorySystem repositorySystem, MavenProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
+    public MavenProject( Model model, RepositorySystem repositorySystem, ProjectBuilder mavenProjectBuilder, ProjectBuilderConfiguration projectBuilderConfiguration )
         throws InvalidRepositoryException
     {
         if ( model == null )
@@ -366,7 +366,7 @@ public class MavenProject
             {
                 try
                 {
-                    parent = mavenProjectBuilder.buildFromRepository( getParentArtifact(), projectBuilderConfiguration );
+                    parent = mavenProjectBuilder.build( getParentArtifact(), projectBuilderConfiguration );
                 }
                 catch ( ProjectBuildingException e )
                 {

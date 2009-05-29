@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -40,7 +39,7 @@ import org.apache.maven.execution.ProjectSorter;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.codehaus.plexus.PlexusContainer;
@@ -58,7 +57,7 @@ public class DefaultMaven
     implements Maven
 {
     @Requirement
-    protected MavenProjectBuilder projectBuilder;
+    protected ProjectBuilder projectBuilder;
 
     @Requirement
     protected LifecycleExecutor lifecycleExecutor;

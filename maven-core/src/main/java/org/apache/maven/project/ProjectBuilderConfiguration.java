@@ -51,7 +51,7 @@ public interface ProjectBuilderConfiguration
     // Profiles
     
     /**
-     * Set any active profiles that the {@link MavenProjectBuilder} should consider while constructing
+     * Set any active profiles that the {@link ProjectBuilder} should consider while constructing
      * a {@link MavenProject}.
      */
     void setActiveProfileIds( List<String> activeProfileIds );

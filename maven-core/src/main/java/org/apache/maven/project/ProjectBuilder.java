@@ -16,34 +16,16 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.profiles.ProfileManager;
 
-@Deprecated
-public interface MavenProjectBuilder
+public interface ProjectBuilder
 {
 
     MavenProject build( File projectFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
-    //TODO maven-site-plugin -- Vincent, Dennis and Lukas are checking but this doesn't appear to be required anymore.
-    MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
-        throws ProjectBuildingException;
-
-    //TODO remote-resources-plugin
-    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
-        throws ProjectBuildingException;
-
-    //TODO remote-resources-plugin
-    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean force )
-        throws ProjectBuildingException;
-
-    // TODO: This also doesn't really belong here as it's a mix of project builder and artifact resolution and belongs
-    // in an integration component like the embedder.
-    MavenProjectBuildingResult buildProjectWithDependencies( File project, ProjectBuilderConfiguration configuration )
+    MavenProject build( Artifact projectArtifact, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
     // TODO: this is only to provide a project for plugins that don't need a project to execute but need some

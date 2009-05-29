@@ -39,7 +39,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.PlexusContainer;
@@ -63,7 +63,7 @@ public class MavenMetadataSource
 
     //TODO: This prevents a cycle in the composition which shows us another problem we need to deal with. 
     //@Requirement
-    private MavenProjectBuilder projectBuilder;
+    private ProjectBuilder projectBuilder;
 
     @Requirement
     private PlexusContainer container;
@@ -118,7 +118,7 @@ public class MavenMetadataSource
 
             try
             {
-                dependencies = getProjectBuilder().buildFromRepository( pomArtifact, configuration ).getDependencies();
+                dependencies = getProjectBuilder().build( pomArtifact, configuration ).getDependencies();
             }
             catch ( ProjectBuildingException e )
             {
@@ -296,7 +296,7 @@ public class MavenMetadataSource
         return artifacts;
     }
 
-    public MavenProjectBuilder getProjectBuilder()
+    public ProjectBuilder getProjectBuilder()
     {
         if ( projectBuilder != null )
         {
@@ -305,7 +305,7 @@ public class MavenMetadataSource
 
         try
         {
-            projectBuilder = container.lookup( MavenProjectBuilder.class );
+            projectBuilder = container.lookup( ProjectBuilder.class );
         }
         catch ( ComponentLookupException e )
         {
