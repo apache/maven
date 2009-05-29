@@ -202,5 +202,5 @@ public interface MavenExecutionRequest
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
-    ProjectBuildingRequest getProjectBuilderRequest();    
+    ProjectBuildingRequest getProjectBuildingRequest();    
 }

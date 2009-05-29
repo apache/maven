@@ -132,9 +132,9 @@ public class MavenSession
         return currentProject;
     }
 
-    public ProjectBuildingRequest getProjectBuilderRequest()
+    public ProjectBuildingRequest getProjectBuildingRequest()
     {
-        return request.getProjectBuilderRequest();
+        return request.getProjectBuildingRequest();
     }
     
     public List<String> getPluginGroups()

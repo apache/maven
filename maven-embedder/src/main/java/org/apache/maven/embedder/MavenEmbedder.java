@@ -278,7 +278,7 @@ public class MavenEmbedder
     {
         getLogger().debug( "Building MavenProject instance: " + mavenProject );
 
-        return projectBuilder.build( mavenProject, request.getProjectBuilderRequest() );
+        return projectBuilder.build( mavenProject, request.getProjectBuildingRequest() );
     }
 
     /**
@@ -308,7 +308,7 @@ public class MavenEmbedder
 
         try
         {
-            MavenProjectBuildingResult projectBuildingResult = projectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuilderRequest() );
+            MavenProjectBuildingResult projectBuildingResult = projectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuildingRequest() );
             
             result.setProject( projectBuildingResult.getProject() );
 

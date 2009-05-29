@@ -234,7 +234,7 @@ public class DefaultMavenExecutionRequest
 
     public void setProjectBuildingConfiguration( ProjectBuildingRequest projectBuildingConfiguration )
     {
-        this.projectBuilderRequest = projectBuildingConfiguration;
+        this.projectBuildingRequest = projectBuildingConfiguration;
     }
 
     public List<String> getActiveProfiles()
@@ -617,7 +617,7 @@ public class DefaultMavenExecutionRequest
     private Settings settings;
 
     // calculated from request attributes.
-    private ProjectBuildingRequest projectBuilderRequest;
+    private ProjectBuildingRequest projectBuildingRequest;
 
     public MavenExecutionRequest setSettings( Settings settings )
     {
@@ -706,21 +706,21 @@ public class DefaultMavenExecutionRequest
     }
 
     //TODO: this does not belong here.
-    public ProjectBuildingRequest getProjectBuilderRequest()
+    public ProjectBuildingRequest getProjectBuildingRequest()
     {
-        if ( projectBuilderRequest == null )
+        if ( projectBuildingRequest == null )
         {
-            projectBuilderRequest = new DefaultProjectBuildingRequest();
-            projectBuilderRequest.setLocalRepository( getLocalRepository() );
-            projectBuilderRequest.setExecutionProperties( getProperties() );
-            projectBuilderRequest.setRemoteRepositories( getRemoteRepositories() );
-            projectBuilderRequest.setActiveProfileIds( getActiveProfiles() );
-            projectBuilderRequest.setInactiveProfileIds( getInactiveProfiles() );
-            projectBuilderRequest.setProfiles( getProfiles() );
-            projectBuilderRequest.setProcessPlugins( true );
+            projectBuildingRequest = new DefaultProjectBuildingRequest();
+            projectBuildingRequest.setLocalRepository( getLocalRepository() );
+            projectBuildingRequest.setExecutionProperties( getProperties() );
+            projectBuildingRequest.setRemoteRepositories( getRemoteRepositories() );
+            projectBuildingRequest.setActiveProfileIds( getActiveProfiles() );
+            projectBuildingRequest.setInactiveProfileIds( getInactiveProfiles() );
+            projectBuildingRequest.setProfiles( getProfiles() );
+            projectBuildingRequest.setProcessPlugins( true );
         }
 
-        return projectBuilderRequest;
+        return projectBuildingRequest;
     }
     
     public MavenExecutionRequest addProfile( Profile profile )
