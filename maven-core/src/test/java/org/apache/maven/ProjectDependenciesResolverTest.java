@@ -80,9 +80,6 @@ public class ProjectDependenciesResolverTest
 
         resolver.resolve( project, Artifact.SCOPE_COMPILE, getLocalRepository(), getRemoteRepositories() );                
                 
-        // Here we will actually not have any artifacts because the ProjectDependenciesResolver is not involved here. So
-        // right now it's not valid to ask for artifacts unless plugins require the artifacts.
-      
         List<String> elements = project.getCompileClasspathElements();
         assertEquals( 2, elements.size() );
         
