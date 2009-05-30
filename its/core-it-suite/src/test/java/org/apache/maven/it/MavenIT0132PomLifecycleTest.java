@@ -50,7 +50,7 @@ public class MavenIT0132PomLifecycleTest
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "deploy" );
-        if ( matchesVersionRange( "(2.0.1,)" ) )
+        if ( matchesVersionRange( "(2.0.1,3.0-alpha-1)" ) )
         {
             verifier.assertFilePresent( "target/site-attach-descriptor.txt" );
         }
