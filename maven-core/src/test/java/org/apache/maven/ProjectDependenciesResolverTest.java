@@ -67,7 +67,6 @@ public class ProjectDependenciesResolverTest
         assertEquals( 1, artifactDependencies.size() );        
     }  
     
-    /*
     public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements()
         throws Exception
     {
@@ -83,8 +82,12 @@ public class ProjectDependenciesResolverTest
                 
         // Here we will actually not have any artifacts because the ProjectDependenciesResolver is not involved here. So
         // right now it's not valid to ask for artifacts unless plugins require the artifacts.
-
+      
         List<String> elements = project.getCompileClasspathElements();
+        assertEquals( 2, elements.size() );
+        
+        List<Artifact> artifacts = project.getCompileArtifacts();
+        assertEquals( 1, artifacts.size() );
+        assertTrue( artifacts.get( 0 ).getFile().getName().endsWith( "tools.jar" ) );
     }
-    */
 }
