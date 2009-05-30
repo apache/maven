@@ -268,6 +268,8 @@ public class DefaultLifecycleExecutor
                 
                 MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session );
 
+                requiredDependencyResolutionScope = mojoDescriptor.isDependencyResolutionRequired();
+
                 MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-" + mojoDescriptor.getGoal() );
                 
                 populateMojoExecutionConfiguration( project, mojoExecution, true );
