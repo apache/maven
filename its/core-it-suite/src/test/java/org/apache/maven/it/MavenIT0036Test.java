@@ -35,7 +35,7 @@ public class MavenIT0036Test
 {
     public MavenIT0036Test()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "(2.0,3.0-alpha-1)" );
     }
 
     /**
