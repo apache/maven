@@ -99,13 +99,20 @@ public abstract class AbstractCoreMavenComponentTestCase
     // a Maven subclass because we don't want to couple maven to the project builder which we need to
     // separate.
     protected MavenSession createMavenSession( File pom )
+        throws Exception        
+    {
+        return createMavenSession( pom, new Properties() );
+    }
+    
+    protected MavenSession createMavenSession( File pom, Properties executionProperties )
         throws Exception
     {
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
 
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest()
             .setLocalRepository( request.getLocalRepository() )
-            .setRemoteRepositories( request.getRemoteRepositories() );
+            .setRemoteRepositories( request.getRemoteRepositories() )
+            .setExecutionProperties( executionProperties );
 
         MavenProject project = null;
 

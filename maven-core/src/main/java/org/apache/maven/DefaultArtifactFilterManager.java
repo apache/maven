@@ -19,12 +19,18 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * @author Jason van Zyl
@@ -37,6 +43,9 @@ public class DefaultArtifactFilterManager
 {
 
     private static final Set<String> DEFAULT_EXCLUSIONS;
+
+    @Requirement
+    private PlexusContainer plexus;
 
     static
     {
@@ -96,7 +105,14 @@ public class DefaultArtifactFilterManager
      */
     public ArtifactFilter getArtifactFilter()
     {
-        return new ExclusionSetFilter( excludedArtifacts );
+        Set<String> excludes = new LinkedHashSet<String>( excludedArtifacts );
+
+        for ( ArtifactFilterManagerDelegate delegate : getDelegates() )
+        {
+            delegate.addExcludes( excludes );
+        }
+
+        return new ExclusionSetFilter( excludes );
     }
 
     /**
@@ -106,7 +122,26 @@ public class DefaultArtifactFilterManager
      */
     public ArtifactFilter getCoreArtifactFilter()
     {
-        return new ExclusionSetFilter( DEFAULT_EXCLUSIONS );
+        Set<String> excludes = new LinkedHashSet<String>( DEFAULT_EXCLUSIONS );
+
+        for ( ArtifactFilterManagerDelegate delegate : getDelegates() )
+        {
+            delegate.addCoreExcludes( excludes );
+        }
+
+        return new ExclusionSetFilter( excludes );
+    }
+
+    private List<ArtifactFilterManagerDelegate> getDelegates()
+    {
+        try
+        {
+            return plexus.lookupList( ArtifactFilterManagerDelegate.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            return new ArrayList<ArtifactFilterManagerDelegate>();
+        }
     }
 
     /* (non-Javadoc)

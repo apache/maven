@@ -333,7 +333,7 @@ public class DefaultPluginManager
         }
         catch ( PluginManagerException e )
         {
-            throw new PluginExecutionException( mojoExecution, project, e.getMessage() );
+            throw new PluginExecutionException( mojoExecution, project, e );
         }
         finally
         {

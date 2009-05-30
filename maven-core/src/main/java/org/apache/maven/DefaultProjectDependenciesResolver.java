@@ -74,6 +74,7 @@ public class DefaultProjectDependenciesResolver
     
         ArtifactResolutionResult result = repositorySystem.resolve( request );                
         resolutionErrorHandler.throwErrors( request, result );
+        project.setArtifacts( result.getArtifacts() );
         return result.getArtifacts();        
     }  
 }

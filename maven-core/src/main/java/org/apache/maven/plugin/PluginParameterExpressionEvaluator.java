@@ -250,7 +250,6 @@ public class PluginParameterExpressionEvaluator
             }
             catch ( Exception e )
             {
-                e.printStackTrace();
                 throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression, e );
             }
         }       

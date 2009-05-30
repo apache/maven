@@ -1,9 +1,12 @@
 package org.apache.maven;
 
 import java.io.File;
+import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -63,4 +66,25 @@ public class ProjectDependenciesResolverTest
         Set<Artifact> artifactDependencies = resolver.resolve( project, Artifact.SCOPE_COMPILE, getLocalRepository(), getRemoteRepositories() );                
         assertEquals( 1, artifactDependencies.size() );        
     }  
+    
+    /*
+    public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements()
+        throws Exception
+    {
+        File pom = getProject( "it0063" );
+
+        Properties eps = new Properties();
+        eps.setProperty( "jre.home", new File( pom.getParentFile(), "jdk/jre" ).getPath() );
+
+        MavenSession session = createMavenSession( pom, eps );
+        MavenProject project = session.getCurrentProject();
+
+        resolver.resolve( project, Artifact.SCOPE_COMPILE, getLocalRepository(), getRemoteRepositories() );                
+                
+        // Here we will actually not have any artifacts because the ProjectDependenciesResolver is not involved here. So
+        // right now it's not valid to ask for artifacts unless plugins require the artifacts.
+
+        List<String> elements = project.getCompileClasspathElements();
+    }
+    */
 }

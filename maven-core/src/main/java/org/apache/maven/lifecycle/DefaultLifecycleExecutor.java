@@ -164,8 +164,7 @@ public class DefaultLifecycleExecutor
                 // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
                 try
                 {
-                    Set<Artifact> projectDependencies = projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScope(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
-                    currentProject.setArtifacts( projectDependencies );    
+                    projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScope(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
                 }
                 catch ( ArtifactNotFoundException e )
                 {

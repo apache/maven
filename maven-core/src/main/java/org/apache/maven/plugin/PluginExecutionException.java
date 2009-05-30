@@ -15,7 +15,7 @@ public class PluginExecutionException
         this.mojoExecution = mojoExecution;
     }
 
-    public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, MojoExecutionException cause )
+    public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, Exception cause )
     {
         super( mojoExecution.getMojoDescriptor(), project, "Mojo execution failed.", cause );
         this.mojoExecution = mojoExecution;

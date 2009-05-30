@@ -45,6 +45,9 @@ public class ReactorArtifactRepository
             }
             else
             {
+                //TODO Need to look for attached artifacts
+                //TODO Need to look for plugins
+                
                 File artifactFile = project.getArtifact().getFile();
 
                 if ( artifactFile != null && artifactFile.exists() )
