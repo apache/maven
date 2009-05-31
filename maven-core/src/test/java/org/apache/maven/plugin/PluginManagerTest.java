@@ -19,7 +19,7 @@ public class PluginManagerTest
     @Requirement
     private DefaultPluginManager pluginManager;
     
-    private String plexusVersion = "1.0-beta-3.0.7-SNAPSHOT";
+    private String plexusVersion = "1.0-beta-3.0.7";
     
     protected void setUp()
         throws Exception
