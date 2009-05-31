@@ -1,4 +1,4 @@
-package org.apache.maven.model.lifecycle;
+package org.apache.maven.model.plugin;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
