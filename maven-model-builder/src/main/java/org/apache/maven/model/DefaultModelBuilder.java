@@ -28,11 +28,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.inheritance.InheritanceAssembler;
-import org.apache.maven.model.interpolator.Interpolator;
+import org.apache.maven.model.interpolation.ModelInterpolationException;
+import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.management.ManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
+import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.profile.ProfileActivationException;
@@ -66,7 +68,10 @@ public class DefaultModelBuilder
     private ModelNormalizer modelNormalizer;
 
     @Requirement
-    private Interpolator modelInterpolator;
+    private ModelInterpolator modelInterpolator;
+
+    @Requirement
+    private ModelPathTranslator modelPathTranslator;
 
     @Requirement
     private InheritanceAssembler inheritanceAssembler;
@@ -154,6 +159,8 @@ public class DefaultModelBuilder
 
         resultModel = interpolateModel( resultModel, request );
         resultModels.set( 0, resultModel );
+
+        modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory() );
 
         if ( request.isProcessPlugins() )
         {
@@ -281,14 +288,11 @@ public class DefaultModelBuilder
     {
         try
         {
-            Model result =
-                modelInterpolator.interpolateModel( model,
-                                                    request.getProfileActivationContext().getExecutionProperties(),
-                                                    model.getProjectDirectory() );
+            Model result = modelInterpolator.interpolateModel( model, model.getProjectDirectory(), request );
             result.setPomFile( model.getPomFile() );
             return result;
         }
-        catch ( IOException e )
+        catch ( ModelInterpolationException e )
         {
             throw new ModelBuildingException( "Failed to interpolate model " + toSourceHint( model ), e );
         }
