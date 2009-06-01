@@ -68,9 +68,8 @@ public class FileProfileActivator
                     }
                     catch ( Exception e )
                     {
-                        throw new ProfileActivationException( profile,
-                                                              "Failed to interpolate file location for profile "
-                                                                  + profile.getId() + ": " + existingPath );
+                        throw new ProfileActivationException( "Failed to interpolate file location for profile "
+                            + profile.getId() + ": " + existingPath, profile );
                     }
                     active = new File( existingPath ).exists();
                 }
@@ -82,9 +81,8 @@ public class FileProfileActivator
                     }
                     catch ( Exception e )
                     {
-                        throw new ProfileActivationException( profile,
-                                                              "Failed to interpolate file location for profile "
-                                                                  + profile.getId() + ": " + existingPath );
+                        throw new ProfileActivationException( "Failed to interpolate file location for profile "
+                            + profile.getId() + ": " + existingPath, profile );
                     }
                     active = !new File( missingPath ).exists();
                 }

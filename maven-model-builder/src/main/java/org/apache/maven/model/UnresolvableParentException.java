@@ -28,11 +28,22 @@ public class UnresolvableParentException
     extends ModelBuildingException
 {
 
+    /**
+     * Creates a new exception with specified detail message and cause.
+     * 
+     * @param message The detail message, may be {@code null}.
+     * @param cause The cause, may be {@code null}.
+     */
     public UnresolvableParentException( String message, Throwable cause )
     {
         super( message, cause );
     }
 
+    /**
+     * Creates a new exception with specified detail message.
+     * 
+     * @param message The detail message, may be {@code null}.
+     */
     public UnresolvableParentException( String message )
     {
         super( message );

@@ -47,9 +47,9 @@ public class InvalidProfileException
     }
 
     /**
-     * Gets the profile that causes this error (if any).
+     * Gets the profile that caused this error (if any).
      * 
-     * @return The profile that causes this error or {@code null} if not applicable.
+     * @return The profile that caused this error or {@code null} if not applicable.
      */
     public Profile getProfile()
     {

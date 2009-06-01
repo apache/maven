@@ -56,8 +56,8 @@ public class JdkVersionProfileActivator
 
                 if ( version.length() <= 0 )
                 {
-                    throw new ProfileActivationException( profile, "Failed to determine Java version for profile "
-                        + profile.getId() );
+                    throw new ProfileActivationException( "Failed to determine Java version for profile "
+                        + profile.getId(), profile );
                 }
 
                 if ( jdk.startsWith( "!" ) )

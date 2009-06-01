@@ -55,9 +55,8 @@ public class PropertyProfileActivator
 
                 if ( name == null )
                 {
-                    throw new ProfileActivationException( profile,
-                                                          "The property name is required to activate the profile "
-                                                              + profile.getId() );
+                    throw new ProfileActivationException( "The property name is required to activate the profile "
+                        + profile.getId(), profile );
                 }
 
                 if ( name.startsWith( "!" ) )

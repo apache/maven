@@ -30,14 +30,29 @@ public class InvalidModelException
     extends ModelBuildingException
 {
 
+    /**
+     * The validation result, can be {@code null}.
+     */
     private ModelValidationResult validationResult;
 
+    /**
+     * Creates a new exception with specified detail message and validation result.
+     * 
+     * @param message The detail message, may be {@code null}.
+     * @param validationResult The validation result, may be {@code null}.
+     */
     public InvalidModelException( String message, ModelValidationResult validationResult )
     {
         super( message );
         this.validationResult = validationResult;
     }
 
+    /**
+     * Creates a new exception with specified detail message and cause.
+     * 
+     * @param message The detail message, may be {@code null}.
+     * @param cause The cause, may be {@code null}.
+     */
     public InvalidModelException( String message, Throwable cause )
     {
         super( message, cause );
@@ -45,6 +60,11 @@ public class InvalidModelException
         validationResult.addMessage( ( cause != null ) ? cause.getMessage() : message );
     }
 
+    /**
+     * Gets the validation result.
+     * 
+     * @return The validation result or {@code null} if unknown.
+     */
     public ModelValidationResult getValidationResult()
     {
         return validationResult;

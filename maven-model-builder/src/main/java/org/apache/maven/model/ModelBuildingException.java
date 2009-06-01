@@ -28,11 +28,22 @@ public class ModelBuildingException
     extends Exception
 {
 
+    /**
+     * Creates a new exception with specified detail message.
+     * 
+     * @param message The detail message, may be {@code null}.
+     */
     public ModelBuildingException( String message )
     {
         super( message );
     }
 
+    /**
+     * Creates a new exception with specified detail message and cause.
+     * 
+     * @param message The detail message, may be {@code null}.
+     * @param cause The cause, may be {@code null}.
+     */
     public ModelBuildingException( String message, Throwable cause )
     {
         super( message, cause );

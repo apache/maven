@@ -72,7 +72,7 @@ public class DefaultModelReader
         }
         catch ( XmlPullParserException e )
         {
-            throw new ModelParseException( e.getMessage(), e, e.getLineNumber(), e.getColumnNumber() );
+            throw new ModelParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
         }
         finally
         {
@@ -95,7 +95,7 @@ public class DefaultModelReader
         }
         catch ( XmlPullParserException e )
         {
-            throw new ModelParseException( e.getMessage(), e, e.getLineNumber(), e.getColumnNumber() );
+            throw new ModelParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
         }
         finally
         {

@@ -38,11 +38,11 @@ public class ProfileActivationException
     /**
      * Creates a new exception with specified detail message and cause for the given profile.
      * 
-     * @param profile The profile that caused the error, may be {@code null}.
      * @param message The detail message, may be {@code null}.
+     * @param profile The profile that caused the error, may be {@code null}.
      * @param cause The cause, may be {@code null}.
      */
-    public ProfileActivationException( Profile profile, String message, Throwable cause )
+    public ProfileActivationException( String message, Profile profile, Throwable cause )
     {
         super( message, cause );
         this.profile = profile;
@@ -51,18 +51,18 @@ public class ProfileActivationException
     /**
      * Creates a new exception with specified detail message for the given profile.
      * 
-     * @param profile The profile that caused the error, may be {@code null}.
      * @param message The detail message, may be {@code null}.
+     * @param profile The profile that caused the error, may be {@code null}.
      */
-    public ProfileActivationException( Profile profile, String message )
+    public ProfileActivationException( String message, Profile profile )
     {
         super( message );
     }
 
     /**
-     * Gets the profile that causes this error (if any).
+     * Gets the profile that caused this error (if any).
      * 
-     * @return The profile that causes this error or {@code null} if not applicable.
+     * @return The profile that caused this error or {@code null} if not applicable.
      */
     public Profile getProfile()
     {

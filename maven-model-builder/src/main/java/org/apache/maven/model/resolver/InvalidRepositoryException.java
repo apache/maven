@@ -30,6 +30,9 @@ public class InvalidRepositoryException
     extends Exception
 {
 
+    /**
+     * The repository that raised this error, can be {@code null}.
+     */
     private Repository repository;
 
     /**
