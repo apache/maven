@@ -32,9 +32,9 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.model.FileModelSource;
 import org.apache.maven.model.ModelSource;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.resolver.InvalidRepositoryException;
-import org.apache.maven.model.resolver.ModelResolver;
-import org.apache.maven.model.resolver.UnresolvableModelException;
+import org.apache.maven.model.resolution.InvalidRepositoryException;
+import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.repository.RepositorySystem;
 
 /**

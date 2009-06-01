@@ -28,11 +28,11 @@ import java.util.Map;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.profile.activator.FileProfileActivator;
-import org.apache.maven.model.profile.activator.JdkVersionProfileActivator;
-import org.apache.maven.model.profile.activator.OperatingSystemProfileActivator;
-import org.apache.maven.model.profile.activator.ProfileActivator;
-import org.apache.maven.model.profile.activator.PropertyProfileActivator;
+import org.apache.maven.model.profile.activation.FileProfileActivator;
+import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
+import org.apache.maven.model.profile.activation.OperatingSystemProfileActivator;
+import org.apache.maven.model.profile.activation.ProfileActivator;
+import org.apache.maven.model.profile.activation.PropertyProfileActivator;
 
 @Deprecated
 public class DefaultProfileManager

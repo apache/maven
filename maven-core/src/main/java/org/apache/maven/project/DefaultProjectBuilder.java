@@ -33,7 +33,7 @@ import org.apache.maven.model.ModelBuilder;
 import org.apache.maven.model.ModelBuildingException;
 import org.apache.maven.model.ModelBuildingResult;
 import org.apache.maven.model.io.ModelReader;
-import org.apache.maven.model.resolver.ModelResolver;
+import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;

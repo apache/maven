@@ -1,4 +1,4 @@
-package org.apache.maven.model.resolver;
+package org.apache.maven.model.resolution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

@@ -21,7 +21,7 @@ package org.apache.maven.model;
 
 import java.io.File;
 
-import org.apache.maven.model.resolver.ModelResolver;
+import org.apache.maven.model.resolution.ModelResolver;
 
 /**
  * @author Benjamin Bentmann
