@@ -21,12 +21,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
+import org.apache.maven.model.path.ModelPathTranslator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
@@ -45,6 +43,9 @@ public class DefaultInterpolator
 
     @Requirement
     private ModelWriter modelWriter;
+
+    @Requirement
+    private ModelPathTranslator modelPathTranslator;
 
     public Model interpolateModel( Model model, Properties properties, File projectDirectory )
         throws IOException
@@ -191,85 +192,13 @@ public class DefaultInterpolator
         {
             String xml = unmarshalModelPropertiesToXml( modelProperties, ProjectUri.baseUri );
             Model m = modelReader.read( new StringReader( xml ), null );
-            if ( projectDirectory != null )
-            {
-                alignPaths( m, projectDirectory );
-            }
+            modelPathTranslator.alignToBaseDirectory( m, projectDirectory );
             return m;
         }
         catch ( IOException e )
         {
             throw new IllegalStateException( "Unmarshalling of model properties failed", e );
         }
-    }
-
-    /**
-     * Post-processes the paths of build directories by aligning relative paths to the project
-     * directory and normalizing file separators to the platform-specific separator.
-     * 
-     * @param model The model to process, must not be {@code null}.
-     * @param basedir The project directory, must not be {@code null}.
-     */
-    private static void alignPaths( Model model, File basedir )
-    {
-        Build build = model.getBuild();
-        if ( build != null )
-        {
-            build.setDirectory( getAlignedPathFor( build.getDirectory(), basedir ) );
-            build.setOutputDirectory( getAlignedPathFor( build.getOutputDirectory(), basedir ) );
-            build.setTestOutputDirectory( getAlignedPathFor( build.getTestOutputDirectory(), basedir ) );
-            build.setSourceDirectory( getAlignedPathFor( build.getSourceDirectory(), basedir ) );
-            build.setTestSourceDirectory( getAlignedPathFor( build.getTestSourceDirectory(), basedir ) );
-            build.setScriptSourceDirectory( getAlignedPathFor( build.getScriptSourceDirectory(), basedir ) );
-
-            for ( Resource r : build.getResources() )
-            {
-                r.setDirectory( getAlignedPathFor( r.getDirectory(), basedir ) );
-            }
-
-            for ( Resource r : build.getTestResources() )
-            {
-                r.setDirectory( getAlignedPathFor( r.getDirectory(), basedir ) );
-            }
-
-            List<String> filters = new ArrayList<String>();
-            for ( String f : build.getFilters() )
-            {
-                filters.add( getAlignedPathFor( f, basedir ) );
-            }
-            build.setFilters( filters );
-        }
-
-        Reporting reporting = model.getReporting();
-        if ( reporting != null )
-        {
-            reporting.setOutputDirectory( getAlignedPathFor( reporting.getOutputDirectory(), basedir ) );
-        }
-
-    }
-
-    private static String getAlignedPathFor( String path, File basedir )
-    {
-        if ( path != null )
-        {
-            File file = new File( path );
-            if ( file.isAbsolute() )
-            {
-                // path was already absolute, just normalize file separator and we're done
-                path = file.getPath();
-            }
-            else if ( file.getPath().startsWith( File.separator ) )
-            {
-                // drive-relative Windows path, don't align with project directory but with drive root
-                path = file.getAbsolutePath();
-            }
-            else
-            {
-                // an ordinary relative path, align with project directory
-                path = new File( new File( basedir, path ).toURI().normalize() ).getAbsolutePath();
-            }
-        }
-        return path;
     }
 
     private static void interpolateModelProperties( List<ModelProperty> modelProperties, List<InterpolatorProperty> interpolatorProperties )

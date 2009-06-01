@@ -1,4 +1,4 @@
-package org.apache.maven.project.path;
+package org.apache.maven.model.path;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,19 +24,20 @@ import java.io.File;
 import org.apache.maven.model.Model;
 
 /**
+ * Resolves relative paths of a model against a specific base directory.
+ * 
  * @author Jason van Zyl
- * @version $Id$
  */
-@Deprecated
-public interface PathTranslator
+public interface ModelPathTranslator
 {
-    String ROLE = PathTranslator.class.getName();
 
+    /**
+     * Resolves the well-known paths of the specified model against the given base directory. Paths within plugin
+     * configuration are not processed.
+     * 
+     * @param model The model whose paths should be resolved, may be {@code null}.
+     * @param basedir The base directory to resolve relative paths against, may be {@code null}.
+     */
     void alignToBaseDirectory( Model model, File basedir );
 
-    String alignToBaseDirectory( String path, File basedir );
-
-    void unalignFromBaseDirectory( Model model, File basedir );
-
-    String unalignFromBaseDirectory( String directory, File basedir );
 }

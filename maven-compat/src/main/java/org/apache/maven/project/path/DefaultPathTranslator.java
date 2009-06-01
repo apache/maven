@@ -30,6 +30,7 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.codehaus.plexus.component.annotations.Component;
 
+@Deprecated
 @Component(role = PathTranslator.class)
 public class DefaultPathTranslator
     implements PathTranslator
