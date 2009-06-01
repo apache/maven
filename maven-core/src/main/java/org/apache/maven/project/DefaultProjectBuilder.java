@@ -110,6 +110,8 @@ public class DefaultProjectBuilder
         Model model = result.getEffectiveModel();
 
         project = fromModelToMavenProject( model, result.getRawModels().get( 1 ).getPomFile(), configuration, model.getPomFile() );
+
+        project.setOriginalModel( result.getRawModel() );
      
         try
         {
