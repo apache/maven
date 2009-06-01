@@ -43,6 +43,7 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultModelValidator
     implements ModelValidator
 {
+
     private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
 
     public ModelValidationResult validateRawModel( Model model, boolean lenient )
@@ -64,6 +65,8 @@ public class DefaultModelValidator
                 result.addMessage( "The parent element cannot have the same ID as the project." );
             }
         }
+
+        validateRepositories( result, model.getRepositories(), "repositories.repository" );
 
         return result;
     }
@@ -184,15 +187,9 @@ public class DefaultModelValidator
                     validateStringNotEmpty( "build.plugins.plugin.version", result, p.getVersion(), p.getKey() );
                 }
 
-                for ( Resource r : build.getResources() )
-                {
-                    validateStringNotEmpty( "build.resources.resource.directory", result, r.getDirectory() );
-                }
+                validateResources( result, build.getResources(), "build.resources.resource" );
 
-                for ( Resource r : build.getTestResources() )
-                {
-                    validateStringNotEmpty( "build.testResources.testResource.directory", result, r.getDirectory() );
-                }
+                validateResources( result, build.getTestResources(), "build.testResources.testResource" );
             }
 
             Reporting reporting = model.getReporting();
@@ -207,10 +204,6 @@ public class DefaultModelValidator
                     validateStringNotEmpty( "reporting.plugins.plugin.version", result, p.getVersion(), p.getKey() );
                 }
             }
-
-            validateRepositories( result, model.getRepositories(), "repositories.repository" );
-
-            // validateRepositories( result, model.getPluginRepositories(), "pluginRepositories.pluginRepository" );
 
             forcePluginExecutionIdCollision( model, result );
         }
@@ -242,6 +235,14 @@ public class DefaultModelValidator
             validateStringNotEmpty( prefix + ".id", result, repository.getId() );
 
             validateStringNotEmpty( prefix + ".url", result, repository.getUrl() );
+        }
+    }
+
+    private void validateResources( ModelValidationResult result, List<Resource> resources, String prefix )
+    {
+        for ( Resource resource : resources )
+        {
+            validateStringNotEmpty( prefix + ".directory", result, resource.getDirectory() );
         }
     }
 

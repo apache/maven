@@ -48,7 +48,20 @@ public class DefaultModelValidatorTest
     private ModelValidationResult validate( String pom )
         throws Exception
     {
-        return validator.validateEffectiveModel( read( pom ), false );
+        return validate(pom, false, false);
+    }
+
+    private ModelValidationResult validate( String pom, boolean raw, boolean lenient )
+        throws Exception
+    {
+        if ( raw )
+        {
+            return validator.validateRawModel( read( pom ), lenient );
+        }
+        else
+        {
+            return validator.validateEffectiveModel( read( pom ), lenient );
+        }
     }
 
     @Override
@@ -233,7 +246,7 @@ public class DefaultModelValidatorTest
     public void testMissingRepositoryId()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-repository-id-pom.xml" );
+        ModelValidationResult result = validate( "missing-repository-id-pom.xml", true, false );
 
         assertEquals( 2, result.getMessageCount() );
 
