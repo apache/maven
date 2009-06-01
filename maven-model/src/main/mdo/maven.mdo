@@ -2007,6 +2007,12 @@
 
         return id.toString();
     }
+
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
             ]]>
           </code>
         </codeSegment>
