@@ -330,6 +330,10 @@ public class DefaultModelBuilder
         Parent parent = childModel.getParent();
 
         File pomFile = new File( new File( projectDirectory, parent.getRelativePath() ).toURI().normalize() );
+        if ( pomFile.isDirectory() )
+        {
+            pomFile = new File( pomFile, "pom.xml" );
+        }
         if ( !pomFile.isFile() )
         {
             return null;
