@@ -27,9 +27,9 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationException;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
 
 /**
  * Determines profile activation based on the existence/absence of some file.
