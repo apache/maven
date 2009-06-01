@@ -63,14 +63,13 @@ public class MavenITmng2196ParentResolutionTest
             {
                 verifier.executeGoal( "validate" );
                 verifier.verifyErrorFreeLog();
+                fail( "Build should have failed due to bad relativePath" );
             }
             catch ( VerificationException e )
             {
-                verifier.verifyTextInLog( "java.io.IOException" );
+                // expected
                 verifier.resetStreams();
-                return;
             }
-            throw new VerificationException( "Build should have failed with java.io.IOException" );           
         }
     }
 
