@@ -221,7 +221,6 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "reporting-interpolation" );
-        pom = new PomTestWrapper(pom.getMavenProject());
         assertEquals( createPath(Arrays.asList(System.getProperty("user.dir"),
                 "src", "test", "resources-project-builder", "reporting-interpolation", "target", "site")),
                 pom.getValue( "reporting/outputDirectory" ) );

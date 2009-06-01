@@ -4,11 +4,10 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.profile.ProfileActivationContext;
 
 public interface ProjectBuildingRequest
-    extends ProfileActivationContext
 {
     ProjectBuildingRequest setLocalRepository( ArtifactRepository localRepository );
     
@@ -72,4 +71,7 @@ public interface ProjectBuildingRequest
     void setProfiles( List<Profile> profiles );
     
     List<Profile> getProfiles();
+
+    ModelBuildingRequest getModelBuildingRequest();
+
 }

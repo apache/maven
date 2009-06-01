@@ -572,10 +572,10 @@
     private java.io.File pomFile;
 
     /**
-     * Gets the POM file from which this model originated. This can either be a {@code pom.xml} of some project being
-     * built or the {@code *.pom} of some artifact being resolved from the repository.
+     * Gets the POM file for the corresponding project (if any).
      * 
-     * @return The POM file from which this model originated or {@code null} if unknown.
+     * @return The POM file from which this model originated or {@code null} if this model does not belong to a local
+     *         project (e.g. describes the metadata of some artifact from the repository).
      */
     public java.io.File getPomFile()
     {
@@ -588,26 +588,14 @@
     }
 
     /**
-     * The base directory for the corresponding project (if any). This is transient runtime state and therefore not
-     * managed by Modello.
-     */
-    private java.io.File projectDirectory;
-
-    /**
-     * Gets the base directory for the corresponding project (if any). Note that this is really a separate piece of
-     * information and not necessarily equivalent to the parent directory of {@link #getPomFile()}.
+     * Gets the base directory for the corresponding project (if any).
      * 
      * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
-     *         project but describes the metadata of some artifact from the repository.
+     *         project (e.g. describes the metadata of some artifact from the repository).
      */
     public java.io.File getProjectDirectory()
     {
-        return projectDirectory;
-    }
-
-    public void setProjectDirectory( java.io.File projectDirectory )
-    {
-        this.projectDirectory = projectDirectory;
+        return ( pomFile != null ) ? pomFile.getParentFile() : null;
     }
 
     /**

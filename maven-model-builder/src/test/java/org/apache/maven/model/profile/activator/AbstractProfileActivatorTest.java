@@ -19,10 +19,9 @@ package org.apache.maven.model.profile.activator;
  * under the License.
  */
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Component;
@@ -74,25 +73,7 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
 
     protected ProfileActivationContext newContext( final Properties executionProperties )
     {
-        return new ProfileActivationContext()
-        {
-
-            public List<String> getActiveProfileIds()
-            {
-                return Collections.emptyList();
-            }
-
-            public List<String> getInactiveProfileIds()
-            {
-                return Collections.emptyList();
-            }
-
-            public Properties getExecutionProperties()
-            {
-                return executionProperties;
-            }
-
-        };
+        return new DefaultProfileActivationContext().setExecutionProperties( executionProperties );
     }
 
 }

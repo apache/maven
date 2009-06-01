@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.DefaultModelBuildingRequest;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.ModelEventListener;
 import org.apache.maven.model.Profile;
 
@@ -33,23 +35,13 @@ public class DefaultProjectBuildingRequest
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
-    
-    private Properties executionProperties;
 
     private List<ModelEventListener> listeners;
     
     private MavenProject topProject;
-    
-    private boolean processPlugins = true;
 
-    private boolean lenientValidation;
+    private ModelBuildingRequest modelBuildingRequest = new DefaultModelBuildingRequest().setProcessPlugins( true );
 
-    private List<String> activeProfileIds;
-    
-    private List<String> inactiveProfileIds;
-    
-    private List<Profile> profiles;
-        
     public MavenProject getTopLevelProjectFromReactor()
     {
     	return topProject;
@@ -88,16 +80,12 @@ public class DefaultProjectBuildingRequest
     
     public Properties getExecutionProperties()
     {
-        if ( executionProperties == null )
-        {
-            executionProperties = new Properties();
-        }
-        return executionProperties;
+        return modelBuildingRequest.getExecutionProperties();
     }
 
     public ProjectBuildingRequest setExecutionProperties( Properties executionProperties )
     {
-        this.executionProperties = executionProperties;
+        modelBuildingRequest.setExecutionProperties( executionProperties );
         return this;
     }
 
@@ -114,76 +102,64 @@ public class DefaultProjectBuildingRequest
 
     public boolean isProcessPlugins()
     {
-        return processPlugins;
+        return modelBuildingRequest.isProcessPlugins();
     }
 
     public ProjectBuildingRequest setProcessPlugins( boolean processPlugins )
     {
-        this.processPlugins = processPlugins;
+        modelBuildingRequest.setProcessPlugins( processPlugins );
         return this;
     }
 
     public ProjectBuildingRequest setLenientValidation( boolean lenientValidation )
     {
-        this.lenientValidation = lenientValidation;
+        modelBuildingRequest.setLenientValidation( lenientValidation );
         return this;
     }
 
     public boolean istLenientValidation()
     {
-        return lenientValidation;
+        return modelBuildingRequest.istLenientValidation();
     }
 
     public List<String> getActiveProfileIds()
     {
-        if ( activeProfileIds == null )
-        {
-            activeProfileIds = new ArrayList<String>();
-        }
-        return activeProfileIds;        
+        return modelBuildingRequest.getActiveProfileIds();
     }
 
     public void setActiveProfileIds( List<String> activeProfileIds )
     {
-        this.activeProfileIds = activeProfileIds;      
+        modelBuildingRequest.setActiveProfileIds( activeProfileIds );
     }
 
     public List<String> getInactiveProfileIds()
     {
-        if ( inactiveProfileIds == null )
-        {
-            inactiveProfileIds = new ArrayList<String>();
-        }
-        return inactiveProfileIds;
+        return modelBuildingRequest.getInactiveProfileIds();
     }
 
     public void setInactiveProfileIds( List<String> inactiveProfileIds )
     {
-        this.inactiveProfileIds = inactiveProfileIds;
+        modelBuildingRequest.setInactiveProfileIds( inactiveProfileIds );
     }
 
     public void setProfiles( List<Profile> profiles )
     {
-        this.profiles = profiles;
+        modelBuildingRequest.setProfiles( profiles );
     }
     
     public void addProfile( Profile profile )
     {
-        if ( profiles == null )
-        {
-            profiles = new ArrayList<Profile>();
-        }
-        
-        profiles.add( profile );
+        modelBuildingRequest.getProfiles().add(profile);
     }
 
     public List<Profile> getProfiles()
     {
-        if ( profiles == null )
-        {
-            profiles = new ArrayList<Profile>();
-        }
-        return profiles;
+        return modelBuildingRequest.getProfiles();
+    }
+
+    public ModelBuildingRequest getModelBuildingRequest()
+    {
+        return modelBuildingRequest;
     }
 
 }

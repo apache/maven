@@ -160,4 +160,25 @@ public class ProfileActivationContext
         return getExplicitlyInactiveProfileIds();
     }
 
+    public org.apache.maven.model.profile.ProfileActivationContext setActiveProfileIds( List<String> activeProfileIds )
+    {
+        setExplicitlyActiveProfileIds( activeProfileIds );
+        return this;
+    }
+
+    public org.apache.maven.model.profile.ProfileActivationContext setExecutionProperties(
+                                                                                           Properties executionProperties )
+    {
+        this.executionProperties.clear();
+        this.executionProperties.putAll( executionProperties );
+        return this;
+    }
+
+    public org.apache.maven.model.profile.ProfileActivationContext setInactiveProfileIds(
+                                                                                          List<String> inactiveProfileIds )
+    {
+        setExplicitlyInactiveProfileIds( inactiveProfileIds );
+        return this;
+    }
+
 }

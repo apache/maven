@@ -38,6 +38,14 @@ public interface ProfileActivationContext
     List<String> getActiveProfileIds();
 
     /**
+     * Sets the identifiers of those profiles that should be activated by explicit demand.
+     * 
+     * @param activeProfileIds The identifiers of those profiles to activate, may be {@code null}.
+     * @return This context, never {@code null}.
+     */
+    ProfileActivationContext setActiveProfileIds( List<String> activeProfileIds );
+
+    /**
      * Gets the identifiers of those profiles that should be deactivated by explicit demand.
      * 
      * @return The identifiers of those profiles to deactivate, never {@code null}.
@@ -45,10 +53,26 @@ public interface ProfileActivationContext
     List<String> getInactiveProfileIds();
 
     /**
+     * Sets the identifiers of those profiles that should be deactivated by explicit demand.
+     * 
+     * @param inactiveProfileIds The identifiers of those profiles to deactivate, may be {@code null}.
+     * @return This context, never {@code null}.
+     */
+    ProfileActivationContext setInactiveProfileIds( List<String> inactiveProfileIds );
+
+    /**
      * Gets the execution properties.
      * 
      * @return The execution properties, never {@code null}.
      */
     Properties getExecutionProperties();
+
+    /**
+     * Sets the execution properties.
+     * 
+     * @param executionProperties The execution properties, may be {@code null}.
+     * @return This context, never {@code null}.
+     */
+    ProfileActivationContext setExecutionProperties( Properties executionProperties );
 
 }

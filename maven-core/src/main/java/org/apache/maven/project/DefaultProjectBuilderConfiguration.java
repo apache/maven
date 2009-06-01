@@ -19,171 +19,52 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.ModelEventListener;
-import org.apache.maven.model.Profile;
 
+@Deprecated
 public class DefaultProjectBuilderConfiguration
+    extends DefaultProjectBuildingRequest
     implements ProjectBuilderConfiguration
 {
-    private ArtifactRepository localRepository;
-
-    private List<ArtifactRepository> remoteRepositories;
-    
-    private Properties executionProperties;
-
-    private List<ModelEventListener> listeners;
-    
-    private MavenProject topProject;
-    
-    private boolean processPlugins = true;
-
-    private boolean lenientValidation;
-
-    private List<String> activeProfileIds;
-    
-    private List<String> inactiveProfileIds;
-    
-    private List<Profile> profiles;
-        
-    public MavenProject getTopLevelProjectFromReactor()
-    {
-    	return topProject;
-    }
-    
-    public void setTopLevelProjectForReactor(MavenProject mavenProject)
-    {
-    	this.topProject = mavenProject;
-    }       
 
     public ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository )
     {
-        this.localRepository = localRepository;
+        super.setLocalRepository( localRepository );
         return this;
-    }
-
-    public ArtifactRepository getLocalRepository()
-    {
-        return localRepository;
-    }
-        
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
-        if ( remoteRepositories == null )
-        {
-            remoteRepositories = new ArrayList<ArtifactRepository>();
-        }
-        return remoteRepositories;
     }
 
     public ProjectBuilderConfiguration setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
-        this.remoteRepositories = remoteRepositories;
+        super.setRemoteRepositories( remoteRepositories );
         return this;
-    }
-    
-    public Properties getExecutionProperties()
-    {
-        if ( executionProperties == null )
-        {
-            executionProperties = new Properties();
-        }
-        return executionProperties;
     }
 
     public ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties )
     {
-        this.executionProperties = executionProperties;
+        super.setExecutionProperties( executionProperties );
         return this;
-    }
-
-    public List<ModelEventListener> getModelEventListeners()
-    {
-        return listeners;
     }
 
     public ProjectBuilderConfiguration setModelEventListeners( List<ModelEventListener> listeners )
     {
-        this.listeners = listeners;
+        super.setModelEventListeners( listeners );
         return this;
-    }
-
-    public boolean isProcessPlugins()
-    {
-        return processPlugins;
     }
 
     public ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins )
     {
-        this.processPlugins = processPlugins;
+        super.setProcessPlugins( processPlugins );
         return this;
     }
 
     public ProjectBuilderConfiguration setLenientValidation( boolean lenientValidation )
     {
-        this.lenientValidation = lenientValidation;
+        super.setLenientValidation( lenientValidation );
         return this;
-    }
-
-    public boolean istLenientValidation()
-    {
-        return lenientValidation;
-    }
-
-    public List<String> getActiveProfileIds()
-    {
-        if ( activeProfileIds == null )
-        {
-            activeProfileIds = new ArrayList<String>();
-        }
-        return activeProfileIds;        
-    }
-
-    public void setActiveProfileIds( List<String> activeProfileIds )
-    {
-        this.activeProfileIds = activeProfileIds;      
-    }
-
-    public List<String> getInactiveProfileIds()
-    {
-        if ( inactiveProfileIds == null )
-        {
-            inactiveProfileIds = new ArrayList<String>();
-        }
-        return inactiveProfileIds;
-    }
-
-    public void setInactiveProfileIds( List<String> inactiveProfileIds )
-    {
-        this.inactiveProfileIds = inactiveProfileIds;
-    }
-
-    public void setProfiles( List<Profile> profiles )
-    {
-        this.profiles = profiles;
-    }
-    
-    public void addProfile( Profile profile )
-    {
-        if ( profiles == null )
-        {
-            profiles = new ArrayList<Profile>();
-        }
-        
-        profiles.add( profile );
-    }
-
-    public List<Profile> getProfiles()
-    {
-        if ( profiles == null )
-        {
-            profiles = new ArrayList<Profile>();
-        }
-        return profiles;
     }
 
 }
