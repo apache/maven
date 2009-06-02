@@ -25,7 +25,7 @@ import java.util.Properties;
 import org.apache.maven.model.profile.ProfileActivationContext;
 
 /**
- * Collects settings that control building of effective models.
+ * Collects settings that control the building of effective models.
  * 
  * @author Benjamin Bentmann
  */
@@ -41,7 +41,9 @@ public interface ModelBuildingRequest
     boolean istLenientValidation();
 
     /**
-     * Sets the level of validation to perform on processed models. By default, models are validated in strict mode.
+     * Sets the level of validation to perform on processed models. For building of projects, strict validation should
+     * be used to ensure proper building. For the mere retrievel of dependencies during artifact resolution, lenient
+     * validation should be used to account for models of poor quality. By default, models are validated in strict mode.
      * 
      * @param lenientValidation A flag whether validation should be lenient instead of strict. For building of projects,
      *            strict validation should be used to ensure proper building. For the mere retrievel of dependencies

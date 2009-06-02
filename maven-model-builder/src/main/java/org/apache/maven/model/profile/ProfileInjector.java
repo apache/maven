@@ -32,7 +32,8 @@ public interface ProfileInjector
 {
 
     /**
-     * Merges values from the specified profile into the given model.
+     * Merges values from the specified profile into the given model. Implementations are expected to keep the profile
+     * and model completely decoupled by injecting deep copies rather than the original objects from the profile.
      * 
      * @param model The model into which to merge the values defined by the profile, must not be <code>null</code>.
      * @param profile The (read-only) profile whose values should be injected, may be <code>null</code>.
