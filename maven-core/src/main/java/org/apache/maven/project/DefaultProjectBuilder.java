@@ -28,6 +28,7 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.FileModelSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBuilder;
 import org.apache.maven.model.ModelBuildingException;
@@ -78,10 +79,10 @@ public class DefaultProjectBuilder
     public MavenProject build( File pomFile, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        return build( pomFile, pomFile.getParentFile(), configuration );
+        return build( pomFile, true, configuration );
     }
 
-    private MavenProject build( File pomFile, File projectDirectory, ProjectBuildingRequest configuration )
+    private MavenProject build( File pomFile, boolean localProject, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
         String cacheKey = getCacheKey( pomFile, configuration );
@@ -100,7 +101,16 @@ public class DefaultProjectBuilder
         ModelBuildingResult result;
         try
         {
-            result = modelBuilder.build( pomFile, configuration.getModelBuildingRequest(), resolver );
+            if ( localProject )
+            {
+                result = modelBuilder.build( pomFile, configuration.getModelBuildingRequest(), resolver );
+            }
+            else
+            {
+                result =
+                    modelBuilder.build( new FileModelSource( pomFile ), configuration.getModelBuildingRequest(),
+                                        resolver );
+            }
         }
         catch ( ModelBuildingException e )
         {
@@ -171,7 +181,7 @@ public class DefaultProjectBuilder
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
 
-        return build( artifact.getFile(), null, configuration );
+        return build( artifact.getFile(), false, configuration );
     }
 
     /**
@@ -238,7 +248,7 @@ public class DefaultProjectBuilder
         throws InvalidProjectModelException
     {
         MavenProject project;
-        String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
+
         try
         {
             project = new MavenProject( model, repositorySystem, this, config );
@@ -247,10 +257,10 @@ public class DefaultProjectBuilder
             project.setArtifact( projectArtifact );
 
             project.setParentFile( parentFile );
-
         }
         catch ( InvalidRepositoryException e )
         {
+            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
             throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
         }
 
