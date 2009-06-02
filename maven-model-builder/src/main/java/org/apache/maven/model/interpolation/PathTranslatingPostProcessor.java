@@ -24,6 +24,7 @@ import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.util.ValueSourceUtils;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -34,12 +35,12 @@ class PathTranslatingPostProcessor
     implements InterpolationPostProcessor
 {
 
-    private final List<String> unprefixedPathKeys;
+    private final Collection<String> unprefixedPathKeys;
     private final File projectDir;
     private final PathTranslator pathTranslator;
     private final List<String> expressionPrefixes;
 
-    public PathTranslatingPostProcessor( List<String> expressionPrefixes, List<String> unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
+    public PathTranslatingPostProcessor( List<String> expressionPrefixes, Collection<String> unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
     {
         this.expressionPrefixes = expressionPrefixes;
         this.unprefixedPathKeys = unprefixedPathKeys;
@@ -49,11 +50,14 @@ class PathTranslatingPostProcessor
 
     public Object execute( String expression, Object value )
     {
-        expression = ValueSourceUtils.trimPrefix( expression, expressionPrefixes, true );
-        
-        if ( projectDir != null && value != null && unprefixedPathKeys.contains( expression ) )
+        if ( value != null )
         {
-            return pathTranslator.alignToBaseDirectory( String.valueOf( value ), projectDir );
+            expression = ValueSourceUtils.trimPrefix( expression, expressionPrefixes, true );
+
+            if ( unprefixedPathKeys.contains( expression ) )
+            {
+                return pathTranslator.alignToBaseDirectory( String.valueOf( value ), projectDir );
+            }
         }
 
         return value;

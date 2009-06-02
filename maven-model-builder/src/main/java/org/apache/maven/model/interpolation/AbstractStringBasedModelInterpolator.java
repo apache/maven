@@ -38,7 +38,9 @@ import org.codehaus.plexus.interpolation.ValueSource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -54,11 +56,11 @@ public abstract class AbstractStringBasedModelInterpolator
 {
     private static final List<String> PROJECT_PREFIXES = Arrays.asList( new String[]{ "pom.", "project." } );
 
-    private static final List<String> TRANSLATED_PATH_EXPRESSIONS;
+    private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
 
     static
     {
-        List<String> translatedPrefixes = new ArrayList<String>();
+        Collection<String> translatedPrefixes = new HashSet<String>();
 
         // MNG-1927, MNG-2124, MNG-3355:
         // If the build section is present and the project directory is non-null, we should make
@@ -150,9 +152,16 @@ public abstract class AbstractStringBasedModelInterpolator
                                                                                final File projectDir,
                                                                                final ModelBuildingRequest config )
     {
-        return Collections.singletonList( new PathTranslatingPostProcessor( PROJECT_PREFIXES,
-                                                                            TRANSLATED_PATH_EXPRESSIONS, projectDir,
-                                                                            pathTranslator ) );
+        if ( projectDir != null )
+        {
+            return Collections.singletonList( new PathTranslatingPostProcessor( PROJECT_PREFIXES,
+                                                                                TRANSLATED_PATH_EXPRESSIONS,
+                                                                                projectDir, pathTranslator ) );
+        }
+        else
+        {
+            return Collections.emptyList();
+        }
     }
     
     protected String interpolateInternal( String src, List<? extends ValueSource> valueSources,
