@@ -60,8 +60,8 @@ public class StringSearchModelInterpolator
     {
         try
         {
-            List<ValueSource> valueSources = createValueSources( model, projectDir, config );
-            List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
+            List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config );
+            List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
             
             InterpolateObjectAction action =
                 new InterpolateObjectAction( obj, valueSources, postProcessors, this );
@@ -92,11 +92,11 @@ public class StringSearchModelInterpolator
 
         private final LinkedList<Object> interpolationTargets;
         private final StringSearchModelInterpolator modelInterpolator;
-        private final List<ValueSource> valueSources;
-        private final List<InterpolationPostProcessor> postProcessors;
+        private final List<? extends ValueSource> valueSources;
+        private final List<? extends InterpolationPostProcessor> postProcessors;
         
-        public InterpolateObjectAction( Object target, List<ValueSource> valueSources,
-                                        List<InterpolationPostProcessor> postProcessors,
+        public InterpolateObjectAction( Object target, List<? extends ValueSource> valueSources,
+                                        List<? extends InterpolationPostProcessor> postProcessors,
                                         StringSearchModelInterpolator modelInterpolator )
         {
             this.valueSources = valueSources;

@@ -146,18 +146,17 @@ public abstract class AbstractStringBasedModelInterpolator
         return valueSources;
     }
     
-    protected List<InterpolationPostProcessor> createPostProcessors( final Model model, final File projectDir,
-                                                                     final ModelBuildingRequest config )
+    protected List<? extends InterpolationPostProcessor> createPostProcessors( final Model model,
+                                                                               final File projectDir,
+                                                                               final ModelBuildingRequest config )
     {
-        return Collections.singletonList( (InterpolationPostProcessor) new PathTranslatingPostProcessor(
-                                                                                                         PROJECT_PREFIXES,
-                                                                                                         TRANSLATED_PATH_EXPRESSIONS,
-                                                                                                         projectDir,
-                                                                                                         pathTranslator ) );
+        return Collections.singletonList( new PathTranslatingPostProcessor( PROJECT_PREFIXES,
+                                                                            TRANSLATED_PATH_EXPRESSIONS, projectDir,
+                                                                            pathTranslator ) );
     }
     
-    protected String interpolateInternal( String src, List<ValueSource> valueSources,
-                                          List<InterpolationPostProcessor> postProcessors )
+    protected String interpolateInternal( String src, List<? extends ValueSource> valueSources,
+                                          List<? extends InterpolationPostProcessor> postProcessors )
         throws ModelInterpolationException
     {
         if ( src.indexOf( "${" ) < 0 )
