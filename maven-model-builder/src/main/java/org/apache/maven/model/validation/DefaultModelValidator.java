@@ -26,6 +26,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
@@ -46,7 +47,7 @@ public class DefaultModelValidator
 
     private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
 
-    public ModelValidationResult validateRawModel( Model model, boolean lenient )
+    public ModelValidationResult validateRawModel( Model model, ModelBuildingRequest request )
     {
         ModelValidationResult result = new ModelValidationResult();
 
@@ -71,7 +72,7 @@ public class DefaultModelValidator
         return result;
     }
 
-    public ModelValidationResult validateEffectiveModel( Model model, boolean lenient )
+    public ModelValidationResult validateEffectiveModel( Model model, ModelBuildingRequest request )
     {
         ModelValidationResult result = new ModelValidationResult();
 
@@ -173,7 +174,7 @@ public class DefaultModelValidator
             }
         }
 
-        if ( !lenient )
+        if ( !request.istLenientValidation() )
         {
             Build build = model.getBuild();
             if ( build != null )

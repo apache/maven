@@ -22,6 +22,7 @@ package org.apache.maven.model.path;
 import java.io.File;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 
 /**
  * Resolves relative paths of a model against a specific base directory.
@@ -37,7 +38,8 @@ public interface ModelPathTranslator
      * 
      * @param model The model whose paths should be resolved, may be {@code null}.
      * @param basedir The base directory to resolve relative paths against, may be {@code null}.
+     * @param request The model building request that holds further settings, must not be {@code null}.
      */
-    void alignToBaseDirectory( Model model, File basedir );
+    void alignToBaseDirectory( Model model, File basedir, ModelBuildingRequest request );
 
 }

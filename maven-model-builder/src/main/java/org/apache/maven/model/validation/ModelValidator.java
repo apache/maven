@@ -20,6 +20,7 @@ package org.apache.maven.model.validation;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 
 /**
  * Checks the model for missing or invalid values.
@@ -35,23 +36,19 @@ public interface ModelValidator
      * file and has not been subjected to inheritance, interpolation or profile/default injection.
      * 
      * @param model The model to validate, must not be {@code null}.
-     * @param lenient A flag whether validation should be lenient instead of strict. For building of projects, strict
-     *            validation should be used to ensure proper building. For the mere retrievel of dependencies during
-     *            artifact resolution, lenient validation should be used to account for models of poor quality.
+     * @param request The model building request that holds further settings, must not be {@code null}.
      * @return The result of the validation, never {@code null}.
      */
-    ModelValidationResult validateRawModel( Model model, boolean lenient );
+    ModelValidationResult validateRawModel( Model model, ModelBuildingRequest request );
 
     /**
      * Checks the specified (effective) model for missing or invalid values. The effective model is fully assembled and
      * has undergone inheritance, interpolation and other model operations.
      * 
      * @param model The model to validate, must not be {@code null}.
-     * @param lenient A flag whether validation should be lenient instead of strict. For building of projects, strict
-     *            validation should be used to ensure proper building. For the mere retrievel of dependencies during
-     *            artifact resolution, lenient validation should be used to account for models of poor quality.
+     * @param request The model building request that holds further settings, must not be {@code null}.
      * @return The result of the validation, never {@code null}.
      */
-    ModelValidationResult validateEffectiveModel( Model model, boolean lenient );
+    ModelValidationResult validateEffectiveModel( Model model, ModelBuildingRequest request );
 
 }

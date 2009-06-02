@@ -125,7 +125,7 @@ public class DefaultModelBuilder
             Model rawModel = ModelUtils.cloneModel( current );
             rawModels.add( rawModel );
 
-            modelNormalizer.mergeDuplicates( resultModel );
+            modelNormalizer.mergeDuplicates( resultModel, request );
 
             List<Profile> activeProjectProfiles = getActiveProjectProfiles( rawModel, request );
 
@@ -139,7 +139,7 @@ public class DefaultModelBuilder
 
             for ( Profile activeProfile : activeProfiles )
             {
-                profileInjector.injectProfile( resultModel, activeProfile );
+                profileInjector.injectProfile( resultModel, activeProfile, request );
             }
 
             result.setActiveProfiles( rawModel, activeProfiles );
@@ -153,25 +153,25 @@ public class DefaultModelBuilder
 
         result.setRawModels( rawModels );
 
-        assembleInheritance( resultModels );
+        assembleInheritance( resultModels, request );
 
         Model resultModel = resultModels.get( 0 );
 
         resultModel = interpolateModel( resultModel, request );
         resultModels.set( 0, resultModel );
 
-        modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory() );
+        modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
         if ( request.isProcessPlugins() )
         {
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel );
         }
 
-        managementInjector.injectManagement( resultModel );
+        managementInjector.injectManagement( resultModel, request );
 
         if ( request.isProcessPlugins() )
         {
-            pluginConfigurationExpander.expandPluginConfiguration( resultModel );
+            pluginConfigurationExpander.expandPluginConfiguration( resultModel, request );
         }
 
         validateModel( resultModel, false, request );
@@ -215,11 +215,11 @@ public class DefaultModelBuilder
 
         if ( raw )
         {
-            result = modelValidator.validateRawModel( model, request.istLenientValidation() );
+            result = modelValidator.validateRawModel( model, request );
         }
         else
         {
-            result = modelValidator.validateEffectiveModel( model, request.istLenientValidation() );
+            result = modelValidator.validateEffectiveModel( model, request );
         }
 
         if ( result.getMessageCount() > 0 )
@@ -273,13 +273,13 @@ public class DefaultModelBuilder
         }
     }
 
-    private void assembleInheritance( List<Model> models )
+    private void assembleInheritance( List<Model> models, ModelBuildingRequest request )
     {
         for ( int i = models.size() - 2; i >= 0; i-- )
         {
             Model parent = models.get( i + 1 );
             Model child = models.get( i );
-            inheritanceAssembler.assembleModelInheritance( child, parent );
+            inheritanceAssembler.assembleModelInheritance( child, parent, request );
         }
     }
 

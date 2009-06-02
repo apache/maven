@@ -20,6 +20,7 @@ package org.apache.maven.model.plugin;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 
 /**
  * Handles expansion of general plugin configuration into individual executions and report sets.
@@ -34,7 +35,8 @@ public interface PluginConfigurationExpander
      * given model.
      * 
      * @param model The model whose plugin configuration should be expanded, must not be <code>null</code>.
+     * @param request The model building request that holds further settings, must not be {@code null}.
      */
-    void expandPluginConfiguration( Model model );
+    void expandPluginConfiguration( Model model, ModelBuildingRequest request );
 
 }

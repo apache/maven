@@ -20,6 +20,7 @@ package org.apache.maven.model.normalization;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 
 /**
  * Handles normalization of a model.
@@ -33,7 +34,8 @@ public interface ModelNormalizer
      * Merges duplicate elements like multiple declarations of the same build plugin in the specified model.
      * 
      * @param model The model whose duplicate elements should be merged, must not be <code>null</code>.
+     * @param request The model building request that holds further settings, must not be {@code null}.
      */
-    void mergeDuplicates( Model model );
+    void mergeDuplicates( Model model, ModelBuildingRequest request );
 
 }

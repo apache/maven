@@ -20,6 +20,7 @@ package org.apache.maven.model.inheritance;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 
 /**
  * Handles inheritance of model values.
@@ -35,7 +36,8 @@ public interface InheritanceAssembler
      * @param child The child model into which to merge the values inherited from the parent, must not be
      *            <code>null</code>.
      * @param parent The (read-only) parent model from which to inherit the values, may be <code>null</code>.
+     * @param request The model building request that holds further settings, must not be {@code null}.
      */
-    void assembleModelInheritance( Model child, Model parent );
+    void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request );
 
 }

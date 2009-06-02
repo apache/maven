@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -38,7 +39,7 @@ public class DefaultInheritanceAssembler
 
     private MavenModelMerger merger = new MavenModelMerger();
 
-    public void assembleModelInheritance( Model child, Model parent )
+    public void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request )
     {
         Map<Object, Object> hints = new HashMap<Object, Object>();
         hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent ) );

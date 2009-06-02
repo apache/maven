@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
 import org.codehaus.plexus.component.annotations.Component;
@@ -43,7 +44,7 @@ public class DefaultModelPathTranslator
     @Requirement
     private PathTranslator pathTranslator;
 
-    public void alignToBaseDirectory( Model model, File basedir )
+    public void alignToBaseDirectory( Model model, File basedir, ModelBuildingRequest request )
     {
         if ( model == null || basedir == null )
         {

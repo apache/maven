@@ -21,6 +21,7 @@ package org.apache.maven.model.plugin;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
@@ -39,7 +40,7 @@ public class DefaultPluginConfigurationExpander
     implements PluginConfigurationExpander
 {
 
-    public void expandPluginConfiguration( Model model )
+    public void expandPluginConfiguration( Model model, ModelBuildingRequest request )
     {
         Build build = model.getBuild();
         Reporting reporting = model.getReporting();

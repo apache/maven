@@ -32,6 +32,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
@@ -51,7 +52,7 @@ public class DefaultManagementInjector
 
     private ManagementModelMerger merger = new ManagementModelMerger();
 
-    public void injectManagement( Model model )
+    public void injectManagement( Model model, ModelBuildingRequest request )
     {
         merger.mergeManagedDependencies( model );
         merger.mergeManagedBuildPlugins( model );

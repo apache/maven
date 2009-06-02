@@ -22,7 +22,9 @@ package org.apache.maven.model.validation;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.maven.model.DefaultModelBuildingRequest;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -48,19 +50,20 @@ public class DefaultModelValidatorTest
     private ModelValidationResult validate( String pom )
         throws Exception
     {
-        return validate(pom, false, false);
+        return validate( pom, false, false );
     }
 
     private ModelValidationResult validate( String pom, boolean raw, boolean lenient )
         throws Exception
     {
+        ModelBuildingRequest request = new DefaultModelBuildingRequest().setLenientValidation( lenient );
         if ( raw )
         {
-            return validator.validateRawModel( read( pom ), lenient );
+            return validator.validateRawModel( read( pom ), request );
         }
         else
         {
-            return validator.validateEffectiveModel( read( pom ), lenient );
+            return validator.validateEffectiveModel( read( pom ), request );
         }
     }
 

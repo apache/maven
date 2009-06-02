@@ -20,6 +20,7 @@ package org.apache.maven.model.management;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 
 /**
  * Handles injection of plugin/dependency management into the model.
@@ -34,7 +35,8 @@ public interface ManagementInjector
      * 
      * @param child The model into which to merge the values specified by its management sections, must not be
      *            <code>null</code>.
+     * @param request The model building request that holds further settings, must not be {@code null}.
      */
-    void injectManagement( Model child );
+    void injectManagement( Model child, ModelBuildingRequest request );
 
 }

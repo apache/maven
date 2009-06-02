@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
@@ -43,7 +44,7 @@ public class DefaultModelNormalizer
 
     private DuplicateMerger merger = new DuplicateMerger();
 
-    public void mergeDuplicates( Model model )
+    public void mergeDuplicates( Model model, ModelBuildingRequest request )
     {
         Build build = model.getBuild();
         if ( build != null )
