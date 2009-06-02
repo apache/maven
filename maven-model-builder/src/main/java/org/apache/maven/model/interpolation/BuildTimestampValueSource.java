@@ -28,7 +28,7 @@ import org.codehaus.plexus.interpolation.AbstractValueSource;
  *
  * @version $Id$
  */
-public class BuildTimestampValueSource
+class BuildTimestampValueSource
     extends AbstractValueSource
 {
 
