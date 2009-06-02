@@ -41,7 +41,7 @@ public class MavenITmng4167PluginAndCoordXFormPOMTest
     public MavenITmng4167PluginAndCoordXFormPOMTest()
         throws InvalidVersionSpecificationException
     {
-        super( "(2.1.0,)" ); // only test in 2.0.9+
+        super( "[2.2.0,)" );
     }
 
     public void testIt ()
@@ -54,8 +54,8 @@ public class MavenITmng4167PluginAndCoordXFormPOMTest
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.mng4167", "mng-4167", "1", "pom" );
 
-		String specVersion = System.getProperty( "java.specification.version" );
-		
+        String specVersion = System.getProperty( "java.specification.version" );
+    
         verifier.deleteArtifact( "org.apache.maven.its.mng4167." + specVersion, "mng-4167-" + specVersion, "1-"
             + specVersion, "pom" );
         
