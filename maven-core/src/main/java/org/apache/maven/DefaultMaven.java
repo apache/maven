@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +95,8 @@ public class DefaultMaven
         
         Map<String,MavenProject> projects;
 
+        //TODO: optimize for the single project or no project
+        
         try
         {
             projects = getProjects( request );
@@ -176,6 +180,13 @@ public class DefaultMaven
     protected Map<String,MavenProject> getProjects( MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
+        // We have no POM file.
+        //
+        if ( request.getPom() == null || !request.getPom().exists() )
+        {
+            return new HashMap<String,MavenProject>();
+        }
+        
         List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
 
         Map<String,MavenProject> projects = collectProjects( files, request );
