@@ -73,6 +73,8 @@ public class DefaultMavenProjectBuilder
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
             .setLocalRepository( localRepository )
             .setRemoteRepositories( remoteRepositories );
+        configuration.setProcessPlugins( false );
+        configuration.setLenientValidation( true );
         
         return buildFromRepository( artifact, configuration );
     }

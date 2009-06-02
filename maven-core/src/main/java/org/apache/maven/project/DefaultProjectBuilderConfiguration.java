@@ -31,6 +31,11 @@ public class DefaultProjectBuilderConfiguration
     implements ProjectBuilderConfiguration
 {
 
+    public DefaultProjectBuilderConfiguration()
+    {
+        setProcessPlugins( false );
+    }
+
     public ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository )
     {
         super.setLocalRepository( localRepository );
