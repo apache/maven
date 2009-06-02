@@ -22,8 +22,6 @@ package org.apache.maven.model;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.model.profile.ProfileActivationContext;
-
 /**
  * Collects settings that control the building of effective models.
  * 
@@ -128,13 +126,5 @@ public interface ModelBuildingRequest
      * @return This request, never {@code null}.
      */
     ModelBuildingRequest setExecutionProperties( Properties executionProperties );
-
-    /**
-     * Gets the profile activation context for this request. The activation context is basically a view on a subset of
-     * settings from this request, manipulations to the request are reflected by the activation context and vice versa.
-     * 
-     * @return The profile activation context for this request, never {@code null}.
-     */
-    ProfileActivationContext getProfileActivationContext();
 
 }

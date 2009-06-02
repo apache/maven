@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.model.profile.DefaultProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationContext;
-
 /**
  * Collects settings that control building of effective models.
  * 
@@ -41,12 +38,18 @@ public class DefaultModelBuildingRequest
 
     private List<Profile> profiles;
 
-    private ProfileActivationContext profileActivationContext;
+    private List<String> activeProfileIds;
+
+    private List<String> inactiveProfileIds;
+
+    private Properties executionProperties;
 
     public DefaultModelBuildingRequest()
     {
         profiles = new ArrayList<Profile>();
-        profileActivationContext = new DefaultProfileActivationContext();
+        activeProfileIds = new ArrayList<String>();
+        inactiveProfileIds = new ArrayList<String>();
+        executionProperties = new Properties();
     }
 
     public boolean istLenientValidation()
@@ -91,50 +94,48 @@ public class DefaultModelBuildingRequest
 
     public List<String> getActiveProfileIds()
     {
-        return profileActivationContext.getActiveProfileIds();
+        return activeProfileIds;
     }
 
-    public ModelBuildingRequest setActiveProfileIds( List<String> activeProfileIds )
+    public DefaultModelBuildingRequest setActiveProfileIds( List<String> activeProfileIds )
     {
-        profileActivationContext.setActiveProfileIds( activeProfileIds );
+        this.activeProfileIds.clear();
+        if ( activeProfileIds != null )
+        {
+            this.activeProfileIds.addAll( activeProfileIds );
+        }
+
         return this;
     }
 
     public List<String> getInactiveProfileIds()
     {
-        return profileActivationContext.getInactiveProfileIds();
+        return inactiveProfileIds;
     }
 
-    public ModelBuildingRequest setInactiveProfileIds( List<String> inactiveProfileIds )
+    public DefaultModelBuildingRequest setInactiveProfileIds( List<String> inactiveProfileIds )
     {
-        profileActivationContext.setInactiveProfileIds( inactiveProfileIds );
+        this.inactiveProfileIds.clear();
+        if ( inactiveProfileIds != null )
+        {
+            this.inactiveProfileIds.addAll( inactiveProfileIds );
+        }
+
         return this;
     }
 
     public Properties getExecutionProperties()
     {
-        return profileActivationContext.getExecutionProperties();
+        return executionProperties;
     }
 
-    public ModelBuildingRequest setExecutionProperties( Properties executionProperties )
+    public DefaultModelBuildingRequest setExecutionProperties( Properties executionProperties )
     {
-        profileActivationContext.setExecutionProperties( executionProperties );
-        return this;
-    }
-
-    public ProfileActivationContext getProfileActivationContext()
-    {
-        return profileActivationContext;
-    }
-
-    public DefaultModelBuildingRequest setProfileActivationContext( ProfileActivationContext profileActivationContext )
-    {
-        if ( profileActivationContext == null )
+        this.executionProperties.clear();
+        if ( executionProperties != null )
         {
-            throw new IllegalArgumentException( "no profile activation context specified" );
+            this.executionProperties.putAll( executionProperties );
         }
-
-        this.profileActivationContext = profileActivationContext;
 
         return this;
     }

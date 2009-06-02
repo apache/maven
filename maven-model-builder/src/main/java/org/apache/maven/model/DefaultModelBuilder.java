@@ -37,6 +37,8 @@ import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
+import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationException;
 import org.apache.maven.model.profile.ProfileInjector;
 import org.apache.maven.model.profile.ProfileSelector;
@@ -109,7 +111,9 @@ public class DefaultModelBuilder
     {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
-        List<Profile> activeExternalProfiles = getActiveExternalProfiles( request );
+        ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
+
+        List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext );
 
         Model model = readModel( modelSource, request );
         model.setPomFile( pomFile );
@@ -127,7 +131,7 @@ public class DefaultModelBuilder
 
             modelNormalizer.mergeDuplicates( resultModel, request );
 
-            List<Profile> activeProjectProfiles = getActiveProjectProfiles( rawModel, request );
+            List<Profile> activeProjectProfiles = getActiveProjectProfiles( rawModel, profileActivationContext );
 
             List<Profile> activeProfiles = activeProjectProfiles;
             if ( current == model )
@@ -181,6 +185,15 @@ public class DefaultModelBuilder
         return result;
     }
 
+    private ProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
+    {
+        ProfileActivationContext context = new DefaultProfileActivationContext();
+        context.setActiveProfileIds( request.getActiveProfileIds() );
+        context.setInactiveProfileIds( request.getInactiveProfileIds() );
+        context.setExecutionProperties( request.getExecutionProperties() );
+        return context;
+    }
+
     private Model readModel( ModelSource modelSource, ModelBuildingRequest request )
         throws ModelBuildingException
     {
@@ -228,12 +241,12 @@ public class DefaultModelBuilder
         }
     }
 
-    private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request )
+    private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request, ProfileActivationContext context )
         throws ModelBuildingException
     {
         try
         {
-            return profileSelector.getActiveProfiles( request.getProfiles(), request.getProfileActivationContext() );
+            return profileSelector.getActiveProfiles( request.getProfiles(), context );
         }
         catch ( ProfileActivationException e )
         {
@@ -242,12 +255,12 @@ public class DefaultModelBuilder
         }
     }
 
-    private List<Profile> getActiveProjectProfiles( Model model, ModelBuildingRequest request )
+    private List<Profile> getActiveProjectProfiles( Model model, ProfileActivationContext context )
         throws ModelBuildingException
     {
         try
         {
-            return profileSelector.getActiveProfiles( model.getProfiles(), request.getProfileActivationContext() );
+            return profileSelector.getActiveProfiles( model.getProfiles(), context );
         }
         catch ( ProfileActivationException e )
         {
