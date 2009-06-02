@@ -25,6 +25,9 @@ import org.apache.maven.model.ModelBuildingRequest;
 import java.io.File;
 
 /**
+ * Replaces expressions of the form <tt>${token}</tt> with their effective values. Effective values are basically
+ * calculated from the elements of the model itself and the execution properties from the building request.
+ * 
  * @author jdcasey
  *         <p/>
  *         Created on Feb 2, 2005
@@ -32,10 +35,30 @@ import java.io.File;
 public interface ModelInterpolator
 {
 
+    /**
+     * The default format used for build timestamps.
+     */
     String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
 
+    /**
+     * The name of a property that if present in the model's {@code <properties>} section specifies a custom format for
+     * build timestamps. See {@link java.text.SimpleDateFormat} for details on the format.
+     */
     String BUILD_TIMESTAMP_FORMAT_PROPERTY = "maven.build.timestamp.format";
 
+    /**
+     * Interpolates expressions in the specified model. Note that implementations are free to either interpolate the
+     * provided model directly or to create a clone of the model and interpolate the clone. Callers should always use
+     * the returned model and must not rely on the input model being updated.
+     * 
+     * @param model The model to interpolate, must not be {@code null}.
+     * @param projectDir The project directory, may be {@code null} if the model does not belong to a local project but
+     *            to some artifact's metadata.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @return The interpolated model, never {@code null}.
+     * @throws ModelInterpolationException If the model could not be interpolated (e.g. due to expressions with cyclic
+     *             references).
+     */
     Model interpolateModel( Model model, File projectDir, ModelBuildingRequest request )
         throws ModelInterpolationException;
 
