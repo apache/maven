@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
@@ -38,7 +36,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectSorter;
-import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -66,9 +63,6 @@ public class DefaultMaven
 
     @Requirement
     protected PlexusContainer container;
-
-    @Requirement
-    protected RuntimeInformation runtimeInformation;
     
     public List<String> getLifecyclePhases()
     {
@@ -203,16 +197,6 @@ public class DefaultMaven
         {
             MavenProject project = projectBuilder.build( file, request.getProjectBuildingRequest() );
             
-            if ( ( project.getPrerequisites() != null ) && ( project.getPrerequisites().getMaven() != null ) )
-            {
-                DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
-
-                if ( runtimeInformation.getApplicationInformation().getVersion().compareTo( version ) < 0 )
-                {
-                    throw new MavenExecutionException( "Unable to build project '" + file + "; it requires Maven version " + version.toString(), file );
-                }
-            }
-
             if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && request.isRecursive() )
             {
                 File basedir = file.getParentFile();
