@@ -19,7 +19,9 @@ package org.apache.maven.project.validation;
  * under the License.
  */
 
+import org.apache.maven.model.DefaultModelBuildingRequest;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -40,7 +42,9 @@ public class DefaultModelValidator
     {
         ModelValidationResult result = new ModelValidationResult();
 
-        for ( String message : modelValidator.validateEffectiveModel( model, false ).getMessages() )
+        ModelBuildingRequest request = new DefaultModelBuildingRequest().setLenientValidation( false );
+
+        for ( String message : modelValidator.validateEffectiveModel( model, request ).getMessages() )
         {
             result.addMessage( message );
         }
