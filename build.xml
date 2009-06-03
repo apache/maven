@@ -186,6 +186,12 @@ TODO:
   <target name="maven-compile" depends="compile-boot" description="compiles Maven using the bootstrap Maven, skipping automated tests">
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
       <jvmarg value="-Xmx256M"/>
+      
+      <!-- <jvmarg value="-Xdebug"/>
+      <jvmarg value="-Xnoagent"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,address=8000"/>
+      <jvmarg value="-Djava.compiler=NONE"/> -->
+
       <classpath refid="maven.classpath"/>
       <arg value="-e"/>
       <arg value="-B"/>
