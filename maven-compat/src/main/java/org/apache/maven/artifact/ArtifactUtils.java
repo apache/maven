@@ -146,6 +146,16 @@ public final class ArtifactUtils
         return clone;
     }
 
+    /** Returns <code>to</code> collection */
+    public static <T extends Collection<Artifact>> T copyArtifacts( Collection<Artifact> from, T to )
+    {
+        for ( Artifact artifact : from )
+        {
+            to.add( ArtifactUtils.copyArtifact( artifact ) );
+        }
+        return to;
+    }
+
     private static <T> List<T> copyList( List<T> original )
     {
         List<T> copy = null;

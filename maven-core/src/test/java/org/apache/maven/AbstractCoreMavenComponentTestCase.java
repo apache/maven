@@ -154,22 +154,6 @@ public abstract class AbstractCoreMavenComponentTestCase
     {        
         return repositorySystem.createDefaultLocalRepository();        
     }
-
-    protected ArtifactRepository getReactorRepository( MavenProject... projects ) 
-        throws InvalidRepositoryException
-    {
-        Map<String, MavenProject> projectsMap = new LinkedHashMap<String, MavenProject>();
-
-        for ( MavenProject project : projects )
-        {
-            projectsMap.put( ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
-        }
-
-        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository( getLocalRepository() );
-        delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectsMap ) );
-        
-        return delegatingLocalArtifactRepository;
-    }
     
     protected class ProjectBuilder
     {

@@ -18,7 +18,6 @@ package org.apache.maven.project.artifact;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -130,7 +129,7 @@ public class DefaultMavenMetadataCache
         CacheRecord(Artifact pomArtifact, Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories)
         {
             this.pomArtifact = ArtifactUtils.copyArtifact( pomArtifact );
-            this.artifacts = copyArtifacts( artifacts );
+            this.artifacts = ArtifactUtils.copyArtifacts( artifacts, new ArrayList<Artifact>() );
             this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
 
 
@@ -186,7 +185,7 @@ public class DefaultMavenMetadataCache
         if ( cacheRecord != null && !cacheRecord.isStale() )
         {
             Artifact pomArtifact = ArtifactUtils.copyArtifact( cacheRecord.getArtifact() );
-            Set<Artifact> artifacts = new LinkedHashSet<Artifact>( copyArtifacts( cacheRecord.getArtifacts() ) );
+            Set<Artifact> artifacts = ArtifactUtils.copyArtifacts( cacheRecord.getArtifacts(), new LinkedHashSet<Artifact>() );
             return new ResolutionGroup( pomArtifact, artifacts , cacheRecord.getRemoteRepositories() );
         }
 
@@ -202,16 +201,6 @@ public class DefaultMavenMetadataCache
         CacheRecord cacheRecord = new CacheRecord( result.getPomArtifact(), result.getArtifacts(), result.getResolutionRepositories() );
 
         cache.put( cacheKey, cacheRecord );
-    }
-
-    public static List<Artifact> copyArtifacts( Collection<Artifact> artifacts )
-    {
-        ArrayList<Artifact> result = new ArrayList<Artifact>();
-        for ( Artifact artifact : artifacts )
-        {
-            result.add( ArtifactUtils.copyArtifact( artifact ) );
-        }
-        return result;
     }
 
     public void flush()

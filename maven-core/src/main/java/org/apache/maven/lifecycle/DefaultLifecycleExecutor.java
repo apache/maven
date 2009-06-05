@@ -397,12 +397,6 @@ public class DefaultLifecycleExecutor
             MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( 
                 mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getVersion(), mojoExecution.getGoal(), session.getLocalRepository(), project.getPluginArtifactRepositories() );
 
-            PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-            if ( pluginDescriptor.getPlugin().isExtensions() )
-            {
-                pluginDescriptor.setClassRealm( pluginManager.getPluginRealm( session, pluginDescriptor ) );
-            }
-
             requiredDependencyResolutionScope = calculateRequiredDependencyResolutionScope( requiredDependencyResolutionScope, mojoDescriptor.isDependencyResolutionRequired() );          
             
             mojoExecution.setMojoDescriptor( mojoDescriptor );
