@@ -165,7 +165,16 @@ public class MavenCli
         }
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
-        
+
+        try
+        {
+            mavenEmbedder.stop();
+        }
+        catch ( MavenEmbedderException e )
+        {
+            result.addException( e );
+        }
+
         // The exception handling should be handled in Maven itself.
         
         if ( result.hasExceptions() )

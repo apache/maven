@@ -67,9 +67,6 @@ public class DefaultProjectBuilder
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
     
-    @Requirement
-    private MavenProjectCache projectCache;
-    
     private MavenProject superProject;
 
     // ----------------------------------------------------------------------
@@ -85,15 +82,6 @@ public class DefaultProjectBuilder
     private MavenProject build( File pomFile, boolean localProject, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        String cacheKey = getCacheKey( pomFile, configuration );
-
-        MavenProject project = projectCache.get( cacheKey );
-                
-        if ( project != null )
-        {
-            return project;
-        }
-        
         ModelResolver resolver =
             new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, configuration.getLocalRepository(),
                                          configuration.getRemoteRepositories() );
@@ -119,7 +107,7 @@ public class DefaultProjectBuilder
         
         Model model = result.getEffectiveModel();
 
-        project = fromModelToMavenProject( model, result.getRawModels().get( 1 ).getPomFile(), configuration, model.getPomFile() );
+        MavenProject project = fromModelToMavenProject( model, result.getRawModels().get( 1 ).getPomFile(), configuration, model.getPomFile() );
 
         project.setOriginalModel( result.getRawModel() );
      
@@ -144,17 +132,7 @@ public class DefaultProjectBuilder
         project.setFile( pomFile );
         project.setActiveProfiles( result.getActiveProfiles( result.getRawModel() ) );
                 
-        projectCache.put( cacheKey, project );
-                
         return project;
-    }
-
-    private String getCacheKey( File pomFile, ProjectBuildingRequest configuration )
-    {
-        StringBuilder buffer = new StringBuilder( 256 );
-        buffer.append( pomFile.getAbsolutePath() );
-        buffer.append( '/' ).append( pomFile.lastModified() );
-        return buffer.toString();
     }
 
     public MavenProject build( Artifact artifact, ProjectBuildingRequest configuration )

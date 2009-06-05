@@ -171,7 +171,7 @@ public class DefaultMaven
         return result;
     }
     
-    protected Map<String,MavenProject> getProjects( MavenExecutionRequest request )
+    public Map<String,MavenProject> getProjects( MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
         // We have no POM file.

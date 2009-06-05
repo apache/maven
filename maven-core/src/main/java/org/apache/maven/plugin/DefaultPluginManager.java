@@ -15,21 +15,20 @@ package org.apache.maven.plugin;
  * the License.
  */
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
@@ -52,8 +51,11 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
@@ -61,23 +63,18 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurationExceptio
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
-import org.codehaus.plexus.component.discovery.ComponentDiscoveryEvent;
-import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextMapAdapter;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 // TODO: get plugin groups
@@ -88,12 +85,12 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
-    implements PluginManager, ComponentDiscoverer, ComponentDiscoveryListener
+    implements PluginManager
 {
     @Requirement
     private Logger logger;
 
-    @Requirement
+    @Requirement(role=PlexusContainer.class)
     protected PlexusContainer container;
 
     @Requirement
@@ -106,19 +103,7 @@ public class DefaultPluginManager
     private ResolutionErrorHandler resolutionErrorHandler;
 
     @Requirement
-    private PluginClassLoaderCache pluginClassLoaderCache;
-    
-    private Map<String, PluginDescriptor> pluginDescriptors;
-
-    public DefaultPluginManager()
-    {
-        pluginDescriptors = new HashMap<String, PluginDescriptor>();
-    }
-
-    private String pluginKey( Plugin plugin )
-    {
-        return plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
-    }
+    private PluginCache pluginCache;
 
     /**
      * 
@@ -133,24 +118,33 @@ public class DefaultPluginManager
      *                                      happen but if someone has made a descriptor by hand it's possible.
      * @throws CycleDetectedInComponentGraphException A cycle has been detected in the component graph for a plugin that has been dynamically loaded.
      */
-    public PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public synchronized PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException
     {
-        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
+//        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
 
         // There are cases where plugins are discovered but not actually populated. These are edge cases where you are working in the IDE on
         // Maven itself so this speaks to a problem we have with the system not starting entirely clean.
-        if ( pluginDescriptor != null && pluginDescriptor.getClassRealm() != null )
+//        if ( pluginDescriptor != null && pluginDescriptor.getClassRealm() != null )
+//        {
+//            return pluginDescriptor;
+//        }
+
+        PluginDescriptor pluginDescriptor = pluginCache.getPluginDescriptor( plugin, localRepository, remoteRepositories );
+        
+        if ( pluginDescriptor != null )
         {
             return pluginDescriptor;
-        }        
-        
+        }
+
+
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( pluginArtifact )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( remoteRepositories );
+            .setRemoteRepostories( remoteRepositories )
+            .setResolveTransitively( false );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
@@ -162,81 +156,99 @@ public class DefaultPluginManager
         {
             throw new PluginResolutionException( plugin, e );            
         }
-        
 
-        ClassRealm pluginRealm = pluginClassLoaderCache.get( constructPluginKey( plugin ) );
-        
-        if ( pluginRealm != null )            
-        {
-            return getPluginDescriptor( plugin );            
-        }            
-            
-        pluginRealm = container.createChildRealm( pluginKey( plugin ) );
-
-        Set<Artifact> pluginArtifacts;
-        
         try
         {
-            pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, localRepository, remoteRepositories );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new PluginNotFoundException( plugin, e );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginResolutionException( plugin, e );
-        }
+            if ( pluginArtifact.getFile().isFile() )
+            {
+                JarFile pluginJar = new JarFile( pluginArtifact.getFile() );
+                try
+                {
+                    ZipEntry pluginDescriptorEntry = pluginJar.getEntry( getComponentDescriptorLocation() );
+    
+                    if ( pluginDescriptorEntry != null )
+                    {
+                        InputStream is = pluginJar.getInputStream( pluginDescriptorEntry );
+    
+                        pluginDescriptor = parsebuildPluginDescriptor( is );
+                    }
+                }
+                finally
+                {
+                    pluginJar.close();
+                }
+            }
+            else
+            {
+                File pluginXml = new File( pluginArtifact.getFile(), getComponentDescriptorLocation() );
 
-        for ( Artifact a : pluginArtifacts )
-        {
-            try
-            {
-                pluginRealm.addURL( a.getFile().toURI().toURL() );
+                if ( pluginXml.canRead() )
+                {
+                    InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) );
+                    try
+                    {
+                        pluginDescriptor = parsebuildPluginDescriptor( is );
+                    }
+                    finally
+                    {
+                        IOUtil.close( is );
+                    }
+                }
             }
-            catch ( MalformedURLException e )
+
+            String pluginKey = constructPluginKey( plugin );
+
+            if ( pluginDescriptor == null )
             {
-                // Not going to happen
+                throw new InvalidPluginDescriptorException( "Invalid or missing Plugin Descriptor for " + pluginKey );
             }
+
+            // Check the internal consistent of a plugin descriptor when it is discovered. Most of the time the plugin descriptor is generated
+            // by the maven-plugin-plugin, but if you happened to have created one by hand and it's incorrect this validator will report
+            // the problem to the user.
+            //
+            MavenPluginValidator validator = new MavenPluginValidator( pluginArtifact );
+
+            validator.validate( pluginDescriptor );
+
+            if ( validator.hasErrors() )                                                                                                                        
+            {          
+                throw new InvalidPluginDescriptorException( "Invalid Plugin Descriptor for " + pluginKey, validator.getErrors() );
+            }        
+
+            pluginDescriptor.setPlugin( plugin );
+            pluginDescriptor.setPluginArtifact( pluginArtifact );
+
+            pluginCache.putPluginDescriptor( plugin, localRepository, remoteRepositories, pluginDescriptor );
+
+            return pluginDescriptor;
+        
         }
-        
-        String pluginKey = constructPluginKey( plugin );
-        
-        // Check the internal consistent of a plugin descriptor when it is discovered. Most of the time the plugin descriptor is generated
-        // by the maven-plugin-plugin, but if you happened to have created one by hand and it's incorrect this validator will report
-        // the problem to the user.
-        //
-        MavenPluginValidator validator = new MavenPluginValidator( pluginArtifact );
-        
-        try
+        catch ( IOException e )
         {
-            container.discoverComponents( pluginRealm, validator );
+            throw new PluginDescriptorParsingException( plugin, e );
         }
         catch ( PlexusConfigurationException e )
         {
             throw new PluginDescriptorParsingException( plugin, e );
         }
-        catch ( CycleDetectedInComponentGraphException e )
-        {
-            throw new CycleDetectedInPluginGraphException( plugin, e );
-        }
+    }
 
-        if ( validator.hasErrors() )                                                                                                                        
-        {          
-            throw new InvalidPluginDescriptorException( "Invalid Plugin Descriptor for " + pluginKey, validator.getErrors() );
-        }        
-        
-        pluginClassLoaderCache.put( pluginKey, pluginRealm );
-        
-        pluginDescriptor = getPluginDescriptor( plugin );
-        pluginDescriptor.setArtifacts( new ArrayList<Artifact>( pluginArtifacts ) );
-        
+    private PluginDescriptor parsebuildPluginDescriptor( InputStream is )
+        throws IOException, PlexusConfigurationException
+    {
+        PluginDescriptor pluginDescriptor;
+        XmlStreamReader reader = ReaderFactory.newXmlReader( is );
+
+        InterpolationFilterReader interpolationFilterReader = new InterpolationFilterReader( new BufferedReader( reader ), container.getContext().getContextData() );
+
+        pluginDescriptor = builder.build( interpolationFilterReader );
         return pluginDescriptor;
     }
 
     // TODO: Turn this into a component so it can be tested.
     //
-    Set<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedInPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    List<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedInPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactNotFoundException, ArtifactResolutionException
     {
         AndArtifactFilter filter = new AndArtifactFilter();
@@ -284,7 +296,7 @@ public class DefaultPluginManager
 
         logger.debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + result.getArtifacts().toString().replace( ',', '\n' ) );
 
-        return result.getArtifacts();
+        return new ArrayList<Artifact>( result.getArtifacts() );
     }
 
     // ----------------------------------------------------------------------
@@ -292,8 +304,8 @@ public class DefaultPluginManager
     // ----------------------------------------------------------------------
 
     public void executeMojo( MavenSession session, MojoExecution mojoExecution )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginExecutionException
-    {        
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
+    {
         MavenProject project = session.getCurrentProject();
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -308,8 +320,7 @@ public class DefaultPluginManager
             goalExecId += " {execution: " + mojoExecution.getExecutionId() + "}";
         }
 
-        // by this time, the pluginDescriptor has had the correct realm setup from getConfiguredMojo(..)
-        ClassRealm pluginRealm = pluginClassLoaderCache.get( constructPluginKey( mojoDescriptor.getPluginDescriptor() ) );            
+        ClassRealm pluginRealm = getPluginRealm( session, mojoDescriptor.getPluginDescriptor() );            
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
@@ -358,6 +369,121 @@ public class DefaultPluginManager
         }
     }
 
+    /**
+     * TODO pluginDescriptor classRealm and artifacts are set as a side effect of this
+     *      call, which is not nice.
+     */
+    public synchronized ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) throws PluginManagerException
+    {
+        ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
+        if ( pluginRealm != null )
+        {
+            return pluginRealm;
+        }
+
+        Plugin plugin = pluginDescriptor.getPlugin();
+        ArtifactRepository localRepository = session.getLocalRepository();
+        List<ArtifactRepository> remoteRepositories = session.getCurrentProject().getPluginArtifactRepositories();
+
+        PluginCache.CacheRecord cacheRecord = pluginCache.get( plugin, localRepository, remoteRepositories );
+
+        if ( cacheRecord != null )
+        {
+            pluginDescriptor.setClassRealm( cacheRecord.realm );
+            pluginDescriptor.setArtifacts( new ArrayList<Artifact>( cacheRecord.artifacts ) );
+
+            return pluginRealm;
+        }
+
+        pluginRealm = createPluginRealm( plugin );
+
+        Artifact pluginArtifact = pluginDescriptor.getPluginArtifact();
+
+        List<Artifact> pluginArtifacts;
+
+        try
+        {
+            pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, localRepository, remoteRepositories );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new IllegalStateException( e ); // XXX
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new IllegalStateException( e ); // XXX
+        }
+
+        for ( Artifact a : pluginArtifacts )
+        {
+            try
+            {
+                pluginRealm.addURL( a.getFile().toURI().toURL() );
+            }
+            catch ( MalformedURLException e )
+            {
+                // Not going to happen
+            }
+        }
+
+        pluginDescriptor.setClassRealm( pluginRealm );
+        pluginDescriptor.setArtifacts( pluginArtifacts );
+        
+        try
+        {
+            for ( ComponentDescriptor componentDescriptor : pluginDescriptor.getComponents() )
+            {
+                componentDescriptor.setRealm( pluginRealm );
+                container.addComponentDescriptor( componentDescriptor );
+            }
+
+            container.discoverComponents( pluginRealm );
+        }
+        catch ( PlexusConfigurationException e )
+        {
+            throw new PluginManagerException( plugin, e.getMessage(), e );
+        }
+        catch ( CycleDetectedInComponentGraphException e )
+        {
+            throw new PluginManagerException( plugin, e.getMessage(), e );
+        }
+
+        pluginCache.put( plugin, localRepository, remoteRepositories, pluginRealm, pluginArtifacts );
+        
+        return pluginRealm;
+    }
+
+    /**
+     * Creates ClassRealm with unique id for the given plugin
+     */
+    private ClassRealm createPluginRealm( Plugin plugin ) 
+        throws PluginManagerException
+    {
+        ClassWorld world = ((MutablePlexusContainer) container).getClassWorld();
+
+        String baseRealmId = constructPluginKey( plugin );
+        String realmId = baseRealmId;
+
+        synchronized ( world )
+        {
+            for ( int i = 0; i < 100; i++ )
+            {
+                try
+                {
+                    ClassRealm pluginRealm = world.newRealm( realmId );
+                    pluginRealm.setParentRealm( container.getContainerRealm() );
+                    return pluginRealm;
+                }
+                catch ( DuplicateRealmException e )
+                {
+                    realmId = baseRealmId + "-" + i;
+                }
+            }
+        }
+
+        throw new PluginManagerException( plugin, "Could not create ClassRealm", (Throwable) null );
+    }
+
     private Mojo getConfiguredMojo( MavenSession session, MavenProject project, MojoExecution mojoExecution, ClassRealm pluginRealm )
         throws PluginConfigurationException, PluginManagerException
     {
@@ -368,60 +494,68 @@ public class DefaultPluginManager
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
-        container.setLookupRealm( pluginRealm );
+        ClassRealm oldLookupRealm = container.setLookupRealm( pluginRealm );
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader( pluginRealm );
-
-        Mojo mojo;
+        container.setLookupRealm( pluginRealm );
 
         try
         {
-            mojo = container.lookup( Mojo.class, mojoDescriptor.getRoleHint() );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to find the mojo '" + mojoDescriptor.getRoleHint() + "' in the plugin '" + pluginDescriptor.getPluginLookupKey()
-                + "'", e );
-        }
-
-        if ( mojo instanceof ContextEnabled )
-        {
-            //TODO: find somewhere better to put the plugin context.
-            Map<String, Object> pluginContext = null;
-
-            if ( pluginContext != null )
+            Mojo mojo;
+    
+            try
             {
-                pluginContext.put( "project", project );
-
-                pluginContext.put( "pluginDescriptor", pluginDescriptor );
-
-                ( (ContextEnabled) mojo ).setPluginContext( pluginContext );
+                mojo = container.lookup( Mojo.class, mojoDescriptor.getRoleHint() );
             }
+            catch ( ComponentLookupException e )
+            {
+                throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to find the mojo '" + mojoDescriptor.getRoleHint() + "' in the plugin '" + pluginDescriptor.getPluginLookupKey()
+                    + "'", e );
+            }
+    
+            if ( mojo instanceof ContextEnabled )
+            {
+                //TODO: find somewhere better to put the plugin context.
+                Map<String, Object> pluginContext = null;
+    
+                if ( pluginContext != null )
+                {
+                    pluginContext.put( "project", project );
+    
+                    pluginContext.put( "pluginDescriptor", pluginDescriptor );
+    
+                    ( (ContextEnabled) mojo ).setPluginContext( pluginContext );
+                }
+            }
+    
+            mojo.setLog( new DefaultLog( logger ) );
+    
+            Xpp3Dom dom = mojoExecution.getConfiguration();
+    
+            PlexusConfiguration pomConfiguration;
+    
+            if ( dom == null )
+            {
+                pomConfiguration = new XmlPlexusConfiguration( "configuration" );
+            }
+            else
+            {
+                pomConfiguration = new XmlPlexusConfiguration( dom );
+            }
+    
+            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
+    
+            populatePluginFields( mojo, mojoDescriptor, pluginRealm, pomConfiguration, expressionEvaluator );
+
+            return mojo;
         }
-
-        mojo.setLog( new DefaultLog( logger ) );
-
-        Xpp3Dom dom = mojoExecution.getConfiguration();
-
-        PlexusConfiguration pomConfiguration;
-
-        if ( dom == null )
+        finally
         {
-            pomConfiguration = new XmlPlexusConfiguration( "configuration" );
-        }
-        else
-        {
-            pomConfiguration = new XmlPlexusConfiguration( dom );
+            Thread.currentThread().setContextClassLoader( oldClassLoader );
+            container.setLookupRealm( oldLookupRealm );
         }
 
-        ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
-
-        populatePluginFields( mojo, mojoDescriptor, pluginRealm, pomConfiguration, expressionEvaluator );
-
-        Thread.currentThread().setContextClassLoader( oldClassLoader );
-
-        return mojo;
     }
 
     // ----------------------------------------------------------------------
@@ -553,117 +687,9 @@ public class DefaultPluginManager
         return "META-INF/maven/plugin.xml";
     }
 
-    public ComponentSetDescriptor createComponentDescriptors( Reader componentDescriptorConfiguration, String source )
-        throws PlexusConfigurationException
-    {
-        return builder.build( componentDescriptorConfiguration, source );
-    }
-
-    public List<ComponentSetDescriptor> findComponents( Context context, ClassRealm realm )
-        throws PlexusConfigurationException
-    {
-        List<ComponentSetDescriptor> componentSetDescriptors = new ArrayList<ComponentSetDescriptor>();
-
-        Enumeration<URL> resources;
-        try
-        {
-            // We don't always want to scan parent realms. For plexus
-            // testcase, most components are in the root classloader so that needs to be scanned,
-            // but for child realms, we don't.
-            if ( realm.getParentRealm() != null )
-            {
-                resources = realm.findRealmResources( getComponentDescriptorLocation() );
-            }
-            else
-            {
-                resources = realm.findResources( getComponentDescriptorLocation() );
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new PlexusConfigurationException( "Unable to retrieve resources for: " + getComponentDescriptorLocation() + " in class realm: " + realm.getId() );
-        }
-
-        for ( URL url : Collections.list( resources ) )
-        {
-            Reader reader = null;
-
-            try
-            {
-                URLConnection conn = url.openConnection();
-
-                conn.setUseCaches( false );
-
-                conn.connect();
-
-                reader = ReaderFactory.newXmlReader( conn.getInputStream() );
-
-                InterpolationFilterReader interpolationFilterReader = new InterpolationFilterReader( reader, new ContextMapAdapter( context ) );
-
-                ComponentSetDescriptor componentSetDescriptor = createComponentDescriptors( interpolationFilterReader, url.toString() );
-
-                if ( componentSetDescriptor.getComponents() != null )
-                {
-                    for ( ComponentDescriptor<?> cd : componentSetDescriptor.getComponents() )
-                    {
-                        cd.setComponentSetDescriptor( componentSetDescriptor );
-                        cd.setRealm( realm );
-                    }
-                }
-
-                componentSetDescriptors.add( componentSetDescriptor );
-            }
-            catch ( IOException ex )
-            {
-                throw new PlexusConfigurationException( "Error reading configuration " + url, ex );
-            }
-            finally
-            {
-                IOUtil.close( reader );
-            }
-        }
-
-        return componentSetDescriptors;
-    }
-
     // ----------------------------------------------------------------------
     // Component Discovery Listener
     // ----------------------------------------------------------------------
-
-    private Set pluginsInProcess = new HashSet();
-
-    public void componentDiscovered( ComponentDiscoveryEvent event )
-    {
-        ComponentSetDescriptor componentSetDescriptor = event.getComponentSetDescriptor();
-
-        if ( componentSetDescriptor instanceof PluginDescriptor )
-        {
-            PluginDescriptor pluginDescriptor = (PluginDescriptor) componentSetDescriptor;
-
-            MavenPluginValidator validator = (MavenPluginValidator) event.getData();
-            
-            validator.validate( pluginDescriptor );
-            
-            if ( validator.hasErrors() )
-            {
-                return;
-            }
-            
-            String key = constructPluginKey( pluginDescriptor );
-
-            if ( !pluginsInProcess.contains( key ) )
-            {
-                pluginsInProcess.add( key );
-
-                pluginDescriptors.put( key, pluginDescriptor );
-            }
-        }
-    }
-
-    public PluginDescriptor getPluginDescriptor( Plugin plugin )
-    {
-        return pluginDescriptors.get( constructPluginKey( plugin ) );
-    }
 
     public String constructPluginKey( Plugin plugin )
     {

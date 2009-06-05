@@ -22,14 +22,12 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.component.discovery.ComponentDiscoverer;
-import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
  * @author Jason van Zyl
  */
 public interface PluginManager
-    extends ComponentDiscoverer, ComponentDiscoveryListener
 {
     // - find the plugin [extension point: any client may wish to do whatever they choose]
     // - load the plugin into a classloader [extension point: we want to take them from a repository, some may take from disk or whatever]
@@ -41,16 +39,22 @@ public interface PluginManager
     // plugin resolution exception
     // plugin configuration can't be parsed -- and this may be a result of client insertion of configuration
     // plugin component deps have a cycle -- this should be prevented for the most part but client code may inject an override component which itself has a cycle
+    // igorf: Way too many declared exceptions!
     PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException;
 
+    // igorf: Way too many declared exceptions!
     MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
-    
+
+    // igorf: Way too many declared exceptions!
     MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
-    
+
     // Why do we have a plugin execution exception as well?
+    // igorf: Way too many declared exceptions!
     void executeMojo( MavenSession session, MojoExecution execution )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginExecutionException;
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginExecutionException, PluginManagerException;
+
+    ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) throws PluginManagerException;
 }

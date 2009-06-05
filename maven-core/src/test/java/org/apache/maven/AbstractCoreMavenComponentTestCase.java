@@ -2,10 +2,13 @@ package org.apache.maven;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -21,6 +24,7 @@ import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
@@ -77,8 +81,8 @@ public abstract class AbstractCoreMavenComponentTestCase
      */
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
-        containerConfiguration.addComponentDiscoverer( PluginManager.class );
-        containerConfiguration.addComponentDiscoveryListener( PluginManager.class );
+//        containerConfiguration.addComponentDiscoverer( PluginManager.class );
+//        containerConfiguration.addComponentDiscoveryListener( PluginManager.class );
     }
 
     protected MavenExecutionRequest createMavenExecutionRequest( File pom )
@@ -149,6 +153,22 @@ public abstract class AbstractCoreMavenComponentTestCase
         throws InvalidRepositoryException
     {        
         return repositorySystem.createDefaultLocalRepository();        
+    }
+
+    protected ArtifactRepository getReactorRepository( MavenProject... projects ) 
+        throws InvalidRepositoryException
+    {
+        Map<String, MavenProject> projectsMap = new LinkedHashMap<String, MavenProject>();
+
+        for ( MavenProject project : projects )
+        {
+            projectsMap.put( ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
+        }
+
+        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository( getLocalRepository() );
+        delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectsMap ) );
+        
+        return delegatingLocalArtifactRepository;
     }
     
     protected class ProjectBuilder

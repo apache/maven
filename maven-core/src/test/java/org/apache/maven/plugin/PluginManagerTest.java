@@ -1,11 +1,9 @@
 package org.apache.maven.plugin;
 
-import java.util.Set;
+import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -66,7 +64,8 @@ public class PluginManagerTest
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );        
         assertNotNull( mojoDescriptor );
         assertEquals( "generate-metadata", mojoDescriptor.getGoal() );
-        assertNotNull( mojoDescriptor.getRealm() );
+        // igorf: plugin realm comes later
+        // assertNotNull( mojoDescriptor.getRealm() );
         
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
         assertNotNull( pluginDescriptor );
@@ -226,7 +225,7 @@ public class PluginManagerTest
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         */
         
-        Set<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getRemoteRepositories() );   
+        List<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getRemoteRepositories() );   
         assertEquals( 4, artifacts.size() );
         
         for ( Artifact a : artifacts )

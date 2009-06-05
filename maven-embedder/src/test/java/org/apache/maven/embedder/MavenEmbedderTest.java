@@ -39,7 +39,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectCache;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
@@ -243,9 +242,6 @@ public class MavenEmbedderTest
         assertNull( p0.getProperties().getProperty( "name" ) );
 
         assertNull( p0.getProperties().getProperty( "occupation" ) );
-
-        // NOTE: The default cache does not consider profiles so clear it to ensure the project is properly rebuild
-        mavenEmbedder.getPlexusContainer().lookup( MavenProjectCache.class ).clear();
 
         // Check with profile activated
 

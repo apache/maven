@@ -47,6 +47,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -221,7 +222,7 @@ public class DefaultLifecycleExecutor
     // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
     // 5. Bind mojos specified in the project itself to the lifecycle
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginManagerException
     {        
         MavenProject project = session.getCurrentProject();
                 
@@ -394,7 +395,13 @@ public class DefaultLifecycleExecutor
             // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
             //                        
             MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( 
-                mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getVersion(), mojoExecution.getGoal(), session.getLocalRepository(), project.getRemoteArtifactRepositories() );
+                mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getVersion(), mojoExecution.getGoal(), session.getLocalRepository(), project.getPluginArtifactRepositories() );
+
+            PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+            if ( pluginDescriptor.getPlugin().isExtensions() )
+            {
+                pluginDescriptor.setClassRealm( pluginManager.getPluginRealm( session, pluginDescriptor ) );
+            }
 
             requiredDependencyResolutionScope = calculateRequiredDependencyResolutionScope( requiredDependencyResolutionScope, mojoDescriptor.isDependencyResolutionRequired() );          
             

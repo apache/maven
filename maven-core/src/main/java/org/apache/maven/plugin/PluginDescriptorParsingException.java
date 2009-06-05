@@ -20,11 +20,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
  * @author Jason van Zyl
@@ -34,7 +29,7 @@ public class PluginDescriptorParsingException
 {
     private Plugin plugin;
 
-    public PluginDescriptorParsingException( Plugin plugin, PlexusConfigurationException e )
+    public PluginDescriptorParsingException( Plugin plugin, Exception e )
     {
         super( e );
         this.plugin = plugin;

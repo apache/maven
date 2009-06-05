@@ -31,4 +31,5 @@ public interface MavenMetadataCache
     void put( Artifact artifact, ArtifactRepository localRepository,
               List<ArtifactRepository> remoteRepositories, ResolutionGroup result );
 
+    void flush();
 }

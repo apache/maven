@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 
@@ -60,6 +61,8 @@ public class PluginDescriptor
     private String name;
 
     private String description;
+
+    private Plugin plugin;
 
     private Artifact pluginArtifact;
 
@@ -305,6 +308,16 @@ public class PluginDescriptor
     public String getDescription()
     {
         return description;
+    }
+
+    public void setPlugin( Plugin plugin )
+    {
+        this.plugin = plugin;
+    }
+    
+    public Plugin getPlugin()
+    {
+        return plugin;
     }
 
     public Artifact getPluginArtifact()

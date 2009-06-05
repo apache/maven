@@ -64,7 +64,7 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-final class ModelUtils
+public final class ModelUtils
 {
 
     // TODO: Replace this with MODELLO-191

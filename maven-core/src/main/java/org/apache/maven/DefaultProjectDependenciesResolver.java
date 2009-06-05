@@ -54,7 +54,7 @@ public class DefaultProjectDependenciesResolver
         
         ArtifactFilter filter; 
 
-        if ( exclusions != null )
+        if ( ! exclusions.isEmpty() )
         {
             filter = new AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{ new ExcludesArtifactFilter( exclusions ), scopeFilter } ) );
         }

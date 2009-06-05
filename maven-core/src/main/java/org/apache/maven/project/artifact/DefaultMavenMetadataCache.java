@@ -38,24 +38,26 @@ public class DefaultMavenMetadataCache
 
     public static class CacheKey 
     {
-        Artifact artifact;
-        List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+        private final Artifact artifact;
+        private final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+        private final int hashCode;
 
-        CacheKey( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        public CacheKey( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         {
             this.artifact = ArtifactUtils.copyArtifact( artifact );
             this.repositories.add( localRepository );
             this.repositories.addAll( remoteRepositories );
+
+            int hash = 17;
+            hash = hash * 31 + artifactHashCode( artifact );
+            hash = hash * 31 + repositories.hashCode();
+            this.hashCode = hash;
         }
 
         @Override
         public int hashCode()
         {
-            int hash = 17;
-            hash = hash * 31 + artifact.hashCode();
-            hash = hash * 31 + repositories.hashCode();
-
-            return hash;
+            return hashCode;
         }
 
         @Override
@@ -73,18 +75,57 @@ public class DefaultMavenMetadataCache
             
             CacheKey other = (CacheKey) o;
             
-            return artifact.equals( other.artifact ) && repositories.equals( other.repositories );
+            return artifactEquals( artifact, other.artifact ) && repositories.equals( other.repositories );
         }
+    }
+
+    private static int artifactHashCode( Artifact a )
+    {
+        int result = 17;
+        result = 31 * result + a.getGroupId().hashCode();
+        result = 31 * result + a.getArtifactId().hashCode();
+        result = 31 * result + a.getType().hashCode();
+        if ( a.getVersion() != null )
+        {
+            result = 31 * result + a.getVersion().hashCode();
+        }
+        result = 31 * result + ( a.getClassifier() != null ? a.getClassifier().hashCode() : 0 );
+        result = 31 * result + ( a.getScope() != null ? a.getScope().hashCode() : 0 );
+        result = 31 * result + ( a.getDependencyFilter() != null? a.getDependencyFilter().hashCode() : 0 );
+        result = 31 * result + ( a.isOptional() ? 1 : 0 );
+        return result;
+    }
+
+    private static boolean artifactEquals( Artifact a1, Artifact a2 )
+    {
+        if ( a1 == a2 )
+        {
+            return true;
+        }
+        
+        return eq( a1.getGroupId(), a2.getGroupId() )
+            && eq( a1.getArtifactId(), a2.getArtifactId() )
+            && eq( a1.getType(), a2.getType() )
+            && eq( a1.getVersion(), a2.getVersion() )
+            && eq( a1.getClassifier(), a2.getClassifier() )
+            && eq( a1.getScope(), a2.getScope() )
+            && eq( a1.getDependencyFilter(), a2.getDependencyFilter() )
+            && a1.isOptional() == a2.isOptional();
+    }
+
+    private static <T> boolean eq( T s1, T s2 )
+    {
+        return s1 != null? s1.equals( s2 ): s2 == null;
     }
 
     public class CacheRecord
     {
-        Artifact pomArtifact;
-        List<Artifact> artifacts;
-        List<ArtifactRepository> remoteRepositories;
+        private Artifact pomArtifact;
+        private List<Artifact> artifacts;
+        private List<ArtifactRepository> remoteRepositories;
 
-        long length;
-        long timestamp;
+        private long length;
+        private long timestamp;
 
         CacheRecord(Artifact pomArtifact, Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories)
         {
@@ -105,6 +146,21 @@ public class DefaultMavenMetadataCache
                 this.timestamp = -1;
             }
         }
+        
+        public Artifact getArtifact()
+        {
+            return pomArtifact;
+        }
+
+        public List<Artifact> getArtifacts()
+        {
+            return artifacts;
+        }
+
+        public List<ArtifactRepository> getRemoteRepositories()
+        {
+            return remoteRepositories;
+        }
 
         public boolean isStale()
         {
@@ -117,8 +173,8 @@ public class DefaultMavenMetadataCache
             return length != -1 || timestamp != -1;
         }
     }
-    
-    private Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
+
+    protected Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
     public ResolutionGroup get( Artifact artifact, ArtifactRepository localRepository,
                                 List<ArtifactRepository> remoteRepositories )
@@ -129,9 +185,9 @@ public class DefaultMavenMetadataCache
 
         if ( cacheRecord != null && !cacheRecord.isStale() )
         {
-            Artifact pomArtifact = ArtifactUtils.copyArtifact( cacheRecord.pomArtifact );
-            Set<Artifact> artifacts = new LinkedHashSet<Artifact>( copyArtifacts( cacheRecord.artifacts ) );
-            return new ResolutionGroup( pomArtifact, artifacts , cacheRecord.remoteRepositories );
+            Artifact pomArtifact = ArtifactUtils.copyArtifact( cacheRecord.getArtifact() );
+            Set<Artifact> artifacts = new LinkedHashSet<Artifact>( copyArtifacts( cacheRecord.getArtifacts() ) );
+            return new ResolutionGroup( pomArtifact, artifacts , cacheRecord.getRemoteRepositories() );
         }
 
         cache.remove( cacheKey );
@@ -158,4 +214,8 @@ public class DefaultMavenMetadataCache
         return result;
     }
 
+    public void flush()
+    {
+        cache.clear();
+    }
 }

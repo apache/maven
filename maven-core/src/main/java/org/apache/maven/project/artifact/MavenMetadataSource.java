@@ -40,8 +40,8 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -77,14 +77,12 @@ public class MavenMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        /*
         ResolutionGroup cached = cache.get( artifact, localRepository, remoteRepositories );
 
         if ( cached != null )
         {
             return cached;
         }
-        */
                 
         List<Dependency> dependencies;
 
@@ -169,7 +167,7 @@ public class MavenMetadataSource
 
         ResolutionGroup result = new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
 
-        //cache.put( artifact, localRepository, remoteRepositories, result );
+        cache.put( artifact, localRepository, remoteRepositories, result );
 
         return result;
     }
