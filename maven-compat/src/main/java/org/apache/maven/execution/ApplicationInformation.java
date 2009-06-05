@@ -2,6 +2,7 @@ package org.apache.maven.execution;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 
+@Deprecated
 public class ApplicationInformation
 {
     private ArtifactVersion version;

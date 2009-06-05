@@ -37,6 +37,7 @@ import org.codehaus.plexus.util.IOUtil;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
+@Deprecated
 @Component(role = RuntimeInformation.class)
 public class DefaultRuntimeInformation
     implements RuntimeInformation, Initializable

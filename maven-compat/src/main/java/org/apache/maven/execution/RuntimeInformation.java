@@ -27,6 +27,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
+@Deprecated
 public interface RuntimeInformation
 {
     ApplicationInformation getApplicationInformation();

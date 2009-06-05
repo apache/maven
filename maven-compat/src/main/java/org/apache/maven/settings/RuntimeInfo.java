@@ -27,6 +27,7 @@ import java.io.File;
  *
  * @version $Id$
  */
+@Deprecated
 public class RuntimeInfo
 {
     public static final String userHome = System.getProperty( "user.home" );
