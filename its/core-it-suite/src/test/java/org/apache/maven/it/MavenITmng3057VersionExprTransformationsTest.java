@@ -47,7 +47,7 @@ public class MavenITmng3057VersionExprTransformationsTest
     public MavenITmng3057VersionExprTransformationsTest()
     {
         // TODO: port to 3.x
-        super( "[2.1.0,)" ); // only test in 2.1.0+
+        super( "[2.1.0,2.1.1)" ); // only test in 2.1.0
     }
 
     public void testitMNG3057 ()
