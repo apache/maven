@@ -2,13 +2,10 @@ package org.apache.maven;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -20,11 +17,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.model.Repository;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
@@ -146,7 +142,12 @@ public abstract class AbstractCoreMavenComponentTestCase
     protected List<ArtifactRepository> getRemoteRepositories() 
         throws InvalidRepositoryException
     {
-        return Arrays.asList( repositorySystem.createDefaultRemoteRepository() );
+        Repository itRepo = new Repository();
+        itRepo.setId( "maven.it" );
+        itRepo.setUrl( "http://repository.sonatype.org/content/repositories/maven.snapshots" );
+
+        return Arrays.asList( repositorySystem.buildArtifactRepository( itRepo ),
+                              repositorySystem.createDefaultRemoteRepository() );
     }
         
     protected ArtifactRepository getLocalRepository() 
