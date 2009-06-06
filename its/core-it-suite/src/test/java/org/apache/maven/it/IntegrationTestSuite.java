@@ -93,7 +93,6 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng4180PerDependencyExclusionsTest.class );
         suite.addTestSuite( MavenITmng4172EmptyDependencySetTest.class );
-        suite.addTestSuite( MavenITmng4167PluginAndCoordXFormPOMTest.class );
         suite.addTestSuite( MavenITmng4150VersionRangeTest.class );
         suite.addTestSuite( MavenITmng4129PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng4126ParentProfilesXmlTest.class );
