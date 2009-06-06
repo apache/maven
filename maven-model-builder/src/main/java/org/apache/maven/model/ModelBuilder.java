@@ -38,12 +38,10 @@ public interface ModelBuilder
      * 
      * @param pomFile The POM file of the project to build the effective model from, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
-     * @param modelResolver The model resolver used to resolve parent POMs that are not locally reachable from the
-     *            project directory, must not be {@code null}.
      * @return The result of the model building, never {@code null}.
      * @throws ModelBuildingException If the effective model could not be built.
      */
-    ModelBuildingResult build( File pomFile, ModelBuildingRequest request, ModelResolver modelResolver )
+    ModelBuildingResult build( File pomFile, ModelBuildingRequest request )
         throws ModelBuildingException;
 
     /**
@@ -53,11 +51,10 @@ public interface ModelBuilder
      * 
      * @param modelSource The source of the POM, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
-     * @param modelResolver The model resolver used to resolve parent POMs, must not be {@code null}.
      * @return The result of the model building, never {@code null}.
      * @throws ModelBuildingException If the effective model could not be built.
      */
-    ModelBuildingResult build( ModelSource modelSource, ModelBuildingRequest request, ModelResolver modelResolver )
+    ModelBuildingResult build( ModelSource modelSource, ModelBuildingRequest request )
         throws ModelBuildingException;
 
 }

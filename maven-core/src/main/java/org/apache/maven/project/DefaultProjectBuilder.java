@@ -28,10 +28,12 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.DefaultModelBuildingRequest;
 import org.apache.maven.model.FileModelSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBuilder;
 import org.apache.maven.model.ModelBuildingException;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.ModelBuildingResult;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.resolution.ModelResolver;
@@ -86,18 +88,25 @@ public class DefaultProjectBuilder
             new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, configuration.getLocalRepository(),
                                          configuration.getRemoteRepositories() );
 
+        ModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setLenientValidation( configuration.istLenientValidation() );
+        request.setProcessPlugins( configuration.isProcessPlugins() );
+        request.setProfiles( configuration.getProfiles() );
+        request.setActiveProfileIds( configuration.getActiveProfileIds() );
+        request.setInactiveProfileIds( configuration.getInactiveProfileIds() );
+        request.setExecutionProperties( configuration.getExecutionProperties() );
+        request.setModelResolver( resolver );
+
         ModelBuildingResult result;
         try
         {
             if ( localProject )
             {
-                result = modelBuilder.build( pomFile, configuration.getModelBuildingRequest(), resolver );
+                result = modelBuilder.build( pomFile, request );
             }
             else
             {
-                result =
-                    modelBuilder.build( new FileModelSource( pomFile ), configuration.getModelBuildingRequest(),
-                                        resolver );
+                result = modelBuilder.build( new FileModelSource( pomFile ), request );
             }
         }
         catch ( ModelBuildingException e )

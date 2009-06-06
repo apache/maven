@@ -72,6 +72,4 @@ public interface ProjectBuildingRequest
     
     List<Profile> getProfiles();
 
-    ModelBuildingRequest getModelBuildingRequest();
-
 }

@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.model.resolution.ModelResolver;
+
 /**
  * Collects settings that control building of effective models.
  * 
@@ -44,6 +46,8 @@ public class DefaultModelBuildingRequest
 
     private Properties executionProperties;
 
+    private ModelResolver modelResolver;
+    
     public DefaultModelBuildingRequest()
     {
         profiles = new ArrayList<Profile>();
@@ -136,6 +140,18 @@ public class DefaultModelBuildingRequest
         {
             this.executionProperties.putAll( executionProperties );
         }
+
+        return this;
+    }
+
+    public ModelResolver getModelResolver()
+    {
+        return this.modelResolver;
+    }
+
+    public DefaultModelBuildingRequest setModelResolver( ModelResolver modelResolver )
+    {
+        this.modelResolver = modelResolver;
 
         return this;
     }

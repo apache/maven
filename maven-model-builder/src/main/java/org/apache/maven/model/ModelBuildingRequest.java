@@ -22,6 +22,8 @@ package org.apache.maven.model;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.model.resolution.ModelResolver;
+
 /**
  * Collects settings that control the building of effective models.
  * 
@@ -126,5 +128,22 @@ public interface ModelBuildingRequest
      * @return This request, never {@code null}.
      */
     ModelBuildingRequest setExecutionProperties( Properties executionProperties );
+
+    /**
+     * Gets the model resolver to use for resolution of mixins or parents that are not locally reachable from the
+     * project directory.
+     * 
+     * @return The model resolver or {@code null} if not set.
+     */
+    ModelResolver getModelResolver();
+
+    /**
+     * Sets the model resolver to use for resolution of mixins or parents that are not locally reachable from the
+     * project directory.
+     * 
+     * @param modelResolver The model resolver to use, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    ModelBuildingRequest setModelResolver( ModelResolver modelResolver );
 
 }

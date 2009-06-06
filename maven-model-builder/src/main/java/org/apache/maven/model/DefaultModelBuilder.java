@@ -93,20 +93,19 @@ public class DefaultModelBuilder
     @Requirement
     private PluginConfigurationExpander pluginConfigurationExpander;
 
-    public ModelBuildingResult build( File pomFile, ModelBuildingRequest request, ModelResolver modelResolver )
+    public ModelBuildingResult build( File pomFile, ModelBuildingRequest request )
         throws ModelBuildingException
     {
-        return build( new FileModelSource( pomFile ), pomFile, request, modelResolver );
+        return build( new FileModelSource( pomFile ), pomFile, request );
     }
 
-    public ModelBuildingResult build( ModelSource modelSource, ModelBuildingRequest request, ModelResolver modelResolver )
+    public ModelBuildingResult build( ModelSource modelSource, ModelBuildingRequest request )
         throws ModelBuildingException
     {
-        return build( modelSource, null, request, modelResolver );
+        return build( modelSource, null, request );
     }
 
-    private ModelBuildingResult build( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
-                                       ModelResolver modelResolver )
+    private ModelBuildingResult build( ModelSource modelSource, File pomFile, ModelBuildingRequest request )
         throws ModelBuildingException
     {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
@@ -121,7 +120,7 @@ public class DefaultModelBuilder
         List<Model> rawModels = new ArrayList<Model>();
         List<Model> resultModels = new ArrayList<Model>();
 
-        for ( Model current = model; current != null; current = readParent( current, request, modelResolver ) )
+        for ( Model current = model; current != null; current = readParent( current, request ) )
         {
             Model resultModel = current;
             resultModels.add( resultModel );
@@ -148,7 +147,7 @@ public class DefaultModelBuilder
 
             result.setActiveProfiles( rawModel, activeProfiles );
 
-            configureResolver( modelResolver, resultModel );
+            configureResolver( request.getModelResolver(), resultModel );
         }
 
         Model superModel = getSuperModel();
@@ -272,6 +271,11 @@ public class DefaultModelBuilder
     private void configureResolver( ModelResolver modelResolver, Model model )
         throws ModelBuildingException
     {
+        if ( modelResolver == null )
+        {
+            return;
+        }
+
         for ( Repository repository : model.getRepositories() )
         {
             try
@@ -311,7 +315,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private Model readParent( Model childModel, ModelBuildingRequest request, ModelResolver modelResolver )
+    private Model readParent( Model childModel, ModelBuildingRequest request )
         throws ModelBuildingException
     {
         Model parentModel;
@@ -324,7 +328,7 @@ public class DefaultModelBuilder
 
             if ( parentModel == null )
             {
-                parentModel = readParentExternally( childModel, request, modelResolver );
+                parentModel = readParentExternally( childModel, request );
             }
         }
         else
@@ -387,10 +391,19 @@ public class DefaultModelBuilder
         return candidateModel;
     }
 
-    private Model readParentExternally( Model childModel, ModelBuildingRequest request, ModelResolver modelResolver )
+    private Model readParentExternally( Model childModel, ModelBuildingRequest request )
         throws ModelBuildingException
     {
         Parent parent = childModel.getParent();
+
+        ModelResolver modelResolver = request.getModelResolver();
+
+        if ( modelResolver == null )
+        {
+            Exception e = new IllegalArgumentException( "No model resolver provided" );
+            throw new UnresolvableParentException( "Failed to resolve parent POM " + toId( parent ) + " for POM "
+                + toSourceHint( childModel ), e );
+        }
 
         ModelSource modelSource;
         try
