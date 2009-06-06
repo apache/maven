@@ -207,8 +207,8 @@ public class DefaultModelBuilder
         }
         catch ( ModelParseException e )
         {
-            throw new UnparseableModelException( "Failed to parse POM " + modelSource.getLocation(), e.getLineNumber(),
-                                                 e.getColumnNumber(), e );
+            throw new UnparseableModelException( "Failed to parse POM " + modelSource.getLocation() + ": "
+                + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
         }
         catch ( IOException e )
         {
