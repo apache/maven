@@ -43,8 +43,7 @@ public class DefaultProfileSelector
     @Requirement( role = ProfileActivator.class )
     private List<ProfileActivator> activators;
 
-    public List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context )
-        throws ProfileActivationException
+    public ProfileSelectionResult getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context )
     {
         Collection<String> activatedIds = new HashSet<String>( context.getActiveProfileIds() );
         Collection<String> deactivatedIds = new HashSet<String>( context.getInactiveProfileIds() );
@@ -53,11 +52,13 @@ public class DefaultProfileSelector
         List<Profile> activePomProfilesByDefault = new ArrayList<Profile>();
         boolean activatedPomProfileNotByDefault = false;
 
+        List<ProfileActivationException> activationExceptions = new ArrayList<ProfileActivationException>();
+
         for ( Profile profile : profiles )
         {
             if ( !deactivatedIds.contains( profile.getId() ) )
             {
-                if ( activatedIds.contains( profile.getId() ) || isActive( profile, context ) )
+                if ( activatedIds.contains( profile.getId() ) || isActive( profile, context, activationExceptions ) )
                 {
                     activeProfiles.add( profile );
 
@@ -86,17 +87,28 @@ public class DefaultProfileSelector
             activeProfiles.addAll( activePomProfilesByDefault );
         }
 
-        return activeProfiles;
+        ProfileSelectionResult result = new ProfileSelectionResult();
+        result.setActiveProfiles( activeProfiles );
+        result.setActivationExceptions( activationExceptions );
+
+        return result;
     }
 
-    private boolean isActive( Profile profile, ProfileActivationContext context )
-        throws ProfileActivationException
+    private boolean isActive( Profile profile, ProfileActivationContext context,
+                              List<ProfileActivationException> exceptions )
     {
         for ( ProfileActivator activator : activators )
         {
-            if ( activator.isActive( profile, context ) )
+            try
             {
-                return true;
+                if ( activator.isActive( profile, context ) )
+                {
+                    return true;
+                }
+            }
+            catch ( ProfileActivationException e )
+            {
+                exceptions.add( e );
             }
         }
         return false;

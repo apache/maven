@@ -57,6 +57,7 @@ public class ProfileActivationException
     public ProfileActivationException( String message, Profile profile )
     {
         super( message );
+        this.profile = profile;
     }
 
     /**

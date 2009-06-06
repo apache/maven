@@ -41,6 +41,7 @@ import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationException;
 import org.apache.maven.model.profile.ProfileInjector;
+import org.apache.maven.model.profile.ProfileSelectionResult;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
@@ -251,37 +252,30 @@ public class DefaultModelBuilder
     private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request, ProfileActivationContext context,
                                                      List<ModelProblem> problems )
     {
-        try
-        {
-            return profileSelector.getActiveProfiles( request.getProfiles(), context );
-        }
-        catch ( ProfileActivationException e )
+        ProfileSelectionResult result = profileSelector.getActiveProfiles( request.getProfiles(), context );
+
+        for ( ProfileActivationException e : result.getActivationExceptions() )
         {
             problems.add( new ModelProblem( "Invalid activation condition for external profile "
                 + e.getProfile().getId() + ": " + e.getMessage(), "(external profiles)", e ) );
-
-            // FIXME: Update profile selector to integrate better with the problem reporting
-            return new ArrayList<Profile>();
         }
+
+        return result.getActiveProfiles();
     }
 
     private List<Profile> getActiveProjectProfiles( Model model, ProfileActivationContext context,
                                                     List<ModelProblem> problems )
-        throws ModelBuildingException
     {
-        try
-        {
-            return profileSelector.getActiveProfiles( model.getProfiles(), context );
-        }
-        catch ( ProfileActivationException e )
+        ProfileSelectionResult result = profileSelector.getActiveProfiles( model.getProfiles(), context );
+
+        for ( ProfileActivationException e : result.getActivationExceptions() )
         {
             problems.add( new ModelProblem( "Invalid activation condition for project profile "
                 + e.getProfile().getId() + " in POM " + toSourceHint( model ) + ": " + e.getMessage(),
                                             toSourceHint( model ), e ) );
-
-            // FIXME: Update profile selector to integrate better with the problem reporting
-            return new ArrayList<Profile>();
         }
+
+        return result.getActiveProfiles();
     }
 
     private void configureResolver( ModelResolver modelResolver, Model model, List<ModelProblem> problems )

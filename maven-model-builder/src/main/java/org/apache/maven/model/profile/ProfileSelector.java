@@ -20,7 +20,6 @@ package org.apache.maven.model.profile;
  */
 
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.maven.model.Profile;
 
@@ -39,11 +38,8 @@ public interface ProfileSelector
      * @param profiles The profiles whose activation status should be determined, must not be {@code null}.
      * @param context The environmental context used to determine the activation status of a profile, must not be
      *            {@code null}.
-     * @return The list of active profiles, never {@code null}.
-     * @throws ProfileActivationException If the activation status of any profile could not be determined (e.g. due to
-     *             missing values or bad syntax).
+     * @return The result of the selection process, never {@code null}.
      */
-    List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context )
-        throws ProfileActivationException;
+    ProfileSelectionResult getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context );
 
 }

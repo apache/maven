@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Signals an error during model building.
+ * Signals one ore more errors during model building. The model builder tries to collect as many problems as possible
+ * before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to query the
+ * details of the failure.
  * 
  * @author Benjamin Bentmann
  */
