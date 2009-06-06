@@ -110,17 +110,19 @@ public class DefaultModelBuilder
     {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
+        List<ModelProblem> problems = new ArrayList<ModelProblem>();
+
         ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
-        List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext );
+        List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
 
-        Model model = readModel( modelSource, request );
+        Model model = readModel( modelSource, request, problems );
         model.setPomFile( pomFile );
 
         List<Model> rawModels = new ArrayList<Model>();
         List<Model> resultModels = new ArrayList<Model>();
 
-        for ( Model current = model; current != null; current = readParent( current, request ) )
+        for ( Model current = model; current != null; current = readParent( current, request, problems ) )
         {
             Model resultModel = current;
             resultModels.add( resultModel );
@@ -130,7 +132,8 @@ public class DefaultModelBuilder
 
             modelNormalizer.mergeDuplicates( resultModel, request );
 
-            List<Profile> activeProjectProfiles = getActiveProjectProfiles( rawModel, profileActivationContext );
+            List<Profile> activeProjectProfiles =
+                getActiveProjectProfiles( rawModel, profileActivationContext, problems );
 
             List<Profile> activeProfiles = activeProjectProfiles;
             if ( current == model )
@@ -147,7 +150,7 @@ public class DefaultModelBuilder
 
             result.setActiveProfiles( rawModel, activeProfiles );
 
-            configureResolver( request.getModelResolver(), resultModel );
+            configureResolver( request.getModelResolver(), resultModel, problems );
         }
 
         Model superModel = getSuperModel();
@@ -160,7 +163,7 @@ public class DefaultModelBuilder
 
         Model resultModel = resultModels.get( 0 );
 
-        resultModel = interpolateModel( resultModel, request );
+        resultModel = interpolateModel( resultModel, request, problems );
         resultModels.set( 0, resultModel );
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
@@ -177,7 +180,12 @@ public class DefaultModelBuilder
             pluginConfigurationExpander.expandPluginConfiguration( resultModel, request );
         }
 
-        validateModel( resultModel, false, request );
+        validateModel( resultModel, false, request, problems );
+
+        if ( !problems.isEmpty() )
+        {
+            throw new ModelBuildingException( problems );
+        }
 
         result.setEffectiveModel( resultModel );
 
@@ -193,7 +201,7 @@ public class DefaultModelBuilder
         return context;
     }
 
-    private Model readModel( ModelSource modelSource, ModelBuildingRequest request )
+    private Model readModel( ModelSource modelSource, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
         Model model;
@@ -207,21 +215,23 @@ public class DefaultModelBuilder
         }
         catch ( ModelParseException e )
         {
-            throw new UnparseableModelException( "Failed to parse POM " + modelSource.getLocation() + ": "
-                + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+            problems.add( new ModelProblem( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
+                                            modelSource.getLocation(), e ) );
+            throw new ModelBuildingException( problems );
         }
         catch ( IOException e )
         {
-            throw new UnparseableModelException( "Failed to read POM " + modelSource.getLocation(), -1, -1, e );
+            problems.add( new ModelProblem( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(),
+                                            modelSource.getLocation(), e ) );
+            throw new ModelBuildingException( problems );
         }
 
-        validateModel( model, true, request );
+        validateModel( model, true, request, problems );
 
         return model;
     }
 
-    private void validateModel( Model model, boolean raw, ModelBuildingRequest request )
-        throws ModelBuildingException
+    private void validateModel( Model model, boolean raw, ModelBuildingRequest request, List<ModelProblem> problems )
     {
         ModelValidationResult result;
 
@@ -236,12 +246,17 @@ public class DefaultModelBuilder
 
         if ( result.getMessageCount() > 0 )
         {
-            throw new InvalidModelException( "Failed to validate POM " + toSourceHint( model ), result );
+            String source = toSourceHint( model );
+
+            for ( int i = 0; i < result.getMessageCount(); i++ )
+            {
+                problems.add( new ModelProblem( "Invalid POM " + source + ": " + result.getMessage( i ), source ) );
+            }
         }
     }
 
-    private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request, ProfileActivationContext context )
-        throws ModelBuildingException
+    private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request, ProfileActivationContext context,
+                                                     List<ModelProblem> problems )
     {
         try
         {
@@ -249,12 +264,16 @@ public class DefaultModelBuilder
         }
         catch ( ProfileActivationException e )
         {
-            throw new InvalidProfileException( "Failed to determine activation status of external profile "
-                + e.getProfile(), e.getProfile(), e );
+            problems.add( new ModelProblem( "Invalid activation condition for external profile "
+                + e.getProfile().getId() + ": " + e.getMessage(), "(external profiles)", e ) );
+
+            // FIXME: Update profile selector to integrate better with the problem reporting
+            return new ArrayList<Profile>();
         }
     }
 
-    private List<Profile> getActiveProjectProfiles( Model model, ProfileActivationContext context )
+    private List<Profile> getActiveProjectProfiles( Model model, ProfileActivationContext context,
+                                                    List<ModelProblem> problems )
         throws ModelBuildingException
     {
         try
@@ -263,13 +282,16 @@ public class DefaultModelBuilder
         }
         catch ( ProfileActivationException e )
         {
-            throw new InvalidProfileException( "Failed to determine activation status of project profile "
-                + e.getProfile() + " for POM " + toSourceHint( model ), e.getProfile(), e );
+            problems.add( new ModelProblem( "Invalid activation condition for project profile "
+                + e.getProfile().getId() + " in POM " + toSourceHint( model ) + ": " + e.getMessage(),
+                                            toSourceHint( model ), e ) );
+
+            // FIXME: Update profile selector to integrate better with the problem reporting
+            return new ArrayList<Profile>();
         }
     }
 
-    private void configureResolver( ModelResolver modelResolver, Model model )
-        throws ModelBuildingException
+    private void configureResolver( ModelResolver modelResolver, Model model, List<ModelProblem> problems )
     {
         if ( modelResolver == null )
         {
@@ -284,8 +306,8 @@ public class DefaultModelBuilder
             }
             catch ( InvalidRepositoryException e )
             {
-                throw new InvalidModelException( "Failed to validate repository " + repository.getId() + " for POM "
-                    + toSourceHint( model ), e );
+                problems.add( new ModelProblem( "Invalid repository " + repository.getId() + " in POM "
+                    + toSourceHint( model ) + ": " + e.getMessage(), toSourceHint( model ), e ) );
             }
         }
     }
@@ -300,8 +322,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private Model interpolateModel( Model model, ModelBuildingRequest request )
-        throws ModelBuildingException
+    private Model interpolateModel( Model model, ModelBuildingRequest request, List<ModelProblem> problems )
     {
         try
         {
@@ -311,11 +332,14 @@ public class DefaultModelBuilder
         }
         catch ( ModelInterpolationException e )
         {
-            throw new ModelBuildingException( "Failed to interpolate model " + toSourceHint( model ), e );
+            problems.add( new ModelProblem( "Invalid expression in POM " + toSourceHint( model ) + ": "
+                + e.getMessage(), toSourceHint( model ), e ) );
+
+            return model;
         }
     }
 
-    private Model readParent( Model childModel, ModelBuildingRequest request )
+    private Model readParent( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
         Model parentModel;
@@ -324,11 +348,11 @@ public class DefaultModelBuilder
 
         if ( parent != null )
         {
-            parentModel = readParentLocally( childModel, request );
+            parentModel = readParentLocally( childModel, request, problems );
 
             if ( parentModel == null )
             {
-                parentModel = readParentExternally( childModel, request );
+                parentModel = readParentExternally( childModel, request, problems );
             }
         }
         else
@@ -339,7 +363,7 @@ public class DefaultModelBuilder
         return parentModel;
     }
 
-    private Model readParentLocally( Model childModel, ModelBuildingRequest request )
+    private Model readParentLocally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
         File projectDirectory = childModel.getProjectDirectory();
@@ -360,7 +384,7 @@ public class DefaultModelBuilder
             return null;
         }
 
-        Model candidateModel = readModel( new FileModelSource( pomFile ), request );
+        Model candidateModel = readModel( new FileModelSource( pomFile ), request, problems );
         candidateModel.setPomFile( pomFile );
 
         String groupId = candidateModel.getGroupId();
@@ -391,7 +415,7 @@ public class DefaultModelBuilder
         return candidateModel;
     }
 
-    private Model readParentExternally( Model childModel, ModelBuildingRequest request )
+    private Model readParentExternally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
         Parent parent = childModel.getParent();
@@ -400,9 +424,9 @@ public class DefaultModelBuilder
 
         if ( modelResolver == null )
         {
-            Exception e = new IllegalArgumentException( "No model resolver provided" );
-            throw new UnresolvableParentException( "Failed to resolve parent POM " + toId( parent ) + " for POM "
-                + toSourceHint( childModel ), e );
+            problems.add( new ModelProblem( "Non-resolvable parent POM " + toId( parent ) + " for POM "
+                + toSourceHint( childModel ) + ": " + "No model resolver provided", toSourceHint( childModel ) ) );
+            throw new ModelBuildingException( problems );
         }
 
         ModelSource modelSource;
@@ -412,11 +436,12 @@ public class DefaultModelBuilder
         }
         catch ( UnresolvableModelException e )
         {
-            throw new UnresolvableParentException( "Failed to resolve parent POM " + toId( parent ) + " for POM "
-                + toSourceHint( childModel ), e );
+            problems.add( new ModelProblem( "Non-resolvable parent POM " + toId( parent ) + " for POM "
+                + toSourceHint( childModel ) + ": " + e.getMessage(), toSourceHint( childModel ), e ) );
+            throw new ModelBuildingException( problems );
         }
 
-        return readModel( modelSource, request );
+        return readModel( modelSource, request, problems );
     }
 
     private Model getSuperModel()

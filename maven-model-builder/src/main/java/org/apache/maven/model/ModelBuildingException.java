@@ -19,6 +19,11 @@ package org.apache.maven.model;
  * under the License.
  */
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Signals an error during model building.
  * 
@@ -28,25 +33,51 @@ public class ModelBuildingException
     extends Exception
 {
 
+    private List<ModelProblem> problems;
+
     /**
-     * Creates a new exception with specified detail message.
+     * Creates a new exception with the specified problems.
      * 
-     * @param message The detail message, may be {@code null}.
+     * @param problems The problems that causes this exception, may be {@code null}.
      */
-    public ModelBuildingException( String message )
+    public ModelBuildingException( List<ModelProblem> problems )
     {
-        super( message );
+        super( toMessage( problems ) );
+
+        this.problems = new ArrayList<ModelProblem>();
+        if ( problems != null )
+        {
+            this.problems.addAll( problems );
+        }
     }
 
     /**
-     * Creates a new exception with specified detail message and cause.
+     * Gets the problems that caused this exception.
      * 
-     * @param message The detail message, may be {@code null}.
-     * @param cause The cause, may be {@code null}.
+     * @return The problems that caused this exception, never {@code null}.
      */
-    public ModelBuildingException( String message, Throwable cause )
+    public List<ModelProblem> getProblems()
     {
-        super( message, cause );
+        return this.problems;
+    }
+
+    private static String toMessage( List<ModelProblem> problems )
+    {
+        StringWriter buffer = new StringWriter( 1024 );
+
+        PrintWriter writer = new PrintWriter( buffer );
+
+        writer.print( problems.size() );
+        writer.print( ( problems.size() == 1 ) ? " problem was " : " problems were " );
+        writer.println( "encountered during construction of the effective model:" );
+
+        for ( ModelProblem problem : problems )
+        {
+            writer.print( "o " );
+            writer.println( problem.getMessage() );
+        }
+
+        return buffer.toString();
     }
 
 }

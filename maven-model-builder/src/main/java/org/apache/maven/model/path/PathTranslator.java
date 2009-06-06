@@ -31,7 +31,7 @@ public interface PathTranslator
 
     /**
      * Resolves the specified path against the given base directory. The resolved path will be absolute and uses the
-     * platform-specified file separator.
+     * platform-specific file separator.
      * 
      * @param path The path to resolve, may be {@code null}.
      * @param basedir The base directory to resolve relative paths against, may be {@code null}.
