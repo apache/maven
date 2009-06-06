@@ -33,9 +33,25 @@ import org.apache.maven.model.Repository;
 public interface ModelResolver
 {
 
+    /**
+     * Tries to resolve the POM for the specified coordinates.
+     * 
+     * @param groupId The group identifier of the POM, must not be {@code null}.
+     * @param artifactId The artifact identifier of the POM, must not be {@code null}.
+     * @param version The version of the POM, must not be {@code null}.
+     * @return The source of the requested POM, never {@code null}.
+     * @throws UnresolvableModelException If the POM could not be resolved from any configured repository.
+     */
     ModelSource resolveModel( String groupId, String artifactId, String version )
         throws UnresolvableModelException;
 
+    /**
+     * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters.
+     * When multiple repositories with the same identifier are added, only the last repository being added will be used.
+     * 
+     * @param repository The repository to add to the internal search chain, must not be {@code null}.
+     * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
+     */
     void addRepository( Repository repository )
         throws InvalidRepositoryException;
 
