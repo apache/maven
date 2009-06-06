@@ -116,8 +116,7 @@ public class DefaultModelBuilder
 
         List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
 
-        Model model = readModel( modelSource, request, problems );
-        model.setPomFile( pomFile );
+        Model model = readModel( modelSource, pomFile, request, problems );
 
         List<Model> rawModels = new ArrayList<Model>();
         List<Model> resultModels = new ArrayList<Model>();
@@ -180,7 +179,8 @@ public class DefaultModelBuilder
             pluginConfigurationExpander.expandPluginConfiguration( resultModel, request );
         }
 
-        validateModel( resultModel, false, request, problems );
+        ModelValidationResult validationResult = modelValidator.validateEffectiveModel( resultModel, request );
+        addProblems( resultModel, validationResult, problems );
 
         if ( !problems.isEmpty() )
         {
@@ -201,7 +201,8 @@ public class DefaultModelBuilder
         return context;
     }
 
-    private Model readModel( ModelSource modelSource, ModelBuildingRequest request, List<ModelProblem> problems )
+    private Model readModel( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
+                             List<ModelProblem> problems )
         throws ModelBuildingException
     {
         Model model;
@@ -226,24 +227,16 @@ public class DefaultModelBuilder
             throw new ModelBuildingException( problems );
         }
 
-        validateModel( model, true, request, problems );
+        model.setPomFile( pomFile );
+
+        ModelValidationResult validationResult = modelValidator.validateRawModel( model, request );
+        addProblems( model, validationResult, problems );
 
         return model;
     }
 
-    private void validateModel( Model model, boolean raw, ModelBuildingRequest request, List<ModelProblem> problems )
+    private void addProblems( Model model, ModelValidationResult result, List<ModelProblem> problems )
     {
-        ModelValidationResult result;
-
-        if ( raw )
-        {
-            result = modelValidator.validateRawModel( model, request );
-        }
-        else
-        {
-            result = modelValidator.validateEffectiveModel( model, request );
-        }
-
         if ( result.getMessageCount() > 0 )
         {
             String source = toSourceHint( model );
@@ -384,8 +377,7 @@ public class DefaultModelBuilder
             return null;
         }
 
-        Model candidateModel = readModel( new FileModelSource( pomFile ), request, problems );
-        candidateModel.setPomFile( pomFile );
+        Model candidateModel = readModel( new FileModelSource( pomFile ), pomFile, request, problems );
 
         String groupId = candidateModel.getGroupId();
         if ( groupId == null && candidateModel.getParent() != null )
@@ -441,7 +433,7 @@ public class DefaultModelBuilder
             throw new ModelBuildingException( problems );
         }
 
-        return readModel( modelSource, request, problems );
+        return readModel( modelSource, null, request, problems );
     }
 
     private Model getSuperModel()
