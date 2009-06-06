@@ -103,12 +103,10 @@ class RepositoryModelResolver
 
             remoteRepositories.add( 0, mirror );
         }
-        catch ( org.apache.maven.artifact.InvalidRepositoryException e )
+        catch ( Exception e )
         {
-            throw new InvalidRepositoryException( "Failed to create artifact repository for " + repository.getId()
-                + " with layout " + repository.getLayout() + " and URL " + repository.getUrl(), repository, e );
+            throw new InvalidRepositoryException( e.getMessage(), repository, e );
         }
-
     }
 
     public ModelSource resolveModel( String groupId, String artifactId, String version )
@@ -130,7 +128,7 @@ class RepositoryModelResolver
         catch ( ArtifactResolutionException e )
         {
             throw new UnresolvableModelException( "Failed to resolve POM for " + groupId + ":" + artifactId + ":"
-                + version, e );
+                + version + " due to " + e.getMessage(), e );
         }
 
         return new FileModelSource( artifactParent.getFile() );
