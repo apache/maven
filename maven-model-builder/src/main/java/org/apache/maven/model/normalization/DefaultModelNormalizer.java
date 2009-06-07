@@ -26,11 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles normalization of a model.
@@ -76,6 +78,32 @@ public class DefaultModelNormalizer
             super.mergePlugin( target, source, false, Collections.emptyMap() );
         }
 
+    }
+
+    public void injectDefaultValues( Model model, ModelBuildingRequest request )
+    {
+        injectDependencyDefaults( model.getDependencies() );
+
+        Build build = model.getBuild();
+        if ( build != null )
+        {
+            for ( Plugin plugin : build.getPlugins() )
+            {
+                injectDependencyDefaults( plugin.getDependencies() );
+            }
+        }
+    }
+
+    private void injectDependencyDefaults( List<Dependency> dependencies )
+    {
+        for ( Dependency dependency : dependencies )
+        {
+            if ( StringUtils.isEmpty( dependency.getScope() ) )
+            {
+                // we cannot set this directly in the MDO due to the interactions with dependency management
+                dependency.setScope( "compile" );
+            }
+        }
     }
 
 }

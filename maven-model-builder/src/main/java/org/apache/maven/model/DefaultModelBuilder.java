@@ -175,6 +175,8 @@ public class DefaultModelBuilder
 
         managementInjector.injectManagement( resultModel, request );
 
+        modelNormalizer.injectDefaultValues( resultModel, request );
+
         if ( request.isProcessPlugins() )
         {
             pluginConfigurationExpander.expandPluginConfiguration( resultModel, request );

@@ -1405,8 +1405,7 @@ public class PomConstructionTest
 	{
 	    PomTestWrapper pom = buildPom( "dependency-scope-inheritance/sub" );
 	    String scope = (String) pom.getValue("dependencies[1]/scope");
-	    assertNull("Scope not null: " + scope, scope);
-	
+	    assertEquals( "compile", scope );
 	}   
     
     public void testDependencyScope()

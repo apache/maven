@@ -23,7 +23,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBuildingRequest;
 
 /**
- * Handles normalization of a model.
+ * Handles normalization of a model. In this context, normalization is the process of producing a canonical
+ * representation for models that physically look different but are semantically equivalent.
  * 
  * @author Benjamin Bentmann
  */
@@ -37,5 +38,14 @@ public interface ModelNormalizer
      * @param request The model building request that holds further settings, must not be {@code null}.
      */
     void mergeDuplicates( Model model, ModelBuildingRequest request );
+
+    /**
+     * Sets default values in the specified model that for technical reasons cannot be set directly in the Modello
+     * definition.
+     * 
+     * @param model The model in which to set the default values, must not be {@code null}.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     */
+    void injectDefaultValues( Model model, ModelBuildingRequest request );
 
 }
