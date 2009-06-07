@@ -313,7 +313,11 @@ public class DefaultLifecycleExecutor
                     //TODO: remove hard coding
                     if ( phase.equals( "clean" ) )
                     {
-                        mojos.add( new MojoExecution( "org.apache.maven.plugins", "maven-clean-plugin", "2.3", "clean", "default-clean" ) );
+                        Plugin plugin = new Plugin();
+                        plugin.setGroupId( "org.apache.maven.plugins" );
+                        plugin.setArtifactId( "maven-clean-plugin" );
+                        plugin.setVersion( "2.3" );
+                        mojos.add( new MojoExecution( plugin, "clean", "default-clean" ) );
                     }
 
                     // This is just just laying out the initial structure of the mojos to run in each phase of the
@@ -347,7 +351,7 @@ public class DefaultLifecycleExecutor
                                     phaseToMojoMapping.put( execution.getPhase(), new ArrayList<MojoExecution>() );
                                 }
 
-                                MojoExecution mojoExecution = new MojoExecution( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), goal, execution.getId() );
+                                MojoExecution mojoExecution = new MojoExecution( plugin, goal, execution.getId() );
                                 phaseToMojoMapping.get( execution.getPhase() ).add( mojoExecution );
                             }
                         }
@@ -360,7 +364,7 @@ public class DefaultLifecycleExecutor
 
                                 if ( mojoDescriptor.getPhase() != null && phaseToMojoMapping.get( mojoDescriptor.getPhase() ) != null )
                                 {
-                                    MojoExecution mojoExecution = new MojoExecution( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), goal, execution.getId() );
+                                    MojoExecution mojoExecution = new MojoExecution( plugin, goal, execution.getId() );
                                     phaseToMojoMapping.get( mojoDescriptor.getPhase() ).add( mojoExecution );
                                 }
                             }
@@ -395,7 +399,7 @@ public class DefaultLifecycleExecutor
             // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
             //                        
             MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( 
-                mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getVersion(), mojoExecution.getGoal(), session.getLocalRepository(), project.getPluginArtifactRepositories() );
+                mojoExecution.getPlugin(), mojoExecution.getGoal(), session.getLocalRepository(), project.getPluginArtifactRepositories() );
 
             requiredDependencyResolutionScope = calculateRequiredDependencyResolutionScope( requiredDependencyResolutionScope, mojoDescriptor.isDependencyResolutionRequired() );          
             
@@ -794,7 +798,7 @@ public class DefaultLifecycleExecutor
         {
             for( String goal : pluginExecution.getGoals() )
             {
-                Xpp3Dom dom = getDefaultPluginConfiguration( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), goal, localRepository, remoteRepositories );
+                Xpp3Dom dom = getDefaultPluginConfiguration( plugin, goal, localRepository, remoteRepositories );
                 pluginExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pluginExecution.getConfiguration(), dom, Boolean.TRUE ) );
             }
         }
@@ -809,14 +813,14 @@ public class DefaultLifecycleExecutor
         }
     }    
     
-    private Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+    private Xpp3Dom getDefaultPluginConfiguration( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
         throws LifecycleExecutionException
     {
         MojoDescriptor mojoDescriptor;
         
         try
         {
-            mojoDescriptor = pluginManager.getMojoDescriptor( groupId, artifactId, version, goal, localRepository, remoteRepositories );
+            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, localRepository, remoteRepositories );
         }
         catch ( PluginNotFoundException e )
         {

@@ -19,16 +19,14 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class MojoExecution
 {
-    private String groupId;
-    
-    private String artifactId;
-    
-    private String version;
+
+    private Plugin plugin;
     
     private String goal;
     
@@ -44,11 +42,9 @@ public class MojoExecution
      */
     private String lifecyclePhase;
     
-    public MojoExecution( String groupId, String artifactId, String version, String goal, String executionId )
+    public MojoExecution( Plugin plugin, String goal, String executionId )
     {
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
+        this.plugin = plugin;
         this.goal = goal;
         this.executionId = executionId;
     }
@@ -77,6 +73,16 @@ public class MojoExecution
     public String getExecutionId()
     {
         return executionId;
+    }
+
+    public Plugin getPlugin()
+    {
+        if ( mojoDescriptor != null )
+        {
+            return mojoDescriptor.getPluginDescriptor().getPlugin();
+        }
+
+        return plugin;
     }
 
     public MojoDescriptor getMojoDescriptor()
@@ -133,7 +139,7 @@ public class MojoExecution
             return mojoDescriptor.getPluginDescriptor().getGroupId();
         }
         
-        return groupId;
+        return plugin.getGroupId();
     }
 
     public String getArtifactId()
@@ -143,7 +149,7 @@ public class MojoExecution
             return mojoDescriptor.getPluginDescriptor().getArtifactId();
         }
         
-        return artifactId;
+        return plugin.getArtifactId();
     }
 
     public String getVersion()
@@ -153,7 +159,7 @@ public class MojoExecution
             return mojoDescriptor.getPluginDescriptor().getVersion();
         }        
         
-        return version;
+        return plugin.getVersion();
     }
 
     public String getGoal()

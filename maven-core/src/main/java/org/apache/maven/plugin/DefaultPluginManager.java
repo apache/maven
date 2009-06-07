@@ -274,7 +274,7 @@ public class DefaultPluginManager
             // defined dependencies and then the result is merged with the overrides. The overrides don't pass through the metadata source which is where the
             // Artifact.setFile( file ) method is called. We should eventually take care of this in the resolver.
             Artifact a = repositorySystem.createDependencyArtifact( dependencySpecifiedInProject );
-            if ( a.getScope().equals(  Artifact.SCOPE_SYSTEM ) )
+            if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 a.setFile( new File( dependencySpecifiedInProject.getSystemPath() ) );
             }
