@@ -20,6 +20,8 @@ package org.apache.maven.model.validation;
  */
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.model.Build;
@@ -29,6 +31,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
@@ -67,7 +70,21 @@ public class DefaultModelValidator
             }
         }
 
-        validateRepositories( result, model.getRepositories(), "repositories.repository" );
+        if ( !request.istLenientValidation() )
+        {
+            validateRepositories( result, model.getRepositories(), "repositories.repository" );
+
+            validateRepositories( result, model.getPluginRepositories(), "pluginRepositories.pluginRepository" );
+
+            for ( Profile profile : model.getProfiles() )
+            {
+                validateRepositories( result, profile.getRepositories(), "profiles.profile[" + profile.getId()
+                    + "].repositories.repository" );
+
+                validateRepositories( result, profile.getPluginRepositories(), "profiles.profile[" + profile.getId()
+                    + "].pluginRepositories.pluginRepository" );
+            }
+        }
 
         return result;
     }
@@ -231,11 +248,19 @@ public class DefaultModelValidator
 
     private void validateRepositories( ModelValidationResult result, List<Repository> repositories, String prefix )
     {
+        Collection<String> ids = new HashSet<String>();
+
         for ( Repository repository :  repositories )
         {
             validateStringNotEmpty( prefix + ".id", result, repository.getId() );
 
             validateStringNotEmpty( prefix + ".url", result, repository.getUrl() );
+
+            if ( !ids.add( repository.getId() ) )
+            {
+                result.addMessage( "'" + prefix + ".id' must be unique: " + repository.getId() + " -> "
+                    + repository.getUrl() );
+            }
         }
     }
 

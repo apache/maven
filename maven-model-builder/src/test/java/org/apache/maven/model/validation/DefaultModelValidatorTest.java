@@ -251,11 +251,15 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-repository-id-pom.xml", true, false );
 
-        assertEquals( 2, result.getMessageCount() );
+        assertEquals( 4, result.getMessageCount() );
 
         assertEquals( "'repositories.repository.id' is missing.", result.getMessage( 0 ) );
 
         assertEquals( "'repositories.repository.url' is missing.", result.getMessage( 1 ) );
+
+        assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getMessage( 2 ) );
+
+        assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getMessage( 3 ) );
     }
 
     public void testMissingResourceDirectory()

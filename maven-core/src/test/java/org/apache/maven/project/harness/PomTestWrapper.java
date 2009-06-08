@@ -20,7 +20,6 @@ package org.apache.maven.project.harness;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.commons.jxpath.JXPathContext;
@@ -43,7 +42,6 @@ public class PomTestWrapper
     }
 
     public PomTestWrapper( File pomFile, MavenProject mavenProject )
-        throws IOException
     {
         if ( mavenProject == null )
         {
@@ -55,7 +53,6 @@ public class PomTestWrapper
     }
 
     public PomTestWrapper( MavenProject mavenProject )
-        throws IOException
     {
         if ( mavenProject == null )
         {

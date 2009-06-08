@@ -1450,6 +1450,67 @@ public class PomConstructionTest
         assertEquals( 1, executions.size() );
         assertEquals( "inherited-execution", executions.get( 0 ).getId() );
     }    
+    
+    /* MNG-4193 */
+    public void testValidationErrorUponNonUniqueArtifactRepositoryId()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "unique-repo-id/artifact-repo" );
+            fail( "Non-unique repository ids did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
+    }
+
+    /* MNG-4193 */
+    public void testValidationErrorUponNonUniquePluginRepositoryId()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "unique-repo-id/plugin-repo" );
+            fail( "Non-unique repository ids did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
+    }
+    
+    /* MNG-4193 */
+    public void testValidationErrorUponNonUniqueArtifactRepositoryIdInProfile()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "unique-repo-id/artifact-repo-in-profile" );
+            fail( "Non-unique repository ids did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+            e.printStackTrace();
+        }
+    }
+
+    /* MNG-4193 */
+    public void testValidationErrorUponNonUniquePluginRepositoryIdInProfile()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "unique-repo-id/plugin-repo-in-profile" );
+            fail( "Non-unique repository ids did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
+    }
 
     private void assertPathSuffixEquals( String expected, Object actual )
     {
@@ -1470,7 +1531,7 @@ public class PomConstructionTest
     }
 
     private PomTestWrapper buildPom( String pomPath, Properties executionProperties, String... profileIds )
-        throws Exception
+        throws ProjectBuildingException
     {
         File pomFile = new File( testDirectory, pomPath );
         if ( pomFile.isDirectory() )
