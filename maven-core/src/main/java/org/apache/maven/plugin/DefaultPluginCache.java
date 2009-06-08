@@ -31,7 +31,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.ModelUtils;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -44,7 +43,7 @@ public class DefaultPluginCache
     implements PluginCache
 {
 
-    private static class CacheKey
+    protected static class CacheKey
     {
         private final Plugin plugin;
 
@@ -85,13 +84,13 @@ public class DefaultPluginCache
 
             CacheKey other = (CacheKey) o;
 
-            return pluginEquals( plugin, other.plugin );
+            return pluginEquals( plugin, other.plugin ) && eq(repositories, other.repositories);
         }
     }
 
-    private final Map<CacheKey, PluginDescriptor> descriptorsCache = new HashMap<CacheKey, PluginDescriptor>();
+    protected final Map<CacheKey, PluginDescriptor> descriptorsCache = new HashMap<CacheKey, PluginDescriptor>();
 
-    private final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
+    protected final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
     public CacheRecord get( Plugin plugin, ArtifactRepository localRepository,
                             List<ArtifactRepository> remoteRepositories )
@@ -143,6 +142,12 @@ public class DefaultPluginCache
         }
 
         CacheKey key = new CacheKey( plugin, localRepository, remoteRepositories );
+
+        if ( cache.containsKey( key ) )
+        {
+            throw new IllegalStateException( "Duplicate plugin realm for plugin " + plugin );
+        }
+
         CacheRecord record = new CacheRecord( pluginRealm, pluginArtifacts );
         cache.put( key, record );
     }
@@ -186,19 +191,6 @@ public class DefaultPluginCache
             }
         }
 
-        /*
-         * Must consider executions because each execution ends up as separate plexus component, with its own
-         * configuration, etc.
-         */
-        for ( PluginExecution execution : plugin.getExecutions() )
-        {
-            hash = hash * 31 + execution.getId().hashCode();
-            hash = hash * 31 + ( execution.getInherited() != null ? execution.getInherited().hashCode() : 0 );
-            hash = hash * 31 + ( execution.getPhase() != null ? execution.getPhase().hashCode() : 0); 
-            hash = hash * 31 + ( execution.getConfiguration() != null ? execution.getConfiguration().hashCode() : 0 );
-            hash = hash * 31 + execution.getGoals().hashCode();
-        }
-
         return hash;
     }
 
@@ -208,38 +200,7 @@ public class DefaultPluginCache
             && eq( a.getArtifactId(), b.getArtifactId() ) //
             && eq( a.getVersion(), b.getVersion() ) // 
             && a.isExtensions() == b.isExtensions() //
-            && pluginExecutionsEquals( a.getExecutions(), b.getExecutions() ) //
             && dependenciesEquals( a.getDependencies(), b.getDependencies() );
-    }
-
-    protected static boolean pluginExecutionsEquals( List<PluginExecution> a, List<PluginExecution> b )
-    {
-        if ( a.size() != b.size() )
-        {
-            return false;
-        }
-
-        Iterator<PluginExecution> aI = a.iterator();
-        Iterator<PluginExecution> bI = b.iterator();
-
-        while ( aI.hasNext() )
-        {
-            PluginExecution aD = aI.next();
-            PluginExecution bD = bI.next();
-
-            boolean r = eq( aD.getId(), bD.getId() ) //
-                && eq( aD.getInherited(), bD.getInherited() ) //
-                && eq( aD.getPhase(), bD.getPhase() ) // 
-                && eq( aD.getConfiguration(), bD.getConfiguration() ) //
-                && eq( aD.getGoals(), bD.getGoals() );
-
-            if ( !r )
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private static boolean dependenciesEquals( List<Dependency> a, List<Dependency> b )
