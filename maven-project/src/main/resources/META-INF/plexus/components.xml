@@ -49,21 +49,6 @@ under the License.
      |
      -->
     <component>
-      <role>org.apache.maven.project.interpolation.CoordinateInterpolator</role>
-      <role-hint>default</role-hint>
-      <implementation>org.apache.maven.project.interpolation.DefaultCoordinateInterpolator</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.project.path.PathTranslator</role>
-        </requirement>
-      </requirements>
-    </component>
-<!--
-     |
-     |
-     |
-     -->
-    <component>
       <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
       <implementation>org.apache.maven.project.interpolation.StringSearchModelInterpolator</implementation>
       <requirements>
@@ -110,9 +95,6 @@ under the License.
         </requirement>
         <requirement>
           <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
-        </requirement>
-        <requirement>
-          <role>org.apache.maven.project.interpolation.CoordinateInterpolator</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.project.inheritance.ModelInheritanceAssembler</role>

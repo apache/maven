@@ -72,9 +72,6 @@ under the License.
           <role-hint>test</role-hint>
         </requirement>
         <requirement>
-          <role>org.apache.maven.project.interpolation.CoordinateInterpolator</role>
-        </requirement>
-        <requirement>
           <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
         </requirement>
         <requirement>

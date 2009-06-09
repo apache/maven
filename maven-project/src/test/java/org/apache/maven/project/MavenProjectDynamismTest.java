@@ -32,7 +32,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
-import org.apache.maven.project.interpolation.CoordinateInterpolator;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.StringUtils;

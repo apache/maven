@@ -19,25 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -82,7 +63,6 @@ import org.apache.maven.project.artifact.ProjectArtifactFactory;
 import org.apache.maven.project.inheritance.ModelInheritanceAssembler;
 import org.apache.maven.project.injection.ModelDefaultsInjector;
 import org.apache.maven.project.injection.ProfileInjector;
-import org.apache.maven.project.interpolation.CoordinateInterpolator;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 import org.apache.maven.project.path.PathTranslator;
@@ -101,6 +81,25 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /*:apt
 
@@ -173,8 +172,6 @@ public class DefaultMavenProjectBuilder
 
     private ModelInterpolator modelInterpolator;
     
-    private CoordinateInterpolator coordinateInterpolator;
-
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     // ----------------------------------------------------------------------
@@ -908,19 +905,6 @@ public class DefaultMavenProjectBuilder
 
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
-
-            try
-            {
-                coordinateInterpolator.interpolateArtifactCoordinates( project );
-            }
-            catch ( IOException e )
-            {
-                throw new ProjectBuildingException( project.getId(), "Failed to write POM with interpolated coordinate expressions.", e );
-            }
-            catch ( ModelInterpolationException e )
-            {
-                throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
-            }
         }
         
         project.setManagedVersionMap( createManagedVersionMap( projectId,
