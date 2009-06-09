@@ -146,7 +146,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-cli</artifactId>
+      <artifactId>maven-compat</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>

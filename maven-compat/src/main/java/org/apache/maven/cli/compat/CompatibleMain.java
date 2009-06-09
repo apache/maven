@@ -1,5 +1,6 @@
-package org.apache.maven.cli;
+package org.apache.maven.cli.compat;
 
+import org.apache.maven.cli.MavenCli;
 import org.codehaus.classworlds.ClassWorld;
 
 /**
@@ -7,7 +8,7 @@ import org.codehaus.classworlds.ClassWorld;
  * 
  * @since 2.2.0
  */
-public class Main
+public class CompatibleMain
 {
 
     public static void main( String[] args )

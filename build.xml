@@ -184,7 +184,7 @@ TODO:
   </target>
 
   <target name="maven-compile" depends="compile-boot" description="compiles Maven using the bootstrap Maven, skipping automated tests">
-    <java fork="true" classname="org.apache.maven.cli.Main" failonerror="true">
+    <java fork="true" classname="org.apache.maven.cli.compat.CompatibleMain" failonerror="true">
       <jvmarg value="-Xmx256M"/>
       
       <!-- <jvmarg value="-Xdebug"/>

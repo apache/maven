@@ -25,9 +25,9 @@
     <version>2.2.0-RC3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-cli</artifactId>
+  <artifactId>maven-compat</artifactId>
 
-  <name>Maven Command-Line Interface</name>
+  <name>Maven Compatibility Layer</name>
 
   <dependencies>
     <dependency>
