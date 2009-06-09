@@ -224,6 +224,7 @@ TODO:
     <chmod perm="+x">
       <fileset dir="${maven.home}/bin">
         <include name="mvn"/>
+        <include name="mvnDebug"/>
       </fileset>
     </chmod>
   </target>
