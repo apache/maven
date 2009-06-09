@@ -90,6 +90,9 @@ public class MavenCli
 
     private static Embedder embedder;
 
+    /**
+     * @deprecated Use {@link Main#main(String[])} instead.
+     */
     public static void main( String[] args )
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
@@ -107,7 +110,7 @@ public class MavenCli
         // ----------------------------------------------------------------------
         // Setup the command line parser
         // ----------------------------------------------------------------------
-
+        
         CLIManager cliManager = new CLIManager();
 
         CommandLine commandLine;

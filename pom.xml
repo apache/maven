@@ -280,6 +280,7 @@ under the License.
     <module>maven-artifact</module>
     <module>maven-artifact-manager</module>
     <module>maven-artifact-test</module>
+    <module>maven-cli</module>
     <module>maven-core</module>
     <module>maven-error-diagnostics</module>
     <module>maven-model</module>
@@ -367,6 +368,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-cli</artifactId>
         <version>${mavenVersion}</version>
       </dependency>
       <dependency>

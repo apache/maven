@@ -33,7 +33,9 @@ import java.util.List;
  */
 public class MojoExecution
 {
-    private final String executionId;
+    // Execution ID needs to default to "default" to allow configuration of that execution alongside
+    // other executions.
+    private String executionId = "default";
 
     private final MojoDescriptor mojoDescriptor;
 
@@ -46,7 +48,6 @@ public class MojoExecution
     public MojoExecution( MojoDescriptor mojoDescriptor )
     {
         this.mojoDescriptor = mojoDescriptor;
-        this.executionId = null;
         this.configuration = null;
     }
 
@@ -61,7 +62,6 @@ public class MojoExecution
     {
         this.mojoDescriptor = mojoDescriptor;
         this.configuration = configuration;
-        this.executionId = null;
     }
 
     public String getExecutionId()
