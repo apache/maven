@@ -184,50 +184,45 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         throws Exception
     {
         // TODO: implement equivalent test for 3.0 once supported
-        if ( matchesVersionRange( "[2.1.0-M1,3.0-alpha-1)" ) ) //2.1.0-M1+
-        {
-            File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
+        requiresMavenVersion( "[2.1.0-M1,3.0-alpha-1)" );
 
-            /*
-             * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
-             * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
-             * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
-             */
-            Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-            verifier.executeGoal( "validate" );
-            verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
 
-            String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
-            settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
-            String newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
-            
-            FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
+        /*
+         * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
+         * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
+         * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
+         */
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
 
-            verifier = new Verifier( testDir.getAbsolutePath() );
+        String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
+        settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
+        String newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
+        
+        FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
 
-            List cliOptions = new ArrayList();
-            cliOptions.add( "--settings" );
-            cliOptions.add( "settings.xml" );
-            cliOptions.add( "-X" );
-            
-            verifier.setCliOptions( cliOptions );
+        verifier = new Verifier( testDir.getAbsolutePath() );
 
-            verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
-            verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
-            
-            verifier.setLogFileName( "logDAV.txt" );
-            verifier.executeGoal( "compile" );
-            verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
+        List cliOptions = new ArrayList();
+        cliOptions.add( "--settings" );
+        cliOptions.add( "settings.xml" );
+        cliOptions.add( "-X" );
+        
+        verifier.setCliOptions( cliOptions );
 
-            verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
-            verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
-                                             content + LS );
-        }
-        else
-        {
-            System.out.print( " [skipping DAV test for Maven versions < 2.1.0-M1] " );
-        }
+        verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
+        verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
+        
+        verifier.setLogFileName( "logDAV.txt" );
+        verifier.executeGoal( "compile" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
+        verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
+                                         content + LS );
     }
 }
