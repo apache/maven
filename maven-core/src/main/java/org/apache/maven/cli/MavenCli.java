@@ -368,7 +368,14 @@ public class MavenCli
         }
         finally
         {
-            embedder.stop();
+            try
+            {
+                embedder.stop();
+            }
+            catch ( Exception e )
+            {
+                // do nothing; we took our best shot.
+            }
         }
 
         return 0;
