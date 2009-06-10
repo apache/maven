@@ -74,6 +74,29 @@
             <target>1.3</target>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>clirr-maven-plugin</artifactId>
+          <configuration>
+            <!-- This is goofy and a little childish. :-)
+            
+                 We're comparing vs. maven-core from previous release (why not?). We have to do this
+                 because clirr:check doesn't have a skip flag, and this module didn't exist in the last
+                 release...so, without this weirdo configuration, clirr fails the build at the verify
+                 stage of this module build, thereby killing the release attempt.
+             -->
+            <comparisonArtifacts>
+              <comparisonArtifact>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>2.1.0</version>
+              </comparisonArtifact>
+            </comparisonArtifacts>
+            <excludes>
+              <exclude>**</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>

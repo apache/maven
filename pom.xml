@@ -215,38 +215,11 @@ under the License.
           <version>2.2.1</version>
           <configuration>
             <!-- needed for release: default value "(,${project.version})" for 2.0.10 is 2.0.10-SNAPSHOT -->
-            <comparisonVersion>2.1.0-M1</comparisonVersion>
+            <comparisonVersion>2.1.0</comparisonVersion>
             <excludes>
-              <exclude>org/apache/maven/artifact/Artifact*</exclude>
-
-              <exclude>org/apache/maven/execution/MavenExecutionRequest*</exclude>
-
-              <exclude>org/apache/maven/plugin/PluginManagerException*</exclude>
-
-              <exclude>org/apache/maven/artifact/repository/metadata/Snapshot*</exclude>
-              <exclude>org/apache/maven/artifact/repository/metadata/Versioning*</exclude>
-              <exclude>org/apache/maven/artifact/repository/metadata/Plugin*</exclude>
-              <exclude>org/apache/maven/artifact/repository/metadata/io/xpp3/*</exclude>
-
-              <exclude>org/apache/maven/model/*</exclude>
-              <exclude>org/apache/maven/model/io/xpp3/*</exclude>
-              <exclude>org/apache/maven/settings/*</exclude>
-              <exclude>org/apache/maven/settings/io/xpp3/*</exclude>
-
-              <exclude>org/apache/maven/usability/plugin/*</exclude>
-              <exclude>org/apache/maven/usability/plugin/io/xpp3/*</exclude>
-
-              <exclude>org/apache/maven/profiles/*</exclude>
-              <exclude>org/apache/maven/profiles/io/xpp3/*</exclude>
-
-              <exclude>org/apache/maven/plugin/registry/*</exclude>
-              <exclude>org/apache/maven/plugin/registry/io/xpp3/*</exclude>
-
-              <exclude>org/apache/maven/plugin/lifecycle/*</exclude>
-              <exclude>org/apache/maven/plugin/lifecycle/io/xpp3/*</exclude>
-
-              <exclude>org/apache/maven/toolchain/model/*</exclude>
-              <exclude>org/apache/maven/toolchain/model/io/xpp3/*</exclude>
+              <exclude>org/apache/maven/project/artifact/ArtifactWithProject*</exclude>
+              <exclude>org/apache/maven/project/artifact/ProjectArtifactFactory*</exclude>
+              <exclude>org/apache/maven/project/artifact/VersionExpressionTransformation*</exclude>
             </excludes>
           </configuration>
         </plugin>
