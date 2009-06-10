@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.List;
 
 import org.apache.maven.Maven;
 import org.apache.maven.MavenExecutionException;
@@ -548,10 +547,5 @@ public class MavenEmbedder
     public PlexusContainer getPlexusContainer()
     {
         return container;
-    }
-
-    public List<String> getLifecyclePhases()
-    {       
-        return maven.getLifecyclePhases();
     }
 }

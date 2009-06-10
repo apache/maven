@@ -32,7 +32,7 @@ import org.apache.maven.model.Plugin;
 public class PluginNotFoundException
     extends AbstractArtifactResolutionException
 {
-    private final Plugin plugin;
+    private Plugin plugin;
 
     public PluginNotFoundException( Plugin plugin, ArtifactNotFoundException e )
     {

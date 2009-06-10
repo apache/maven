@@ -252,16 +252,22 @@ public final class CLIRequestUtils
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
             .setUserToolchainsFile( userToolchainsFile );
         
-
+        File pom;
+        
         if ( alternatePomFile != null )
         {
-            request.setPom( new File( alternatePomFile ) );
+            pom = new File( alternatePomFile );
         }
         else
         {
-            request.setPom( new File( baseDirectory, Maven.POMv4 ) );
+            pom = new File( baseDirectory, Maven.POMv4 ); 
         }
-
+                
+        if ( pom.exists() )
+        {
+            request.setPom( pom );
+        }        
+        
         return request;
     }
 

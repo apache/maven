@@ -19,8 +19,6 @@ package org.apache.maven;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 
@@ -31,7 +29,5 @@ public interface Maven
 {
     String POMv4 = "pom.xml";
 
-    MavenExecutionResult execute( MavenExecutionRequest request );
-    
-    List<String> getLifecyclePhases();
+    MavenExecutionResult execute( MavenExecutionRequest request );    
 }

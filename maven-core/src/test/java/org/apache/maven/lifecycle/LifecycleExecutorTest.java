@@ -42,15 +42,6 @@ public class LifecycleExecutorTest
     }
         
     // -----------------------------------------------------------------------------------------------
-    // 
-    // -----------------------------------------------------------------------------------------------    
-    
-    public void testLifecyclePhases()
-    {
-        assertNotNull( lifecycleExecutor.getLifecyclePhases() );
-    }
-
-    // -----------------------------------------------------------------------------------------------
     // Tests which exercise the lifecycle executor when it is dealing with default lifecycle phases.
     // -----------------------------------------------------------------------------------------------
     

@@ -64,10 +64,9 @@ public class DelegatingLocalArtifactRepository
         return userLocalArtifactRepository.pathOfLocalRepositoryMetadata( metadata, userLocalArtifactRepository );
     }
 
-    // This ID is necessary of the metadata lookup doesn't work correctly.
     public String getId()
     {
-        return "delegating";
+        return "local";
     }
 
     @Override

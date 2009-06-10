@@ -64,11 +64,6 @@ public class DefaultMaven
     @Requirement
     protected PlexusContainer container;
     
-    public List<String> getLifecyclePhases()
-    {
-        return lifecycleExecutor.getLifecyclePhases();
-    }
-
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         //TODO: Need a general way to inject standard properties
@@ -93,7 +88,7 @@ public class DefaultMaven
         
         try
         {
-            projects = getProjects( request );
+            projects = getProjectsForMavenReactor( request );
                                                 
             //TODO: We really need to get rid of this requirement in here. If we know there is no project present
             if ( projects.isEmpty() )
@@ -171,7 +166,7 @@ public class DefaultMaven
         return result;
     }
     
-    public Map<String,MavenProject> getProjects( MavenExecutionRequest request )
+    protected Map<String,MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
         // We have no POM file.

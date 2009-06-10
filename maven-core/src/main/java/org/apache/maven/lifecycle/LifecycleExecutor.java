@@ -39,8 +39,6 @@ import org.apache.maven.plugin.PluginResolutionException;
  */
 public interface LifecycleExecutor
 {    
-    List<String> getLifecyclePhases();
-       
     /**
      * Calculate the list of {@link org.apache.maven.plugin.descriptor.MojoDescriptor} objects to run for the selected lifecycle phase.
      * 

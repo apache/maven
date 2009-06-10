@@ -94,14 +94,6 @@ public class DefaultMavenExecutionRequestPopulator
 
     private void pom( MavenExecutionRequest request )
     {
-        // ------------------------------------------------------------------------
-        // POM
-        //
-        // If we are not given a specific POM file, but passed a base directory
-        // then we will use a release POM in the directory provided, and then
-        // look for the standard POM.
-        // ------------------------------------------------------------------------
-
         if ( request.getPom() != null && !request.getPom().isAbsolute() )
         {
             request.setPom( request.getPom().getAbsoluteFile() );
