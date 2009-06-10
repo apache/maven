@@ -304,7 +304,7 @@ public class DefaultLifecycleExecutor
         
         MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session );
 
-        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-" + mojoDescriptor.getGoal() );
+        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-cli" );
         
         populateMojoExecutionConfiguration( project, mojoExecution, true );
 
@@ -839,7 +839,6 @@ public class DefaultLifecycleExecutor
             String[] p = StringUtils.split( goal, ":" );
 
             PluginExecution execution = new PluginExecution();
-            // FIXME: Find a better execution id
             execution.setId( "default-" + p[2] );
             execution.setPhase( phase );
             execution.getGoals().add( p[2] );
