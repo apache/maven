@@ -33,9 +33,13 @@ import java.util.List;
  */
 public class MojoExecution
 {
+    public static final String DEFAULT_EXEC_ID_PREFIX = "default-";
+
+    public static final String CLI_EXECUTION_ID = DEFAULT_EXEC_ID_PREFIX + "cli";
+
     // Execution ID needs to default to "default" to allow configuration of that execution alongside
     // other executions.
-    private String executionId = "default";
+    private final String executionId;
 
     private final MojoDescriptor mojoDescriptor;
 
@@ -49,6 +53,7 @@ public class MojoExecution
     {
         this.mojoDescriptor = mojoDescriptor;
         this.configuration = null;
+        this.executionId = DEFAULT_EXEC_ID_PREFIX + mojoDescriptor.getGoal();
     }
 
     public MojoExecution( MojoDescriptor mojoDescriptor, String executionId )
@@ -62,6 +67,14 @@ public class MojoExecution
     {
         this.mojoDescriptor = mojoDescriptor;
         this.configuration = configuration;
+        this.executionId = DEFAULT_EXEC_ID_PREFIX + mojoDescriptor.getGoal();
+    }
+
+    public MojoExecution( MojoDescriptor mojoDescriptor, Xpp3Dom configuration, String executionId )
+    {
+        this.mojoDescriptor = mojoDescriptor;
+        this.configuration = configuration;
+        this.executionId = executionId;
     }
 
     public String getExecutionId()
