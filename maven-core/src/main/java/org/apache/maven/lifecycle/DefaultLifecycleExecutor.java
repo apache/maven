@@ -248,7 +248,7 @@ public class DefaultLifecycleExecutor
             //
             // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
             //                        
-            MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getVersion(), mojoExecution.getGoal(), session
+            MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(), session
                 .getLocalRepository(), project.getRemoteArtifactRepositories() );
 
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
@@ -869,7 +869,7 @@ public class DefaultLifecycleExecutor
         {
             for( String goal : pluginExecution.getGoals() )
             {
-                Xpp3Dom dom = getDefaultPluginConfiguration( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), goal, localRepository, remoteRepositories );
+                Xpp3Dom dom = getDefaultPluginConfiguration( plugin, goal, localRepository, remoteRepositories );
                 pluginExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pluginExecution.getConfiguration(), dom, Boolean.TRUE ) );
             }
         }
@@ -884,14 +884,14 @@ public class DefaultLifecycleExecutor
         }
     }    
     
-    private Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+    private Xpp3Dom getDefaultPluginConfiguration( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
         throws LifecycleExecutionException
     {
         MojoDescriptor mojoDescriptor;
         
         try
         {
-            mojoDescriptor = pluginManager.getMojoDescriptor( groupId, artifactId, version, goal, localRepository, remoteRepositories );
+            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, localRepository, remoteRepositories );
         }
         catch ( PluginNotFoundException e )
         {
