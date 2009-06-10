@@ -167,6 +167,12 @@ public class MavenModelMerger
     }
 
     @Override
+    protected void mergeModel_Prerequisites( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        // neither inherited nor injected
+    }
+
+    @Override
     protected void mergeModelBase_Modules( ModelBase target, ModelBase source, boolean sourceDominant,
                                            Map<Object, Object> context )
     {

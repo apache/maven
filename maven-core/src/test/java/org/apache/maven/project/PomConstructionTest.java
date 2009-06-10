@@ -1512,6 +1512,14 @@ public class PomConstructionTest
         }
     }
 
+    /** MNG-3843 */
+    public void testPrerequisitesAreNotInherited()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "prerequisites-inheritance/child" );
+        assertSame( null, pom.getValue( "prerequisites" ) );
+    }    
+
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
