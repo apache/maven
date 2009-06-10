@@ -30,10 +30,10 @@ public class CompatibleMain
         // ----------------------------------------------------------------------
         
         String javaVersion = System.getProperty( "java.specification.version", "1.5" );
-        System.out.println( "Java specification version: " + javaVersion );
-        
-        if ( "1.3".equals( javaVersion ) || "1.4".equals( javaVersion ) )
+        if ( "1.4".equals( javaVersion ) || "1.3".equals( javaVersion ) 
+             || "1.2".equals( javaVersion )  || "1.1".equals( javaVersion ) )
         {
+	        System.out.println( "Java specification version: " + javaVersion );
             System.err.println( "This release of Maven requires Java version 1.5 or greater." );
             return 1;
         }
