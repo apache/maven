@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven.reporting</groupId>
     <artifactId>maven-reporting</artifactId>
-    <version>2.2.0-RC3-SNAPSHOT</version>
+    <version>2.2.0-RC3</version>
   </parent>
 
   <artifactId>maven-reporting-api</artifactId>
