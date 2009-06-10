@@ -220,6 +220,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
         suite.addTestSuite( MavenITmng3422ActiveComponentCollectionTest.class );
         suite.addTestSuite( MavenITmng3415JunkRepositoryMetadataTest.class );
+		suite.addTestSuite( MavenITmng3401CLIDefaultExecIdTest.class );
         suite.addTestSuite( MavenITmng3396DependencyManagementForOverConstrainedRangesTest.class );
         suite.addTestSuite( MavenITmng3394POMPluginVersionDominanceTest.class );
         suite.addTestSuite( MavenITmng3380ManagedRelocatedTransdepsTest.class );
@@ -236,6 +237,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3259DepsDroppedInMultiModuleBuildTest.class );
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
         suite.addTestSuite( MavenITmng3217InterPluginDependencyTest.class );
+		suite.addTestSuite( MavenITmng3203DefaultLifecycleExecIdTest.class );
         suite.addTestSuite( MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest.class );
         suite.addTestSuite( MavenITmng3118TestClassPathOrderTest.class );
         suite.addTestSuite( MavenITmng3106ProfileMultipleActivatorsTest.class );
