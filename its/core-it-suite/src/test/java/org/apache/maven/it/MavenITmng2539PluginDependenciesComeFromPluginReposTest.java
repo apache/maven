@@ -30,7 +30,8 @@ public class MavenITmng2539PluginDependenciesComeFromPluginReposTest
 
     public MavenITmng2539PluginDependenciesComeFromPluginReposTest()
     {
-        super( "(2.0.4,)" );
+        // plugin repositories and normal artifact repositories are completely separated in 3.x (see MNG-4191)
+        super( "(2.0.4,3.0-alpha-3)" );
     }
 
     /**
