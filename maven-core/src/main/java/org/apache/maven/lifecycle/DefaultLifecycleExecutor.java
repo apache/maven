@@ -249,7 +249,7 @@ public class DefaultLifecycleExecutor
             // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
             //                        
             MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(), session
-                .getLocalRepository(), project.getRemoteArtifactRepositories() );
+                .getLocalRepository(), project.getPluginArtifactRepositories() );
 
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
             if ( pluginDescriptor.getPlugin().isExtensions() )
@@ -402,7 +402,7 @@ public class DefaultLifecycleExecutor
                 {
                     for ( String goal : execution.getGoals() )
                     {
-                        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
+                        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getPluginArtifactRepositories() );
 
                         if ( mojoDescriptor.getPhase() != null && phaseToMojoMapping.get( mojoDescriptor.getPhase() ) != null )
                         {
@@ -673,7 +673,7 @@ public class DefaultLifecycleExecutor
                     //
                     //TODO: we should cycle through the repositories but take the repository which actually
                     // satisfied the prefix.
-                    for ( ArtifactRepository repository : project.getRemoteArtifactRepositories() )
+                    for ( ArtifactRepository repository : project.getPluginArtifactRepositories() )
                     {
                         localPath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-" + repository.getId() + ".xml";
 
@@ -733,7 +733,7 @@ public class DefaultLifecycleExecutor
             }
         }        
         
-        return pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getRemoteArtifactRepositories() );
+        return pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getPluginArtifactRepositories() );
     }
                 
     private String attemptToGetPluginVersionFromProject( Plugin plugin, MavenProject project )
@@ -999,7 +999,7 @@ public class DefaultLifecycleExecutor
         //
         for ( String pluginGroup : session.getPluginGroups() )
         {                
-            for ( ArtifactRepository repository : session.getCurrentProject().getRemoteArtifactRepositories() )
+            for ( ArtifactRepository repository : session.getCurrentProject().getPluginArtifactRepositories() )
             {
                 try
                 {
@@ -1032,7 +1032,7 @@ public class DefaultLifecycleExecutor
 
         }            
                             
-        throw new NoPluginFoundForPrefixException( prefix, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );
+        throw new NoPluginFoundForPrefixException( prefix, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );
     }  
     
     // Keep track of the repository that provided the prefix mapping

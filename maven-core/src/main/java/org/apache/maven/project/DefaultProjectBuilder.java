@@ -124,7 +124,7 @@ public class DefaultProjectBuilder
         {
             if ( configuration.isProcessPlugins() )
             {
-                lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(), configuration.getLocalRepository(), project.getRemoteArtifactRepositories() );
+                lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(), configuration.getLocalRepository(), project.getPluginArtifactRepositories() );
             }
         }
         catch ( LifecycleExecutionException e )

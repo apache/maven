@@ -106,6 +106,8 @@ public class MavenProject
 
     private List<ArtifactRepository> remoteArtifactRepositories;
 
+    private List<ArtifactRepository> pluginArtifactRepositories;
+
     private List<Artifact> attachedArtifacts;
 
     private MavenProject executionProject;
@@ -244,11 +246,14 @@ public class MavenProject
 
             }
         }
+
+        pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+
         for ( Repository r : model.getPluginRepositories() )
         {
             try
             {
-                remoteArtifactRepositories.add( repositorySystem.buildArtifactRepository( r ) );
+                pluginArtifactRepositories.add( repositorySystem.buildArtifactRepository( r ) );
             }
             catch ( InvalidRepositoryException e )
             {
@@ -262,6 +267,8 @@ public class MavenProject
         {
             remoteArtifactRepositories.addAll( projectBuilderConfiguration.getRemoteRepositories() );
         }
+
+        pluginArtifactRepositories = repositorySystem.getMirrors( pluginArtifactRepositories );
     }
 
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
@@ -390,7 +397,7 @@ public class MavenProject
 
     public List<ArtifactRepository> getRemoteArtifactRepositories()
     {
-        return new ArrayList<ArtifactRepository>( remoteArtifactRepositories );
+        return remoteArtifactRepositories;
     }
     
     public boolean hasParent()
@@ -1350,6 +1357,7 @@ public class MavenProject
 
     public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
+        this.pluginArtifactRepositories = pluginArtifactRepositories;
     }
 
     /**
@@ -1358,7 +1366,7 @@ public class MavenProject
      */
     public List<ArtifactRepository> getPluginArtifactRepositories()
     {
-        return getRemoteArtifactRepositories();
+        return pluginArtifactRepositories;
     }
 
     public ArtifactRepository getDistributionManagementArtifactRepository()

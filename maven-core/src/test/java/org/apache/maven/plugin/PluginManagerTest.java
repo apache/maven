@@ -47,7 +47,7 @@ public class PluginManagerTest
         plugin.setGroupId( "org.codehaus.plexus" );
         plugin.setArtifactId( "plexus-component-metadata" );
         plugin.setVersion( plexusVersion );
-        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );
         assertNotNull( pluginDescriptor );
     }
     
@@ -61,7 +61,7 @@ public class PluginManagerTest
         plugin.setArtifactId( "plexus-component-metadata" );
         plugin.setVersion( plexusVersion );
         
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );        
         assertNotNull( mojoDescriptor );
         assertEquals( "generate-metadata", mojoDescriptor.getGoal() );
         // igorf: plugin realm comes later
