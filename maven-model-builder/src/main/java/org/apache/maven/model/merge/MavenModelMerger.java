@@ -31,11 +31,15 @@ import java.util.StringTokenizer;
 
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.CiManagement;
+import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
+import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.IssueManagement;
+import org.apache.maven.model.License;
+import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Organization;
@@ -170,6 +174,45 @@ public class MavenModelMerger
     protected void mergeModel_Prerequisites( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
     {
         // neither inherited nor injected
+    }
+
+    @Override
+    protected void mergeModel_Licenses( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        if ( target.getLicenses().isEmpty() )
+        {
+            target.setLicenses( new ArrayList<License>( source.getLicenses() ) );
+        }
+    }
+
+    @Override
+    protected void mergeModel_Developers( Model target, Model source, boolean sourceDominant,
+                                          Map<Object, Object> context )
+    {
+        if ( target.getDevelopers().isEmpty() )
+        {
+            target.setDevelopers( new ArrayList<Developer>( source.getDevelopers() ) );
+        }
+    }
+
+    @Override
+    protected void mergeModel_Contributors( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+    {
+        if ( target.getContributors().isEmpty() )
+        {
+            target.setContributors( new ArrayList<Contributor>( source.getContributors() ) );
+        }
+    }
+
+    @Override
+    protected void mergeModel_MailingLists( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+    {
+        if ( target.getMailingLists().isEmpty() )
+        {
+            target.setMailingLists( new ArrayList<MailingList>( source.getMailingLists() ) );
+        }
     }
 
     @Override

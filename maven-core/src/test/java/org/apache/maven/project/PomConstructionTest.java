@@ -1520,6 +1520,39 @@ public class PomConstructionTest
         assertSame( null, pom.getValue( "prerequisites" ) );
     }    
 
+    public void testLicensesAreInheritedButNotAggregated()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "licenses-inheritance/child-2" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "licenses" ) ).size() );
+        assertEquals( "child-license", pom.getValue( "licenses[1]/name" ) );
+        assertEquals( "http://child.url/license", pom.getValue( "licenses[1]/url" ) );
+    }    
+
+    public void testDevelopersAreInheritedButNotAggregated()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "developers-inheritance/child-2" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "developers" ) ).size() );
+        assertEquals( "child-developer", pom.getValue( "developers[1]/name" ) );
+    }
+
+    public void testContributorsAreInheritedButNotAggregated()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "contributors-inheritance/child-2" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "contributors" ) ).size() );
+        assertEquals( "child-contributor", pom.getValue( "contributors[1]/name" ) );
+    }    
+
+    public void testMailingListsAreInheritedButNotAggregated()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "mailing-lists-inheritance/child-2" );
+        assertEquals( 1, ( (List<?>) pom.getValue( "mailingLists" ) ).size() );
+        assertEquals( "child-mailing-list", pom.getValue( "mailingLists[1]/name" ) );
+    }    
+
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
