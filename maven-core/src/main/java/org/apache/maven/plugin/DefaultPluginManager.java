@@ -77,11 +77,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-// TODO: get plugin groups
 // TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO: remove the coreArtifactFilterManager
-// TODO: rework the plugin classloader/plugin descriptor caching
-// TODO: surface all exceptions to the handler: get rid of generic useless exceptions
 
 @Component(role = PluginManager.class)
 public class DefaultPluginManager
@@ -90,7 +87,7 @@ public class DefaultPluginManager
     @Requirement
     private Logger logger;
 
-    @Requirement(role=PlexusContainer.class)
+    @Requirement
     protected PlexusContainer container;
 
     @Requirement
@@ -121,22 +118,12 @@ public class DefaultPluginManager
     public synchronized PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException
     {
-//        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin );
-
-        // There are cases where plugins are discovered but not actually populated. These are edge cases where you are working in the IDE on
-        // Maven itself so this speaks to a problem we have with the system not starting entirely clean.
-//        if ( pluginDescriptor != null && pluginDescriptor.getClassRealm() != null )
-//        {
-//            return pluginDescriptor;
-//        }
-
         PluginDescriptor pluginDescriptor = pluginCache.getPluginDescriptor( plugin, localRepository, remoteRepositories );
         
         if ( pluginDescriptor != null )
         {
             return pluginDescriptor;
         }
-
 
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
@@ -373,7 +360,8 @@ public class DefaultPluginManager
      * TODO pluginDescriptor classRealm and artifacts are set as a side effect of this
      *      call, which is not nice.
      */
-    public synchronized ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) throws PluginManagerException
+    public synchronized ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) 
+        throws PluginManagerException
     {
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
         if ( pluginRealm != null )

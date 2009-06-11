@@ -29,16 +29,6 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
  */
 public interface PluginManager
 {
-    // - find the plugin [extension point: any client may wish to do whatever they choose]
-    // - load the plugin into a classloader [extension point: we want to take them from a repository, some may take from disk or whatever]
-    // - configure the plugin [extension point] -- actually this should happen before the plugin manager gets anything i.e. do whatever you want to get the information
-    // - execute the plugin    
-        
-    // Use more meaningful exceptions
-    // plugin not found
-    // plugin resolution exception
-    // plugin configuration can't be parsed -- and this may be a result of client insertion of configuration
-    // plugin component deps have a cycle -- this should be prevented for the most part but client code may inject an override component which itself has a cycle
     // igorf: Way too many declared exceptions!
     PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException;
@@ -51,10 +41,9 @@ public interface PluginManager
     MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
 
-    // Why do we have a plugin execution exception as well?
-    // igorf: Way too many declared exceptions!
     void executeMojo( MavenSession session, MojoExecution execution )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginExecutionException, PluginManagerException;
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException;
 
-    ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) throws PluginManagerException;
+    ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) 
+        throws PluginManagerException;
 }
