@@ -36,10 +36,10 @@ public class MavenITmng2562TimestampTest
         super( "[2.1.0-M1,)" ); // 2.1.0+ only
     }
 
-    public void testitMNG2562()
+    public void testitDefaultFormat()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2562" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2562/default" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -48,11 +48,38 @@ public class MavenITmng2562TimestampTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        Date now = new Date();
+
         Properties props = verifier.loadProperties( "target/pom.properties" );
-        String timestamp = props.getProperty( "project.properties.timestamp", "" );
-        assertTrue( timestamp, timestamp.matches( "[0-9]{8}-[0-9]{4}" ) );
-        Date date = new SimpleDateFormat( "yyyyMMdd-HHmm" ).parse( timestamp );
-        assertTrue( new Date() + " vs " + date, Math.abs( System.currentTimeMillis() - date.getTime() ) < 24 * 60 * 60 * 1000 );
+
+        String timestamp1 = props.getProperty( "project.properties.timestamp1", "" );
+        assertTrue( timestamp1, timestamp1.matches( "[0-9]{8}-[0-9]{4}" ) );
+        Date date = new SimpleDateFormat( "yyyyMMdd-HHmm" ).parse( timestamp1 );
+        assertTrue( now + " vs " + date, Math.abs( now.getTime() - date.getTime() ) < 24 * 60 * 60 * 1000 );
+
+        String timestamp2 = props.getProperty( "project.properties.timestamp2", "" );
+        assertEquals( timestamp1, timestamp2 );
+    }
+
+    public void testitCustomFormat()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2562/custom" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Date now = new Date();
+
+        Properties props = verifier.loadProperties( "target/pom.properties" );
+
+        String timestamp1 = props.getProperty( "project.properties.timestamp", "" );
+        Date date = new SimpleDateFormat( "mm:HH dd-MM-yyyy" ).parse( timestamp1 );
+        assertTrue( now + " vs " + date, Math.abs( now.getTime() - date.getTime() ) < 24 * 60 * 60 * 1000 );
     }
 
 }

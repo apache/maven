@@ -32,7 +32,8 @@ under the License.
   </description>
 
   <properties>
-    <timestamp>${build.timestamp}</timestamp>
+    <timestamp1>${maven.build.timestamp}</timestamp1>
+    <timestamp2>${build.timestamp}</timestamp2>
   </properties>
 
   <build>
