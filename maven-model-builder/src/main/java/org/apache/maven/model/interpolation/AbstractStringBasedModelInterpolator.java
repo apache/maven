@@ -105,49 +105,56 @@ public abstract class AbstractStringBasedModelInterpolator
 
     protected List<ValueSource> createValueSources( final Model model, final File projectDir, final ModelBuildingRequest config )
     {
-        String timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
-
         Properties modelProperties = model.getProperties();
-        if ( modelProperties != null )
-        {
-            timestampFormat = modelProperties.getProperty( BUILD_TIMESTAMP_FORMAT_PROPERTY, timestampFormat );
-        }
 
         ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
         ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
 
-        ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false ){
-            public Object getValue( String expression )
-            {
-                if ( projectDir != null && "basedir".equals( expression ) )
-                {
-                    return projectDir.getAbsolutePath();
-                }
-                return null;
-            }
-        },
-        PROJECT_PREFIXES, true );
-        ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false ){
-            public Object getValue( String expression )
-            {
-                if ( projectDir != null && "baseUri".equals( expression ) )
-                {
-                    return projectDir.getAbsoluteFile().toURI().toString();
-                }
-                return null;
-            }
-        },
-        PROJECT_PREFIXES, false );
-        
-        List<ValueSource> valueSources = new ArrayList<ValueSource>( 9 );
-        
         // NOTE: Order counts here!
-        valueSources.add( basedirValueSource );
-        valueSources.add( baseUriValueSource );
-        valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), timestampFormat ) );
+        List<ValueSource> valueSources = new ArrayList<ValueSource>( 9 );
+
+        if ( projectDir != null )
+        {
+            ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
+            {
+                public Object getValue( String expression )
+                {
+                    if ( "basedir".equals( expression ) )
+                    {
+                        return projectDir.getAbsolutePath();
+                    }
+                    return null;
+                }
+            }, PROJECT_PREFIXES, true );
+            valueSources.add( basedirValueSource );
+
+            ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
+            {
+                public Object getValue( String expression )
+                {
+                    if ( "baseUri".equals( expression ) )
+                    {
+                        return projectDir.getAbsoluteFile().toURI().toString();
+                    }
+                    return null;
+                }
+            }, PROJECT_PREFIXES, false );
+            valueSources.add( baseUriValueSource );
+
+            String timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
+            if ( modelProperties != null )
+            {
+                timestampFormat = modelProperties.getProperty( BUILD_TIMESTAMP_FORMAT_PROPERTY, timestampFormat );
+            }
+            valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), timestampFormat ) );
+        }
+
         valueSources.add( modelValueSource1 );
+
         valueSources.add( new MapBasedValueSource( modelProperties ) );
+
         valueSources.add( new MapBasedValueSource( config.getExecutionProperties() ) );
+
         valueSources.add( new AbstractValueSource( false )
         {
             public Object getValue( String expression )
@@ -155,8 +162,9 @@ public abstract class AbstractStringBasedModelInterpolator
                 return config.getExecutionProperties().getProperty( "env." + expression );
             }
         } );
+
         valueSources.add( modelValueSource2 );
-        
+
         return valueSources;
     }
     
