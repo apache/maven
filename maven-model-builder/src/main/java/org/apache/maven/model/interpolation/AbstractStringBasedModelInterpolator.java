@@ -144,7 +144,7 @@ public abstract class AbstractStringBasedModelInterpolator
         // NOTE: Order counts here!
         valueSources.add( basedirValueSource );
         valueSources.add( baseUriValueSource );
-        // TODO: valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), timestampFormat ) );
+        valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), timestampFormat ) );
         valueSources.add( modelValueSource1 );
         valueSources.add( new MapBasedValueSource( modelProperties ) );
         valueSources.add( new MapBasedValueSource( config.getExecutionProperties() ) );

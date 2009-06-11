@@ -17,6 +17,7 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -102,6 +103,7 @@ public class DefaultProjectBuilder
         {
             if ( localProject )
             {
+                request.setBuildStartTime( new Date() );
                 result = modelBuilder.build( pomFile, request );
             }
             else

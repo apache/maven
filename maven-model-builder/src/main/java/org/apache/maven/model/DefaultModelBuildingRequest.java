@@ -20,6 +20,7 @@ package org.apache.maven.model;
  */
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -46,8 +47,10 @@ public class DefaultModelBuildingRequest
 
     private Properties executionProperties;
 
+    private Date buildStartTime;
+
     private ModelResolver modelResolver;
-    
+
     public DefaultModelBuildingRequest()
     {
         profiles = new ArrayList<Profile>();
@@ -140,6 +143,18 @@ public class DefaultModelBuildingRequest
         {
             this.executionProperties.putAll( executionProperties );
         }
+
+        return this;
+    }
+
+    public Date getBuildStartTime()
+    {
+        return buildStartTime;
+    }
+
+    public ModelBuildingRequest setBuildStartTime( Date buildStartTime )
+    {
+        this.buildStartTime = buildStartTime;
 
         return this;
     }

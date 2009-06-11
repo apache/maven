@@ -19,6 +19,7 @@ package org.apache.maven.model;
  * under the License.
  */
 
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -128,6 +129,21 @@ public interface ModelBuildingRequest
      * @return This request, never {@code null}.
      */
     ModelBuildingRequest setExecutionProperties( Properties executionProperties );
+
+    /**
+     * Gets the start time of the build.
+     * 
+     * @return The start time of the build or {@code null} if unknown.
+     */
+    Date getBuildStartTime();
+
+    /**
+     * Sets the start time of the build.
+     * 
+     * @param buildStartTime The start time of the build, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    ModelBuildingRequest setBuildStartTime( Date buildStartTime );
 
     /**
      * Gets the model resolver to use for resolution of mixins or parents that are not locally reachable from the
