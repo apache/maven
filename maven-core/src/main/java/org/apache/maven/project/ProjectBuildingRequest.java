@@ -1,10 +1,10 @@
 package org.apache.maven.project;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Profile;
 
 public interface ProjectBuildingRequest
@@ -71,5 +71,20 @@ public interface ProjectBuildingRequest
     void setProfiles( List<Profile> profiles );
     
     List<Profile> getProfiles();
+
+    /**
+     * Gets the start time of the build.
+     * 
+     * @return The start time of the build or {@code null} if unknown.
+     */
+    Date getBuildStartTime();
+
+    /**
+     * Sets the start time of the build.
+     * 
+     * @param buildStartTime The start time of the build, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    void setBuildStartTime( Date buildStartTime );
 
 }

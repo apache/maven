@@ -20,6 +20,7 @@ package org.apache.maven.project;
  */
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -49,6 +50,8 @@ public class DefaultProjectBuildingRequest
     private List<String> inactiveProfileIds;
 
     private Properties executionProperties;
+
+    private Date buildStartTime;
 
     public DefaultProjectBuildingRequest()
     {
@@ -189,6 +192,16 @@ public class DefaultProjectBuildingRequest
     public List<Profile> getProfiles()
     {
         return profiles;
+    }
+
+    public Date getBuildStartTime()
+    {
+        return buildStartTime;
+    }
+
+    public void setBuildStartTime( Date buildStartTime )
+    {
+        this.buildStartTime = buildStartTime;
     }
 
 }

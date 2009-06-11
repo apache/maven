@@ -96,6 +96,7 @@ public class DefaultProjectBuilder
         request.setActiveProfileIds( configuration.getActiveProfileIds() );
         request.setInactiveProfileIds( configuration.getInactiveProfileIds() );
         request.setExecutionProperties( configuration.getExecutionProperties() );
+        request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
 
         ModelBuildingResult result;
@@ -103,7 +104,6 @@ public class DefaultProjectBuilder
         {
             if ( localProject )
             {
-                request.setBuildStartTime( new Date() );
                 result = modelBuilder.build( pomFile, request );
             }
             else

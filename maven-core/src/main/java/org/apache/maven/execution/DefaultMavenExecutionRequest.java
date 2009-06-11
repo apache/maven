@@ -718,6 +718,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setInactiveProfileIds( getInactiveProfiles() );
             projectBuildingRequest.setProfiles( getProfiles() );
             projectBuildingRequest.setProcessPlugins( true );
+            projectBuildingRequest.setBuildStartTime( getStartTime() );
         }
 
         return projectBuildingRequest;
