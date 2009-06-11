@@ -273,7 +273,7 @@ under the License.
   </modules>
 
   <properties>
-    <mavenVersion>2.2.0-RC3</mavenVersion>
+    <mavenVersion>2.2.0-RC4-SNAPSHOT</mavenVersion>
     <wagonVersion>1.0-beta-5</wagonVersion>
     <doxiaVersion>1.1</doxiaVersion>
   </properties>
