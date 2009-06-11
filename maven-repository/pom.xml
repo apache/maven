@@ -63,13 +63,7 @@ under the License.
       <artifactId>wagon-file</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty6</artifactId>
-      <scope>test</scope>
-    </dependency>          
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
