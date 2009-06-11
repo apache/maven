@@ -127,7 +127,7 @@
         <version>2.2-beta-4</version>
         <executions>
           <execution>
-            <id>bin-assembly</id>
+            <id>assemblies</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
@@ -135,6 +135,7 @@
             <configuration>
               <descriptors>
                 <descriptor>src/assemble/bin.xml</descriptor>
+                <descriptor>src/assemble/source-release.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
