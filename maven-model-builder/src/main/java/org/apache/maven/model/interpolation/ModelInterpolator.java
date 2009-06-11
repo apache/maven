@@ -36,17 +36,6 @@ public interface ModelInterpolator
 {
 
     /**
-     * The default format used for build timestamps.
-     */
-    String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
-
-    /**
-     * The name of a property that if present in the model's {@code <properties>} section specifies a custom format for
-     * build timestamps. See {@link java.text.SimpleDateFormat} for details on the format.
-     */
-    String BUILD_TIMESTAMP_FORMAT_PROPERTY = "maven.build.timestamp.format";
-
-    /**
      * Interpolates expressions in the specified model. Note that implementations are free to either interpolate the
      * provided model directly or to create a clone of the model and interpolate the clone. Callers should always use
      * the returned model and must not rely on the input model being updated.

@@ -54,6 +54,18 @@ import java.util.Properties;
 public abstract class AbstractStringBasedModelInterpolator
     implements ModelInterpolator
 {
+
+    /**
+     * The default format used for build timestamps.
+     */
+    private static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
+
+    /**
+     * The name of a property that if present in the model's {@code <properties>} section specifies a custom format for
+     * build timestamps. See {@link java.text.SimpleDateFormat} for details on the format.
+     */
+    private static final String BUILD_TIMESTAMP_FORMAT_PROPERTY = "maven.build.timestamp.format";
+
     private static final List<String> PROJECT_PREFIXES = Arrays.asList( new String[]{ "pom.", "project." } );
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
