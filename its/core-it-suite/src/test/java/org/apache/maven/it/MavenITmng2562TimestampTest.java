@@ -82,4 +82,36 @@ public class MavenITmng2562TimestampTest
         assertTrue( now + " vs " + date, Math.abs( now.getTime() - date.getTime() ) < 24 * 60 * 60 * 1000 );
     }
 
+    public void testitSameValueAcrossModules()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2562/reactor" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "child-1/target" );
+        verifier.deleteDirectory( "child-2/target" );
+        verifier.deleteDirectory( "child-3/target" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/pom.properties" );
+        String timestamp = props.getProperty( "project.properties.timestamp", "" );
+
+        Properties props1 = verifier.loadProperties( "child-1/target/pom.properties" );
+        String timestamp1 = props1.getProperty( "project.properties.timestamp", "" );
+
+        Properties props2 = verifier.loadProperties( "child-2/target/pom.properties" );
+        String timestamp2 = props2.getProperty( "project.properties.timestamp", "" );
+
+        Properties props3 = verifier.loadProperties( "child-3/target/pom.properties" );
+        String timestamp3 = props3.getProperty( "project.properties.timestamp", "" );
+
+        assertEquals( timestamp, timestamp1 );
+        assertEquals( timestamp, timestamp2 );
+        assertEquals( timestamp, timestamp3 );
+    }
+
 }
