@@ -105,7 +105,11 @@ public class MavenITmng3843PomInheritanceTest
         assertPathEquals( basedir, "target/site", props.getProperty( "project.reporting.outputDirectory" ) );
         assertEquals( "false", props.getProperty( "project.reporting.excludeDefaults" ) );
         assertTrue( Integer.parseInt( props.getProperty( "project.repositories" ) ) > 0 );
-        assertEquals( "1", props.getProperty( "project.build.plugins" ) );
+        if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
+        {
+            // 3.x will provide the lifecycle bindings in the effective model, don't count these
+            assertEquals( "1", props.getProperty( "project.build.plugins" ) );
+        }
         assertMissing( props, "project.dependencies." );
         assertMissing( props, "project.dependencyManagement." );
 
@@ -167,7 +171,11 @@ public class MavenITmng3843PomInheritanceTest
             assertEquals( "true", props.getProperty( "project.reporting.excludeDefaults" ) );
         }
         assertTrue( Integer.parseInt( props.getProperty( "project.repositories" ) ) > 1 );
-        assertEquals( "1", props.getProperty( "project.build.plugins" ) );
+        if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
+        {
+            // 3.x will provide the lifecycle bindings in the effective model, don't count these
+            assertEquals( "1", props.getProperty( "project.build.plugins" ) );
+        }
         assertEquals( "1", props.getProperty( "project.dependencies" ) );
         assertEquals( "parent-dep-b", props.getProperty( "project.dependencies.0.artifactId" ) );
         assertEquals( "1", props.getProperty( "project.dependencyManagement.dependencies" ) );
@@ -223,8 +231,9 @@ public class MavenITmng3843PomInheritanceTest
         assertPathEquals( basedir, "docs", props.getProperty( "project.reporting.outputDirectory" ) );
         assertEquals( "false", props.getProperty( "project.reporting.excludeDefaults" ) );
         assertTrue( Integer.parseInt( props.getProperty( "project.repositories" ) ) > 1 );
-        if ( matchesVersionRange( "(2.0.4,)" ) )
+        if ( matchesVersionRange( "(2.0.4,3.0-alpha-3)" ) )
         {
+            // 3.x will provide the lifecycle bindings in the effective model, don't count these
             assertEquals( "1", props.getProperty( "project.build.plugins" ) );
         }
         assertEquals( "4", props.getProperty( "project.dependencies" ) );
