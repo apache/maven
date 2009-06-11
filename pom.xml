@@ -48,7 +48,6 @@ under the License.
   <properties>
     <classWorldsVersion>1.5.0</classWorldsVersion>
     <commonsCliVersion>1.0</commonsCliVersion>
-    <doxiaVersion>1.0-alpha-9</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.0-beta-3.0.8-SNAPSHOT</plexusVersion>
@@ -268,12 +267,6 @@ under the License.
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http-lightweight</artifactId>
         <version>${wagonVersion}</version>
-      </dependency>
-      <!--  Doxia -->
-      <dependency>
-        <groupId>org.apache.maven.doxia</groupId>
-        <artifactId>doxia-sink-api</artifactId>
-        <version>${doxiaVersion}</version>
       </dependency>
       <!--  Commons -->
       <dependency>
