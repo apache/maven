@@ -167,21 +167,69 @@ public class PomConstructionTest
 
     }
 
-    /*MNG-4005 - not implemented
-    public void testDependenciesDifferentVersions()
+    /** MNG-4005 */
+    public void testValidationErrorUponNonUniqueDependencyKey()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "dependencies-different-versions" );
-
+        try
+        {
+            buildPom( "unique-dependency-key/deps" );
+            fail( "Non-unique dependency keys did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
     }
-    */
+
+    public void testValidationErrorUponNonUniqueDependencyManagementKey()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "unique-dependency-key/dep-mngt" );
+            fail( "Non-unique dependency keys did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
+    }
+
+    public void testValidationErrorUponNonUniqueDependencyKeyInProfile()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "unique-dependency-key/deps-in-profile" );
+            fail( "Non-unique dependency keys did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
+    }
+
+    public void testValidationErrorUponNonUniqueDependencyManagementKeyInProfile()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "unique-dependency-key/dep-mngt-in-profile" );
+            fail( "Non-unique dependency keys did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
+    }
 
     public void testDuplicateDependenciesCauseLastDeclarationToBePickedInLenientMode()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "dependencies-different-versions", true, null );
+        PomTestWrapper pom = buildPom( "unique-dependency-key/deps", true, null );
         assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
-        assertEquals( "1.1", pom.getValue( "dependencies[1]/version" ) );
+        assertEquals( "0.2", pom.getValue( "dependencies[1]/version" ) );
     }
 
     /* MNG-3567*/
@@ -1501,7 +1549,6 @@ public class PomConstructionTest
         catch ( ProjectBuildingException e )
         {
             // expected
-            e.printStackTrace();
         }
     }
 

@@ -20,9 +20,9 @@ package org.apache.maven.model.validation;
  */
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -72,12 +72,29 @@ public class DefaultModelValidator
 
         if ( !request.istLenientValidation() )
         {
+            validateDependencies( result, model.getDependencies(), "dependencies" );
+
+            if ( model.getDependencyManagement() != null )
+            {
+                validateDependencies( result, model.getDependencyManagement().getDependencies(),
+                                      "dependencyManagment.dependencies" );
+            }
+
             validateRepositories( result, model.getRepositories(), "repositories.repository" );
 
             validateRepositories( result, model.getPluginRepositories(), "pluginRepositories.pluginRepository" );
 
             for ( Profile profile : model.getProfiles() )
             {
+                validateDependencies( result, profile.getDependencies(), "profiles.profile[" + profile.getId()
+                    + "].dependencies" );
+
+                if ( profile.getDependencyManagement() != null )
+                {
+                    validateDependencies( result, profile.getDependencyManagement().getDependencies(),
+                                          "profiles.profile[" + profile.getId() + "].dependencyManagment.dependencies" );
+                }
+
                 validateRepositories( result, profile.getRepositories(), "profiles.profile[" + profile.getId()
                     + "].repositories.repository" );
 
@@ -246,20 +263,50 @@ public class DefaultModelValidator
         }
     }
 
+    private void validateDependencies( ModelValidationResult result, List<Dependency> dependencies, String prefix )
+    {
+        Map<String, Dependency> index = new HashMap<String, Dependency>();
+
+        for ( Dependency dependency : dependencies )
+        {
+            String key = dependency.getManagementKey();
+
+            Dependency existing = index.get( key );
+
+            if ( existing != null )
+            {
+                result.addMessage( "'" + prefix + ".(groupId:artifactId:type:classifier)' must be unique: " + key
+                    + " -> " + existing.getVersion() + " vs " + dependency.getVersion() );
+            }
+            else
+            {
+                index.put( key, dependency );
+            }
+        }
+    }
+
     private void validateRepositories( ModelValidationResult result, List<Repository> repositories, String prefix )
     {
-        Collection<String> ids = new HashSet<String>();
+        Map<String, Repository> index = new HashMap<String, Repository>();
 
-        for ( Repository repository :  repositories )
+        for ( Repository repository : repositories )
         {
             validateStringNotEmpty( prefix + ".id", result, repository.getId() );
 
             validateStringNotEmpty( prefix + ".url", result, repository.getUrl() );
 
-            if ( !ids.add( repository.getId() ) )
+            String key = repository.getId();
+
+            Repository existing = index.get( key );
+
+            if ( existing != null )
             {
                 result.addMessage( "'" + prefix + ".id' must be unique: " + repository.getId() + " -> "
-                    + repository.getUrl() );
+                    + existing.getUrl() + " vs " + repository.getUrl() );
+            }
+            else
+            {
+                index.put( key, repository );
             }
         }
     }
