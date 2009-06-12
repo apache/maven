@@ -31,6 +31,37 @@ public class DefaultProjectDependenciesResolver
     public Set<Artifact> resolve( MavenProject project, String scope, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {        
+        /*
+         
+        Logic for transitve global exclusions
+         
+        List<String> exclusions = new ArrayList<String>();
+        
+        for ( Dependency d : project.getDependencies() )
+        {
+            if ( d.getExclusions() != null )
+            {
+                for ( Exclusion e : d.getExclusions() )
+                {
+                    exclusions.add(  e.getGroupId() + ":" + e.getArtifactId() );
+                }
+            }
+        }
+        
+        ArtifactFilter scopeFilter = new ScopeArtifactFilter( scope );
+        
+        ArtifactFilter filter; 
+
+        if ( ! exclusions.isEmpty() )
+        {
+            filter = new AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{ new ExcludesArtifactFilter( exclusions ), scopeFilter } ) );
+        }
+        else
+        {
+            filter = scopeFilter;
+        }        
+        */
+        
         ArtifactFilter scopeFilter = new ScopeArtifactFilter( scope );
 
         ArtifactFilter filter = scopeFilter; 
