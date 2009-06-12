@@ -17,6 +17,7 @@ package org.apache.maven.project.artifact;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,10 +34,13 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -135,6 +139,8 @@ public class MavenMetadataSource
         {
             artifacts = new LinkedHashSet<Artifact>();
 
+            ArtifactFilter dependencyFilter = artifact.getDependencyFilter();
+
             for ( Dependency d : dependencies )
             {
                 String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
@@ -153,14 +159,34 @@ public class MavenMetadataSource
                         dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
                     }
 
-                    dependencyArtifact.setOptional( d.isOptional() );
-
-                    if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
+                    if ( dependencyFilter == null || dependencyFilter.include( dependencyArtifact ) )
                     {
-                        dependencyArtifact.setFile( new File( d.getSystemPath() ) );
-                    }                    
-                    
-                    artifacts.add( dependencyArtifact );
+                        dependencyArtifact.setOptional( d.isOptional() );
+
+                        if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
+                        {
+                            dependencyArtifact.setFile( new File( d.getSystemPath() ) );
+                        }
+
+                        if ( !d.getExclusions().isEmpty() )
+                        {
+                            List<String> exclusions = new ArrayList<String>();
+
+                            for ( Exclusion e : d.getExclusions() )
+                            {
+                                exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
+                            }
+
+                            ArtifactFilter newFilter = new ExcludesArtifactFilter( exclusions );
+                            if ( dependencyFilter != null )
+                            {
+                                newFilter = new AndArtifactFilter( Arrays.asList( dependencyFilter, newFilter ) );
+                            }
+                            dependencyArtifact.setDependencyFilter( newFilter );
+                        }
+
+                        artifacts.add( dependencyArtifact );
+                    }
                 }
             }
         }
