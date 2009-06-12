@@ -70,7 +70,18 @@ public interface RepositorySystem
     
     ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException;
-    
+
+    /**
+     * Calculates the effective repositories for the given input repositories. This process will essentially remove
+     * duplicate repositories by merging them into one equivalent repository. It is worth to point out that merging does
+     * not simply choose one of the input repositories and discards the others but actually combines their possibly
+     * different policies.
+     * 
+     * @param repositories The original repositories, may be {@code null}.
+     * @return The effective repositories or {@code null} if the input was {@code null}.
+     */
+    List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories );    
+
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );

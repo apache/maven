@@ -17,7 +17,11 @@ package org.apache.maven.repository.legacy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -387,6 +391,137 @@ public class LegacyRepositorySystem
     public List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories )
     {
         return mirrorBuilder.getMirrors( repositories );
+    }
+
+    public List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories )
+    {
+        if ( repositories == null )
+        {
+            return null;
+        }
+
+        Map<String, List<ArtifactRepository>> reposByKey = new LinkedHashMap<String, List<ArtifactRepository>>();
+
+        for ( ArtifactRepository repository : repositories )
+        {
+            String key = repository.getId();
+
+            List<ArtifactRepository> aliasedRepos = reposByKey.get( key );
+
+            if ( aliasedRepos == null )
+            {
+                aliasedRepos = new ArrayList<ArtifactRepository>();
+                reposByKey.put( key, aliasedRepos );
+            }
+
+            aliasedRepos.add( repository );
+        }
+
+        List<ArtifactRepository> effectiveRepositories = new ArrayList<ArtifactRepository>();
+
+        for ( List<ArtifactRepository> aliasedRepos : reposByKey.values() )
+        {
+            List<ArtifactRepositoryPolicy> releasePolicies =
+                new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
+
+            for ( ArtifactRepository aliasedRepo : aliasedRepos )
+            {
+                releasePolicies.add( aliasedRepo.getReleases() );
+            }
+
+            ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy( releasePolicies );
+
+            List<ArtifactRepositoryPolicy> snapshotPolicies =
+                new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
+
+            for ( ArtifactRepository aliasedRepo : aliasedRepos )
+            {
+                snapshotPolicies.add( aliasedRepo.getSnapshots() );
+            }
+
+            ArtifactRepositoryPolicy snapshotPolicy = getEffectivePolicy( snapshotPolicies );
+
+            ArtifactRepository aliasedRepo = aliasedRepos.get( 0 );
+
+            ArtifactRepository effectiveRepository =
+                artifactRepositoryFactory.createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(),
+                                                                    aliasedRepo.getLayout(), snapshotPolicy,
+                                                                    releasePolicy );
+
+            effectiveRepositories.add( effectiveRepository );
+        }
+
+        return effectiveRepositories;
+    }
+
+    private ArtifactRepositoryPolicy getEffectivePolicy( Collection<ArtifactRepositoryPolicy> policies )
+    {
+        ArtifactRepositoryPolicy effectivePolicy = null;
+
+        for ( ArtifactRepositoryPolicy policy : policies )
+        {
+            if ( effectivePolicy == null )
+            {
+                effectivePolicy =
+                    new ArtifactRepositoryPolicy( policy.isEnabled(), policy.getUpdatePolicy(),
+                                                  policy.getChecksumPolicy() );
+            }
+            else
+            {
+                if ( policy.isEnabled() )
+                {
+                    effectivePolicy.setEnabled( true );
+
+                    if ( ordinalOfChecksumPolicy( policy.getChecksumPolicy() ) < ordinalOfChecksumPolicy( effectivePolicy.getChecksumPolicy() ) )
+                    {
+                        effectivePolicy.setChecksumPolicy( policy.getChecksumPolicy() );
+                    }
+
+                    if ( ordinalOfUpdatePolicy( policy.getUpdatePolicy() ) < ordinalOfUpdatePolicy( effectivePolicy.getUpdatePolicy() ) )
+                    {
+                        effectivePolicy.setUpdatePolicy( policy.getUpdatePolicy() );
+                    }
+                }
+            }
+        }
+
+        return effectivePolicy;
+    }
+
+    private int ordinalOfChecksumPolicy( String policy )
+    {
+        if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals( policy ) )
+        {
+            return 2;
+        }
+        else if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals( policy ) )
+        {
+            return 0;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    private int ordinalOfUpdatePolicy( String policy )
+    {
+        if ( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY.equals( policy ) )
+        {
+            return 1440;
+        }
+        else if ( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS.equals( policy ) )
+        {
+            return 0;
+        }
+        else if ( policy != null && policy.startsWith( ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL ) )
+        {
+            return 60;
+        }
+        else
+        {
+            return Integer.MAX_VALUE;
+        }
     }
 
     public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )

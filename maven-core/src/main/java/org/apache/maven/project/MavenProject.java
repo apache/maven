@@ -233,13 +233,22 @@ public class MavenProject
         this.repositorySystem = repositorySystem;
         originalModel = model;
         
-        remoteArtifactRepositories = new ArrayList<ArtifactRepository>();
+        remoteArtifactRepositories =
+            createArtifactRepositories( model.getRepositories(), projectBuilderConfiguration.getRemoteRepositories() );
 
-        for ( Repository r : model.getRepositories() )
+        pluginArtifactRepositories = createArtifactRepositories( model.getPluginRepositories(), null );
+    }
+
+    private List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
+                                                                 List<ArtifactRepository> externalRepositories )
+    {
+        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
+
+        for ( Repository repository : pomRepositories )
         {
             try
             {
-                remoteArtifactRepositories.add( repositorySystem.buildArtifactRepository( r ) );
+                artifactRepositories.add( repositorySystem.buildArtifactRepository( repository ) );
             }
             catch ( InvalidRepositoryException e )
             {
@@ -247,28 +256,16 @@ public class MavenProject
             }
         }
 
-        pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+        artifactRepositories = repositorySystem.getMirrors( artifactRepositories );
 
-        for ( Repository r : model.getPluginRepositories() )
+        if ( externalRepositories != null )
         {
-            try
-            {
-                pluginArtifactRepositories.add( repositorySystem.buildArtifactRepository( r ) );
-            }
-            catch ( InvalidRepositoryException e )
-            {
-
-            }
+            artifactRepositories.addAll( externalRepositories );
         }
 
-        remoteArtifactRepositories = repositorySystem.getMirrors( remoteArtifactRepositories );
+        artifactRepositories = repositorySystem.getEffectiveRepositories( artifactRepositories );
 
-        if ( projectBuilderConfiguration.getRemoteRepositories() != null )
-        {
-            remoteArtifactRepositories.addAll( projectBuilderConfiguration.getRemoteRepositories() );
-        }
-
-        pluginArtifactRepositories = repositorySystem.getMirrors( pluginArtifactRepositories );
+        return artifactRepositories;
     }
 
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
