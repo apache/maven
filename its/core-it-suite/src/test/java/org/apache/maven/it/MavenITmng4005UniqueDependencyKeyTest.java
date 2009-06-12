@@ -26,36 +26,60 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4190">MNG-4190</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4005">MNG-4005</a>.
  * 
  * @author Benjamin Bentmann
  */
-public class MavenITmng4190MirrorRepoMergingTest
+public class MavenITmng4005UniqueDependencyKeyTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4190MirrorRepoMergingTest()
+    public MavenITmng4005UniqueDependencyKeyTest()
     {
         super( "[3.0-alpha-3,)" );
     }
 
     /**
-     * Test that artifact repositories are merged if they are mirrored by the same repo. If n repos map to one
-     * mirror, there is no point in making n trips to the same mirror. However, the effective/merged repo needs
-     * to account for possibly different policies of the original repos.
+     * Test that duplicate dependencies cause a validation error during building.
      */
-    public void testit()
+    public void testitProjectBuild()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4190" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005/build" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4190" );
+        try
+        {
+            verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
+            fail( "Duplicate dependency did not cause validation error" );
+        }
+        catch ( VerificationException e )
+        {
+            // expected
+        }
+        finally
+        {
+            verifier.resetStreams();
+        }
+    }
+
+    /**
+     * Test that duplicate dependencies don't cause a validation error during metadata retrieval.
+     */
+    public void testitMetadataRetrieval()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005/metadata" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4005" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
@@ -67,21 +91,10 @@ public class MavenITmng4190MirrorRepoMergingTest
         Collections.sort( artifacts );
 
         List expected = new ArrayList();
-        expected.add( "org.apache.maven.its.mng4190:a:jar:0.1" );
-        expected.add( "org.apache.maven.its.mng4190:b:jar:0.1-SNAPSHOT" );
+        expected.add( "org.apache.maven.its.mng4005:a:jar:0.2" );
+        expected.add( "org.apache.maven.its.mng4005:b:jar:0.1" );
 
         assertEquals( expected, artifacts );
-
-        Properties props = verifier.loadProperties( "target/repo.properties" );
-        assertEquals( "1", props.getProperty( "project.remoteArtifactRepositories" ) );
-
-        assertEquals( "true", props.getProperty( "project.remoteArtifactRepositories.0.releases.enabled" ) );
-        assertEquals( "ignore", props.getProperty( "project.remoteArtifactRepositories.0.releases.checksumPolicy" ) );
-        assertEquals( "daily", props.getProperty( "project.remoteArtifactRepositories.0.releases.updatePolicy" ) );
-
-        assertEquals( "true", props.getProperty( "project.remoteArtifactRepositories.0.snapshots.enabled" ) );
-        assertEquals( "ignore", props.getProperty( "project.remoteArtifactRepositories.0.snapshots.checksumPolicy" ) );
-        assertEquals( "always", props.getProperty( "project.remoteArtifactRepositories.0.snapshots.updatePolicy" ) );
     }
 
 }

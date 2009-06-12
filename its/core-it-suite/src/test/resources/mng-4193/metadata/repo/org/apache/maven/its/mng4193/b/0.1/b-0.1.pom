@@ -34,8 +34,18 @@ under the License.
     </repository>
   </distributionManagement>
 
+  <dependencies>
+    <dependency>
+      <!-- if the model builder rejected this POM, the test will miss this dependency -->
+      <groupId>org.apache.maven.its.mng4193</groupId>
+      <artifactId>a</artifactId>
+      <version>0.1</version>
+    </dependency>
+  </dependencies>
+
+  <!-- The duplicate repository id's in here should not cause a validation error during metadata retrieval -->
+
   <repositories>
-    <!-- The duplicate repository id should not cause a validation error during metadata retrieval -->
     <repository>
       <id>non-unique-id</id>
       <url>http://repo1.maven.org</url>
@@ -45,13 +55,40 @@ under the License.
       <url>http://repo2.maven.org</url>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>non-unique-id</id>
+      <url>http://repo1.maven.org</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>non-unique-id</id>
+      <url>http://repo2.maven.org</url>
+    </pluginRepository>
+  </pluginRepositories>
 
-  <dependencies>
-    <dependency>
-      <!-- if the model builder rejected this POM, the test will miss this dependency -->
-      <groupId>org.apache.maven.its.mng4193</groupId>
-      <artifactId>a</artifactId>
-      <version>0.1</version>
-    </dependency>
-  </dependencies>
+  <profiles>
+    <profile>
+      <id>test</id>
+      <repositories>
+        <repository>
+          <id>non-unique-id</id>
+          <url>http://repo1.maven.org</url>
+        </repository>
+        <repository>
+          <id>non-unique-id</id>
+          <url>http://repo2.maven.org</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>non-unique-id</id>
+          <url>http://repo1.maven.org</url>
+        </pluginRepository>
+        <pluginRepository>
+          <id>non-unique-id</id>
+          <url>http://repo2.maven.org</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
 </project>

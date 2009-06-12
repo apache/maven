@@ -119,6 +119,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4009InheritProfileEffectsTest.class );
         suite.addTestSuite( MavenITmng4008MergedFilterOrderTest.class );
         suite.addTestSuite( MavenITmng4007PlatformFileSeparatorTest.class );
+        suite.addTestSuite( MavenITmng4005UniqueDependencyKeyTest.class );
         suite.addTestSuite( MavenITmng4000MultiPluginExecutionsTest.class );
         suite.addTestSuite( MavenITmng3998PluginExecutionConfigTest.class );
         suite.addTestSuite( MavenITmng3983PluginResolutionFromProfileReposTest.class );
