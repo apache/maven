@@ -1,1 +1,0 @@
-Test that the plugin version given in project/build/plugins overrides that in project/build/pluginManagement/plugins. If this is correct, the clean plugin should find a valid version, and execute. Otherwise, the version 'invalid' is used by Maven, and the clean plugin with that version cannot be resolved...so the build fails. Use `mvn clean` to test.

@@ -51,75 +51,31 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         //testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt" );
 
-        Verifier verifier;
-
-        verifier = new Verifier( testDir.getAbsolutePath() );
-
-        verifier.setCliOptions( Collections.singletonList( "-X" ) );
-
-        verifier.executeGoal( "install" );
-
-        /*
-         * This is the simplest way to check a build
-         * succeeded. It is also the simplest way to create
-         * an IT test: make the build pass when the test
-         * should pass, and make the build fail when the
-         * test should fail. There are other methods
-         * supported by the verifier. They can be seen here:
-         * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
-         */
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "process-resources" );
         verifier.verifyErrorFreeLog();
-
-        List logFile = verifier.loadFile( new File( testDir, "log.txt" ), false );
-
-        boolean foundSiteBeta5 = false;
-        for ( Iterator it = logFile.iterator(); it.hasNext(); )
-        {
-            String line = (String) it.next();
-            if ( line.indexOf( "maven-site-plugin:2.0-beta-5" ) > -1 )
-            {
-                foundSiteBeta5 = true;
-                break;
-            }
-        }
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
         verifier.resetStreams();
 
-        assertTrue( "No reference to maven-site-plugin, version 2.0-beta-5 found in build log.", foundSiteBeta5 );
+        verifier.assertFilePresent( "target/resources-resources.txt" );
     }
 
-    public void testitMNG3394b ()
+    public void testitMNG3394b()
         throws Exception
     {
         //testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt" );
 
-        Verifier verifier;
-
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "clean" );
-
-        /*
-         * This is the simplest way to check a build
-         * succeeded. It is also the simplest way to create
-         * an IT test: make the build pass when the test
-         * should pass, and make the build fail when the
-         * test should fail. There are other methods
-         * supported by the verifier. They can be seen here:
-         * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
-         */
         verifier.verifyErrorFreeLog();
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/clean-clean.txt" );
     }
+
 }
