@@ -67,6 +67,21 @@ public class DefaultModelNormalizer
 
             build.setPlugins( new ArrayList<Plugin>( normalized.values() ) );
         }
+
+        if ( request.istLenientValidation() )
+        {
+            /*
+             * NOTE: This is to keep backward-compat with Maven 2.x which did not validate that dependencies are unique
+             * within a single POM. Upon multiple declarations, 2.x just kept the last one. So when we're in lenient
+             * mode for metadata retrieval, we have to deal with such broken POMs and mimic the way 2.x works.
+             */
+            Map<String, Dependency> dependencies = new LinkedHashMap<String, Dependency>();
+            for ( Dependency dependency : model.getDependencies() )
+            {
+                dependencies.put( dependency.getManagementKey(), dependency );
+            }
+            model.setDependencies( new ArrayList<Dependency>( dependencies.values() ) );
+        }
     }
 
     private static class DuplicateMerger

@@ -176,6 +176,14 @@ public class PomConstructionTest
     }
     */
 
+    public void testDuplicateDependenciesCauseLastDeclarationToBePickedInLenientMode()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "dependencies-different-versions", true, null );
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+        assertEquals( "1.1", pom.getValue( "dependencies[1]/version" ) );
+    }
+
     /* MNG-3567*/
     public void testParentInterpolation()
         throws Exception
@@ -1574,6 +1582,13 @@ public class PomConstructionTest
     private PomTestWrapper buildPom( String pomPath, Properties executionProperties, String... profileIds )
         throws ProjectBuildingException
     {
+        return buildPom( pomPath, false, executionProperties, profileIds );
+    }
+
+    private PomTestWrapper buildPom( String pomPath, boolean lenientValidation, Properties executionProperties,
+                                     String... profileIds )
+        throws ProjectBuildingException
+    {
         File pomFile = new File( testDirectory, pomPath );
         if ( pomFile.isDirectory() )
         {
@@ -1582,12 +1597,14 @@ public class PomConstructionTest
 
         ProjectBuildingRequest config = new DefaultProjectBuildingRequest();
 
-        String localRepoUrl = System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
+        String localRepoUrl =
+            System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
         localRepoUrl = "file://" + localRepoUrl;
         config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
         config.setActiveProfileIds( Arrays.asList( profileIds ) );
         config.setExecutionProperties( executionProperties );
-        
+        config.setLenientValidation( lenientValidation );
+
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ) );
     }
 
