@@ -137,7 +137,10 @@ public final class ArtifactUtils
         clone.setFile( artifact.getFile() );
 
         clone.setAvailableVersions( copyList( artifact.getAvailableVersions() ) );
-        clone.setBaseVersion( artifact.getBaseVersion() );
+        if ( artifact.getVersion() != null )
+        {
+            clone.setBaseVersion( artifact.getBaseVersion() );
+        }
         clone.setDependencyFilter( artifact.getDependencyFilter() );
         clone.setDependencyTrail( copyList( artifact.getDependencyTrail() ) );
         clone.setDownloadUrl( artifact.getDownloadUrl() );

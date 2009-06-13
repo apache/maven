@@ -39,6 +39,8 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -149,17 +151,21 @@ public class MavenMetadataSource
                 {
                     Artifact dependencyArtifact;
 
-                    //TODO: deal with this in a unified way, probably just looking at the dependency.                        
-                    if ( d.getClassifier() != null )
+                    VersionRange versionRange;
+                    try
                     {
-                        dependencyArtifact = repositorySystem.createArtifactWithClassifier( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getClassifier() );
+                        versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                     }
-                    else
+                    catch ( InvalidVersionSpecificationException e )
                     {
-                        dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
+                        throw new ArtifactMetadataRetrievalException( "Invalid version for dependency "
+                            + d.getManagementKey() + ": " + e.getMessage(), e, pomArtifact );
                     }
 
-                    dependencyArtifact.setScope( effectiveScope );
+                    dependencyArtifact =
+                        repositorySystem.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange,
+                                                                   d.getType(), d.getClassifier(), effectiveScope,
+                                                                   d.isOptional() );
 
                     if ( dependencyFilter == null || dependencyFilter.include( dependencyArtifact ) )
                     {
@@ -252,7 +258,7 @@ public class MavenMetadataSource
         }
         catch ( RepositoryMetadataResolutionException e )
         {
-            throw new ArtifactMetadataRetrievalException( e.getMessage(), e );
+            throw new ArtifactMetadataRetrievalException( e.getMessage(), e, artifact );
         }
 
         return retrieveAvailableVersionsFromMetadata( metadata.getMetadata() );
@@ -268,7 +274,7 @@ public class MavenMetadataSource
         }
         catch ( RepositoryMetadataResolutionException e )
         {
-            throw new ArtifactMetadataRetrievalException( e.getMessage(), e );
+            throw new ArtifactMetadataRetrievalException( e.getMessage(), e, artifact );
         }
 
         return retrieveAvailableVersionsFromMetadata( metadata.getMetadata() );
