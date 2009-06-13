@@ -1,5 +1,6 @@
 package org.apache.maven;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +12,6 @@ import org.apache.maven.project.MavenProject;
 
 public interface ProjectDependenciesResolver
 {
-    public Set<Artifact> resolve( MavenProject project, String scope, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopes, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 }

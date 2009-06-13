@@ -1,5 +1,6 @@
 package org.apache.maven;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.OrArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -28,7 +30,7 @@ public class DefaultProjectDependenciesResolver
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
     
-    public Set<Artifact> resolve( MavenProject project, String scope, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopes, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {        
         /*
@@ -61,8 +63,13 @@ public class DefaultProjectDependenciesResolver
             filter = scopeFilter;
         }        
         */
-        
-        ArtifactFilter scopeFilter = new ScopeArtifactFilter( scope );
+
+        OrArtifactFilter scopeFilter = new OrArtifactFilter();
+
+        for ( String scope : scopes )
+        {
+            scopeFilter.add( new ScopeArtifactFilter( scope ) );
+        }
 
         ArtifactFilter filter = scopeFilter; 
 

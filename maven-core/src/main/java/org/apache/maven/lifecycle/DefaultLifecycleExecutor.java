@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.maven.ProjectDependenciesResolver;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
@@ -169,7 +169,7 @@ public class DefaultLifecycleExecutor
                 // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
                 try
                 {
-                    projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScope(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
+                    projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
                 }
                 catch ( ArtifactNotFoundException e )
                 {
@@ -227,7 +227,7 @@ public class DefaultLifecycleExecutor
 
         List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
 
-        String requiredDependencyResolutionScope = null;
+        Set<String> requiredDependencyResolutionScopes = new HashSet<String>();
 
         for ( String task : tasks )
         {
@@ -258,14 +258,17 @@ public class DefaultLifecycleExecutor
                 pluginDescriptor.setClassRealm( pluginManager.getPluginRealm( session, pluginDescriptor ) );
             }
 
-            requiredDependencyResolutionScope = calculateRequiredDependencyResolutionScope( requiredDependencyResolutionScope, mojoDescriptor.isDependencyResolutionRequired() );
+            if ( StringUtils.isNotEmpty( mojoDescriptor.isDependencyResolutionRequired() ) )
+            {
+                requiredDependencyResolutionScopes.add( mojoDescriptor.isDependencyResolutionRequired() );
+            }
 
             mojoExecution.setMojoDescriptor( mojoDescriptor );
 
             populateMojoExecutionConfiguration( project, mojoExecution, false );
         }
 
-        return new MavenExecutionPlan( lifecyclePlan, requiredDependencyResolutionScope );
+        return new MavenExecutionPlan( lifecyclePlan, requiredDependencyResolutionScopes );
     }      
     
     private void calculateExecutionForIndividualGoal( MavenSession session, List<MojoExecution> lifecyclePlan, String goal ) 
@@ -431,37 +434,6 @@ public class DefaultLifecycleExecutor
         }
     }   
 
-    // SCOPE_COMPILE
-    // SCOPE_TEST
-    // SCOPE_RUNTIME
-    //
-    String calculateRequiredDependencyResolutionScope( String currentRequiredDependencyResolutionScope, String inputScope )
-    {
-        if ( inputScope == null )
-        {
-            return currentRequiredDependencyResolutionScope;
-        }
-                
-        if ( currentRequiredDependencyResolutionScope == null && inputScope != null )
-        {
-            return inputScope;
-        }
-
-        if ( currentRequiredDependencyResolutionScope.equals( Artifact.SCOPE_COMPILE ) && ( inputScope.equals(  Artifact.SCOPE_RUNTIME ) || inputScope.equals( Artifact.SCOPE_TEST ) ) )
-        {
-            return inputScope;
-        }
-
-        if ( currentRequiredDependencyResolutionScope.equals( Artifact.SCOPE_RUNTIME ) && inputScope.equals(  Artifact.SCOPE_TEST ) )
-        {
-            return inputScope;
-        }        
-        
-        // Nothing changed we return what we were
-        //
-        return currentRequiredDependencyResolutionScope;
-    }
-    
     private String executionDescription( MojoExecution me, MavenProject project )
     {
         PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();

@@ -1,6 +1,7 @@
 package org.apache.maven;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -48,10 +49,14 @@ public class ProjectDependenciesResolverTest
             .addDependency( "org.apache.maven.its", "maven-core-it-support", "1.3", Artifact.SCOPE_RUNTIME, exclusion  )
             .get();        
         
-        Set<Artifact> artifactDependencies = resolver.resolve( project, Artifact.SCOPE_COMPILE, getLocalRepository(), getRemoteRepositories() );
+        Set<Artifact> artifactDependencies =
+            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getLocalRepository(),
+                              getRemoteRepositories() );
         assertEquals( 0, artifactDependencies.size() );
         
-        artifactDependencies = resolver.resolve( project, Artifact.SCOPE_RUNTIME, getLocalRepository(), getRemoteRepositories() );
+        artifactDependencies =
+            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_RUNTIME ), getLocalRepository(),
+                              getRemoteRepositories() );
         assertEquals( 1, artifactDependencies.size() );
         assertEquals( "maven-core-it-support" , artifactDependencies.iterator().next().getArtifactId() );
     }
@@ -63,7 +68,9 @@ public class ProjectDependenciesResolverTest
             .addDependency( "com.mycompany", "system-dependency", "1.0", Artifact.SCOPE_SYSTEM, new File( getBasedir(), "pom.xml" ).getAbsolutePath() )
             .get();
 
-        Set<Artifact> artifactDependencies = resolver.resolve( project, Artifact.SCOPE_COMPILE, getLocalRepository(), getRemoteRepositories() );                
+        Set<Artifact> artifactDependencies =
+            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getLocalRepository(),
+                              getRemoteRepositories() );                
         assertEquals( 1, artifactDependencies.size() );        
     }  
     
@@ -78,7 +85,8 @@ public class ProjectDependenciesResolverTest
         MavenSession session = createMavenSession( pom, eps );
         MavenProject project = session.getCurrentProject();
 
-        resolver.resolve( project, Artifact.SCOPE_COMPILE, getLocalRepository(), getRemoteRepositories() );                
+        resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getLocalRepository(),
+                          getRemoteRepositories() );                
                 
         List<String> elements = project.getCompileClasspathElements();
         assertEquals( 2, elements.size() );

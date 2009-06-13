@@ -1,6 +1,7 @@
 package org.apache.maven.lifecycle;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecution;
 
@@ -15,13 +16,13 @@ public class MavenExecutionPlan
     /** Individual executions that must be performed. */
     private List<MojoExecution> executions;
     
-    /** For project dependency resolution, the scope of resolution required if any. */
-    private String requiredDependencyResolutionScope;
+    /** For project dependency resolution, the scopes of resolution required if any. */
+    private Set<String> requiredDependencyResolutionScopes;
 
-    public MavenExecutionPlan( List<MojoExecution> executions, String requiredDependencyResolutionScope )
+    public MavenExecutionPlan( List<MojoExecution> executions, Set<String> requiredDependencyResolutionScopes )
     {
         this.executions = executions;
-        this.requiredDependencyResolutionScope = requiredDependencyResolutionScope;
+        this.requiredDependencyResolutionScopes = requiredDependencyResolutionScopes;
     }
 
     public List<MojoExecution> getExecutions()
@@ -29,8 +30,8 @@ public class MavenExecutionPlan
         return executions;
     }
 
-    public String getRequiredResolutionScope()
+    public Set<String> getRequiredResolutionScopes()
     {
-        return requiredDependencyResolutionScope;
+        return requiredDependencyResolutionScopes;
     }        
 }

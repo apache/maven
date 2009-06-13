@@ -127,7 +127,9 @@ public class LifecycleExecutorTest
         
         MavenExecutionPlan plan = lifecycleExecutor.calculateExecutionPlan( session, "clean", "install" );
         
-        assertEquals( Artifact.SCOPE_TEST, plan.getRequiredResolutionScope() );
+        assertTrue( plan.getRequiredResolutionScopes().contains( Artifact.SCOPE_COMPILE ) );
+        assertTrue( plan.getRequiredResolutionScopes().contains( Artifact.SCOPE_RUNTIME ) );
+        assertTrue( plan.getRequiredResolutionScopes().contains( Artifact.SCOPE_TEST ) );
         
         List<MojoExecution> executions = plan.getExecutions();        
         
@@ -259,17 +261,4 @@ public class LifecycleExecutorTest
         assertNotNull( plugin );
     }
     
-    //
-    
-    public void testRequiredDependencyResolutionScopeCalculation()
-        throws Exception
-    {
-        assertEquals( Artifact.SCOPE_COMPILE, lifecycleExecutor.calculateRequiredDependencyResolutionScope( null, Artifact.SCOPE_COMPILE ) );
-        assertEquals( Artifact.SCOPE_COMPILE, lifecycleExecutor.calculateRequiredDependencyResolutionScope( Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE ) );
-        assertEquals( Artifact.SCOPE_RUNTIME, lifecycleExecutor.calculateRequiredDependencyResolutionScope( null, Artifact.SCOPE_RUNTIME ) );
-        assertEquals( Artifact.SCOPE_RUNTIME, lifecycleExecutor.calculateRequiredDependencyResolutionScope( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME ) );
-        assertEquals( Artifact.SCOPE_TEST, lifecycleExecutor.calculateRequiredDependencyResolutionScope( null, Artifact.SCOPE_TEST ) );
-        assertEquals( Artifact.SCOPE_TEST, lifecycleExecutor.calculateRequiredDependencyResolutionScope( Artifact.SCOPE_TEST, Artifact.SCOPE_TEST ) );
-        assertEquals( Artifact.SCOPE_RUNTIME, lifecycleExecutor.calculateRequiredDependencyResolutionScope( Artifact.SCOPE_COMPILE, Artifact.SCOPE_RUNTIME) );                
-    }
 }
