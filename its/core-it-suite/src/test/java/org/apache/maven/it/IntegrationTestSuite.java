@@ -91,6 +91,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4199CompileMeetsRuntimeScopeTest.class );
         suite.addTestSuite( MavenITmng4196ExclusionOnPluginDepTest.class );
         suite.addTestSuite( MavenITmng4193UniqueRepoIdTest.class );
         suite.addTestSuite( MavenITmng4190MirrorRepoMergingTest.class );

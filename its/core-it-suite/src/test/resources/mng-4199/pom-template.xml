@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4199</groupId>
+  <artifactId>consumer</artifactId>
+  <version>0.1</version>
+
+  <name>Maven Integration Test :: MNG-4199</name>
+  <description>
+    Test that the core properly handles goals with different requirements on dependency resolution. In particular
+    verify that the different dependency scopes are not erroneously collapsed/combined into just a single scope.
+    The problem is that scope "runtime" is not a superset of scope "compile".
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng4199</groupId>
+      <artifactId>system</artifactId>
+      <version>0.1</version>
+      <scope>system</scope>
+      <!--
+      NOTE: We don't want to test POM interpolation here, so we have the test controller filter the POM.
+      -->
+      <systemPath>@basedir@/lib/system-0.1.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.mng4199</groupId>
+      <artifactId>provided</artifactId>
+      <version>0.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.mng4199</groupId>
+      <artifactId>compile</artifactId>
+      <version>0.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.mng4199</groupId>
+      <artifactId>runtime</artifactId>
+      <version>0.1</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>validate</phase>
+            <configuration>
+              <compileClassPath>target/compile-cp.txt</compileClassPath>
+              <compileArtifacts>target/compile-artifacts.txt</compileArtifacts>
+              <runtimeClassPath>target/runtime-cp.txt</runtimeClassPath>
+              <runtimeArtifacts>target/runtime-artifacts.txt</runtimeArtifacts>
+              <significantPathLevels>1</significantPathLevels>
+            </configuration>
+            <goals>
+              <!--
+              The moral of the story should be that
+              @requiresDependencyResolution (compile & runtime) != @requiresDependencyResolution runtime
+              -->
+              <goal>compile</goal>
+              <goal>runtime</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
