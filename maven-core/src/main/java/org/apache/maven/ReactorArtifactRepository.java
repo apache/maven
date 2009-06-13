@@ -1,11 +1,10 @@
 package org.apache.maven;
 
-import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.LocalArtifactRepository;
 
@@ -35,7 +34,7 @@ public class ReactorArtifactRepository
 
         if ( project != null )
         {
-            if ( artifact.getType().equals( "pom" ) )
+            if ( "pom".equals( artifact.getType() ) )
             {
                 artifact.setFile( project.getFile() );
 
@@ -45,23 +44,23 @@ public class ReactorArtifactRepository
             }
             else
             {
-                //TODO Need to look for attached artifacts
                 //TODO Need to look for plugins
-                
-                File artifactFile = project.getArtifact().getFile();
 
-                if ( artifactFile != null && artifactFile.exists() )
+                Artifact projectArtifact = findMatchingArtifact( project, artifact );
+
+                if ( projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists() )
                 {
                     //TODO: This is really completely wrong and should probably be based on the phase that is currently being executed.
                     // If we are running before the packaging phase there is going to be no archive anyway, but if we are running prior to package
                     // we shouldn't even take the archive anyway.
 
-                    artifact.setFile( artifactFile );
+                    artifact.setFile( projectArtifact.getFile() );
 
                     artifact.setFromAuthoritativeRepository( true );
 
                     artifact.setResolved( true );
                 }
+
                 /*
                 
                 TODO: This is being left out because Maven 2.x does not set this internally and it is only done by the compiler
@@ -99,4 +98,85 @@ public class ReactorArtifactRepository
     {
         return false;
     }
+
+    /**
+     * Tries to resolve the specified artifact from the artifacts of the given project.
+     * 
+     * @param project The project to try to resolve the artifact from, must not be <code>null</code>.
+     * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
+     * @return The matching artifact from the project or <code>null</code> if not found.
+     */
+    private Artifact findMatchingArtifact( MavenProject project, Artifact requestedArtifact )
+    {
+        String requestedDependencyConflictId = requestedArtifact.getDependencyConflictId();
+
+        // check for match with project's main artifact by dependency conflict id
+        Artifact mainArtifact = project.getArtifact();
+        if ( requestedDependencyConflictId.equals( mainArtifact.getDependencyConflictId() ) )
+        {
+            return mainArtifact;
+        }
+
+        String requestedRepositoryConflictId = getRepositoryConflictId( requestedArtifact );
+
+        // check for match with project's main artifact by repository conflict id
+        if ( requestedRepositoryConflictId.equals( getRepositoryConflictId( mainArtifact ) ) )
+        {
+            return mainArtifact;
+        }
+
+        // check for match with one of the attached artifacts
+        Collection<Artifact> attachedArtifacts = project.getAttachedArtifacts();
+        if ( attachedArtifacts != null && !attachedArtifacts.isEmpty() )
+        {
+            // first try matching by dependency conflict id
+            for ( Artifact attachedArtifact : attachedArtifacts )
+            {
+                if ( requestedDependencyConflictId.equals( attachedArtifact.getDependencyConflictId() ) )
+                {
+                    return attachedArtifact;
+                }
+            }
+
+            // next try matching by repository conflict id
+            for ( Artifact attachedArtifact : attachedArtifacts )
+            {
+                if ( requestedRepositoryConflictId.equals( getRepositoryConflictId( attachedArtifact ) ) )
+                {
+                    return attachedArtifact;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the repository conflict id of the specified artifact. Unlike the dependency conflict id, the repository
+     * conflict id uses the artifact file extension instead of the artifact type. Hence, the repository conflict id more
+     * closely reflects the identity of artifacts as perceived by a repository.
+     * 
+     * @param artifact The artifact, must not be <code>null</code>.
+     * @return The repository conflict id, never <code>null</code>.
+     */
+    private String getRepositoryConflictId( Artifact artifact )
+    {
+        StringBuilder buffer = new StringBuilder( 128 );
+        buffer.append( artifact.getGroupId() );
+        buffer.append( ':' ).append( artifact.getArtifactId() );
+        if ( artifact.getArtifactHandler() != null )
+        {
+            buffer.append( ':' ).append( artifact.getArtifactHandler().getExtension() );
+        }
+        else
+        {
+            buffer.append( ':' ).append( artifact.getType() );
+        }
+        if ( artifact.hasClassifier() )
+        {
+            buffer.append( ':' ).append( artifact.getClassifier() );
+        }
+        return buffer.toString();
+    }
+
 }
