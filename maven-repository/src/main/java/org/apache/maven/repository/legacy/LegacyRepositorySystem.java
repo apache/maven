@@ -34,9 +34,11 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
@@ -114,7 +116,28 @@ public class LegacyRepositorySystem
             return null;
         }
 
-        return artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), d.getScope() );
+        Artifact artifact =
+            artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
+                                                      d.getClassifier(), d.getScope(), d.isOptional() );
+
+        if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && d.getSystemPath() != null )
+        {
+            artifact.setFile( new File( d.getSystemPath() ) );
+        }
+
+        if ( !d.getExclusions().isEmpty() )
+        {
+            List<String> exclusions = new ArrayList<String>();
+
+            for ( Exclusion exclusion : d.getExclusions() )
+            {
+                exclusions.add( exclusion.getGroupId() + ':' + exclusion.getArtifactId() );
+            }
+
+            artifact.setDependencyFilter( new ExcludesArtifactFilter( exclusions ) );
+        }
+
+        return artifact;
     }
 
     public Artifact createExtensionArtifact( String groupId, String artifactId, String version )

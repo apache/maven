@@ -159,6 +159,8 @@ public class MavenMetadataSource
                         dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), effectiveScope, d.getType() );
                     }
 
+                    dependencyArtifact.setScope( effectiveScope );
+
                     if ( dependencyFilter == null || dependencyFilter.include( dependencyArtifact ) )
                     {
                         dependencyArtifact.setOptional( d.isOptional() );

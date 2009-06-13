@@ -36,7 +36,6 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
@@ -45,7 +44,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
@@ -1539,35 +1537,6 @@ public class MavenProject
                     if ( artifact == null )
                     {
                         map = Collections.emptyMap();
-                    }
-
-                    if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && ( d.getSystemPath() != null ) )
-                    {
-                        artifact.setFile( new File( d.getSystemPath() ) );
-                    }
-
-                    // If the dependencyManagement section listed exclusions,
-                    // add them to the managed artifacts here so that transitive
-                    // dependencies will be excluded if necessary.
-
-                    if ( ( null != d.getExclusions() ) && !d.getExclusions().isEmpty() )
-                    {
-                        List<String> exclusions = new ArrayList<String>();
-
-                        for ( Iterator<Exclusion> j = d.getExclusions().iterator(); j.hasNext(); )
-                        {
-                            Exclusion e = j.next();
-
-                            exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
-                        }
-
-                        ExcludesArtifactFilter eaf = new ExcludesArtifactFilter( exclusions );
-
-                        artifact.setDependencyFilter( eaf );
-                    }
-                    else
-                    {
-                        artifact.setDependencyFilter( null );
                     }
 
                     map.put( d.getManagementKey(), artifact );
