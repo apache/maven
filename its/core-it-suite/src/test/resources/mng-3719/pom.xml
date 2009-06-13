@@ -50,7 +50,7 @@ under the License.
               <goal>reset</goal>
             </goals>
             <configuration>
-              <logFile>target/model.properties</logFile>
+              <logFile>target/step-1.properties</logFile>
             </configuration>
           </execution>
         </executions>
@@ -67,7 +67,7 @@ under the License.
               <goal>eval</goal>
             </goals>
             <configuration>
-              <outputFile>target/model.properties</outputFile>
+              <outputFile>target/step-2.properties</outputFile>
               <expressions>
                 <expression>project/properties</expression>
               </expressions>
@@ -87,7 +87,7 @@ under the License.
               <goal>reset</goal>
             </goals>
             <configuration>
-              <logFile>target/model.properties</logFile>
+              <logFile>target/step-3.properties</logFile>
             </configuration>
           </execution>
         </executions>

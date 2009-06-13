@@ -56,7 +56,7 @@ public class MavenITmng3719PomExecutionOrderingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Pattern pattern = Pattern.compile( ".*\\{execution: step ([0-9])\\}.*" );
+        Pattern pattern = Pattern.compile( ".*step-([0-9])\\.properties.*" );
 
         int[] stepLines = new int[3];
         List content = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
