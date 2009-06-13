@@ -51,6 +51,14 @@ under the License.
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <!-- just to have a classifier in the mix as well -->
+      <groupId>org.apache.maven.its.it0142</groupId>
+      <artifactId>runtime</artifactId>
+      <version>0.1</version>
+      <scope>runtime</scope>
+      <classifier>retro</classifier>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven.its.it0142</groupId>
       <artifactId>test</artifactId>
       <version>0.1</version>
