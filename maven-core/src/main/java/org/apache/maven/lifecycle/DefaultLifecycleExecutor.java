@@ -39,6 +39,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
@@ -641,13 +642,11 @@ public class DefaultLifecycleExecutor
             
             plugin = findPluginForPrefix( prefix, session );
         }
-                     
+
+        injectPluginDeclarationFromProject( plugin, project );
+
         if ( plugin.getVersion() == null )
         {
-            // We need to get it from the POM first before anything else
-            //
-            plugin.setVersion( attemptToGetPluginVersionFromProject( plugin, project ) );
-            
             // If there is no version to be found then we need to look in the repository metadata for
             // this plugin and see what's specified as the latest release.
             //
@@ -735,31 +734,39 @@ public class DefaultLifecycleExecutor
         
         return pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getPluginArtifactRepositories() );
     }
-                
-    private String attemptToGetPluginVersionFromProject( Plugin plugin, MavenProject project )
+
+    private void injectPluginDeclarationFromProject( Plugin plugin, MavenProject project )
     {
-        for ( Plugin pluginInPom : project.getBuildPlugins() )
+        Plugin pluginInPom = findPlugin( plugin, project.getBuildPlugins() );
+
+        if ( pluginInPom == null && project.getPluginManagement() != null )
         {
-            if ( pluginInPom.getArtifactId().equals( plugin.getArtifactId() ) )
-            {
-                return pluginInPom.getVersion();
-            }
+            pluginInPom = findPlugin( plugin, project.getPluginManagement().getPlugins() );
         }
 
-        if ( plugin.getVersion() == null && project.getPluginManagement() != null )
+        if ( pluginInPom != null )
         {
-            for ( Plugin pluginInPom : project.getPluginManagement().getPlugins() )
+            if ( plugin.getVersion() == null )
             {
-                if ( pluginInPom.getArtifactId().equals( plugin.getArtifactId() ) )
-                {
-                    return pluginInPom.getVersion();
-                }
+                plugin.setVersion( pluginInPom.getVersion() );
+            }
+
+            plugin.setDependencies( new ArrayList<Dependency>( pluginInPom.getDependencies() ) );
+        }
+    }
+
+    private Plugin findPlugin( Plugin plugin, Collection<Plugin> plugins )
+    {
+        for ( Plugin p : plugins )
+        {
+            if ( p.getKey().equals( plugin.getKey() ) )
+            {
+                return p;
             }
         }
-        
         return null;
     }
-    
+
     public void initialize()
         throws InitializationException
     {
