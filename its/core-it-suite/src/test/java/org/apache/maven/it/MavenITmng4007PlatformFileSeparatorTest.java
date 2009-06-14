@@ -79,8 +79,8 @@ public class MavenITmng4007PlatformFileSeparatorTest
          * NOTE: The script source directory is deliberately excluded from the checks due to MNG-3741.
          */
 
-        // FIXME: MNG-3877
-        if ( matchesVersionRange( "(4,)" ) )
+        // MNG-3877
+        if ( matchesVersionRange( "[3.0-alpha-3,)" ) )
         {
             assertPath( modelProps.getProperty( "project.reporting.outputDirectory" ) );
         }
