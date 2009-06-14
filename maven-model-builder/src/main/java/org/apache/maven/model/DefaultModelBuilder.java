@@ -117,6 +117,8 @@ public class DefaultModelBuilder
 
         List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
 
+        result.setActiveExternalProfiles( activeExternalProfiles );
+
         Model model = readModel( modelSource, pomFile, request, problems );
 
         List<Model> rawModels = new ArrayList<Model>();
@@ -132,23 +134,22 @@ public class DefaultModelBuilder
 
             modelNormalizer.mergeDuplicates( resultModel, request );
 
-            List<Profile> activeProjectProfiles =
-                getActiveProjectProfiles( rawModel, profileActivationContext, problems );
+            List<Profile> activePomProfiles = getActivePomProfiles( rawModel, profileActivationContext, problems );
 
-            List<Profile> activeProfiles = activeProjectProfiles;
-            if ( current == model )
-            {
-                activeProfiles = new ArrayList<Profile>( activeProjectProfiles.size() + activeExternalProfiles.size() );
-                activeProfiles.addAll( activeProjectProfiles );
-                activeProfiles.addAll( activeExternalProfiles );
-            }
+            result.setActivePomProfiles( rawModel, activePomProfiles );
 
-            for ( Profile activeProfile : activeProfiles )
+            for ( Profile activeProfile : activePomProfiles )
             {
                 profileInjector.injectProfile( resultModel, activeProfile, request );
             }
 
-            result.setActiveProfiles( rawModel, activeProfiles );
+            if ( current == model )
+            {
+                for ( Profile activeProfile : activeExternalProfiles )
+                {
+                    profileInjector.injectProfile( resultModel, activeProfile, request );
+                }
+            }
 
             configureResolver( request.getModelResolver(), resultModel, problems );
         }
@@ -265,8 +266,8 @@ public class DefaultModelBuilder
         return result.getActiveProfiles();
     }
 
-    private List<Profile> getActiveProjectProfiles( Model model, ProfileActivationContext context,
-                                                    List<ModelProblem> problems )
+    private List<Profile> getActivePomProfiles( Model model, ProfileActivationContext context,
+                                                List<ModelProblem> problems )
     {
         ProfileSelectionResult result = profileSelector.getActiveProfiles( model.getProfiles(), context );
 

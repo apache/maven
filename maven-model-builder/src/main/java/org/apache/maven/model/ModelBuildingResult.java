@@ -29,12 +29,44 @@ import java.util.List;
 public interface ModelBuildingResult
 {
 
+    /**
+     * Gets the fully assembled model.
+     * 
+     * @return The fully assembled model, never {@code null}.
+     */
     Model getEffectiveModel();
 
+    /**
+     * Gets the raw model as it was read from the model source. Apart from basic validation, the raw model has not
+     * undergone any updates by the model builder, e.g. reflects neither inheritance or interpolation.
+     * 
+     * @return The raw model, never {@code null}.
+     */
     Model getRawModel();
 
+    /**
+     * Gets the lineage of raw models from which the effective model was constructed. The first model is the model on
+     * which the model builder was originally invoked, the last model is the super POM.
+     * 
+     * @return The lineage of raw models, never {@code null}.
+     */
     List<Model> getRawModels();
 
-    List<Profile> getActiveProfiles( Model rawModel );
+    /**
+     * Gets the profiles from the specified (raw) model that were active during model building. The input parameter
+     * should be a model from the collection obtained by {@link #getRawModels()}.
+     * 
+     * @param rawModel The (raw) model for whose active profiles should be retrieved, must not be {@code null}.
+     * @return The active profiles of the model or an empty list if none, never {@code null}.
+     */
+    List<Profile> getActivePomProfiles( Model rawModel );
+
+    /**
+     * Gets the external profiles that were active during model building. External profiles are those that were
+     * contributed by {@link ModelBuildingRequest#getProfiles()}.
+     * 
+     * @return The active external profiles or an empty list if none, never {@code null}.
+     */
+    List<Profile> getActiveExternalProfiles();
 
 }

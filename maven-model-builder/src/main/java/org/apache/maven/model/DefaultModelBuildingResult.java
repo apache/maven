@@ -38,12 +38,15 @@ public class DefaultModelBuildingResult
 
     private List<Model> rawModels;
 
-    private Map<Model, List<Profile>> activeProfiles;
+    private Map<Model, List<Profile>> activePomProfiles;
+
+    private List<Profile> activeExternalProfiles;
 
     public DefaultModelBuildingResult()
     {
         rawModels = new ArrayList<Model>();
-        activeProfiles = new HashMap<Model, List<Profile>>();
+        activePomProfiles = new HashMap<Model, List<Profile>>();
+        activeExternalProfiles = new ArrayList<Profile>();
     }
 
     public Model getEffectiveModel()
@@ -79,13 +82,13 @@ public class DefaultModelBuildingResult
         return this;
     }
 
-    public List<Profile> getActiveProfiles( Model rawModel )
+    public List<Profile> getActivePomProfiles( Model rawModel )
     {
-        List<Profile> profiles = this.activeProfiles.get( rawModel );
+        List<Profile> profiles = this.activePomProfiles.get( rawModel );
         return ( profiles == null ) ? Collections.<Profile> emptyList() : Collections.unmodifiableList( profiles );
     }
 
-    public DefaultModelBuildingResult setActiveProfiles( Model rawModel, List<Profile> activeProfiles )
+    public DefaultModelBuildingResult setActivePomProfiles( Model rawModel, List<Profile> activeProfiles )
     {
         if ( rawModel == null )
         {
@@ -94,30 +97,46 @@ public class DefaultModelBuildingResult
 
         if ( activeProfiles != null )
         {
-            this.activeProfiles.put( rawModel, new ArrayList<Profile>( activeProfiles ) );
+            this.activePomProfiles.put( rawModel, new ArrayList<Profile>( activeProfiles ) );
         }
         else
         {
-            this.activeProfiles.remove( rawModel );
+            this.activePomProfiles.remove( rawModel );
         }
 
         return this;
     }
 
-    public DefaultModelBuildingResult addActiveProfiles( Model rawModel, List<Profile> activeProfiles )
+    public DefaultModelBuildingResult addActivePomProfiles( Model rawModel, List<Profile> activeProfiles )
     {
         if ( rawModel == null )
         {
             throw new IllegalArgumentException( "no model specified" );
         }
 
-        List<Profile> currentProfiles = this.activeProfiles.get( rawModel );
+        List<Profile> currentProfiles = this.activePomProfiles.get( rawModel );
         if ( currentProfiles == null )
         {
             currentProfiles = new ArrayList<Profile>( activeProfiles.size() );
-            this.activeProfiles.put( rawModel, currentProfiles );
+            this.activePomProfiles.put( rawModel, currentProfiles );
         }
         currentProfiles.addAll( activeProfiles );
+
+        return this;
+    }
+
+    public List<Profile> getActiveExternalProfiles()
+    {
+        return Collections.unmodifiableList( activeExternalProfiles );
+    }
+
+    public DefaultModelBuildingResult setActiveExternalProfiles( List<Profile> activeProfiles )
+    {
+        this.activeExternalProfiles.clear();
+        if ( activeProfiles != null )
+        {
+            this.activeExternalProfiles.addAll( activeProfiles );
+        }
 
         return this;
     }

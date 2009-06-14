@@ -17,7 +17,8 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -36,6 +37,7 @@ import org.apache.maven.model.ModelBuilder;
 import org.apache.maven.model.ModelBuildingException;
 import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.ModelBuildingResult;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -141,7 +143,11 @@ public class DefaultProjectBuilder
         project.addCompileSourceRoot( build.getSourceDirectory() );
         project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
         project.setFile( pomFile );
-        project.setActiveProfiles( result.getActiveProfiles( result.getRawModel() ) );
+
+        List<Profile> activeProfiles = new ArrayList<Profile>();
+        activeProfiles.addAll( result.getActivePomProfiles( result.getRawModel() ) );
+        activeProfiles.addAll( result.getActiveExternalProfiles() );
+        project.setActiveProfiles( activeProfiles );
                 
         return project;
     }
