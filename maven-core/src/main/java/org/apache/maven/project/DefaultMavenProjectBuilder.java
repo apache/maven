@@ -16,11 +16,15 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Repository;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -35,6 +39,9 @@ public class DefaultMavenProjectBuilder
     @Requirement
     private ProjectBuilder projectBuilder;
 
+    @Requirement
+    private RepositorySystem repositorySystem;
+
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
@@ -48,7 +55,52 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
+        normalizeToArtifactRepositories( configuration );
+
         return projectBuilder.build( artifact, configuration );
+    }
+
+    private void normalizeToArtifactRepositories( ProjectBuilderConfiguration configuration )
+        throws ProjectBuildingException
+    {
+        /*
+         * This provides backward-compat with 2.x that allowed plugins like the maven-remote-resources-plugin:1.0 to
+         * populate the builder configuration with model repositories instead of artifact repositories.
+         */
+
+        List<?> repositories = configuration.getRemoteRepositories();
+
+        if ( repositories != null )
+        {
+            boolean normalized = false;
+
+            List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>( repositories.size() );
+
+            for ( Object repository : repositories )
+            {
+                if ( repository instanceof Repository )
+                {
+                    try
+                    {
+                        repos.add( repositorySystem.buildArtifactRepository( (Repository) repository ) );
+                    }
+                    catch ( InvalidRepositoryException e )
+                    {
+                        throw new ProjectBuildingException( "", "Invalid remote repository " + repository, e );
+                    }
+                    normalized = true;
+                }
+                else
+                {
+                    repos.add( (ArtifactRepository) repository );
+                }
+            }
+
+            if ( normalized )
+            {
+                configuration.setRemoteRepositories( repos );
+            }
+        }
     }
 
     // This is used by the SITE plugin.
