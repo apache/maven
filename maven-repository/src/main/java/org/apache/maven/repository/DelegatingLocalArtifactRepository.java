@@ -3,7 +3,9 @@ package org.apache.maven.repository;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 /**
  * Delegating local artifact repository chains the reactor, IDE workspace
@@ -66,7 +68,7 @@ public class DelegatingLocalArtifactRepository
 
     public String getId()
     {
-        return "local";
+        return userLocalArtifactRepository.getId();
     }
 
     @Override
@@ -80,4 +82,35 @@ public class DelegatingLocalArtifactRepository
     {
         return userLocalArtifactRepository.getBasedir();
     }
+
+    @Override
+    public ArtifactRepositoryLayout getLayout()
+    {
+        return userLocalArtifactRepository.getLayout();
+    }
+
+    @Override
+    public ArtifactRepositoryPolicy getReleases()
+    {
+        return userLocalArtifactRepository.getReleases();
+    }
+
+    @Override
+    public ArtifactRepositoryPolicy getSnapshots()
+    {
+        return userLocalArtifactRepository.getSnapshots();
+    }
+
+    @Override
+    public String getKey()
+    {
+        return userLocalArtifactRepository.getKey();
+    }
+
+    @Override
+    public String getUrl()
+    {
+        return userLocalArtifactRepository.getUrl();
+    }
+
 }
