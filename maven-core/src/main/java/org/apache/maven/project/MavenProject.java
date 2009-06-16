@@ -250,10 +250,12 @@ public class MavenProject
         for ( Dependency d : getDependencies() )
         {
             Artifact dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() );
-
-            if ( filter.include( dependencyArtifact ) )
+            if ( filter != null )
             {
-                artifacts.add( dependencyArtifact );
+                if ( filter.include( dependencyArtifact ) )
+                {
+                    artifacts.add( dependencyArtifact );
+                }
             }
         }
 
