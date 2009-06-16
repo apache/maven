@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -35,7 +36,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
@@ -156,6 +159,9 @@ public class MavenProject
     private ProjectBuildingRequest projectBuilderConfiguration;
 
     private RepositorySystem repositorySystem;
+    
+    private File parentFile;
+    
     //
 
     public MavenProject()
@@ -189,8 +195,6 @@ public class MavenProject
         this.repositorySystem = repositorySystem;
         setModel( model );
     }
-
-    private File parentFile;
 
     public File getParentFile()
     {
@@ -237,6 +241,25 @@ public class MavenProject
         pluginArtifactRepositories = createArtifactRepositories( model.getPluginRepositories(), null );
     }
 
+    //TODO: need to integrate the effective scope and refactor it out of the MMS
+    @Deprecated
+    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter )
+    {
+        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+
+        for ( Dependency d : getDependencies() )
+        {
+            Artifact dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() );
+
+            if ( filter.include( dependencyArtifact ) )
+            {
+                artifacts.add( dependencyArtifact );
+            }
+        }
+
+        return artifacts;        
+    }
+    
     private List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
                                                                  List<ArtifactRepository> externalRepositories )
     {
