@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+  <!--
+    Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+    file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+    applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+    governing permissions and limitations under the License.
+  -->
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
--->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -167,7 +159,7 @@ under the License.
 
   <!--bootstrap-start-comment-->
   <dependencyManagement>
-  <!--bootstrap-end-comment-->
+    <!--bootstrap-end-comment-->
     <dependencies>
       <!--  Maven Modules -->
       <!--bootstrap-start-comment-->
@@ -363,14 +355,8 @@ under the License.
           </configuration>
           <executions>
             <!--
-            <execution>
-              <id>site-docs</id>
-              <phase>pre-site</phase>
-              <goals>
-                <goal>xdoc</goal>
-                <goal>xsd</goal>
-              </goals>
-            </execution>
+              <execution> <id>site-docs</id> <phase>pre-site</phase> <goals> <goal>xdoc</goal> <goal>xsd</goal> </goals>
+              </execution>
             -->
             <execution>
               <id>standard</id>
@@ -406,41 +392,12 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-remote-resources-plugin</artifactId>
           <version>1.0.1-SNAPSHOT</version>
-        </plugin>        
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
 
   <profiles>
-    <profile>
-      <id>osgi</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>maven-bundle-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>manifest</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <!-- Needed for including the manifest, see MJAR-71 -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <version>2.1</version>
-            <configuration>
-              <archive>
-                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-              </archive>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>release</id>
       <build>
@@ -469,28 +426,29 @@ under the License.
       </build>
     </profile>
     <profile>
-      <id>strict</id>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>1.0-alpha-3</version>
-            <executions>
-              <execution>
-                <id>enforce-jdk-15</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireJavaVersion>
-                      <version>1.5</version>
-                    </requireJavaVersion>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
+            <groupId>org.maven.ide.eclipse</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>0.9.9-SNAPSHOT</version>
+            <configuration>
+              <mappingId>customizable</mappingId>
+              <configurators>
+                <configurator id='org.maven.ide.eclipse.jdt.javaConfigurator' />
+                <configurator id='org.maven.ide.eclipse.modello.modelloConfigurator' />
+                <configurator id='org.maven.ide.eclipse.plexus.annotations.plexusConfigurator' />
+              </configurators>
+              <mojoExecutions>
+                <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
+              </mojoExecutions>
+            </configuration>
           </plugin>
         </plugins>
       </build>
