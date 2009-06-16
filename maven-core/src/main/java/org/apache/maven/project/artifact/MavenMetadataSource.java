@@ -176,6 +176,8 @@ public class MavenMetadataSource
                             dependencyArtifact.setFile( new File( d.getSystemPath() ) );
                         }
 
+                        ArtifactFilter newFilter = dependencyFilter;
+
                         if ( !d.getExclusions().isEmpty() )
                         {
                             List<String> exclusions = new ArrayList<String>();
@@ -185,13 +187,14 @@ public class MavenMetadataSource
                                 exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
                             }
 
-                            ArtifactFilter newFilter = new ExcludesArtifactFilter( exclusions );
+                            newFilter = new ExcludesArtifactFilter( exclusions );
                             if ( dependencyFilter != null )
                             {
                                 newFilter = new AndArtifactFilter( Arrays.asList( dependencyFilter, newFilter ) );
                             }
-                            dependencyArtifact.setDependencyFilter( newFilter );
                         }
+
+                        dependencyArtifact.setDependencyFilter( newFilter );
 
                         artifacts.add( dependencyArtifact );
                     }
