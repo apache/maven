@@ -59,7 +59,7 @@ public class MavenIT0138PluginLifecycleTest
         verifier.assertFilePresent( "target/jar-jar.txt" );
         verifier.assertFilePresent( "target/plugin-add-plugin-artifact-metadata.txt" );
         verifier.assertFilePresent( "target/install-install.txt" );
-        if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
+        if ( matchesVersionRange( "(,2.2.0)" ) )
         {
             verifier.assertFilePresent( "target/plugin-update-registry.txt" );
         }
