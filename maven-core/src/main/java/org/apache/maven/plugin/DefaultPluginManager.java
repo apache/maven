@@ -56,6 +56,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
@@ -456,6 +457,20 @@ public class DefaultPluginManager
                 {
                     ClassRealm pluginRealm = world.newRealm( realmId );
                     pluginRealm.setParentRealm( container.getContainerRealm() );
+
+                    String coreRealmId = container.getContainerRealm().getId();
+                    try
+                    {
+                        pluginRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.Xpp3Dom" );
+                        pluginRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlPullParser" );
+                        pluginRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlPullParserException" );
+                        pluginRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlSerializer" );
+                    }
+                    catch ( NoSuchRealmException e )
+                    {
+                        throw new IllegalStateException( e );
+                    }
+
                     return pluginRealm;
                 }
                 catch ( DuplicateRealmException e )
