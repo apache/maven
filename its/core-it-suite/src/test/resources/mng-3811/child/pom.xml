@@ -33,22 +33,27 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-configuration</artifactId>
+        <artifactId>maven-it-plugin-expression</artifactId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
-          <propertiesFile>target/pom.properties</propertiesFile>
+          <outputFile>target/config.properties</outputFile>
+          <expressions>
+            <expression>project/reporting/plugins/0/configuration</expression>
+          </expressions>
         </configuration>
         <executions>
           <execution>
             <id>test</id>
+            <phase>validate</phase>
             <goals>
-              <goal>config</goal>
+              <goal>eval</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
   <reporting>
     <plugins>
       <plugin>
@@ -64,4 +69,3 @@
     </plugins>
   </reporting>
 </project>
-

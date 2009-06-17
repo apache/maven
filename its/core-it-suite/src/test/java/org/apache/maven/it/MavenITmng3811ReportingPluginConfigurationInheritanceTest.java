@@ -55,11 +55,13 @@ public class MavenITmng3811ReportingPluginConfigurationInheritanceTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( "2", props.getProperty( "stringParams" ) );
-        assertEquals( "parentParam", props.getProperty( "stringParams.0" ) );
-        assertEquals( "childParam", props.getProperty( "stringParams.1" ) );
-        assertEquals( "true", props.getProperty( "booleanParam" ) );
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        String p = "project.reporting.plugins.0.configuration.children.";
+
+        assertEquals( "2", props.getProperty( p + "stringParams.0.children" ) );
+        assertEquals( "parentParam", props.getProperty( p + "stringParams.0.children.stringParam.0.value" ) );
+        assertEquals( "childParam", props.getProperty( p + "stringParams.0.children.stringParam.1.value" ) );
+        assertEquals( "true", props.getProperty( p + "booleanParam.0.value" ) );
     }
 
 }
