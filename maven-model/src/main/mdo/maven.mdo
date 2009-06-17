@@ -3309,8 +3309,14 @@
           <name>inherited</name>
           <version>4.0.0</version>
           <type>String</type>
-          <description>Whether the configuration in this plugin should be made available to projects
-            that inherit from this one.</description>
+          <description>
+            <![CDATA[
+            Whether the configuration in this plugin should be made available to projects
+            that inherit from this one. Note: While the type of this field is <code>String</code>
+            for technical reasons, the semantic type is actually <code>Boolean</code>.
+            Default value is <code>true</code>.
+            ]]>
+          </description>
         </field>
         <field>
           <name>configuration</name>
@@ -3386,6 +3392,16 @@
     public static String constructKey( String groupId, String artifactId )
     {
         return groupId + ":" + artifactId;
+    }
+
+    public boolean isInherited()
+    {
+        return ( inherited != null ) ? Boolean.parseBoolean( inherited ) : true;
+    }
+
+    public void setInherited( boolean inherited )
+    {
+        this.inherited = String.valueOf( inherited );
     }
 
     private boolean inheritanceApplied = true;
