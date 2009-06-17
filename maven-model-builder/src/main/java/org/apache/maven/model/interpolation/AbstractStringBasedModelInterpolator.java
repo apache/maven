@@ -151,9 +151,9 @@ public abstract class AbstractStringBasedModelInterpolator
 
         valueSources.add( modelValueSource1 );
 
-        valueSources.add( new MapBasedValueSource( modelProperties ) );
-
         valueSources.add( new MapBasedValueSource( config.getExecutionProperties() ) );
+
+        valueSources.add( new MapBasedValueSource( modelProperties ) );
 
         valueSources.add( new AbstractValueSource( false )
         {

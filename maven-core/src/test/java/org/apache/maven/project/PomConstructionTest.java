@@ -1622,6 +1622,16 @@ public class PomConstructionTest
         assertEquals( "maven-it-plugin-configuration", pom.getValue( "reporting/plugins[3]/artifactId" ) );
     }
 
+    public void testCliPropsDominateProjectPropsDuringInterpolation()
+        throws Exception
+    {
+        Properties props = new Properties();
+        props.setProperty( "testProperty", "PASSED" );
+        PomTestWrapper pom = buildPom( "interpolation-cli-wins", props );
+
+        assertEquals( "PASSED", pom.getValue( "properties/interpolatedProperty" ) );
+    }
+
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
