@@ -499,7 +499,7 @@ public class DefaultLifecycleExecutor
     {
         Xpp3Dom mojoConfiguration = new Xpp3Dom( executionConfiguration.getName() );
 
-        Collection<String> mojoParameters = mojoDescriptor.getParameterMap().keySet();
+        Map<String, Parameter> mojoParameters = mojoDescriptor.getParameterMap();
 
         Map<String, String> aliases = new HashMap<String, String>();
         if ( mojoDescriptor.getParameters() != null )
@@ -519,28 +519,28 @@ public class DefaultLifecycleExecutor
             Xpp3Dom executionDom = executionConfiguration.getChild( i );
             String paramName = executionDom.getName();
 
-            if ( mojoParameters.contains( paramName ) )
+            Xpp3Dom mojoDom;
+
+            if ( mojoParameters.containsKey( paramName ) )
             {
-                Xpp3Dom mojoDom = new Xpp3Dom( executionDom );
-                mojoConfiguration.addChild( mojoDom );
+                mojoDom = new Xpp3Dom( executionDom );
             }
             else if ( aliases.containsKey( paramName ) )
             {
-                Xpp3Dom mojoDom = new Xpp3Dom( aliases.get( paramName ) );
-                mojoDom.setValue( executionDom.getValue() );
-
-                for ( String attributeName : executionDom.getAttributeNames() )
-                {
-                    mojoDom.setAttribute( attributeName, executionDom.getAttribute( attributeName ) );
-                }
-
-                for ( Xpp3Dom child : executionDom.getChildren() )
-                {
-                    mojoDom.addChild( new Xpp3Dom( child ) );
-                }
-
-                mojoConfiguration.addChild( mojoDom );
+                mojoDom = new Xpp3Dom( executionDom, aliases.get( paramName ) );
             }
+            else
+            {
+                continue;
+            }
+
+            String implementation = mojoParameters.get( mojoDom.getName() ).getImplementation();
+            if ( StringUtils.isNotEmpty( implementation ) )
+            {
+                mojoDom.setAttribute( "implementation", implementation );
+            }
+
+            mojoConfiguration.addChild( mojoDom );
         }
 
         return mojoConfiguration;
