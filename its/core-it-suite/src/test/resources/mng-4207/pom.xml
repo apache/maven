@@ -22,12 +22,12 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.mng4208</groupId>
+  <groupId>org.apache.maven.its.mng4207</groupId>
   <artifactId>test</artifactId>
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4208</name>
+  <name>Maven Integration Test :: MNG-4207</name>
   <description>
     Test that a plugin that depends on log4j and employes the artifact resolver does not die when using
     commons-http to resolve an artifact.
