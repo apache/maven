@@ -92,6 +92,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
         suite.addTestSuite( MavenITmng4208InterpolationPrefersCliOverProjectPropsTest.class );
+        suite.addTestSuite( MavenITmng4207PluginWithLog4JTest.class );
         suite.addTestSuite( MavenITmng4203TransitiveDependencyExclusionTest.class );
         suite.addTestSuite( MavenITmng4199CompileMeetsRuntimeScopeTest.class );
         suite.addTestSuite( MavenITmng4196ExclusionOnPluginDepTest.class );
