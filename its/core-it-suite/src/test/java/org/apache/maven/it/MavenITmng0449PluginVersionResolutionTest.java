@@ -69,8 +69,8 @@ public class MavenITmng0449PluginVersionResolutionTest
     }
 
     /**
-     * Verify that versions for plugins are automatically resolved if not given in the POM by checking first LATEST and
-     * then RELEASE in the repo metadata when the plugin is invoked directly from the command line.
+     * Verify that versions for plugins are automatically resolved if not given in the POM by checking LATEST and
+     * RELEASE in the repo metadata when the plugin is invoked directly from the command line.
      */
     public void testitCliInvocation()
         throws Exception
@@ -89,8 +89,17 @@ public class MavenITmng0449PluginVersionResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch-release.txt" );
-        verifier.assertFilePresent( "target/touch-snapshot.txt" );
+        // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
+        if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
+        {
+            verifier.assertFileNotPresent( "target/touch-release.txt" );
+            verifier.assertFilePresent( "target/touch-snapshot.txt" );
+        }
+        else
+        {
+            verifier.assertFilePresent( "target/touch-release.txt" );
+            verifier.assertFileNotPresent( "target/touch-snapshot.txt" );
+        }
     }
 
 }
