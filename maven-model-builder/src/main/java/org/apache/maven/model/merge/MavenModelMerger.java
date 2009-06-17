@@ -44,11 +44,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
-import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryBase;
 import org.apache.maven.model.Scm;
@@ -449,81 +447,6 @@ public class MavenModelMerger
                 target.setDeveloperConnection( appendPath( src, context.get( ARTIFACT_ID ).toString(),
                                                            context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
             }
-        }
-    }
-
-    @Override
-    protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
-                                                 boolean sourceDominant, Map<Object, Object> context )
-    {
-        List<Plugin> src = source.getPlugins();
-        if ( !src.isEmpty() )
-        {
-            List<Plugin> tgt = target.getPlugins();
-            Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
-
-            for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
-            {
-                Plugin element = it.next();
-                Object key = getPluginKey( element );
-                merged.put( key, element );
-            }
-
-            for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
-            {
-                Plugin element = it.next();
-                Object key = getPluginKey( element );
-                Plugin existing = merged.get( key );
-                if ( existing == null )
-                {
-                    // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
-                    existing = new Plugin();
-                    existing.setGroupId( element.getGroupId() );
-                    existing.setArtifactId( element.getArtifactId() );
-                    merged.put( key, existing );
-                }
-                mergePlugin( existing, element, sourceDominant, context );
-            }
-
-            target.setPlugins( new ArrayList<Plugin>( merged.values() ) );
-        }
-    }
-
-    @Override
-    protected void mergeReporting_Plugins( Reporting target, Reporting source, boolean sourceDominant,
-                                           Map<Object, Object> context )
-    {
-        List<ReportPlugin> src = source.getPlugins();
-        if ( !src.isEmpty() )
-        {
-            List<ReportPlugin> tgt = target.getPlugins();
-            Map<Object, ReportPlugin> merged =
-                new LinkedHashMap<Object, ReportPlugin>( ( src.size() + tgt.size() ) * 2 );
-
-            for ( Iterator<ReportPlugin> it = tgt.iterator(); it.hasNext(); )
-            {
-                ReportPlugin element = it.next();
-                Object key = getReportPluginKey( element );
-                merged.put( key, element );
-            }
-
-            for ( Iterator<ReportPlugin> it = src.iterator(); it.hasNext(); )
-            {
-                ReportPlugin element = it.next();
-                Object key = getReportPluginKey( element );
-                ReportPlugin existing = merged.get( key );
-                if ( existing == null )
-                {
-                    // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
-                    existing = new ReportPlugin();
-                    existing.setGroupId( element.getGroupId() );
-                    existing.setArtifactId( element.getArtifactId() );
-                    merged.put( key, existing );
-                }
-                mergeReportPlugin( existing, element, sourceDominant, context );
-            }
-
-            target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
         }
     }
 
