@@ -34,7 +34,7 @@ public class MavenITmng4207PluginWithLog4JTest
 
     public MavenITmng4207PluginWithLog4JTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0.3,)" );
     }
 
     /**
