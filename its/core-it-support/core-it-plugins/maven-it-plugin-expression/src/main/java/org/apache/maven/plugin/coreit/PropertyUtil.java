@@ -27,6 +27,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,6 +43,8 @@ class PropertyUtil
 {
 
     private static final Object[] NO_ARGS = {};
+
+    private static final Class[] NO_PARAMS = {};
 
     /**
      * Serializes the specified object into the given properties, using the provided key. The object may be a scalar
@@ -108,7 +111,50 @@ class PropertyUtil
                     store( props, key + "." + index, elem, visited );
                 }
             }
-            else if ( obj != null )
+            else if ( obj.getClass().getName().endsWith( "Xpp3Dom" ) )
+            {
+                Class type = obj.getClass();
+                try
+                {
+                    Method getValue = type.getMethod( "getValue", NO_PARAMS );
+                    String value = (String) getValue.invoke( obj, NO_ARGS );
+
+                    if ( value != null )
+                    {
+                        props.put( key + ".value", value );
+                    }
+
+                    Method getName = type.getMethod( "getName", NO_PARAMS );
+
+                    Method getChildren = type.getMethod( "getChildren", NO_PARAMS );
+                    Object[] children = (Object[]) getChildren.invoke( obj, NO_ARGS );
+
+                    props.put( key + ".children", Integer.toString( children.length ) );
+
+                    Map indices = new HashMap();
+                    for ( int i = 0; i < children.length; i++ )
+                    {
+                        Object child = children[i];
+
+                        String name = (String) getName.invoke( child, NO_ARGS );
+
+                        Integer index = (Integer) indices.get( name );
+                        if ( index == null )
+                        {
+                            index = new Integer( 0 );
+                        }
+
+                        store( props, key + ".children." + name + "." + index, child, visited );
+
+                        indices.put( name, new Integer( index.intValue() + 1 ) );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    // can't happen
+                }
+            }
+            else
             {
                 Class type = obj.getClass();
                 Method[] methods = type.getMethods();
