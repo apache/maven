@@ -59,6 +59,7 @@ under the License.
     <module>maven-it-plugin-plexus-utils-11</module>
     <module>maven-it-plugin-plexus-utils-new</module>
     <module>maven-it-plugin-plexus-component-api</module>
+    <module>maven-it-plugin-log4j</module>
   </modules>
 
   <scm>
