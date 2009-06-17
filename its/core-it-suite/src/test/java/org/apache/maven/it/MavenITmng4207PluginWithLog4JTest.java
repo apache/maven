@@ -38,7 +38,8 @@ public class MavenITmng4207PluginWithLog4JTest
     }
 
     /**
-     * Test that exclusions defined on a dependency apply to its transitive dependencies as well.
+     * Test that a plugin that depends on log4j and employes the artifact resolver does not die when using
+     * commons-http to resolve an artifact.
      */
     public void testit()
         throws Exception
@@ -46,6 +47,7 @@ public class MavenITmng4207PluginWithLog4JTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4207" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

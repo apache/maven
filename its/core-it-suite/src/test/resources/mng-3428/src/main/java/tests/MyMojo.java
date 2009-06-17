@@ -47,6 +47,8 @@ public class MyMojo
         {
             Artifact artifact = (Artifact) it.next();
 
+            System.out.println( artifact );
+
             if ( "commons-cli".equals( artifact.getArtifactId() ) )
             {
                 foundCommonsCli = true;

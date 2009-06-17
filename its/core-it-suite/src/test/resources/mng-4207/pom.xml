@@ -22,10 +22,16 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.mngXXXX</groupId>
+  <groupId>org.apache.maven.its.mng4208</groupId>
   <artifactId>test</artifactId>
   <version>0.1</version>
   <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: MNG-4208</name>
+  <description>
+    Test that a plugin that depends on log4j and employes the artifact resolver does not die when using
+    commons-http to resolve an artifact.
+  </description>
 
   <build>
     <extensions>
@@ -34,16 +40,20 @@ under the License.
         <artifactId>wagon-webdav-jackrabbit</artifactId>
         <version>1.0-beta-5</version>
       </extension>
-      <!--extension>
+      <!--
+      FWIW, adding the extension below would make the test pass but it has to work with the bundled wagon, too.
+      <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http</artifactId>
         <version>1.0-beta-5</version>
-      </extension-->
+      </extension>
+      -->
     </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-log4j</artifactId>
+        <version>2.1-SNAPSHOT</version>
         <configuration>
           <groupId>test</groupId>
           <artifactId>test</artifactId>
