@@ -37,7 +37,8 @@ public class MavenITmng4086ExplicitPluginMetaversionTest
 
     public MavenITmng4086ExplicitPluginMetaversionTest()
     {
-        super( "[2.0.6,)" );
+        // metaversions no longer explicitly supported by 3.x (see MNG-4205)
+        super( "[2.0.6,3.0-alpha-3)" );
     }
 
     /**
