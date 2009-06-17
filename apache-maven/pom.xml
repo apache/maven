@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>2.2.0-RC5-SNAPSHOT</version>
+    <version>2.2.0-RC4-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-maven</artifactId>
@@ -88,6 +88,9 @@
                 </relocation>
                 <relocation>
                   <pattern>org.apache.commons.logging</pattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.log4j</pattern>
                 </relocation>
 
                 <!-- For maven-artifact-manager -->
