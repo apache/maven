@@ -489,7 +489,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "join-different-containers-same-id" );
         assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/goals" ) ).size() );
-        assertEquals( 1, ( (List<?>) pom.getValue( "build/pluginManagement/plugins[1]/executions[1]/goals" ) ).size() );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/pluginManagement/plugins[@artifactId='maven-it-plugin-b']/executions[1]/goals" ) ).size() );
     }
 
     /* MNG-3937*/
@@ -1424,7 +1424,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "plugin-management-inheritance");
-        assertEquals("0.1-stub-SNAPSHOT", pom.getValue( "build/pluginManagement/plugins[1]/version" ) );
+        assertEquals("0.1-stub-SNAPSHOT", pom.getValue( "build/pluginManagement/plugins[@artifactId='maven-compiler-plugin']/version" ) );
     }   
     
     public void testProfilePlugins()
