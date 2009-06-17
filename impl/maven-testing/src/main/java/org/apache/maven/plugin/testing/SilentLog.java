@@ -325,4 +325,10 @@ public class SilentLog
     {
         return null;
     }
+
+    public void setThreshold( int threshold )
+    {
+        // TODO Auto-generated method stub
+        
+    }
 }

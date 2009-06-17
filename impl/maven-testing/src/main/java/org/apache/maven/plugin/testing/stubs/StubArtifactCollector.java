@@ -19,8 +19,6 @@ package org.apache.maven.plugin.testing.stubs;
  * under the License.
  */
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,9 +27,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 /**
@@ -49,41 +45,12 @@ public class StubArtifactCollector
         super();
     }
 
-    /** {@inheritDoc} */
-    public ArtifactResolutionResult collect( Set theArtifacts, Artifact theOriginatingArtifact,
-                                            ArtifactRepository theLocalRepository, List theRemoteRepositories,
-                                            ArtifactMetadataSource theSource, ArtifactFilter theFilter,
-                                            List theListeners )
-        throws ArtifactResolutionException
+    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
+                                             ArtifactRepository localRepository, List remoteRepositories,
+                                             ArtifactMetadataSource source, ArtifactFilter filter, List listeners,
+                                             List conflictResolvers )
     {
-        Set nodes = new HashSet();
-        ArtifactResolutionResult arr = new ArtifactResolutionResult();
-
-        Iterator iter = theArtifacts.iterator();
-        while ( iter.hasNext() )
-        {
-            nodes.add( new ResolutionNode( (Artifact) iter.next(), theRemoteRepositories ) );
-        }
-        arr.setArtifactResolutionNodes( nodes );
-        return arr;
-    }
-
-    /** {@inheritDoc} */
-    public ArtifactResolutionResult collect( Set theArtifacts, Artifact theOriginatingArtifact, Map theManagedVersions,
-                                            ArtifactRepository theLocalRepository, List theRemoteRepositories,
-                                            ArtifactMetadataSource theSource, ArtifactFilter theFilter,
-                                            List theListeners )
-        throws ArtifactResolutionException
-    {
-        Set nodes = new HashSet();
-        ArtifactResolutionResult arr = new ArtifactResolutionResult();
-
-        Iterator iter = theArtifacts.iterator();
-        while ( iter.hasNext() )
-        {
-            nodes.add( new ResolutionNode( (Artifact) iter.next(), theRemoteRepositories ) );
-        }
-        arr.setArtifactResolutionNodes( nodes );
-        return arr;
+        // TODO check if we have to do more here
+        return new ArtifactResolutionResult();
     }
 }

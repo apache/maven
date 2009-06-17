@@ -53,7 +53,6 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -1453,7 +1452,6 @@ public class MavenProjectStub
      * @see org.apache.maven.project.MavenProject#createArtifacts(org.apache.maven.artifact.factory.ArtifactFactory, java.lang.String, org.apache.maven.artifact.resolver.filter.ArtifactFilter)
      */
     public Set createArtifacts( ArtifactFactory artifactFactory, String string, ArtifactFilter artifactFilter )
-        throws InvalidDependencyVersionException
     {
         return Collections.EMPTY_SET;
     }

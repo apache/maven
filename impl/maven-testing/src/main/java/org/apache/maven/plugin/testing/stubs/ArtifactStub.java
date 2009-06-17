@@ -497,4 +497,14 @@ public class ArtifactStub
             sb.append( getClassifier() );
         }
     }
+
+    public boolean isFromAuthoritativeRepository()
+    {
+        return true;
+    }
+
+    public void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository )
+    {
+        // nothing
+    }
 }

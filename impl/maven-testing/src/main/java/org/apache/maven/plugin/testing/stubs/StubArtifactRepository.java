@@ -170,4 +170,40 @@ public class StubArtifactRepository
     {
         return false;
     }
+
+    public Artifact find( Artifact artifact )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setId( String id )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setLayout( ArtifactRepositoryLayout layout )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setUrl( String url )
+    {
+        // TODO Auto-generated method stub
+        
+    }
 }

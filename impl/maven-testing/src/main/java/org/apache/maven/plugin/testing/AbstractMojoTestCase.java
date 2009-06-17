@@ -19,6 +19,13 @@ package org.apache.maven.plugin.testing;
  * under the License.
  */
 
+import java.io.File;
+import java.io.Reader;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.logging.Log;
@@ -27,17 +34,11 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-
-import java.io.File;
-import java.io.Reader;
-import java.util.Map;
-import java.util.HashMap;
-import java.lang.reflect.Field;
-import java.lang.reflect.AccessibleObject;
 
 /**
  * TODO: add a way to use the plugin POM for the lookup so that the user doesn't have to provide the a:g:v:goal
@@ -181,7 +182,9 @@ public abstract class AbstractMojoTestCase
 
         Mojo mojo = (Mojo) lookup( Mojo.ROLE, groupId + ":" + artifactId + ":" + version + ":" + goal );
 
-        Log mojoLogger = new DefaultLog( getContainer().getLoggerManager().getLoggerForComponent( Mojo.ROLE ) );
+        LoggerManager loggerManager = (LoggerManager) getContainer().lookup( LoggerManager.class );
+        
+        Log mojoLogger = new DefaultLog( loggerManager.getLoggerForComponent( Mojo.ROLE ) );
 
         mojo.setLog( mojoLogger );
 
