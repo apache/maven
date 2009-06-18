@@ -700,4 +700,15 @@ public class DefaultArtifactCollector
             }
         }
     }
+
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                             Map managedVersions, ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories,
+                                             ArtifactMetadataSource source, ArtifactFilter filter,
+                                             List<ResolutionListener> listeners )
+    {
+        return collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source,
+                        filter, listeners, null );
+    }
+
 }

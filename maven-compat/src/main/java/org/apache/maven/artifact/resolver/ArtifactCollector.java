@@ -38,6 +38,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
  */
 public interface ArtifactCollector
 {
+
     ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                       Artifact originatingArtifact,
                                       Map managedVersions,
@@ -47,4 +48,12 @@ public interface ArtifactCollector
                                       ArtifactFilter filter,
                                       List<ResolutionListener> listeners,
                                       List<ConflictResolver> conflictResolvers );
+
+    // used by maven-dependency-tree and maven-dependency-plugin
+    @Deprecated
+    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions,
+                                      ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                                      ArtifactMetadataSource source, ArtifactFilter filter,
+                                      List<ResolutionListener> listeners );
+
 }
