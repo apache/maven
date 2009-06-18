@@ -249,13 +249,13 @@ public class MavenProject
 
         for ( Dependency d : getDependencies() )
         {
-            Artifact dependencyArtifact = repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() );
-            if ( filter != null )
+            Artifact dependencyArtifact =
+                repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(),
+                                                 d.getType() );
+
+            if ( filter == null || filter.include( dependencyArtifact ) )
             {
-                if ( filter.include( dependencyArtifact ) )
-                {
-                    artifacts.add( dependencyArtifact );
-                }
+                artifacts.add( dependencyArtifact );
             }
         }
 
