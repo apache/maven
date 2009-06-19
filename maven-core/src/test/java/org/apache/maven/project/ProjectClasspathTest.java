@@ -32,8 +32,10 @@ public class ProjectClasspathTest
     public void setUp()
         throws Exception
     {
-        //super.setUp();
         projectBuilder = lookup( ProjectBuilder.class, "classpath" );
+
+        // the metadata source looks up the default impl, so we have to trick it
+        getContainer().addComponent( projectBuilder, ProjectBuilder.class, "default" );
     }
    
     @Override

@@ -3,9 +3,12 @@
  */
 package org.apache.maven.project;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.component.annotations.Component;
 
 @Component(role=ProjectBuilder.class,hint="classpath")
@@ -36,4 +39,16 @@ public class TestProjectBuilder
         }
         return build( artifact.getFile(), request );
     }
+
+    @Override
+    public MavenProject build( File pomFile, ProjectBuildingRequest configuration )
+        throws ProjectBuildingException
+    {
+        MavenProject project = super.build( pomFile, configuration );
+
+        project.setRemoteArtifactRepositories( Collections.<ArtifactRepository> emptyList() );
+
+        return project;
+    }
+
 }
