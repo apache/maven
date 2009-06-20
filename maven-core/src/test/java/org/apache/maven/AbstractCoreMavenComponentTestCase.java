@@ -89,6 +89,7 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setPluginGroups( Arrays.asList( new String[] { "org.apache.maven.plugins" } ) )
             .setLocalRepository( getLocalRepository() )
             .setRemoteRepositories( getRemoteRepositories() )
+            .setPluginArtifactRepositories( getPluginArtifactRepositories() )
             .setGoals( Arrays.asList( new String[] { "package" } ) )
             .setProperties( new Properties() );
 
@@ -112,6 +113,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest()
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( request.getRemoteRepositories() )
+            .setPluginArtifactRepositories( request.getPluginArtifactRepositories() )
             .setExecutionProperties( executionProperties );
 
         MavenProject project = null;
@@ -139,7 +141,13 @@ public abstract class AbstractCoreMavenComponentTestCase
         return new MavenProject( model );
     }
     
-    protected List<ArtifactRepository> getRemoteRepositories() 
+    protected List<ArtifactRepository> getRemoteRepositories()
+        throws InvalidRepositoryException
+    {
+        return Arrays.asList( repositorySystem.createDefaultRemoteRepository() );
+    }
+
+    protected List<ArtifactRepository> getPluginArtifactRepositories()
         throws InvalidRepositoryException
     {
         Repository itRepo = new Repository();

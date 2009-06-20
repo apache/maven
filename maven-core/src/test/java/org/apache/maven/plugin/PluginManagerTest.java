@@ -127,7 +127,7 @@ public class PluginManagerTest
         plugin.setVersion( "2.4.2" );
 
         // The project has already been fully interpolated so getting the raw mojoDescriptor is not going to have the processes configuration.
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getRemoteArtifactRepositories() );        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );        
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-surefire-plugin", "2.4.2" );
         
         System.out.println( session.getCurrentProject().getBuild().getPluginsAsMap() );
@@ -207,7 +207,7 @@ public class PluginManagerTest
         // we need to pass this through as is so it doesn't get parsed again.
         Artifact pluginArtifact = new ProjectArtifact( pluginProject );
         
-        Set<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getRemoteRepositories() );
+        Set<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getPluginArtifactRepositories() );
         System.out.println( artifacts );
         */
         
@@ -220,12 +220,12 @@ public class PluginManagerTest
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( pluginArtifact )
             .setLocalRepository( getLocalRepository() )
-            .setRemoteRepostories( getRemoteRepositories() );
+            .setRemoteRepostories( getPluginArtifactRepositories() );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         */
         
-        List<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getRemoteRepositories() );   
+        List<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getPluginArtifactRepositories() );   
         assertEquals( 4, artifacts.size() );
         
         for ( Artifact a : artifacts )
