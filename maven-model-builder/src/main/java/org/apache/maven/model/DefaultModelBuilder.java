@@ -303,7 +303,10 @@ public class DefaultModelBuilder
             return;
         }
 
-        for ( Repository repository : model.getRepositories() )
+        List<Repository> repositories = model.getRepositories();
+        Collections.reverse( repositories );
+
+        for ( Repository repository : repositories )
         {
             try
             {

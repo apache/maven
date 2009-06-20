@@ -21,7 +21,6 @@ package org.apache.maven.project;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -90,18 +89,11 @@ class RepositoryModelResolver
         {
             ArtifactRepository repo = repositorySystem.buildArtifactRepository( repository );
 
-            ArtifactRepository mirror = repositorySystem.getMirrors( Arrays.asList( repo ) ).get( 0 );
+            List<ArtifactRepository> mirrors = repositorySystem.getMirrors( Arrays.asList( repo ) );
 
-            for ( Iterator<ArtifactRepository> it = remoteRepositories.iterator(); it.hasNext(); )
-            {
-                ArtifactRepository remoteRepository = it.next();
-                if ( mirror.getId().equals( remoteRepository.getId() ) )
-                {
-                    it.remove();
-                }
-            }
+            remoteRepositories.addAll( 0, mirrors );
 
-            remoteRepositories.add( 0, mirror );
+            remoteRepositories = repositorySystem.getEffectiveRepositories( remoteRepositories );
         }
         catch ( Exception e )
         {
