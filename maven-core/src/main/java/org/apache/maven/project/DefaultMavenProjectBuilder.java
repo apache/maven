@@ -17,6 +17,7 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -82,7 +83,8 @@ public class DefaultMavenProjectBuilder
                 {
                     try
                     {
-                        repos.add( repositorySystem.buildArtifactRepository( (Repository) repository ) );
+                        ArtifactRepository repo = repositorySystem.buildArtifactRepository( (Repository) repository );
+                        repos.addAll( repositorySystem.getMirrors( Arrays.asList( repo ) ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
