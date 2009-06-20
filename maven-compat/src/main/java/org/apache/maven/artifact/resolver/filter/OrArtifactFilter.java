@@ -19,8 +19,9 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -33,7 +34,7 @@ public class OrArtifactFilter
     implements ArtifactFilter
 {
 
-    private Collection<ArtifactFilter> filters;
+    private Set<ArtifactFilter> filters;
 
     public OrArtifactFilter()
     {
@@ -41,7 +42,7 @@ public class OrArtifactFilter
 
     public OrArtifactFilter( Collection<ArtifactFilter> filters )
     {
-        this.filters = filters;
+        this.filters = new LinkedHashSet<ArtifactFilter>( filters );
     }
 
     public boolean include( Artifact artifact )
@@ -64,10 +65,36 @@ public class OrArtifactFilter
     {
         if ( filters == null )
         {
-            filters = new ArrayList<ArtifactFilter>();
+            filters = new LinkedHashSet<ArtifactFilter>();
         }
 
         filters.add( artifactFilter );
     }
 
+    @Override
+    public int hashCode()
+    {
+        int hash = 17;
+        hash = hash * 31 + filters.hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+        
+        if ( !( obj instanceof OrArtifactFilter ) )
+        {
+            return false;
+        }
+        
+        OrArtifactFilter other = (OrArtifactFilter) obj;
+        
+        return filters.equals( other.filters );
+    }
+    
 }

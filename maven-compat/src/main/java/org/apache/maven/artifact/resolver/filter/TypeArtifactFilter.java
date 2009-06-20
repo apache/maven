@@ -36,4 +36,31 @@ public class TypeArtifactFilter
     {
         return type.equals( artifact.getType() );
     }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 17;
+        hash = hash * 31 + type.hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+        
+        if ( !( obj instanceof TypeArtifactFilter ) )
+        {
+            return false;
+        }
+        
+        TypeArtifactFilter other = (TypeArtifactFilter) obj;
+        
+        return type.equals( other.type );
+    }
+
 }

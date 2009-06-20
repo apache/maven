@@ -120,4 +120,47 @@ public class ScopeArtifactFilter
     {
         return scope;
     }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 17;
+        hash = hash * 31 + ( compileScope ? 1 : 0 );
+        hash = hash * 31 + ( runtimeScope ? 1 : 0 );
+        hash = hash * 31 + ( testScope ? 1 : 0 );
+        hash = hash * 31 + ( providedScope ? 1 : 0 );
+        hash = hash * 31 + ( systemScope ? 1 : 0 );
+        
+        hash = hash * 31 + ( scope != null ? scope.hashCode() : 0);
+        
+        return hash;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+        
+        if ( !( obj instanceof ScopeArtifactFilter ) )
+        {
+            return false;
+        }
+        
+        ScopeArtifactFilter other = (ScopeArtifactFilter) obj;
+
+        return compileScope == other.compileScope
+                && runtimeScope == other.runtimeScope
+                && testScope == other.testScope
+                && providedScope == other.providedScope
+                && systemScope == other.systemScope
+                && equals( scope, other.scope );
+    }
+
+    private static boolean equals( String str1, String str2 )
+    {
+        return str1 != null ? str1.equals( str2 ) : str2 == null;
+    }
 }

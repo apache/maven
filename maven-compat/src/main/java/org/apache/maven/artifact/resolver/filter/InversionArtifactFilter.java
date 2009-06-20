@@ -35,4 +35,31 @@ public class InversionArtifactFilter
     {
         return !toInvert.include( artifact );
     }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 17;
+        hash = hash * 31 + toInvert.hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+        
+        if ( !( obj instanceof InversionArtifactFilter ) )
+        {
+            return false;
+        }
+        
+        InversionArtifactFilter other = (InversionArtifactFilter) obj;
+        
+        return toInvert.equals( other.toInvert );
+    }
+
 }

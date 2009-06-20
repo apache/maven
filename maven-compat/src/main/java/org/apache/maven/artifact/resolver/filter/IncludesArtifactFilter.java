@@ -19,8 +19,11 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -33,11 +36,11 @@ import org.apache.maven.artifact.Artifact;
 public class IncludesArtifactFilter
     implements ArtifactFilter
 {
-    private final List<String> patterns;
+    private final Set<String> patterns;
 
     public IncludesArtifactFilter( List<String> patterns )
     {
-        this.patterns = patterns;
+        this.patterns = new LinkedHashSet<String>( patterns );
     }
 
     public boolean include( Artifact artifact )
@@ -55,9 +58,37 @@ public class IncludesArtifactFilter
         }
         return matched;
     }
-    
+
     public List<String> getPatterns()
     {
-        return patterns;
+        return new ArrayList<String>( patterns );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 17;
+        hash = hash * 31 + patterns.hashCode();
+        
+        return hash;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj ) 
+        {
+            return true;
+        }
+
+        // make sure IncludesArtifactFilter is not equal ExcludesArtifactFilter! 
+        if ( obj == null || getClass() != obj.getClass() )
+        {
+            return false;
+        }
+
+        IncludesArtifactFilter other = (IncludesArtifactFilter) obj;
+
+        return patterns.equals( other.patterns );
     }
 }
