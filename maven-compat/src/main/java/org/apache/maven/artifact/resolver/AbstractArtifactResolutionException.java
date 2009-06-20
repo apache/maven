@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 
 /**
  * Base class for artifact resolution exceptions.
@@ -212,6 +213,19 @@ public class AbstractArtifactResolutionException
                 sb.append( remoteRepository.getId() );
                 sb.append( " (" );
                 sb.append( remoteRepository.getUrl() );
+
+                ArtifactRepositoryPolicy releases = remoteRepository.getReleases();
+                if ( releases != null )
+                {
+                    sb.append( ", releases=" ).append( releases.isEnabled() );
+                }
+
+                ArtifactRepositoryPolicy snapshots = remoteRepository.getSnapshots();
+                if ( snapshots != null )
+                {
+                    sb.append( ", snapshots=" ).append( snapshots.isEnabled() );
+                }
+
                 sb.append( ")" );
                 if ( i.hasNext() )
                 {
