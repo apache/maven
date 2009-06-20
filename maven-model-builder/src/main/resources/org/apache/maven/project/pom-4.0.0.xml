@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -20,10 +22,7 @@ under the License.
 <!-- START SNIPPET: superpom -->
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven</groupId>
-  <artifactId>super-pom</artifactId>
-  <version>3.0-SNAPSHOT</version>
-  <name>Maven Default Project</name>
+
   <repositories>
     <repository>
       <id>central</id>
@@ -155,4 +154,4 @@ under the License.
     <outputDirectory>${project.build.directory}/site</outputDirectory>
   </reporting>
 </project>
-  <!-- END SNIPPET: superpom -->
+<!-- END SNIPPET: superpom -->

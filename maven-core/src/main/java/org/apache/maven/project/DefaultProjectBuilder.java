@@ -16,7 +16,6 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,7 @@ import org.apache.maven.model.ModelBuildingException;
 import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.ModelBuildingResult;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.io.ModelReader;
+import org.apache.maven.model.UrlModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
@@ -61,9 +60,6 @@ public class DefaultProjectBuilder
     private ModelBuilder modelBuilder;
 
     @Requirement
-    private ModelReader modelReader;
-
-    @Requirement
     private LifecycleExecutor lifecycle;
 
     @Requirement
@@ -72,7 +68,7 @@ public class DefaultProjectBuilder
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
     
-    private MavenProject superProject;
+    private MavenProject standaloneProject;
 
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -87,19 +83,7 @@ public class DefaultProjectBuilder
     private MavenProject build( File pomFile, boolean localProject, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        ModelResolver resolver =
-            new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, configuration.getLocalRepository(),
-                                         configuration.getRemoteRepositories() );
-
-        ModelBuildingRequest request = new DefaultModelBuildingRequest();
-        request.setLenientValidation( configuration.istLenientValidation() );
-        request.setProcessPlugins( configuration.isProcessPlugins() );
-        request.setProfiles( configuration.getProfiles() );
-        request.setActiveProfileIds( configuration.getActiveProfileIds() );
-        request.setInactiveProfileIds( configuration.getInactiveProfileIds() );
-        request.setExecutionProperties( configuration.getExecutionProperties() );
-        request.setBuildStartTime( configuration.getBuildStartTime() );
-        request.setModelResolver( resolver );
+        ModelBuildingRequest request = getModelBuildingRequest( configuration );
 
         ModelBuildingResult result;
         try
@@ -153,6 +137,25 @@ public class DefaultProjectBuilder
         return project;
     }
 
+    private ModelBuildingRequest getModelBuildingRequest( ProjectBuildingRequest configuration )
+    {
+        ModelResolver resolver =
+            new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, configuration.getLocalRepository(),
+                                         configuration.getRemoteRepositories() );
+
+        ModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setLenientValidation( configuration.istLenientValidation() );
+        request.setProcessPlugins( configuration.isProcessPlugins() );
+        request.setProfiles( configuration.getProfiles() );
+        request.setActiveProfileIds( configuration.getActiveProfileIds() );
+        request.setInactiveProfileIds( configuration.getInactiveProfileIds() );
+        request.setExecutionProperties( configuration.getExecutionProperties() );
+        request.setBuildStartTime( configuration.getBuildStartTime() );
+        request.setModelResolver( resolver );
+
+        return request;
+    }
+
     public MavenProject build( Artifact artifact, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
@@ -189,25 +192,35 @@ public class DefaultProjectBuilder
     public MavenProject buildStandaloneSuperProject( ProjectBuildingRequest config )
         throws ProjectBuildingException
     {
-        if ( superProject != null )
+        if ( standaloneProject != null )
         {
-            return superProject;
+            return standaloneProject;
         }
 
-        Model superModel = getSuperModel();
+        ModelBuildingRequest request = getModelBuildingRequest( config );
+
+        ModelBuildingResult result;
+        try
+        {
+            result = modelBuilder.build( new UrlModelSource( getClass().getResource( "standalone.xml" ) ), request );
+        }
+        catch ( ModelBuildingException e )
+        {
+            throw new ProjectBuildingException( "[standalone]", "Failed to build standalone project", e );
+        }
 
         try
         {
-            superProject = new MavenProject( superModel, repositorySystem, this, config );
+            standaloneProject = new MavenProject( result.getEffectiveModel(), repositorySystem, this, config );
         }
         catch ( InvalidRepositoryException e )
         {
             // Not going to happen.
         }
 
-        superProject.setExecutionRoot( true );
+        standaloneProject.setExecutionRoot( true );
 
-        return superProject;
+        return standaloneProject;
     }
 
     public MavenProjectBuildingResult buildProjectWithDependencies( File pomFile, ProjectBuildingRequest request )
@@ -280,34 +293,6 @@ public class DefaultProjectBuilder
         }
 
         return ArtifactUtils.versionlessKey( gid, aid );
-    }
-
-    // Super Model Handling
-
-    private static final String MAVEN_MODEL_VERSION = "4.0.0";
-
-    private Model superModel;
-
-    protected Model getSuperModel()
-    {
-        if ( superModel != null )
-        {
-            return superModel;
-        }
-
-        String superPomResource = "/org/apache/maven/project/pom-" + MAVEN_MODEL_VERSION + ".xml";
-
-        try
-        {
-            superModel = modelReader.read( getClass().getResourceAsStream( superPomResource ), null );
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalStateException( "The super POM is damaged"
-                + ", please verify the integrity of your Maven installation", e );
-        }
-
-        return superModel;
     }
 
 }
