@@ -480,7 +480,7 @@ public class DefaultPluginManager
             }
         }
 
-        throw new PluginManagerException( plugin, "Could not create ClassRealm", (Throwable) null );
+        throw new PluginManagerException( plugin, "Could not create ClassRealm for plugin " + baseRealmId, (Throwable) null );
     }
 
     private Mojo getConfiguredMojo( MavenSession session, MavenProject project, MojoExecution mojoExecution, ClassRealm pluginRealm )

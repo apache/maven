@@ -222,7 +222,8 @@ public class DefaultPluginCache
                 && eq( aD.getArtifactId(), bD.getArtifactId() ) //
                 && eq( aD.getVersion(), bD.getVersion() ) // 
                 && eq( aD.getType(), bD.getType() ) //
-                && eq( aD.getClassifier(), bD.getScope() );
+                && eq( aD.getClassifier(), bD.getClassifier() ) //
+                && eq( aD.getScope(), bD.getScope() );
 
             r &= exclusionsEquals( aD.getExclusions(), bD.getExclusions() );
 
