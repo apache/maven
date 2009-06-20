@@ -72,8 +72,8 @@ END SNIPPET: ant-bootstrap -->
     <property name="maven.debug" value="-e -X" />
     -->
     <property name="maven.test.skip" value="false" />
-    <!-- TODO: Change this default back to false once we're done -->
     <property name="surefire.useFile" value="true" />
+    <property name="maven.test.redirectTestOutputToFile" value="${surefire.useFile}" />
     <echo>maven.home = ${maven.home.effective}</echo>
     <echo>maven.repo.local = ${maven.repo.local}</echo>
   </target>
@@ -218,6 +218,7 @@ END SNIPPET: ant-bootstrap -->
       <arg value="-Dmaven.test.skip=${maven.test.skip}" />
       <arg value="-Dmaven.repo.local=${maven.repo.local}" />
       <arg value="-Dsurefire.useFile=${surefire.useFile}" />
+      <arg value="-Dmaven.test.redirectTestOutputToFile=${maven.test.redirectTestOutputToFile}" />
     </java>
   </target>
 
