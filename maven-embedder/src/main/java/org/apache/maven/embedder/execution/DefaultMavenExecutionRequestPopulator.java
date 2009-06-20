@@ -235,6 +235,8 @@ public class DefaultMavenExecutionRequestPopulator
         // </mirrors>        
 
         request.setRemoteRepositories( repositorySystem.getMirrors( request.getRemoteRepositories() ) );
+
+        request.setPluginArtifactRepositories( repositorySystem.getMirrors( request.getPluginArtifactRepositories() ) );
     }
 
     // ------------------------------------------------------------------------

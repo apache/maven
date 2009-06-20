@@ -35,6 +35,8 @@ public class DefaultProjectBuildingRequest
 
     private List<ArtifactRepository> remoteRepositories;
 
+    private List<ArtifactRepository> pluginArtifactRepositories;
+
     private List<ModelEventListener> listeners;
     
     private MavenProject topProject;
@@ -60,6 +62,8 @@ public class DefaultProjectBuildingRequest
         activeProfileIds = new ArrayList<String>();
         inactiveProfileIds = new ArrayList<String>();
         executionProperties = new Properties();
+        remoteRepositories = new ArrayList<ArtifactRepository>();
+        pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
     }
 
     public MavenProject getTopLevelProjectFromReactor()
@@ -85,16 +89,35 @@ public class DefaultProjectBuildingRequest
         
     public List<ArtifactRepository> getRemoteRepositories()
     {
-        if ( remoteRepositories == null )
-        {
-            remoteRepositories = new ArrayList<ArtifactRepository>();
-        }
         return remoteRepositories;
     }
 
     public ProjectBuildingRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
-        this.remoteRepositories = remoteRepositories;
+        this.remoteRepositories.clear();
+
+        if ( remoteRepositories != null )
+        {
+            this.remoteRepositories.addAll( remoteRepositories );
+        }
+
+        return this;
+    }
+
+    public List<ArtifactRepository> getPluginArtifactRepositories()
+    {
+        return pluginArtifactRepositories;
+    }
+
+    public ProjectBuildingRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
+    {
+        this.pluginArtifactRepositories.clear();
+
+        if ( pluginArtifactRepositories != null )
+        {
+            this.pluginArtifactRepositories.addAll( pluginArtifactRepositories );
+        }
+
         return this;
     }
     
@@ -106,6 +129,7 @@ public class DefaultProjectBuildingRequest
     public ProjectBuildingRequest setExecutionProperties( Properties executionProperties )
     {
         this.executionProperties.clear();
+
         if ( executionProperties != null )
         {
             this.executionProperties.putAll( executionProperties );
@@ -155,6 +179,7 @@ public class DefaultProjectBuildingRequest
     public void setActiveProfileIds( List<String> activeProfileIds )
     {
         this.activeProfileIds.clear();
+
         if ( activeProfileIds != null )
         {
             this.activeProfileIds.addAll( activeProfileIds );
@@ -169,6 +194,7 @@ public class DefaultProjectBuildingRequest
     public void setInactiveProfileIds( List<String> inactiveProfileIds )
     {
         this.inactiveProfileIds.clear();
+
         if ( inactiveProfileIds != null )
         {
             this.inactiveProfileIds.addAll( inactiveProfileIds );
@@ -178,6 +204,7 @@ public class DefaultProjectBuildingRequest
     public void setProfiles( List<Profile> profiles )
     {
         this.profiles.clear();
+
         if ( profiles != null )
         {
             this.profiles.addAll( profiles );

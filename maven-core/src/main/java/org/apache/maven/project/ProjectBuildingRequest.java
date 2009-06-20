@@ -17,6 +17,10 @@ public interface ProjectBuildingRequest
 
     List<ArtifactRepository> getRemoteRepositories();
 
+    ProjectBuildingRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifacgRepositories );
+
+    List<ArtifactRepository> getPluginArtifactRepositories();
+
     ProjectBuildingRequest setExecutionProperties( Properties executionProperties );
 
     Properties getExecutionProperties();

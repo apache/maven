@@ -235,10 +235,12 @@ public class MavenProject
         this.repositorySystem = repositorySystem;
         originalModel = model;
         
-        remoteArtifactRepositories =
-            createArtifactRepositories( model.getRepositories(), projectBuilderConfiguration.getRemoteRepositories() );
+        remoteArtifactRepositories = projectBuilderConfiguration.getRemoteRepositories();
+        remoteArtifactRepositories = createArtifactRepositories( model.getRepositories(), remoteArtifactRepositories );
 
-        pluginArtifactRepositories = createArtifactRepositories( model.getPluginRepositories(), null );
+        pluginArtifactRepositories = projectBuilderConfiguration.getPluginArtifactRepositories();
+        pluginArtifactRepositories =
+            createArtifactRepositories( model.getPluginRepositories(), pluginArtifactRepositories );
     }
 
     //TODO: need to integrate the effective scope and refactor it out of the MMS

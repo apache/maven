@@ -105,6 +105,8 @@ public class DefaultMavenExecutionRequest
 
     private List<ArtifactRepository> remoteRepositories;
 
+    private List<ArtifactRepository> pluginArtifactRepositories;
+
     /**
      * Suppress SNAPSHOT updates.
      * 
@@ -144,6 +146,7 @@ public class DefaultMavenExecutionRequest
         copy.setGlobalChecksumPolicy( original.getGlobalChecksumPolicy() );
         copy.setUpdateSnapshots( original.isUpdateSnapshots() );
         copy.setRemoteRepositories( original.getRemoteRepositories() );
+        copy.setPluginArtifactRepositories( original.getPluginArtifactRepositories() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         return original;        
     }
@@ -228,6 +231,14 @@ public class DefaultMavenExecutionRequest
     {
         getRemoteRepositories().clear();
         getRemoteRepositories().addAll( remoteRepositories );
+        
+        return this;
+    }
+
+    public MavenExecutionRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
+    {
+        getPluginArtifactRepositories().clear();
+        getPluginArtifactRepositories().addAll( pluginArtifactRepositories );
         
         return this;
     }
@@ -705,6 +716,15 @@ public class DefaultMavenExecutionRequest
         return remoteRepositories;
     }
 
+    public List<ArtifactRepository> getPluginArtifactRepositories()
+    {
+        if ( pluginArtifactRepositories == null )
+        {
+            pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+        }
+        return pluginArtifactRepositories;
+    }
+
     //TODO: this does not belong here.
     public ProjectBuildingRequest getProjectBuildingRequest()
     {
@@ -714,6 +734,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setLocalRepository( getLocalRepository() );
             projectBuildingRequest.setExecutionProperties( getProperties() );
             projectBuildingRequest.setRemoteRepositories( getRemoteRepositories() );
+            projectBuildingRequest.setPluginArtifactRepositories( getPluginArtifactRepositories() );
             projectBuildingRequest.setActiveProfileIds( getActiveProfiles() );
             projectBuildingRequest.setInactiveProfileIds( getInactiveProfiles() );
             projectBuildingRequest.setProfiles( getProfiles() );

@@ -199,6 +199,9 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> repositories );
     List<ArtifactRepository> getRemoteRepositories();
 
+    MavenExecutionRequest setPluginArtifactRepositories( List<ArtifactRepository> repositories );
+    List<ArtifactRepository> getPluginArtifactRepositories();
+
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
