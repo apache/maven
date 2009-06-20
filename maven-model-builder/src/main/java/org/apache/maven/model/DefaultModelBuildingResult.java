@@ -30,97 +30,100 @@ import java.util.Map;
  * 
  * @author Benjamin Bentmann
  */
-public class DefaultModelBuildingResult
+class DefaultModelBuildingResult
     implements ModelBuildingResult
 {
 
-    private Model model;
+    private Model effectiveModel;
 
-    private List<Model> rawModels;
+    private List<String> modelIds;
 
-    private Map<Model, List<Profile>> activePomProfiles;
+    private Map<String, Model> rawModels;
+
+    private Map<String, List<Profile>> activePomProfiles;
 
     private List<Profile> activeExternalProfiles;
 
     public DefaultModelBuildingResult()
     {
-        rawModels = new ArrayList<Model>();
-        activePomProfiles = new HashMap<Model, List<Profile>>();
+        modelIds = new ArrayList<String>();
+        rawModels = new HashMap<String, Model>();
+        activePomProfiles = new HashMap<String, List<Profile>>();
         activeExternalProfiles = new ArrayList<Profile>();
     }
 
     public Model getEffectiveModel()
     {
-        return model;
+        return effectiveModel;
     }
 
     public DefaultModelBuildingResult setEffectiveModel( Model model )
     {
-        this.model = model;
+        this.effectiveModel = model;
+
+        return this;
+    }
+
+    public List<String> getModelIds()
+    {
+        return Collections.unmodifiableList( modelIds );
+    }
+
+    public DefaultModelBuildingResult addModelId( String modelId )
+    {
+        if ( modelId == null )
+        {
+            throw new IllegalArgumentException( "no model identifier specified" );
+        }
+
+        modelIds.add( modelId );
 
         return this;
     }
 
     public Model getRawModel()
     {
-        return rawModels.get( 0 );
+        return rawModels.get( modelIds.get( 0 ) );
     }
 
-    public List<Model> getRawModels()
+    public Model getRawModel( String modelId )
     {
-        return Collections.unmodifiableList( rawModels );
+        return rawModels.get( modelId );
     }
 
-    public DefaultModelBuildingResult setRawModels( List<Model> rawModels )
+    public DefaultModelBuildingResult setRawModel( String modelId, Model rawModel )
     {
-        this.rawModels.clear();
-        if ( rawModels != null )
+        if ( modelId == null )
         {
-            this.rawModels.addAll( rawModels );
+            throw new IllegalArgumentException( "no model identifier specified" );
         }
+
+        rawModels.put( modelId, rawModel );
 
         return this;
     }
 
-    public List<Profile> getActivePomProfiles( Model rawModel )
+    public List<Profile> getActivePomProfiles( String modelId )
     {
-        List<Profile> profiles = this.activePomProfiles.get( rawModel );
-        return ( profiles == null ) ? Collections.<Profile> emptyList() : Collections.unmodifiableList( profiles );
+        List<Profile> profiles = this.activePomProfiles.get( modelId );
+        return ( profiles != null ) ? Collections.unmodifiableList( profiles ) : null;
     }
 
-    public DefaultModelBuildingResult setActivePomProfiles( Model rawModel, List<Profile> activeProfiles )
+    public DefaultModelBuildingResult setActivePomProfiles( String modelId, List<Profile> activeProfiles )
     {
-        if ( rawModel == null )
+        if ( modelId == null )
         {
-            throw new IllegalArgumentException( "no model specified" );
+            throw new IllegalArgumentException( "no model identifier specified" );
         }
 
         if ( activeProfiles != null )
         {
-            this.activePomProfiles.put( rawModel, new ArrayList<Profile>( activeProfiles ) );
+            this.activePomProfiles.put( modelId, new ArrayList<Profile>( activeProfiles ) );
         }
         else
         {
-            this.activePomProfiles.remove( rawModel );
+            this.activePomProfiles.remove( modelId );
         }
-
-        return this;
-    }
-
-    public DefaultModelBuildingResult addActivePomProfiles( Model rawModel, List<Profile> activeProfiles )
-    {
-        if ( rawModel == null )
-        {
-            throw new IllegalArgumentException( "no model specified" );
-        }
-
-        List<Profile> currentProfiles = this.activePomProfiles.get( rawModel );
-        if ( currentProfiles == null )
-        {
-            currentProfiles = new ArrayList<Profile>( activeProfiles.size() );
-            this.activePomProfiles.put( rawModel, currentProfiles );
-        }
-        currentProfiles.addAll( activeProfiles );
 
         return this;
     }
@@ -133,6 +136,7 @@ public class DefaultModelBuildingResult
     public DefaultModelBuildingResult setActiveExternalProfiles( List<Profile> activeProfiles )
     {
         this.activeExternalProfiles.clear();
+
         if ( activeProfiles != null )
         {
             this.activeExternalProfiles.addAll( activeProfiles );

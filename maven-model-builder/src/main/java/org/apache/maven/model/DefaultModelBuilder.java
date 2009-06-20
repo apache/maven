@@ -117,55 +117,55 @@ public class DefaultModelBuilder
 
         List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
 
-        result.setActiveExternalProfiles( activeExternalProfiles );
+        Model inputModel = readModel( modelSource, pomFile, request, problems );
 
-        Model model = readModel( modelSource, pomFile, request, problems );
+        ModelData resultData = new ModelData( inputModel );
 
-        List<Model> rawModels = new ArrayList<Model>();
-        List<Model> resultModels = new ArrayList<Model>();
+        List<ModelData> lineage = new ArrayList<ModelData>();
 
-        for ( Model current = model; current != null; current = readParent( current, request, problems ) )
+        for ( ModelData currentData = resultData; currentData != null; )
         {
-            Model resultModel = current;
-            resultModels.add( resultModel );
+            lineage.add( currentData );
 
-            Model rawModel = ModelUtils.cloneModel( current );
-            rawModels.add( rawModel );
+            Model tmpModel = currentData.getModel();
 
-            modelNormalizer.mergeDuplicates( resultModel, request );
+            Model rawModel = ModelUtils.cloneModel( tmpModel );
+            currentData.setRawModel( rawModel );
+
+            modelNormalizer.mergeDuplicates( tmpModel, request );
 
             List<Profile> activePomProfiles = getActivePomProfiles( rawModel, profileActivationContext, problems );
-
-            result.setActivePomProfiles( rawModel, activePomProfiles );
+            currentData.setActiveProfiles( activePomProfiles );
 
             for ( Profile activeProfile : activePomProfiles )
             {
-                profileInjector.injectProfile( resultModel, activeProfile, request );
+                profileInjector.injectProfile( tmpModel, activeProfile, request );
             }
 
-            if ( current == model )
+            if ( currentData == resultData )
             {
                 for ( Profile activeProfile : activeExternalProfiles )
                 {
-                    profileInjector.injectProfile( resultModel, activeProfile, request );
+                    profileInjector.injectProfile( tmpModel, activeProfile, request );
                 }
             }
 
-            configureResolver( request.getModelResolver(), resultModel, problems );
+            configureResolver( request.getModelResolver(), tmpModel, problems );
+
+            currentData = readParent( tmpModel, request, problems );
         }
 
-        Model superModel = getSuperModel();
-        rawModels.add( superModel );
-        resultModels.add( superModel );
+        ModelData superData = new ModelData( getSuperModel() );
+        superData.setRawModel( superData.getModel() );
+        superData.setActiveProfiles( Collections.<Profile> emptyList() );
+        lineage.add( superData );
 
-        result.setRawModels( rawModels );
+        assembleInheritance( lineage, request );
 
-        assembleInheritance( resultModels, request );
-
-        Model resultModel = resultModels.get( 0 );
+        Model resultModel = resultData.getModel();
 
         resultModel = interpolateModel( resultModel, request, problems );
-        resultModels.set( 0, resultModel );
+        resultData.setModel( resultModel );
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
@@ -191,7 +191,22 @@ public class DefaultModelBuilder
             throw new ModelBuildingException( problems );
         }
 
+        resultData.setGroupId( resultModel.getGroupId() );
+        resultData.setArtifactId( resultModel.getArtifactId() );
+        resultData.setVersion( resultModel.getVersion() );
+
         result.setEffectiveModel( resultModel );
+
+        result.setActiveExternalProfiles( activeExternalProfiles );
+
+        for ( ModelData currentData : lineage )
+        {
+            String modelId = ( currentData != superData ) ? currentData.getId() : "";
+
+            result.addModelId( modelId );
+            result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
+            result.setRawModel( modelId, currentData.getRawModel() );
+        }
 
         return result;
     }
@@ -302,12 +317,12 @@ public class DefaultModelBuilder
         }
     }
 
-    private void assembleInheritance( List<Model> models, ModelBuildingRequest request )
+    private void assembleInheritance( List<ModelData> lineage, ModelBuildingRequest request )
     {
-        for ( int i = models.size() - 2; i >= 0; i-- )
+        for ( int i = lineage.size() - 2; i >= 0; i-- )
         {
-            Model parent = models.get( i + 1 );
-            Model child = models.get( i );
+            Model parent = lineage.get( i + 1 ).getModel();
+            Model child = lineage.get( i ).getModel();
             inheritanceAssembler.assembleModelInheritance( child, parent, request );
         }
     }
@@ -329,31 +344,31 @@ public class DefaultModelBuilder
         }
     }
 
-    private Model readParent( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
+    private ModelData readParent( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
-        Model parentModel;
+        ModelData parentData;
 
         Parent parent = childModel.getParent();
 
         if ( parent != null )
         {
-            parentModel = readParentLocally( childModel, request, problems );
+            parentData = readParentLocally( childModel, request, problems );
 
-            if ( parentModel == null )
+            if ( parentData == null )
             {
-                parentModel = readParentExternally( childModel, request, problems );
+                parentData = readParentExternally( childModel, request, problems );
             }
         }
         else
         {
-            parentModel = null;
+            parentData = null;
         }
 
-        return parentModel;
+        return parentData;
     }
 
-    private Model readParentLocally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
+    private ModelData readParentLocally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
         File projectDirectory = childModel.getProjectDirectory();
@@ -401,10 +416,12 @@ public class DefaultModelBuilder
             return null;
         }
 
-        return candidateModel;
+        ModelData parentData = new ModelData( candidateModel, groupId, artifactId, version );
+
+        return parentData;
     }
 
-    private Model readParentExternally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
+    private ModelData readParentExternally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
         Parent parent = childModel.getParent();
@@ -430,7 +447,12 @@ public class DefaultModelBuilder
             throw new ModelBuildingException( problems );
         }
 
-        return readModel( modelSource, null, request, problems );
+        Model parentModel = readModel( modelSource, null, request, problems );
+
+        ModelData parentData =
+            new ModelData( parentModel, parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+
+        return parentData;
     }
 
     private Model getSuperModel()

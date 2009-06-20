@@ -120,7 +120,8 @@ public class DefaultProjectBuilder
         
         Model model = result.getEffectiveModel();
 
-        MavenProject project = fromModelToMavenProject( model, result.getRawModels().get( 1 ).getPomFile(), configuration, model.getPomFile() );
+        File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();
+        MavenProject project = fromModelToMavenProject( model, parentPomFile, configuration, model.getPomFile() );
 
         project.setOriginalModel( result.getRawModel() );
      
@@ -145,7 +146,7 @@ public class DefaultProjectBuilder
         project.setFile( pomFile );
 
         List<Profile> activeProfiles = new ArrayList<Profile>();
-        activeProfiles.addAll( result.getActivePomProfiles( result.getRawModel() ) );
+        activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
         activeProfiles.addAll( result.getActiveExternalProfiles() );
         project.setActiveProfiles( activeProfiles );
                 

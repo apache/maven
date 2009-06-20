@@ -30,6 +30,16 @@ public interface ModelBuildingResult
 {
 
     /**
+     * Gets the sequence of model identifiers that denote the lineage of models from which the effective model was
+     * constructed. Model identifiers have the form {@code <groupId>:<artifactId>:<version>}. The first identifier from
+     * the list denotes the model on which the model builder was originally invoked. The last identifier will always be
+     * an empty string that by definition denotes the super POM.
+     * 
+     * @return The model identifiers from the lineage of models, never {@code null}.
+     */
+    List<String> getModelIds();
+
+    /**
      * Gets the fully assembled model.
      * 
      * @return The fully assembled model, never {@code null}.
@@ -37,29 +47,34 @@ public interface ModelBuildingResult
     Model getEffectiveModel();
 
     /**
-     * Gets the raw model as it was read from the model source. Apart from basic validation, the raw model has not
-     * undergone any updates by the model builder, e.g. reflects neither inheritance or interpolation.
+     * Gets the raw model as it was read from the input model source. Apart from basic validation, the raw model has not
+     * undergone any updates by the model builder, e.g. reflects neither inheritance nor interpolation.
      * 
      * @return The raw model, never {@code null}.
      */
     Model getRawModel();
 
     /**
-     * Gets the lineage of raw models from which the effective model was constructed. The first model is the model on
-     * which the model builder was originally invoked, the last model is the super POM.
+     * Gets the specified raw model as it was read from a model source. Apart from basic validation, a raw model has not
+     * undergone any updates by the model builder, e.g. reflects neither inheritance nor interpolation. The model
+     * identifier should be from the collection obtained by {@link #getModelIds()}. As a special case, an empty string
+     * can be used as the identifier for the super POM.
      * 
-     * @return The lineage of raw models, never {@code null}.
+     * @param modelId The identifier of the desired raw model, must not be {@code null}.
+     * @return The raw model or {@code null} if the specified model id does not refer to a known model.
      */
-    List<Model> getRawModels();
+    Model getRawModel( String modelId );
 
     /**
-     * Gets the profiles from the specified (raw) model that were active during model building. The input parameter
-     * should be a model from the collection obtained by {@link #getRawModels()}.
+     * Gets the profiles from the specified model that were active during model building. The model identifier should be
+     * from the collection obtained by {@link #getModelIds()}. As a special case, an empty string can be used as the
+     * identifier for the super POM.
      * 
-     * @param rawModel The (raw) model for whose active profiles should be retrieved, must not be {@code null}.
-     * @return The active profiles of the model or an empty list if none, never {@code null}.
+     * @param modelId The identifier of the model whose active profiles should be retrieved, must not be {@code null}.
+     * @return The active profiles of the model or an empty list if none or {@code null} if the specified model id does
+     *         not refer to a known model.
      */
-    List<Profile> getActivePomProfiles( Model rawModel );
+    List<Profile> getActivePomProfiles( String modelId );
 
     /**
      * Gets the external profiles that were active during model building. External profiles are those that were
