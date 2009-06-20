@@ -51,14 +51,6 @@ public class DefaultModelBuildingRequest
 
     private ModelResolver modelResolver;
 
-    public DefaultModelBuildingRequest()
-    {
-        profiles = new ArrayList<Profile>();
-        activeProfileIds = new ArrayList<String>();
-        inactiveProfileIds = new ArrayList<String>();
-        executionProperties = new Properties();
-    }
-
     public boolean istLenientValidation()
     {
         return lenientValidation;
@@ -85,15 +77,23 @@ public class DefaultModelBuildingRequest
 
     public List<Profile> getProfiles()
     {
+        if ( profiles == null )
+        {
+            profiles = new ArrayList<Profile>();
+        }
+
         return profiles;
     }
 
     public DefaultModelBuildingRequest setProfiles( List<Profile> profiles )
     {
-        this.profiles.clear();
         if ( profiles != null )
         {
-            this.profiles.addAll( profiles );
+            this.profiles = new ArrayList<Profile>( profiles );
+        }
+        else
+        {
+            this.profiles = null;
         }
 
         return this;
@@ -101,15 +101,23 @@ public class DefaultModelBuildingRequest
 
     public List<String> getActiveProfileIds()
     {
+        if ( activeProfileIds == null )
+        {
+            activeProfileIds = new ArrayList<String>();
+        }
+
         return activeProfileIds;
     }
 
     public DefaultModelBuildingRequest setActiveProfileIds( List<String> activeProfileIds )
     {
-        this.activeProfileIds.clear();
         if ( activeProfileIds != null )
         {
-            this.activeProfileIds.addAll( activeProfileIds );
+            this.activeProfileIds = new ArrayList<String>( activeProfileIds );
+        }
+        else
+        {
+            this.activeProfileIds = null;
         }
 
         return this;
@@ -117,15 +125,23 @@ public class DefaultModelBuildingRequest
 
     public List<String> getInactiveProfileIds()
     {
+        if ( inactiveProfileIds == null )
+        {
+            inactiveProfileIds = new ArrayList<String>();
+        }
+
         return inactiveProfileIds;
     }
 
     public DefaultModelBuildingRequest setInactiveProfileIds( List<String> inactiveProfileIds )
     {
-        this.inactiveProfileIds.clear();
         if ( inactiveProfileIds != null )
         {
-            this.inactiveProfileIds.addAll( inactiveProfileIds );
+            this.inactiveProfileIds = new ArrayList<String>( inactiveProfileIds );
+        }
+        else
+        {
+            this.inactiveProfileIds = null;
         }
 
         return this;
@@ -133,15 +149,24 @@ public class DefaultModelBuildingRequest
 
     public Properties getExecutionProperties()
     {
+        if ( executionProperties == null )
+        {
+            executionProperties = new Properties();
+        }
+
         return executionProperties;
     }
 
     public DefaultModelBuildingRequest setExecutionProperties( Properties executionProperties )
     {
-        this.executionProperties.clear();
         if ( executionProperties != null )
         {
+            this.executionProperties = new Properties();
             this.executionProperties.putAll( executionProperties );
+        }
+        else
+        {
+            this.executionProperties = null;
         }
 
         return this;

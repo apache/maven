@@ -38,24 +38,25 @@ public class DefaultProfileActivationContext
 
     private Properties executionProperties;
 
-    public DefaultProfileActivationContext()
-    {
-        activeProfileIds = new ArrayList<String>();
-        inactiveProfileIds = new ArrayList<String>();
-        executionProperties = new Properties();
-    }
-
     public List<String> getActiveProfileIds()
     {
+        if ( activeProfileIds == null )
+        {
+            activeProfileIds = new ArrayList<String>();
+        }
+
         return activeProfileIds;
     }
 
     public DefaultProfileActivationContext setActiveProfileIds( List<String> activeProfileIds )
     {
-        this.activeProfileIds.clear();
         if ( activeProfileIds != null )
         {
-            this.activeProfileIds.addAll( activeProfileIds );
+            this.activeProfileIds = new ArrayList<String>( activeProfileIds );
+        }
+        else
+        {
+            this.activeProfileIds = null;
         }
 
         return this;
@@ -63,15 +64,23 @@ public class DefaultProfileActivationContext
 
     public List<String> getInactiveProfileIds()
     {
+        if ( inactiveProfileIds == null )
+        {
+            inactiveProfileIds = new ArrayList<String>();
+        }
+
         return inactiveProfileIds;
     }
 
     public DefaultProfileActivationContext setInactiveProfileIds( List<String> inactiveProfileIds )
     {
-        this.inactiveProfileIds.clear();
         if ( inactiveProfileIds != null )
         {
-            this.inactiveProfileIds.addAll( inactiveProfileIds );
+            this.inactiveProfileIds = new ArrayList<String>( inactiveProfileIds );
+        }
+        else
+        {
+            this.inactiveProfileIds = null;
         }
 
         return this;
@@ -79,15 +88,24 @@ public class DefaultProfileActivationContext
 
     public Properties getExecutionProperties()
     {
+        if ( executionProperties == null )
+        {
+            executionProperties = new Properties();
+        }
+
         return executionProperties;
     }
 
     public DefaultProfileActivationContext setExecutionProperties( Properties executionProperties )
     {
-        this.executionProperties.clear();
         if ( executionProperties != null )
         {
+            this.executionProperties = new Properties();
             this.executionProperties.putAll( executionProperties );
+        }
+        else
+        {
+            this.executionProperties = null;
         }
 
         return this;

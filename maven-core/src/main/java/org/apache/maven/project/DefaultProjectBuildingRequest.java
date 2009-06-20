@@ -38,7 +38,7 @@ public class DefaultProjectBuildingRequest
     private List<ArtifactRepository> pluginArtifactRepositories;
 
     private List<ModelEventListener> listeners;
-    
+
     private MavenProject topProject;
 
     private boolean lenientValidation;
@@ -68,13 +68,13 @@ public class DefaultProjectBuildingRequest
 
     public MavenProject getTopLevelProjectFromReactor()
     {
-    	return topProject;
+        return topProject;
     }
-    
-    public void setTopLevelProjectForReactor(MavenProject mavenProject)
+
+    public void setTopLevelProjectForReactor( MavenProject mavenProject )
     {
-    	this.topProject = mavenProject;
-    }       
+        this.topProject = mavenProject;
+    }
 
     public ProjectBuildingRequest setLocalRepository( ArtifactRepository localRepository )
     {
@@ -86,7 +86,7 @@ public class DefaultProjectBuildingRequest
     {
         return localRepository;
     }
-        
+
     public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
@@ -94,11 +94,13 @@ public class DefaultProjectBuildingRequest
 
     public ProjectBuildingRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
-        this.remoteRepositories.clear();
-
         if ( remoteRepositories != null )
         {
-            this.remoteRepositories.addAll( remoteRepositories );
+            this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
+        }
+        else
+        {
+            this.remoteRepositories.clear();
         }
 
         return this;
@@ -111,16 +113,18 @@ public class DefaultProjectBuildingRequest
 
     public ProjectBuildingRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
-        this.pluginArtifactRepositories.clear();
-
         if ( pluginArtifactRepositories != null )
         {
-            this.pluginArtifactRepositories.addAll( pluginArtifactRepositories );
+            this.pluginArtifactRepositories = new ArrayList<ArtifactRepository>( pluginArtifactRepositories );
+        }
+        else
+        {
+            this.pluginArtifactRepositories.clear();
         }
 
         return this;
     }
-    
+
     public Properties getExecutionProperties()
     {
         return executionProperties;
@@ -128,11 +132,14 @@ public class DefaultProjectBuildingRequest
 
     public ProjectBuildingRequest setExecutionProperties( Properties executionProperties )
     {
-        this.executionProperties.clear();
-
         if ( executionProperties != null )
         {
+            this.executionProperties = new Properties();
             this.executionProperties.putAll( executionProperties );
+        }
+        else
+        {
+            this.executionProperties.clear();
         }
 
         return this;
@@ -178,11 +185,13 @@ public class DefaultProjectBuildingRequest
 
     public void setActiveProfileIds( List<String> activeProfileIds )
     {
-        this.activeProfileIds.clear();
-
         if ( activeProfileIds != null )
         {
-            this.activeProfileIds.addAll( activeProfileIds );
+            this.activeProfileIds = new ArrayList<String>( activeProfileIds );
+        }
+        else
+        {
+            this.activeProfileIds.clear();
         }
     }
 
@@ -193,27 +202,31 @@ public class DefaultProjectBuildingRequest
 
     public void setInactiveProfileIds( List<String> inactiveProfileIds )
     {
-        this.inactiveProfileIds.clear();
-
         if ( inactiveProfileIds != null )
         {
-            this.inactiveProfileIds.addAll( inactiveProfileIds );
+            this.inactiveProfileIds = new ArrayList<String>( inactiveProfileIds );
+        }
+        else
+        {
+            this.inactiveProfileIds.clear();
         }
     }
 
     public void setProfiles( List<Profile> profiles )
     {
-        this.profiles.clear();
-
         if ( profiles != null )
         {
-            this.profiles.addAll( profiles );
+            this.profiles = new ArrayList<Profile>( profiles );
+        }
+        else
+        {
+            this.profiles.clear();
         }
     }
-    
+
     public void addProfile( Profile profile )
     {
-        profiles.add(profile);
+        profiles.add( profile );
     }
 
     public List<Profile> getProfiles()

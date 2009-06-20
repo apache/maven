@@ -217,28 +217,52 @@ public class DefaultMavenExecutionRequest
 
     public void setActiveProfiles( List<String> activeProfiles )
     {
-        getActiveProfiles().clear();
-        getActiveProfiles().addAll( activeProfiles );
+        if ( activeProfiles != null )
+        {
+            this.activeProfiles = new ArrayList<String>( activeProfiles );
+        }
+        else
+        {
+            this.activeProfiles = null;
+        }
     }
 
     public void setInactiveProfiles( List<String> inactiveProfiles )
     {
-        getInactiveProfiles().clear();
-        getInactiveProfiles().addAll( inactiveProfiles );
+        if ( inactiveProfiles != null )
+        {
+            this.inactiveProfiles = new ArrayList<String>( inactiveProfiles );
+        }
+        else
+        {
+            this.inactiveProfiles = null;
+        }
     }
 
     public MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
-        getRemoteRepositories().clear();
-        getRemoteRepositories().addAll( remoteRepositories );
+        if ( remoteRepositories != null )
+        {
+            this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
+        }
+        else
+        {
+            this.remoteRepositories = null;
+        }
         
         return this;
     }
 
     public MavenExecutionRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
-        getPluginArtifactRepositories().clear();
-        getPluginArtifactRepositories().addAll( pluginArtifactRepositories );
+        if ( pluginArtifactRepositories != null )
+        {
+            this.pluginArtifactRepositories = new ArrayList<ArtifactRepository>( pluginArtifactRepositories );
+        }
+        else
+        {
+            this.pluginArtifactRepositories = null;
+        }
         
         return this;
     }
@@ -328,8 +352,14 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setGoals( List<String> goals )
     {
-        getGoals().clear();
-        getGoals().addAll( goals );
+        if ( goals != null )
+        {
+            this.goals = new ArrayList<String>( goals );
+        }
+        else
+        {
+            this.goals = null;
+        }
 
         return this;
     }
@@ -357,8 +387,15 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setProperties( Properties properties )
     {
-        getProperties().clear();
-        getProperties().putAll( properties );
+        if ( properties != null )
+        {
+            this.properties = new Properties();
+            this.properties.putAll( properties );
+        }
+        else
+        {
+            this.properties = null;
+        }
 
         return this;
     }
@@ -511,8 +548,14 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setProxies( List proxies )
     {
-        getProxies().clear();
-        getProxies().addAll( proxies );
+        if ( proxies != null )
+        {
+            this.proxies = new ArrayList( proxies );
+        }
+        else
+        {
+            this.proxies = null;
+        }
 
         return this;
     }
@@ -528,8 +571,14 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setServers( List servers )
     {
-        getServers().clear();
-        getServers().addAll( servers );
+        if ( servers != null )
+        {
+            this.servers = new ArrayList( servers );
+        }
+        else
+        {
+            this.servers = null;
+        }
 
         return this;
     }
@@ -545,8 +594,14 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setMirrors( List mirrors )
     {
-        getMirrors().clear();
-        getMirrors().addAll( mirrors );
+        if ( mirrors != null )
+        {
+            this.mirrors = new ArrayList( mirrors );
+        }
+        else
+        {
+            this.mirrors = null;
+        }
 
         return this;
     }
@@ -562,8 +617,14 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setProfiles( List<Profile> profiles )
     {
-        getProfiles().clear();
-        getProfiles().addAll( profiles );
+        if ( profiles != null )
+        {
+            this.profiles = new ArrayList<Profile>( profiles );
+        }
+        else
+        {
+            this.profiles = null;
+        }
 
         return this;
     }
@@ -580,8 +641,14 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setPluginGroups( List<String> pluginGroups )
     {
-        getPluginGroups().clear();
-        getPluginGroups().addAll( pluginGroups );
+        if ( pluginGroups != null )
+        {
+            this.pluginGroups = new ArrayList<String>( pluginGroups );
+        }
+        else
+        {
+            this.pluginGroups = null;
+        }
 
         return this;
     }

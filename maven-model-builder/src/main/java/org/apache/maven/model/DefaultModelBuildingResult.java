@@ -135,11 +135,13 @@ class DefaultModelBuildingResult
 
     public DefaultModelBuildingResult setActiveExternalProfiles( List<Profile> activeProfiles )
     {
-        this.activeExternalProfiles.clear();
-
         if ( activeProfiles != null )
         {
-            this.activeExternalProfiles.addAll( activeProfiles );
+            this.activeExternalProfiles = new ArrayList<Profile>( activeProfiles );
+        }
+        else
+        {
+            this.activeExternalProfiles.clear();
         }
 
         return this;
