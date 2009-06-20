@@ -39,10 +39,10 @@ public interface ModelSource
         throws IOException;
 
     /**
-     * Provides a human-readable hint about the location of the POM. This could be a local file path, a URI or just an
+     * Provides a user-friendly hint about the location of the POM. This could be a local file path, a URI or just an
      * empty string. The intention is to assist users during error reporting.
      * 
-     * @return A human-readable hint about the location of the POM, never {@code null}.
+     * @return A user-friendly hint about the location of the POM, never {@code null}.
      */
     String getLocation();
 
