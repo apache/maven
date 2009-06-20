@@ -459,7 +459,7 @@ public class DefaultModelBuilder
     {
         if ( superModel == null )
         {
-            InputStream is = getClass().getResourceAsStream( "/org/apache/maven/project/pom-4.0.0.xml" );
+            InputStream is = getClass().getResourceAsStream( "/org/apache/maven/model/pom-4.0.0.xml" );
             try
             {
                 superModel = modelReader.read( is, null );
