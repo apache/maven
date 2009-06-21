@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +125,8 @@ public class MavenProject
     private ArtifactRepository snapshotArtifactRepository;
 
     private List<Profile> activeProfiles = new ArrayList<Profile>();
+
+    private Map<String, List<String>> injectedProfileIds = new LinkedHashMap<String, List<String>>();
 
     private Set<Artifact> dependencyArtifacts;
 
@@ -1409,6 +1412,33 @@ public class MavenProject
     public List<Profile> getActiveProfiles()
     {
         return activeProfiles;
+    }
+
+    public void setInjectedProfileIds( String source, List<String> injectedProfileIds )
+    {
+        if ( injectedProfileIds != null )
+        {
+            this.injectedProfileIds.put( source, new ArrayList<String>( injectedProfileIds ) );
+        }
+        else
+        {
+            this.injectedProfileIds.remove( source );
+        }
+    }
+
+    /**
+     * Gets the identifiers of all profiles that contributed to this project's effective model. This includes active
+     * profiles from the project's POM and all its parent POMs as well as from external sources like the {@code
+     * settings.xml}. The profile identifiers are grouped by the identifier of their source, e.g. {@code
+     * <groupId>:<artifactId>:<version>} for a POM profile or {@code external} for profiles from the {@code
+     * settings.xml}.
+     * 
+     * @return The identifiers of all injected profiles, indexed by the source from which the profiles originated, never
+     *         {@code null}.
+     */
+    public Map<String, List<String>> getInjectedProfileIds()
+    {
+        return this.injectedProfileIds;
     }
 
     public void addAttachedArtifact( Artifact artifact )

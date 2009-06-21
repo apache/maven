@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +46,7 @@ import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
@@ -55,6 +58,10 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 public class DefaultMaven
     implements Maven
 {
+
+    @Requirement
+    private Logger logger;
+
     @Requirement
     protected ProjectBuilder projectBuilder;
 
@@ -140,7 +147,9 @@ public class DefaultMaven
         }        
 
         lifecycleExecutor.execute( session );
-        
+
+        validateActivatedProfiles( session.getProjects(), request.getActiveProfiles() );
+
         if ( session.getResult().hasExceptions() )
         {        
             return processResult( result, session.getResult().getExceptions().get( 0 ) );
@@ -246,4 +255,23 @@ public class DefaultMaven
 
         return projects;
     }
+
+    private void validateActivatedProfiles( List<MavenProject> projects, List<String> activeProfileIds )
+    {
+        Collection<String> notActivatedProfileIds = new LinkedHashSet<String>( activeProfileIds );
+
+        for ( MavenProject project : projects )
+        {
+            for ( List<String> profileIds : project.getInjectedProfileIds().values() )
+            {
+                notActivatedProfileIds.removeAll( profileIds );
+            }
+        }
+
+        for ( String notActivatedProfileId : notActivatedProfileIds )
+        {
+            logger.warn( "Profile with id \"" + notActivatedProfileId + "\" has not been activated." );
+        }
+    }
+
 }

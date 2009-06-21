@@ -133,8 +133,26 @@ public class DefaultProjectBuilder
         activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
         activeProfiles.addAll( result.getActiveExternalProfiles() );
         project.setActiveProfiles( activeProfiles );
-                
+
+        project.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
+        for ( String modelId : result.getModelIds() )
+        {
+            project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
+        }
+
         return project;
+    }
+
+    private List<String> getProfileIds( List<Profile> profiles )
+    {
+        List<String> ids = new ArrayList<String>( profiles.size() );
+
+        for ( Profile profile : profiles )
+        {
+            ids.add( profile.getId() );
+        }
+
+        return ids;
     }
 
     private ModelBuildingRequest getModelBuildingRequest( ProjectBuildingRequest configuration )
