@@ -33,7 +33,7 @@ import org.apache.maven.wagon.repository.Repository;
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
  */
-//TODO: this needs to be decoupled from Wagon
+@Deprecated
 public class DefaultArtifactRepository
     extends Repository
     implements ArtifactRepository

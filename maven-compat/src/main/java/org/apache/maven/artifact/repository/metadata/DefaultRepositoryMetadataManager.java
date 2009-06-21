@@ -81,16 +81,8 @@ public class DefaultRepositoryMetadataManager
                 }
                 catch ( TransferFailedException e )
                 {
-                    getLogger().warn(
-                                      metadata + " could not be retrieved from repository: " + repository.getId()
-                                          + " due to an error: " + e.getMessage() );
+                    getLogger().warn( metadata + " could not be retrieved from repository: " + repository.getId() + " due to an error: " + e.getMessage() );
                     getLogger().debug( "Exception", e );
-
-                    getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
-                    repository.setBlacklisted( true );
-
-                    // TODO: [jc; 08-Nov-2005] revisit this for 2.1
-                    // suppressing logging to avoid logging this error twice.
                 }
                 finally
                 {

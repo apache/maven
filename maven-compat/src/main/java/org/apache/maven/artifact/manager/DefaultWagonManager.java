@@ -333,10 +333,7 @@ public class DefaultWagonManager
         {            
             logger.debug( "Skipping disabled repository " + repository.getId() );
         }
-        else if ( repository.isBlacklisted() )
-        {
-            logger.debug( "Skipping blacklisted repository " + repository.getId() );
-        }
+        
         // If the artifact is a snapshot, we need to determine whether it's time to check this repository for an update:
         // 1. If it's forced, then check
         // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.        

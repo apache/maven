@@ -30,8 +30,6 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 public class MavenArtifactRepository
     implements ArtifactRepository
 {
-    public static final int UNKNOWN_PORT = -1;
-    
     private String id;
     
     private String url;
@@ -67,24 +65,13 @@ public class MavenArtifactRepository
         this.id = id;
         this.url = url;
         this.layout = layout;
-        
+        this.snapshots = snapshots;
+        this.releases = releases;        
         //
         // Derive these from the URL
         //
         this.protocol = protocol( url );
         this.basedir = basedir( url );            
-        this.snapshots = snapshots;
-        this.releases = releases;
-
-        if ( this.snapshots == null )
-        {
-            this.snapshots = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
-        }
-
-        if ( this.releases == null )
-        {
-            this.releases = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
-        }        
     }
 
     public String pathOf( Artifact artifact )
@@ -332,7 +319,7 @@ public class MavenArtifactRepository
             return false;
         }
         
-        final ArtifactRepository other = (ArtifactRepository) obj;
+        ArtifactRepository other = (ArtifactRepository) obj;
         
         if ( id == null )
         {

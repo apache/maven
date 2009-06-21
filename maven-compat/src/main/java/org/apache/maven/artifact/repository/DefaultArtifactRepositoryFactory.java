@@ -103,17 +103,6 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
     {
-        boolean blacklisted = false;
-        if ( artifactRepositories.containsKey( id ) )
-        {
-            ArtifactRepository repository = artifactRepositories.get( id );
-            // TODO: this should be an if there are duplicates?
-            if ( repository.getUrl().equals( url ) )
-            {
-                blacklisted = repository.isBlacklisted();
-            }
-        }
-
         if ( snapshots == null )
         {
             snapshots = new ArtifactRepositoryPolicy();
@@ -137,7 +126,6 @@ public class DefaultArtifactRepositoryFactory
         }
 
         ArtifactRepository repository = new MavenArtifactRepository( id, url, repositoryLayout, snapshots, releases );
-        repository.setBlacklisted( blacklisted );
 
         artifactRepositories.put( id, repository );
 

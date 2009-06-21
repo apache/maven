@@ -52,10 +52,6 @@ public interface ArtifactRepository
     void setLayout( ArtifactRepositoryLayout layout );
 
     String getKey();
-
-    void setBlacklisted( boolean blackListed );
-
-    boolean isBlacklisted();
     
     // New interface methods for the repository system. 
     
