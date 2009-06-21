@@ -166,5 +166,25 @@ public final class CLIReportingUtils
 
         return properties;
     }
-    
+
+    public static void showError( String message, Exception e, boolean showStackTrace )
+    {
+        System.err.println( message );
+
+        if ( showStackTrace )
+        {
+            e.printStackTrace();
+        }
+        else
+        {
+            System.err.println( e.getMessage() );
+
+            for ( Throwable cause = e.getCause(); cause != null; cause = cause.getCause() )
+            {
+                System.err.print( "Caused by: " );
+                System.err.println( cause.getMessage() );
+            }
+        }
+    }
+
 }

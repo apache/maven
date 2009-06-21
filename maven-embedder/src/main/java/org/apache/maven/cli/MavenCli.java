@@ -131,14 +131,14 @@ public class MavenCli
 
         if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
         {
-            //TODO: CLIReportingUtils.showError( "Error reading user settings: ", cvr.getUserSettingsException(), showErrors );
+            CLIReportingUtils.showError( "Error reading user settings: ", cvr.getUserSettingsException(), showErrors );
 
             return 1;
         }
 
         if ( cvr.isGlobalSettingsFilePresent() && !cvr.isGlobalSettingsFileParses() )
         {
-            //TODO: CLIReportingUtils.showError( "Error reading global settings: ", cvr.getGlobalSettingsException(), showErrors );
+            CLIReportingUtils.showError( "Error reading global settings: ", cvr.getGlobalSettingsException(), showErrors );
 
             return 1;
         }
@@ -159,7 +159,7 @@ public class MavenCli
         }
         catch ( MavenEmbedderException e )
         {
-            //TODO: CLIReportingUtils.showError( "Unable to start the embedder: ", e, showErrors );
+            CLIReportingUtils.showError( "Unable to start the embedder: ", e, showErrors );
 
             return 1;
         }
