@@ -352,6 +352,14 @@ public class DefaultLifecycleExecutor
 
         //TODO: need to separate the lifecycles
 
+        if ( lifecycle == null )
+        {
+            logger.info( "Invalid task '"
+                + lifecyclePhase
+                + "' : you must specify a valid lifecycle phase, or a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal" );
+            throw new MojoNotFoundException( lifecyclePhase, null );
+        }
+        
         for ( String phase : lifecycle.getPhases() )
         {
             List<MojoExecution> mojos = new ArrayList<MojoExecution>();
