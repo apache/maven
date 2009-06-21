@@ -21,7 +21,9 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -57,7 +59,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         List logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
+        assertNull( findWarning( logFile, "mng-3641-it-provided-profile" ) );
 
         // (2) make sure the profile was not found and a warning was printed.
         verifier = new Verifier( testDir.getAbsolutePath() );
@@ -68,7 +70,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertTrue( logFile.contains( "Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
+        assertNotNull( findWarning( logFile, "mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" ) );
 
         // (3) make sure the first profile is found while the other is not and a warning was printed
         // accordingly.
@@ -80,8 +82,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
-        assertTrue( logFile.contains( "Profile with id: 'mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p' has not been activated." ) );
+        assertNull( findWarning( logFile, "mng-3641-it-provided-profile" ) );
+        assertNotNull( findWarning( logFile, "mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" ) );
 
         // (4) make sure the warning is only printed when the profile is missing in all projects
         verifier = new Verifier( testDir.getAbsolutePath() );
@@ -92,7 +94,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile-child' has not been activated." ) );
+        assertNull( findWarning( logFile, "mng-3641-it-provided-profile-child" ) );
 
         // (5) make sure the profile is found in subproject. Must not contain a warning.
         verifier = new Verifier( new File( testDir, "child1" ).getAbsolutePath() );
@@ -103,7 +105,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile-child' has not been activated." ) );
+        assertNull( findWarning( logFile, "mng-3641-it-provided-profile-child" ) );
 
         // (6) make sure the profile is found from parent in subproject. Must not contain a warning.
         verifier = new Verifier( new File( testDir, "child1" ).getAbsolutePath() );
@@ -114,7 +116,24 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        assertFalse( logFile.contains( "Profile with id: 'mng-3641-it-provided-profile' has not been activated." ) );
-
+        assertNull( findWarning( logFile, "mng-3641-it-provided-profile" ) );
     }
+
+    private String findWarning( List logLines, String profileId )
+    {
+        Pattern pattern = Pattern.compile( "(?i).*profile\\s.*\\Q" + profileId + "\\E.*\\snot\\s.*activated.*" );
+
+        for ( Iterator it = logLines.iterator(); it.hasNext(); )
+        {
+            String logLine = (String) it.next();
+
+            if ( pattern.matcher( logLine ).matches() )
+            {
+                return logLine;
+            }
+        }
+
+        return null;
+    }
+
 }
