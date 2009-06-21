@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-768">MNG-768</a>.
@@ -65,14 +63,12 @@ public class MavenITmng0768OfflineModeTest
         }
 
         {
-            // phase 2: run build in offline mode to check it still passes (after deleting test repo, to be sure)
+            // phase 2: run build in offline mode to check it still passes
+            // NOTE: We don't add the settings here to ensure Maven has no chance to access the required remote repo
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
-            verifier.deleteDirectory( "repo" );
-            List cliOptions = new ArrayList();
-            cliOptions.add( "-o" );
-            verifier.setCliOptions( cliOptions );
+            verifier.getCliOptions().add( "-o" );
             verifier.setLogFileName( "log2.txt" );
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
             verifier.assertFilePresent( "target/compile.txt" );
@@ -82,19 +78,20 @@ public class MavenITmng0768OfflineModeTest
 
         {
             // phase 3: delete test artifact and run build in offline mode to check it fails now
+            // NOTE: We add the settings again to offer Maven the bad choice of using the remote repo
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.it0069" );
-            List cliOptions = new ArrayList();
-            cliOptions.add( "-o" );
-            verifier.setCliOptions( cliOptions );
+            verifier.getCliOptions().add( "-o" );
+            verifier.getCliOptions().add( "--settings" );
+            verifier.getCliOptions().add( "settings.xml" );
             verifier.setLogFileName( "log3.txt" );
             try
             {
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
                 verifier.verifyErrorFreeLog();
-                fail( "Build did not fail!" );
+                fail( "Build did not fail to resolve missing dependency although Maven ought to work offline!" );
             }
             catch( VerificationException e )
             {
