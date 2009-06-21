@@ -187,16 +187,52 @@ public class DefaultMaven
         
         List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
 
-        Map<String,MavenProject> projects = collectProjects( files, request );
+        List<MavenProject> projects = new ArrayList<MavenProject>();
 
-        return projects;
+        collectProjects( projects, files, request );
+
+        Map<String, MavenProject> index = new LinkedHashMap<String, MavenProject>();
+        Map<String, List<File>> collisions = new LinkedHashMap<String, List<File>>();
+
+        for ( MavenProject project : projects )
+        {
+            String projectId = ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+
+            MavenProject collision = index.get( projectId );
+
+            if ( collision == null )
+            {
+                index.put( projectId, project );
+            }
+            else
+            {
+                List<File> pomFiles = collisions.get( projectId );
+
+                if ( pomFiles == null )
+                {
+                    pomFiles = new ArrayList<File>( Arrays.asList( collision.getFile(), project.getFile() ) );
+                    collisions.put( projectId, pomFiles );
+                }
+                else
+                {
+                    pomFiles.add( project.getFile() );
+                }
+            }
+        }
+
+        if ( !collisions.isEmpty() )
+        {
+            throw new org.apache.maven.DuplicateProjectException( "Two or more projects in the reactor"
+                + " have the same identifier, please make sure that <groupId>:<artifactId>:<version>"
+                + " is unique for each project: " + collisions, collisions );
+        }
+
+        return index;
     }
 
-    private Map<String,MavenProject> collectProjects( List<File> files, MavenExecutionRequest request )
+    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
-        Map<String,MavenProject> projects = new LinkedHashMap<String,MavenProject>();
-
         for ( File file : files )
         {
             MavenProject project = projectBuilder.build( file, request.getProjectBuildingRequest() );
@@ -245,15 +281,11 @@ public class DefaultMaven
                     moduleFiles.add( moduleFile );
                 }
 
-                Map<String,MavenProject> collectedProjects = collectProjects( moduleFiles, request );
-
-                projects.putAll( collectedProjects );                
+                collectProjects( projects, moduleFiles, request );
             }
-            
-            projects.put( ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
-        }
 
-        return projects;
+            projects.add( project );
+        }
     }
 
     private void validateActivatedProfiles( List<MavenProject> projects, List<String> activeProfileIds )
