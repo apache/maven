@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.validation.ModelValidationResult;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
@@ -37,11 +38,13 @@ public abstract class AbstractMavenProjectTestCase
 {
     protected ProjectBuilder projectBuilder;
 
+    protected RepositorySystem repositorySystem;
+    
     protected void setUp()
         throws Exception
     {
         super.setUp();
-
+        
         if ( getContainer().hasComponent( ProjectBuilder.class, "test" ) )
         {
             projectBuilder = lookup( ProjectBuilder.class, "test" );
@@ -51,6 +54,8 @@ public abstract class AbstractMavenProjectTestCase
             // default over to the main project builder...
             projectBuilder = lookup( ProjectBuilder.class );
         }
+        
+        repositorySystem = lookup( RepositorySystem.class );        
     }    
 
     @Override
@@ -70,7 +75,9 @@ public abstract class AbstractMavenProjectTestCase
     @Override
     protected String getCustomConfigurationName()
     {
-        return AbstractMavenProjectTestCase.class.getName().replace( '.', '/' ) + ".xml";
+        String name = AbstractMavenProjectTestCase.class.getName().replace( '.', '/' ) + ".xml";
+        System.out.println( name );
+        return name;
     }
 
     // ----------------------------------------------------------------------
@@ -105,7 +112,7 @@ public abstract class AbstractMavenProjectTestCase
     {
         ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
 
-        ArtifactRepository r = new DefaultArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout );
+        ArtifactRepository r = repositorySystem.createArtifactRepository( "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout, null, null );
 
         return r;
     }

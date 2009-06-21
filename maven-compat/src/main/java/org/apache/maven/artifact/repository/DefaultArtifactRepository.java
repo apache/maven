@@ -45,10 +45,6 @@ public class DefaultArtifactRepository
     private ArtifactRepositoryPolicy releases;
 
     private boolean blacklisted;
-
-    public DefaultArtifactRepository()
-    {
-    }
     
     /**
      * Create a local repository or a test repository.

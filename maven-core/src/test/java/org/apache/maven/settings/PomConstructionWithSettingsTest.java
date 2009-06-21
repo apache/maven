@@ -12,6 +12,7 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.IOUtil;
@@ -26,6 +27,8 @@ public class PomConstructionWithSettingsTest
     private static String BASE_POM_DIR = BASE_DIR + "/resources-settings";
 
     private DefaultProjectBuilder projectBuilder;
+    
+    private RepositorySystem repositorySystem;
 
     private File testDirectory;
 
@@ -34,6 +37,7 @@ public class PomConstructionWithSettingsTest
     {
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         projectBuilder = (DefaultProjectBuilder) lookup( ProjectBuilder.class );
+        repositorySystem = lookup( RepositorySystem.class );
     }
 
     @Override
@@ -83,7 +87,7 @@ public class PomConstructionWithSettingsTest
 	    
         String localRepoUrl = System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
         localRepoUrl = "file://" + localRepoUrl;
-        config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
+        config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null, null ) );
         config.setActiveProfileIds( settings.getActiveProfiles() );
         
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ) );        

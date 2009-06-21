@@ -1,6 +1,7 @@
 package org.apache.maven.repository;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
@@ -9,11 +10,13 @@ public class MirrorProcessorTest
     extends PlexusTestCase
 {
     private DefaultMirrorBuilder mirrorBuilder;
+    private ArtifactRepositoryFactory repositorySystem;
     
     protected void setUp()
         throws Exception
     {
         mirrorBuilder = (DefaultMirrorBuilder) lookup( MirrorBuilder.class );
+        repositorySystem = lookup( ArtifactRepositoryFactory.class );
         mirrorBuilder.clearMirrors();
     }
     
@@ -179,7 +182,7 @@ public class MirrorProcessorTest
      */
     private ArtifactRepository getRepo( String id, String url )
     {
-        return new DefaultArtifactRepository( id, url, new DefaultRepositoryLayout() );
+        return repositorySystem.createArtifactRepository( id, url, new DefaultRepositoryLayout(), null, null );
     }
 
     /**

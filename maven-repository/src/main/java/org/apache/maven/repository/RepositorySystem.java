@@ -25,6 +25,8 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.Dependency;
@@ -75,6 +77,8 @@ public interface RepositorySystem
     ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException;
 
+    ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases );
+    
     /**
      * Calculates the effective repositories for the given input repositories. This process will essentially remove
      * duplicate repositories by merging them into one equivalent repository. It is worth to point out that merging does

@@ -30,6 +30,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -62,15 +63,16 @@ public class DefaultWagonManagerTest
     private TransferListener transferListener = new Debug();
 
     private ArtifactFactory artifactFactory;
+    
+    private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
-
-        wagonManager = (DefaultWagonManager) lookup( WagonManager.class );
-        
-        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        wagonManager = (DefaultWagonManager) lookup( WagonManager.class );        
+        artifactFactory = lookup( ArtifactFactory.class );
+        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
     }
     
     @Override
@@ -91,8 +93,8 @@ public class DefaultWagonManagerTest
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
 
         List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
-        repos.add(new DefaultArtifactRepository( "repo1", "string://url1", new ArtifactRepositoryLayoutStub() ));
-        repos.add(new DefaultArtifactRepository( "repo2", "string://url2", new ArtifactRepositoryLayoutStub() ));
+        repos.add(artifactRepositoryFactory.createArtifactRepository( "repo1", "string://url1", new ArtifactRepositoryLayoutStub(), null, null ));
+        repos.add(artifactRepositoryFactory.createArtifactRepository( "repo2", "string://url2", new ArtifactRepositoryLayoutStub(), null, null ));
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repos.get(0).getLayout().pathOf( artifact ), "expected" );
@@ -259,12 +261,9 @@ public class DefaultWagonManagerTest
 
     private ArtifactRepository createStringRepo()
     {
-        ArtifactRepository repo =
-            new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub() );
-        return repo;
+        return artifactRepositoryFactory.createArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), null, null );
     }
     
-
     /**
      * Build an ArtifactRepository object.
      * 
@@ -274,7 +273,7 @@ public class DefaultWagonManagerTest
      */
     private ArtifactRepository getRepo( String id, String url )
     {
-        return new DefaultArtifactRepository( id, url, new DefaultRepositoryLayout() );
+        return artifactRepositoryFactory.createArtifactRepository( id, url, new DefaultRepositoryLayout(), null, null );
     }
 
     /**
@@ -369,11 +368,9 @@ public class DefaultWagonManagerTest
     public void xtestChecksumVerification()
         throws Exception
     {
-        ArtifactRepositoryPolicy policy =
-            new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                                          ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL );
-        ArtifactRepository repo =
-            new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
+        ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL );
+        
+        ArtifactRepository repo = artifactRepositoryFactory.createArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
 
         Artifact artifact =
             new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ), "scope",

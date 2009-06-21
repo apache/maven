@@ -299,6 +299,11 @@ public class LegacyRepositorySystem
         return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
     }
 
+    public ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
+    {
+        return artifactRepositoryFactory.createArtifactRepository( id, url, repositoryLayout, snapshots, releases );
+    }
+    
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
         /*

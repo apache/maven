@@ -32,6 +32,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -62,12 +63,14 @@ public class PluginParameterExpressionEvaluatorTest
     private static final String FS = System.getProperty( "file.separator" );
 
     private ArtifactFactory factory;
+    private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     public void setUp()
         throws Exception
     {
         super.setUp();
         factory = lookup( ArtifactFactory.class );        
+        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );        
     }
     
     @Override
@@ -343,7 +346,7 @@ public class PluginParameterExpressionEvaluatorTest
             createExpressionEvaluator( createDefaultProject(), null, new Properties() );
         Object value = expressionEvaluator.evaluate( "${localRepository}" );
 
-        assertEquals( "local", ( (DefaultArtifactRepository) value ).getId() );
+        assertEquals( "local", ( (ArtifactRepository) value ).getId() );
     }
 
     public void testTwoExpressions()
@@ -398,7 +401,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
 
-        ArtifactRepository repo = new DefaultArtifactRepository( "local", "target/repo", repoLayout );
+        ArtifactRepository repo = artifactRepositoryFactory.createArtifactRepository( "local", "target/repo", repoLayout, null, null );
 
         MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
         MavenSession session = createSession( container, repo, executionProperties );

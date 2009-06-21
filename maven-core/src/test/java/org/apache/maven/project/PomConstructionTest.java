@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.harness.PomTestWrapper;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class PomConstructionTest
@@ -41,7 +42,9 @@ public class PomConstructionTest
     private static String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
 
     private DefaultProjectBuilder projectBuilder;
-
+    
+    private RepositorySystem repositorySystem;
+    
     private File testDirectory;
 
     protected void setUp()
@@ -50,6 +53,7 @@ public class PomConstructionTest
         testDirectory = new File( getBasedir(), BASE_POM_DIR );
         new File( getBasedir(), BASE_MIXIN_DIR );
         projectBuilder = (DefaultProjectBuilder) lookup( ProjectBuilder.class );
+        repositorySystem = lookup( RepositorySystem.class );
     }
     
     @Override
@@ -1671,7 +1675,7 @@ public class PomConstructionTest
         String localRepoUrl =
             System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
         localRepoUrl = "file://" + localRepoUrl;
-        config.setLocalRepository( new DefaultArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout() ) );
+        config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null, null ) );
         config.setActiveProfileIds( Arrays.asList( profileIds ) );
         config.setExecutionProperties( executionProperties );
         config.setLenientValidation( lenientValidation );

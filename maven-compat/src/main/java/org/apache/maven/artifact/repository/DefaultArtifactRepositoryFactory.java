@@ -19,12 +19,9 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.component.annotations.Component;
@@ -83,7 +80,7 @@ public class DefaultArtifactRepositoryFactory
                                                                   ArtifactRepositoryLayout repositoryLayout,
                                                                   boolean uniqueVersion )
     {
-        return new DefaultArtifactRepository( id, url, repositoryLayout, uniqueVersion );
+        return createArtifactRepository( id, url, repositoryLayout, null, null );
     }
 
     public ArtifactRepository createArtifactRepository( String id,
@@ -139,7 +136,7 @@ public class DefaultArtifactRepositoryFactory
             releases.setChecksumPolicy( globalChecksumPolicy );
         }
 
-        DefaultArtifactRepository repository = new DefaultArtifactRepository( id, url, repositoryLayout, snapshots, releases );
+        ArtifactRepository repository = new MavenArtifactRepository( id, url, repositoryLayout, snapshots, releases );
         repository.setBlacklisted( blacklisted );
 
         artifactRepositories.put( id, repository );
@@ -156,30 +153,4 @@ public class DefaultArtifactRepositoryFactory
     {
         globalChecksumPolicy = checksumPolicy;
     }
-
-    public ArtifactRepository createLocalRepository( File localRepositoryDirectory )
-        throws InvalidRepositoryException
-    {
-        ArtifactRepositoryLayout layout = getLayout( DEFAULT_LAYOUT_ID );
-        DefaultArtifactRepository repo;
-        try
-        {
-            repo = new DefaultArtifactRepository( LOCAL_REPOSITORY_ID,
-                localRepositoryDirectory.toURI()
-                    .toURL()
-                    .toExternalForm(),
-                layout, new ArtifactRepositoryPolicy(),
-                new ArtifactRepositoryPolicy() );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new InvalidRepositoryException( "Invalid local repository directory: "
-                + localRepositoryDirectory
-                + ". Cannot render URL.", LOCAL_REPOSITORY_ID, e );
-        }
-
-        repo.setBasedir( localRepositoryDirectory.getAbsolutePath() );
-
-        return repo;
-    }
-}
+ }

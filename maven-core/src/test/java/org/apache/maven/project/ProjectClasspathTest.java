@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Iterator;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.repository.RepositorySystem;
 
 public class ProjectClasspathTest
     extends AbstractMavenProjectTestCase
@@ -36,6 +37,8 @@ public class ProjectClasspathTest
 
         // the metadata source looks up the default impl, so we have to trick it
         getContainer().addComponent( projectBuilder, ProjectBuilder.class, "default" );
+        
+        repositorySystem = lookup( RepositorySystem.class );        
     }
    
     @Override

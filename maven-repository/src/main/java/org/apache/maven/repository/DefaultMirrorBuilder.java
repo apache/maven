@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -60,7 +61,7 @@ public class DefaultMirrorBuilder
             logger.warn( "You are using a mirror that doesn't declare an <id/> element. Using \'" + id + "\' instead:\nId: " + id + "\nmirrorOf: " + mirrorOf + "\nurl: " + url + "\n" );
         }
 
-        ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
+        ArtifactRepository mirror = repositoryFactory.createArtifactRepository( id, url, (ArtifactRepositoryLayout)null, null, null );
 
         if ( !mirrors.containsKey( mirrorOf ) )
         {

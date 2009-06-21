@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -43,13 +44,15 @@ public abstract class AbstractArtifactComponentTestCase
 {
     protected ArtifactFactory artifactFactory;
 
+    protected ArtifactRepositoryFactory artifactRepositoryFactory;
+    
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-
-        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+        artifactFactory = lookup( ArtifactFactory.class);        
+        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
     }
     
     @Override
@@ -80,7 +83,7 @@ public abstract class AbstractArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
-        return new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
+        return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout, null, null );
     }
 
     protected String getRepositoryLayout()
@@ -98,7 +101,7 @@ public abstract class AbstractArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
-        return new DefaultArtifactRepository( "local", "file://" + f.getPath(), repoLayout );
+        return artifactRepositoryFactory.createArtifactRepository( "local", "file://" + f.getPath(), repoLayout, null, null );
     }
 
     protected ArtifactRepository remoteRepository()
@@ -111,7 +114,7 @@ public abstract class AbstractArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
-        return new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
+        return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
                                               new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
     }
 
@@ -121,7 +124,7 @@ public abstract class AbstractArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
-        return new DefaultArtifactRepository( "test", "http://foo.bar/repository", repoLayout );
+        return artifactRepositoryFactory.createArtifactRepository( "test", "http://foo.bar/repository", repoLayout, null, null );
     }
 
     protected void assertRemoteArtifactPresent( Artifact artifact )
