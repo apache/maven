@@ -78,9 +78,6 @@
                 <relocation>
                   <pattern>org.apache.jackrabbit</pattern>
                 </relocation>
-                <relocation>
-                  <pattern>org.slf4j</pattern>
-                </relocation>
 
                 <!-- For http/webdav wagons -->
                 <relocation>
@@ -90,7 +87,7 @@
                   <pattern>org.apache.commons.logging</pattern>
                 </relocation>
                 <relocation>
-                  <pattern>org.apache.log4j</pattern>
+                  <pattern>org.slf4j</pattern>
                 </relocation>
 
                 <!-- For maven-artifact-manager -->
