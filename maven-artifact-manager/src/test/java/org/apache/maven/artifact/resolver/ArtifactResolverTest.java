@@ -361,5 +361,60 @@ public class ArtifactResolverTest
 
         control.verify();
     }
+
+    /**
+     * Test deadlocking in case a transfer error occurs within a group of multiple artifacts (MNG-4179).
+     */
+    public void testResolveMultipleWithException()
+        throws Exception
+    {
+        ArtifactRepository repository = remoteRepository();
+        List remoteRepositories = Collections.singletonList( repository );
+
+        Artifact a1 = createArtifact( "testGroup", "artifactId", "1.0", "jar" );
+
+        Artifact a2 = createArtifact( "testGroup", "anotherId", "1.0", "jar" );
+
+        ArtifactMetadataSource mds = new ArtifactMetadataSourceImplementation();
+
+        DefaultArtifactResolver artifactResolver = (DefaultArtifactResolver) this.artifactResolver;
+
+        MockControl control = MockControl.createControl( WagonManager.class );
+        WagonManager wagonManager = (WagonManager) control.getMock();
+        artifactResolver.setWagonManager( wagonManager );
+
+        wagonManager.isOnline();
+        control.setReturnValue( true );
+        wagonManager.getArtifact( a1, remoteRepositories );
+        control.setThrowable( new TransferFailedException( "message" ) );
+        wagonManager.getMirrorRepository( repository );
+        control.setReturnValue( repository );
+
+        wagonManager.isOnline();
+        control.setReturnValue( true );
+        wagonManager.getArtifact( a2, remoteRepositories );
+        control.setThrowable( new TransferFailedException( "message" ) );
+        wagonManager.getMirrorRepository( repository );
+        control.setReturnValue( repository );
+
+        control.replay();
+
+        try
+        {
+            artifactResolver.resolveTransitively( new LinkedHashSet( Arrays.asList( new Artifact[] { a1, a2 } ) ),
+                                                  projectArtifact, remoteRepositories, localRepository(), mds );
+            fail( "Resolution succeeded when it should have failed" );
+        }
+        catch ( ArtifactResolutionException expected )
+        {
+            List repos = expected.getRemoteRepositories();
+            assertEquals( 1, repos.size() );
+            assertEquals( "test", ( (ArtifactRepository) repos.get( 0 ) ).getId() );
+
+            assertEquals( "testGroup", expected.getGroupId() );
+        }
+
+        control.verify();
+    }
 }
 
