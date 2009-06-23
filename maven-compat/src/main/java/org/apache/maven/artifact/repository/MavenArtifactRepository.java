@@ -225,7 +225,7 @@ public class MavenArtifactRepository
      * @param url the url
      * @return the host name
      */
-    public static String protocol( final String url )
+    private static String protocol( final String url )
     {
         final int pos = url.indexOf( ":" );
 
@@ -243,13 +243,14 @@ public class MavenArtifactRepository
      * @return the basedir of the repository
      * @todo need to URL decode for spaces?
      */
-    public String basedir( String url )
+    private String basedir( String url )
     {
         String retValue = null;
 
         if ( protocol.equalsIgnoreCase( "file" ) )
         {
             retValue = url.substring( protocol.length() + 1 );
+            retValue = decode( retValue );
             // special case: if omitted // on protocol, keep path as is
             if ( retValue.startsWith( "//" ) )
             {
@@ -295,7 +296,33 @@ public class MavenArtifactRepository
         }
         return retValue.trim();
     }
-    
+
+    /**
+     * Decodes the specified (portion of a) URL. <strong>Note:</strong> This decoder assumes that ISO-8859-1 is used to
+     * convert URL-encoded octets to characters.
+     * 
+     * @param url The URL to decode, may be <code>null</code>.
+     * @return The decoded URL or <code>null</code> if the input was <code>null</code>.
+     */
+    private static String decode( String url )
+    {
+        String decoded = url;
+        if ( url != null )
+        {
+            int pos = -1;
+            while ( ( pos = decoded.indexOf( '%', pos + 1 ) ) >= 0 )
+            {
+                if ( pos + 2 < decoded.length() )
+                {
+                    String hexStr = decoded.substring( pos + 1, pos + 3 );
+                    char ch = (char) Integer.parseInt( hexStr, 16 );
+                    decoded = decoded.substring( 0, pos ) + ch + decoded.substring( pos + 3 );
+                }
+            }
+        }
+        return decoded;
+    }
+
     public int hashCode()
     {
         final int prime = 31;
