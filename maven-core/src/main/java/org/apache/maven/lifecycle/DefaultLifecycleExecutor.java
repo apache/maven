@@ -788,8 +788,12 @@ public class DefaultLifecycleExecutor
         {
             LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
 
-            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );                                                           
-            
+            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration = null;
+            if ( lifecycleMappingForPackaging != null )
+            {
+                lifecycleConfiguration = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
+            }
+
             if ( lifecycleConfiguration != null )
             {
                 Map<String, String> lifecyclePhasesForPackaging = lifecycleConfiguration.getPhases();
