@@ -306,4 +306,9 @@ public class DefaultMaven
         }
     }
 
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
 }
