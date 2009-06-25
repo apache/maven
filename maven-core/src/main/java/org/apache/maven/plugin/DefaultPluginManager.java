@@ -509,8 +509,8 @@ public class DefaultPluginManager
             }
             catch ( ComponentLookupException e )
             {
-                throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to find the mojo '" + mojoDescriptor.getRoleHint() + "' in the plugin '" + pluginDescriptor.getPluginLookupKey()
-                    + "'", e );
+                throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to find the mojo '"
+                    + mojoDescriptor.getGoal() + "' in the plugin '" + pluginDescriptor.getId() + "'", e );
             }
     
             if ( mojo instanceof ContextEnabled )
@@ -597,6 +597,12 @@ public class DefaultPluginManager
         catch ( ComponentLookupException e )
         {
             throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(), "Unable to retrieve component configurator for plugin configuration", e );
+        }
+        catch ( NoClassDefFoundError e )
+        {
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
+                                                    "A required class was missing during mojo configuration: "
+                                                        + e.getMessage(), e );
         }
         catch ( LinkageError e )
         {
