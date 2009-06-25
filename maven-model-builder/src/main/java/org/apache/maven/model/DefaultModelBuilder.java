@@ -21,7 +21,6 @@ package org.apache.maven.model;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
+import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidationResult;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.component.annotations.Component;
@@ -58,8 +58,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class DefaultModelBuilder
     implements ModelBuilder
 {
-
-    private Model superModel;
 
     @Requirement
     private ModelReader modelReader;
@@ -75,6 +73,9 @@ public class DefaultModelBuilder
 
     @Requirement
     private ModelPathTranslator modelPathTranslator;
+
+    @Requirement
+    private SuperPomProvider superPomProvider;
 
     @Requirement
     private InheritanceAssembler inheritanceAssembler;
@@ -460,21 +461,7 @@ public class DefaultModelBuilder
 
     private Model getSuperModel()
     {
-        if ( superModel == null )
-        {
-            InputStream is = getClass().getResourceAsStream( "/org/apache/maven/model/pom-4.0.0.xml" );
-            try
-            {
-                superModel = modelReader.read( is, null );
-            }
-            catch ( IOException e )
-            {
-                throw new IllegalStateException( "The super POM is damaged"
-                    + ", please verify the integrity of your Maven installation", e );
-            }
-        }
-
-        return ModelUtils.cloneModel( superModel );
+        return ModelUtils.cloneModel( superPomProvider.getSuperModel( "4.0.0" ) );
     }
 
     private String toSourceHint( Model model )
