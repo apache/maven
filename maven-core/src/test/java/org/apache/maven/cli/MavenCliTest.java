@@ -44,6 +44,12 @@ public class MavenCliTest
         MavenCli.populateProperties( ( new CLIManager() ).parse( new String[] {
             "-Dtest.property.2=2.1",
             "-Dtest.property.3=3.0" } ), execProperties, userProperties );
+        
+        System.out.println( "Execution properties:\n\n" );
+        execProperties.list( System.out );
+        
+        System.out.println( "\n\nUser properties:\n\n" );
+        userProperties.list( System.out );
 
         // assume that everybody has a PATH env var
         String envPath = execProperties.getProperty( "env.PATH" );
