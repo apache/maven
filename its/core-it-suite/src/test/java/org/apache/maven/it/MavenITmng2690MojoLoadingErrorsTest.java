@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
@@ -71,26 +72,11 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
-        boolean foundMessage = false;
-        boolean foundClass = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
-        {
-            String line = (String) it.next();
-            if ( line.indexOf( "A required class is missing" ) > -1 )
-            {
-                foundMessage = true;
-            }
+        int msg = indexOf( lines, "(?i).*required class is missing.*" );
+        assertTrue( "User-friendly message was not found in output.", msg >= 0 );
 
-            // trigger AFTER the required-class message is found, since the class name should come afterward.
-            if ( foundMessage && line.replace( '/', '.' ).indexOf( TestCase.class.getName() ) > -1 )
-            {
-                foundClass = true;
-                break;
-            }
-        }
-
-        assertTrue( "User-friendly message was not found in output.", foundMessage );
-        assertTrue( "Missing class name was not found in output.", foundClass );
+        int cls = lines.get( msg ).toString().replace( '/', '.' ).indexOf( TestCase.class.getName() );
+        assertTrue( "Missing class name was not found in output.", cls >= 0 );
     }
 
     public void testNoClassDefFromMojoConfiguration()
@@ -118,26 +104,11 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
-        boolean foundMessage = false;
-        boolean foundClass = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
-        {
-            String line = (String) it.next();
-            if ( line.indexOf( "A required class was missing during mojo configuration" ) > -1 )
-            {
-                foundMessage = true;
-            }
+        int msg = indexOf( lines, "(?i).*required class was missing during mojo configuration.*" );
+        assertTrue( "User-friendly message was not found in output.", msg >= 0 );
 
-            // trigger AFTER the required-class message is found, since the class name should come afterward.
-            if ( foundMessage && line.replace( '/', '.' ).indexOf( TestCase.class.getName() ) > -1 )
-            {
-                foundClass = true;
-                break;
-            }
-        }
-
-        assertTrue( "User-friendly message was not found in output.", foundMessage );
-        assertTrue( "Missing class name was not found in output.", foundClass );
+        int cls = lines.get( msg ).toString().replace( '/', '.' ).indexOf( TestCase.class.getName() );
+        assertTrue( "Missing class name was not found in output.", cls >= 0 );
     }
 
     public void testMojoComponentLookupException()
@@ -165,23 +136,11 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
-        String compLookupMessage =
-            "Unable to find the mojo 'mojo-component-lookup-exception' "
-                + "(or one of its required components) in the plugin "
-                + "'org.apache.maven.its.plugins:maven-it-plugin-error";
+        String compLookupMsg =
+            "(?i).*unable to .* mojo 'mojo-component-lookup-exception' .* plugin "
+                + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";
 
-        boolean foundMessage = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
-        {
-            String line = (String) it.next();
-            if ( line.indexOf( compLookupMessage ) > -1 )
-            {
-                foundMessage = true;
-                break;
-            }
-        }
-
-        assertTrue( "User-friendly message was not found in output.", foundMessage );
+        assertTrue( "User-friendly message was not found in output.", indexOf( lines, compLookupMsg ) > 0 );
     }
 
     public void testMojoRequirementComponentLookupException()
@@ -209,23 +168,28 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
-        String compLookupMessage =
-            "Unable to find the mojo 'requirement-component-lookup-exception' "
-                + "(or one of its required components) in the plugin "
-                + "'org.apache.maven.its.plugins:maven-it-plugin-error";
+        String compLookupMsg =
+            "(?i).*unable to .* mojo 'requirement-component-lookup-exception' .* plugin "
+                + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";
 
-        boolean foundMessage = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        assertTrue( "User-friendly message was not found in output.", indexOf( lines, compLookupMsg ) > 0 );
+    }
+
+    private int indexOf( List logLines, String regex )
+    {
+        Pattern pattern = Pattern.compile( regex );
+
+        for ( int i = 0; i < logLines.size(); i++ )
         {
-            String line = (String) it.next();
-            if ( line.indexOf( compLookupMessage ) > -1 )
+            String logLine = (String) logLines.get( i );
+
+            if ( pattern.matcher( logLine ).matches() )
             {
-                foundMessage = true;
-                break;
+                return i;
             }
         }
 
-        assertTrue( "User-friendly message was not found in output.", foundMessage );
+        return -1;
     }
 
 }
