@@ -20,6 +20,7 @@ package org.apache.maven.profiles;
  */
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,8 @@ public class ProfileActivationContext
     private List<String> explicitlyInactive;
 
     private List<String> activeByDefault;
+
+    private File projectDirectory;
 
     public ProfileActivationContext( Properties executionProperties, boolean isCustomActivatorFailureSuppressed )
     {
@@ -178,6 +181,17 @@ public class ProfileActivationContext
                                                                                           List<String> inactiveProfileIds )
     {
         setExplicitlyInactiveProfileIds( inactiveProfileIds );
+        return this;
+    }
+
+    public File getProjectDirectory()
+    {
+        return projectDirectory;
+    }
+
+    public org.apache.maven.model.profile.ProfileActivationContext setProjectDirectory( File projectDirectory )
+    {
+        this.projectDirectory = projectDirectory;
         return this;
     }
 

@@ -24,9 +24,12 @@ import java.io.File;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationException;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.StringUtils;
@@ -41,56 +44,95 @@ public class FileProfileActivator
     implements ProfileActivator
 {
 
+    @Requirement
+    private PathTranslator pathTranslator;
+
     public boolean isActive( Profile profile, ProfileActivationContext context )
         throws ProfileActivationException
     {
-        boolean active = false;
-
         Activation activation = profile.getActivation();
 
-        if ( activation != null )
+        if ( activation == null )
         {
-            ActivationFile file = activation.getFile();
-
-            if ( file != null )
-            {
-                RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-                interpolator.addValueSource( new MapBasedValueSource( context.getExecutionProperties() ) );
-
-                String existingPath = file.getExists();
-                String missingPath = file.getMissing();
-
-                if ( StringUtils.isNotEmpty( existingPath ) )
-                {
-                    try
-                    {
-                        existingPath = StringUtils.replace( interpolator.interpolate( existingPath, "" ), "\\", "/" );
-                    }
-                    catch ( Exception e )
-                    {
-                        throw new ProfileActivationException( "Failed to interpolate file location for profile "
-                            + profile.getId() + ": " + existingPath, profile );
-                    }
-                    active = new File( existingPath ).exists();
-                }
-                else if ( StringUtils.isNotEmpty( missingPath ) )
-                {
-                    try
-                    {
-                        missingPath = StringUtils.replace( interpolator.interpolate( missingPath, "" ), "\\", "/" );
-                    }
-                    catch ( Exception e )
-                    {
-                        throw new ProfileActivationException( "Failed to interpolate file location for profile "
-                            + profile.getId() + ": " + existingPath, profile );
-                    }
-                    active = !new File( missingPath ).exists();
-                }
-
-            }
+            return false;
         }
 
-        return active;
+        ActivationFile file = activation.getFile();
+
+        if ( file == null )
+        {
+            return false;
+        }
+
+        String path;
+        boolean missing;
+
+        if ( StringUtils.isNotEmpty( file.getExists() ) )
+        {
+            path = file.getExists();
+            missing = false;
+        }
+        else if ( StringUtils.isNotEmpty( file.getMissing() ) )
+        {
+            path = file.getMissing();
+            missing = true;
+        }
+        else
+        {
+            return false;
+        }
+
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
+        final File basedir = context.getProjectDirectory();
+
+        if ( basedir != null )
+        {
+            interpolator.addValueSource( new AbstractValueSource( false )
+            {
+                public Object getValue( String expression )
+                {
+                    /*
+                     * NOTE: We intentionally only support ${basedir} and not ${project.basedir} as the latter form
+                     * would suggest that other project.* expressions can be used which is however beyond the design.
+                     */
+                    if ( "basedir".equals( expression ) )
+                    {
+                        return basedir.getAbsolutePath();
+                    }
+                    return null;
+                }
+            } );
+        }
+        else if ( path.indexOf( "${basedir}" ) >= 0 )
+        {
+            return false;
+        }
+
+        interpolator.addValueSource( new MapBasedValueSource( context.getExecutionProperties() ) );
+
+        try
+        {
+            path = interpolator.interpolate( path, "" );
+        }
+        catch ( Exception e )
+        {
+            throw new ProfileActivationException( "Failed to interpolate file location " + path + " for profile "
+                + profile.getId() + ": " + e.getMessage(), profile, e );
+        }
+
+        path = pathTranslator.alignToBaseDirectory( path, basedir );
+
+        File f = new File( path );
+
+        if ( !f.isAbsolute() )
+        {
+            return false;
+        }
+
+        boolean fileExists = f.exists();
+
+        return missing ? !fileExists : fileExists;
     }
 
 }

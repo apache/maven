@@ -114,7 +114,7 @@ public class DefaultModelBuilder
 
         List<ModelProblem> problems = new ArrayList<ModelProblem>();
 
-        ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
+        ProfileActivationContext profileActivationContext = getProfileActivationContext( pomFile, request );
 
         List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
 
@@ -212,12 +212,15 @@ public class DefaultModelBuilder
         return result;
     }
 
-    private ProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
+    private ProfileActivationContext getProfileActivationContext( File pomFile, ModelBuildingRequest request )
     {
         ProfileActivationContext context = new DefaultProfileActivationContext();
+
         context.setActiveProfileIds( request.getActiveProfileIds() );
         context.setInactiveProfileIds( request.getInactiveProfileIds() );
         context.setExecutionProperties( request.getExecutionProperties() );
+        context.setProjectDirectory( ( pomFile != null ) ? pomFile.getParentFile() : null );
+
         return context;
     }
 

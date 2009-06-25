@@ -19,6 +19,7 @@ package org.apache.maven.model.profile;
  * under the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -37,6 +38,8 @@ public class DefaultProfileActivationContext
     private List<String> inactiveProfileIds;
 
     private Properties executionProperties;
+
+    private File projectDirectory;
 
     public List<String> getActiveProfileIds()
     {
@@ -107,6 +110,18 @@ public class DefaultProfileActivationContext
         {
             this.executionProperties = null;
         }
+
+        return this;
+    }
+
+    public File getProjectDirectory()
+    {
+        return projectDirectory;
+    }
+
+    public ProfileActivationContext setProjectDirectory( File projectDirectory )
+    {
+        this.projectDirectory = projectDirectory;
 
         return this;
     }

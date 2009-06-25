@@ -19,6 +19,7 @@ package org.apache.maven.model.profile;
  * under the License.
  */
 
+import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
@@ -74,5 +75,21 @@ public interface ProfileActivationContext
      * @return This context, never {@code null}.
      */
     ProfileActivationContext setExecutionProperties( Properties executionProperties );
+
+    /**
+     * Gets the base directory of the current project (if any).
+     * 
+     * @return The base directory of the current project or {@code null} if none.
+     */
+    File getProjectDirectory();
+
+    /**
+     * Sets the base directory of the current project.
+     * 
+     * @param projectDirectory The base directory of the current project, may be {@code null} if profile activation
+     *            happens in the context of metadata retrieval rather than project building.
+     * @return This context, never {@code null}.
+     */
+    ProfileActivationContext setProjectDirectory( File projectDirectory );
 
 }
