@@ -347,7 +347,7 @@ public class DefaultArtifactResolver
         }
         catch ( InterruptedException e )
         {
-            throw new ArtifactResolutionException( "Resolution interrupted", null, e );
+            throw new ArtifactResolutionException( "Resolution interrupted", originatingArtifact, e );
         }
 
         if ( !resolutionExceptions.isEmpty() )
