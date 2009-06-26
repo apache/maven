@@ -40,7 +40,6 @@ import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -57,7 +56,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Prerequisites;
-import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
@@ -87,11 +85,11 @@ public class MavenProject
     implements Cloneable
 {
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
-
+    
     public static final String EMPTY_PROJECT_ARTIFACT_ID = "empty-project";
-
+    
     public static final String EMPTY_PROJECT_VERSION = "0";
-
+    
     private Model model;
 
     private MavenProject parent;
@@ -124,7 +122,7 @@ public class MavenProject
 
     private ArtifactRepository snapshotArtifactRepository;
 
-    private List<Profile> activeProfiles = new ArrayList<Profile>();
+    private List activeProfiles = new ArrayList();
 
     private Set dependencyArtifacts;
 
@@ -145,28 +143,28 @@ public class MavenProject
 
     private Map extensionArtifactMap;
 
-    private Map<String, Artifact> managedVersionMap;
+    private Map managedVersionMap;
 
     private Map projectReferences = new HashMap();
 
     private boolean executionRoot;
-
-    private Map<String, String> moduleAdjustments;
+    
+    private Map moduleAdjustments;
 
     private File basedir;
-
+    
     private Logger logger;
-
+    
     private ProjectBuilderConfiguration projectBuilderConfiguration;
-
+    
     public MavenProject()
     {
         Model model = new Model();
-
+        
         model.setGroupId( EMPTY_PROJECT_GROUP_ID );
         model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
         model.setVersion( EMPTY_PROJECT_VERSION );
-
+        
         this.setModel( model );
     }
 
@@ -284,12 +282,12 @@ public class MavenProject
         {
             setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
         }
-
+        
         if ( project.getReleaseArtifactRepository() != null )
         {
             setReleaseArtifactRepository( project.getReleaseArtifactRepository() );
         }
-
+        
         if ( project.getSnapshotArtifactRepository() != null )
         {
             setSnapshotArtifactRepository( project.getSnapshotArtifactRepository() );
@@ -326,53 +324,53 @@ public class MavenProject
         preservedBasedir = project.preservedBasedir;
         setConcrete( project.isConcrete() );
     }
-
+    
     public String getModulePathAdjustment( MavenProject moduleProject ) throws IOException
     {
         // FIXME: This is hacky. What if module directory doesn't match artifactid, and parent
         // is coming from the repository??
-
-        // FIXME: If there is a hierarchy of three projects, with the url specified at the top,
+        
+        // FIXME: If there is a hierarchy of three projects, with the url specified at the top, 
         // and the top two projects are referenced from copies that are in the repository, the
         // middle-level POM doesn't have a File associated with it (or the file's directory is
         // of an unexpected name), and module path adjustments fail.
         String module = moduleProject.getArtifactId();
-
+        
         File moduleFile = moduleProject.getFile();
-
+        
         if ( moduleFile != null )
         {
             File moduleDir = moduleFile.getCanonicalFile().getParentFile();
-
+            
             module = moduleDir.getName();
         }
-
+        
         if ( moduleAdjustments == null )
         {
-            moduleAdjustments = new HashMap<String, String>();
-
-            List<String> modules = getModules();
+            moduleAdjustments = new HashMap();
+            
+            List modules = getModules();
             if ( modules != null )
             {
                 for ( Iterator it = modules.iterator(); it.hasNext(); )
                 {
                     String modulePath = (String) it.next();
                     String moduleName = modulePath;
-
+                    
                     if ( moduleName.endsWith( "/" ) || moduleName.endsWith( "\\" ) )
                     {
                         moduleName = moduleName.substring( 0, moduleName.length() - 1 );
                     }
-
+                    
                     int lastSlash = moduleName.lastIndexOf( '/' );
-
+                    
                     if ( lastSlash < 0 )
                     {
                         lastSlash = moduleName.lastIndexOf( '\\' );
                     }
-
+                    
                     String adjustment = null;
-
+                    
                     if ( lastSlash > -1 )
                     {
                         moduleName = moduleName.substring( lastSlash + 1 );
@@ -383,7 +381,7 @@ public class MavenProject
                 }
             }
         }
-
+        
         return (String) moduleAdjustments.get( module );
     }
 
@@ -443,15 +441,15 @@ public class MavenProject
         {
             return;
         }
-
+        
         if ( basedir == null )
         {
             basedir = file.getParentFile();
         }
-
+        
         this.file = file;
     }
-
+    
     public void setBasedir( File basedir )
     {
         this.basedir = basedir;
@@ -629,7 +627,8 @@ public class MavenProject
         list.add( getBuild().getTestOutputDirectory() );
 
         list.add( getBuild().getOutputDirectory() );
-        for ( Iterator<Artifact> i = getArtifacts().iterator(); i.hasNext(); )
+        
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
             Artifact a = (Artifact) i.next();
 
@@ -907,7 +906,7 @@ public class MavenProject
         {
             groupId = getModel().getParent().getGroupId();
         }
-
+        
         return groupId;
     }
 
@@ -952,7 +951,7 @@ public class MavenProject
         {
             version = getModel().getParent().getVersion();
         }
-
+        
         return version;
     }
 
@@ -1160,10 +1159,9 @@ public class MavenProject
     }
 
     /**
-     * All dependencies that this project has, including transitive ones. Contents are lazily populated, so depending on
-     * what phases have run dependencies in some scopes won't be included. eg. if only compile phase has run,
-     * dependencies with scope test won't be included.
-     * 
+     * All dependencies that this project has, including transitive ones.
+     * Contents are lazily populated, so depending on what phases have run dependencies in some scopes won't be included.
+     * eg. if only compile phase has run, dependencies with scope test won't be included. 
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
@@ -1303,7 +1301,7 @@ public class MavenProject
 
         return pluginMgmt;
     }
-
+    
     private Build getModelBuild()
     {
         Build build = getModel().getBuild();
@@ -1314,7 +1312,7 @@ public class MavenProject
 
             getModel().setBuild( build );
         }
-
+        
         return build;
     }
 
@@ -1330,7 +1328,7 @@ public class MavenProject
             build.flushPluginMap();
         }
     }
-
+    
     public void injectPluginManagementInfo( Plugin plugin )
     {
         PluginManagement pm = getModelBuild().getPluginManagement();
@@ -1385,12 +1383,12 @@ public class MavenProject
         return getModel().getPluginRepositories();
     }
 
-    public void setActiveProfiles( List<Profile> activeProfiles )
+    public void setActiveProfiles( List activeProfiles )
     {
         this.activeProfiles.addAll( activeProfiles );
     }
 
-    public List<Profile> getActiveProfiles()
+    public List getActiveProfiles()
     {
         return activeProfiles;
     }
@@ -1447,7 +1445,7 @@ public class MavenProject
                 }
             }
         }
-
+        
 //        PluginManagement pluginManagement = getBuild().getPluginManagement();
 //        if ( pluginManagement != null && pluginManagement.getPlugins() != null )
 //        {
@@ -1472,7 +1470,7 @@ public class MavenProject
 //                            }
 //                        }
 //                    }
-        //
+//                    
 //                    dom = Xpp3Dom.mergeXpp3Dom( dom, managedDom );
 //                    break;
 //                }
@@ -1596,12 +1594,12 @@ public class MavenProject
         return originalModel;
     }
 
-    public void setManagedVersionMap( Map<String, Artifact> map )
+    public void setManagedVersionMap( Map map )
     {
         this.managedVersionMap = map;
     }
 
-    public Map<String, Artifact> getManagedVersionMap()
+    public Map getManagedVersionMap()
     {
         return this.managedVersionMap;
     }
@@ -1736,7 +1734,7 @@ public class MavenProject
     {
         return snapshotArtifactRepository;
     }
-
+    
     public void resolveActiveArtifacts()
     {
         Set depArtifacts = getDependencyArtifacts();
@@ -1744,23 +1742,23 @@ public class MavenProject
         {
             return;
         }
-
-        Set<Artifact> updated = new LinkedHashSet<Artifact>( depArtifacts.size() );
+        
+        Set updated = new LinkedHashSet( depArtifacts.size() );
         int updatedCount = 0;
-
-        for ( Iterator<Artifact> it = depArtifacts.iterator(); it.hasNext(); )
+        
+        for ( Iterator it = depArtifacts.iterator(); it.hasNext(); )
         {
             Artifact depArtifact = (Artifact) it.next();
             Artifact replaced = replaceWithActiveArtifact( depArtifact );
-
+            
             if ( depArtifact != replaced )
             {
                 updatedCount++;
             }
-
+            
             updated.add( replaced );
         }
-
+        
         if ( updatedCount > 0 )
         {
             setDependencyArtifacts( updated );
@@ -1881,7 +1879,7 @@ public class MavenProject
         {
             return;
         }
-
+        
         if ( logger.isDebugEnabled() )
         {
             StringBuffer message = new StringBuffer();
@@ -1891,7 +1889,7 @@ public class MavenProject
             message.append( "\nRequested Dependency: " ).append( artifact.getId() );
             message.append( "\n\nNOTE: You may need to run this build to the 'compile' lifecycle phase, or farther, in order to build the dependency artifact." );
             message.append( "\n" );
-
+            
             logger.debug( message.toString() );
         }
         else
@@ -1909,7 +1907,7 @@ public class MavenProject
         }
         list.add( file.getPath() );
     }
-
+    
     /**
      * Default toString
      */
@@ -1923,8 +1921,8 @@ public class MavenProject
         sb.append( ":" );
         sb.append( this.getVersion() );
         sb.append( " @ " );
-
-        try
+        
+        try 
         {
             sb.append( this.getFile().getPath() );
         }
@@ -1932,10 +1930,10 @@ public class MavenProject
         {
             //don't log it.
         }
-
-        return sb.toString();
+        
+        return sb.toString();        
     }
-
+    
     /**
      * @throws CloneNotSupportedException
      * @since 2.0.9
@@ -1951,7 +1949,7 @@ public class MavenProject
 // ----------------------------------------------------------------------------
 // CODE BELOW IS USED TO PRESERVE DYNAMISM IN THE BUILD SECTION OF THE POM.
 // ----------------------------------------------------------------------------
-
+    
     private Build dynamicBuild;
 
     private Build originalInterpolatedBuild;
@@ -2102,9 +2100,9 @@ public class MavenProject
     {
         this.originalInterpolatedScriptSourceRoots = originalInterpolatedScriptSourceRoots;
     }
-
+    
     private Properties preservedProperties;
-
+    
     public Properties getPreservedProperties()
     {
         return preservedProperties;
@@ -2123,9 +2121,9 @@ public class MavenProject
             }
         }
     }
-
+    
     private File preservedBasedir;
-
+    
     public File getPreservedBasedir()
     {
         return preservedBasedir;
