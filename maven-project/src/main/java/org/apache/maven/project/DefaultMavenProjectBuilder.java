@@ -19,25 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactStatus;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -100,6 +81,25 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /*:apt
 
@@ -171,7 +171,7 @@ public class DefaultMavenProjectBuilder
     private ModelDefaultsInjector modelDefaultsInjector;
 
     private ModelInterpolator modelInterpolator;
-
+    
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     // ----------------------------------------------------------------------
@@ -906,16 +906,7 @@ public class DefaultMavenProjectBuilder
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
         }
-
-//        try
-//        {
-//            calculateConcreteState( project, config );
-//        }
-//        catch ( ModelInterpolationException e )
-//        {
-//            throw new InvalidProjectModelException( projectId, pomLocation, e.getMessage(), e );
-//        }
-
+        
         project.setManagedVersionMap( createManagedVersionMap( projectId,
                                                                project.getDependencyManagement(),
                                                                project.getParent() ) );

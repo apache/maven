@@ -460,5 +460,6 @@ public class ArtifactResolverTest
         
         assertLocalArtifactPresent( g3 );
     }
+
 }
 

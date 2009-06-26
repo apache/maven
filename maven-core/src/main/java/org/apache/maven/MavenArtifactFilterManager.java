@@ -65,7 +65,7 @@ public class MavenArtifactFilterManager
 
         artifacts.add( "classworlds" );
         artifacts.add( "jsch" );
-        artifacts.add( "commons-cli" );
+//        artifacts.add( "commons-cli" );
         artifacts.add( "doxia-sink-api" );
         artifacts.add( "doxia-logging-api" );
         artifacts.add( "maven-artifact" );

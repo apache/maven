@@ -90,6 +90,9 @@ public class MavenCli
 
     private static Embedder embedder;
 
+    /**
+     * @deprecated Use {@link Main#main(String[])} instead.
+     */
     public static void main( String[] args )
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
@@ -107,7 +110,7 @@ public class MavenCli
         // ----------------------------------------------------------------------
         // Setup the command line parser
         // ----------------------------------------------------------------------
-
+        
         CLIManager cliManager = new CLIManager();
 
         CommandLine commandLine;
@@ -180,184 +183,199 @@ public class MavenCli
             return 1;
         }
 
-        // ----------------------------------------------------------------------
-        // The execution properties need to be created before the settings
-        // are constructed.
-        // ----------------------------------------------------------------------
-
-        Properties executionProperties = new Properties();
-        Properties userProperties = new Properties();
-        populateProperties( commandLine, executionProperties, userProperties );
-
-        Settings settings;
-
+        // wraps the following code to ensure the embedder is stopped no matter what else happens.
         try
         {
-            settings = buildSettings( commandLine );
-        }
-        catch ( SettingsConfigurationException e )
-        {
-            showError( "Error reading settings.xml: " + e.getMessage(), e, showErrors );
+            // ----------------------------------------------------------------------
+            // The execution properties need to be created before the settings
+            // are constructed.
+            // ----------------------------------------------------------------------
 
-            return 1;
-        }
-        catch ( ComponentLookupException e )
-        {
-            showFatalError( "Unable to read settings.xml", e, showErrors );
+            Properties executionProperties = new Properties();
+            Properties userProperties = new Properties();
+            populateProperties( commandLine, executionProperties, userProperties );
 
-            return 1;
-        }
+            Settings settings;
 
-        DefaultSecDispatcher dispatcher;
-        try
-        {
-            if ( commandLine.hasOption( CLIManager.ENCRYPT_MASTER_PASSWORD ) )
+            try
             {
-                String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_MASTER_PASSWORD );
-
-                DefaultPlexusCipher cipher = new DefaultPlexusCipher();
-
-                System.out.println( cipher.encryptAndDecorate( passwd,
-                                                               DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
-                
-                return 0;
+                settings = buildSettings( commandLine );
             }
-            else if ( commandLine.hasOption( CLIManager.ENCRYPT_PASSWORD ) )
+            catch ( SettingsConfigurationException e )
             {
-                String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
-                
-                dispatcher = (DefaultSecDispatcher) embedder.lookup( SecDispatcher.ROLE );
-                String configurationFile = dispatcher.getConfigurationFile();
-                if ( configurationFile.startsWith( "~" ) )
-                {
-                    configurationFile = System.getProperty( "user.home" ) + configurationFile.substring( 1 );
-                }
-                String file = System.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, configurationFile );
-                embedder.release( dispatcher );
-                
-                String master = null;
-                
-                SettingsSecurity sec = SecUtil.read( file, true );
-                if ( sec != null )
-                {
-                    master = sec.getMaster();
-                }
+                showError( "Error reading settings.xml: " + e.getMessage(), e, showErrors );
 
-                if ( master == null )
+                return 1;
+            }
+            catch ( ComponentLookupException e )
+            {
+                showFatalError( "Unable to read settings.xml", e, showErrors );
+
+                return 1;
+            }
+
+            DefaultSecDispatcher dispatcher;
+            try
+            {
+                if ( commandLine.hasOption( CLIManager.ENCRYPT_MASTER_PASSWORD ) )
                 {
-                    System.err.println( "Master password is not set in the setting security file" );
+                    String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_MASTER_PASSWORD );
+
+                    DefaultPlexusCipher cipher = new DefaultPlexusCipher();
+
+                    System.out.println( cipher.encryptAndDecorate( passwd,
+                                                                   DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
                     
-                    return 1;
+                    return 0;
                 }
-                
-                DefaultPlexusCipher cipher = new DefaultPlexusCipher();
-                String masterPasswd =
-                    cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
-                System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
-                
-                return 0;
-            }
-        }
-        catch ( Exception e )
-        {
-            showFatalError( "Error encrypting password: " + e.getMessage(), e, showErrors );
-            
-            return 1;
-        }
-            
-        Maven maven = null;
-
-        MavenExecutionRequest request = null;
-
-        LoggerManager loggerManager = null;
-
-        try
-        {
-            // logger must be created first
-            loggerManager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
-
-            if ( debug )
-            {
-                loggerManager.setThreshold( Logger.LEVEL_DEBUG );
-            }
-            else if ( commandLine.hasOption( CLIManager.QUIET ) )
-            {
-                // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
-                // Ideally, we could use Warn across the board
-                loggerManager.setThreshold( Logger.LEVEL_ERROR );
-                // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
-            }
-
-            ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer(), executionProperties );
-
-            if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
-            {
-                String [] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
-
-                if ( profileOptionValues != null )
+                else if ( commandLine.hasOption( CLIManager.ENCRYPT_PASSWORD ) )
                 {
-                    for ( int i=0; i < profileOptionValues.length; ++i )
+                    String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
+                    
+                    dispatcher = (DefaultSecDispatcher) embedder.lookup( SecDispatcher.ROLE );
+                    String configurationFile = dispatcher.getConfigurationFile();
+                    if ( configurationFile.startsWith( "~" ) )
                     {
-                        StringTokenizer profileTokens = new StringTokenizer( profileOptionValues[i], "," );
+                        configurationFile = System.getProperty( "user.home" ) + configurationFile.substring( 1 );
+                    }
+                    String file = System.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, configurationFile );
+                    embedder.release( dispatcher );
+                    
+                    String master = null;
+                    
+                    SettingsSecurity sec = SecUtil.read( file, true );
+                    if ( sec != null )
+                    {
+                        master = sec.getMaster();
+                    }
 
-                        while ( profileTokens.hasMoreTokens() )
+                    if ( master == null )
+                    {
+                        System.err.println( "Master password is not set in the setting security file" );
+                        
+                        return 1;
+                    }
+                    
+                    DefaultPlexusCipher cipher = new DefaultPlexusCipher();
+                    String masterPasswd =
+                        cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
+                    System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
+                    
+                    return 0;
+                }
+            }
+            catch ( Exception e )
+            {
+                showFatalError( "Error encrypting password: " + e.getMessage(), e, showErrors );
+                
+                return 1;
+            }
+                
+            Maven maven = null;
+
+            MavenExecutionRequest request = null;
+
+            LoggerManager loggerManager = null;
+
+            try
+            {
+                // logger must be created first
+                loggerManager = (LoggerManager) embedder.lookup( LoggerManager.ROLE );
+
+                if ( debug )
+                {
+                    loggerManager.setThreshold( Logger.LEVEL_DEBUG );
+                }
+                else if ( commandLine.hasOption( CLIManager.QUIET ) )
+                {
+                    // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
+                    // Ideally, we could use Warn across the board
+                    loggerManager.setThreshold( Logger.LEVEL_ERROR );
+                    // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+                }
+
+                ProfileManager profileManager = new DefaultProfileManager( embedder.getContainer(), executionProperties );
+
+                if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+                {
+                    String [] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
+
+                    if ( profileOptionValues != null )
+                    {
+                        for ( int i=0; i < profileOptionValues.length; ++i )
                         {
-                            String profileAction = profileTokens.nextToken().trim();
+                            StringTokenizer profileTokens = new StringTokenizer( profileOptionValues[i], "," );
 
-                            if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
+                            while ( profileTokens.hasMoreTokens() )
                             {
-                                profileManager.explicitlyDeactivate( profileAction.substring( 1 ) );
-                            }
-                            else if ( profileAction.startsWith( "+" ) )
-                            {
-                                profileManager.explicitlyActivate( profileAction.substring( 1 ) );
-                            }
-                            else
-                            {
-                                profileManager.explicitlyActivate( profileAction );
+                                String profileAction = profileTokens.nextToken().trim();
+
+                                if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
+                                {
+                                    profileManager.explicitlyDeactivate( profileAction.substring( 1 ) );
+                                }
+                                else if ( profileAction.startsWith( "+" ) )
+                                {
+                                    profileManager.explicitlyActivate( profileAction.substring( 1 ) );
+                                }
+                                else
+                                {
+                                    profileManager.explicitlyActivate( profileAction );
+                                }
                             }
                         }
                     }
                 }
+
+                request = createRequest( commandLine, settings, eventDispatcher, loggerManager, profileManager,
+                                         executionProperties, userProperties, showErrors );
+
+                setProjectFileOptions( commandLine, request );
+
+                maven =
+                    createMavenInstance( settings.isInteractiveMode(),
+                                         loggerManager.getLoggerForComponent( WagonManager.ROLE ) );
+            }
+            catch ( ComponentLookupException e )
+            {
+                showFatalError( "Unable to configure the Maven application", e, showErrors );
+
+                return 1;
+            }
+            finally
+            {
+                if ( loggerManager != null )
+                {
+                    try
+                    {
+                        embedder.release( loggerManager );
+                    }
+                    catch ( ComponentLifecycleException e )
+                    {
+                        showFatalError( "Error releasing logging manager", e, showErrors );
+                    }
+                }
             }
 
-            request = createRequest( commandLine, settings, eventDispatcher, loggerManager, profileManager,
-                                     executionProperties, userProperties, showErrors );
-
-            setProjectFileOptions( commandLine, request );
-
-            maven =
-                createMavenInstance( settings.isInteractiveMode(),
-                                     loggerManager.getLoggerForComponent( WagonManager.ROLE ) );
-        }
-        catch ( ComponentLookupException e )
-        {
-            showFatalError( "Unable to configure the Maven application", e, showErrors );
-
-            return 1;
+            try
+            {
+                maven.execute( request );
+            }
+            catch ( MavenExecutionException e )
+            {
+                return 1;
+            }
         }
         finally
         {
-            if ( loggerManager != null )
+            try
             {
-                try
-                {
-                    embedder.release( loggerManager );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    showFatalError( "Error releasing logging manager", e, showErrors );
-                }
+                embedder.stop();
             }
-        }
-
-        try
-        {
-            maven.execute( request );
-        }
-        catch ( MavenExecutionException e )
-        {
-            return 1;
+            catch ( Exception e )
+            {
+                // do nothing; we took our best shot.
+            }
         }
 
         return 0;

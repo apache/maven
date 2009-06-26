@@ -49,21 +49,6 @@ under the License.
      |
      -->
     <component>
-      <role>org.apache.maven.artifact.transform.ArtifactTransformation</role>
-      <role-hint>version-expression</role-hint>
-      <implementation>org.apache.maven.project.artifact.VersionExpressionTransformation</implementation>
-      <requirements>
-        <requirement>
-          <role>org.apache.maven.project.path.PathTranslator</role>
-        </requirement>
-      </requirements>
-    </component>
-<!--
-     |
-     |
-     |
-     -->
-    <component>
       <role>org.apache.maven.project.interpolation.ModelInterpolator</role>
       <implementation>org.apache.maven.project.interpolation.StringSearchModelInterpolator</implementation>
       <requirements>

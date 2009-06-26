@@ -92,12 +92,12 @@ public class PluginParameterExpressionEvaluator
 
         if ( project != null )
         {
-            File projectFile = project.getFile();
+            File baseDir = project.getBasedir();
 
             // this should always be the case for non-super POM instances...
-            if ( projectFile != null )
+            if ( baseDir != null )
             {
-                basedir = projectFile.getParentFile().getAbsolutePath();
+                basedir = baseDir.getAbsolutePath();
             }
         }
 

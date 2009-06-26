@@ -550,8 +550,8 @@ public class DefaultLifecycleExecutor
     {
         // guaranteed to come from the CLI and not be part of a phase
         MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, project, task, true, false );
-        executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor ) ), forkEntryPoints, session,
-                      project );
+        executeGoals( Collections.singletonList( new MojoExecution( mojoDescriptor, MojoExecution.CLI_EXECUTION_ID ) ),
+                      forkEntryPoints, session, project );
     }
 
     private void executeGoals( List goals, Stack forkEntryPoints, MavenSession session, MavenProject project )
@@ -624,7 +624,7 @@ public class DefaultLifecycleExecutor
             {
                 forkEntryPoints.push( mojoDescriptor );
 
-                forkLifecycle( mojoDescriptor, forkEntryPoints, session, project );
+                forkLifecycle( mojoDescriptor, forkEntryPoints, session, project, mojoExecution.getExecutionId() );
 
                 forkEntryPoints.pop();
             }
@@ -644,7 +644,7 @@ public class DefaultLifecycleExecutor
                     {
                         forkEntryPoints.push( descriptor );
 
-                        forkLifecycle( descriptor, forkEntryPoints, session, project );
+                        forkLifecycle( descriptor, forkEntryPoints, session, project, forkedExecution.getExecutionId() );
 
                         forkEntryPoints.pop();
                     }
@@ -930,8 +930,21 @@ public class DefaultLifecycleExecutor
                 {
                     id = reportSet.getId();
                 }
+                else
+                {
+                    id = mojoExecution.getExecutionId();
+                }
+                
+                MojoExecution reportExecution;
+                if ( id.startsWith( MojoExecution.DEFAULT_EXEC_ID_PREFIX ) )
+                {
+                    reportExecution = new MojoExecution( mojoDescriptor );
+                }
+                else
+                {
+                    reportExecution = new MojoExecution( mojoDescriptor, id );
+                }
 
-                MojoExecution reportExecution = new MojoExecution( mojoDescriptor, id );
                 reports.add( reportExecution );
             }
         }
@@ -983,7 +996,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void forkLifecycle( MojoDescriptor mojoDescriptor, Stack ancestorLifecycleForkers, MavenSession session,
-                                MavenProject project )
+                                MavenProject project, String executionId )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
@@ -1001,17 +1014,17 @@ public class DefaultLifecycleExecutor
 
                 line();
 
-                forkProjectLifecycle( mojoDescriptor, ancestorLifecycleForkers, session, reactorProject );
+                forkProjectLifecycle( mojoDescriptor, ancestorLifecycleForkers, session, reactorProject, executionId );
             }
         }
         else
         {
-            forkProjectLifecycle( mojoDescriptor, ancestorLifecycleForkers, session, project );
+            forkProjectLifecycle( mojoDescriptor, ancestorLifecycleForkers, session, project, executionId );
         }
     }
 
     private void forkProjectLifecycle( MojoDescriptor mojoDescriptor, Stack forkEntryPoints, MavenSession session,
-                                       MavenProject project )
+                                       MavenProject project, String executionId )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         project = project.getExecutionProject();
@@ -1128,7 +1141,16 @@ public class DefaultLifecycleExecutor
                             }
 
                             MojoDescriptor desc = getMojoDescriptor( lifecyclePluginDescriptor, lifecycleGoal );
-                            MojoExecution mojoExecution = new MojoExecution( desc, configuration );
+                            MojoExecution mojoExecution;
+                            if ( executionId.startsWith( MojoExecution.DEFAULT_EXEC_ID_PREFIX ) )
+                            {
+                                mojoExecution = new MojoExecution( desc, configuration );
+                            }
+                            else
+                            {
+                                mojoExecution = new MojoExecution( desc, configuration, executionId );
+                            }
+                            
                             addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
                                                     session.getSettings() );
                         }
@@ -1171,7 +1193,7 @@ public class DefaultLifecycleExecutor
         {
             String goal = mojoDescriptor.getExecuteGoal();
             MojoDescriptor desc = getMojoDescriptor( pluginDescriptor, goal );
-            executeGoals( Collections.singletonList( new MojoExecution( desc ) ), forkEntryPoints, session, project );
+            executeGoals( Collections.singletonList( new MojoExecution( desc, goal ) ), forkEntryPoints, session, project );
         }
     }
 

@@ -684,8 +684,6 @@ public class MavenProjectDynamismTest
 
         MavenProject project = projectBuilder.build( pomFile, new DefaultProjectBuilderConfiguration() );
 
-        assertEquals( pomFile, project.getFile() );
-
         return project;
     }
 
