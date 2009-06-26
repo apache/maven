@@ -99,6 +99,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4196ExclusionOnPluginDepTest.class );
         suite.addTestSuite( MavenITmng4193UniqueRepoIdTest.class );
         suite.addTestSuite( MavenITmng4190MirrorRepoMergingTest.class );
+        suite.addTestSuite( MavenITmng4189UniqueVersionSnapshotTest.class ); 
         suite.addTestSuite( MavenITmng4180PerDependencyExclusionsTest.class );
         suite.addTestSuite( MavenITmng4172EmptyDependencySetTest.class );
         suite.addTestSuite( MavenITmng4150VersionRangeTest.class );
