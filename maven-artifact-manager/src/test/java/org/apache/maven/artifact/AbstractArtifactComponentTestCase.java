@@ -182,12 +182,12 @@ public abstract class AbstractArtifactComponentTestCase
     // Test artifact generation for unit tests
     // ----------------------------------------------------------------------
 
-    protected Artifact createLocalArtifact( String artifactId, String version )
+    protected Artifact createLocalArtifact( String artifactId, String version, String content )
         throws Exception
     {
         Artifact artifact = createArtifact( artifactId, version );
 
-        createArtifact( artifact, localRepository() );
+        createArtifact( artifact, localRepository(), content );
 
         return artifact;
     }
@@ -197,7 +197,7 @@ public abstract class AbstractArtifactComponentTestCase
     {
         Artifact artifact = createArtifact( artifactId, version );
 
-        createArtifact( artifact, remoteRepository() );
+        createArtifact( artifact, remoteRepository(), null );
 
         return artifact;
     }
@@ -205,16 +205,16 @@ public abstract class AbstractArtifactComponentTestCase
     protected void createLocalArtifact( Artifact artifact )
         throws Exception
     {
-        createArtifact( artifact, localRepository() );
+        createArtifact( artifact, localRepository(), null );
     }
 
     protected void createRemoteArtifact( Artifact artifact )
         throws Exception
     {
-        createArtifact( artifact, remoteRepository() );
+        createArtifact( artifact, remoteRepository(), null );
     }
 
-    protected void createArtifact( Artifact artifact, ArtifactRepository repository )
+    protected void createArtifact( Artifact artifact, ArtifactRepository repository, String content )
         throws Exception
     {
         String path = repository.pathOf( artifact );
@@ -228,9 +228,20 @@ public abstract class AbstractArtifactComponentTestCase
 
         Writer writer = new FileWriter( artifactFile );
 
-        writer.write( artifact.getId() );
+        if( content == null )
+        {
+            writer.write( artifact.getId() );
+        }
+        else
+        {
+            writer.write( content );
+        }
 
         writer.close();
+        
+        artifactFile = new File( repository.getBasedir(), path );
+        
+        artifact.setFile( artifactFile );
     }
 
     protected Artifact createArtifact( String artifactId, String version )

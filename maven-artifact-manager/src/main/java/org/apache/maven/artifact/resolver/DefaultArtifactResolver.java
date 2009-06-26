@@ -195,7 +195,7 @@ public class DefaultArtifactResolver
                     force = true;
                 }
             }
-            boolean resolved = false;
+
             if ( !destination.exists() || force )
             {
                 if ( !wagonManager.isOnline() )
@@ -233,8 +233,6 @@ public class DefaultArtifactResolver
                     throw new ArtifactResolutionException( e.getMessage(), artifact,
                                                            getMirroredRepositories( remoteRepositories ), e );
                 }
-
-                resolved = true;
             }
             else if ( destination.exists() )
             {
@@ -247,12 +245,14 @@ public class DefaultArtifactResolver
                 String version = artifact.getVersion();
                 artifact.selectVersion( artifact.getBaseVersion() );
                 File copy = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-                if ( resolved || !copy.exists() )
+                if ( !copy.exists() || copy.lastModified() != destination.lastModified()
+                    || copy.length() != destination.length() )
                 {
                     // recopy file if it was reresolved, or doesn't exist.
                     try
                     {
                         FileUtils.copyFile( destination, copy );
+                        copy.setLastModified( destination.lastModified() );
                     }
                     catch ( IOException e )
                     {

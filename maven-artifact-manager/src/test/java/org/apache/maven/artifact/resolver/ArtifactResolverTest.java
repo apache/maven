@@ -86,7 +86,7 @@ public class ArtifactResolverTest
 
         artifactResolver = (ArtifactResolver) lookup( ArtifactResolver.ROLE );
 
-        projectArtifact = createLocalArtifact( "project", "3.0" );
+        projectArtifact = createLocalArtifact( "project", "3.0", null );
     }
 
     protected String component()
@@ -97,7 +97,7 @@ public class ArtifactResolverTest
     public void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository()
         throws Exception
     {
-        Artifact a = createLocalArtifact( "a", "1.0" );
+        Artifact a = createLocalArtifact( "a", "1.0", null );
 
         artifactResolver.resolve( a, remoteRepositories(), localRepository() );
 
@@ -125,9 +125,9 @@ public class ArtifactResolverTest
     public void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository()
         throws Exception
     {
-        Artifact g = createLocalArtifact( "g", "1.0" );
+        Artifact g = createLocalArtifact( "g", "1.0", null );
 
-        Artifact h = createLocalArtifact( "h", "1.0" );
+        Artifact h = createLocalArtifact( "h", "1.0", null );
 
         ArtifactMetadataSource mds = new ArtifactMetadataSourceImplementation()
         {
@@ -415,6 +415,50 @@ public class ArtifactResolverTest
         }
 
         control.verify();
+    }
+    
+    public void testResolveOlderSpecificSnapshotVersionWhenNewerVersionAlreadyExistsAndBothAreInLocalRepository()
+        throws Exception
+    {
+        Artifact g1 = createLocalArtifact( "g", "1.0-20090608.090416-1", "Write something to make file length longer" );
+        
+        long expectedFileLength = g1.getFile().length();
+        
+        Artifact g3 = createLocalArtifact( "g", "1.0-SNAPSHOT", null );
+        
+        long incorrectFileLength = g3.getFile().length();
+        
+        ArtifactMetadataSource mds = new ArtifactMetadataSourceImplementation()
+        {
+            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                             List remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                Set dependencies = new LinkedHashSet();
+
+                return new ResolutionGroup( artifact, dependencies, remoteRepositories );
+            }
+        };
+
+        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( g1 ),
+                                                                                projectArtifact, remoteRepositories(),
+                                                                                localRepository(), mds );
+
+        assertEquals( 1, result.getArtifacts().size() );
+        
+        assertTrue( result.getArtifacts().contains( g1 ) );
+
+        assertFalse( result.getArtifacts().contains( g3 ) );
+
+        Artifact artifact = ( (Artifact) result.getArtifacts().iterator().next() );
+        
+        assertEquals( expectedFileLength, artifact.getFile().length() );
+        
+        assertFalse( "Incorrect artifact file resolved", incorrectFileLength == artifact.getFile().length() );
+                
+        assertLocalArtifactPresent( g1 );
+        
+        assertLocalArtifactPresent( g3 );
     }
 }
 
