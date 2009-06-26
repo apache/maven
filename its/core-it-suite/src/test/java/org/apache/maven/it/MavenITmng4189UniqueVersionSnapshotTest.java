@@ -33,7 +33,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest
 {
     public MavenITmng4189UniqueVersionSnapshotTest()
     {
-        super( "[2.1.1,)" );
+        super( "[2.1.1,2.2.0),[2.2.1,)" );
     }
 
     public void testmng4189()
