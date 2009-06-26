@@ -132,4 +132,37 @@ public class DelegatingLocalArtifactRepository
         return userLocalArtifactRepository.getUrl();
     }
 
+    @Override
+    public int hashCode()
+    {
+        int hash = 17;
+        hash = hash * 31 + ( buildReactor == null ? 0 : buildReactor.hashCode() );
+        hash = hash * 31 + ( ideWorkspace == null ? 0 : ideWorkspace.hashCode() );
+        hash = hash * 31 + ( userLocalArtifactRepository == null ? 0 : userLocalArtifactRepository.hashCode() );
+
+        return hash;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+        {
+            return true;
+        }
+        if ( obj == null )
+        {
+            return false;
+        }
+        if ( getClass() != obj.getClass() )
+        {
+            return false;
+        }
+        
+        DelegatingLocalArtifactRepository other = (DelegatingLocalArtifactRepository) obj;
+
+        return eq( buildReactor, other.buildReactor )
+            && eq( ideWorkspace, other.ideWorkspace )
+            && eq( userLocalArtifactRepository, other.userLocalArtifactRepository );
+    }
 }

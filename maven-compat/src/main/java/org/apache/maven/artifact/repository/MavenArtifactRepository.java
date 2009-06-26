@@ -327,7 +327,7 @@ public class MavenArtifactRepository
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ( ( id == null ) ? 0 : id.hashCode() );
+        result = prime * result + ( ( getId() == null ) ? 0 : getId().hashCode() );
         return result;
     }
 
@@ -345,21 +345,15 @@ public class MavenArtifactRepository
         {
             return false;
         }
-        
+
         ArtifactRepository other = (ArtifactRepository) obj;
-        
-        if ( id == null )
-        {
-            if ( other.getId() != null )
-            {
-                return false;
-            }
-        }
-        else if ( !id.equals( other.getId() ) )
-        {
-            return false;
-        }
-        
-        return true;
-    }    
+
+        return eq( getId(), other.getId() );
+    }
+
+    protected static <T> boolean eq( T s1, T s2 )
+    {
+        return s1 != null ? s1.equals( s2 ) : s2 == null;
+    }
+
 }
