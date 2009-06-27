@@ -54,7 +54,6 @@ public class DefaultArtifactFilterManager
         artifacts.add( "classworlds" );
         artifacts.add( "plexus-classworlds" );
         artifacts.add( "commons-cli" );
-        //artifacts.add( "doxia-sink-api" );
         artifacts.add( "jsch" );
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
@@ -73,10 +72,10 @@ public class DefaultArtifactFilterManager
         artifacts.add( "maven-project" );
         artifacts.add( "maven-repository-metadata" );
         artifacts.add( "maven-settings" );
+        artifacts.add( "maven-toolchain" );
         artifacts.add( "plexus-component-api" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "plexus-interactivity-api" );
-        //artifacts.add( "plexus-interpolation" );        
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
