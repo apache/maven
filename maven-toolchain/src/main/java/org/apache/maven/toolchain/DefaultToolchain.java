@@ -36,7 +36,7 @@ public abstract class DefaultToolchain
 
     private String type;
 
-    private Map provides = new HashMap /*<String,RequirementMatcher>*/ (  );
+    private Map<String, RequirementMatcher> provides = new HashMap<String, RequirementMatcher>();
 
     public static final String KEY_TYPE = "type"; //NOI18N
     
@@ -81,7 +81,7 @@ public abstract class DefaultToolchain
         {
             String key = (String) it.next();
             
-            RequirementMatcher matcher = (RequirementMatcher) provides.get(key);
+            RequirementMatcher matcher = provides.get( key );
             
             if ( matcher == null )
             {
