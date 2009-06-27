@@ -156,37 +156,35 @@ public class MavenSession
     {
         return result;
     }        
+
+    private Map<String,Map<String,Map<String,Object>>>  pluginContextsByProjectAndPluginKey = new HashMap<String,Map<String,Map<String,Object>>> ();
     
     // Backward compat
-    public Map<String,Map<String,Object>> getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
+    public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
-        return new HashMap<String,Map<String,Object>>();
-    }    
+        String projectKey = project.getId();
 
-    /*
-    private Map pluginContextsByProjectAndPluginKey = new HashMap();
-    
-    public Map getPluginContext( PluginDescriptor plugin, MavenProject project )
-    {
-        Map pluginContextsByKey = (Map) pluginContextsByProjectAndPluginKey.get( project.getId() );
+        Map<String, Map<String, Object>> pluginContextsByKey = pluginContextsByProjectAndPluginKey.get( projectKey );
 
         if ( pluginContextsByKey == null )
         {
-            pluginContextsByKey = new HashMap();
+            pluginContextsByKey = new HashMap<String, Map<String, Object>>();
 
-            pluginContextsByProjectAndPluginKey.put( project.getId(), pluginContextsByKey );
+            pluginContextsByProjectAndPluginKey.put( projectKey, pluginContextsByKey );
         }
 
-        Map pluginContext = (Map) pluginContextsByKey.get( plugin.getPluginLookupKey() );
+        String pluginKey = plugin.getPluginLookupKey();
+
+        Map<String, Object> pluginContext = pluginContextsByKey.get( pluginKey );
 
         if ( pluginContext == null )
         {
-            pluginContext = new HashMap();
-            pluginContextsByKey.put( plugin.getPluginLookupKey(), pluginContext );
+            pluginContext = new HashMap<String, Object>();
+
+            pluginContextsByKey.put( pluginKey, pluginContext );
         }
 
         return pluginContext;
     }
-    */
-    
+
 }

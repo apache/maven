@@ -45,7 +45,7 @@ public class DefaultToolchainManager
 
     public Toolchain getToolchainFromBuildContext( String type, MavenSession session )
     {
-        Map context = retrieveContext( session );
+        Map<String, Object> context = retrieveContext( session );
 
         ToolchainModel model = (ToolchainModel) context.get( getStorageKey( type ) );
 
@@ -73,9 +73,9 @@ public class DefaultToolchainManager
         return null;
     }
 
-    Map retrieveContext( MavenSession session )
+    Map<String, Object> retrieveContext( MavenSession session )
     {
-        Map context = null;
+        Map<String, Object> context = null;
 
         if ( session != null )
         {
@@ -88,11 +88,11 @@ public class DefaultToolchainManager
             if ( current != null )
             {
                 //TODO: why is this using the context
-                //context = session.getPluginContext( desc, current );
+                context = session.getPluginContext( desc, current );
             }
         }
 
-        return ( context != null ) ? context : new HashMap();
+        return ( context != null ) ? context : new HashMap<String, Object>();
     }
 
     public static final String getStorageKey( String type )
