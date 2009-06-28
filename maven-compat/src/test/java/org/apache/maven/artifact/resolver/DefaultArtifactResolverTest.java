@@ -11,5 +11,4 @@ public class DefaultArtifactResolverTest
     {
         ArtifactResolver resolver = lookup( ArtifactResolver.class, "default" );
     }
-
 }

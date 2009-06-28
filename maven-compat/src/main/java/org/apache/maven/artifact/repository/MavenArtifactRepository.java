@@ -43,9 +43,6 @@ public class MavenArtifactRepository
     private ArtifactRepositoryPolicy snapshots;
 
     private ArtifactRepositoryPolicy releases;
-
-    //TODO: this should be tracked externally, not by the repository itself
-    private boolean blacklisted;
     
     public MavenArtifactRepository()
     {
@@ -122,16 +119,6 @@ public class MavenArtifactRepository
     public String getKey()
     {
         return getId();
-    }
-
-    public boolean isBlacklisted()
-    {
-        return blacklisted;
-    }
-
-    public void setBlacklisted( boolean blacklisted )
-    {
-        this.blacklisted = blacklisted;
     }
     
     public String toString()

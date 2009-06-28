@@ -21,49 +21,12 @@ package org.apache.maven.artifact.metadata;
 
 import org.apache.maven.artifact.Artifact;
 
-/**
- * Error while retrieving repository metadata from the repository.
- *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
- */
+@Deprecated
 public class ArtifactMetadataRetrievalException
-    extends Exception
+    extends org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException
 {
-    private Artifact artifact;
-
-    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
-    @Deprecated
-    public ArtifactMetadataRetrievalException( String message )
+    public ArtifactMetadataRetrievalException( String message, Throwable cause, Artifact artifact )
     {
-        this( message, null, null );
-    }
-
-    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
-    @Deprecated
-    public ArtifactMetadataRetrievalException( Throwable cause )
-    {
-        this( null, cause, null );
-    }
-
-    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
-    @Deprecated
-    public ArtifactMetadataRetrievalException( String message,
-                                               Throwable cause )
-    {
-        this( message, cause, null );
-    }
-
-    public ArtifactMetadataRetrievalException( String message,
-                                               Throwable cause,
-                                               Artifact artifact )
-    {
-        super( message, cause );
-        this.artifact = artifact;
-    }
-
-    public Artifact getArtifact()
-    {
-        return artifact;
+        super( message, cause, artifact );
     }
 }

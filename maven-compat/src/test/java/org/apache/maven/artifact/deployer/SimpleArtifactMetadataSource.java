@@ -23,13 +23,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.repository.legacy.metadata.ArtifactMetadataSource;
+import org.apache.maven.repository.legacy.metadata.ResolutionGroup;
 
 /** @author Jason van Zyl */
 public class SimpleArtifactMetadataSource

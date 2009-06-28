@@ -19,7 +19,7 @@ package org.apache.maven.artifact.repository.metadata;
  * under the License.
  */
 
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
+//import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
@@ -30,8 +30,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * @todo not happy about the store method - they use "this"
  */
 public interface RepositoryMetadata
-    extends ArtifactMetadata
-{
+    extends org.apache.maven.artifact.metadata.ArtifactMetadata
+{        
     /**
      * Set the repository the metadata was located in.
      *
@@ -58,5 +58,5 @@ public interface RepositoryMetadata
      *
      * @return if it is a snapshot
      */
-    boolean isSnapshot();
+    boolean isSnapshot();       
 }

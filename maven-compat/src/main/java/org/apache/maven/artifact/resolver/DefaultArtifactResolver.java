@@ -27,8 +27,6 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -36,9 +34,12 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
+import org.apache.maven.repository.legacy.WagonManager;
+import org.apache.maven.repository.legacy.metadata.ArtifactMetadata;
+import org.apache.maven.repository.legacy.resolver.ArtifactCollector;
+import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.events.TransferListener;
@@ -146,10 +147,6 @@ public class DefaultArtifactResolver
                 return;
             }
             
-            //String localPath = localRepository.pathOf( artifact );
-
-            //artifact.setFile( new File( localRepository.getBasedir(), localPath ) );
-
             transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
 
             boolean localCopy = isLocalCopy( artifact );
@@ -158,13 +155,6 @@ public class DefaultArtifactResolver
 
             boolean resolved = false;
 
-            boolean destinationExists = destination.exists();
-            
-            // There are three conditions in which we'll go after the artifact here:
-            // 1. the force flag is set.
-            // 2. the artifact's file doesn't exist (this would be true for release or snapshot artifacts)
-            // 3. the artifact is a snapshot and is not a locally installed snapshot
-
             if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) )
             {
                 try
@@ -172,11 +162,11 @@ public class DefaultArtifactResolver
                     if ( artifact.getRepository() != null )
                     {
                         // the transformations discovered the artifact - so use it exclusively
-                        wagonManager.getArtifact( artifact, artifact.getRepository(), downloadMonitor, force );
+                        wagonManager.getArtifact( artifact, artifact.getRepository(), downloadMonitor );
                     }
                     else
                     {
-                        wagonManager.getArtifact( artifact, remoteRepositories, downloadMonitor, force );
+                        wagonManager.getArtifact( artifact, remoteRepositories, downloadMonitor );
                     }
 
                     if ( !artifact.isResolved() && !destination.exists() )

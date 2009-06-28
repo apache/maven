@@ -19,66 +19,9 @@ package org.apache.maven.artifact.metadata;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
-
-/**
- * Contains metadata about an artifact, and methods to retrieve/store it from an artifact repository.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- * @todo merge with artifactmetadatasource
- * @todo retrieval exception not appropriate for store
- */
+@Deprecated
 public interface ArtifactMetadata
+    extends org.apache.maven.repository.legacy.metadata.ArtifactMetadata
 {
-    /** Whether this metadata should be stored alongside the artifact. */
-    boolean storedInArtifactVersionDirectory();
-
-    /** Whether this metadata should be stored alongside the group. */
-    boolean storedInGroupDirectory();
-
-    String getGroupId();
-
-    String getArtifactId();
-
-    String getBaseVersion();
-
-    Object getKey();
-
-    /**
-     * Get the filename of this metadata on the local repository.
-     *
-     * @param repository the remote repository it came from
-     * @return the filename
-     */
-    String getLocalFilename( ArtifactRepository repository );
-
-    /**
-     * Get the filename of this metadata on the remote repository.
-     *
-     * @return the filename
-     */
-    String getRemoteFilename();
-
-    /**
-     * Merge a new metadata set into this piece of metadata.
-     *
-     * @param metadata the new metadata
-     * @todo this should only be needed on the repository metadata
-     */
-    void merge( ArtifactMetadata metadata );
-
-    /**
-     * Store the metadata in the local repository.
-     *
-     * @param localRepository  the local repository
-     * @param remoteRepository the remote repository it came from
-     * @todo this should only be needed on the repository metadata
-     */
-    void storeInLocalRepository( ArtifactRepository localRepository,
-                                 ArtifactRepository remoteRepository )
-        throws RepositoryMetadataStoreException;
-
-    String extendedToString();
+    void merge( ArtifactMetadata metadata );    
 }

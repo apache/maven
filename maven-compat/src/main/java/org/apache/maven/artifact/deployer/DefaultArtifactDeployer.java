@@ -19,14 +19,12 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
+import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -46,12 +44,6 @@ public class DefaultArtifactDeployer
 
     @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
-
-    @Requirement
-    private ArtifactMetadataSource metadataSource;
-
-    @Requirement(hint="default")
-    private ArtifactRepositoryLayout defaultLayout;
 
     /**
      * @deprecated we want to use the artifact method only, and ensure artifact.file is set

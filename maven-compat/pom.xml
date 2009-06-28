@@ -20,7 +20,6 @@
   </parent>
 
   <artifactId>maven-compat</artifactId>
-
   <name>Maven Compat</name>
 
   <dependencies>
