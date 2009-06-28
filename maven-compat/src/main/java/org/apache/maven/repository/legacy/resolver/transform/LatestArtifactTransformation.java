@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.transform;
+package org.apache.maven.repository.legacy.resolver.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,23 +22,15 @@ package org.apache.maven.artifact.transform;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 
-/**
- * Change the version <code>RELEASE</code> to the appropriate release version from the remote repository.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- */
-@Component(role=ArtifactTransformation.class, hint="release") 
-public class ReleaseArtifactTransformation
+@Component(role=ArtifactTransformation.class, hint="latest")
+public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {
     public void transformForResolve( Artifact artifact,
@@ -46,15 +38,14 @@ public class ReleaseArtifactTransformation
                                      ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        if ( Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
+        if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) )
         {
             try
             {
                 String version = resolveVersion( artifact, localRepository, remoteRepositories );
-
-                if ( Artifact.RELEASE_VERSION.equals( version ) )
+                if ( Artifact.LATEST_VERSION.equals( version ) )
                 {
-                    throw new ArtifactNotFoundException( "Unable to determine the release version", artifact );
+                    throw new ArtifactNotFoundException( "Unable to determine the latest version", artifact );
                 }
 
                 artifact.setBaseVersion( version );
@@ -70,37 +61,19 @@ public class ReleaseArtifactTransformation
     public void transformForInstall( Artifact artifact,
                                      ArtifactRepository localRepository )
     {
-        ArtifactMetadata metadata = createMetadata( artifact );
-
-        artifact.addMetadata( metadata );
+        // metadata is added via addPluginArtifactMetadata
     }
 
     public void transformForDeployment( Artifact artifact,
                                         ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
     {
-        ArtifactMetadata metadata = createMetadata( artifact );
-
-        artifact.addMetadata( metadata );
-    }
-
-    private ArtifactMetadata createMetadata( Artifact artifact )
-    {
-        Versioning versioning = new Versioning();
-        versioning.updateTimestamp();
-        versioning.addVersion( artifact.getVersion() );
-
-        if ( artifact.isRelease() )
-        {
-            versioning.setRelease( artifact.getVersion() );
-        }
-
-        return new ArtifactRepositoryMetadata( artifact, versioning );
+        // metadata is added via addPluginArtifactMetadata
     }
 
     protected String constructVersion( Versioning versioning,
                                        String baseVersion )
     {
-        return versioning.getRelease();
+        return versioning.getLatest();
     }
 }

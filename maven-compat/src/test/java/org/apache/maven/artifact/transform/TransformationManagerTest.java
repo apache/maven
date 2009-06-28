@@ -2,6 +2,10 @@ package org.apache.maven.artifact.transform;
 
 import java.util.List;
 
+import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
+import org.apache.maven.repository.legacy.resolver.transform.LatestArtifactTransformation;
+import org.apache.maven.repository.legacy.resolver.transform.ReleaseArtifactTransformation;
+import org.apache.maven.repository.legacy.resolver.transform.SnapshotTransformation;
 import org.codehaus.plexus.PlexusTestCase;
 
 /** @author Jason van Zyl */

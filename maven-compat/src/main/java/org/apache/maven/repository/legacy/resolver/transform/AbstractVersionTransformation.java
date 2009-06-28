@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.transform;
+package org.apache.maven.repository.legacy.resolver.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
