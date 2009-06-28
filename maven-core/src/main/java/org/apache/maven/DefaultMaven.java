@@ -222,9 +222,11 @@ public class DefaultMaven
 
         if ( !collisions.isEmpty() )
         {
-            throw new org.apache.maven.DuplicateProjectException( "Two or more projects in the reactor"
+            /*
+            throw new DuplicateProjectException( "Two or more projects in the reactor"
                 + " have the same identifier, please make sure that <groupId>:<artifactId>:<version>"
-                + " is unique for each project: " + collisions, collisions );
+                + " is unique for each project: " + collisions );
+            */
         }
 
         return index;

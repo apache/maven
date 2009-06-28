@@ -69,8 +69,7 @@ public class ProjectArtifactMetadata
     public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws RepositoryMetadataStoreException
     {
-        File destination = new File( localRepository.getBasedir(),
-                                     localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
+        File destination = new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
         // ----------------------------------------------------------------------------
         // I'm fully aware that the file could just be moved using File.rename but
@@ -116,5 +115,10 @@ public class ProjectArtifactMetadata
         {
             throw new IllegalStateException( "Cannot add two different pieces of metadata for: " + getKey() );
         }
+    }
+
+    public void merge( org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata )
+    {
+        this.merge( (ArtifactMetadata)metadata );
     }
 }

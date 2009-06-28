@@ -30,7 +30,6 @@ import java.util.Map;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -384,32 +383,6 @@ public class LegacyRepositorySystem
         authenticationInfoMap.put( repositoryId, authInfo );
 
         wagonManager.addAuthenticationInfo( repositoryId, username, password, privateKey, passphrase );
-    }
-    */
-
-    /*
-    public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
-    {
-        RepositoryPermissions permissions = new RepositoryPermissions();
-
-        boolean addPermissions = false;
-
-        if ( filePermissions != null )
-        {
-            permissions.setFileMode( filePermissions );
-            addPermissions = true;
-        }
-
-        if ( directoryPermissions != null )
-        {
-            permissions.setDirectoryMode( directoryPermissions );
-            addPermissions = true;
-        }
-
-        if ( addPermissions )
-        {
-            serverPermissionsMap.put( repositoryId, permissions );
-        }
     }
     */
 

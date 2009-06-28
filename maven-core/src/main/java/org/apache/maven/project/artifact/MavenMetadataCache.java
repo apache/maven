@@ -3,8 +3,8 @@ package org.apache.maven.project.artifact;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license

@@ -11,8 +11,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.metadata.MetadataSource;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.apache.maven.repository.metadata.MetadataSource;
 import org.codehaus.plexus.component.annotations.Component;
 
 @Component(role=ArtifactMetadataSource.class,hint="classpath")

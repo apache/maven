@@ -105,7 +105,9 @@ public interface RepositorySystem
     
     // Map types of artifacts
     
+    //
     // Raw file transfers
+    //
     void publish( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
         throws TransferFailedException;
     

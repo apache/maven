@@ -10,8 +10,6 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.maven.embedder.MavenEmbedderLogger;
-import org.apache.maven.execution.ApplicationInformation;
-import org.apache.maven.execution.DefaultRuntimeInformation;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 
