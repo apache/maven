@@ -30,7 +30,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.CyclicDependencyException;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.apache.maven.repository.legacy.resolver.DefaultArtifactCollector;
+import org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector;
 
 
 /**
@@ -166,7 +166,7 @@ public class MetadataResolutionResult
     /**
      * @TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
      *       {@link #getVersionRangeViolation(int)} but it's not used like that in
-     *       {@link DefaultArtifactCollector}
+     *       {@link DefaultLegacyArtifactCollector}
      */
     public MetadataResolutionResult addVersionRangeViolation( Exception e )
     {

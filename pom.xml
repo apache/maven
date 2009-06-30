@@ -137,7 +137,10 @@
     <module>maven-model-builder</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
+    <!--
+    While working on the compatibility layer I've merged the code with maven-compat
     <module>maven-repository</module>
+    -->
   </modules>
 
   <scm>

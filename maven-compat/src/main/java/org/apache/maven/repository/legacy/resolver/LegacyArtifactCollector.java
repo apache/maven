@@ -39,7 +39,7 @@ import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
  * @version $Id$
  */
 @Deprecated
-public interface ArtifactCollector
+public interface LegacyArtifactCollector
 {
 
     ArtifactResolutionResult collect( Set<Artifact> artifacts,

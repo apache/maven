@@ -57,6 +57,12 @@
       <version>1.2_Java1.3</version>
       <scope>test</scope>
     </dependency>
+    
+    
+    <dependency>
+      <groupId>org.jsecurity</groupId>
+      <artifactId>jsecurity</artifactId>
+    </dependency>    
   </dependencies>
 
   <build>

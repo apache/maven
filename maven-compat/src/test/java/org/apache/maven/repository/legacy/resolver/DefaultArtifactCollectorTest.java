@@ -47,7 +47,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.repository.legacy.resolver.ArtifactCollector;
+import org.apache.maven.repository.legacy.resolver.LegacyArtifactCollector;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
@@ -59,7 +59,7 @@ import org.codehaus.plexus.PlexusTestCase;
 public class DefaultArtifactCollectorTest
     extends PlexusTestCase
 {
-    private ArtifactCollector artifactCollector;
+    private LegacyArtifactCollector artifactCollector;
 
     private ArtifactFactory artifactFactory;
 
@@ -77,7 +77,7 @@ public class DefaultArtifactCollectorTest
 
         source = new Source();
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        artifactCollector = (ArtifactCollector) lookup( ArtifactCollector.class );
+        artifactCollector = (LegacyArtifactCollector) lookup( LegacyArtifactCollector.class );
 
         projectArtifact = createArtifactSpec( "project", "1.0", null );
     }

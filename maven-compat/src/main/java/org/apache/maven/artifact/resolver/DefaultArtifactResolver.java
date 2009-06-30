@@ -37,7 +37,6 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadata;
-import org.apache.maven.repository.legacy.resolver.ArtifactCollector;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;

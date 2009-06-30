@@ -54,9 +54,9 @@ import org.codehaus.plexus.logging.Logger;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author Jason van Zyl
  */
-@Component(role=ArtifactCollector.class)
-public class DefaultArtifactCollector
-    implements ArtifactCollector
+@Component(role=LegacyArtifactCollector.class)
+public class DefaultLegacyArtifactCollector
+    implements LegacyArtifactCollector
 {
 	@Requirement(hint="nearest")
     private ConflictResolver defaultConflictResolver;
