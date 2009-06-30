@@ -30,10 +30,11 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-compat</artifactId>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository</artifactId>
-    </dependency>    
+    </dependency>         -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
