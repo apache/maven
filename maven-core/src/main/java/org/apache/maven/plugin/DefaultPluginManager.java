@@ -222,7 +222,7 @@ public class DefaultPluginManager
         }
     }
 
-    private PluginDescriptor parsebuildPluginDescriptor( InputStream is )
+    public PluginDescriptor parsebuildPluginDescriptor( InputStream is )
         throws IOException, PlexusConfigurationException
     {
         PluginDescriptor pluginDescriptor;

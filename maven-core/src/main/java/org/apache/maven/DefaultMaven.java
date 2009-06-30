@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -86,13 +86,24 @@ public class DefaultMaven
         DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository( request.getLocalRepository() );
         
         request.setLocalRepository( delegatingLocalArtifactRepository );        
-                
-        MavenSession session;
+
+        MavenSession session = new MavenSession( container, request, result);
         
-        Map<String,MavenProject> projects;
+        try
+        {
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants() )
+            {
+                listener.afterSessionStart( session );
+            }
+        }
+        catch ( MavenExecutionException e )
+        {
+            return processResult( result, e );
+        }
 
         //TODO: optimize for the single project or no project
         
+        List<MavenProject> projects;
         try
         {
             projects = getProjectsForMavenReactor( request );
@@ -101,7 +112,7 @@ public class DefaultMaven
             if ( projects.isEmpty() )
             {
                 MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingRequest() ); 
-                projects.put( ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
+                projects.add( project );
                 request.setProjectPresent( false );
             }
         }
@@ -113,12 +124,28 @@ public class DefaultMaven
         {
             return processResult( result, e );
         }
-        
+
+        session.setProjects( projects );
+
+        try
+        {
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants() )
+            {
+                listener.afterProjectsRead( session );
+            }
+        }
+        catch ( MavenExecutionException e )
+        {
+            return processResult( result, e );
+        }
+
         try
         {                        
-            ProjectSorter projectSorter = new ProjectSorter( projects.values() );
-                                    
-            session = new MavenSession( container, request, result, projectSorter.getSortedProjects() );            
+            ProjectSorter projectSorter = new ProjectSorter( session.getProjects() );
+
+            projects = projectSorter.getSortedProjects();
+
+            session.setProjects( projects );
         }
         catch ( CycleDetectedException e )
         {            
@@ -132,14 +159,20 @@ public class DefaultMaven
         {
             return processResult( result, e );
         }
-       
+
         // Desired order of precedence for local artifact repositories
         //
         // Reactor
         // Workspace
         // User Local Repository
-                
-        delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projects ) );
+        try
+        {
+            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( getProjectMap( session.getProjects() ) ) );
+        }
+        catch ( MavenExecutionException e )
+        {
+            return processResult( result, e );
+        }
         
         if ( result.hasExceptions() )
         {
@@ -162,6 +195,22 @@ public class DefaultMaven
         return result;
     }
 
+    private List<AbstractMavenLifecycleParticipant> getLifecycleParticipants()
+    {
+        // TODO injection of component lists does not work
+        List<AbstractMavenLifecycleParticipant> lifecycleListeners;
+        try
+        {
+            lifecycleListeners = container.lookupList( AbstractMavenLifecycleParticipant.class );
+        }
+        catch ( ComponentLookupException e1 )
+        {
+            // this is just silly, lookupList should return an empty list!
+            lifecycleListeners = new ArrayList<AbstractMavenLifecycleParticipant>();
+        }
+        return lifecycleListeners;
+    }
+
     private MavenExecutionResult processResult( MavenExecutionResult result, Exception e )
     {
         ExceptionHandler handler = new DefaultExceptionHandler();
@@ -175,14 +224,14 @@ public class DefaultMaven
         return result;
     }
     
-    protected Map<String,MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
+    private List<MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
         // We have no POM file.
         //
         if ( request.getPom() == null || !request.getPom().exists() )
         {
-            return new HashMap<String,MavenProject>();
+            return new ArrayList<MavenProject>();
         }
         
         List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
@@ -191,6 +240,12 @@ public class DefaultMaven
 
         collectProjects( projects, files, request );
 
+        return projects;
+    }
+
+    private Map<String, MavenProject> getProjectMap( List<MavenProject> projects )
+        throws org.apache.maven.DuplicateProjectException
+    {
         Map<String, MavenProject> index = new LinkedHashMap<String, MavenProject>();
         Map<String, List<File>> collisions = new LinkedHashMap<String, List<File>>();
 

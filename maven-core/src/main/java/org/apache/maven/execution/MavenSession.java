@@ -31,7 +31,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * @author Jason van Zyl
@@ -55,25 +54,37 @@ public class MavenSession
     
     private MavenProject topLevelProject;
     
+    @Deprecated
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, MavenProject project )
-        throws CycleDetectedException, DuplicateProjectException
     {
         this( container, request, result, Arrays.asList( new MavenProject[]{ project } ) );        
     }    
 
+    @Deprecated
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, List<MavenProject> projects )
-        throws CycleDetectedException, DuplicateProjectException
     {
         this.container = container;
         this.request = request;
         this.result = result;
+        setProjects( projects );     
+    }
+
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result )
+    {
+        this.container = container;
+        this.request = request;
+        this.result = result;
+    }
+
+    public void setProjects( List<MavenProject> projects )
+    {
         //TODO: Current for testing classes creating the session
         if ( projects.size() > 0 )
         {
             this.currentProject = projects.get( 0 );
             this.topLevelProject = projects.get(  0 );
         }
-        this.projects = projects;     
+        this.projects = projects;
     }    
         
     @Deprecated

@@ -6,7 +6,6 @@ import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 public class MavenTest

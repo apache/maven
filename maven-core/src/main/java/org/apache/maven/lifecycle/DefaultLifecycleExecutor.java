@@ -806,7 +806,10 @@ public class DefaultLifecycleExecutor
                 {
                     String phase = goalsForLifecyclePhase.getKey();
                     String goals = goalsForLifecyclePhase.getValue();
-                    parseLifecyclePhaseDefinitions( plugins, phase, goals );
+                    if ( goals != null )
+                    {
+                        parseLifecyclePhaseDefinitions( plugins, phase, goals );
+                    }
                 }
             }
             else if ( lifecycle.getDefaultPhases() != null )

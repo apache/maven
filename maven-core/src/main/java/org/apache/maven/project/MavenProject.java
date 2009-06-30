@@ -164,7 +164,9 @@ public class MavenProject
     private RepositorySystem repositorySystem;
     
     private File parentFile;
-    
+
+    private Map<String, Object> context;
+
     //
 
     public MavenProject()
@@ -1965,5 +1967,42 @@ public class MavenProject
     private static String getProjectReferenceId( String groupId, String artifactId, String version )
     {
         return groupId + ":" + artifactId + ":" + version;
+    }
+
+    /**
+     * Sets the value of the context value of this project identified
+     * by the given key. If the supplied value is <code>null</code>,
+     * the context value is removed from this project.
+     * 
+     * Context values are intended to allow core extensions to associate
+     * derived state with project instances. 
+     */
+    public void setContextValue( String key, Object value )
+    {
+        if ( context == null )
+        {
+            context = new HashMap<String, Object>();
+        }
+        if ( value != null )
+        {
+            context.put( key, value );
+        }
+        else
+        {
+            context.remove( key );
+        }
+    }
+
+    /**
+     * Returns context value of this project associated with the given key 
+     * or null if this project has no such value. 
+     */
+    public Object getContextValue( String key )
+    {
+        if ( context == null )
+        {
+            return null;
+        }
+        return context.get( key );
     }
 }
