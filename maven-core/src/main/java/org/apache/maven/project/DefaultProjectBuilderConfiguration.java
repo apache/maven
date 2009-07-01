@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.ModelEventListener;
 
 @Deprecated
@@ -34,6 +35,7 @@ public class DefaultProjectBuilderConfiguration
     public DefaultProjectBuilderConfiguration()
     {
         setProcessPlugins( false );
+        setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
     }
 
     public ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository )
@@ -66,9 +68,9 @@ public class DefaultProjectBuilderConfiguration
         return this;
     }
 
-    public ProjectBuilderConfiguration setLenientValidation( boolean lenientValidation )
+    public ProjectBuilderConfiguration setValidationLevel( int validationLevel )
     {
-        super.setLenientValidation( lenientValidation );
+        super.setValidationLevel( validationLevel );
         return this;
     }
 

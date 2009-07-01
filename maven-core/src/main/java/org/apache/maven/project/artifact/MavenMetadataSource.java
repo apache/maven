@@ -43,6 +43,7 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -114,7 +115,7 @@ public class MavenMetadataSource
             ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
             configuration.setLocalRepository( localRepository );
             configuration.setRemoteRepositories( remoteRepositories );
-            configuration.setLenientValidation( true );
+            configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
             // We don't care about processing plugins here, all we're interested in is the dependencies.
             configuration.setProcessPlugins( false );
             // FIXME: We actually need the execution properties here...

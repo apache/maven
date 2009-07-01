@@ -182,8 +182,7 @@ public class DefaultProjectBuilder
                                          configuration.getRemoteRepositories() );
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
-        request.setValidationLevel( configuration.istLenientValidation() ? ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL
-                        : ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
+        request.setValidationLevel( configuration.getValidationLevel() );
         request.setProcessPlugins( configuration.isProcessPlugins() );
         request.setProfiles( configuration.getProfiles() );
         request.setActiveProfileIds( configuration.getActiveProfileIds() );

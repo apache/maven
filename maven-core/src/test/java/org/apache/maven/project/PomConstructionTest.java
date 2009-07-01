@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
@@ -1678,7 +1678,8 @@ public class PomConstructionTest
         config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null, null ) );
         config.setActiveProfileIds( Arrays.asList( profileIds ) );
         config.setExecutionProperties( executionProperties );
-        config.setLenientValidation( lenientValidation );
+        config.setValidationLevel( lenientValidation ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
+                        : ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ) );
     }
