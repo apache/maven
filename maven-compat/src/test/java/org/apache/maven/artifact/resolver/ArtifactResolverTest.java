@@ -57,12 +57,6 @@ public class ArtifactResolverTest
     {
         super.setUp();
 
-        for ( java.net.URL url : Collections.list( Thread.currentThread().getContextClassLoader().getResources(
-                                                                                                                "META-INF/plexus/components.xml" ) ) )
-        {
-            System.err.println( url );
-        }
-
         artifactResolver = (DefaultArtifactResolver) lookup( ArtifactResolver.class );
 
         projectArtifact = createLocalArtifact( "project", "3.0" );
