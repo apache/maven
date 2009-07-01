@@ -33,7 +33,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 // It would be cool if there was a hook that i could use to setup a test environment.
@@ -61,6 +60,8 @@ public class ArtifactResolverTest
         artifactResolver = (DefaultArtifactResolver) lookup( ArtifactResolver.class );
 
         projectArtifact = createLocalArtifact( "project", "3.0" );
+
+        System.out.println( getName() );
     }
     
     @Override
