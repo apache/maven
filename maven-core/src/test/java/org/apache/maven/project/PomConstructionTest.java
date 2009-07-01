@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;

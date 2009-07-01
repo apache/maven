@@ -20,7 +20,7 @@ package org.apache.maven.model.plugin;
  */
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 
 /**
  * Handles expansion of general plugin configuration into individual executions and report sets.

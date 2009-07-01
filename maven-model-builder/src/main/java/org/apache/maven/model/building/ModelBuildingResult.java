@@ -1,4 +1,4 @@
-package org.apache.maven.model;
+package org.apache.maven.model.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,6 +20,9 @@ package org.apache.maven.model;
  */
 
 import java.util.List;
+
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
 
 /**
  * Collects the output of the model builder.

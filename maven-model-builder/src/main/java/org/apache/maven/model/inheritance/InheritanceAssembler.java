@@ -20,7 +20,7 @@ package org.apache.maven.model.inheritance;
  */
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 
 /**
  * Handles inheritance of model values.

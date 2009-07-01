@@ -19,9 +19,9 @@ package org.apache.maven.project.validation;
  * under the License.
  */
 
-import org.apache.maven.model.DefaultModelBuildingRequest;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBuildingRequest;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 

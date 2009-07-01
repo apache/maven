@@ -20,7 +20,7 @@ package org.apache.maven.model.normalization;
  */
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 
 /**
  * Handles normalization of a model. In this context, normalization is the process of producing a canonical

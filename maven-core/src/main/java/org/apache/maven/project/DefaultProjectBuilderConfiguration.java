@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.ModelBuildingRequest;
-import org.apache.maven.model.ModelEventListener;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelEventListener;
 
 @Deprecated
 public class DefaultProjectBuilderConfiguration

@@ -20,7 +20,7 @@ package org.apache.maven.model.interpolation;
  */
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 
 import java.io.File;
 

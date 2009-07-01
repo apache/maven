@@ -1,4 +1,4 @@
-package org.apache.maven.model;
+package org.apache.maven.model.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.resolution.ModelResolver;
 
 /**

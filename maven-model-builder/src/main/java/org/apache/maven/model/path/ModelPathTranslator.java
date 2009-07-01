@@ -22,7 +22,7 @@ package org.apache.maven.model.path;
 import java.io.File;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 
 /**
  * Resolves relative paths of a model against a specific base directory.

@@ -1,4 +1,4 @@
-package org.apache.maven.model;
+package org.apache.maven.model.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

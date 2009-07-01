@@ -19,9 +19,9 @@ package org.apache.maven.model.resolution;
  * under the License.
  */
 
-import org.apache.maven.model.ModelBuilder;
-import org.apache.maven.model.ModelSource;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.building.ModelBuilder;
+import org.apache.maven.model.building.ModelSource;
 
 /**
  * Resolves a POM from its coordinates. During the build process, the {@link ModelBuilder} will add any relevant

@@ -22,9 +22,9 @@ package org.apache.maven.model.validation;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.maven.model.DefaultModelBuildingRequest;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBuildingRequest;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
 

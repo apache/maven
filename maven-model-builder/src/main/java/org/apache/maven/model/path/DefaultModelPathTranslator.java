@@ -25,9 +25,9 @@ import java.util.List;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Resource;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
