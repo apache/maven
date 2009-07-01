@@ -34,24 +34,49 @@ public interface ModelBuildingRequest
 {
 
     /**
-     * Gets the level of validation to perform on processed models.
-     * 
-     * @return {@code true} if lenient validation is enabled and only the dependency information is to be validated,
-     *         {@code false} if strict validation is enabled and the entire model is validated.
+     * Denotes minimal validation of POMs. This validation level is meant for processing of POMs from repositories
+     * during metadata retrieval.
      */
-    boolean istLenientValidation();
+    static final int VALIDATION_LEVEL_MINIMAL = 0;
 
     /**
-     * Sets the level of validation to perform on processed models. For building of projects, strict validation should
-     * be used to ensure proper building. For the mere retrievel of dependencies during artifact resolution, lenient
-     * validation should be used to account for models of poor quality. By default, models are validated in strict mode.
+     * Denotes validation as performed by Maven 2.0. This validation level is meant as a compatibility mode to allow
+     * users to migrate their projects.
+     */
+    static final int VALIDATION_LEVEL_MAVEN_2_0 = 20;
+
+    /**
+     * Denotes validation as performed by Maven 3.0. This validation level is meant for existing projects.
+     */
+    static final int VALIDATION_LEVEL_MAVEN_3_0 = 30;
+
+    /**
+     * Denotes validation as performed by Maven 3.1. This validation level is meant for new projects.
+     */
+    static final int VALIDATION_LEVEL_MAVEN_3_1 = 31;
+
+    /**
+     * Denotes strict validation as recommended by the current Maven version.
+     */
+    static final int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
+
+    /**
+     * Gets the level of validation to perform on processed models.
      * 
-     * @param lenientValidation A flag whether validation should be lenient instead of strict. For building of projects,
-     *            strict validation should be used to ensure proper building. For the mere retrievel of dependencies
-     *            during artifact resolution, lenient validation should be used to account for models of poor quality.
+     * @return The level of validation to perform on processed models.
+     */
+    int getValidationLevel();
+
+    /**
+     * Sets the level of validation to perform on processed models. For building of projects,
+     * {@link #VALIDATION_LEVEL_STRICT} should be used to ensure proper building. For the mere retrievel of dependencies
+     * during artifact resolution, {@link #VALIDATION_LEVEL_MINIMAL} should be used to account for models of poor
+     * quality. By default, models are validated in strict mode.
+     * 
+     * @param validationLevel The level of validation to perform on processed models.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setLenientValidation( boolean lenientValidation );
+    ModelBuildingRequest setValidationLevel( int validationLevel );
 
     /**
      * Indicates whether plugin executions and configurations should be processed. If enabled, lifecycle-induced plugin

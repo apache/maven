@@ -234,9 +234,11 @@ public class DefaultModelBuilder
 
         try
         {
+            boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+
             Map<String, Object> options =
-                Collections.<String, Object> singletonMap( ModelReader.IS_STRICT,
-                                                           Boolean.valueOf( !request.istLenientValidation() ) );
+                Collections.<String, Object> singletonMap( ModelReader.IS_STRICT, Boolean.valueOf( strict ) );
+
             model = modelReader.read( modelSource.getInputStream(), options );
         }
         catch ( ModelParseException e )

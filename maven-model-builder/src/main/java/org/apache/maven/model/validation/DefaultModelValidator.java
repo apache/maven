@@ -70,36 +70,37 @@ public class DefaultModelValidator
             }
         }
 
-        if ( !request.istLenientValidation() )
+        if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
-            validateDependencies( result, model.getDependencies(), "dependencies" );
+            validateDependencies( result, model.getDependencies(), "dependencies", request );
 
             if ( model.getDependencyManagement() != null )
             {
                 validateDependencies( result, model.getDependencyManagement().getDependencies(),
-                                      "dependencyManagment.dependencies" );
+                                      "dependencyManagment.dependencies", request );
             }
 
-            validateRepositories( result, model.getRepositories(), "repositories.repository" );
+            validateRepositories( result, model.getRepositories(), "repositories.repository", request );
 
-            validateRepositories( result, model.getPluginRepositories(), "pluginRepositories.pluginRepository" );
+            validateRepositories( result, model.getPluginRepositories(), "pluginRepositories.pluginRepository", request );
 
             for ( Profile profile : model.getProfiles() )
             {
                 validateDependencies( result, profile.getDependencies(), "profiles.profile[" + profile.getId()
-                    + "].dependencies" );
+                    + "].dependencies", request );
 
                 if ( profile.getDependencyManagement() != null )
                 {
                     validateDependencies( result, profile.getDependencyManagement().getDependencies(),
-                                          "profiles.profile[" + profile.getId() + "].dependencyManagment.dependencies" );
+                                          "profiles.profile[" + profile.getId() + "].dependencyManagment.dependencies",
+                                          request );
                 }
 
                 validateRepositories( result, profile.getRepositories(), "profiles.profile[" + profile.getId()
-                    + "].repositories.repository" );
+                    + "].repositories.repository", request );
 
                 validateRepositories( result, profile.getPluginRepositories(), "profiles.profile[" + profile.getId()
-                    + "].pluginRepositories.pluginRepository" );
+                    + "].pluginRepositories.pluginRepository", request );
             }
         }
 
@@ -208,8 +209,11 @@ public class DefaultModelValidator
             }
         }
 
-        if ( !request.istLenientValidation() )
+        if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
+            boolean warnOnMissingPluginVersion =
+                request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1;
+
             Build build = model.getBuild();
             if ( build != null )
             {
@@ -219,7 +223,8 @@ public class DefaultModelValidator
 
                     validateStringNotEmpty( "build.plugins.plugin.groupId", result, false, p.getGroupId() );
 
-                    validateStringNotEmpty( "build.plugins.plugin.version", result, true, p.getVersion(), p.getKey() );
+                    validateStringNotEmpty( "build.plugins.plugin.version", result, warnOnMissingPluginVersion,
+                                            p.getVersion(), p.getKey() );
                 }
 
                 validateResources( result, build.getResources(), "build.resources.resource" );
@@ -234,9 +239,10 @@ public class DefaultModelValidator
                 {
                     validateStringNotEmpty( "reporting.plugins.plugin.artifactId", result, false, p.getArtifactId() );
 
-                    validateStringNotEmpty( "reporting.plugins.plugin.groupId", result,false, p.getGroupId() );
+                    validateStringNotEmpty( "reporting.plugins.plugin.groupId", result, false, p.getGroupId() );
 
-                    validateStringNotEmpty( "reporting.plugins.plugin.version", result, true, p.getVersion(), p.getKey() );
+                    validateStringNotEmpty( "reporting.plugins.plugin.version", result, warnOnMissingPluginVersion,
+                                            p.getVersion(), p.getKey() );
                 }
             }
 
@@ -263,7 +269,8 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateDependencies( ModelValidationResult result, List<Dependency> dependencies, String prefix )
+    private void validateDependencies( ModelValidationResult result, List<Dependency> dependencies, String prefix,
+                                       ModelBuildingRequest request )
     {
         Map<String, Dependency> index = new HashMap<String, Dependency>();
 
@@ -275,8 +282,10 @@ public class DefaultModelValidator
 
             if ( existing != null )
             {
-                addViolation( result, false, "'" + prefix + ".(groupId:artifactId:type:classifier)' must be unique: " + key
-                    + " -> " + existing.getVersion() + " vs " + dependency.getVersion() );
+                boolean warning = request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
+
+                addViolation( result, warning, "'" + prefix + ".(groupId:artifactId:type:classifier)' must be unique: "
+                    + key + " -> " + existing.getVersion() + " vs " + dependency.getVersion() );
             }
             else
             {
@@ -285,7 +294,8 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateRepositories( ModelValidationResult result, List<Repository> repositories, String prefix )
+    private void validateRepositories( ModelValidationResult result, List<Repository> repositories, String prefix,
+                                       ModelBuildingRequest request )
     {
         Map<String, Repository> index = new HashMap<String, Repository>();
 
@@ -301,7 +311,9 @@ public class DefaultModelValidator
 
             if ( existing != null )
             {
-                addViolation( result, false, "'" + prefix + ".id' must be unique: " + repository.getId() + " -> "
+                boolean warning = request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
+
+                addViolation( result, warning, "'" + prefix + ".id' must be unique: " + repository.getId() + " -> "
                     + existing.getUrl() + " vs " + repository.getUrl() );
             }
             else

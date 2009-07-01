@@ -68,12 +68,12 @@ public class DefaultModelNormalizer
             build.setPlugins( new ArrayList<Plugin>( normalized.values() ) );
         }
 
-        if ( request.istLenientValidation() )
+        if ( request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 )
         {
             /*
              * NOTE: This is to keep backward-compat with Maven 2.x which did not validate that dependencies are unique
-             * within a single POM. Upon multiple declarations, 2.x just kept the last one. So when we're in lenient
-             * mode for metadata retrieval, we have to deal with such broken POMs and mimic the way 2.x works.
+             * within a single POM. Upon multiple declarations, 2.x just kept the last one. So when we're in
+             * lenient/compat mode, we have to deal with such broken POMs and mimic the way 2.x works.
              */
             Map<String, Dependency> dependencies = new LinkedHashMap<String, Dependency>();
             for ( Dependency dependency : model.getDependencies() )

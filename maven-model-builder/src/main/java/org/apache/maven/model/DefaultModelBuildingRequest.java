@@ -35,7 +35,7 @@ public class DefaultModelBuildingRequest
     implements ModelBuildingRequest
 {
 
-    private boolean lenientValidation;
+    private int validationLevel = VALIDATION_LEVEL_STRICT;
 
     private boolean processPlugins;
 
@@ -51,14 +51,14 @@ public class DefaultModelBuildingRequest
 
     private ModelResolver modelResolver;
 
-    public boolean istLenientValidation()
+    public int getValidationLevel()
     {
-        return lenientValidation;
+        return validationLevel;
     }
 
-    public DefaultModelBuildingRequest setLenientValidation( boolean lenientValidation )
+    public DefaultModelBuildingRequest setValidationLevel( int validationLevel )
     {
-        this.lenientValidation = lenientValidation;
+        this.validationLevel = validationLevel;
 
         return this;
     }

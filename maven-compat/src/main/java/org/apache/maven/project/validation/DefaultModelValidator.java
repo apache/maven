@@ -42,7 +42,8 @@ public class DefaultModelValidator
     {
         ModelValidationResult result = new ModelValidationResult();
 
-        ModelBuildingRequest request = new DefaultModelBuildingRequest().setLenientValidation( false );
+        ModelBuildingRequest request =
+            new DefaultModelBuildingRequest().setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
 
         for ( String message : modelValidator.validateEffectiveModel( model, request ).getErrors() )
         {
