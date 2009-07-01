@@ -205,7 +205,7 @@ class ModelData
     @Override
     public String toString()
     {
-        return model.toString();
+        return String.valueOf( model );
     }
 
 }
