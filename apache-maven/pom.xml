@@ -219,7 +219,6 @@
                 <configuration>
                   <descriptors>
                     <descriptor>src/assemble/src.xml</descriptor>
-                    <descriptor>src/assemble/source-release.xml</descriptor>
                   </descriptors>
                   <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
