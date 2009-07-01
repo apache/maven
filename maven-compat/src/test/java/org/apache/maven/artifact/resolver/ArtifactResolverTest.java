@@ -114,6 +114,8 @@ public class ArtifactResolverTest
 
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( g ), projectArtifact, remoteRepositories(), localRepository(), null );
 
+        printErrors( result );
+
         assertEquals( 2, result.getArtifacts().size() );
 
         assertTrue( result.getArtifacts().contains( g ) );
@@ -135,6 +137,8 @@ public class ArtifactResolverTest
         deleteLocalArtifact( j );
 
         ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( i ), projectArtifact, remoteRepositories(), localRepository(), null );
+
+        printErrors( result );
 
         assertEquals( 2, result.getArtifacts().size() );
 
@@ -231,6 +235,8 @@ public class ArtifactResolverTest
         result =
             artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
 
+        printErrors( result );
+
         Iterator i = result.getArtifacts().iterator();
         assertEquals( "n should be first", n, i.next() );
         assertEquals( "m should be second", m, i.next() );
@@ -243,8 +249,30 @@ public class ArtifactResolverTest
         result =
             artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
 
+        printErrors( result );
+
         i = result.getArtifacts().iterator();
         assertEquals( "m should be first", m, i.next() );
         assertEquals( "n should be second", n, i.next() );
     }
+
+    private void printErrors( ArtifactResolutionResult result )
+    {
+        if ( result.hasMissingArtifacts() )
+        {
+            for ( Artifact artifact : result.getMissingArtifacts() )
+            {
+                System.err.println( "Missing: " + artifact );
+            }
+        }
+
+        if ( result.hasExceptions() )
+        {
+            for ( Exception e : result.getExceptions() )
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
