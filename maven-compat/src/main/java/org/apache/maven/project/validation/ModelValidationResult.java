@@ -19,12 +19,77 @@ package org.apache.maven.project.validation;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
 public class ModelValidationResult
-    extends org.apache.maven.model.validation.ModelValidationResult
 {
+
+    /** */
+    private final static String NEWLINE = System.getProperty( "line.separator" );
+
+    /** */
+    private List<String> messages;
+
+    public ModelValidationResult()
+    {
+        messages = new ArrayList<String>();
+    }
+
+    public int getMessageCount()
+    {
+        return messages.size();
+    }
+
+    public String getMessage( int i )
+    {
+        return messages.get( i );
+    }
+
+    public List<String> getMessages()
+    {
+        return Collections.unmodifiableList( messages );
+    }
+
+    public void addMessage( String message )
+    {
+        messages.add( message );
+    }
+
+    public String toString()
+    {
+        return render( "" );
+    }
+
+    public String render( String indentation )
+    {
+        if ( messages.size() == 0 )
+        {
+            return indentation + "There were no validation errors.";
+        }
+
+        StringBuffer message = new StringBuffer();
+
+//        if ( messages.size() == 1 )
+//        {
+//            message.append( "There was 1 validation error: " );
+//        }
+//        else
+//        {
+//            message.append( "There was " + messages.size() + " validation errors: " + NEWLINE );
+//        }
+//
+        for ( int i = 0; i < messages.size(); i++ )
+        {
+            message.append( indentation + "[" + i + "]  " + messages.get( i ).toString() + NEWLINE );
+        }
+
+        return message.toString();
+    }
 
 }

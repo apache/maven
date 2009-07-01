@@ -138,7 +138,15 @@ public abstract class AbstractMavenProjectTestCase
             if ( e instanceof InvalidProjectModelException )
             {
                 ModelValidationResult validationResult = ( (InvalidProjectModelException) e ).getValidationResult();
-                String message = "In: " + pom + "(" + ( (ProjectBuildingException) e ).getProjectId() + ")\n\n" + validationResult.render( "  " );
+                String message = "In: " + pom + "(" + ( (ProjectBuildingException) e ).getProjectId() + ")\n\n";
+                for ( String error : validationResult.getErrors() )
+                {
+                    message += "  [ERROR] " + error + "\n";
+                }
+                for ( String warning : validationResult.getWarnings() )
+                {
+                    message += "  [WARNING] " + warning + "\n";
+                }
                 System.out.println( message );
                 fail( message );
             }

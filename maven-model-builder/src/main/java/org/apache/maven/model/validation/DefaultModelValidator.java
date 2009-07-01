@@ -57,16 +57,16 @@ public class DefaultModelValidator
         Parent parent = model.getParent();
         if ( parent != null )
         {
-            validateStringNotEmpty( "parent.groupId", result, parent.getGroupId() );
+            validateStringNotEmpty( "parent.groupId", result, false, parent.getGroupId() );
 
-            validateStringNotEmpty( "parent.artifactId", result, parent.getArtifactId() );
+            validateStringNotEmpty( "parent.artifactId", result, false, parent.getArtifactId() );
 
-            validateStringNotEmpty( "parent.version", result, parent.getVersion() );
+            validateStringNotEmpty( "parent.version", result, false, parent.getVersion() );
 
             if ( parent.getGroupId().equals( model.getGroupId() )
                 && parent.getArtifactId().equals( model.getArtifactId() ) )
             {
-                result.addMessage( "The parent element cannot have the same ID as the project." );
+                addViolation( result, false, "The parent element cannot have the same ID as the project." );
             }
         }
 
@@ -110,17 +110,17 @@ public class DefaultModelValidator
     {
         ModelValidationResult result = new ModelValidationResult();
 
-        validateStringNotEmpty( "modelVersion", result, model.getModelVersion() );
+        validateStringNotEmpty( "modelVersion", result, false, model.getModelVersion() );
 
         validateId( "groupId", result, model.getGroupId() );
 
         validateId( "artifactId", result, model.getArtifactId() );
 
-        validateStringNotEmpty( "packaging", result, model.getPackaging() );
+        validateStringNotEmpty( "packaging", result, false, model.getPackaging() );
 
         if ( !model.getModules().isEmpty() && !"pom".equals( model.getPackaging() ) )
         {
-            result.addMessage( "Packaging '" + model.getPackaging() + "' is invalid. Aggregator projects " +
+            addViolation( result, false, "Packaging '" + model.getPackaging() + "' is invalid. Aggregator projects " +
                 "require 'pom' as packaging." );
         }
 
@@ -130,11 +130,11 @@ public class DefaultModelValidator
             if ( parent.getGroupId().equals( model.getGroupId() ) &&
                 parent.getArtifactId().equals( model.getArtifactId() ) )
             {
-                result.addMessage( "The parent element cannot have the same ID as the project." );
+                addViolation( result, false, "The parent element cannot have the same ID as the project." );
             }
         }
 
-        validateStringNotEmpty( "version", result, model.getVersion() );
+        validateStringNotEmpty( "version", result, false, model.getVersion() );
 
         for ( Dependency d : model.getDependencies() )
         {
@@ -142,9 +142,9 @@ public class DefaultModelValidator
 
             validateId( "dependencies.dependency.groupId", result, d.getGroupId() );
 
-            validateStringNotEmpty( "dependencies.dependency.type", result, d.getType(), d.getManagementKey() );
+            validateStringNotEmpty( "dependencies.dependency.type", result, false, d.getType(), d.getManagementKey() );
 
-            validateStringNotEmpty( "dependencies.dependency.version", result, d.getVersion(),
+            validateStringNotEmpty( "dependencies.dependency.version", result, false, d.getVersion(),
                                     d.getManagementKey() );
 
             if ( "system".equals( d.getScope() ) )
@@ -153,20 +153,20 @@ public class DefaultModelValidator
 
                 if ( StringUtils.isEmpty( systemPath ) )
                 {
-                    result.addMessage( "For dependency " + d + ": system-scoped dependency must specify systemPath." );
+                    addViolation( result, false, "For dependency " + d + ": system-scoped dependency must specify systemPath." );
                 }
                 else
                 {
                     if ( !new File( systemPath ).isAbsolute() )
                     {
-                        result.addMessage( "For dependency " + d + ": system-scoped dependency must " +
+                        addViolation( result, false, "For dependency " + d + ": system-scoped dependency must " +
                             "specify an absolute path systemPath." );
                     }
                 }
             }
             else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
             {
-                result.addMessage(
+                addViolation( result, false,
                     "For dependency " + d + ": only dependency with system scope can specify systemPath." );
             }
         }
@@ -188,21 +188,21 @@ public class DefaultModelValidator
 
                     if ( StringUtils.isEmpty( systemPath ) )
                     {
-                        result.addMessage(
+                        addViolation( result, false,
                             "For managed dependency " + d + ": system-scoped dependency must specify systemPath." );
                     }
                     else
                     {
                         if ( !new File( systemPath ).isAbsolute() )
                         {
-                            result.addMessage( "For managed dependency " + d + ": system-scoped dependency must " +
+                            addViolation( result, false, "For managed dependency " + d + ": system-scoped dependency must " +
                                 "specify an absolute path systemPath." );
                         }
                     }
                 }
                 else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
                 {
-                    result.addMessage(
+                    addViolation( result, false,
                         "For managed dependency " + d + ": only dependency with system scope can specify systemPath." );
                 }
             }
@@ -215,11 +215,11 @@ public class DefaultModelValidator
             {
                 for ( Plugin p : build.getPlugins() )
                 {
-                    validateStringNotEmpty( "build.plugins.plugin.artifactId", result, p.getArtifactId() );
+                    validateStringNotEmpty( "build.plugins.plugin.artifactId", result, false, p.getArtifactId() );
 
-                    validateStringNotEmpty( "build.plugins.plugin.groupId", result, p.getGroupId() );
+                    validateStringNotEmpty( "build.plugins.plugin.groupId", result, false, p.getGroupId() );
 
-                    validateStringNotEmpty( "build.plugins.plugin.version", result, p.getVersion(), p.getKey() );
+                    validateStringNotEmpty( "build.plugins.plugin.version", result, false, p.getVersion(), p.getKey() );
                 }
 
                 validateResources( result, build.getResources(), "build.resources.resource" );
@@ -232,11 +232,11 @@ public class DefaultModelValidator
             {
                 for ( ReportPlugin p : reporting.getPlugins() )
                 {
-                    validateStringNotEmpty( "reporting.plugins.plugin.artifactId", result, p.getArtifactId() );
+                    validateStringNotEmpty( "reporting.plugins.plugin.artifactId", result, false, p.getArtifactId() );
 
-                    validateStringNotEmpty( "reporting.plugins.plugin.groupId", result, p.getGroupId() );
+                    validateStringNotEmpty( "reporting.plugins.plugin.groupId", result,false, p.getGroupId() );
 
-                    validateStringNotEmpty( "reporting.plugins.plugin.version", result, p.getVersion(), p.getKey() );
+                    validateStringNotEmpty( "reporting.plugins.plugin.version", result, false, p.getVersion(), p.getKey() );
                 }
             }
 
@@ -248,7 +248,7 @@ public class DefaultModelValidator
 
     private boolean validateId( String fieldName, ModelValidationResult result, String id )
     {
-        if ( !validateStringNotEmpty( fieldName, result, id ) )
+        if ( !validateStringNotEmpty( fieldName, result, false, id ) )
         {
             return false;
         }
@@ -257,7 +257,7 @@ public class DefaultModelValidator
             boolean match = id.matches( ID_REGEX );
             if ( !match )
             {
-                result.addMessage( "'" + fieldName + "' with value '" + id + "' does not match a valid id pattern." );
+                addViolation( result, false, "'" + fieldName + "' with value '" + id + "' does not match a valid id pattern." );
             }
             return match;
         }
@@ -275,7 +275,7 @@ public class DefaultModelValidator
 
             if ( existing != null )
             {
-                result.addMessage( "'" + prefix + ".(groupId:artifactId:type:classifier)' must be unique: " + key
+                addViolation( result, false, "'" + prefix + ".(groupId:artifactId:type:classifier)' must be unique: " + key
                     + " -> " + existing.getVersion() + " vs " + dependency.getVersion() );
             }
             else
@@ -291,9 +291,9 @@ public class DefaultModelValidator
 
         for ( Repository repository : repositories )
         {
-            validateStringNotEmpty( prefix + ".id", result, repository.getId() );
+            validateStringNotEmpty( prefix + ".id", result, false, repository.getId() );
 
-            validateStringNotEmpty( prefix + ".url", result, repository.getUrl() );
+            validateStringNotEmpty( prefix + ".url", result, false, repository.getUrl() );
 
             String key = repository.getId();
 
@@ -301,7 +301,7 @@ public class DefaultModelValidator
 
             if ( existing != null )
             {
-                result.addMessage( "'" + prefix + ".id' must be unique: " + repository.getId() + " -> "
+                addViolation( result, false, "'" + prefix + ".id' must be unique: " + repository.getId() + " -> "
                     + existing.getUrl() + " vs " + repository.getUrl() );
             }
             else
@@ -315,7 +315,7 @@ public class DefaultModelValidator
     {
         for ( Resource resource : resources )
         {
-            validateStringNotEmpty( prefix + ".directory", result, resource.getDirectory() );
+            validateStringNotEmpty( prefix + ".directory", result, false, resource.getDirectory() );
         }
     }
 
@@ -338,7 +338,7 @@ public class DefaultModelValidator
                     }
                     catch ( IllegalStateException collisionException )
                     {
-                        result.addMessage( collisionException.getMessage() );
+                        addViolation( result, false, collisionException.getMessage() );
                     }
                 }
             }
@@ -349,23 +349,23 @@ public class DefaultModelValidator
     // Field validation
     // ----------------------------------------------------------------------
 
-    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string )
+    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, boolean warning, String string )
     {
-        return validateStringNotEmpty( fieldName, result, string, null );
+        return validateStringNotEmpty( fieldName, result, warning, string, null );
     }
 
     /**
      * Asserts:
      * <p/>
      * <ul>
-     * <li><code>string.length != null</code>
+     * <li><code>string != null</code>
      * <li><code>string.length > 0</code>
      * </ul>
      */
-    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string,
-                                            String sourceHint )
+    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, boolean warning,
+                                            String string, String sourceHint )
     {
-        if ( !validateNotNull( fieldName, result, string, sourceHint ) )
+        if ( !validateNotNull( fieldName, result, warning, string, sourceHint ) )
         {
             return false;
         }
@@ -377,11 +377,11 @@ public class DefaultModelValidator
 
         if ( sourceHint != null )
         {
-            result.addMessage( "'" + fieldName + "' is missing for " + sourceHint );
+            addViolation( result, false, "'" + fieldName + "' is missing for " + sourceHint );
         }
         else
         {
-            result.addMessage( "'" + fieldName + "' is missing." );
+            addViolation( result, false, "'" + fieldName + "' is missing." );
         }
 
         return false;
@@ -391,7 +391,7 @@ public class DefaultModelValidator
      * Asserts:
      * <p/>
      * <ul>
-     * <li><code>string.length != null</code>
+     * <li><code>string != null</code>
      * <li><code>string.length > 0</code>
      * </ul>
      */
@@ -408,7 +408,7 @@ public class DefaultModelValidator
             return true;
         }
 
-        result.addMessage( "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
+        addViolation( result, false, "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
 
         return false;
     }
@@ -420,7 +420,7 @@ public class DefaultModelValidator
      * <li><code>string != null</code>
      * </ul>
      */
-    private boolean validateNotNull( String fieldName, ModelValidationResult result, Object object, String sourceHint )
+    private boolean validateNotNull( String fieldName, ModelValidationResult result, boolean warning, Object object, String sourceHint )
     {
         if ( object != null )
         {
@@ -429,11 +429,11 @@ public class DefaultModelValidator
 
         if ( sourceHint != null )
         {
-            result.addMessage( "'" + fieldName + "' is missing for " + sourceHint );
+            addViolation( result, warning, "'" + fieldName + "' is missing for " + sourceHint );
         }
         else
         {
-            result.addMessage( "'" + fieldName + "' is missing." );
+            addViolation( result, warning, "'" + fieldName + "' is missing." );
         }
 
         return false;
@@ -454,9 +454,21 @@ public class DefaultModelValidator
             return true;
         }
 
-        result.addMessage( "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
+        addViolation( result, false, "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
 
         return false;
+    }
+
+    private void addViolation( ModelValidationResult result, boolean warning, String message )
+    {
+        if ( warning )
+        {
+            result.addWarning( message );
+        }
+        else
+        {
+            result.addError( message );
+        }
     }
 
 }

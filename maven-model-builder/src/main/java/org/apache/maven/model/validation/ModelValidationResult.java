@@ -20,74 +20,67 @@ package org.apache.maven.model.validation;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
+ * Collects the warnings and errors from the model validator.
+ * 
+ * @author Benjamin Bentmann
  */
 public class ModelValidationResult
 {
-    /** */
-    private final static String NEWLINE = System.getProperty( "line.separator" );
 
-    /** */
-    private List<String> messages;
+    private List<String> warnings;
 
+    private List<String> errors;
+
+    /**
+     * Creates a new validation result.
+     */
     public ModelValidationResult()
     {
-        messages = new ArrayList<String>();
+        warnings = new ArrayList<String>();
+        errors = new ArrayList<String>();
     }
 
-    public int getMessageCount()
+    /**
+     * Gets the warnings from the validator.
+     * 
+     * @return The warnings from the validator, can be empty but never {@code null}.
+     */
+    public List<String> getWarnings()
     {
-        return messages.size();
+        return warnings;
     }
 
-    public String getMessage( int i )
+    /**
+     * Records the specified warning.
+     * 
+     * @param message The detail message about the validation warning.
+     */
+    public void addWarning( String message )
     {
-        return messages.get( i );
+        warnings.add( message );
     }
 
-    public List<String> getMessages()
+    /**
+     * Gets the errors from the validator.
+     * 
+     * @return The errors from the validator, can be empty but never {@code null}.
+     */
+    public List<String> getErrors()
     {
-        return Collections.unmodifiableList( messages );
+        return errors;
     }
 
-    public void addMessage( String message )
+    /**
+     * Records the specified error.
+     * 
+     * @param message The detail message about the validation error.
+     */
+    public void addError( String message )
     {
-        messages.add( message );
+        errors.add( message );
     }
 
-    public String toString()
-    {
-        return render( "" );
-    }
-
-    public String render( String indentation )
-    {
-        if ( messages.size() == 0 )
-        {
-            return indentation + "There were no validation errors.";
-        }
-
-        StringBuffer message = new StringBuffer();
-
-//        if ( messages.size() == 1 )
-//        {
-//            message.append( "There was 1 validation error: " );
-//        }
-//        else
-//        {
-//            message.append( "There was " + messages.size() + " validation errors: " + NEWLINE );
-//        }
-//
-        for ( int i = 0; i < messages.size(); i++ )
-        {
-            message.append( indentation + "[" + i + "]  " + messages.get( i ).toString() + NEWLINE );
-        }
-
-        return message.toString();
-    }
 }

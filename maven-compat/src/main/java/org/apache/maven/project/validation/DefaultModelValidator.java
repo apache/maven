@@ -44,7 +44,7 @@ public class DefaultModelValidator
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setLenientValidation( false );
 
-        for ( String message : modelValidator.validateEffectiveModel( model, request ).getMessages() )
+        for ( String message : modelValidator.validateEffectiveModel( model, request ).getErrors() )
         {
             result.addMessage( message );
         }

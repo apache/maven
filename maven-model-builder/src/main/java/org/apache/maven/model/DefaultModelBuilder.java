@@ -278,14 +278,20 @@ public class DefaultModelBuilder
 
     private void addProblems( Model model, ModelValidationResult result, List<ModelProblem> problems )
     {
-        if ( result.getMessageCount() > 0 )
+        if ( !result.getWarnings().isEmpty() || !result.getErrors().isEmpty() )
         {
             String source = toSourceHint( model );
 
-            for ( int i = 0; i < result.getMessageCount(); i++ )
+            for ( String message : result.getWarnings() )
             {
-                problems.add( new ModelProblem( "Invalid POM " + source + ": " + result.getMessage( i ),
+                problems.add( new ModelProblem( "Invalid POM " + source + ": " + message,
                                                 ModelProblem.Severity.WARNING, source ) );
+            }
+
+            for ( String message : result.getErrors() )
+            {
+                problems.add( new ModelProblem( "Invalid POM " + source + ": " + message, ModelProblem.Severity.ERROR,
+                                                source ) );
             }
         }
     }

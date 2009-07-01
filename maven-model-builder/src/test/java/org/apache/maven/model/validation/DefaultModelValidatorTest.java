@@ -90,9 +90,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-modelVersion-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertEquals( "'modelVersion' is missing.", result.getMessage( 0 ) );
+        assertEquals( "'modelVersion' is missing.", result.getErrors().get( 0 ) );
     }
 
     public void testMissingArtifactId()
@@ -100,9 +100,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-artifactId-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertEquals( "'artifactId' is missing.", result.getMessage( 0 ) );
+        assertEquals( "'artifactId' is missing.", result.getErrors().get( 0 ) );
     }
 
     public void testMissingGroupId()
@@ -110,9 +110,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-groupId-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertEquals( "'groupId' is missing.", result.getMessage( 0 ) );
+        assertEquals( "'groupId' is missing.", result.getErrors().get( 0 ) );
     }
 
     public void testInvalidIds()
@@ -120,11 +120,11 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "invalid-ids-pom.xml" );
 
-        assertEquals( 2, result.getMessageCount() );
+        assertEquals( 2, result.getErrors().size() );
 
-        assertEquals( "'groupId' with value 'o/a/m' does not match a valid id pattern.", result.getMessage( 0 ) );
+        assertEquals( "'groupId' with value 'o/a/m' does not match a valid id pattern.", result.getErrors().get( 0 ) );
 
-        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid id pattern.", result.getMessage( 1 ) );
+        assertEquals( "'artifactId' with value 'm$-do$' does not match a valid id pattern.", result.getErrors().get( 1 ) );
     }
 
     public void testMissingType()
@@ -132,9 +132,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-type-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertEquals( "'packaging' is missing.", result.getMessage( 0 ) );
+        assertEquals( "'packaging' is missing.", result.getErrors().get( 0 ) );
     }
 
     public void testMissingVersion()
@@ -142,9 +142,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-version-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertEquals( "'version' is missing.", result.getMessage( 0 ) );
+        assertEquals( "'version' is missing.", result.getErrors().get( 0 ) );
     }
 
     public void testInvalidAggregatorPackaging()
@@ -152,9 +152,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "invalid-aggregator-packaging-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertTrue( result.getMessage( 0 ).indexOf( "Aggregator projects require 'pom' as packaging." ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf( "Aggregator projects require 'pom' as packaging." ) > -1 );
     }
 
     public void testMissingDependencyArtifactId()
@@ -162,9 +162,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-dependency-artifactId-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertTrue( result.getMessage( 0 ).indexOf( "'dependencies.dependency.artifactId' is missing." ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.artifactId' is missing." ) > -1 );
     }
 
     public void testMissingDependencyGroupId()
@@ -172,9 +172,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-dependency-groupId-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertTrue( result.getMessage( 0 ).indexOf( "'dependencies.dependency.groupId' is missing." ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.groupId' is missing." ) > -1 );
     }
 
     public void testMissingDependencyVersion()
@@ -182,9 +182,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-dependency-version-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertTrue( result.getMessage( 0 ).indexOf( "'dependencies.dependency.version' is missing" ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.version' is missing" ) > -1 );
     }
 
     public void testMissingDependencyManagementArtifactId()
@@ -192,9 +192,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-dependency-mgmt-artifactId-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertTrue( result.getMessage( 0 ).indexOf(
+        assertTrue( result.getErrors().get( 0 ).indexOf(
                                                     "'dependencyManagement.dependencies.dependency.artifactId' is missing." ) > -1 );
     }
 
@@ -203,9 +203,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-dependency-mgmt-groupId-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertTrue( result.getMessage( 0 ).indexOf(
+        assertTrue( result.getErrors().get( 0 ).indexOf(
                                                     "'dependencyManagement.dependencies.dependency.groupId' is missing." ) > -1 );
     }
 
@@ -214,9 +214,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-1-pom.xml" );
 
-        assertEquals( 4, result.getMessageCount() );
+        assertEquals( 4, result.getErrors().size() );
 
-        List<String> messages = result.getMessages();
+        List<String> messages = result.getErrors();
 
         assertTrue( messages.contains( "\'modelVersion\' is missing." ) );
         assertTrue( messages.contains( "\'groupId\' is missing." ) );
@@ -230,9 +230,9 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-plugin-artifactId-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
-        assertEquals( "'build.plugins.plugin.artifactId' is missing.", result.getMessage( 0 ) );
+        assertEquals( "'build.plugins.plugin.artifactId' is missing.", result.getErrors().get( 0 ) );
     }
 
     public void testMissingPluginVersion()
@@ -240,10 +240,10 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-plugin-version-pom.xml" );
 
-        assertEquals( 1, result.getMessageCount() );
+        assertEquals( 1, result.getErrors().size() );
 
         assertEquals( "'build.plugins.plugin.version' is missing for org.apache.maven.plugins:maven-it-plugin",
-                      result.getMessage( 0 ) );
+                      result.getErrors().get( 0 ) );
     }
 
     public void testMissingRepositoryId()
@@ -251,15 +251,15 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-repository-id-pom.xml", true, false );
 
-        assertEquals( 4, result.getMessageCount() );
+        assertEquals( 4, result.getErrors().size() );
 
-        assertEquals( "'repositories.repository.id' is missing.", result.getMessage( 0 ) );
+        assertEquals( "'repositories.repository.id' is missing.", result.getErrors().get( 0 ) );
 
-        assertEquals( "'repositories.repository.url' is missing.", result.getMessage( 1 ) );
+        assertEquals( "'repositories.repository.url' is missing.", result.getErrors().get( 1 ) );
 
-        assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getMessage( 2 ) );
+        assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getErrors().get( 2 ) );
 
-        assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getMessage( 3 ) );
+        assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getErrors().get( 3 ) );
     }
 
     public void testMissingResourceDirectory()
@@ -267,11 +267,11 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-resource-directory-pom.xml" );
 
-        assertEquals( 2, result.getMessageCount() );
+        assertEquals( 2, result.getErrors().size() );
 
-        assertEquals( "'build.resources.resource.directory' is missing.", result.getMessage( 0 ) );
+        assertEquals( "'build.resources.resource.directory' is missing.", result.getErrors().get( 0 ) );
 
-        assertEquals( "'build.testResources.testResource.directory' is missing.", result.getMessage( 1 ) );
+        assertEquals( "'build.testResources.testResource.directory' is missing.", result.getErrors().get( 1 ) );
     }
 
 }
