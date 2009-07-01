@@ -219,7 +219,7 @@ public class DefaultModelValidator
 
                     validateStringNotEmpty( "build.plugins.plugin.groupId", result, false, p.getGroupId() );
 
-                    validateStringNotEmpty( "build.plugins.plugin.version", result, false, p.getVersion(), p.getKey() );
+                    validateStringNotEmpty( "build.plugins.plugin.version", result, true, p.getVersion(), p.getKey() );
                 }
 
                 validateResources( result, build.getResources(), "build.resources.resource" );
@@ -236,7 +236,7 @@ public class DefaultModelValidator
 
                     validateStringNotEmpty( "reporting.plugins.plugin.groupId", result,false, p.getGroupId() );
 
-                    validateStringNotEmpty( "reporting.plugins.plugin.version", result, false, p.getVersion(), p.getKey() );
+                    validateStringNotEmpty( "reporting.plugins.plugin.version", result, true, p.getVersion(), p.getKey() );
                 }
             }
 

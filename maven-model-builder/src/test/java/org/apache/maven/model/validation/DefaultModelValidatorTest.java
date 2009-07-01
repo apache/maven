@@ -240,10 +240,10 @@ public class DefaultModelValidatorTest
     {
         ModelValidationResult result = validate( "missing-plugin-version-pom.xml" );
 
-        assertEquals( 1, result.getErrors().size() );
+        assertEquals( 1, result.getWarnings().size() );
 
         assertEquals( "'build.plugins.plugin.version' is missing for org.apache.maven.plugins:maven-it-plugin",
-                      result.getErrors().get( 0 ) );
+                      result.getWarnings().get( 0 ) );
     }
 
     public void testMissingRepositoryId()

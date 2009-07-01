@@ -36,6 +36,7 @@ import org.apache.maven.model.ModelBuilder;
 import org.apache.maven.model.ModelBuildingException;
 import org.apache.maven.model.ModelBuildingRequest;
 import org.apache.maven.model.ModelBuildingResult;
+import org.apache.maven.model.ModelProblem;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.UrlModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
@@ -102,6 +103,17 @@ public class DefaultProjectBuilder
             throw new ProjectBuildingException( "[unknown]", "Failed to build project for " + pomFile, pomFile, e );
         }
         
+        if ( localProject && !result.getProblems().isEmpty() && logger.isWarnEnabled() )
+        {
+            logger.warn( "One or more problems were encoutered while building the effective model:" );
+            for ( ModelProblem problem : result.getProblems() )
+            {
+                logger.warn( problem.getMessage() );
+            }
+            logger.warn( "It is highly recommended to fix these problems"
+                + ", otherwise the project will fail to build with future Maven versions." );
+        }
+
         Model model = result.getEffectiveModel();
 
         File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();

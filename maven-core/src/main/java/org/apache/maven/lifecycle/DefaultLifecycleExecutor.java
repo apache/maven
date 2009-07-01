@@ -630,88 +630,96 @@ public class DefaultLifecycleExecutor
         //
         if ( plugin.getVersion() == null )
         {
-            File artifactMetadataFile;
-            
-            String localPath; 
-            
-            // Search in the local repositiory for a version
-            //
-            // maven-metadata-local.xml
-            //
-            localPath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-" + session.getLocalRepository().getId() + ".xml";
-
-            artifactMetadataFile = new File( session.getLocalRepository().getBasedir(), localPath );
-            
-            if ( !artifactMetadataFile.exists() /* || user requests snapshot updates */ )
-            {                
-                // Search in remote repositories for a version.
-                //
-                // maven-metadata-{central|nexus|...}.xml 
-                //
-                //TODO: we should cycle through the repositories but take the repository which actually
-                // satisfied the prefix.
-                for ( ArtifactRepository repository : project.getPluginArtifactRepositories() )
-                {
-                    localPath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-" + repository.getId() + ".xml";
-
-                    artifactMetadataFile = new File( session.getLocalRepository().getBasedir(), localPath );
-
-                    if ( !artifactMetadataFile.exists() )
-                    {
-                        try
-                        {
-                            String remotePath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata.xml";
-
-                            repositorySystem.retrieve( repository, artifactMetadataFile, remotePath, session.getRequest().getTransferListener() );
-                        }
-                        catch ( TransferFailedException e )
-                        {
-                            continue;
-                        }
-                        catch ( ResourceDoesNotExistException e )
-                        {
-                            continue;
-                        }
-                    }
-
-                    break;
-                }
-            }
-
-            if ( artifactMetadataFile.exists() )
-            {                    
-                try
-                {
-                    Metadata pluginMetadata = readMetadata( artifactMetadataFile );
-
-                    String release = pluginMetadata.getVersioning().getRelease();
-
-                    if ( release != null )
-                    {
-                        plugin.setVersion( release );
-                    }
-                    else
-                    {
-                        String latest = pluginMetadata.getVersioning().getLatest();
-                        
-                        if ( latest != null )
-                        {
-                            plugin.setVersion( latest );
-                        }
-                    }
-                }
-                catch ( RepositoryMetadataReadException e )
-                {
-                    logger.warn( "Error reading plugin metadata: ", e );
-                }
-            }
-            else
-            {
-                throw new PluginNotFoundException( plugin, null );
-            }
+            resolvePluginVersion( plugin, session.getLocalRepository(), project.getPluginArtifactRepositories() );
         }
         
         return pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getPluginArtifactRepositories() );
+    }
+
+    private void resolvePluginVersion( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws PluginNotFoundException
+    {
+        File artifactMetadataFile = null;
+        
+        String localPath; 
+        
+        // Search in remote repositories for a (released) version.
+        //
+        // maven-metadata-{central|nexus|...}.xml 
+        //
+        //TODO: we should cycle through the repositories but take the repository which actually
+        // satisfied the prefix.
+        for ( ArtifactRepository repository : remoteRepositories )
+        {
+            localPath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-" + repository.getId() + ".xml";
+
+            artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
+
+            if ( !artifactMetadataFile.exists() /* || user requests snapshot updates */)
+            {
+                try
+                {
+                    String remotePath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata.xml";
+
+                    repositorySystem.retrieve( repository, artifactMetadataFile, remotePath, null );
+                }
+                catch ( TransferFailedException e )
+                {
+                    continue;
+                }
+                catch ( ResourceDoesNotExistException e )
+                {
+                    continue;
+                }
+            }
+
+            break;
+        }
+
+        // Search in the local repositiory for a (development) version
+        //
+        // maven-metadata-local.xml
+        //
+        if ( artifactMetadataFile == null || !artifactMetadataFile.exists() )
+        {
+            localPath =
+                plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-"
+                    + localRepository.getId() + ".xml";
+
+            artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
+        }
+
+        if ( artifactMetadataFile.exists() )
+        {                    
+            try
+            {
+                Metadata pluginMetadata = readMetadata( artifactMetadataFile );
+
+                String release = pluginMetadata.getVersioning().getRelease();
+
+                if ( release != null )
+                {
+                    plugin.setVersion( release );
+                }
+                else
+                {
+                    String latest = pluginMetadata.getVersioning().getLatest();
+                    
+                    if ( latest != null )
+                    {
+                        plugin.setVersion( latest );
+                    }
+                }
+            }
+            catch ( RepositoryMetadataReadException e )
+            {
+                logger.warn( "Error reading plugin metadata: ", e );
+            }
+        }
+        else
+        {
+            throw new PluginNotFoundException( plugin, null );
+        }
     }
 
     private void injectPluginDeclarationFromProject( Plugin plugin, MavenProject project )
@@ -857,6 +865,18 @@ public class DefaultLifecycleExecutor
     private void populateDefaultConfigurationForPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
         throws LifecycleExecutionException
     {
+        if ( plugin.getVersion() == null )
+        {
+            try
+            {
+                resolvePluginVersion( plugin, localRepository, remoteRepositories );
+            }
+            catch ( PluginNotFoundException e )
+            {
+                throw new LifecycleExecutionException( "Error resolving version for plugin " + plugin, e );
+            }
+        }
+
         for( PluginExecution pluginExecution : plugin.getExecutions() )
         {
             for( String goal : pluginExecution.getGoals() )
