@@ -105,13 +105,21 @@ public class DefaultProjectBuilder
         
         if ( localProject && !result.getProblems().isEmpty() && logger.isWarnEnabled() )
         {
-            logger.warn( "One or more problems were encoutered while building the effective model:" );
+            logger.warn( "" );
+            logger.warn( "One or more problems were encountered while building the effective model:" );
+
             for ( ModelProblem problem : result.getProblems() )
             {
                 logger.warn( problem.getMessage() );
             }
+
+            logger.warn( "" );
             logger.warn( "It is highly recommended to fix these problems"
-                + ", otherwise the project will fail to build with future Maven versions." );
+                + " because they threaten the stability of your build." );
+            logger.warn( "" );
+            logger.warn( "For this reason, future Maven versions will no"
+                + " longer support building such malformed projects." );
+            logger.warn( "" );
         }
 
         Model model = result.getEffectiveModel();
