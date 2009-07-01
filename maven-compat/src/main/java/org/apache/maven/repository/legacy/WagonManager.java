@@ -23,10 +23,21 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.UnsupportedProtocolException;
+import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.wagon.repository.Repository;
 
 public interface WagonManager
 {
+    @Deprecated
+    Wagon getWagon( String protocol )
+        throws UnsupportedProtocolException;
+
+    @Deprecated
+    Wagon getWagon( Repository repository )
+        throws UnsupportedProtocolException, WagonConfigurationException;
+
     //
     // Retriever
     //        

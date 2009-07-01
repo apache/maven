@@ -645,6 +645,13 @@ public class DefaultWagonManager
     }
 
     @Deprecated
+    public Wagon getWagon( Repository repository )
+        throws UnsupportedProtocolException
+    {
+        return getWagon( repository.getProtocol() );
+    }    
+    
+    @Deprecated
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
     {
