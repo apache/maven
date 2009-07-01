@@ -21,13 +21,25 @@ package org.apache.maven.model;
 
 /**
  * Describes a problem that was encountered during model building. A problem can either be an exception that was thrown
- * or a simple string message. In addition, a problem carries a hint about its source, e.g. the POM file that could not
- * be processed.
+ * or a simple string message. In addition, a problem carries a hint about its source, e.g. the POM file that exhibits
+ * the problem.
  * 
  * @author Benjamin Bentmann
  */
 public class ModelProblem
 {
+
+    /**
+     * The different severity levels for a problem, in decreasing order.
+     */
+    public enum Severity
+    {
+
+        FATAL, //
+        ERROR, //
+        WARNING, //
+
+    }
 
     private String source;
 
@@ -35,15 +47,19 @@ public class ModelProblem
 
     private Exception exception;
 
+    private Severity severity;
+
     /**
      * Creates a new problem with the specified message.
      * 
      * @param message The message describing the problem, may be {@code null}.
+     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
      * @param source A hint about the source of the problem, may be {@code null}.
      */
-    public ModelProblem( String message, String source )
+    public ModelProblem( String message, Severity severity, String source )
     {
         this.message = message;
+        this.severity = ( severity != null ) ? severity : Severity.ERROR;
         this.source = ( source != null ) ? source : "";
     }
 
@@ -51,12 +67,14 @@ public class ModelProblem
      * Creates a new problem with the specified message and exception.
      * 
      * @param message The message describing the problem, may be {@code null}.
+     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
      * @param source A hint about the source of the problem, may be {@code null}.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    public ModelProblem( String message, String source, Exception exception )
+    public ModelProblem( String message, Severity severity, String source, Exception exception )
     {
         this.message = message;
+        this.severity = ( severity != null ) ? severity : Severity.ERROR;
         this.source = ( source != null ) ? source : "";
         this.exception = exception;
     }
@@ -109,10 +127,25 @@ public class ModelProblem
         return msg;
     }
 
+    /**
+     * Gets the severity level of this problem.
+     * 
+     * @return The severity level of this problem, never {@code null}.
+     */
+    public Severity getSeverity()
+    {
+        return severity;
+    }
+
     @Override
     public String toString()
     {
-        return getSource() + ": " + getMessage();
+        StringBuilder buffer = new StringBuilder( 128 );
+
+        buffer.append( "[" ).append( getSeverity() ).append( "] " );
+        buffer.append( getSource() ).append( ": " ).append( getMessage() );
+
+        return buffer.toString();
     }
 
 }

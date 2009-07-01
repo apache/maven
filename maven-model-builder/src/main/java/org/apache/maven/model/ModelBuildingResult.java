@@ -84,4 +84,13 @@ public interface ModelBuildingResult
      */
     List<Profile> getActiveExternalProfiles();
 
+    /**
+     * Gets the problems that were encountered during the model building. Note that only problems of severity
+     * {@link ModelProblem.Severity#WARNING} and below are reported here. Problems with a higher severity level cause
+     * the model builder to fail with a {@link ModelBuildingException}.
+     * 
+     * @return The problems that were encountered during the model building, can be empty but never {@code null}.
+     */
+    List<ModelProblem> getProblems();
+
 }

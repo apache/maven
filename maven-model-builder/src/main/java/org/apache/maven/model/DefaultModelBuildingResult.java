@@ -44,12 +44,15 @@ class DefaultModelBuildingResult
 
     private List<Profile> activeExternalProfiles;
 
+    private List<ModelProblem> problems;
+
     public DefaultModelBuildingResult()
     {
         modelIds = new ArrayList<String>();
         rawModels = new HashMap<String, Model>();
         activePomProfiles = new HashMap<String, List<Profile>>();
         activeExternalProfiles = new ArrayList<Profile>();
+        problems = new ArrayList<ModelProblem>();
     }
 
     public Model getEffectiveModel()
@@ -142,6 +145,25 @@ class DefaultModelBuildingResult
         else
         {
             this.activeExternalProfiles.clear();
+        }
+
+        return this;
+    }
+
+    public List<ModelProblem> getProblems()
+    {
+        return Collections.unmodifiableList( problems );
+    }
+
+    public DefaultModelBuildingResult setProblems( List<ModelProblem> problems )
+    {
+        if ( problems != null )
+        {
+            this.problems = new ArrayList<ModelProblem>( problems );
+        }
+        else
+        {
+            this.problems.clear();
         }
 
         return this;

@@ -187,7 +187,7 @@ public class DefaultModelBuilder
         ModelValidationResult validationResult = modelValidator.validateEffectiveModel( resultModel, request );
         addProblems( resultModel, validationResult, problems );
 
-        if ( !problems.isEmpty() )
+        if ( hasErrors( problems ) )
         {
             throw new ModelBuildingException( problems );
         }
@@ -195,6 +195,8 @@ public class DefaultModelBuilder
         resultData.setGroupId( resultModel.getGroupId() );
         resultData.setArtifactId( resultModel.getArtifactId() );
         resultData.setVersion( resultModel.getVersion() );
+
+        result.setProblems( problems );
 
         result.setEffectiveModel( resultModel );
 
@@ -240,13 +242,13 @@ public class DefaultModelBuilder
         catch ( ModelParseException e )
         {
             problems.add( new ModelProblem( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                                            modelSource.getLocation(), e ) );
+                                            ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
             throw new ModelBuildingException( problems );
         }
         catch ( IOException e )
         {
             problems.add( new ModelProblem( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                                            modelSource.getLocation(), e ) );
+                                            ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
             throw new ModelBuildingException( problems );
         }
 
@@ -258,6 +260,22 @@ public class DefaultModelBuilder
         return model;
     }
 
+    private boolean hasErrors( List<ModelProblem> problems )
+    {
+        if ( problems != null )
+        {
+            for ( ModelProblem problem : problems )
+            {
+                if ( ModelProblem.Severity.ERROR.compareTo( problem.getSeverity() ) >= 0 )
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void addProblems( Model model, ModelValidationResult result, List<ModelProblem> problems )
     {
         if ( result.getMessageCount() > 0 )
@@ -266,7 +284,8 @@ public class DefaultModelBuilder
 
             for ( int i = 0; i < result.getMessageCount(); i++ )
             {
-                problems.add( new ModelProblem( "Invalid POM " + source + ": " + result.getMessage( i ), source ) );
+                problems.add( new ModelProblem( "Invalid POM " + source + ": " + result.getMessage( i ),
+                                                ModelProblem.Severity.WARNING, source ) );
             }
         }
     }
@@ -279,7 +298,7 @@ public class DefaultModelBuilder
         for ( ProfileActivationException e : result.getActivationExceptions() )
         {
             problems.add( new ModelProblem( "Invalid activation condition for external profile "
-                + e.getProfile().getId() + ": " + e.getMessage(), "(external profiles)", e ) );
+                + e.getProfile().getId() + ": " + e.getMessage(), ModelProblem.Severity.ERROR, "(external profiles)", e ) );
         }
 
         return result.getActiveProfiles();
@@ -294,7 +313,7 @@ public class DefaultModelBuilder
         {
             problems.add( new ModelProblem( "Invalid activation condition for project profile "
                 + e.getProfile().getId() + " in POM " + toSourceHint( model ) + ": " + e.getMessage(),
-                                            toSourceHint( model ), e ) );
+                                            ModelProblem.Severity.ERROR, toSourceHint( model ), e ) );
         }
 
         return result.getActiveProfiles();
@@ -319,7 +338,8 @@ public class DefaultModelBuilder
             catch ( InvalidRepositoryException e )
             {
                 problems.add( new ModelProblem( "Invalid repository " + repository.getId() + " in POM "
-                    + toSourceHint( model ) + ": " + e.getMessage(), toSourceHint( model ), e ) );
+                    + toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
+                                                toSourceHint( model ), e ) );
             }
         }
     }
@@ -345,7 +365,7 @@ public class DefaultModelBuilder
         catch ( ModelInterpolationException e )
         {
             problems.add( new ModelProblem( "Invalid expression in POM " + toSourceHint( model ) + ": "
-                + e.getMessage(), toSourceHint( model ), e ) );
+                + e.getMessage(), ModelProblem.Severity.ERROR, toSourceHint( model ), e ) );
 
             return model;
         }
@@ -438,7 +458,8 @@ public class DefaultModelBuilder
         if ( modelResolver == null )
         {
             problems.add( new ModelProblem( "Non-resolvable parent POM " + toId( parent ) + " for POM "
-                + toSourceHint( childModel ) + ": " + "No model resolver provided", toSourceHint( childModel ) ) );
+                + toSourceHint( childModel ) + ": " + "No model resolver provided", ModelProblem.Severity.FATAL,
+                                            toSourceHint( childModel ) ) );
             throw new ModelBuildingException( problems );
         }
 
@@ -450,7 +471,8 @@ public class DefaultModelBuilder
         catch ( UnresolvableModelException e )
         {
             problems.add( new ModelProblem( "Non-resolvable parent POM " + toId( parent ) + " for POM "
-                + toSourceHint( childModel ) + ": " + e.getMessage(), toSourceHint( childModel ), e ) );
+                + toSourceHint( childModel ) + ": " + e.getMessage(), ModelProblem.Severity.FATAL,
+                                            toSourceHint( childModel ), e ) );
             throw new ModelBuildingException( problems );
         }
 
