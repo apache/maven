@@ -20,6 +20,7 @@ package org.apache.maven.plugin.testing;
  */
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -27,11 +28,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.monitor.logging.DefaultLog;
+import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -57,6 +62,7 @@ public abstract class AbstractMojoTestCase
     extends PlexusTestCase
 {
     private ComponentConfigurator configurator;
+    private DefaultPluginManager pluginManager;
 
     /*
      * for the harness I think we have decided against going the route of using the maven project builder.
@@ -69,9 +75,16 @@ public abstract class AbstractMojoTestCase
     {
         super.setUp();
 
-        configurator = (ComponentConfigurator) getContainer().lookup( ComponentConfigurator.ROLE, "basic" );
+        configurator = getContainer().lookup( ComponentConfigurator.class, "basic" );
+        pluginManager = (DefaultPluginManager) getContainer().lookup( PluginManager.class );
 
-        //projectBuilder = (MavenProjectBuilder) getContainer().lookup( MavenProjectBuilder.ROLE );
+        InputStream is = getClass().getResourceAsStream( "/" + pluginManager.getComponentDescriptorLocation() );
+        PluginDescriptor pluginDescriptor = pluginManager.parsebuildPluginDescriptor( is ); // closes the stream
+
+        for ( ComponentDescriptor<?> desc : pluginDescriptor.getComponents() )
+        {
+            getContainer().addComponentDescriptor( desc );
+        }
     }
 
     /**

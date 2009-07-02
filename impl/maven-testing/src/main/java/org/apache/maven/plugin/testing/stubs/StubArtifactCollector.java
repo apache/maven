@@ -28,7 +28,9 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ResolutionListener;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 
 /**
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
@@ -45,10 +47,22 @@ public class StubArtifactCollector
         super();
     }
 
-    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                             ArtifactRepository localRepository, List remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter, List listeners,
-                                             List conflictResolvers )
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                             Map managedVersions, ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories,
+                                             ArtifactMetadataSource source, ArtifactFilter filter,
+                                             List<ResolutionListener> listeners,
+                                             List<ConflictResolver> conflictResolvers )
+    {
+        // TODO check if we have to do more here
+        return new ArtifactResolutionResult();
+    }
+
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                             Map managedVersions, ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories,
+                                             ArtifactMetadataSource source, ArtifactFilter filter,
+                                             List<ResolutionListener> listeners )
     {
         // TODO check if we have to do more here
         return new ArtifactResolutionResult();
