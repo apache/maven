@@ -177,6 +177,16 @@ public class DefaultArtifactVersionTest
         assertEquals( v1.hashCode(), v2.hashCode() );
     }
 
+    public void testEqualsNullSafe()
+    {
+        assertFalse( newArtifactVersion( "1" ).equals( null ) );
+    }
+
+    public void testEqualsTypeSafe()
+    {
+        assertFalse( newArtifactVersion( "1" ).equals( "non-an-artifact-version-instance" ) );
+    }
+
     private void assertVersionOlder( String left, String right )
     {
         assertTrue( left + " should be older than " + right,
@@ -192,4 +202,5 @@ public class DefaultArtifactVersionTest
         assertTrue( right + " should be equal to " + left,
                     newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) == 0 );
     }
+
 }
