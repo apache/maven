@@ -222,6 +222,7 @@ public class DefaultPluginManager
         }
     }
 
+    // TODO: This is only public for reuse by the 3.x compatible maven-plugin-testing-harness ...
     public PluginDescriptor parsebuildPluginDescriptor( InputStream is )
         throws IOException, PlexusConfigurationException
     {
