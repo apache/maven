@@ -31,6 +31,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.Request;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.AbstractHandler;
+
 /**
  * This is a sample integration test. The IT tests typically
  * operate by having a sample project in the
@@ -80,7 +88,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      * 3. Build the test project the second time
      *    a. See (2.a) and (2.b) above; the same criteria applies here.
      */
-    public void testitMNG3415()
+    public void testitTransferFailed()
         throws Exception
     {
         String methodName = getMethodName();
@@ -91,13 +99,16 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         Verifier verifier;
 
         verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
-        File localRepo = findLocalRepoDirectory();
+        File localRepo = new File( verifier.localRepo );
 
         setupDummyDependency( testDir, localRepo, true );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.put( "@baseurl@", "invalid" + filterProps.getProperty( "@baseurl@" ).substring( "file".length() ) );
+        filterProps.put( "@protocol@", "invalid" );
+        filterProps.put( "@port@", "0" );
         File settings = verifier.filterFile( "../settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
 
         List cliOptions = new ArrayList();
@@ -107,7 +118,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         verifier.setCliOptions( cliOptions );
         verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
-        verifier.executeGoal( "package" );
+        verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
 
@@ -116,7 +127,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         setupDummyDependency( testDir, localRepo, true );
 
         verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
-        verifier.executeGoal( "package" );
+        verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -146,11 +157,9 @@ public class MavenITmng3415JunkRepositoryMetadataTest
      *    c. Create the settings file for use in this test, which contains the VALID
      *       remote repository entry.
      * 2. Build the test project the first time
-     *    a. Verify that a log message checking the remote repository for the metadata file
-     *       is in the build output for the test-repo
+     *    a. Verify that the remote repository is checked for the metadata file
      * 3. Build the test project the second time
-     *    a. Verify that a log message checking the remote repository for the metadata file
-     *       IS NOT in the build output for the test-repo
+     *    a. Verify that the remote repository is NOT checked for the metadata file again
      *    b. Verify that the file used for updateInterval calculations was NOT changed from
      *       the first build.
      */
@@ -165,48 +174,79 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         Verifier verifier;
 
         verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
-        File localRepo = findLocalRepoDirectory();
+        File localRepo = new File( verifier.localRepo );
 
-        setupDummyDependency( testDir, localRepo, true );
+        final List requestUris = new ArrayList();
 
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        File settings = verifier.filterFile( "../settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
+        Handler repoHandler = new AbstractHandler()
+        {
+            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            {
+                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-X" );
-        cliOptions.add( "-s" );
-        cliOptions.add( settings.getName() );
+                requestUris.add( request.getRequestURI() );
 
-        verifier.setCliOptions( cliOptions );
+                response.setStatus( HttpServletResponse.SC_NOT_FOUND );
 
-        verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
-        verifier.executeGoal( "package" );
+                ( (Request) request ).setHandled( true );
+            }
+        };
 
-        verifier.verifyErrorFreeLog();
+        Server server = new Server( 0 );
+        server.setHandler( repoHandler );
+        server.start();
 
-        File firstLogFile = new File( projectDir, verifier.getLogFileName() );
+        try
+        {
+            int port = server.getConnectors()[0].getLocalPort();
 
-        // FIXME: There really should be a better way than matching console output!
-        assertOutputLinePresent( verifier, firstLogFile, "snapshot org.apache.maven.its.mng3415:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
+            Properties filterProps = verifier.newDefaultFilterProperties();
+            filterProps.put( "@protocol@", "http" );
+            filterProps.put( "@port@", Integer.toString( port ) );
+            File settings = verifier.filterFile( "../settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
 
-        File updateCheckFile = getUpdateCheckFile( localRepo );
-        long firstLastMod = updateCheckFile.lastModified();
+            List cliOptions = new ArrayList();
+            cliOptions.add( "-X" );
+            cliOptions.add( "-s" );
+            cliOptions.add( settings.getName() );
 
-        setupDummyDependency( testDir, localRepo, false );
+            verifier.setCliOptions( cliOptions );
 
-        verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
-        verifier.executeGoal( "package" );
+            setupDummyDependency( testDir, localRepo, true );
 
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
+            verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
+            verifier.executeGoal( "validate" );
 
-        File secondLogFile = new File( projectDir, verifier.getLogFileName() );
+            verifier.verifyErrorFreeLog();
 
-        // FIXME: There really should be a better way than matching console output!
-        assertOutputLineMissing( verifier, secondLogFile, "snapshot org.apache.maven.its.mng3415:missing:1.0-SNAPSHOT: checking for updates from testing-repo" );
+            assertTrue( requestUris.toString(), 
+                requestUris.contains( "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
-        assertEquals( "Last-modified time should be unchanged from first build through second build for the file we use for updateInterval checks.", firstLastMod, updateCheckFile.lastModified() );
+            requestUris.clear();
+
+            File updateCheckFile = getUpdateCheckFile( localRepo );
+            long firstLastMod = updateCheckFile.lastModified();
+
+            setupDummyDependency( testDir, localRepo, false );
+
+            verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
+            verifier.executeGoal( "validate" );
+
+            verifier.verifyErrorFreeLog();
+            verifier.resetStreams();
+
+            assertFalse( requestUris.toString(), 
+                requestUris.contains( "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );
+
+            assertEquals( "Last-modified time should be unchanged from first build through second build for the file we use for updateInterval checks.", firstLastMod, updateCheckFile.lastModified() );
+        }
+        finally
+        {
+            server.stop();
+        }
     }
 
     private void assertMetadataMissing( File localRepo )
@@ -231,6 +271,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         }
 
         File resolverStatus = new File( metadata.getParentFile(), "resolver-status.properties" );
+
         if ( resetUpdateInterval && resolverStatus.exists() )
         {
             System.out.println( "Deleting resolver-status.properties file related to: " + metadata );
@@ -284,79 +325,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         {
             return new File( dir, "resolver-status.properties" );
         }
-    }
-
-    private File findLocalRepoDirectory()
-        throws VerificationException, IOException
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 RESOURCE_BASE
-                                                                                 + "/maven-find-local-repo-plugin" );
-
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-
-        verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-find-local-repo-plugin", "1.0-SNAPSHOT", "jar" );
-
-        verifier.executeGoal( "install" );
-
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-find-local-repo-plugin:1.0-SNAPSHOT:find" );
-
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        List lines = verifier.loadFile( new File( testDir, "target/local-repository-location.txt" ),
-                                        false );
-
-        File localRepo = new File( (String) lines.get( 0 ) );
-
-        System.out.println( "Using local repository at: " + localRepo );
-
-        return localRepo;
-    }
-
-    private void assertOutputLinePresent( Verifier verifier,
-                                   File logFile,
-                                   String lineContents )
-        throws VerificationException
-    {
-        List lines = verifier.loadFile( logFile, false );
-
-        boolean found = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
-        {
-            String line = (String) it.next();
-            if ( line.indexOf( lineContents ) > -1 )
-            {
-                found = true;
-                break;
-            }
-        }
-
-        assertTrue( "Build output in:\n\n" + logFile + "\n\nshould contain line with contents:\n\n" + lineContents + "\n", found );
-    }
-
-    private void assertOutputLineMissing( Verifier verifier,
-                                   File logFile,
-                                   String lineContents )
-        throws VerificationException
-    {
-        List lines = verifier.loadFile( logFile, false );
-
-        boolean found = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
-        {
-            String line = (String) it.next();
-            if ( line.indexOf( lineContents ) > -1 )
-            {
-                found = true;
-                break;
-            }
-        }
-
-        assertFalse( "Build output in:\n\n" + logFile + "\n\nshould NOT contain line with contents:\n\n" + lineContents + "\n", found );
     }
 
 }
