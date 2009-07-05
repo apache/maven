@@ -94,11 +94,10 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         String methodName = getMethodName();
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_BASE );
-        File projectDir = new File( testDir, "project" );
 
         Verifier verifier;
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
@@ -109,7 +108,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.put( "@protocol@", "invalid" );
         filterProps.put( "@port@", "0" );
-        File settings = verifier.filterFile( "../settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
+        File settings = verifier.filterFile( "settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-X" );
@@ -169,11 +168,10 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         String methodName = getMethodName();
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_BASE );
-        File projectDir = new File( testDir, "project" );
 
         Verifier verifier;
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
@@ -206,7 +204,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.put( "@protocol@", "http" );
             filterProps.put( "@port@", Integer.toString( port ) );
-            File settings = verifier.filterFile( "../settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
+            File settings = verifier.filterFile( "settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
 
             List cliOptions = new ArrayList();
             cliOptions.add( "-X" );
