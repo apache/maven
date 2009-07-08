@@ -40,7 +40,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
 
     /**
      * Test fail-fast reactor behavior. Forces an exception to be thrown in
-     * the first module and checks that the second module is not built and the overall build fails, too.
+     * the first module and checks that the second & third module is not built and the overall build fails, too.
      */
     public void testitFailFast()
         throws Exception
@@ -50,8 +50,9 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "subproject/target" );
+        verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
+        verifier.deleteDirectory( "subproject3/target" );
         verifier.getCliOptions().add( "--fail-fast" );
         verifier.setLogFileName( "log-ff.txt" );
         try
@@ -66,13 +67,14 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject/target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
         verifier.assertFileNotPresent( "subproject2/target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
     }
 
     /**
      * Test fail-never reactor behavior. Forces an exception to be thrown in
-     * the first module, but checks that the second module is built and the overall build succeeds.
+     * the first module, but checks that the second & third module is built and the overall build succeeds.
      */
     public void testitFailNever()
         throws Exception
@@ -82,8 +84,9 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "subproject/target" );
+        verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
+        verifier.deleteDirectory( "subproject3/target" );
         verifier.getCliOptions().add( "--fail-never" );
         verifier.setLogFileName( "log-fn.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
@@ -91,13 +94,15 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject/target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
         verifier.assertFilePresent( "subproject2/target/touch.txt" );
+        verifier.assertFilePresent( "subproject3/target/touch.txt" );
     }
 
     /**
      * Test fail-at-end reactor behavior. Forces an exception to be thrown in
-     * the first module and checks that the second module is still built but the overall build finally fails.
+     * the first module and checks that the second module is still built but the overall build finally fails
+     * and the third module (which depends on the failed module) is skipped.
      */
     public void testitFailAtEnd()
         throws Exception
@@ -107,8 +112,9 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "subproject/target" );
+        verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
+        verifier.deleteDirectory( "subproject3/target" );
         verifier.getCliOptions().add( "--fail-at-end" );
         verifier.setLogFileName( "log-fae.txt" );
         try
@@ -123,8 +129,9 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject/target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
         verifier.assertFilePresent( "subproject2/target/touch.txt" );
+        verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
     }
 
 }
