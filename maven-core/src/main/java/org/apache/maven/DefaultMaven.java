@@ -146,6 +146,8 @@ public class DefaultMaven
             projects = projectSorter.getSortedProjects();
 
             session.setProjects( projects );
+
+            session.setProjectDependencyGraph( new DefaultProjectDependencyGraph( projectSorter ) );
         }
         catch ( CycleDetectedException e )
         {            

@@ -35,8 +35,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Dependency;
@@ -144,43 +143,27 @@ public class DefaultLifecycleExecutor
                 
         for ( MavenProject currentProject : session.getProjects() )
         {
+            if ( session.isBlackListed( currentProject ) )
+            {
+                logger.info( "Skipping " + currentProject.getName() );
+                logger.info( "This project has been banned from the build due to previous failures." );
+
+                continue;
+            }
+
             logger.info( "Building " + currentProject.getName() );
 
             try
             {
                 session.setCurrentProject( currentProject );
 
-                MavenExecutionPlan executionPlan;
-
-                try
-                {
-                    executionPlan = calculateExecutionPlan( session, goals.toArray( new String[] {} ) );
-                }
-                catch ( Exception e )
-                {
-                    session.getResult().addException( e );
-                    return;
-                }
+                MavenExecutionPlan executionPlan = calculateExecutionPlan( session, goals.toArray( new String[] {} ) );
 
                 //TODO: once we have calculated the build plan then we should accurately be able to download
                 // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
                 // later by looking at the build plan. Would be better to just batch download everything required by the reactor.
 
-                // mojoDescriptor.isDependencyResolutionRequired() is actually the scope of the dependency resolution required, not a boolean ... yah.
-                try
-                {
-                    projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
-                }
-                catch ( ArtifactNotFoundException e )
-                {
-                    session.getResult().addException( e );
-                    return;
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    session.getResult().addException( e );
-                    return;
-                }
+                projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
 
                 if ( logger.isDebugEnabled() )
                 {
@@ -200,18 +183,34 @@ public class DefaultLifecycleExecutor
 
                 for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                 {
-                    try
-                    {
-                        logger.info( executionDescription( mojoExecution, currentProject ) );
-                        pluginManager.executeMojo( session, mojoExecution );
-                    }
-                    catch ( Exception e )
-                    {
-                        session.getResult().addException( e );
-                        return;
-                    }
+                    logger.info( executionDescription( mojoExecution, currentProject ) );
+                    pluginManager.executeMojo( session, mojoExecution );
                 }                         
                 
+            }
+            catch ( Exception e )
+            {
+                session.getResult().addException( e );
+
+                if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( session.getReactorFailureBehavior() ) )
+                {
+                    // continue the build
+                }
+                else if ( MavenExecutionRequest.REACTOR_FAIL_AT_END.equals( session.getReactorFailureBehavior() ) )
+                {
+                    // continue the build but ban all projects that depend on the failed one
+                    session.blackList( currentProject );
+                }
+                else if ( MavenExecutionRequest.REACTOR_FAIL_FAST.equals( session.getReactorFailureBehavior() ) )
+                {
+                    // abort the build
+                    return;
+                }
+                else
+                {
+                    throw new IllegalArgumentException( "invalid reactor failure behavior "
+                        + session.getReactorFailureBehavior() );
+                }
             }
             finally
             {

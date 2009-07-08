@@ -192,7 +192,16 @@ public class MavenCli
             es.getException().printStackTrace();
             }
             
-            return 1;
+            if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )
+            {
+                System.out.println( "+ Build failures were ignored." );
+
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
         }
         else
         {

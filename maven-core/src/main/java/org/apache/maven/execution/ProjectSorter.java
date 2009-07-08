@@ -58,11 +58,11 @@ public class ProjectSorter
 
         for ( MavenProject project : projects )
         {
-            String id = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
+            String id = getId( project );
 
             if ( dag.getVertex( id ) != null )
             {
-                MavenProject conflictingProject = (MavenProject) projectMap.get( id );
+                MavenProject conflictingProject = projectMap.get( id );
 
                 throw new DuplicateProjectException( id, conflictingProject.getFile(), project.getFile(), "Project '" + id + "' is duplicated in the reactor" );
             }
@@ -74,7 +74,7 @@ public class ProjectSorter
 
         for ( MavenProject project : projects )
         {
-            String id = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
+            String id = getId( project );
 
             for( Dependency dependency : project.getDependencies() )
             {
@@ -82,7 +82,7 @@ public class ProjectSorter
 
                 if ( dag.getVertex( dependencyId ) != null )
                 {
-                    project.addProjectReference( (MavenProject) projectMap.get( dependencyId ) );
+                    project.addProjectReference( projectMap.get( dependencyId ) );
 
                     dag.addEdge( id, dependencyId );
                 }
@@ -139,7 +139,7 @@ public class ProjectSorter
     private void addEdgeWithParentCheck( Map<String,MavenProject> projectMap, String projectRefId, MavenProject project, String id )
         throws CycleDetectedException
     {
-        MavenProject extProject = (MavenProject) projectMap.get( projectRefId );
+        MavenProject extProject = projectMap.get( projectRefId );
 
         if ( extProject == null )
         {
@@ -165,9 +165,9 @@ public class ProjectSorter
     {
         if ( topLevelProject == null )
         {
-            for ( Iterator i = sortedProjects.iterator(); i.hasNext() && ( topLevelProject == null ); )
+            for ( Iterator<MavenProject> i = sortedProjects.iterator(); i.hasNext() && ( topLevelProject == null ); )
             {
-                MavenProject project = (MavenProject) i.next();
+                MavenProject project = i.next();
                 if ( project.isExecutionRoot() )
                 {
                     topLevelProject = project;
@@ -188,8 +188,14 @@ public class ProjectSorter
         return sortedProjects.size() > 1;
     }
 
-    List<String> getDependents( String id )
+    public List<String> getDependents( String id )
     {
         return dag.getParentLabels( id );
     }
+
+    public static String getId( MavenProject project )
+    {
+        return ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
+    }
+
 }

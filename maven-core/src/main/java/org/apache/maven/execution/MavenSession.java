@@ -20,7 +20,9 @@ package org.apache.maven.execution;
  */
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -53,7 +55,11 @@ public class MavenSession
     private List<MavenProject> projects;
     
     private MavenProject topLevelProject;
-    
+
+    private ProjectDependencyGraph projectDependencyGraph;
+
+    private Collection<String> blackListedProjects;
+
     @Deprecated
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, MavenProject project )
     {
@@ -196,6 +202,42 @@ public class MavenSession
         }
 
         return pluginContext;
+    }
+
+    public void setProjectDependencyGraph( ProjectDependencyGraph projectDependencyGraph )
+    {
+        this.projectDependencyGraph = projectDependencyGraph;
+    }
+
+    public String getReactorFailureBehavior()
+    {
+        return request.getReactorFailureBehavior();
+    }
+
+    public boolean isBlackListed( MavenProject project )
+    {
+        return blackListedProjects != null && blackListedProjects.contains( getId( project ) );
+    }
+
+    public void blackList( MavenProject project )
+    {
+        if ( blackListedProjects == null )
+        {
+            blackListedProjects = new HashSet<String>();
+        }
+
+        if ( blackListedProjects.add( getId( project ) ) && projectDependencyGraph != null )
+        {
+            for ( MavenProject downstreamProject : projectDependencyGraph.getDownstreamProjects( project, true ) )
+            {
+                blackListedProjects.add( getId( downstreamProject ) );
+            }
+        }
+    }
+
+    private String getId( MavenProject project )
+    {
+        return project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion();
     }
 
 }
