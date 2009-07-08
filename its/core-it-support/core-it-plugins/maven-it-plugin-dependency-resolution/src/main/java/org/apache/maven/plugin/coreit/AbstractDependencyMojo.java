@@ -26,11 +26,16 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Provides common services for all mojos of this plugin.
@@ -78,12 +83,7 @@ public abstract class AbstractDependencyMojo
             return;
         }
 
-        // NOTE: We don't want to test path translation here so resolve relative path manually for robustness
-        File file = new File( pathname );
-        if ( !file.isAbsolute() )
-        {
-            file = new File( project.getBasedir(), pathname );
-        }
+        File file = resolveFile( pathname );
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Dumping artifact list: " + file );
 
@@ -141,12 +141,7 @@ public abstract class AbstractDependencyMojo
             return;
         }
 
-        // NOTE: We don't want to test path translation here so resolve relative path manually for robustness
-        File file = new File( pathname );
-        if ( !file.isAbsolute() )
-        {
-            file = new File( project.getBasedir(), pathname );
-        }
+        File file = resolveFile( pathname );
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Dumping class path: " + file );
 
@@ -188,6 +183,124 @@ public abstract class AbstractDependencyMojo
         }
     }
 
+    protected void writeClassPathChecksums( String pathname, Collection classPath )
+        throws MojoExecutionException
+    {
+        if ( pathname == null || pathname.length() <= 0 )
+        {
+            return;
+        }
+
+        File file = resolveFile( pathname );
+
+        getLog().info( "[MAVEN-CORE-IT-LOG] Dumping class path checksums: " + file );
+
+        Properties checksums = new Properties();
+
+        if ( classPath != null )
+        {
+            for ( Iterator it = classPath.iterator(); it.hasNext(); )
+            {
+                String element = it.next().toString();
+
+                File jarFile = new File( element );
+
+                if ( !jarFile.isFile() )
+                {
+                    getLog().info( "[MAVEN-CORE-IT-LOG]   ( no file )                              < " + element );
+                    continue;
+                }
+
+                String key = stripLeadingDirs( element, significantPathLevels );
+
+                String hash;
+                try
+                {
+                    hash = calcChecksum( jarFile );
+                }
+                catch ( NoSuchAlgorithmException e )
+                {
+                    throw new MojoExecutionException( "Failed to lookup message digest", e );
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( "Failed to calculate checksum for " + jarFile, e );
+                }
+
+                checksums.setProperty( key, hash );
+
+                getLog().info( "[MAVEN-CORE-IT-LOG]   " + hash + " < " + element );
+            }
+        }
+
+        FileOutputStream os = null;
+        try
+        {
+            file.getParentFile().mkdirs();
+
+            os = new FileOutputStream( file );
+
+            checksums.store( os, "MAVEN-CORE-IT" );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Failed to write class path checksums", e );
+        }
+        finally
+        {
+            if ( os != null )
+            {
+                try
+                {
+                    os.close();
+                }
+                catch ( IOException e )
+                {
+                    // just ignore
+                }
+            }
+        }
+    }
+
+    private String calcChecksum( File jarFile )
+        throws IOException, NoSuchAlgorithmException
+    {
+        MessageDigest digester = MessageDigest.getInstance( "SHA-1" );
+
+        FileInputStream is = new FileInputStream( jarFile );
+        try
+        {
+            DigestInputStream dis = new DigestInputStream( is, digester );
+
+            for ( byte[] buffer = new byte[1024 * 4]; dis.read( buffer ) >= 0; )
+            {
+                // just read it
+            }
+        }
+        finally
+        {
+            is.close();
+        }
+
+        byte[] digest = digester.digest();
+
+        StringBuffer hash = new StringBuffer( digest.length * 2 );
+
+        for ( int i = 0; i < digest.length; i++ )
+        {
+            int b = digest[i] & 0xFF;
+
+            if ( b < 0x10 )
+            {
+                hash.append( '0' );
+            }
+
+            hash.append( Integer.toHexString( b ) );
+        }
+
+        return hash.toString();
+    }
+
     private String stripLeadingDirs( String path, int significantPathLevels )
     {
         String result;
@@ -211,6 +324,24 @@ public abstract class AbstractDependencyMojo
             result = path;
         }
         return result;
+    }
+
+    // NOTE: We don't want to test path translation here so resolve relative path manually for robustness
+    private File resolveFile( String pathname )
+    {
+        File file = null;
+
+        if ( pathname != null )
+        {
+            file = new File( pathname );
+
+            if ( !file.isAbsolute() )
+            {
+                file = new File( project.getBasedir(), pathname );
+            }
+        }
+
+        return file;
     }
 
 }

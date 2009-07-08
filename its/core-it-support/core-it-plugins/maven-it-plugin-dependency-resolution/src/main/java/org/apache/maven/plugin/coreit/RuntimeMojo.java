@@ -20,7 +20,6 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
@@ -65,6 +64,15 @@ public class RuntimeMojo
     private String runtimeClassPath;
 
     /**
+     * The path to the properties file for the checksums of the runtime class path elements, relative to the project
+     * base directory. The (trimmed) path to a JAR is used as the property key, the property value is the SHA-1 hash of
+     * the JAR. If not specified, the class path checksums will not be calculated.
+     * 
+     * @parameter expression="${depres.runtimeClassPathChecksums}"
+     */
+    private String runtimeClassPathChecksums;
+
+    /**
      * Runs this mojo.
      * 
      * @throws MojoExecutionException If the output file could not be created or any dependency could not be resolved.
@@ -77,6 +85,7 @@ public class RuntimeMojo
             writeArtifacts( projectArtifacts, project.getArtifacts() );
             writeArtifacts( runtimeArtifacts, project.getRuntimeArtifacts() );
             writeClassPath( runtimeClassPath, project.getRuntimeClasspathElements() );
+            writeClassPathChecksums( runtimeClassPathChecksums, project.getRuntimeClasspathElements() );
         }
         catch ( DependencyResolutionRequiredException e )
         {
