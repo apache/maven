@@ -2286,7 +2286,8 @@
           <description>
             <![CDATA[
             A unique identifier for a repository. This is used to match the repository
-            to configuration in the <code>settings.xml</code> file, for example.
+            to configuration in the <code>settings.xml</code> file, for example. Furthermore, the identifier is
+            used during POM inheritance and profile injection to detect repositories that should be merged.
             ]]>
           </description>
           <type>String</type>
@@ -2745,7 +2746,7 @@
           <type>String</type>
           <defaultValue>default</defaultValue>
           <description>The identifier of this execution for labelling the goals during the build,
-            and for matching executions to merge during inheritance.</description>
+            and for matching executions to merge during inheritance and profile injection.</description>
         </field>
         <field>
           <name>phase</name>
@@ -2905,8 +2906,8 @@
           <required>true</required>
           <version>4.0.0</version>
           <type>String</type>
-          <description>The identifier of this build profile. This used both for command line
-            activation, and identifies identical profiles to merge with during inheritance.
+          <description>The identifier of this build profile. This is used for command line
+            activation, and identifies profiles to be merged.
           </description>
         </field>
         <field>
@@ -3272,7 +3273,9 @@
           <name>id</name>
           <type>String</type>
           <required>true</required>
-          <description>The unique id for this report set, to be used during POM inheritance.</description>
+          <description>The unique id for this report set, to be used during POM inheritance and profile injection
+            for merging of report sets.
+          </description>
           <defaultValue>default</defaultValue>
         </field>
         <field>
