@@ -277,6 +277,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2668UsePluginDependenciesForSortingTest.class );
         suite.addTestSuite( MavenITmng2605BogusProfileActivationTest.class );
         suite.addTestSuite( MavenITmng2591MergeInheritedPluginConfigTest.class );
+        suite.addTestSuite( MavenITmng2576MakeLikeReactorTest.class );
         suite.addTestSuite( MavenITmng2562TimestampTest.class );
         suite.addTestSuite( MavenITmng2539PluginDependenciesComeFromPluginReposTest.class );
         suite.addTestSuite( MavenITmng2432PluginPrefixOrderTest.class );
