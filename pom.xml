@@ -116,9 +116,9 @@ under the License.
   </mailingLists>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/branches/maven-2.2.x</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.2.x</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/components/branches/maven-2.2.x</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/maven-2/branches/maven-2.2.x</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/maven-2/branches/maven-2.2.x</developerConnection>
+    <url>http://svn.apache.org/viewvc/maven/maven-2/branches/maven-2.2.x</url>
   </scm>
 
   <build>
@@ -178,7 +178,7 @@ under the License.
           <artifactId>maven-release-plugin</artifactId>
           <version>2.0-beta-7</version>
           <configuration>
-            <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
+            <tagBase>https://svn.apache.org/repos/asf/maven/maven-2/tags</tagBase>
             <autoVersionSubmodules>true</autoVersionSubmodules>
             <preparationGoals>install</preparationGoals>
           </configuration>
