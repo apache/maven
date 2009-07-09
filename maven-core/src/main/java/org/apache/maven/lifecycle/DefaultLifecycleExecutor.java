@@ -717,7 +717,7 @@ public class DefaultLifecycleExecutor
         }
         else
         {
-            throw new PluginNotFoundException( plugin, null );
+            throw new PluginNotFoundException( plugin, remoteRepositories );
         }
     }
 
