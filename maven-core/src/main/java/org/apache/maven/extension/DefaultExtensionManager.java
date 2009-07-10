@@ -266,8 +266,11 @@ public class DefaultExtensionManager
         if ( extensionContainer != null )
         {
             Map wagons = extensionContainer.getComponentDescriptorMap( Wagon.ROLE );
-            getLogger().debug( "Wagons to register: " + wagons.keySet() );
-            wagonManager.registerWagons( wagons.keySet(), extensionContainer );
+            if ( wagons != null && !wagons.isEmpty() )
+            {
+                getLogger().debug( "Wagons to register: " + wagons.keySet() );
+                wagonManager.registerWagons( wagons.keySet(), extensionContainer );
+            }
         }
         else
         {
