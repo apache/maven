@@ -46,6 +46,7 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -82,6 +83,10 @@ public class DefaultWagonManager
 
     private static final String MAVEN_ARTIFACT_PROPERTIES = "META-INF/maven/org.apache.maven/maven-artifact/pom.properties";
 
+    public static final String DELEGATE_PROPERTY_BASE = "maven.wagon.";
+
+    private static final String WAGON_IMPL_CONFIGURATION = "wagonImpl";
+
     private static int anonymousMirrorIdSeed = 0;
     
     private PlexusContainer container;
@@ -98,7 +103,7 @@ public class DefaultWagonManager
     private Map mirrors = new LinkedHashMap();
 
     /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
-    private Map serverConfigurationMap = new HashMap();
+    private Map<String, XmlPlexusConfiguration> serverConfigurationMap = new HashMap<String, XmlPlexusConfiguration>();
 
     private TransferListener downloadMonitor;
 
@@ -108,7 +113,7 @@ public class DefaultWagonManager
 
     private boolean interactive = true;
 
-    private Map availableWagons = new HashMap();
+    private Map<String, PlexusContainer> availableWagons = new HashMap<String, PlexusContainer>();
 
     private RepositoryPermissions defaultRepositoryPermissions;
 
@@ -125,22 +130,29 @@ public class DefaultWagonManager
             throw new UnsupportedProtocolException( "The repository " + repository + " does not specify a protocol" );
         }
 
-        Wagon wagon = getWagon( protocol );
+        Wagon wagon = getWagon( protocol, repository.getId() );
 
         configureWagon( wagon, repository.getId(), protocol );
 
         return wagon;
     }
-
+    
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
     {
-        PlexusContainer container = getWagonContainer( protocol );
+        return getWagon( protocol, null );
+    }
+    
+    private Wagon getWagon( String protocol, String repositoryId )
+        throws UnsupportedProtocolException
+    {
+        String hint = getWagonHint( protocol, repositoryId );
+        PlexusContainer container = getWagonContainer( hint );
 
         Wagon wagon;
         try
         {
-            wagon = (Wagon) container.lookup( Wagon.ROLE, protocol );
+            wagon = (Wagon) container.lookup( Wagon.ROLE, hint );
         }
         catch ( ComponentLookupException e1 )
         {
@@ -152,15 +164,47 @@ public class DefaultWagonManager
 
         return wagon;
     }
+    
+    private String getWagonHint( String protocol, String repositoryId )
+    {
+        // TODO: Implement a better way to get the hint, via settings.xml or something.
+        String impl = null;
+        
+        if ( repositoryId != null && serverConfigurationMap.containsKey( repositoryId ) )
+        {
+            XmlPlexusConfiguration config = serverConfigurationMap.get( repositoryId );
+            
+            Xpp3Dom dom = config.getXpp3Dom();
+            for ( int i = 0; i < dom.getChildCount(); i++ )
+            {
+                Xpp3Dom domChild = dom.getChild( i );
+                if ( WAGON_IMPL_CONFIGURATION.equals( domChild.getName() ) )
+                {
+                    impl = domChild.getValue();
+                    dom.removeChild( i );
+                    break;
+                }
+                
+                i++;
+            }
+        }
+        
+        if ( impl == null )
+        {
+            impl = System.getProperty( DELEGATE_PROPERTY_BASE + protocol, null );
+        }
+        
+        return impl == null ? protocol : protocol + "-" + impl;
+    }
 
-    private PlexusContainer getWagonContainer( String protocol )
+    private PlexusContainer getWagonContainer( String hint )
     {
         PlexusContainer container = this.container;
-
-        if ( availableWagons.containsKey( protocol ) )
+        if ( availableWagons.containsKey( hint ) )
         {
-            container = (PlexusContainer) availableWagons.get( protocol );
+            container = availableWagons.get( hint );
         }
+        
         return container;
     }
 
@@ -194,7 +238,7 @@ public class DefaultWagonManager
         Wagon wagon;
         try
         {
-            wagon = getWagon( protocol );
+            wagon = getWagon( protocol, repository.getId() );
 
             configureWagon( wagon, repository );
         }
@@ -308,7 +352,7 @@ public class DefaultWagonManager
         {
             disconnectWagon( wagon );
 
-            releaseWagon( protocol, wagon );
+            releaseWagon( protocol, wagon, repository.getId() );
         }
     }
 
@@ -413,7 +457,7 @@ public class DefaultWagonManager
         Wagon wagon;
         try
         {
-            wagon = getWagon( protocol );
+            wagon = getWagon( protocol, repository.getId() );
 
             configureWagon( wagon, repository );
         }
@@ -595,7 +639,7 @@ public class DefaultWagonManager
         {
             disconnectWagon( wagon );
 
-            releaseWagon( protocol, wagon );
+            releaseWagon( protocol, wagon, repository.getId() );
         }
 
         if ( downloaded )
@@ -749,9 +793,11 @@ public class DefaultWagonManager
     }
 
     private void releaseWagon( String protocol,
-                               Wagon wagon )
+                               Wagon wagon, String repositoryId )
     {
-        PlexusContainer container = getWagonContainer( protocol );
+        String hint = getWagonHint( protocol, repositoryId );
+        
+        PlexusContainer container = getWagonContainer( hint );
         try
         {
             container.release( wagon );
@@ -1015,10 +1061,11 @@ public class DefaultWagonManager
         this.interactive = interactive;
     }
 
+    @SuppressWarnings( "unchecked" )
     public void registerWagons( Collection wagons,
                                 PlexusContainer extensionContainer )
     {
-        for ( Iterator i = wagons.iterator(); i.hasNext(); )
+        for ( Iterator<String> i = wagons.iterator(); i.hasNext(); )
         {
             availableWagons.put( i.next(), extensionContainer );
         }

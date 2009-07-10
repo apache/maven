@@ -265,17 +265,9 @@ public class DefaultExtensionManager
     {
         if ( extensionContainer != null )
         {
-            try
-            {
-                Map wagons = extensionContainer.lookupMap( Wagon.ROLE );
-                getLogger().debug( "Wagons to register: " + wagons.keySet() );
-                wagonManager.registerWagons( wagons.keySet(), extensionContainer );
-            }
-            catch ( ComponentLookupException e )
-            {
-                // no wagons found in the extension
-                getLogger().debug( "No wagons found in the extensions or other internal error: " + e.getMessage(), e );
-            }
+            Map wagons = extensionContainer.getComponentDescriptorMap( Wagon.ROLE );
+            getLogger().debug( "Wagons to register: " + wagons.keySet() );
+            wagonManager.registerWagons( wagons.keySet(), extensionContainer );
         }
         else
         {

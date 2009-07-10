@@ -65,6 +65,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- NOTE: Listing this last causes it to be the default Wagon implementation
+         when the bare protocol is used to lookup the http/https wagons.
+    -->
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-http-lightweight</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>

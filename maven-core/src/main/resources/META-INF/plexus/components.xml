@@ -622,5 +622,32 @@ under the License.
         <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
       </configuration>
     </component>    
+    
+    <component>
+      <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>http-sun</role-hint>
+      <implementation>org.apache.maven.wagon.providers.http.LightweightHttpWagon</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <description>LightweightHttpWagon</description>
+    </component>
+    <component>
+      <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>https-sun</role-hint>
+      <implementation>org.apache.maven.wagon.providers.http.LightweightHttpsWagon</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <description>LIghtweightHttpsWagon</description>
+    </component>
+    <component>
+      <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>https-httpclient</role-hint>
+      <implementation>org.apache.maven.wagon.providers.http.HttpWagon</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>http-httpclient</role-hint>
+      <implementation>org.apache.maven.wagon.providers.http.HttpWagon</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+    </component>
   </components>
 </component-set>
