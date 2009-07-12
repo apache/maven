@@ -3581,19 +3581,24 @@
 
         Extension e = (Extension) o;
 
-        if ( !e.getArtifactId().equals( getArtifactId() ) )
+        if ( !equal( e.getArtifactId(), getArtifactId() ) )
         {
             return false;
         }
-        else if ( !e.getGroupId().equals( getGroupId() ) )
+        else if ( !equal( e.getGroupId(), getGroupId() ) )
         {
             return false;
         }
-        else if ( e.getVersion() != null ? !e.getVersion().equals( getVersion() ) : getVersion() != null )
+        else if ( !equal( e.getVersion(), getVersion() ) )
         {
             return false;
         }
         return true;
+    }
+
+    private static <T> boolean equal( T obj1, T obj2 )
+    {
+        return ( obj1 != null ) ? obj1.equals( obj2 ) : obj2 == null;
     }
 
     /**

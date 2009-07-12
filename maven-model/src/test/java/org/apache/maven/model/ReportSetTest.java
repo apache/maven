@@ -39,6 +39,8 @@ public class ReportSetTest
     public void testEqualsNullSafe()
     {
         assertFalse( new ReportSet().equals( null ) );
+
+        new ReportSet().equals( new ReportSet() );
     }
 
     public void testEqualsIdentity()

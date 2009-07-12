@@ -39,6 +39,8 @@ public class CiManagementTest
     public void testEqualsNullSafe()
     {
         assertFalse( new CiManagement().equals( null ) );
+
+        new CiManagement().equals( new CiManagement() );
     }
 
     public void testEqualsIdentity()

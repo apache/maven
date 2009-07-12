@@ -39,6 +39,8 @@ public class ResourceTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Resource().equals( null ) );
+
+        new Resource().equals( new Resource() );
     }
 
     public void testEqualsIdentity()

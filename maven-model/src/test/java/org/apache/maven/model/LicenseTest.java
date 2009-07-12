@@ -39,6 +39,8 @@ public class LicenseTest
     public void testEqualsNullSafe()
     {
         assertFalse( new License().equals( null ) );
+
+        new License().equals( new License() );
     }
 
     public void testEqualsIdentity()

@@ -39,6 +39,8 @@ public class ScmTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Scm().equals( null ) );
+
+        new Scm().equals( new Scm() );
     }
 
     public void testEqualsIdentity()

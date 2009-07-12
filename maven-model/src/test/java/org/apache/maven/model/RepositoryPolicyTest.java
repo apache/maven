@@ -39,6 +39,8 @@ public class RepositoryPolicyTest
     public void testEqualsNullSafe()
     {
         assertFalse( new RepositoryPolicy().equals( null ) );
+
+        new RepositoryPolicy().equals( new RepositoryPolicy() );
     }
 
     public void testEqualsIdentity()

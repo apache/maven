@@ -39,6 +39,8 @@ public class ReportingTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Reporting().equals( null ) );
+
+        new Reporting().equals( new Reporting() );
     }
 
     public void testEqualsIdentity()

@@ -39,6 +39,8 @@ public class PluginTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Plugin().equals( null ) );
+
+        new Plugin().equals( new Plugin() );
     }
 
     public void testEqualsIdentity()

@@ -39,6 +39,8 @@ public class DependencyManagementTest
     public void testEqualsNullSafe()
     {
         assertFalse( new DependencyManagement().equals( null ) );
+
+        new DependencyManagement().equals( new DependencyManagement() );
     }
 
     public void testEqualsIdentity()

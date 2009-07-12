@@ -39,6 +39,8 @@ public class MailingListTest
     public void testEqualsNullSafe()
     {
         assertFalse( new MailingList().equals( null ) );
+
+        new MailingList().equals( new MailingList() );
     }
 
     public void testEqualsIdentity()

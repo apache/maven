@@ -39,6 +39,8 @@ public class PrerequisitesTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Prerequisites().equals( null ) );
+
+        new Prerequisites().equals( new Prerequisites() );
     }
 
     public void testEqualsIdentity()

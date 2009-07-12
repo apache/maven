@@ -39,6 +39,8 @@ public class PluginManagementTest
     public void testEqualsNullSafe()
     {
         assertFalse( new PluginManagement().equals( null ) );
+
+        new PluginManagement().equals( new PluginManagement() );
     }
 
     public void testEqualsIdentity()

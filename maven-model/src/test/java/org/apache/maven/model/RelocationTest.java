@@ -39,6 +39,8 @@ public class RelocationTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Relocation().equals( null ) );
+
+        new Relocation().equals( new Relocation() );
     }
 
     public void testEqualsIdentity()

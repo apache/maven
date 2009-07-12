@@ -39,6 +39,8 @@ public class BuildTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Build().equals( null ) );
+
+        new Build().equals( new Build() );
     }
 
     public void testEqualsIdentity()

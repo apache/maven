@@ -39,6 +39,8 @@ public class SiteTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Site().equals( null ) );
+
+        new Site().equals( new Site() );
     }
 
     public void testEqualsIdentity()

@@ -39,6 +39,8 @@ public class DependencyTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Dependency().equals( null ) );
+
+        new Dependency().equals( new Dependency() );
     }
 
     public void testEqualsIdentity()

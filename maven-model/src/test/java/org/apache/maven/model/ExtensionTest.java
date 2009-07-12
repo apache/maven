@@ -39,6 +39,8 @@ public class ExtensionTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Extension().equals( null ) );
+
+        new Extension().equals( new Extension() );
     }
 
     public void testEqualsIdentity()
