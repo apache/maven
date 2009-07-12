@@ -46,10 +46,7 @@ public abstract class AbstractEmbedderTestCase
     {
         super.setUp();
 
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        Configuration configuration = new DefaultConfiguration().setClassLoader( classLoader ).setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
-        configuration.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
+        Configuration configuration = new SimpleConfiguration();
 
         maven = new MavenEmbedder( configuration );
         

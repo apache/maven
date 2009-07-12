@@ -21,7 +21,6 @@ package org.apache.maven.embedder;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -52,12 +51,7 @@ public class MavenEmbedderAligningBasedirTest
             basedir = new File( "." ).getCanonicalPath();
         }
 
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        Configuration configuration = new DefaultConfiguration()
-            .setClassLoader( classLoader )
-            .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
-        configuration.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
+        Configuration configuration = new SimpleConfiguration();
 
         mavenEmbedder = new MavenEmbedder( configuration );
     }
@@ -70,7 +64,7 @@ public class MavenEmbedderAligningBasedirTest
 
     protected void assertNoExceptions( MavenExecutionResult result )
     {
-        List exceptions = result.getExceptions();
+        List<Exception> exceptions = result.getExceptions();
         if ( ( exceptions == null ) || exceptions.isEmpty() )
         {
             // everything is a-ok.
@@ -78,10 +72,8 @@ public class MavenEmbedderAligningBasedirTest
         }
 
         System.err.println( "Encountered " + exceptions.size() + " exception(s)." );
-        Iterator it = exceptions.iterator();
-        while ( it.hasNext() )
+        for ( Exception exception : exceptions )
         {
-            Exception exception = (Exception) it.next();
             exception.printStackTrace( System.err );
         }
 

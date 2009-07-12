@@ -81,9 +81,7 @@ public class MavenEmbedderProjectWithExtensionReadingTest
         public ExtendableMavenEmbedder( ClassLoader classLoader )
             throws MavenEmbedderException
         {
-            super( new DefaultConfiguration()
-                .setClassLoader( classLoader )
-                .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() ) );
+            super( new SimpleConfiguration().setClassLoader( classLoader ) );
         }
 
         protected Map<String, ArtifactHandler> getPluginExtensionComponents( Plugin plugin )

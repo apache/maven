@@ -21,12 +21,11 @@ package org.apache.maven.embedder.validation;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.ConfigurationValidationResult;
-import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedder;
+import org.apache.maven.embedder.SimpleConfiguration;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -45,9 +44,8 @@ public class MavenEmbedderCrappySettingsConfigurationTest
 
         File user = new File( projectDirectory, "invalid-settings.xml" );
 
-        Configuration configuration = new DefaultConfiguration()
-            .setUserSettingsFile( user )
-            .setClassLoader( Thread.currentThread().getContextClassLoader() );
+        Configuration configuration = new SimpleConfiguration()
+            .setUserSettingsFile( user );
 
         ConfigurationValidationResult validationResult = MavenEmbedder.validateConfiguration( configuration );
 
@@ -63,9 +61,8 @@ public class MavenEmbedderCrappySettingsConfigurationTest
 
         MavenExecutionResult result = embedder.execute( request );
         
-        for ( Iterator i = result.getExceptions().iterator(); i.hasNext(); )
+        for ( Exception e : result.getExceptions() )
         {
-            Exception e = (Exception) i.next();
             e.printStackTrace();
         }
         

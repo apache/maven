@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -71,12 +70,7 @@ public class MavenEmbedderTest
             basedir = new File( "." ).getCanonicalPath();
         }
 
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        Configuration configuration = new DefaultConfiguration()
-            .setClassLoader( classLoader )
-            .setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
-        configuration.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
+        Configuration configuration = new SimpleConfiguration();
 
         mavenEmbedder = new MavenEmbedder( configuration );
 
@@ -92,7 +86,7 @@ public class MavenEmbedderTest
 
     protected void assertNoExceptions( MavenExecutionResult result )
     {
-        List exceptions = result.getExceptions();
+        List<Exception> exceptions = result.getExceptions();
         if ( ( exceptions == null ) || exceptions.isEmpty() )
         {
             // everything is a-ok.
@@ -100,10 +94,8 @@ public class MavenEmbedderTest
         }
 
         System.err.println( "Encountered " + exceptions.size() + " exception(s)." );
-        Iterator it = exceptions.iterator();
-        while ( it.hasNext() )
+        for (Exception exception : exceptions)
         {
-            Exception exception = (Exception) it.next();
             exception.printStackTrace( System.err );
         }
 
@@ -181,11 +173,10 @@ public class MavenEmbedderTest
             .setGoals( Arrays.asList( new String[]{"validate"} ) );
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
-        List exceptions = result.getExceptions();
+        List<Exception> exceptions = result.getExceptions();
         assertEquals("Incorrect number of exceptions", 1, exceptions.size());
 
-        Iterator it = exceptions.iterator();
-        if( (it.next() instanceof NullPointerException))
+        if ( ( exceptions.get( 0 ) instanceof NullPointerException ) )
         {
             fail("Null Pointer on Exception");
         }
@@ -306,7 +297,7 @@ public class MavenEmbedderTest
 
         MavenProject project = result.getProject();
 
-        Artifact p = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
+        Artifact p = project.getPluginArtifactMap().get( plugin.getKey() );
         assertEquals( "2.4.2", p.getVersion() );
 
         /* Add the surefire plugin 2.3 to the pom */
@@ -324,7 +315,7 @@ public class MavenEmbedderTest
 
         project = result.getProject();
 
-        p = (Artifact) project.getPluginArtifactMap().get( plugin.getKey() );
+        p = project.getPluginArtifactMap().get( plugin.getKey() );
         assertEquals( "2.4.3", p.getVersion() );
     }
 
@@ -365,7 +356,7 @@ public class MavenEmbedderTest
 
         assertEquals( "org.apache.maven", result.getProject().getGroupId() );
 
-        Set artifacts = result.getProject().getArtifacts();
+        Set<Artifact> artifacts = result.getProject().getArtifacts();
 
         assertEquals( 1, artifacts.size() );
 

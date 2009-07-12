@@ -1,14 +1,12 @@
 package org.apache.maven.embedder.project;
 
 import java.io.File;
-import java.util.Iterator;
 
 import junit.framework.TestCase;
 
 import org.apache.maven.embedder.Configuration;
-import org.apache.maven.embedder.DefaultConfiguration;
 import org.apache.maven.embedder.MavenEmbedder;
-import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
+import org.apache.maven.embedder.SimpleConfiguration;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
@@ -19,8 +17,7 @@ public class BadModuleNotRecursiveTest
     public void test()
         throws Exception
     {
-        Configuration configuration = new DefaultConfiguration();
-        configuration.setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
+        Configuration configuration = new SimpleConfiguration();
         MavenEmbedder embedder = new MavenEmbedder( configuration );
 
         File pom = new File( "src/test/projects/bad-module-non-recursive/pom.xml" ).getCanonicalFile();
@@ -39,10 +36,9 @@ public class BadModuleNotRecursiveTest
 
         if ( result.hasExceptions() )
         {
-            for ( Iterator it = result.getExceptions().iterator(); it.hasNext(); )
+            for ( Exception e : result.getExceptions() )
             {
-                Exception ex = (Exception) it.next();
-                ex.printStackTrace();
+                e.printStackTrace();
             }
         }
 

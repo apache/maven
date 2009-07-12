@@ -37,13 +37,7 @@ public class TestComponentOverride
     protected void setUp()
         throws Exception
     {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
-        Configuration request = new DefaultConfiguration();
-
-        request.setClassLoader( loader );
-
-        request.setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
+        Configuration request = new SimpleConfiguration();
 
         File extensions = new File( getBasedir(), "src/test/extensions" );
         
