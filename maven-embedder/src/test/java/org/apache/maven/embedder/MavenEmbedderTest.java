@@ -79,6 +79,8 @@ public class MavenEmbedderTest
         configuration.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
 
         mavenEmbedder = new MavenEmbedder( configuration );
+
+        System.err.println( "CHECK-CHECK: " + mavenEmbedder.getLocalRepository().getBasedir() );
     }
 
     protected void tearDown()
