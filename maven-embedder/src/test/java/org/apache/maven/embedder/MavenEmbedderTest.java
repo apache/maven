@@ -73,8 +73,6 @@ public class MavenEmbedderTest
         Configuration configuration = new SimpleConfiguration();
 
         mavenEmbedder = new MavenEmbedder( configuration );
-
-        System.err.println( "CHECK-CHECK: " + mavenEmbedder.getLocalRepository().getBasedir() );
     }
 
     protected void tearDown()
