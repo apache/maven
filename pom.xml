@@ -428,6 +428,30 @@
       </build>
     </profile>
     <profile>
+      <id>maven-repo-local</id>
+      <activation>
+        <property>
+          <name>maven.repo.local</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemProperties combine.children="append">
+                <property>
+                  <!-- Pass this through to the tests (if set!) to have them pick the right repository -->
+                  <name>maven.repo.local</name>
+                  <value>${maven.repo.local}</value>
+                </property>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>m2e</id>
       <activation>
         <property>
