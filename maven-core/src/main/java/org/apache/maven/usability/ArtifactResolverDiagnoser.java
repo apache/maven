@@ -50,7 +50,7 @@ public class ArtifactResolverDiagnoser
 
         IOException ioe = (IOException) DiagnosisUtils.getFromCausality( exception, IOException.class );
 
-        if ( ioe != null && exception.getMessage().indexOf( ioe.getMessage() ) < 0 )
+        if ( ioe != null && ioe.getMessage() != null && exception.getMessage().indexOf( ioe.getMessage() ) < 0 )
         {
             message.append( "\n\nCaused by I/O exception: " ).append( ioe.getMessage() );
         }
