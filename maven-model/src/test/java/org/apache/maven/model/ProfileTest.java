@@ -39,6 +39,8 @@ public class ProfileTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Profile().equals( null ) );
+
+        new Profile().equals( new Profile() );
     }
 
     public void testEqualsIdentity()

@@ -39,6 +39,8 @@ public class ReportPluginTest
     public void testEqualsNullSafe()
     {
         assertFalse( new ReportPlugin().equals( null ) );
+
+        new ReportPlugin().equals( new ReportPlugin() );
     }
 
     public void testEqualsIsKey()

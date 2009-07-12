@@ -39,6 +39,8 @@ public class ActivationFileTest
     public void testEqualsNullSafe()
     {
         assertFalse( new ActivationFile().equals( null ) );
+
+        new ActivationFile().equals( new ActivationFile() );
     }
 
     public void testEqualsIdentity()

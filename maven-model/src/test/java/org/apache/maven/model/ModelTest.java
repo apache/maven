@@ -39,6 +39,8 @@ public class ModelTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Model().equals( null ) );
+
+        new Model().equals( new Model() );
     }
 
     public void testEqualsIdentity()

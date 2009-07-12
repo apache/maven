@@ -39,6 +39,8 @@ public class DistributionManagementTest
     public void testEqualsNullSafe()
     {
         assertFalse( new DistributionManagement().equals( null ) );
+
+        new DistributionManagement().equals( new DistributionManagement() );
     }
 
     public void testEqualsIdentity()

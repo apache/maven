@@ -39,6 +39,8 @@ public class ContributorTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Contributor().equals( null ) );
+
+        new Contributor().equals( new Contributor() );
     }
 
     public void testEqualsIdentity()

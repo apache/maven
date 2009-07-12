@@ -39,6 +39,8 @@ public class OrganizationTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Organization().equals( null ) );
+
+        new Organization().equals( new Organization() );
     }
 
     public void testEqualsIdentity()

@@ -39,6 +39,8 @@ public class NotifierTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Notifier().equals( null ) );
+
+        new Notifier().equals( new Notifier() );
     }
 
     public void testEqualsIdentity()

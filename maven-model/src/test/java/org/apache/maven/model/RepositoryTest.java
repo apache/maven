@@ -39,6 +39,8 @@ public class RepositoryTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Repository().equals( null ) );
+
+        new Repository().equals( new Repository() );
     }
 
     public void testEqualsIdentity()

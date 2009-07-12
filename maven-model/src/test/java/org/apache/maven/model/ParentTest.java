@@ -39,6 +39,8 @@ public class ParentTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Parent().equals( null ) );
+
+        new Parent().equals( new Parent() );
     }
 
     public void testEqualsIdentity()

@@ -39,6 +39,8 @@ public class DeploymentRepositoryTest
     public void testEqualsNullSafe()
     {
         assertFalse( new DeploymentRepository().equals( null ) );
+
+        new DeploymentRepository().equals( new DeploymentRepository() );
     }
 
     public void testEqualsIdentity()

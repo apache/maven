@@ -39,6 +39,8 @@ public class ExclusionTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Exclusion().equals( null ) );
+
+        new Exclusion().equals( new Exclusion() );
     }
 
     public void testEqualsIdentity()

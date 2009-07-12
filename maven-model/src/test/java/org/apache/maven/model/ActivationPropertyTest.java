@@ -39,6 +39,8 @@ public class ActivationPropertyTest
     public void testEqualsNullSafe()
     {
         assertFalse( new ActivationProperty().equals( null ) );
+
+        new ActivationProperty().equals( new ActivationProperty() );
     }
 
     public void testEqualsIdentity()

@@ -39,6 +39,8 @@ public class ActivationOSTest
     public void testEqualsNullSafe()
     {
         assertFalse( new ActivationOS().equals( null ) );
+
+        new ActivationOS().equals( new ActivationOS() );
     }
 
     public void testEqualsIdentity()

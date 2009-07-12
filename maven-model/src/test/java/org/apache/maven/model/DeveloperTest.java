@@ -39,6 +39,8 @@ public class DeveloperTest
     public void testEqualsNullSafe()
     {
         assertFalse( new Developer().equals( null ) );
+
+        new Developer().equals( new Developer() );
     }
 
     public void testEqualsIdentity()
