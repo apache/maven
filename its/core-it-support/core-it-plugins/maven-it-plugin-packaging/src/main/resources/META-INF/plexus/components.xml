@@ -5,10 +5,15 @@
       <role-hint>it-packaging</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
-        <phases>
-          <!-- NOTE: This is intentionally a very minimalistic lifecycle -->
-          <package>org.apache.maven.its.plugins:maven-it-plugin-packaging:package</package>
-        </phases>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <phases>
+              <!-- NOTE: This is intentionally a very minimalistic lifecycle -->
+              <package>org.apache.maven.its.plugins:maven-it-plugin-packaging:package</package>
+            </phases>
+          </lifecycle>
+        </lifecycles>
       </configuration>
     </component>
     <component>
