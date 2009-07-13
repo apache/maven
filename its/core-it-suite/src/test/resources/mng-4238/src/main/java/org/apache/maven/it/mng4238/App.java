@@ -1,4 +1,4 @@
-package org.apache.maven.it.mng3506;
+package org.apache.maven.it.mng4238;
 
 /**
  * Hello world!

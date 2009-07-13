@@ -30,17 +30,17 @@ import java.io.IOException;
  * @author John Casey
  * @version $Id$
  */
-public class MavenITmng3506ArtifactHandlerExtensionUsageTest
+public class MavenITmng4238ArtifactHandlerExtensionUsageTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    private static final String GID = "org.apache.maven.it.mng3506";
-    private static final String AID = "mng-3506";
+    private static final String GID = "org.apache.maven.it.mng4238";
+    private static final String AID = "mng-4238";
     private static final String VERSION = "1";
     private static final String TYPE = "jar";
     private static final String BAD_TYPE = "coreit";
 
-    public MavenITmng3506ArtifactHandlerExtensionUsageTest()
+    public MavenITmng4238ArtifactHandlerExtensionUsageTest()
     {
         super( "(2.2.0,)" );
     }
@@ -48,7 +48,7 @@ public class MavenITmng3506ArtifactHandlerExtensionUsageTest
     public void testProjectPackagingUsage()
         throws IOException, VerificationException
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3506" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4238" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         
