@@ -35,7 +35,8 @@ import org.apache.maven.model.interpolation.ModelInterpolationException;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
-import org.apache.maven.model.management.ManagementInjector;
+import org.apache.maven.model.management.DependencyManagementInjector;
+import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
@@ -91,7 +92,10 @@ public class DefaultModelBuilder
     private ProfileInjector profileInjector;
 
     @Requirement
-    private ManagementInjector managementInjector;
+    private PluginManagementInjector pluginManagementInjector;
+
+    @Requirement
+    private DependencyManagementInjector dependencyManagementInjector;
 
     @Requirement
     private LifecycleBindingsInjector lifecycleBindingsInjector;
@@ -174,12 +178,16 @@ public class DefaultModelBuilder
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
+        pluginManagementInjector.injectBasicManagement( resultModel, request );
+
         if ( request.isProcessPlugins() )
         {
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel );
         }
 
-        managementInjector.injectManagement( resultModel, request );
+        pluginManagementInjector.injectManagement( resultModel, request );
+
+        dependencyManagementInjector.injectManagement( resultModel, request );
 
         modelNormalizer.injectDefaultValues( resultModel, request );
 

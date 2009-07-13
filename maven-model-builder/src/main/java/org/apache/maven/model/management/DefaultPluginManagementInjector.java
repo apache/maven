@@ -21,16 +21,12 @@ package org.apache.maven.model.management;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
@@ -41,28 +37,32 @@ import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * Handles injection of plugin/dependency management into the model.
+ * Handles injection of plugin management into the model.
  * 
  * @author Benjamin Bentmann
  */
-@Component( role = ManagementInjector.class )
-public class DefaultManagementInjector
-    implements ManagementInjector
+@Component( role = PluginManagementInjector.class )
+public class DefaultPluginManagementInjector
+    implements PluginManagementInjector
 {
 
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     public void injectManagement( Model model, ModelBuildingRequest request )
     {
-        merger.mergeManagedDependencies( model );
-        merger.mergeManagedBuildPlugins( model );
+        merger.mergeManagedBuildPlugins( model, false );
+    }
+
+    public void injectBasicManagement( Model model, ModelBuildingRequest request )
+    {
+        merger.mergeManagedBuildPlugins( model, true );
     }
 
     private static class ManagementModelMerger
         extends MavenModelMerger
     {
 
-        public void mergeManagedBuildPlugins( Model model )
+        public void mergeManagedBuildPlugins( Model model, boolean basic )
         {
             Build build = model.getBuild();
             if ( build != null )
@@ -70,14 +70,12 @@ public class DefaultManagementInjector
                 PluginManagement pluginManagement = build.getPluginManagement();
                 if ( pluginManagement != null )
                 {
-                    mergePluginContainer_Plugins( build, pluginManagement, false, Collections.emptyMap() );
+                    mergePluginContainer_Plugins( build, pluginManagement, basic );
                 }
             }
         }
 
-        @Override
-        protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
-                                                     boolean sourceDominant, Map<Object, Object> context )
+        private void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source, boolean basic )
         {
             List<Plugin> src = source.getPlugins();
             if ( !src.isEmpty() )
@@ -85,6 +83,8 @@ public class DefaultManagementInjector
                 List<Plugin> tgt = target.getPlugins();
 
                 Map<Object, Plugin> managedPlugins = new LinkedHashMap<Object, Plugin>( src.size() * 2 );
+
+                Map<Object, Object> context = Collections.emptyMap();
 
                 for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
                 {
@@ -100,7 +100,15 @@ public class DefaultManagementInjector
                     Plugin managedPlugin = managedPlugins.get( key );
                     if ( managedPlugin != null )
                     {
-                        mergePlugin( element, managedPlugin, sourceDominant, context );
+                        if ( basic )
+                        {
+                            mergePlugin_Version( element, managedPlugin, false, context );
+                            mergePlugin_Extensions( element, managedPlugin, false, context );
+                        }
+                        else
+                        {
+                            mergePlugin( element, managedPlugin, false, context );
+                        }
                     }
                 }
             }
@@ -140,51 +148,6 @@ public class DefaultManagementInjector
                 }
 
                 target.setExecutions( new ArrayList<PluginExecution>( merged.values() ) );
-            }
-        }
-
-        public void mergeManagedDependencies( Model model )
-        {
-            DependencyManagement dependencyManagement = model.getDependencyManagement();
-            if ( dependencyManagement != null )
-            {
-                Map<Object, Dependency> dependencies = new HashMap<Object, Dependency>();
-                Map<Object, Object> context = Collections.emptyMap();
-
-                for ( Dependency dependency : model.getDependencies() )
-                {
-                    Object key = getDependencyKey( dependency );
-                    dependencies.put( key, dependency );
-                }
-
-                for ( Dependency managedDependency : dependencyManagement.getDependencies() )
-                {
-                    Object key = getDependencyKey( managedDependency );
-                    Dependency dependency = dependencies.get( key );
-                    if ( dependency != null )
-                    {
-                        mergeDependency( dependency, managedDependency, false, context );
-                    }
-                }
-            }
-        }
-
-        @Override
-        protected void mergeDependency_Exclusions( Dependency target, Dependency source, boolean sourceDominant,
-                                                   Map<Object, Object> context )
-        {
-            List<Exclusion> tgt = target.getExclusions();
-            if ( tgt.isEmpty() )
-            {
-                List<Exclusion> src = source.getExclusions();
-
-                for ( Iterator<Exclusion> it = src.iterator(); it.hasNext(); )
-                {
-                    Exclusion element = it.next();
-                    Exclusion clone = new Exclusion();
-                    mergeExclusion( clone, element, true, context );
-                    target.addExclusion( clone );
-                }
             }
         }
 
