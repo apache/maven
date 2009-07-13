@@ -1,0 +1,8 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.execution.RuntimeInformation</role>
+      <implementation>org.apache.maven.WagonSelectorTest$TestRuntimeInformation</implementation>
+    </component>
+  </components>
+</component-set>
