@@ -83,9 +83,7 @@ public class DefaultWagonManager
 
     private static final String MAVEN_ARTIFACT_PROPERTIES = "META-INF/maven/org.apache.maven/maven-artifact/pom.properties";
 
-    public static final String DELEGATE_PROPERTY_BASE = "maven.wagon.";
-
-    private static final String WAGON_IMPL_CONFIGURATION = "wagonImpl";
+    private static final String WAGON_PROVIDER_CONFIGURATION = "wagonProvider";
 
     private static int anonymousMirrorIdSeed = 0;
     
@@ -118,6 +116,8 @@ public class DefaultWagonManager
     private RepositoryPermissions defaultRepositoryPermissions;
 
     private String httpUserAgent;
+    
+    private WagonProviderMapping providerMapping = new DefaultWagonProviderMapping();
 
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
@@ -178,7 +178,7 @@ public class DefaultWagonManager
             for ( int i = 0; i < dom.getChildCount(); i++ )
             {
                 Xpp3Dom domChild = dom.getChild( i );
-                if ( WAGON_IMPL_CONFIGURATION.equals( domChild.getName() ) )
+                if ( WAGON_PROVIDER_CONFIGURATION.equals( domChild.getName() ) )
                 {
                     impl = domChild.getValue();
                     dom.removeChild( i );
@@ -191,7 +191,7 @@ public class DefaultWagonManager
         
         if ( impl == null )
         {
-            impl = System.getProperty( DELEGATE_PROPERTY_BASE + protocol, null );
+            impl = providerMapping.getWagonProvider( protocol );
         }
         
         return impl == null ? protocol : protocol + "-" + impl;
@@ -1204,6 +1204,11 @@ public class DefaultWagonManager
         final XmlPlexusConfiguration xmlConf = new XmlPlexusConfiguration( configuration );
 
         serverConfigurationMap.put( repositoryId, xmlConf );
+    }
+    
+    public void setWagonProvider( String protocol, String provider )
+    {
+        providerMapping.setWagonProvider( protocol, provider );
     }
 
     public void setDefaultRepositoryPermissions( RepositoryPermissions defaultRepositoryPermissions )

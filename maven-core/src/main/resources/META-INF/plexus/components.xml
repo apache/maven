@@ -624,15 +624,28 @@ under the License.
     </component>    
     
     <component>
+      <role>org.apache.maven.artifact.manager.WagonProviderMapping</role>
+      <role-hint>maven</role-hint>
+      <implementation>org.apache.maven.artifact.manager.DefaultWagonProviderMapping</implementation>
+      <configuration>
+        <wagonProviders>
+          <http>lightweight</http>
+          <http>lightweight</http>
+        </wagonProviders>
+      </configuration>
+    </component>
+
+    <!-- TODO: The following wagon component definitions need to be moved into the proper wagon-* projects... -->
+    <component>
       <role>org.apache.maven.wagon.Wagon</role>
-      <role-hint>http-sun</role-hint>
+      <role-hint>http-lightweight</role-hint>
       <implementation>org.apache.maven.wagon.providers.http.LightweightHttpWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <description>LightweightHttpWagon</description>
     </component>
     <component>
       <role>org.apache.maven.wagon.Wagon</role>
-      <role-hint>https-sun</role-hint>
+      <role-hint>https-lightweight</role-hint>
       <implementation>org.apache.maven.wagon.providers.http.LightweightHttpsWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <description>LIghtweightHttpsWagon</description>

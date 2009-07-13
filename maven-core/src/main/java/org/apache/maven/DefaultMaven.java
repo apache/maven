@@ -795,6 +795,19 @@ public class DefaultMaven
 
                 wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
             }
+            
+            for ( Object k: executionProperties.keySet() )
+            {
+                String key = (String) k;
+                if ( key.startsWith( "maven.wagon.provider." ) )
+                {
+                    String provider = executionProperties.getProperty( key );
+                    key = key.substring( "maven.wagon.provider.".length() );
+                    
+                    wagonManager.setWagonProvider( key, provider );
+                }
+                
+            }
         }
         finally
         {

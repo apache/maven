@@ -43,6 +43,15 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-parameter-documenter</artifactId>
     </dependency>
+    <!-- This is bizarre, but it seems that putting this AFTER wagon-http
+         causes the shade plugin to completely SKIP adding some parts of
+         commons-httpclient. At least the RequestEntity interface is missing
+         in the resulting output, and ITs will start failing left and right...
+    -->
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-http-lightweight</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-webdav-jackrabbit</artifactId>
@@ -64,13 +73,6 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <!-- NOTE: Listing this last causes it to be the default Wagon implementation
-         when the bare protocol is used to lookup the http/https wagons.
-    -->
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-http-lightweight</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
