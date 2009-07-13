@@ -52,7 +52,7 @@ public class ProjectSorter
     
     private final Map projectMap;
 
-    private final List sortedProjects;
+    private final List<MavenProject> sortedProjects;
 
     private MavenProject topLevelProject;
 
@@ -369,7 +369,7 @@ public class ProjectSorter
         return topLevelProject;
     }
 
-    public List getSortedProjects()
+    public List<MavenProject> getSortedProjects()
     {
         return sortedProjects;
     }

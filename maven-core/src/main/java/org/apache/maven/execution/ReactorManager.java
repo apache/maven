@@ -203,7 +203,7 @@ public class ReactorManager
         return sorter.hasMultipleProjects();
     }
 
-    public List getSortedProjects()
+    public List<MavenProject> getSortedProjects()
     {
         return sorter.getSortedProjects();
     }

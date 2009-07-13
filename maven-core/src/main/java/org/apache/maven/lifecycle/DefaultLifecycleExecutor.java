@@ -185,10 +185,9 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException
     {
         // TODO: MNG-4081. What about extensions within the current reactor??
-        for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
+        Map<String, ArtifactHandler> handlers = new HashMap<String, ArtifactHandler>();
+        for ( MavenProject project : session.getSortedProjects() )
         {
-            MavenProject project = (MavenProject) i.next();
-
             for ( Iterator j = project.getBuildExtensions().iterator(); j.hasNext(); )
             {
                 Extension extension = (Extension) j.next();
@@ -211,19 +210,37 @@ public class DefaultLifecycleExecutor
                 }
             }
 
-            extensionManager.registerWagons();
+        }
+        
+        extensionManager.registerWagons();
+        
+        handlers.putAll( extensionManager.getArtifactTypeHandlers() );
 
+        for ( MavenProject project : session.getSortedProjects() )
+        {
             try
             {
-                Map handlers = findArtifactTypeHandlers( project, session.getSettings(), session.getLocalRepository() );
+                handlers.putAll( findArtifactTypeHandlersInPlugins( project, session.getSettings(), session.getLocalRepository() ) );
 
-                artifactHandlerManager.addHandlers( handlers );
+                // shudder...
+                for ( ArtifactHandler handler : handlers.values() )
+                {
+                    if ( project.getPackaging().equals( handler.getPackaging() ) )
+                    {
+                        project.getArtifact().setArtifactHandler( handler );
+                        
+                        // NOTE: Adding this (maven 2.2.1) to short-circuit things. This means first match is used, NOT LAST.
+                        break;
+                    }
+                }
             }
             catch ( PluginNotFoundException e )
             {
                 throw new LifecycleExecutionException( e.getMessage(), e );
             }
         }
+        
+        artifactHandlerManager.addHandlers( handlers );
     }
 
     private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
@@ -1443,10 +1460,11 @@ public class DefaultLifecycleExecutor
      * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
      * lookup directly, or have them passed in
      */
-    private Map findArtifactTypeHandlers( MavenProject project, Settings settings, ArtifactRepository localRepository )
+    private Map<String, ArtifactHandler> findArtifactTypeHandlersInPlugins( MavenProject project, Settings settings,
+                                                                            ArtifactRepository localRepository )
         throws LifecycleExecutionException, PluginNotFoundException
     {
-        Map map = new HashMap();
+        Map<String, ArtifactHandler> map = new HashMap<String, ArtifactHandler>();
         for ( Iterator i = project.getBuildPlugins().iterator(); i.hasNext(); )
         {
             Plugin plugin = (Plugin) i.next();
@@ -1469,16 +1487,6 @@ public class DefaultLifecycleExecutor
                 {
                     throw new LifecycleExecutionException( "Error looking up available components from plugin '" +
                         plugin.getKey() + "': " + e.getMessage(), e );
-                }
-
-                // shudder...
-                for ( Iterator j = map.values().iterator(); j.hasNext(); )
-                {
-                    ArtifactHandler handler = (ArtifactHandler) j.next();
-                    if ( project.getPackaging().equals( handler.getPackaging() ) )
-                    {
-                        project.getArtifact().setArtifactHandler( handler );
-                    }
                 }
             }
         }

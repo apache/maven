@@ -23,6 +23,7 @@ import org.apache.maven.MavenArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -45,6 +46,7 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -57,6 +59,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -261,11 +264,12 @@ public class DefaultExtensionManager
         return child;
     }
 
+    @SuppressWarnings( "unchecked" )
     public void registerWagons()
     {
         if ( extensionContainer != null )
         {
-            Map wagons = extensionContainer.getComponentDescriptorMap( Wagon.ROLE );
+            Map<String, ComponentDescriptor> wagons = extensionContainer.getComponentDescriptorMap( Wagon.ROLE );
             if ( wagons != null && !wagons.isEmpty() )
             {
                 getLogger().debug( "Wagons to register: " + wagons.keySet() );
@@ -276,6 +280,37 @@ public class DefaultExtensionManager
         {
             getLogger().debug( "Wagons could not be registered as the extension container was never created" );
         }
+    }
+    
+    @SuppressWarnings( "unchecked" )
+    public Map<String, ArtifactHandler> getArtifactTypeHandlers()
+    {
+        Map<String, ArtifactHandler> result = new HashMap<String, ArtifactHandler>();
+        
+        if ( extensionContainer != null )
+        {
+            try
+            {
+                result.putAll( extensionContainer.lookupMap( ArtifactHandler.ROLE ) );
+            }
+            catch ( ComponentLookupException e )
+            {
+                getLogger().debug( "ArtifactHandler extensions could not be loaded: " + e.getMessage(), e );
+            }
+        }
+        else
+        {
+            try
+            {
+                result.putAll( container.lookupMap( ArtifactHandler.ROLE ) );
+            }
+            catch ( ComponentLookupException e )
+            {
+                getLogger().debug( "ArtifactHandler extensions could not be loaded: " + e.getMessage(), e );
+            }
+        }
+        
+        return result;
     }
 
     public void contextualize( Context context )
