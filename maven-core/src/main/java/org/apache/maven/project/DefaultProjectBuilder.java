@@ -91,6 +91,15 @@ public class DefaultProjectBuilder
         DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, configuration );
         request.setModelBuildingListeners( Arrays.asList( listener ) );
 
+        if ( localProject )
+        {
+            request.setPomFile( pomFile );
+        }
+        else
+        {
+            request.setModelSource( new FileModelSource( pomFile ) );
+        }
+
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
@@ -98,14 +107,7 @@ public class DefaultProjectBuilder
             ModelBuildingResult result;
             try
             {
-                if ( localProject )
-                {
-                    result = modelBuilder.build( pomFile, request );
-                }
-                else
-                {
-                    result = modelBuilder.build( new FileModelSource( pomFile ), request );
-                }
+                result = modelBuilder.build( request );
             }
             catch ( ModelBuildingException e )
             {
@@ -254,10 +256,12 @@ public class DefaultProjectBuilder
     {
         ModelBuildingRequest request = getModelBuildingRequest( config );
 
+        request.setModelSource( new UrlModelSource( getClass().getResource( "standalone.xml" ) ) );
+
         ModelBuildingResult result;
         try
         {
-            result = modelBuilder.build( new UrlModelSource( getClass().getResource( "standalone.xml" ) ), request );
+            result = modelBuilder.build( request );
         }
         catch ( ModelBuildingException e )
         {

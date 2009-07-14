@@ -103,30 +103,18 @@ public class DefaultModelBuilder
     @Requirement
     private PluginConfigurationExpander pluginConfigurationExpander;
 
-    public ModelBuildingResult build( File pomFile, ModelBuildingRequest request )
-        throws ModelBuildingException
-    {
-        return build( new FileModelSource( pomFile ), pomFile, request );
-    }
-
-    public ModelBuildingResult build( ModelSource modelSource, ModelBuildingRequest request )
-        throws ModelBuildingException
-    {
-        return build( modelSource, null, request );
-    }
-
-    private ModelBuildingResult build( ModelSource modelSource, File pomFile, ModelBuildingRequest request )
+    public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
     {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
         List<ModelProblem> problems = new ArrayList<ModelProblem>();
 
-        ProfileActivationContext profileActivationContext = getProfileActivationContext( pomFile, request );
+        ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
         List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
 
-        Model inputModel = readModel( modelSource, pomFile, request, problems );
+        Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
         ModelData resultData = new ModelData( inputModel );
 
@@ -234,6 +222,18 @@ public class DefaultModelBuilder
     {
         Model model;
 
+        if ( modelSource == null )
+        {
+            if ( pomFile != null )
+            {
+                modelSource = new FileModelSource( pomFile );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "neither model source nor input file are specified" );
+            }
+        }
+
         try
         {
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
@@ -300,14 +300,14 @@ public class DefaultModelBuilder
         }
     }
 
-    private ProfileActivationContext getProfileActivationContext( File pomFile, ModelBuildingRequest request )
+    private ProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
     {
         ProfileActivationContext context = new DefaultProfileActivationContext();
 
         context.setActiveProfileIds( request.getActiveProfileIds() );
         context.setInactiveProfileIds( request.getInactiveProfileIds() );
         context.setExecutionProperties( request.getExecutionProperties() );
-        context.setProjectDirectory( ( pomFile != null ) ? pomFile.getParentFile() : null );
+        context.setProjectDirectory( ( request.getPomFile() != null ) ? request.getPomFile().getParentFile() : null );
 
         return context;
     }
@@ -438,7 +438,7 @@ public class DefaultModelBuilder
             return null;
         }
 
-        Model candidateModel = readModel( new FileModelSource( pomFile ), pomFile, request, problems );
+        Model candidateModel = readModel( null, pomFile, request, problems );
 
         String groupId = candidateModel.getGroupId();
         if ( groupId == null && candidateModel.getParent() != null )

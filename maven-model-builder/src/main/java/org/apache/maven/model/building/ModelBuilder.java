@@ -19,10 +19,6 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.io.File;
-
-import org.apache.maven.model.resolution.ModelResolver;
-
 /**
  * Builds the effective model from a POM.
  * 
@@ -32,29 +28,13 @@ public interface ModelBuilder
 {
 
     /**
-     * Builds the effective model of the specified POM file. Note that this method overload is meant to build the
-     * effective model for the build process of a project. Hence the effective model supports the notion of a project
-     * directory.
+     * Builds the effective model of the specified POM.
      * 
-     * @param pomFile The POM file of the project to build the effective model from, must not be {@code null}.
-     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param request The model building request that holds the parameters, must not be {@code null}.
      * @return The result of the model building, never {@code null}.
      * @throws ModelBuildingException If the effective model could not be built.
      */
-    ModelBuildingResult build( File pomFile, ModelBuildingRequest request )
-        throws ModelBuildingException;
-
-    /**
-     * Builds the effective model for the specified POM. In contrast to
-     * {@link #build(File, ModelBuildingRequest, ModelResolver)} the resulting model does not support the notion of a
-     * project directory. As a consequence, parent POMs are always resolved via the provided model resolver.
-     * 
-     * @param modelSource The source of the POM, must not be {@code null}.
-     * @param request The model building request that holds further settings, must not be {@code null}.
-     * @return The result of the model building, never {@code null}.
-     * @throws ModelBuildingException If the effective model could not be built.
-     */
-    ModelBuildingResult build( ModelSource modelSource, ModelBuildingRequest request )
+    ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException;
 
 }

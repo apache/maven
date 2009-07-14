@@ -19,6 +19,7 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +36,10 @@ import org.apache.maven.model.resolution.ModelResolver;
 public class DefaultModelBuildingRequest
     implements ModelBuildingRequest
 {
+
+    private File pomFile;
+
+    private ModelSource modelSource;
 
     private int validationLevel = VALIDATION_LEVEL_STRICT;
 
@@ -53,6 +58,30 @@ public class DefaultModelBuildingRequest
     private ModelResolver modelResolver;
 
     private List<ModelBuildingListener> modelBuildingListeners;
+
+    public File getPomFile()
+    {
+        return pomFile;
+    }
+
+    public DefaultModelBuildingRequest setPomFile( File pomFile )
+    {
+        this.pomFile = pomFile;
+
+        return this;
+    }
+
+    public ModelSource getModelSource()
+    {
+        return modelSource;
+    }
+
+    public DefaultModelBuildingRequest setModelSource( ModelSource modelSource )
+    {
+        this.modelSource = modelSource;
+
+        return this;
+    }
 
     public int getValidationLevel()
     {
