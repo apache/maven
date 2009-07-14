@@ -109,7 +109,7 @@ public class JdkVersionProfileActivator
         addZeroTokens( valueTokens, max );
         addZeroTokens( rangeValueTokens, max );
 
-        if ( value.equals( rangeValue.value ) )
+        if ( value.equals( rangeValue.getValue() ) )
         {
             if ( !rangeValue.isClosed() )
             {

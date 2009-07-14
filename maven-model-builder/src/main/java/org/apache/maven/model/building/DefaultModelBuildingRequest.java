@@ -52,6 +52,8 @@ public class DefaultModelBuildingRequest
 
     private ModelResolver modelResolver;
 
+    private List<ModelBuildingListener> modelBuildingListeners;
+
     public int getValidationLevel()
     {
         return validationLevel;
@@ -193,6 +195,30 @@ public class DefaultModelBuildingRequest
     public DefaultModelBuildingRequest setModelResolver( ModelResolver modelResolver )
     {
         this.modelResolver = modelResolver;
+
+        return this;
+    }
+
+    public List<ModelBuildingListener> getModelBuildingListeners()
+    {
+        if ( modelBuildingListeners == null )
+        {
+            modelBuildingListeners = new ArrayList<ModelBuildingListener>();
+        }
+
+        return modelBuildingListeners;
+    }
+
+    public ModelBuildingRequest setModelBuildingListeners( List<? extends ModelBuildingListener> modelBuildingListeners )
+    {
+        if ( modelBuildingListeners != null )
+        {
+            this.modelBuildingListeners = new ArrayList<ModelBuildingListener>( modelBuildingListeners );
+        }
+        else
+        {
+            this.modelBuildingListeners = null;
+        }
 
         return this;
     }

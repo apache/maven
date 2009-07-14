@@ -188,4 +188,19 @@ public interface ModelBuildingRequest
      */
     ModelBuildingRequest setModelResolver( ModelResolver modelResolver );
 
+    /**
+     * Gets the model building listeners to notify during the build process.
+     * 
+     * @return The model building listeners to notify, never {@code null}.
+     */
+    List<ModelBuildingListener> getModelBuildingListeners();
+
+    /**
+     * Sets the model building listeners to notify during the build process.
+     * 
+     * @param modelBuildingListeners The model building listeners to notify, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    ModelBuildingRequest setModelBuildingListeners( List<? extends ModelBuildingListener> modelBuildingListeners );
+
 }

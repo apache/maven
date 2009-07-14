@@ -180,6 +180,8 @@ public class DefaultModelBuilder
 
         pluginManagementInjector.injectBasicManagement( resultModel, request );
 
+        fireBuildExtensionsAssembled( resultModel, request, problems );
+
         if ( request.isProcessPlugins() )
         {
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel );
@@ -224,18 +226,6 @@ public class DefaultModelBuilder
         }
 
         return result;
-    }
-
-    private ProfileActivationContext getProfileActivationContext( File pomFile, ModelBuildingRequest request )
-    {
-        ProfileActivationContext context = new DefaultProfileActivationContext();
-
-        context.setActiveProfileIds( request.getActiveProfileIds() );
-        context.setInactiveProfileIds( request.getInactiveProfileIds() );
-        context.setExecutionProperties( request.getExecutionProperties() );
-        context.setProjectDirectory( ( pomFile != null ) ? pomFile.getParentFile() : null );
-
-        return context;
     }
 
     private Model readModel( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
@@ -308,6 +298,18 @@ public class DefaultModelBuilder
                                                 source ) );
             }
         }
+    }
+
+    private ProfileActivationContext getProfileActivationContext( File pomFile, ModelBuildingRequest request )
+    {
+        ProfileActivationContext context = new DefaultProfileActivationContext();
+
+        context.setActiveProfileIds( request.getActiveProfileIds() );
+        context.setInactiveProfileIds( request.getInactiveProfileIds() );
+        context.setExecutionProperties( request.getExecutionProperties() );
+        context.setProjectDirectory( ( pomFile != null ) ? pomFile.getParentFile() : null );
+
+        return context;
     }
 
     private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request, ProfileActivationContext context,
@@ -507,6 +509,30 @@ public class DefaultModelBuilder
     private Model getSuperModel()
     {
         return ModelUtils.cloneModel( superPomProvider.getSuperModel( "4.0.0" ) );
+    }
+
+    private void fireBuildExtensionsAssembled( Model model, ModelBuildingRequest request, List<ModelProblem> problems )
+        throws ModelBuildingException
+    {
+        if ( request.getModelBuildingListeners().isEmpty() )
+        {
+            return;
+        }
+
+        ModelBuildingEvent event = new DefaultModelBuildingEvent( model, request );
+
+        for ( ModelBuildingListener listener : request.getModelBuildingListeners() )
+        {
+            try
+            {
+                listener.buildExtensionsAssembled( event );
+            }
+            catch ( Exception e )
+            {
+                problems.add( new ModelProblem( "Invalid build extensions: " + e.getMessage(),
+                                                ModelProblem.Severity.ERROR, toSourceHint( model ), e ) );
+            }
+        }
     }
 
     private String toSourceHint( Model model )
