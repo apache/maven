@@ -176,6 +176,16 @@ public class DefaultModelInheritanceAssembler
         assembleModelInheritance( dest, source, null, false );
     }
 
+    public void assembleModelInheritance( Model child, Model parent, String childPathAdjustment )
+    {
+        assembleModelInheritance( child, parent, childPathAdjustment, true );
+    }
+
+    public void assembleModelInheritance( Model child, Model parent )
+    {
+        assembleModelInheritance( child, parent, null, true );
+    }
+
     private void assembleModelInheritance( Model child, Model parent, String childPathAdjustment, boolean appendPaths )
     {
         // cannot inherit from null parent.
