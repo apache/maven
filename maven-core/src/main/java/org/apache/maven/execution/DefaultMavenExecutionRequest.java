@@ -85,6 +85,12 @@ public class DefaultMavenExecutionRequest
 
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
 
+    private List<String> selectedProjects;
+
+    private String resumeFrom;
+
+    private String makeBehavior;
+
     private Properties properties;
 
     private Date startTime;
@@ -198,6 +204,26 @@ public class DefaultMavenExecutionRequest
     public String getReactorFailureBehavior()
     {
         return reactorFailureBehavior;
+    }
+
+    public List<String> getSelectedProjects()
+    {
+        if ( selectedProjects == null )
+        {
+            selectedProjects = new ArrayList<String>();
+        }
+
+        return selectedProjects;
+    }
+
+    public String getResumeFrom()
+    {
+        return resumeFrom;
+    }
+
+    public String getMakeBehavior()
+    {
+        return makeBehavior;
     }
 
     public Date getStartTime()
@@ -410,6 +436,34 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setReactorFailureBehavior( String failureBehavior )
     {
         reactorFailureBehavior = failureBehavior;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setSelectedProjects( List<String> selectedProjects )
+    {
+        if ( selectedProjects != null )
+        {
+            this.selectedProjects = new ArrayList<String>( selectedProjects );
+        }
+        else
+        {
+            this.selectedProjects = null;
+        }
+
+        return this;
+    }
+
+    public MavenExecutionRequest setResumeFrom( String project )
+    {
+        this.resumeFrom = project;
+
+        return this;
+    }
+
+    public MavenExecutionRequest setMakeBehavior( String makeBehavior )
+    {
+        this.makeBehavior = makeBehavior;
 
         return this;
     }

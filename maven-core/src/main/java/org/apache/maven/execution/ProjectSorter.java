@@ -193,6 +193,11 @@ public class ProjectSorter
         return dag.getParentLabels( id );
     }
 
+    public List<String> getDependencies( String id )
+    {
+        return dag.getChildLabels( id );
+    }
+
     public static String getId( MavenProject project )
     {
         return ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );

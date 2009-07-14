@@ -40,7 +40,7 @@ public interface ProjectDependencyGraph
     List<MavenProject> getSortedProjects();
 
     /**
-     * Gets the downstream projects of the specified projects. A downstream project is a project that directly or
+     * Gets the downstream projects of the specified project. A downstream project is a project that directly or
      * indirectly depends on the given project.
      * 
      * @param project The project whose downstream projects should be retrieved, must not be {@code null}.
@@ -49,5 +49,16 @@ public interface ProjectDependencyGraph
      * @return The downstream projects in the build order, never {@code null}.
      */
     List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive );
+
+    /**
+     * Gets the upstream projects of the specified project. An upstream project is a project that directly or indirectly
+     * is a prerequisite of the given project.
+     * 
+     * @param project The project whose upstream projects should be retrieved, must not be {@code null}.
+     * @param transitive A flag whether to retrieve all direct and indirect upstream projects or just the immediate
+     *            upstream projects.
+     * @return The upstream projects in the build order, never {@code null}.
+     */
+    List<MavenProject> getUpstreamProjects( MavenProject project, boolean transitive );
 
 }

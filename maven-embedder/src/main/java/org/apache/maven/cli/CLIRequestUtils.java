@@ -22,6 +22,7 @@ package org.apache.maven.cli;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -33,6 +34,7 @@ import org.apache.maven.MavenTransferListener;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 
 public final class CLIRequestUtils
@@ -267,7 +269,34 @@ public final class CLIRequestUtils
         {
             request.setPom( pom );
         }        
-        
+
+        if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
+        {
+            request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
+        }
+
+        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
+        {
+            String projectList = commandLine.getOptionValue( CLIManager.PROJECT_LIST );
+            String[] projects = StringUtils.split( projectList, "," );
+            request.setSelectedProjects( Arrays.asList( projects ) );
+        }
+
+        if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && !commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM );
+        }
+        else if ( !commandLine.hasOption( CLIManager.ALSO_MAKE )
+            && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM );
+        }
+        else if ( commandLine.hasOption( CLIManager.ALSO_MAKE )
+            && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_BOTH );
+        }
+
         return request;
     }
 

@@ -65,6 +65,16 @@ public interface MavenExecutionRequest
     static final String REACTOR_FAIL_NEVER = "FAIL_NEVER";
 
     // ----------------------------------------------------------------------
+    // Reactor Make Mode
+    // ----------------------------------------------------------------------
+
+    static final String REACTOR_MAKE_UPSTREAM = "make-upstream";
+
+    static final String REACTOR_MAKE_DOWNSTREAM = "make-downstream";
+
+    static final String REACTOR_MAKE_BOTH = "make-both";
+
+    // ----------------------------------------------------------------------
     // Artifactr repository policies
     // ----------------------------------------------------------------------
 
@@ -96,6 +106,15 @@ public interface MavenExecutionRequest
     // Reactor
     MavenExecutionRequest setReactorFailureBehavior( String failureBehavior );
     String getReactorFailureBehavior();
+
+    MavenExecutionRequest setSelectedProjects( List<String> projects );
+    List<String> getSelectedProjects();
+
+    MavenExecutionRequest setResumeFrom( String project );
+    String getResumeFrom();
+
+    MavenExecutionRequest setMakeBehavior( String makeBehavior );
+    String getMakeBehavior();
 
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );

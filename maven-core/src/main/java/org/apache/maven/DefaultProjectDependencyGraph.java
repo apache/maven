@@ -70,17 +70,7 @@ class DefaultProjectDependencyGraph
 
         getDownstreamProjects( ProjectSorter.getId( project ), projectIds, transitive );
 
-        List<MavenProject> projects = new ArrayList<MavenProject>();
-
-        for ( MavenProject p : sorter.getSortedProjects() )
-        {
-            if ( projectIds.contains( ProjectSorter.getId( p ) ) )
-            {
-                projects.add( p );
-            }
-        }
-
-        return projects;
+        return getProjects( projectIds );
     }
 
     private void getDownstreamProjects( String projectId, Collection<String> projectIds, boolean transitive )
@@ -94,6 +84,48 @@ class DefaultProjectDependencyGraph
                 getDownstreamProjects( id, projectIds, transitive );
             }
         }
+    }
+
+    public List<MavenProject> getUpstreamProjects( MavenProject project, boolean transitive )
+    {
+        if ( project == null )
+        {
+            throw new IllegalArgumentException( "project missing" );
+        }
+
+        Collection<String> projectIds = new HashSet<String>();
+
+        getUpstreamProjects( ProjectSorter.getId( project ), projectIds, transitive );
+
+        return getProjects( projectIds );
+    }
+
+    private void getUpstreamProjects( String projectId, Collection<String> projectIds, boolean transitive )
+    {
+        for ( String id : sorter.getDependencies( projectId ) )
+        {
+            projectIds.add( id );
+
+            if ( transitive )
+            {
+                getUpstreamProjects( id, projectIds, transitive );
+            }
+        }
+    }
+
+    private List<MavenProject> getProjects( Collection<String> projectIds )
+    {
+        List<MavenProject> projects = new ArrayList<MavenProject>();
+
+        for ( MavenProject p : sorter.getSortedProjects() )
+        {
+            if ( projectIds.contains( ProjectSorter.getId( p ) ) )
+            {
+                projects.add( p );
+            }
+        }
+
+        return projects;
     }
 
     @Override

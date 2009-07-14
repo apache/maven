@@ -84,6 +84,14 @@ public class CLIManager
 
     public static final String FAIL_NEVER = "fn";
 
+    public static final String RESUME_FROM = "rf";
+
+    public static final String PROJECT_LIST = "pl";
+
+    public static final String ALSO_MAKE = "am";
+
+    public static final String ALSO_MAKE_DEPENDENTS = "amd";
+
     public static final String LOG_FILE = "l";
 
     private Options options;
@@ -117,6 +125,10 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "fail-fast" ).withDescription( "Stop at first failure in reactorized builds" ).create( FAIL_FAST ) );
         options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription( "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );
         options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription( "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
+        options.addOption( OptionBuilder.withLongOpt( "resume-from" ).hasArg().withDescription( "Resume reactor from specified project" ).create( RESUME_FROM ) );
+        options.addOption( OptionBuilder.withLongOpt( "projects" ).withDescription( "Build specified reactor projects instead of all projects" ).hasArg().create( PROJECT_LIST ) );
+        options.addOption( OptionBuilder.withLongOpt( "also-make" ).withDescription( "If project list is specified, also build projects required by the list" ).create( ALSO_MAKE ) );
+        options.addOption( OptionBuilder.withLongOpt( "also-make-dependents" ).withDescription( "If project list is specified, also build projects that depend on projects on the list" ).create( ALSO_MAKE_DEPENDENTS ) );
         options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file to where all build output will go." ).create( LOG_FILE ) );
         options.addOption( OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create( SHOW_VERSION ) );
         
@@ -138,7 +150,7 @@ public class CLIManager
 
     private String[] cleanArgs( String[] args )
     {
-        List cleaned = new ArrayList();
+        List<String> cleaned = new ArrayList<String>();
 
         StringBuffer currentArg = null;
 
@@ -226,7 +238,7 @@ public class CLIManager
         }
         else
         {
-            cleanArgs = (String[]) cleaned.toArray( new String[cleanedSz] );
+            cleanArgs = cleaned.toArray( new String[cleanedSz] );
         }
 
         return cleanArgs;

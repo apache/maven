@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.apache.maven.execution.DuplicateProjectException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.execution.ProjectSorter;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.project.MavenProject;
@@ -140,14 +142,14 @@ public class DefaultMaven
         }
 
         try
-        {                        
+        {
             ProjectSorter projectSorter = new ProjectSorter( session.getProjects() );
 
-            projects = projectSorter.getSortedProjects();
+            ProjectDependencyGraph projectDependencyGraph = createDependencyGraph( projectSorter, request );
 
-            session.setProjects( projects );
+            session.setProjects( projectDependencyGraph.getSortedProjects() );
 
-            session.setProjectDependencyGraph( new DefaultProjectDependencyGraph( projectSorter ) );
+            session.setProjectDependencyGraph( projectDependencyGraph );
         }
         catch ( CycleDetectedException e )
         {            
@@ -158,6 +160,10 @@ public class DefaultMaven
             return processResult( result, error );
         }
         catch ( DuplicateProjectException e )
+        {
+            return processResult( result, e );
+        }
+        catch ( MavenExecutionException e )
         {
             return processResult( result, e );
         }
@@ -293,6 +299,8 @@ public class DefaultMaven
         for ( File file : files )
         {
             MavenProject project = projectBuilder.build( file, request.getProjectBuildingRequest() );
+
+            projects.add( project );
             
             if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && request.isRecursive() )
             {
@@ -340,8 +348,6 @@ public class DefaultMaven
 
                 collectProjects( projects, moduleFiles, request );
             }
-
-            projects.add( project );
         }
     }
 
@@ -366,6 +372,92 @@ public class DefaultMaven
     protected Logger getLogger()
     {
         return logger;
+    }
+
+    private ProjectDependencyGraph createDependencyGraph( ProjectSorter sorter, MavenExecutionRequest request )
+        throws MavenExecutionException
+    {
+        ProjectDependencyGraph graph = new DefaultProjectDependencyGraph( sorter );
+
+        if ( !request.getSelectedProjects().isEmpty() )
+        {
+            File reactorDirectory = request.getPom().getParentFile().getAbsoluteFile();
+
+            Map<File, MavenProject> projectsByFile = new HashMap<File, MavenProject>();
+
+            for ( MavenProject project : sorter.getSortedProjects() )
+            {
+                projectsByFile.put( project.getFile(), project );
+            }
+
+            List<MavenProject> selectedProjects = new ArrayList<MavenProject>( request.getSelectedProjects().size() );
+
+            for ( String selectedProject : request.getSelectedProjects() )
+            {
+                File pomFile = new File( reactorDirectory, selectedProject );
+
+                if ( pomFile.isDirectory() )
+                {
+                    pomFile = new File( pomFile, Maven.POMv4 );
+                }
+
+                MavenProject project = projectsByFile.get( pomFile );
+
+                if ( project != null )
+                {
+                    selectedProjects.add( project );
+                }
+                else
+                {
+                    throw new MavenExecutionException( "Could not find project in reactor: " + selectedProject,
+                                                       request.getPom() );
+                }
+            }
+
+            boolean makeUpstream = false;
+            boolean makeDownstream = false;
+            if ( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals( request.getMakeBehavior() ) )
+            {
+                makeUpstream = true;
+            }
+            else if ( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM.equals( request.getMakeBehavior() ) )
+            {
+                makeDownstream = true;
+            }
+            else if ( MavenExecutionRequest.REACTOR_MAKE_BOTH.equals( request.getMakeBehavior() ) )
+            {
+                makeUpstream = true;
+                makeDownstream = true;
+            }
+            else if ( StringUtils.isNotEmpty( request.getMakeBehavior() ) )
+            {
+                throw new MavenExecutionException( "Invalid reactor make behavior: " + request.getMakeBehavior(),
+                                                   request.getPom() );
+            }
+
+            Collection<MavenProject> makeProjects = new LinkedHashSet<MavenProject>( selectedProjects );
+
+            if ( makeUpstream || makeDownstream )
+            {
+                for ( MavenProject selectedProject : selectedProjects )
+                {
+                    if ( makeUpstream )
+                    {
+                        makeProjects.addAll( graph.getUpstreamProjects( selectedProject, true ) );
+                    }
+                    if ( makeDownstream )
+                    {
+                        makeProjects.addAll( graph.getDownstreamProjects( selectedProject, true ) );
+                    }
+                }
+            }
+
+            // TODO: process resume from
+
+            graph = new FilteredProjectDependencyGraph( graph, makeProjects );
+        }
+
+        return graph;
     }
 
 }
