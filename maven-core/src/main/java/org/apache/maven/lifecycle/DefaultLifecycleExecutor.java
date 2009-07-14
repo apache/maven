@@ -57,6 +57,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
@@ -140,6 +141,8 @@ public class DefaultLifecycleExecutor
                 goals = Collections.singletonList( goal );
             }
         }
+
+        ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
                 
         for ( MavenProject currentProject : session.getProjects() )
         {
@@ -156,6 +159,12 @@ public class DefaultLifecycleExecutor
             try
             {
                 session.setCurrentProject( currentProject );
+
+                ClassRealm projectRealm = currentProject.getClassRealm();
+                if ( projectRealm != null )
+                {
+                    Thread.currentThread().setContextClassLoader( projectRealm );
+                }
 
                 MavenExecutionPlan executionPlan = calculateExecutionPlan( session, goals.toArray( new String[] {} ) );
 
@@ -215,6 +224,8 @@ public class DefaultLifecycleExecutor
             finally
             {
                 session.setCurrentProject( null );
+
+                Thread.currentThread().setContextClassLoader( oldContextClassLoader );
             }
         }        
     }        

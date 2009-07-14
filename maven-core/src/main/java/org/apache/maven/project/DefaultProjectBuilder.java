@@ -72,8 +72,6 @@ public class DefaultProjectBuilder
 
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
-    
-    private MavenProject standaloneProject;
 
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -142,6 +140,8 @@ public class DefaultProjectBuilder
 
             project.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
             project.setPluginArtifactRepositories( listener.getPluginRepositories() );
+
+            project.setClassRealm( listener.getProjectRealm() );
 
             try
             {
@@ -252,11 +252,6 @@ public class DefaultProjectBuilder
     public MavenProject buildStandaloneSuperProject( ProjectBuildingRequest config )
         throws ProjectBuildingException
     {
-        if ( standaloneProject != null )
-        {
-            return standaloneProject;
-        }
-
         ModelBuildingRequest request = getModelBuildingRequest( config );
 
         ModelBuildingResult result;
@@ -269,14 +264,19 @@ public class DefaultProjectBuilder
             throw new ProjectBuildingException( "[standalone]", "Failed to build standalone project", e );
         }
 
+        MavenProject standaloneProject;
+
         try
         {
             standaloneProject = new MavenProject( result.getEffectiveModel(), repositorySystem, this, config );
         }
         catch ( InvalidRepositoryException e )
         {
-            // Not going to happen.
+            throw new IllegalStateException( e );
         }
+
+        standaloneProject.setActiveProfiles( result.getActiveExternalProfiles() );
+        standaloneProject.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
 
         standaloneProject.setExecutionRoot( true );
 

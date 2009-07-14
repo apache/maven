@@ -98,11 +98,13 @@ public class DefaultProjectBuildingHelper
                                           List<ArtifactRepository> remoteRepositories )
         throws ArtifactResolutionException
     {
+        ClassRealm projectRealm = container.getContainerRealm();
+
         Build build = model.getBuild();
 
         if ( build == null )
         {
-            return null;
+            return projectRealm;
         }
 
         List<Plugin> extensionPlugins = new ArrayList<Plugin>();
@@ -117,7 +119,7 @@ public class DefaultProjectBuildingHelper
 
         if ( build.getExtensions().isEmpty() && extensionPlugins.isEmpty() )
         {
-            return null;
+            return projectRealm;
         }
 
         String realmId = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
@@ -128,8 +130,6 @@ public class DefaultProjectBuildingHelper
         }
 
         ClassWorld world = ( (MutablePlexusContainer) container ).getClassWorld();
-
-        ClassRealm projectRealm;
 
         synchronized ( world )
         {

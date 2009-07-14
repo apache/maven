@@ -68,6 +68,7 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -166,6 +167,8 @@ public class MavenProject
     private File parentFile;
 
     private Map<String, Object> context;
+
+    private ClassRealm classRealm;
 
     //
 
@@ -379,16 +382,6 @@ public class MavenProject
     public void setParent( MavenProject parent )
     {
         this.parent = parent;
-    }
-
-    public void setRemoteArtifactRepositories( List<ArtifactRepository> remoteArtifactRepositories )
-    {
-        this.remoteArtifactRepositories = remoteArtifactRepositories;
-    }
-
-    public List<ArtifactRepository> getRemoteArtifactRepositories()
-    {
-        return remoteArtifactRepositories;
     }
     
     public boolean hasParent()
@@ -1346,6 +1339,21 @@ public class MavenProject
         return build;
     }
 
+    public void setRemoteArtifactRepositories( List<ArtifactRepository> remoteArtifactRepositories )
+    {
+        this.remoteArtifactRepositories = remoteArtifactRepositories;
+    }
+
+    public List<ArtifactRepository> getRemoteArtifactRepositories()
+    {
+        if ( remoteArtifactRepositories == null )
+        {
+            remoteArtifactRepositories = new ArrayList<ArtifactRepository>();
+        }
+
+        return remoteArtifactRepositories;
+    }
+
     public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
         this.pluginArtifactRepositories = pluginArtifactRepositories;
@@ -1357,6 +1365,11 @@ public class MavenProject
      */
     public List<ArtifactRepository> getPluginArtifactRepositories()
     {
+        if ( pluginArtifactRepositories == null )
+        {
+            pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+        }
+
         return pluginArtifactRepositories;
     }
 
@@ -1969,4 +1982,25 @@ public class MavenProject
         }
         return context.get( key );
     }
+
+    /**
+     * Sets the project's class realm.
+     * 
+     * @param classRealm The class realm hosting the build extensions of this project, may be {@code null}.
+     */
+    public void setClassRealm( ClassRealm classRealm )
+    {
+        this.classRealm = classRealm;
+    }
+
+    /**
+     * Gets the project's class realm. This class realm hosts the build extensions of the project.
+     * 
+     * @return The project's class realm or {@code null}.
+     */
+    public ClassRealm getClassRealm()
+    {
+        return classRealm;
+    }
+
 }
