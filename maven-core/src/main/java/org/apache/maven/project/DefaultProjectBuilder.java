@@ -17,6 +17,7 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -61,6 +62,9 @@ public class DefaultProjectBuilder
     private ModelBuilder modelBuilder;
 
     @Requirement
+    private ProjectBuildingHelper projectBuildingHelper;
+
+    @Requirement
     private LifecycleExecutor lifecycle;
 
     @Requirement
@@ -86,81 +90,98 @@ public class DefaultProjectBuilder
     {
         ModelBuildingRequest request = getModelBuildingRequest( configuration );
 
-        ModelBuildingResult result;
+        DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, configuration );
+        request.setModelBuildingListeners( Arrays.asList( listener ) );
+
+        ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
+
         try
         {
-            if ( localProject )
+            ModelBuildingResult result;
+            try
             {
-                result = modelBuilder.build( pomFile, request );
+                if ( localProject )
+                {
+                    result = modelBuilder.build( pomFile, request );
+                }
+                else
+                {
+                    result = modelBuilder.build( new FileModelSource( pomFile ), request );
+                }
             }
-            else
+            catch ( ModelBuildingException e )
             {
-                result = modelBuilder.build( new FileModelSource( pomFile ), request );
-            }
-        }
-        catch ( ModelBuildingException e )
-        {
-            throw new ProjectBuildingException( "[unknown]", "Failed to build project for " + pomFile, pomFile, e );
-        }
-        
-        if ( localProject && !result.getProblems().isEmpty() && logger.isWarnEnabled() )
-        {
-            logger.warn( "" );
-            logger.warn( "One or more problems were encountered while building the effective model:" );
-
-            for ( ModelProblem problem : result.getProblems() )
-            {
-                logger.warn( problem.getMessage() );
+                throw new ProjectBuildingException( "[unknown]", "Failed to build project for " + pomFile, pomFile, e );
             }
 
-            logger.warn( "" );
-            logger.warn( "It is highly recommended to fix these problems"
-                + " because they threaten the stability of your build." );
-            logger.warn( "" );
-            logger.warn( "For this reason, future Maven versions will no"
-                + " longer support building such malformed projects." );
-            logger.warn( "" );
-        }
-
-        Model model = result.getEffectiveModel();
-
-        File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();
-        MavenProject project = fromModelToMavenProject( model, parentPomFile, configuration, model.getPomFile() );
-
-        project.setOriginalModel( result.getRawModel() );
-     
-        try
-        {
-            if ( configuration.isProcessPlugins() )
+            if ( localProject && !result.getProblems().isEmpty() && logger.isWarnEnabled() )
             {
-                lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(), configuration.getLocalRepository(), project.getPluginArtifactRepositories() );
+                logger.warn( "" );
+                logger.warn( "One or more problems were encountered while building the project's effective model:" );
+
+                for ( ModelProblem problem : result.getProblems() )
+                {
+                    logger.warn( problem.getMessage() );
+                }
+
+                logger.warn( "" );
+                logger.warn( "It is highly recommended to fix these problems"
+                    + " because they threaten the stability of your build." );
+                logger.warn( "" );
+                logger.warn( "For this reason, future Maven versions will no"
+                    + " longer support building such malformed projects." );
+                logger.warn( "" );
             }
+
+            Model model = result.getEffectiveModel();
+
+            File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();
+            MavenProject project = fromModelToMavenProject( model, parentPomFile, configuration, model.getPomFile() );
+
+            project.setOriginalModel( result.getRawModel() );
+
+            project.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
+            project.setPluginArtifactRepositories( listener.getPluginRepositories() );
+
+            try
+            {
+                if ( configuration.isProcessPlugins() )
+                {
+                    lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(),
+                                                                      configuration.getLocalRepository(),
+                                                                      project.getPluginArtifactRepositories() );
+                }
+            }
+            catch ( LifecycleExecutionException e )
+            {
+                throw new ProjectBuildingException( project.getId(), e.getMessage(), e );
+            }
+
+            Build build = project.getBuild();
+            // NOTE: setting this script-source root before path translation, because
+            // the plugin tools compose basedir and scriptSourceRoot into a single file.
+            project.addScriptSourceRoot( build.getScriptSourceDirectory() );
+            project.addCompileSourceRoot( build.getSourceDirectory() );
+            project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
+            project.setFile( pomFile );
+
+            List<Profile> activeProfiles = new ArrayList<Profile>();
+            activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
+            activeProfiles.addAll( result.getActiveExternalProfiles() );
+            project.setActiveProfiles( activeProfiles );
+
+            project.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
+            for ( String modelId : result.getModelIds() )
+            {
+                project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
+            }
+
+            return project;
         }
-        catch ( LifecycleExecutionException e )
+        finally
         {
-            throw new ProjectBuildingException( "", e.getMessage(), e );
+            Thread.currentThread().setContextClassLoader( oldContextClassLoader );
         }
-
-        Build build = project.getBuild();
-        // NOTE: setting this script-source root before path translation, because
-        // the plugin tools compose basedir and scriptSourceRoot into a single file.
-        project.addScriptSourceRoot( build.getScriptSourceDirectory() );
-        project.addCompileSourceRoot( build.getSourceDirectory() );
-        project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
-        project.setFile( pomFile );
-
-        List<Profile> activeProfiles = new ArrayList<Profile>();
-        activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
-        activeProfiles.addAll( result.getActiveExternalProfiles() );
-        project.setActiveProfiles( activeProfiles );
-
-        project.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
-        for ( String modelId : result.getModelIds() )
-        {
-            project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
-        }
-
-        return project;
     }
 
     private List<String> getProfileIds( List<Profile> profiles )
@@ -182,6 +203,7 @@ public class DefaultProjectBuilder
                                          configuration.getRemoteRepositories() );
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
+
         request.setValidationLevel( configuration.getValidationLevel() );
         request.setProcessPlugins( configuration.isProcessPlugins() );
         request.setProfiles( configuration.getProfiles() );

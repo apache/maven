@@ -5,5 +5,9 @@
       <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
       <implementation>org.apache.maven.project.EmptyLifecycleExecutor</implementation>
     </component>
+    <component>
+      <role>org.apache.maven.project.ProjectBuildingHelper</role>
+      <implementation>org.apache.maven.project.EmptyProjectBuildingHelper</implementation>
+    </component>
   </components>
 </plexus>

@@ -239,13 +239,6 @@ public class MavenProject
         this.projectBuilderConfiguration = projectBuilderConfiguration;
         this.repositorySystem = repositorySystem;
         originalModel = model;
-        
-        remoteArtifactRepositories = projectBuilderConfiguration.getRemoteRepositories();
-        remoteArtifactRepositories = createArtifactRepositories( model.getRepositories(), remoteArtifactRepositories );
-
-        pluginArtifactRepositories = projectBuilderConfiguration.getPluginArtifactRepositories();
-        pluginArtifactRepositories =
-            createArtifactRepositories( model.getPluginRepositories(), pluginArtifactRepositories );
     }
 
     //TODO: need to integrate the effective scope and refactor it out of the MMS
@@ -267,35 +260,6 @@ public class MavenProject
         }
 
         return artifacts;        
-    }
-    
-    private List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
-                                                                 List<ArtifactRepository> externalRepositories )
-    {
-        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
-
-        for ( Repository repository : pomRepositories )
-        {
-            try
-            {
-                artifactRepositories.add( repositorySystem.buildArtifactRepository( repository ) );
-            }
-            catch ( InvalidRepositoryException e )
-            {
-
-            }
-        }
-
-        artifactRepositories = repositorySystem.getMirrors( artifactRepositories );
-
-        if ( externalRepositories != null )
-        {
-            artifactRepositories.addAll( externalRepositories );
-        }
-
-        artifactRepositories = repositorySystem.getEffectiveRepositories( artifactRepositories );
-
-        return artifactRepositories;
     }
 
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
