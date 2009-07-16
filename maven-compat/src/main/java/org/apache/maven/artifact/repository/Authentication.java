@@ -1,4 +1,4 @@
-package org.apache.maven.repository;
+package org.apache.maven.artifact.repository;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,7 +20,13 @@ package org.apache.maven.repository;
  */
 
 public class Authentication
-{
+{    
+    public Authentication( String userName, String password )
+    {
+        this.userName = userName;
+        this.password = password;
+    }
+
     /**
      * Username used to login to the host
      */

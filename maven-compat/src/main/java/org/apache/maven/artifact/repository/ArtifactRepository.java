@@ -53,7 +53,12 @@ public interface ArtifactRepository
 
     String getKey();
     
+    //
     // New interface methods for the repository system. 
-    
+    //
     Artifact find( Artifact artifact );
+    
+    void setAuthentication( Authentication authentication );
+    
+    Authentication getAuthentication();
 }

@@ -1,28 +1,25 @@
 package org.apache.maven.repository;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +30,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -63,7 +61,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 /**
  * @author Jason van Zyl
  */
-@Component( role = RepositorySystem.class, hint = "default" )
+@Component(role = RepositorySystem.class, hint = "default")
 public class LegacyRepositorySystem
     implements RepositorySystem
 {
@@ -79,6 +77,9 @@ public class LegacyRepositorySystem
     @Requirement
     private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
 
+    @Requirement
+    private Map<String,ArtifactRepositoryLayout> layouts;
+    
     @Requirement
     private MirrorBuilder mirrorBuilder;
 
@@ -97,7 +98,7 @@ public class LegacyRepositorySystem
     {
         return artifactFactory.createBuildArtifact( groupId, artifactId, version, packaging );
     }
-    
+
     public Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier )
     {
         return artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
@@ -120,9 +121,7 @@ public class LegacyRepositorySystem
             return null;
         }
 
-        Artifact artifact =
-            artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
-                                                      d.getClassifier(), d.getScope(), d.isOptional() );
+        Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), d.getScope(), d.isOptional() );
 
         if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && d.getSystemPath() != null )
         {
@@ -179,27 +178,6 @@ public class LegacyRepositorySystem
         return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
     }
 
-    public ArtifactRepository buildArtifactRepository( Repository repo )
-        throws InvalidRepositoryException
-    {
-        if ( repo != null )
-        {
-            String id = repo.getId();
-            
-            String url = repo.getUrl();
-            
-            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
-
-            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
-
-            return artifactRepositoryFactory.createArtifactRepository( id, url, repo.getLayout(), snapshots, releases );
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     public ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( RepositoryPolicy policy )
     {
         boolean enabled = true;
@@ -224,38 +202,31 @@ public class LegacyRepositorySystem
 
         return new ArtifactRepositoryPolicy( enabled, updatePolicy, checksumPolicy );
     }
-    
+
     public ArtifactRepository createDefaultLocalRepository()
         throws InvalidRepositoryException
     {
         return createLocalRepository( RepositorySystem.defaultUserLocalRepository );
     }
-    
+
     public ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException
     {
-        return createRepository( "file://" + localRepository.toURI().getRawPath(),
-                                 RepositorySystem.DEFAULT_LOCAL_REPO_ID, true,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+        return createRepository( "file://" + localRepository.toURI().getRawPath(), RepositorySystem.DEFAULT_LOCAL_REPO_ID, true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
     }
 
     public ArtifactRepository createDefaultRemoteRepository()
         throws InvalidRepositoryException
     {
-        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
-                                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER, false,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
-                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID, true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER, false,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
-    
+
     public ArtifactRepository createLocalRepository( String url, String repositoryId )
         throws IOException
     {
-        return createRepository( canonicalFileUrl( url ), repositoryId, true,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+        return createRepository( canonicalFileUrl( url ), repositoryId, true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
                                  ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
     }
 
@@ -288,22 +259,6 @@ public class LegacyRepositorySystem
         return url;
     }
 
-    private ArtifactRepository createRepository( String url, String repositoryId, boolean releases,
-                                                 String releaseUpdates, boolean snapshots, String snapshotUpdates,
-                                                 String checksumPolicy )
-    {
-        ArtifactRepositoryPolicy snapshotsPolicy = new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
-
-        ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
-
-        return artifactRepositoryFactory.createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
-    }
-
-    public ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
-    {
-        return artifactRepositoryFactory.createArtifactRepository( id, url, repositoryLayout, snapshots, releases );
-    }
-    
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
     {
         /*
@@ -372,23 +327,7 @@ public class LegacyRepositorySystem
     }
     */
 
-    /*
-    public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey, String passphrase )
-    {
-        AuthenticationInfo authInfo = new AuthenticationInfo();
-        authInfo.setUserName( username );
-        authInfo.setPassword( password );
-        authInfo.setPrivateKey( privateKey );
-        authInfo.setPassphrase( passphrase );
-
-        authenticationInfoMap.put( repositoryId, authInfo );
-
-        wagonManager.addAuthenticationInfo( repositoryId, username, password, privateKey, passphrase );
-    }
-    */
-
     // Mirror 
-
     public void addMirror( String id, String mirrorOf, String url )
     {
         mirrorBuilder.addMirror( id, mirrorOf, url );
@@ -427,8 +366,7 @@ public class LegacyRepositorySystem
 
         for ( List<ArtifactRepository> aliasedRepos : reposByKey.values() )
         {
-            List<ArtifactRepositoryPolicy> releasePolicies =
-                new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
+            List<ArtifactRepositoryPolicy> releasePolicies = new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
@@ -437,8 +375,7 @@ public class LegacyRepositorySystem
 
             ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy( releasePolicies );
 
-            List<ArtifactRepositoryPolicy> snapshotPolicies =
-                new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
+            List<ArtifactRepositoryPolicy> snapshotPolicies = new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
@@ -449,10 +386,8 @@ public class LegacyRepositorySystem
 
             ArtifactRepository aliasedRepo = aliasedRepos.get( 0 );
 
-            ArtifactRepository effectiveRepository =
-                artifactRepositoryFactory.createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(),
-                                                                    aliasedRepo.getLayout(), snapshotPolicy,
-                                                                    releasePolicy );
+            ArtifactRepository effectiveRepository = 
+                createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(), snapshotPolicy, releasePolicy );
 
             effectiveRepositories.add( effectiveRepository );
         }
@@ -468,9 +403,7 @@ public class LegacyRepositorySystem
         {
             if ( effectivePolicy == null )
             {
-                effectivePolicy =
-                    new ArtifactRepositoryPolicy( policy.isEnabled(), policy.getUpdatePolicy(),
-                                                  policy.getChecksumPolicy() );
+                effectivePolicy = new ArtifactRepositoryPolicy( policy.isEnabled(), policy.getUpdatePolicy(), policy.getChecksumPolicy() );
             }
             else
             {
@@ -533,17 +466,17 @@ public class LegacyRepositorySystem
     public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
     {
 
-//      ArtifactResolutionResult collect( Set<Artifact> artifacts,
-//      Artifact originatingArtifact,
-//      Map managedVersions,
-//      ArtifactRepository localRepository,
-//      List<ArtifactRepository> remoteRepositories,
-//      ArtifactMetadataSource source,
-//      ArtifactFilter filter,
-//      List<ResolutionListener> listeners,
-//      List<ConflictResolver> conflictResolvers )
-        
-//        ArtifactResolutionResult result = artifactCollector.
+        //      ArtifactResolutionResult collect( Set<Artifact> artifacts,
+        //      Artifact originatingArtifact,
+        //      Map managedVersions,
+        //      ArtifactRepository localRepository,
+        //      List<ArtifactRepository> remoteRepositories,
+        //      ArtifactMetadataSource source,
+        //      ArtifactFilter filter,
+        //      List<ResolutionListener> listeners,
+        //      List<ConflictResolver> conflictResolvers )
+
+        //        ArtifactResolutionResult result = artifactCollector.
         return null;
     }
 
@@ -558,4 +491,67 @@ public class LegacyRepositorySystem
     {
         wagonManager.putRemoteFile( repository, source, remotePath, downloadMonitor );
     }
+
+    private Map<String, Authentication> authentications = new HashMap<String, Authentication>();
+
+    //
+    // serverId = repository id
+    //
+    public void addAuthenticationForArtifactRepository( String repositoryId, String username, String password )
+    {
+        Authentication authentication = new Authentication( username, password );
+        authentications.put( repositoryId, authentication );
+    }
+
+    //
+    // Artifact Repository Creation
+    //
+    public ArtifactRepository buildArtifactRepository( Repository repo )
+        throws InvalidRepositoryException
+    {        
+        if ( repo != null )
+        {
+            String id = repo.getId();
+
+            String url = repo.getUrl();
+
+            ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
+
+            ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
+            
+            return createArtifactRepository( id, url, layouts.get( repo.getLayout() ), snapshots, releases );
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
+    private ArtifactRepository createRepository( String url, String repositoryId, boolean releases, String releaseUpdates, boolean snapshots, String snapshotUpdates, String checksumPolicy )
+    {
+        ArtifactRepositoryPolicy snapshotsPolicy = new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
+
+        ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
+
+        return createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
+    }
+
+    public ArtifactRepository createArtifactRepository( String repositoryId, String url, ArtifactRepositoryLayout repositoryLayout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
+    {        
+        if ( repositoryLayout == null )
+        {
+            repositoryLayout = defaultArtifactRepositoryLayout;
+        }
+             
+        ArtifactRepository artifactRepository = artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots, releases );
+
+        Authentication authentication = authentications.get( repositoryId );
+        
+        if ( authentication != null )
+        {
+            artifactRepository.setAuthentication( authentication );
+        }
+        
+        return artifactRepository;
+    }   
 }

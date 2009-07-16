@@ -112,5 +112,7 @@ public interface RepositorySystem
         throws TransferFailedException;
     
     void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
-        throws TransferFailedException, ResourceDoesNotExistException;        
+        throws TransferFailedException, ResourceDoesNotExistException; 
+        
+    void addAuthenticationForArtifactRepository( String repositoryId, String username, String password );    
 }

@@ -25,7 +25,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
-//TODO: http://jira.codehaus.org/browse/MNG-4215
 //TODO: completely separate local and remote artifact repositories
 public class MavenArtifactRepository
     implements ArtifactRepository
@@ -43,6 +42,8 @@ public class MavenArtifactRepository
     private ArtifactRepositoryPolicy snapshots;
 
     private ArtifactRepositoryPolicy releases;
+    
+    private Authentication authentication;
     
     public MavenArtifactRepository()
     {
@@ -343,4 +344,13 @@ public class MavenArtifactRepository
         return s1 != null ? s1.equals( s2 ) : s2 == null;
     }
 
+    public Authentication getAuthentication()
+    {
+        return authentication;
+    }
+
+    public void setAuthentication( Authentication authentication )
+    {
+        this.authentication = authentication;        
+    }
 }

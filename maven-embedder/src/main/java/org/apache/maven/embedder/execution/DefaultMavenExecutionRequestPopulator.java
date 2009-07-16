@@ -30,6 +30,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.toolchain.ToolchainsBuilder;
@@ -199,27 +200,14 @@ public class DefaultMavenExecutionRequestPopulator
 
             repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
         }
+        */
 
         for ( Server server : settings.getServers() )
         {
-            String password;
-            String passPhrase;
-            
-            try
-            {
-                password = securityDispatcher.decrypt( server.getPassword() );
-                passPhrase = securityDispatcher.decrypt( server.getPassphrase() );
-            }
-            catch ( SecDispatcherException e )
-            {
-                throw new MavenEmbedderException( "Error decrypting server password/passphrase.", e );
-            }
+            repositorySystem.addAuthenticationForArtifactRepository( server.getId(), server.getUsername(), server.getPassword() );
 
-            repositorySystem.addAuthenticationInfo( server.getId(), server.getUsername(), password, server.getPrivateKey(), passPhrase );
-
-            repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
+            //repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
         }
-        */
 
         for ( Mirror mirror : settings.getMirrors() )
         {

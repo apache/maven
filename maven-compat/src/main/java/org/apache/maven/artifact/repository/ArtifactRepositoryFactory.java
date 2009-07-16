@@ -27,9 +27,11 @@ public interface ArtifactRepositoryFactory
 
     String LOCAL_REPOSITORY_ID = "local";
 
+    @Deprecated
     ArtifactRepositoryLayout getLayout( String layoutId )
         throws UnknownRepositoryLayoutException;
 
+    @Deprecated
     ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId, boolean uniqueVersion )
         throws UnknownRepositoryLayoutException;
 

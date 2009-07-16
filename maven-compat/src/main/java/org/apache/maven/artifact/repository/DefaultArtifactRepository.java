@@ -203,4 +203,17 @@ public class DefaultArtifactRepository
                 
         return artifact;
     }
+
+    //
+    // This implementation does not support authentication
+    //
+    public Authentication getAuthentication()
+    {
+        return null;
+    }
+
+    public void setAuthentication( Authentication authentication )
+    {
+        // do nothing
+    }
 }

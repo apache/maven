@@ -32,9 +32,11 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.ChecksumObserver;
+import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -208,6 +210,38 @@ public class DefaultWagonManager
         getRemoteFile( repository, destination, remotePath, null, checksumPolicy, true );
     }
 
+    /**
+     * Deal with connecting to a wagon repository taking into account authentication and proxies.
+     * 
+     * @param wagon
+     * @param repository
+     * @throws ConnectionException
+     * @throws AuthenticationException
+     */
+    private void connectWagon( Wagon wagon, ArtifactRepository repository ) 
+        throws ConnectionException, AuthenticationException
+    {
+        if ( repository.getAuthentication() != null )
+        {
+            //
+            // We have authentication we have been asked to deal with.
+            //
+            AuthenticationInfo ai = new AuthenticationInfo();
+            ai.setUserName( repository.getAuthentication().getUserName() );
+            ai.setPassword( repository.getAuthentication().getPassword() );
+            
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), ai );                    
+        }
+        else
+        {
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ) );                    
+        }
+        
+        //
+        // ProxyInfo proxyInfo = new ProxyInfo();
+        //        
+    }    
+    
     public void getRemoteFile( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor, String checksumPolicy, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
@@ -237,8 +271,8 @@ public class DefaultWagonManager
 
         try
         {
-            wagon.connect( new Repository( repository.getId(), repository.getUrl() ) );
-
+            connectWagon( wagon, repository );
+            
             boolean firstRun = true;
             boolean retry = true;
 
@@ -467,7 +501,7 @@ public class DefaultWagonManager
         {
             try
             {
-                wagon.connect( new Repository( repository.getId(), repository.getUrl() ) );
+                connectWagon( wagon, repository );
 
                 wagon.put( source, remotePath );
             }
