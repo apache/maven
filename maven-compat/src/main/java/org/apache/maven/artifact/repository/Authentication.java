@@ -23,14 +23,14 @@ public class Authentication
 {    
     public Authentication( String userName, String password )
     {
-        this.userName = userName;
+        this.username = userName;
         this.password = password;
     }
 
     /**
      * Username used to login to the host
      */
-    private String userName;
+    private String username;
 
     /**
      * Password associated with the login
@@ -62,9 +62,9 @@ public class Authentication
      * 
      * @return username at repository
      */
-    public String getUserName()
+    public String getUsername()
     {
-        return userName;
+        return username;
     }
 
     /**
@@ -72,8 +72,8 @@ public class Authentication
      * 
      * @param userName the username used to access repository
      */
-    public void setUserName( final String userName )
+    public void setUsername( final String userName )
     {
-        this.userName = userName;
+        this.username = userName;
     }
 }

@@ -227,7 +227,7 @@ public class DefaultWagonManager
             // We have authentication we have been asked to deal with.
             //
             AuthenticationInfo ai = new AuthenticationInfo();
-            ai.setUserName( repository.getAuthentication().getUserName() );
+            ai.setUserName( repository.getAuthentication().getUsername() );
             ai.setPassword( repository.getAuthentication().getPassword() );
             
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ), ai );                    
