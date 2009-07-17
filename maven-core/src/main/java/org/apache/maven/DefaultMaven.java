@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -379,29 +378,26 @@ public class DefaultMaven
     {
         ProjectDependencyGraph graph = new DefaultProjectDependencyGraph( sorter );
 
+        Collection<MavenProject> activeProjects = sorter.getSortedProjects();
+
+        File reactorDirectory = request.getPom().getAbsoluteFile().getParentFile();
+
         if ( !request.getSelectedProjects().isEmpty() )
         {
-            File reactorDirectory = request.getPom().getParentFile().getAbsoluteFile();
-
-            Map<File, MavenProject> projectsByFile = new HashMap<File, MavenProject>();
-
-            for ( MavenProject project : sorter.getSortedProjects() )
-            {
-                projectsByFile.put( project.getFile(), project );
-            }
-
             List<MavenProject> selectedProjects = new ArrayList<MavenProject>( request.getSelectedProjects().size() );
 
             for ( String selectedProject : request.getSelectedProjects() )
             {
-                File pomFile = new File( reactorDirectory, selectedProject );
+                MavenProject project = null;
 
-                if ( pomFile.isDirectory() )
+                for ( MavenProject activeProject : activeProjects )
                 {
-                    pomFile = new File( pomFile, Maven.POMv4 );
+                    if ( isMatchingProject( activeProject, selectedProject, reactorDirectory ) )
+                    {
+                        project = activeProject;
+                        break;
+                    }
                 }
-
-                MavenProject project = projectsByFile.get( pomFile );
 
                 if ( project != null )
                 {
@@ -409,13 +405,16 @@ public class DefaultMaven
                 }
                 else
                 {
-                    throw new MavenExecutionException( "Could not find project in reactor: " + selectedProject,
-                                                       request.getPom() );
+                    throw new MavenExecutionException( "Could not find the selected project in the reactor: "
+                        + selectedProject, request.getPom() );
                 }
             }
 
+            activeProjects = selectedProjects;
+
             boolean makeUpstream = false;
             boolean makeDownstream = false;
+
             if ( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals( request.getMakeBehavior() ) )
             {
                 makeUpstream = true;
@@ -435,29 +434,74 @@ public class DefaultMaven
                                                    request.getPom() );
             }
 
-            Collection<MavenProject> makeProjects = new LinkedHashSet<MavenProject>( selectedProjects );
-
             if ( makeUpstream || makeDownstream )
             {
+                activeProjects = new LinkedHashSet<MavenProject>( selectedProjects );
+
                 for ( MavenProject selectedProject : selectedProjects )
                 {
                     if ( makeUpstream )
                     {
-                        makeProjects.addAll( graph.getUpstreamProjects( selectedProject, true ) );
+                        activeProjects.addAll( graph.getUpstreamProjects( selectedProject, true ) );
                     }
                     if ( makeDownstream )
                     {
-                        makeProjects.addAll( graph.getDownstreamProjects( selectedProject, true ) );
+                        activeProjects.addAll( graph.getDownstreamProjects( selectedProject, true ) );
                     }
                 }
             }
+        }
 
-            // TODO: process resume from
+        if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
+        {
+            String selectedProject = request.getResumeFrom();
 
-            graph = new FilteredProjectDependencyGraph( graph, makeProjects );
+            List<MavenProject> projects = new ArrayList<MavenProject>( activeProjects.size() );
+
+            boolean resumed = false;
+
+            for ( MavenProject project : activeProjects )
+            {
+                if ( !resumed && isMatchingProject( project, selectedProject, reactorDirectory ) )
+                {
+                    resumed = true;
+                }
+
+                if ( resumed )
+                {
+                    projects.add( project );
+                }
+            }
+
+            if ( !resumed )
+            {
+                throw new MavenExecutionException( "Could not find project to resume reactor build from: "
+                    + selectedProject + " vs " + activeProjects, request.getPom() );
+            }
+
+            activeProjects = projects;
+        }
+
+        if ( activeProjects.size() != sorter.getSortedProjects().size() )
+        {
+            graph = new FilteredProjectDependencyGraph( graph, activeProjects );
         }
 
         return graph;
+    }
+
+    private boolean isMatchingProject( MavenProject project, String selector, File reactorDirectory )
+    {
+        File selectedProject = new File( reactorDirectory, selector );
+
+        if ( selectedProject.isFile() )
+        {
+            return selectedProject.equals( project.getFile() );
+        }
+        else
+        {
+            return selectedProject.equals( project.getBasedir() );
+        }
     }
 
 }
