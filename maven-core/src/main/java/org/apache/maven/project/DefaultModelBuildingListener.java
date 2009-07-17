@@ -97,12 +97,15 @@ class DefaultModelBuildingListener
                 projectBuildingHelper.createProjectRealm( model, projectBuildingRequest.getLocalRepository(),
                                                           pluginRepositories );
 
-            /*
-             * Update the context class loader so that the container will search the project realm when the model
-             * builder injects the lifecycle bindings from the packaging next. The class loader is reset by the project
-             * builder when the project is fully assembled.
-             */
-            Thread.currentThread().setContextClassLoader( projectRealm );
+            if ( projectRealm != null )
+            {
+                /*
+                 * Update the context class loader such that the container will search the project realm when the model
+                 * builder injects the lifecycle bindings from the packaging in the next step. The context class loader
+                 * will be reset by the project builder when the project is fully assembled.
+                 */
+                Thread.currentThread().setContextClassLoader( projectRealm );
+            }
         }
     }
 

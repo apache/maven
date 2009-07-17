@@ -98,7 +98,7 @@ public class DefaultProjectBuildingHelper
                                           List<ArtifactRepository> remoteRepositories )
         throws ArtifactResolutionException
     {
-        ClassRealm projectRealm = container.getContainerRealm();
+        ClassRealm projectRealm = null;
 
         Build build = model.getBuild();
 

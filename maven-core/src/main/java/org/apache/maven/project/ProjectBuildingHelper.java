@@ -55,7 +55,7 @@ public interface ProjectBuildingHelper
      * @param model The model to create the project realm for, must not be {@code null}
      * @param localRepository The local repository to use for artifact resolution, must not be {@code null}.
      * @param remoteRepositories The remote repositories to use for artifact resolution, must not be {@code null}.
-     * @return The project realm, never {@code null}.
+     * @return The project realm or {@code null} if the project uses no extensions.
      * @throws ArtifactResolutionException If any build extension could not be resolved.
      */
     ClassRealm createProjectRealm( Model model, ArtifactRepository localRepository,

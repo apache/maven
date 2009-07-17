@@ -302,7 +302,23 @@ public class DefaultProjectBuilder
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() );
 
-        ArtifactResolutionResult result = repositorySystem.resolve( artifactRequest );
+        ArtifactResolutionResult result;
+
+        ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
+
+        try
+        {
+            if ( project.getClassRealm() != null )
+            {
+                Thread.currentThread().setContextClassLoader( project.getClassRealm() );
+            }
+
+            result = repositorySystem.resolve( artifactRequest );
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( oldContextClassLoader );
+        }
 
         if ( result.hasExceptions() )
         {
