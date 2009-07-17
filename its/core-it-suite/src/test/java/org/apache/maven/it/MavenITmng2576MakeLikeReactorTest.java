@@ -38,21 +38,27 @@ public class MavenITmng2576MakeLikeReactorTest
         super( "[2.1.0,)" ); 
     }
 
+    private void clean( Verifier verifier )
+        throws Exception
+    {
+        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "sub-a/target" );
+        verifier.deleteDirectory( "sub-b/target" );
+        verifier.deleteDirectory( "sub-c/target" );
+        verifier.deleteDirectory( "sub-d/target" );
+    }
+
     /**
      * Verify that project list by itself only builds specified projects.
      */
-    public void testitOnlyList()
+    public void testitMakeOnlyList()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub-a/target" );
-        verifier.deleteDirectory( "sub-b/target" );
-        verifier.deleteDirectory( "sub-c/target" );
-        verifier.deleteDirectory( "sub-d/target" );
+        clean( verifier );
         verifier.getCliOptions().add( "-pl" );
         verifier.getCliOptions().add( "sub-b" );
         verifier.setLogFileName( "log-only.txt" );
@@ -77,11 +83,7 @@ public class MavenITmng2576MakeLikeReactorTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub-a/target" );
-        verifier.deleteDirectory( "sub-b/target" );
-        verifier.deleteDirectory( "sub-c/target" );
-        verifier.deleteDirectory( "sub-d/target" );
+        clean( verifier );
         verifier.getCliOptions().add( "-pl" );
         verifier.getCliOptions().add( "sub-b" );
         verifier.getCliOptions().add( "-am" );
@@ -107,11 +109,7 @@ public class MavenITmng2576MakeLikeReactorTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub-a/target" );
-        verifier.deleteDirectory( "sub-b/target" );
-        verifier.deleteDirectory( "sub-c/target" );
-        verifier.deleteDirectory( "sub-d/target" );
+        clean( verifier );
         verifier.getCliOptions().add( "-pl" );
         verifier.getCliOptions().add( "sub-b" );
         verifier.getCliOptions().add( "-amd" );
@@ -137,11 +135,7 @@ public class MavenITmng2576MakeLikeReactorTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub-a/target" );
-        verifier.deleteDirectory( "sub-b/target" );
-        verifier.deleteDirectory( "sub-c/target" );
-        verifier.deleteDirectory( "sub-d/target" );
+        clean( verifier );
         verifier.getCliOptions().add( "-pl" );
         verifier.getCliOptions().add( "sub-b" );
         verifier.getCliOptions().add( "-am" );
@@ -156,6 +150,30 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.assertFilePresent( "sub-b/target/touch.txt" );
         verifier.assertFilePresent( "sub-c/target/touch.txt" );
         verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+    }
+
+    /**
+     * Verify that reactor is resumed from specified project.
+     */
+    public void testitResumeFrom()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        clean( verifier );
+        verifier.getCliOptions().add( "-rf" );
+        verifier.getCliOptions().add( "sub-b" );
+        verifier.setLogFileName( "log-resume.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.assertFilePresent( "sub-b/target/touch.txt" );
+        verifier.assertFilePresent( "sub-c/target/touch.txt" );
     }
 
 }
