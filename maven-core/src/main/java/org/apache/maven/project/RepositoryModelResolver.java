@@ -82,6 +82,12 @@ class RepositoryModelResolver
         this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
     }
 
+    public ModelResolver newCopy()
+    {
+        return new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, localRepository,
+                                            remoteRepositories );
+    }
+
     public void addRepository( Repository repository )
         throws InvalidRepositoryException
     {

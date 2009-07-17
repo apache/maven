@@ -55,4 +55,13 @@ public interface ModelResolver
     void addRepository( Repository repository )
         throws InvalidRepositoryException;
 
+    /**
+     * Clones this resolver for usage in a forked resolution process. In general, implementors need not provide a deep
+     * clone. The only requirement is that invocations of {@link #addRepository(Repository)} on the clone do not affect
+     * the state of the original resolver and vice versa.
+     * 
+     * @return The cloned resolver, never {@code null}.
+     */
+    ModelResolver newCopy();
+
 }
