@@ -492,16 +492,25 @@ public class DefaultMaven
 
     private boolean isMatchingProject( MavenProject project, String selector, File reactorDirectory )
     {
+        String id = project.getGroupId() + ':' + project.getArtifactId();
+
+        if ( id.equals( selector ) )
+        {
+            return true;
+        }
+
         File selectedProject = new File( reactorDirectory, selector );
 
         if ( selectedProject.isFile() )
         {
             return selectedProject.equals( project.getFile() );
         }
-        else
+        else if ( selectedProject.isDirectory() )
         {
             return selectedProject.equals( project.getBasedir() );
         }
+
+        return false;
     }
 
 }
