@@ -153,6 +153,32 @@ public class MavenITmng2576MakeLikeReactorTest
     }
 
     /**
+     * Verify that using the mere basedir in the project list properly matches projects with non-default POM files.
+     */
+    public void testitMatchesByBasedir()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        clean( verifier );
+        verifier.assertFileNotPresent( "sub-d/pom.xml" );
+        verifier.getCliOptions().add( "-pl" );
+        verifier.getCliOptions().add( "sub-d" );
+        verifier.setLogFileName( "log-basedir.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-b/target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.assertFilePresent( "sub-d/target/touch.txt" );
+    }
+
+    /**
      * Verify that reactor is resumed from specified project.
      */
     public void testitResumeFrom()

@@ -34,7 +34,7 @@ under the License.
     <module>sub-a</module>
     <module>sub-b</module>
     <module>sub-c</module>
-    <module>sub-d</module>
+    <module>sub-d/pom-special.xml</module>
   </modules>
 
   <build>
