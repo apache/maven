@@ -74,11 +74,8 @@ public class LegacyRepositorySystem
     @Requirement
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    @Requirement
-    private ArtifactRepositoryLayout defaultArtifactRepositoryLayout;
-
-    @Requirement
-    private Map<String,ArtifactRepositoryLayout> layouts;
+    @Requirement( role = ArtifactRepositoryLayout.class )
+    private Map<String, ArtifactRepositoryLayout> layouts;
     
     @Requirement
     private MirrorBuilder mirrorBuilder;
@@ -533,16 +530,16 @@ public class LegacyRepositorySystem
 
         ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
 
-        return createArtifactRepository( repositoryId, url, defaultArtifactRepositoryLayout, snapshotsPolicy, releasesPolicy );
+        return createArtifactRepository( repositoryId, url, null, snapshotsPolicy, releasesPolicy );
     }
 
     public ArtifactRepository createArtifactRepository( String repositoryId, String url, ArtifactRepositoryLayout repositoryLayout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
-    {        
+    {
         if ( repositoryLayout == null )
         {
-            repositoryLayout = defaultArtifactRepositoryLayout;
+            repositoryLayout = layouts.get( "default" );
         }
-             
+
         ArtifactRepository artifactRepository = artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots, releases );
 
         Authentication authentication = authentications.get( repositoryId );
