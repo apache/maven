@@ -45,6 +45,12 @@ under the License.
     <!-- IT plugins/artifacts in alphabetical order -->
     <dependency>
       <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-extension</artifactId>
+      <version>${itPluginVersion}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
       <artifactId>core-it-wagon</artifactId>
       <version>${itPluginVersion}</version>
       <scope>runtime</scope>

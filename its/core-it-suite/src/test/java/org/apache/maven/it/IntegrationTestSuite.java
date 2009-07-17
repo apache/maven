@@ -91,6 +91,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4238ArtifactHandlerExtensionUsageTest.class );
         //suite.addTestSuite( MavenITmng4235HttpAuthDeploymentChecksumsTest.class );
         suite.addTestSuite( MavenITmng4231SnapshotUpdatePolicyTest.class );
         suite.addTestSuite( MavenITmng4214MirroredParentSearchReposTest.class );
