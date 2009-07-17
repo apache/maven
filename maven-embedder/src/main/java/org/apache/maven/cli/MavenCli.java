@@ -143,6 +143,16 @@ public class MavenCli
             return 1;
         }
 
+        if ( configuration.getGlobalSettingsFile() != null )
+        {
+            request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+        }
+
+        if ( configuration.getUserSettingsFile() != null )
+        {
+            request.setUserSettingsFile( configuration.getUserSettingsFile() );
+        }
+
         MavenEmbedder mavenEmbedder;
         
         try
