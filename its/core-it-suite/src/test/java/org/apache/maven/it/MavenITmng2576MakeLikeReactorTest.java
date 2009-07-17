@@ -181,7 +181,7 @@ public class MavenITmng2576MakeLikeReactorTest
     /**
      * Verify that the project list can also specify project ids.
      */
-    public void testitMakeById()
+    public void testitMatchesById()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
@@ -192,6 +192,34 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.getCliOptions().add( "-pl" );
         verifier.getCliOptions().add( "org.apache.maven.its.mng2576:sub-b" );
         verifier.setLogFileName( "log-id.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.assertFilePresent( "sub-b/target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+    }
+
+    /**
+     * Verify that the project list can also specify aritfact ids.
+     */
+    public void testitMatchesByArtifactId()
+        throws Exception
+    {
+        // as per MNG-4244
+        requiresMavenVersion( "[3.0-alpha-3,)" );
+
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        clean( verifier );
+        verifier.getCliOptions().add( "-pl" );
+        verifier.getCliOptions().add( ":sub-b" );
+        verifier.setLogFileName( "log-artifact-id.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
