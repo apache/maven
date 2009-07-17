@@ -297,6 +297,13 @@ public final class CLIRequestUtils
             request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_BOTH );
         }
 
+        String localRepoProperty = request.getProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+
+        if ( localRepoProperty != null )
+        {
+            request.setLocalRepositoryPath( localRepoProperty );
+        }
+
         return request;
     }
 
