@@ -126,7 +126,7 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "fail-at-end" ).withDescription( "Only fail the build afterwards; allow all non-impacted builds to continue" ).create( FAIL_AT_END ) );
         options.addOption( OptionBuilder.withLongOpt( "fail-never" ).withDescription( "NEVER fail the build, regardless of project result" ).create( FAIL_NEVER ) );
         options.addOption( OptionBuilder.withLongOpt( "resume-from" ).hasArg().withDescription( "Resume reactor from specified project" ).create( RESUME_FROM ) );
-        options.addOption( OptionBuilder.withLongOpt( "projects" ).withDescription( "Build specified reactor projects instead of all projects" ).hasArg().create( PROJECT_LIST ) );
+        options.addOption( OptionBuilder.withLongOpt( "projects" ).withDescription( "Build specified reactor projects instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path." ).hasArg().create( PROJECT_LIST ) );
         options.addOption( OptionBuilder.withLongOpt( "also-make" ).withDescription( "If project list is specified, also build projects required by the list" ).create( ALSO_MAKE ) );
         options.addOption( OptionBuilder.withLongOpt( "also-make-dependents" ).withDescription( "If project list is specified, also build projects that depend on projects on the list" ).create( ALSO_MAKE_DEPENDENTS ) );
         options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file to where all build output will go." ).create( LOG_FILE ) );
