@@ -118,7 +118,7 @@ public class MavenEmbedder
 
     private Configuration configuration;
 
-    private MavenExecutionRequest request;
+    //private MavenExecutionRequest request;
 
     // ----------------------------------------------------------------------------
     // Constructors
@@ -130,10 +130,12 @@ public class MavenEmbedder
         start( embedderConfiguration );
     }
 
+    /*
     public MavenExecutionRequest getDefaultRequest()
     {
         return request;
     }
+    */
 
     // ----------------------------------------------------------------------
     // Accessors
@@ -144,6 +146,7 @@ public class MavenEmbedder
         return classWorld;
     }
 
+    /*
     public ArtifactRepository getLocalRepository()
     {
         return request.getLocalRepository();
@@ -153,6 +156,7 @@ public class MavenEmbedder
     {
         return request.getSettings();
     }
+    */
 
     public MavenEmbedderLogger getLogger()
     {
@@ -262,65 +266,6 @@ public class MavenEmbedder
     }
 
     // ----------------------------------------------------------------------
-    // Project
-    // ----------------------------------------------------------------------
-
-    public MavenProject readProject( File mavenProject )
-        throws ProjectBuildingException, MavenExecutionException
-    {
-        return readProject( mavenProject, request );
-    }
-
-    private MavenProject readProject( File mavenProject, MavenExecutionRequest request )
-        throws ProjectBuildingException, MissingModuleException
-    {
-        getLogger().debug( "Building MavenProject instance: " + mavenProject );
-
-        return projectBuilder.build( mavenProject, request.getProjectBuildingRequest() );
-    }
-
-    /**
-     * This method is used to grab the list of dependencies that belong to a project so that a UI
-     * can be populated. For example, a list of libraries that are used by an Eclipse, Netbeans, or
-     * IntelliJ project.
-     */
-    
-    // currently in m2eclipse each project is read read a single project for dependencies
-    // Project
-    // Exceptions
-    // explicit for exceptions where coordinate are involved.
-    // m2eclipse is not using the topological sorting at all because it keeps track itself.
-    
-    public MavenExecutionResult readProjectWithDependencies( MavenExecutionRequest request )
-    {
-        MavenExecutionResult result = new DefaultMavenExecutionResult();
-
-        try
-        {
-            request = populator.populateDefaults( request, configuration );
-        }
-        catch ( MavenEmbedderException e )
-        {
-            return result.addException( e );
-        }
-
-        try
-        {
-            MavenProjectBuildingResult projectBuildingResult = projectBuilder.buildProjectWithDependencies( request.getPom(), request.getProjectBuildingRequest() );
-            
-            result.setProject( projectBuildingResult.getProject() );
-
-            result.setArtifactResolutionResult( projectBuildingResult.getArtifactResolutionResult() );
-
-            return result;
-        }
-        catch ( ProjectBuildingException e )
-        {
-            return result.addException( e );
-        }
-    }
-
-    // ----------------------------------------------------------------------
     //  Lifecycle
     // ----------------------------------------------------------------------
 
@@ -397,9 +342,9 @@ public class MavenEmbedder
             
             // This is temporary as we can probably cache a single request and use it for default values and
             // simply cascade values in from requests used for individual executions.
-            request = new DefaultMavenExecutionRequest();
-
-            populator.populateDefaults( request, configuration );
+            //request = new DefaultMavenExecutionRequest();
+            //
+            //populator.populateDefaults( request, configuration );
         }
         catch ( ComponentLookupException e )
         {
@@ -496,18 +441,6 @@ public class MavenEmbedder
         return configuration;
     }
 
-    // ----------------------------------------------------------------------
-    // Start of new embedder API
-    // ----------------------------------------------------------------------
-
-    public boolean isOffline( MavenExecutionRequest request )
-        throws MavenEmbedderException
-    {
-        request = populator.populateDefaults( request, configuration );
-
-        return request.isOffline();
-    }
-
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         LoggerManager loggerManager = container.getLoggerManager();
@@ -520,7 +453,7 @@ public class MavenEmbedder
 
             try
             {
-                request = populator.populateDefaults( request, configuration );
+                request = populator.populateDefaults( request );
             }
             catch ( MavenEmbedderException e )
             {

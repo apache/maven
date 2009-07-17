@@ -23,10 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -56,7 +54,6 @@ public class MavenEmbedderTest
     protected String basedir;
 
     protected MavenEmbedder mavenEmbedder;
-
 
     protected void setUp()
         throws Exception
@@ -321,11 +318,13 @@ public class MavenEmbedderTest
     // Repository
     // ----------------------------------------------------------------------
 
+    /*
     public void testLocalRepositoryRetrieval()
         throws Exception
     {
         assertNotNull( mavenEmbedder.getLocalRepository().getBasedir() );
     }
+    */
 
     // ----------------------------------------------------------------------
     // Model Reading
@@ -341,79 +340,6 @@ public class MavenEmbedderTest
         Model model = mavenEmbedder.readModel( getPomFile() );
 
         assertEquals( "org.apache.maven", model.getGroupId() );
-    }
-
-    public void testProjectReading()
-        throws Exception
-    {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true ).setPom( getPomFile() );
-
-        MavenExecutionResult result = mavenEmbedder.readProjectWithDependencies( request );
-
-        assertNoExceptions( result );
-
-        assertEquals( "org.apache.maven", result.getProject().getGroupId() );
-
-        Set<Artifact> artifacts = result.getProject().getArtifacts();
-
-        assertEquals( 1, artifacts.size() );
-
-        artifacts.iterator().next();
-    }
-
-    public void testProjectReadingNoDependencies()
-        throws Exception
-    {
-        MavenExecutionRequest request =
-            new DefaultMavenExecutionRequest().setShowErrors( true ).setPom(
-                                                                             getPomFile( "pom-without-dependencies.xml" ) );
-
-        MavenExecutionResult result = mavenEmbedder.readProjectWithDependencies( request );
-
-        assertNoExceptions( result );
-
-        assertEquals( new ArrayList<Artifact>(), new ArrayList<Artifact>( result.getProject().getArtifacts() ) );
-    }
-
-    public void testProjectReading_FromChildLevel_ScmInheritanceCalculations()
-        throws Exception
-    {
-        File pomFile = new File( basedir, "src/test/projects/readProject-withScmInheritance/modules/child1/pom.xml" );
-
-        MavenProject project = mavenEmbedder.readProject( pomFile );
-        assertNotNull(project.getScm());
-        assertEquals( "http://host/viewer?path=/trunk/parent/modules/child1", project.getScm().getUrl() );
-        assertEquals( "scm:svn:http://host/trunk/parent/modules/child1", project.getScm().getConnection() );
-        assertEquals( "scm:svn:https://host/trunk/parent/modules/child1", project.getScm().getDeveloperConnection() );
-    }
-
-    public void testProjectReading_SkipMissingModuleSilently()
-        throws Exception
-    {
-        File pomFile = new File( basedir,
-                                 "src/test/projects/readProject-missingModuleIgnored/pom.xml" );
-
-        mavenEmbedder.readProject( pomFile );
-    }
-
-    public void testProjectReadingWithDistributionStatus()
-        throws Exception
-    {
-        File pom = new File( basedir, "src/test/resources/pom-with-distribution-status.xml" );
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setShowErrors( true )
-            .setPom( pom );
-
-        MavenProject project = mavenEmbedder.readProject( pom );
-
-        assertEquals( "deployed", project.getDistributionManagement().getStatus() );
-
-        MavenExecutionResult result = mavenEmbedder.readProjectWithDependencies( request );
-
-        assertNoExceptions( result );
-
-        assertEquals( "org.apache.maven", result.getProject().getGroupId() );
-
-        assertEquals( "deployed", result.getProject().getDistributionManagement().getStatus() );
     }
 
     // ----------------------------------------------------------------------------

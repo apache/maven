@@ -23,7 +23,6 @@ import java.util.Set;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -36,12 +35,10 @@ import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.toolchain.ToolchainsBuilder;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
 @Component(role = MavenExecutionRequestPopulator.class)
 public class DefaultMavenExecutionRequestPopulator
-    extends AbstractLogEnabled
     implements MavenExecutionRequestPopulator
 {
     //TODO: this needs to be pushed up to the front-end
@@ -53,45 +50,6 @@ public class DefaultMavenExecutionRequestPopulator
 
     @Requirement
     private ToolchainsBuilder toolchainsBuilder;
-
-    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request, Configuration configuration )
-        throws MavenEmbedderException
-    {
-        // copy configuration to request
-        if ( request.getSettings() == null )
-        {
-            if ( configuration.getGlobalSettingsFile() != null )
-            {
-                request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
-            }
-    
-            if ( configuration.getUserSettingsFile() != null )
-            {
-                request.setUserSettingsFile( configuration.getUserSettingsFile() );
-            }
-        }
-
-        String localRepositoryPath = null;
-
-        if ( request.getLocalRepositoryPath() != null )
-        {
-            localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
-        }
-
-        if ( StringUtils.isEmpty( localRepositoryPath ) && ( configuration.getLocalRepository() != null ) )
-        {
-            localRepositoryPath = configuration.getLocalRepository().getAbsolutePath();
-        }
-
-        if ( !StringUtils.isEmpty( localRepositoryPath ) )
-        {
-            request.setLocalRepositoryPath( localRepositoryPath );
-        }
-
-        // populate the defaults
-
-        return populateDefaults( request );
-    }
 
     private void pom( MavenExecutionRequest request )
     {
