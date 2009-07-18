@@ -256,6 +256,9 @@ public class DefaultProjectBuilder
     {
         ModelBuildingRequest request = getModelBuildingRequest( config );
 
+        DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, config );
+        request.setModelBuildingListeners( Arrays.asList( listener ) );
+
         request.setModelSource( new UrlModelSource( getClass().getResource( "standalone.xml" ) ) );
 
         ModelBuildingResult result;
@@ -281,6 +284,8 @@ public class DefaultProjectBuilder
 
         standaloneProject.setActiveProfiles( result.getActiveExternalProfiles() );
         standaloneProject.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
+        standaloneProject.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
+        standaloneProject.setPluginArtifactRepositories( listener.getPluginRepositories() );
 
         standaloneProject.setExecutionRoot( true );
 
