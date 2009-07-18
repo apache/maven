@@ -1,1 +1,0 @@
-This IT checks that profiles which are brought in from settings files (and which are activated via activeProfiles) are present even if no POM is in use.

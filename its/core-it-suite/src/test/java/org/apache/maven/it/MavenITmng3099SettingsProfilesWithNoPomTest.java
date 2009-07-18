@@ -23,82 +23,44 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
- * This is a sample integration test. The IT tests typically
- * operate by having a sample project in the
- * /src/test/resources folder along with a junit test like
- * this one. The junit test uses the verifier (which uses
- * the invoker) to invoke a new instance of Maven on the
- * project in the resources folder. It then checks the
- * results. This is a non-trivial example that shows two
- * phases. See more information inline in the code.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3099">MNG-3099</a>.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- *
  */
 public class MavenITmng3099SettingsProfilesWithNoPomTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3099SettingsProfilesWithNoPomTest()
     {
         super( "(2.0.8,)" ); // 2.0.9+
     }
 
-    public void testitMNG3099 ()
+    /**
+     * Verify that (active) profiles from the settings are effective even if no POM is in use (e.g archetype:create).
+     * In more detail, this means the plugin can be resolved from the repositories given in the settings and the plugin
+     * can access properties defined by the profiles.
+     */
+    public void testit()
         throws Exception
     {
-        // The testdir is computed from the location of this
-        // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3099" );
 
-        File plugin = new File( testDir, "plugin" );
-
-        Verifier verifier;
-
-        verifier = new Verifier( plugin.getAbsolutePath() );
-
-        verifier.executeGoal( "install" );
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3099" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.executeGoal( "org.apache.maven.its.mng3099:maven-mng3099-plugin:0.1:touch" );
+        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
-
-        /*
-         * Use the settings for this test, which contains the profile we're looking for.
-         */
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-s" );
-        cliOptions.add( "\"" + new File( testDir, "settings.xml" ).getAbsolutePath() + "\"" );
-
-        verifier.setCliOptions( cliOptions );
-
-        verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.mng3099:maven-mng3099-plugin:1:profile-props" );
-
-
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-        boolean found = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
-        {
-            String line = (String) it.next();
-            if ( line.indexOf( "local-profile-prop=local-profile-prop-value" ) > -1 )
-            {
-                found = true;
-                break;
-            }
-        }
-
-        if ( !found )
-        {
-            fail( "Profile-injected property value: local-profile-prop-value was not found in log output." );
-        }
+        verifier.assertFilePresent( "target/PASSED.txt" );
+        verifier.assertFileNotPresent( "target/touch.txt" );
     }
+
 }
