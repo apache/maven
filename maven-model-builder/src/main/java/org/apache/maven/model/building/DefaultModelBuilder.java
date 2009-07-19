@@ -488,10 +488,8 @@ public class DefaultModelBuilder
 
         if ( modelResolver == null )
         {
-            problems.add( new ModelProblem( "Non-resolvable parent POM " + toId( parent ) + " for POM "
-                + toSourceHint( childModel ) + ": " + "No model resolver provided", ModelProblem.Severity.FATAL,
-                                            toSourceHint( childModel ) ) );
-            throw new ModelBuildingException( problems );
+            throw new IllegalArgumentException( "no model resolver provided, cannot resolve parent POM "
+                + toId( parent ) + " for POM " + toSourceHint( childModel ) );
         }
 
         ModelSource modelSource;
