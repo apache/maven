@@ -32,7 +32,7 @@ public class MavenITmng3220ImportScopeTest
 {
     public MavenITmng3220ImportScopeTest()
     {
-        super( "(2.0.8,3.0-alpha-1)" ); // not supported in 3.0+
+        super( "(2.0.8,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
     public void testitMNG3220a()

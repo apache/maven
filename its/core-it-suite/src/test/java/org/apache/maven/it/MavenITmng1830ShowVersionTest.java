@@ -39,8 +39,7 @@ public class MavenITmng1830ShowVersionTest
 
     public MavenITmng1830ShowVersionTest()
     {
-        // TODO: reinstate for 3.0
-        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1)" ); // Maven 2.0.11 + , 2.1.0-M2 +
+        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // Maven 2.0.11 + , 2.1.0-M2 +
     }
 
     /**
