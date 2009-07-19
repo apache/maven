@@ -181,7 +181,7 @@ public class Restriction
 
     public String toString()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         buf.append( isLowerBoundInclusive() ? "[" : "(" );
         if ( getLowerBound() != null )

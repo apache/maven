@@ -1689,13 +1689,13 @@ public class PomConstructionTest
         assertEquals( expected, pom.getValue( expression ) );        
     }
 
-    private static String createPath(List<String> elements)
+    private static String createPath( List<String> elements )
     {
-        StringBuffer buffer = new StringBuffer();
-        for(String s : elements)
+        StringBuilder buffer = new StringBuilder( 256 );
+        for ( String s : elements )
         {
-            buffer.append(s).append(File.separator);
+            buffer.append( s ).append( File.separator );
         }
-        return buffer.toString().substring(0, buffer.toString().length() - 1);
+        return buffer.toString().substring( 0, buffer.toString().length() - 1 );
     }
 }

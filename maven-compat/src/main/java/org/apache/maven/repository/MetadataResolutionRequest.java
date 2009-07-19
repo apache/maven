@@ -134,7 +134,7 @@ public class MetadataResolutionRequest
 
     public String toString()
     {
-        StringBuffer sb = new StringBuffer()
+        StringBuilder sb = new StringBuilder()
                 .append( "REQUEST: " ).append(  "\n" )
                 .append( "artifact: " ).append( mad ).append(  "\n" )
                 .append( artifactDependencies ).append(  "\n" )

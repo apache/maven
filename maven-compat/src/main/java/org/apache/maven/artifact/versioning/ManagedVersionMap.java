@@ -37,7 +37,7 @@ public class ManagedVersionMap
 
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer( "ManagedVersionMap (" + size() + " entries)\n" );
+        StringBuilder buffer = new StringBuilder( "ManagedVersionMap (" + size() + " entries)\n" );
         Iterator iter = keySet().iterator();
         while ( iter.hasNext() )
         {

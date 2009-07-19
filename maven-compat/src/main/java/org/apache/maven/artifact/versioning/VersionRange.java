@@ -504,7 +504,7 @@ public class VersionRange
         }
         else
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             for ( Iterator i = restrictions.iterator(); i.hasNext(); )
             {
                 Restriction r = (Restriction) i.next();

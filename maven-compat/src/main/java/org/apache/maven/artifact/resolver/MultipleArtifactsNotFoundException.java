@@ -84,7 +84,7 @@ public class MultipleArtifactsNotFoundException
 
     private static String constructMessage( List<Artifact> artifacts )
     {
-        StringBuffer buffer = new StringBuffer( "Missing:\n" );
+        StringBuilder buffer = new StringBuilder( "Missing:\n" );
 
         buffer.append( "----------\n" );
 

@@ -224,14 +224,14 @@ public class DefaultArtifact
 
     public String getDependencyConflictId()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder( 128 );
         sb.append( getGroupId() );
         sb.append( ":" );
         appendArtifactTypeClassifierString( sb );
         return sb.toString();
     }
 
-    private void appendArtifactTypeClassifierString( StringBuffer sb )
+    private void appendArtifactTypeClassifierString( StringBuilder sb )
     {
         sb.append( getArtifactId() );
         sb.append( ":" );
@@ -276,7 +276,7 @@ public class DefaultArtifact
 
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if ( getGroupId() != null )
         {
             sb.append( getGroupId() );

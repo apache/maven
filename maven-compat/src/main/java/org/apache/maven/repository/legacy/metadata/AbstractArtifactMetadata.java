@@ -54,7 +54,7 @@ public abstract class AbstractArtifactMetadata
 
     public String extendedToString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         buffer.append( "\nArtifact Metadata\n--------------------------" );
         buffer.append( "\nGroupId: " ).append( getGroupId() );

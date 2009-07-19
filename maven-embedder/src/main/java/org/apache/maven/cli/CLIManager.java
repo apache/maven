@@ -152,7 +152,7 @@ public class CLIManager
     {
         List<String> cleaned = new ArrayList<String>();
 
-        StringBuffer currentArg = null;
+        StringBuilder currentArg = null;
 
         for ( int i = 0; i < args.length; i++ )
         {
@@ -170,7 +170,7 @@ public class CLIManager
                 }
 
                 // start building an argument here.
-                currentArg = new StringBuffer( arg.substring( 1 ) );
+                currentArg = new StringBuilder( arg.substring( 1 ) );
                 addedToBuffer = true;
             }
 

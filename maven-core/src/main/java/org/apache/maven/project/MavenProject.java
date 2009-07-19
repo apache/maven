@@ -1691,7 +1691,7 @@ public class MavenProject
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer( 30 );
+        StringBuilder sb = new StringBuilder( 128 );
         sb.append( "MavenProject: " );
         sb.append( getGroupId() );
         sb.append( ":" );

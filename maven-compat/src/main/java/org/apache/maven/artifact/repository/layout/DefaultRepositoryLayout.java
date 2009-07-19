@@ -47,7 +47,7 @@ public class DefaultRepositoryLayout
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder( 128 );
 
         path.append( formatAsDirectory( artifact.getGroupId() ) ).append( PATH_SEPARATOR );
         path.append( artifact.getArtifactId() ).append( PATH_SEPARATOR );
@@ -75,7 +75,7 @@ public class DefaultRepositoryLayout
     private String pathOfRepositoryMetadata( ArtifactMetadata metadata,
                                              String filename )
     {
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder( 128 );
 
         path.append( formatAsDirectory( metadata.getGroupId() ) ).append( PATH_SEPARATOR );
         if ( !metadata.storedInGroupDirectory() )

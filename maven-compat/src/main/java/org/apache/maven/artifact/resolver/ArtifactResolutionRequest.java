@@ -171,7 +171,7 @@ public class ArtifactResolutionRequest
 
     public String toString()
     {
-        StringBuffer sb = new StringBuffer()
+        StringBuilder sb = new StringBuilder()
                 .append( "REQUEST: " ).append(  "\n" )
                 .append( "artifact: " ).append( artifact ).append(  "\n" )
                 .append( artifactDependencies ).append(  "\n" )

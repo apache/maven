@@ -102,7 +102,7 @@ public class MojoExecution
     
     public String identify()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder( 256 );
         
         sb.append( executionId );
         sb.append( configuration.toString() );

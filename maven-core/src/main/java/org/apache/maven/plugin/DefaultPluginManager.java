@@ -612,7 +612,7 @@ public class DefaultPluginManager
                 logger.fatalError( configurator.getClass().getName() + "#configureComponent(...) caused a linkage error (" + e.getClass().getName() + ") and may be out-of-date. Check the realms:" );
 
                 ClassRealm pluginRealm = mojoDescriptor.getPluginDescriptor().getClassRealm();
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append( "Plugin realm = " + pluginRealm.getId() ).append( '\n' );
                 for ( int i = 0; i < pluginRealm.getURLs().length; i++ )
                 {
@@ -625,7 +625,7 @@ public class DefaultPluginManager
                 logger.fatalError( sb.toString() );
 
                 ClassRealm containerRealm = container.getContainerRealm();
-                sb = new StringBuffer();
+                sb = new StringBuilder();
                 sb.append( "Container realm = " + containerRealm.getId() ).append( '\n' );
                 for ( int i = 0; i < containerRealm.getURLs().length; i++ )
                 {

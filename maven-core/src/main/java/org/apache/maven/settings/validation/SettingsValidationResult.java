@@ -93,7 +93,7 @@ public final class SettingsValidationResult
             return indentation + "There were no validation errors.";
         }
 
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder( 256 );
 
 //        if ( messages.size() == 1 )
 //        {

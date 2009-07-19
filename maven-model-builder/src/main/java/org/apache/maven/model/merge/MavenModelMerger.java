@@ -615,7 +615,7 @@ public class MavenModelMerger
             }
         }
 
-        StringBuffer cleanedPath = new StringBuffer();
+        StringBuilder cleanedPath = new StringBuilder( 128 );
 
         while ( !pathElements.isEmpty() )
         {

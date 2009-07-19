@@ -352,7 +352,7 @@ public class DefaultUpdateCheckManager
 
     public File getTouchfile( Artifact artifact )
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append( artifact.getArtifactId() );
         sb.append( '-' ).append( artifact.getBaseVersion() );
         if ( artifact.getClassifier() != null )

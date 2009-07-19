@@ -163,7 +163,7 @@ public class AbstractArtifactResolutionException
     protected static String constructArtifactPath( List path,
                                                    String indentation )
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if ( path != null )
         {
@@ -194,7 +194,7 @@ public class AbstractArtifactResolutionException
                                                 List remoteRepositories,
                                                 List path )
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append( message );
         sb.append( LS );
@@ -249,7 +249,7 @@ public class AbstractArtifactResolutionException
                                                              String downloadUrl,
                                                              List path )
     {
-        StringBuffer sb = new StringBuffer( message );
+        StringBuilder sb = new StringBuilder( message );
 
         if ( !"pom".equals( type ) )
         {

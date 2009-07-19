@@ -303,7 +303,7 @@ public class ComparableVersion
 
         public String toString()
         {
-            StringBuffer buffer = new StringBuffer( "(" );
+            StringBuilder buffer = new StringBuilder( "(" );
             for( Iterator iter = iterator(); iter.hasNext(); )
             {
                 buffer.append( iter.next() );

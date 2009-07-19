@@ -67,7 +67,7 @@ public class DebugConfigurationListener
         if ( obj != null && obj.getClass().isArray() )
         {
             int n = Array.getLength( obj );
-            StringBuffer buf = new StringBuffer( 256 );
+            StringBuilder buf = new StringBuilder( 256 );
             buf.append( '[' );
             for ( int i = 0; i < n; i++ )
             {

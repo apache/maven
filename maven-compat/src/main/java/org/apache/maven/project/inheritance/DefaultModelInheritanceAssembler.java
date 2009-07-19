@@ -737,7 +737,7 @@ public class DefaultModelInheritanceAssembler
             }
         }
 
-        StringBuffer cleanedPath = new StringBuffer();
+        StringBuilder cleanedPath = new StringBuilder();
 
         while ( !pathElements.isEmpty() )
         {

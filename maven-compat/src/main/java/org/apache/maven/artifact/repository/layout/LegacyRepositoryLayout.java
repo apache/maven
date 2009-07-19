@@ -43,7 +43,7 @@ public class LegacyRepositoryLayout
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder( 128 );
 
         path.append( artifact.getGroupId() ).append( '/' );
         path.append( artifactHandler.getDirectory() ).append( '/' );
@@ -71,7 +71,7 @@ public class LegacyRepositoryLayout
     private String pathOfRepositoryMetadata( ArtifactMetadata metadata,
                                              String filename )
     {
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder( 128 );
 
         path.append( metadata.getGroupId() ).append( PATH_SEPARATOR ).append( "poms" ).append( PATH_SEPARATOR );
 

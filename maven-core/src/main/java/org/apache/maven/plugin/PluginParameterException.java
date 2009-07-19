@@ -55,7 +55,7 @@ public class PluginParameterException
     }
 
     private static void decomposeParameterIntoUserInstructions( MojoDescriptor mojo, Parameter param,
-                                                                StringBuffer messageBuffer )
+                                                                StringBuilder messageBuffer )
     {
         String expression = param.getExpression();
 
@@ -90,7 +90,7 @@ public class PluginParameterException
 
     public String buildDiagnosticMessage()
     {
-        StringBuffer messageBuffer = new StringBuffer();
+        StringBuilder messageBuffer = new StringBuilder( 256 );
 
         List params = getParameters();
         MojoDescriptor mojo = getMojoDescriptor();

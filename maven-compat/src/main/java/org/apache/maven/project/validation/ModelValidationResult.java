@@ -73,7 +73,7 @@ public class ModelValidationResult
             return indentation + "There were no validation errors.";
         }
 
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
 
 //        if ( messages.size() == 1 )
 //        {

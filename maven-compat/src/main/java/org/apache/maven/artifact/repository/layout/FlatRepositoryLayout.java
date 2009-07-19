@@ -29,7 +29,7 @@ public class FlatRepositoryLayout
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder( 128 );
 
         path.append( artifact.getArtifactId() ).append( ARTIFACT_SEPARATOR ).append( artifact.getVersion() );
 
@@ -54,7 +54,7 @@ public class FlatRepositoryLayout
 
     private String pathOfRepositoryMetadata( String filename )
     {
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder( 128 );
 
         path.append( filename );
 

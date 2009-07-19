@@ -455,7 +455,7 @@ public class DefaultLifecycleExecutor
     private String executionDescription( MojoExecution me, MavenProject project )
     {
         PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder( 128 );
         sb.append( "Executing " + pd.getArtifactId() + "[" + pd.getVersion() + "]: " + me.getMojoDescriptor().getGoal() + " on " + project.getArtifactId() );        
         return sb.toString();
     }
@@ -1217,7 +1217,7 @@ public class DefaultLifecycleExecutor
 
                     if ( warnOfDeprecation )
                     {
-                        StringBuffer buffer = new StringBuffer();
+                        StringBuilder buffer = new StringBuilder( 128 );
                         buffer.append( "In mojo: " ).append( mojoDescriptor.getGoal() ).append( ", parameter: " ).append( param.getName() );
 
                         if ( param.getAlias() != null )
@@ -1338,7 +1338,7 @@ public class DefaultLifecycleExecutor
                 // Make sure the parameter is either editable/configurable, or else is NOT specified in the POM
                 if ( !parameter.isEditable() )
                 {
-                    StringBuffer errorMessage = new StringBuffer().append( "ERROR: Cannot override read-only parameter: " );
+                    StringBuilder errorMessage = new StringBuilder( 128 ).append( "ERROR: Cannot override read-only parameter: " );
                     errorMessage.append( key );
                     errorMessage.append( " in goal: " ).append( goal.getFullGoalName() );
 
