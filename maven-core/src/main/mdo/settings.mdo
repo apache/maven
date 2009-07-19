@@ -332,6 +332,7 @@
         return match;
     }
 
+    @Deprecated
     public Mirror getMirrorOf( String repositoryId )
     {
         Mirror match = null;
