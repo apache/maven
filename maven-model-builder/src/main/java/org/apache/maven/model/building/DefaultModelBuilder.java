@@ -23,9 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
@@ -35,6 +38,7 @@ import org.apache.maven.model.interpolation.ModelInterpolationException;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
+import org.apache.maven.model.management.DependencyManagementImporter;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
@@ -96,6 +100,9 @@ public class DefaultModelBuilder
 
     @Requirement
     private DependencyManagementInjector dependencyManagementInjector;
+
+    @Requirement
+    private DependencyManagementImporter dependencyManagementImporter;
 
     @Requirement
     private LifecycleBindingsInjector lifecycleBindingsInjector;
@@ -176,6 +183,8 @@ public class DefaultModelBuilder
         }
 
         pluginManagementInjector.injectManagement( resultModel, request );
+
+        importDependencyManagement( resultModel, request, problems );
 
         dependencyManagementInjector.injectManagement( resultModel, request );
 
@@ -511,6 +520,86 @@ public class DefaultModelBuilder
         return ModelUtils.cloneModel( superPomProvider.getSuperModel( "4.0.0" ) );
     }
 
+    private void importDependencyManagement( Model model, ModelBuildingRequest request, List<ModelProblem> problems )
+    {
+        DependencyManagement depMngt = model.getDependencyManagement();
+
+        if ( depMngt == null )
+        {
+            return;
+        }
+
+        ModelResolver modelResolver = request.getModelResolver();
+
+        ModelBuildingRequest importRequest = null;
+
+        List<Model> importModels = null;
+
+        for ( Iterator<Dependency> it = depMngt.getDependencies().iterator(); it.hasNext(); )
+        {
+            Dependency dependency = it.next();
+
+            if ( !"pom".equals( dependency.getType() ) || !"import".equals( dependency.getScope() ) )
+            {
+                continue;
+            }
+
+            it.remove();
+
+            if ( modelResolver == null )
+            {
+                throw new IllegalArgumentException( "no model resolver provided, cannot resolve import POM "
+                    + toId( dependency ) + " for POM " + toSourceHint( model ) );
+            }
+
+            ModelSource importSource;
+            try
+            {
+                importSource =
+                    modelResolver.resolveModel( dependency.getGroupId(), dependency.getArtifactId(),
+                                                dependency.getVersion() );
+            }
+            catch ( UnresolvableModelException e )
+            {
+                problems.add( new ModelProblem( "Non-resolvable import POM " + toId( dependency ) + " for POM "
+                    + toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
+                                                toSourceHint( model ), e ) );
+                continue;
+            }
+
+            if ( importRequest == null )
+            {
+                importRequest = new DefaultModelBuildingRequest();
+                importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+            }
+
+            importRequest.setModelSource( importSource );
+            importRequest.setModelResolver( modelResolver.newCopy() );
+
+            ModelBuildingResult importResult;
+            try
+            {
+                importResult = build( importRequest );
+            }
+            catch ( ModelBuildingException e )
+            {
+                problems.addAll( e.getProblems() );
+                continue;
+            }
+
+            problems.addAll( importResult.getProblems() );
+
+            if ( importModels == null )
+            {
+                importModels = new ArrayList<Model>();
+            }
+
+            importModels.add( importResult.getEffectiveModel() );
+        }
+
+        dependencyManagementImporter.importManagement( model, importModels, request );
+    }
+
     private void fireBuildExtensionsAssembled( Model model, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
@@ -605,6 +694,19 @@ public class DefaultModelBuilder
         buffer.append( parent.getArtifactId() );
         buffer.append( ':' );
         buffer.append( parent.getVersion() );
+
+        return buffer.toString();
+    }
+
+    private String toId( Dependency dependency )
+    {
+        StringBuilder buffer = new StringBuilder( 64 );
+
+        buffer.append( dependency.getGroupId() );
+        buffer.append( ':' );
+        buffer.append( dependency.getArtifactId() );
+        buffer.append( ':' );
+        buffer.append( dependency.getVersion() );
 
         return buffer.toString();
     }
