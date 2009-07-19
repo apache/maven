@@ -114,10 +114,12 @@ public class DefaultProjectBuilder
                 throw new ProjectBuildingException( "[unknown]", "Failed to build project for " + pomFile, pomFile, e );
             }
 
+            Model model = result.getEffectiveModel();
+
             if ( localProject && !result.getProblems().isEmpty() && logger.isWarnEnabled() )
             {
                 logger.warn( "" );
-                logger.warn( "One or more problems were encountered while building the project's effective model:" );
+                logger.warn( "Some problems were encountered while building the effective model for " + model.getId() );
 
                 for ( ModelProblem problem : result.getProblems() )
                 {
@@ -132,8 +134,6 @@ public class DefaultProjectBuilder
                     + " longer support building such malformed projects." );
                 logger.warn( "" );
             }
-
-            Model model = result.getEffectiveModel();
 
             File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();
             MavenProject project = fromModelToMavenProject( model, parentPomFile, configuration, model.getPomFile() );
