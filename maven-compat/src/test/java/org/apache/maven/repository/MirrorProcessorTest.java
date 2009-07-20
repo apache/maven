@@ -28,7 +28,7 @@ public class MirrorProcessorTest
     
     public void testAddMirrorWithNullRepositoryId()
     {
-        mirrorBuilder.addMirror( null, "test", "http://www.nowhere.com/" );
+        mirrorBuilder.addMirror( null, "test", "http://www.nowhere.com/", null );
     }
         
     public void testExternalURL()
@@ -55,8 +55,8 @@ public class MirrorProcessorTest
 
     public void testMirrorLookup()
     {
-        mirrorBuilder.addMirror( "a", "a", "http://a" );
-        mirrorBuilder.addMirror( "b", "b", "http://b" );
+        mirrorBuilder.addMirror( "a", "a", "http://a", null );
+        mirrorBuilder.addMirror( "b", "b", "http://b", null );
 
         ArtifactRepository repo = null;
         repo = mirrorBuilder.getMirrorRepository( getRepo( "a", "http://a.a" ) );
@@ -72,9 +72,9 @@ public class MirrorProcessorTest
 
     public void testMirrorWildcardLookup()
     {
-        mirrorBuilder.addMirror( "a", "a", "http://a" );
-        mirrorBuilder.addMirror( "b", "b", "http://b" );
-        mirrorBuilder.addMirror( "c", "*", "http://wildcard" );
+        mirrorBuilder.addMirror( "a", "a", "http://a", null );
+        mirrorBuilder.addMirror( "b", "b", "http://b", null );
+        mirrorBuilder.addMirror( "c", "*", "http://wildcard", null );
 
         ArtifactRepository repo = null;
         repo = mirrorBuilder.getMirrorRepository( getRepo( "a", "http://a.a" ) );
@@ -91,15 +91,15 @@ public class MirrorProcessorTest
     public void testMirrorStopOnFirstMatch()
     {
         //exact matches win first
-        mirrorBuilder.addMirror( "a2", "a,b", "http://a2" );
-        mirrorBuilder.addMirror( "a", "a", "http://a" );
+        mirrorBuilder.addMirror( "a2", "a,b", "http://a2", null );
+        mirrorBuilder.addMirror( "a", "a", "http://a", null );
         //make sure repeated entries are skipped
-        mirrorBuilder.addMirror( "a", "a", "http://a3" ); 
+        mirrorBuilder.addMirror( "a", "a", "http://a3", null ); 
         
-        mirrorBuilder.addMirror( "b", "b", "http://b" );
-        mirrorBuilder.addMirror( "c", "d,e", "http://de" );
-        mirrorBuilder.addMirror( "c", "*", "http://wildcard" );
-        mirrorBuilder.addMirror( "c", "e,f", "http://ef" );        
+        mirrorBuilder.addMirror( "b", "b", "http://b", null );
+        mirrorBuilder.addMirror( "c", "d,e", "http://de", null );
+        mirrorBuilder.addMirror( "c", "*", "http://wildcard", null );
+        mirrorBuilder.addMirror( "c", "e,f", "http://ef", null );        
 
         ArtifactRepository repo = null;
         repo = mirrorBuilder.getMirrorRepository( getRepo( "a", "http://a.a" ) );

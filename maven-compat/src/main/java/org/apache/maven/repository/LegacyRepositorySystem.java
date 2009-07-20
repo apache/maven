@@ -327,7 +327,8 @@ public class LegacyRepositorySystem
     // Mirror 
     public void addMirror( String id, String mirrorOf, String url )
     {
-        mirrorBuilder.addMirror( id, mirrorOf, url );
+        Authentication auth = id != null ? authentications.get( id ) : null;
+        mirrorBuilder.addMirror( id, mirrorOf, url, auth );
     }
 
     public List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories )

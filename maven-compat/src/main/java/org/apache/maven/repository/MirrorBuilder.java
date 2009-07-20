@@ -22,6 +22,7 @@ package org.apache.maven.repository;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.Authentication;
 
 public interface MirrorBuilder
 {
@@ -29,7 +30,7 @@ public interface MirrorBuilder
     
     List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );
     
-    void addMirror( String id, String mirrorOf, String url );
+    void addMirror( String id, String mirrorOf, String url, Authentication auth );
     
     void clearMirrors();    
 }
