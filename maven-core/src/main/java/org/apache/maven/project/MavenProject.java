@@ -1598,18 +1598,27 @@ public class MavenProject
         {
             return false;
         }
-        else
-        {
-            MavenProject otherProject = (MavenProject) other;
 
-            return getId().equals( otherProject.getId() );
-        }
+        MavenProject that = (MavenProject) other;
+
+        return eq( getArtifactId(), that.getArtifactId() )
+            && eq( getGroupId(), that.getGroupId() )
+            && eq( getVersion(), that.getVersion() );
+    }
+
+    private static <T> boolean eq( T s1, T s2 )
+    {
+        return ( s1 != null ) ? s1.equals( s2 ) : s2 == null;
     }
 
     @Override
     public int hashCode()
     {
-        return getId().hashCode();
+        int hash = 17;
+        hash = 31 * hash + getGroupId().hashCode();
+        hash = 31 * hash + getArtifactId().hashCode();
+        hash = 31 * hash + getVersion().hashCode();
+        return hash;
     }
 
     public List<Extension> getBuildExtensions()
