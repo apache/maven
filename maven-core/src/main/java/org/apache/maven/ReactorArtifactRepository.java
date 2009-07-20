@@ -20,9 +20,12 @@ public class ReactorArtifactRepository
 {
     private Map<String, MavenProject> reactorProjects;
 
+    private final int hashCode;
+
     public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects )
     {
         this.reactorProjects = reactorProjects;
+        hashCode = ( reactorProjects != null ) ? reactorProjects.keySet().hashCode() : 0;
     }
 
     @Override
@@ -182,7 +185,7 @@ public class ReactorArtifactRepository
     @Override
     public int hashCode()
     {
-        return reactorProjects != null ? reactorProjects.hashCode() : 0;
+        return hashCode;
     }
 
     @Override
@@ -203,6 +206,6 @@ public class ReactorArtifactRepository
 
         ReactorArtifactRepository other = (ReactorArtifactRepository) obj;
 
-        return eq( reactorProjects, other.reactorProjects );
+        return eq( reactorProjects.keySet(), other.reactorProjects.keySet() );
     }
 }
