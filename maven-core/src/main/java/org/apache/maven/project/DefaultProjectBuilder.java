@@ -151,7 +151,7 @@ public class DefaultProjectBuilder
                 {
                     lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(),
                                                                       configuration.getLocalRepository(),
-                                                                      project.getPluginArtifactRepositories() );
+                                                                      configuration.getPluginArtifactRepositories() );
                 }
             }
             catch ( LifecycleExecutionException e )

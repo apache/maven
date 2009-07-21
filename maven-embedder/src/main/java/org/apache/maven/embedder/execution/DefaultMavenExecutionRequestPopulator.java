@@ -29,6 +29,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
@@ -146,6 +147,18 @@ public class DefaultMavenExecutionRequestPopulator
     {
         Settings settings = request.getSettings();
 
+        //  <proxies>
+        //    <proxy>
+        //      <active>true</active>
+        //      <protocol>http</protocol>
+        //      <host>proxy.somewhere.com</host>
+        //      <port>8080</port>
+        //      <username>proxyuser</username>
+        //      <password>somepassword</password>
+        //      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+        //    </proxy>
+        //  </proxies>
+        
         /*
         Proxy proxy = settings.getActiveProxy();
 
@@ -163,8 +176,6 @@ public class DefaultMavenExecutionRequestPopulator
         for ( Server server : settings.getServers() )
         {
             repositorySystem.addAuthenticationForArtifactRepository( server.getId(), server.getUsername(), server.getPassword() );
-
-            //repositorySystem.addPermissionInfo( server.getId(), server.getFilePermissions(), server.getDirectoryPermissions() );
         }
 
         for ( Mirror mirror : settings.getMirrors() )

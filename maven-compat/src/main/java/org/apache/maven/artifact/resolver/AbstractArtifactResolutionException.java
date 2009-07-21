@@ -79,7 +79,7 @@ public class AbstractArtifactResolutionException
                                                    Throwable t )
     {
         super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ), t );
-
+        
         this.originalMessage = message;
         this.groupId = groupId;
         this.artifactId = artifactId;

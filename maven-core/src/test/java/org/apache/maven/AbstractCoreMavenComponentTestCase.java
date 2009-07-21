@@ -83,7 +83,7 @@ public abstract class AbstractCoreMavenComponentTestCase
 
     protected MavenExecutionRequest createMavenExecutionRequest( File pom )
         throws Exception
-    {
+    {        
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setPom( pom ).setProjectPresent( true )
             .setPluginGroups( Arrays.asList( new String[] { "org.apache.maven.plugins" } ) )
@@ -109,7 +109,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         throws Exception
     {
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
-
+        
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest()
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( request.getRemoteRepositories() )
@@ -153,9 +153,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         Repository itRepo = new Repository();
         itRepo.setId( "maven.it" );
         itRepo.setUrl( "http://repository.sonatype.org/content/repositories/maven.snapshots" );
-
-        return Arrays.asList( repositorySystem.buildArtifactRepository( itRepo ),
-                              repositorySystem.createDefaultRemoteRepository() );
+        return Arrays.asList(  repositorySystem.createDefaultRemoteRepository(), repositorySystem.buildArtifactRepository( itRepo ) );
     }
         
     protected ArtifactRepository getLocalRepository() 

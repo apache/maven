@@ -37,7 +37,7 @@ public class PluginResolutionException
 
     public PluginResolutionException( Plugin plugin, ArtifactResolutionException e )
     {
-        super( "Plugin could not be resolved: " + e.getMessage(), e.getGroupId(), e.getArtifactId(), e.getVersion(), "maven-plugin",null, e.getRemoteRepositories(), null, e.getCause() );
+        super( "Plugin could not be resolved: " + e.getMessage(), e.getGroupId(), e.getArtifactId(), e.getVersion(), "maven-plugin", null, e.getRemoteRepositories(), null, e.getCause() );
         this.plugin = plugin;
     }
 
