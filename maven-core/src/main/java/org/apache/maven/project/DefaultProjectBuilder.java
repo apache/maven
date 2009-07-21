@@ -140,6 +140,8 @@ public class DefaultProjectBuilder
 
             project.setOriginalModel( result.getRawModel() );
 
+//            project.setRemoteArtifactRepositories( configuration.getRemoteRepositories() );
+//            project.setPluginArtifactRepositories( configuration.getPluginArtifactRepositories() );
             project.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
             project.setPluginArtifactRepositories( listener.getPluginRepositories() );
 

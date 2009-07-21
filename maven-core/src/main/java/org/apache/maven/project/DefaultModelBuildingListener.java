@@ -59,7 +59,9 @@ class DefaultModelBuildingListener
         {
             throw new IllegalArgumentException( "project building request missing" );
         }
-        this.projectBuildingRequest = projectBuildingRequest;
+        this.projectBuildingRequest = projectBuildingRequest;        
+        this.remoteRepositories = projectBuildingRequest.getRemoteRepositories();
+        this.pluginRepositories = projectBuildingRequest.getPluginArtifactRepositories();
     }
 
     public ClassRealm getProjectRealm()
@@ -83,13 +85,9 @@ class DefaultModelBuildingListener
     {
         Model model = event.getModel();
 
-        remoteRepositories = projectBuildingRequest.getRemoteRepositories();
-        remoteRepositories =
-            projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories );
+        remoteRepositories = projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories );
 
-        pluginRepositories = projectBuildingRequest.getPluginArtifactRepositories();
-        pluginRepositories =
-            projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories );
+        pluginRepositories = projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories );
 
         if ( event.getRequest().isProcessPlugins() )
         {
