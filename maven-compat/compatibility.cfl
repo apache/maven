@@ -73,3 +73,7 @@ Support for non-unique SNAPSHOT deployments will be dropped.
 h2. Profiles
 
 Support for the profiles.xml will be dropped.
+
+h2. Maven 1.x 
+
+Support for the legacy repositories has been dropped.
