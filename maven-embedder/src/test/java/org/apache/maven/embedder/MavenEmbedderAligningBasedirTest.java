@@ -20,19 +20,15 @@ package org.apache.maven.embedder;
  */
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 
 public class MavenEmbedderAligningBasedirTest
-    extends TestCase
+    extends AbstractCoreMavenComponentTestCase
 {
     protected String basedir;
 
@@ -93,10 +89,14 @@ public class MavenEmbedderAligningBasedirTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
+        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
+
+        /*
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( targetDirectory )
             .setShowErrors( true )
             .setGoals( Arrays.asList( new String[]{"package"} ) );
+        */
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
@@ -109,5 +109,12 @@ public class MavenEmbedderAligningBasedirTest
         File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
 
         assertTrue( jar.exists() );
+    }
+
+    @Override
+    protected String getProjectsDirectory()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -20,20 +20,18 @@ package org.apache.maven.embedder.validation;
  */
 
 import java.io.File;
-import java.util.Arrays;
 
+import org.apache.maven.embedder.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.embedder.Configuration;
 import org.apache.maven.embedder.ConfigurationValidationResult;
 import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.SimpleConfiguration;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusTestCase;
 
 public class MavenEmbedderCrappySettingsConfigurationTest
-    extends PlexusTestCase
+    extends AbstractCoreMavenComponentTestCase
 {
     public void testEmbedderWillStillStartupWhenTheSettingsConfigurationIsCrap()
         throws Exception
@@ -55,9 +53,13 @@ public class MavenEmbedderCrappySettingsConfigurationTest
 
         //assertNotNull( embedder.getLocalRepository().getBasedir() );
 
+        MavenExecutionRequest request = createMavenExecutionRequest( new File( projectDirectory, "pom.xml" ) );        
+        
+        /*
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( projectDirectory )
             .setGoals( Arrays.asList( new String[]{"validate"} ) );
+        */
 
         MavenExecutionResult result = embedder.execute( request );
         
@@ -77,5 +79,12 @@ public class MavenEmbedderCrappySettingsConfigurationTest
         assertEquals( "development", environment );
 
         // END SNIPPET: simple-embedder-example
+    }
+
+    @Override
+    protected String getProjectsDirectory()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

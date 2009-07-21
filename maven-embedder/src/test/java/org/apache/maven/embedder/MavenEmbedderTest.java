@@ -26,8 +26,6 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -49,7 +47,7 @@ import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class MavenEmbedderTest
-    extends TestCase
+    extends AbstractCoreMavenComponentTestCase
 {
     protected String basedir;
 
@@ -110,10 +108,14 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
+        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
+
+        /*
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( targetDirectory )
             .setShowErrors( true )
             .setGoals( Arrays.asList( new String[]{"package"} ) );
+        */
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
@@ -137,10 +139,14 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
+        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
+        
+        /*
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( targetDirectory )
             .setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "install" } ) );
+        */
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
         
@@ -186,9 +192,13 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
+        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
+
+        /*
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setPom( new File( targetDirectory, "pom.xml" ) ).setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "package" } ) );
+        */
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
@@ -214,10 +224,14 @@ public class MavenEmbedderTest
 
         // Check with profile not active
 
+        MavenExecutionRequest requestWithoutProfile = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
+
+        /*
         MavenExecutionRequest requestWithoutProfile = new DefaultMavenExecutionRequest()
             .setPom( new File( targetDirectory, "pom.xml" ) )
             .setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "validate" } ) );
+        */
 
         MavenExecutionResult r0 = mavenEmbedder.execute( requestWithoutProfile );
 
@@ -233,11 +247,16 @@ public class MavenEmbedderTest
 
         // Check with profile activated
 
+        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
+        request.addActiveProfile( "embedderProfile" );
+        
+        /*
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setPom( new File( targetDirectory, "pom.xml" ) )
             .setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "validate" } ) )
             .addActiveProfile( "embedderProfile" );
+        */
 
         MavenExecutionResult r1 = mavenEmbedder.execute( request );
 
@@ -282,9 +301,12 @@ public class MavenEmbedderTest
         mavenEmbedder.writeModel( writer, model );
         writer.close();
 
-        /* execute maven */
+        MavenExecutionRequest request = createMavenExecutionRequest( pom );
+        
+        /*
         MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPom( pom ).setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "package" } ) );
+        */
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
@@ -301,9 +323,13 @@ public class MavenEmbedderTest
         mavenEmbedder.writeModel( writer, model );
         writer.close();
 
-        /* execute Maven */
+        request = createMavenExecutionRequest( pom );
+        
+        /*
         request = new DefaultMavenExecutionRequest().setPom( pom ).setShowErrors( true )
             .setGoals( Arrays.asList( new String[] { "package" } ) );
+        */
+            
         result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );
@@ -313,22 +339,6 @@ public class MavenEmbedderTest
         p = project.getPluginArtifactMap().get( plugin.getKey() );
         assertEquals( "2.4.3", p.getVersion() );
     }
-
-    // ----------------------------------------------------------------------
-    // Repository
-    // ----------------------------------------------------------------------
-
-    /*
-    public void testLocalRepositoryRetrieval()
-        throws Exception
-    {
-        assertNotNull( mavenEmbedder.getLocalRepository().getBasedir() );
-    }
-    */
-
-    // ----------------------------------------------------------------------
-    // Model Reading
-    // ----------------------------------------------------------------------
 
     public void testModelReading()
         throws Exception
@@ -520,4 +530,9 @@ public class MavenEmbedderTest
         return new File( basedir, "src/test/resources/" + name );
     }
 
+    @Override
+    protected String getProjectsDirectory()
+    {
+        return null;
+    }
 }

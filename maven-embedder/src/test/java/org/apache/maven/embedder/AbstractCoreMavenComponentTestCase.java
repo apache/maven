@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.embedder;
 
 import java.io.File;
 import java.util.Arrays;
