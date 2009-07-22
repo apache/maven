@@ -50,7 +50,7 @@ public class Proxy
     /**
      * Type of the proxy
      */
-    private String type;
+    private String protocol;
 
     /**
      * The non-proxy hosts. Follows Java system property format: <code>*.foo.com|localhost</code>.
@@ -152,17 +152,17 @@ public class Proxy
      * 
      * @return the type of the proxy server
      */
-    public String getType()
+    public String getProtocol()
     {
-        return type;
+        return protocol;
     }
 
     /**
      * @param type the type of the proxy server like <i>SOCKSv4</i>
      */
-    public void setType( String type )
+    public void setProtocol( String protocol )
     {
-        this.type = type;
+        this.protocol = protocol;
     }
 
     public String getNonProxyHosts()

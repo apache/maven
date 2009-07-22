@@ -18,6 +18,7 @@ package org.apache.maven.artifact.repository;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.repository.Proxy;
 
 public interface ArtifactRepository
 {
@@ -58,7 +59,9 @@ public interface ArtifactRepository
     //
     Artifact find( Artifact artifact );
     
-    void setAuthentication( Authentication authentication );
-    
+    void setAuthentication( Authentication authentication );    
     Authentication getAuthentication();
+    
+    void setProxy( Proxy proxy );
+    Proxy getProxy();
 }

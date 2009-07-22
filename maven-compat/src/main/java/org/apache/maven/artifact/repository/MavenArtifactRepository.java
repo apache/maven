@@ -24,6 +24,7 @@ import java.io.File;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.repository.Proxy;
 
 //TODO: completely separate local and remote artifact repositories
 public class MavenArtifactRepository
@@ -44,6 +45,8 @@ public class MavenArtifactRepository
     private ArtifactRepositoryPolicy releases;
     
     private Authentication authentication;
+    
+    private Proxy proxy;
     
     public MavenArtifactRepository()
     {
@@ -352,5 +355,15 @@ public class MavenArtifactRepository
     public void setAuthentication( Authentication authentication )
     {
         this.authentication = authentication;        
+    }
+
+    public Proxy getProxy()
+    {
+        return proxy;
+    }
+
+    public void setProxy( Proxy proxy )
+    {
+        this.proxy = proxy;
     }
 }

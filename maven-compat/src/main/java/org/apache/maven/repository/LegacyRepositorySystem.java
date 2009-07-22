@@ -86,6 +86,10 @@ public class LegacyRepositorySystem
     @Requirement
     private PlexusContainer plexus;
 
+    private Map<String, Authentication> authentications = new HashMap<String, Authentication>();
+
+    private Map<String, Proxy> proxies = new HashMap<String,Proxy>();
+    
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
@@ -490,8 +494,6 @@ public class LegacyRepositorySystem
         wagonManager.putRemoteFile( repository, source, remotePath, downloadMonitor );
     }
 
-    private Map<String, Authentication> authentications = new HashMap<String, Authentication>();
-
     //
     // serverId = repository id
     //
@@ -550,6 +552,25 @@ public class LegacyRepositorySystem
             artifactRepository.setAuthentication( authentication );
         }
         
+        Proxy proxy = proxies.get(  artifactRepository.getProtocol() );
+        
+        if ( proxy != null )
+        {
+            artifactRepository.setProxy( proxy );
+        }
+        
         return artifactRepository;
+    }
+
+    public void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )
+    {
+        Proxy proxy = new Proxy();
+        proxy.setHost( host );
+        proxy.setProtocol( protocol );
+        proxy.setPort( port );
+        proxy.setNonProxyHosts( nonProxyHosts );
+        proxy.setUserName( username );
+        proxy.setPassword( password );
+        proxies.put( protocol, proxy );        
     }   
 }

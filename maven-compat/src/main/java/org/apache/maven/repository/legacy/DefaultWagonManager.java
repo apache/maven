@@ -223,24 +223,41 @@ public class DefaultWagonManager
     {
         if ( repository.getAuthentication() != null )
         {
-            //
-            // We have authentication we have been asked to deal with.
-            //
-            AuthenticationInfo ai = new AuthenticationInfo();
-            ai.setUserName( repository.getAuthentication().getUsername() );
-            ai.setPassword( repository.getAuthentication().getPassword() );
-            
-            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), ai );                    
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), authenticationInfo( repository ) );                    
+        }
+        else if ( repository.getProxy() != null )
+        {
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), proxyInfo( repository ) );                    
+        }
+        else if ( repository.getAuthentication() != null && repository.getProxy() != null )
+        {
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), authenticationInfo( repository ), proxyInfo( repository ) );                                
         }
         else
         {
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ) );                    
         }
-        
-        //
-        // ProxyInfo proxyInfo = new ProxyInfo();
-        //        
     }    
+    
+    private AuthenticationInfo authenticationInfo( ArtifactRepository repository )
+    {
+        AuthenticationInfo ai = new AuthenticationInfo();
+        ai.setUserName( repository.getAuthentication().getUsername() );
+        ai.setPassword( repository.getAuthentication().getPassword() );
+        return ai;        
+    }
+    
+    private ProxyInfo proxyInfo( ArtifactRepository repository )
+    {
+        ProxyInfo proxyInfo = new ProxyInfo();
+        proxyInfo.setHost( repository.getProxy().getHost() );
+        proxyInfo.setType( repository.getProxy().getProtocol() );
+        proxyInfo.setPort( repository.getProxy().getPort() );
+        proxyInfo.setNonProxyHosts( repository.getProxy().getNonProxyHosts() );
+        proxyInfo.setUserName( repository.getProxy().getUserName() );
+        proxyInfo.setPassword( repository.getProxy().getPassword() );            
+        return proxyInfo;
+    }
     
     public void getRemoteFile( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor, String checksumPolicy, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException

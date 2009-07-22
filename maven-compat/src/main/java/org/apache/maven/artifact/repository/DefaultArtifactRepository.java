@@ -24,6 +24,7 @@ import java.io.File;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.repository.Proxy;
 import org.apache.maven.wagon.repository.Repository;
 
 /**
@@ -213,6 +214,19 @@ public class DefaultArtifactRepository
     }
 
     public void setAuthentication( Authentication authentication )
+    {
+        // do nothing
+    }
+    
+    //
+    // This implementation does not support proxies
+    //
+    public Proxy getProxy()
+    {
+        return null;
+    }
+
+    public void setProxy( Proxy proxy )
     {
         // do nothing
     }

@@ -186,7 +186,6 @@ public class DefaultMavenExecutionRequestPopulator
         //    </proxy>
         //  </proxies>
 
-        /*
         Proxy proxy = settings.getActiveProxy();
 
         if ( proxy != null )
@@ -198,7 +197,6 @@ public class DefaultMavenExecutionRequestPopulator
 
             repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
         }
-        */
 
         for ( Server server : settings.getServers() )
         {

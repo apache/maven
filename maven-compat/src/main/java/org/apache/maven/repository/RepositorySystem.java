@@ -114,5 +114,7 @@ public interface RepositorySystem
     void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
         throws TransferFailedException, ResourceDoesNotExistException; 
         
-    void addAuthenticationForArtifactRepository( String repositoryId, String username, String password );    
+    void addAuthenticationForArtifactRepository( String repositoryId, String username, String password );
+
+    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );    
 }
