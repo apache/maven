@@ -117,30 +117,6 @@ public class MavenEmbedderTest
         }
     }
 
-    public void testExecutionUsingAPomFile()
-        throws Exception
-    {
-        File testDirectory = new File( basedir, "src/test/embedder-test-project" );
-
-        File targetDirectory = new File( basedir, "target/embedder-test-project1" );
-
-        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
-
-        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
-
-        MavenExecutionResult result = mavenEmbedder.execute( request );
-
-        assertNoExceptions( result );
-        
-        MavenProject project = result.getProject();
-
-        assertEquals( "embedder-test-project", project.getArtifactId() );
-
-        File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
-
-        assertTrue( jar.exists() );
-    }
-
     public void testExecutionUsingAProfileWhichSetsAProperty()
         throws Exception
     {
