@@ -29,7 +29,9 @@ import org.apache.maven.model.Repository;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
- * Assists the project builder.
+ * Assists the project builder. <strong>Warning:</strong> This is an internal utility interface that is only public for
+ * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
+ * prior notice.
  * 
  * @author Benjamin Bentmann
  */
