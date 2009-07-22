@@ -93,26 +93,6 @@ public class MavenEmbedderTest
 
         fail( "Encountered Exceptions in MavenExecutionResult during " + getName() );
     }
-
-    public void testWithOptionalDependencies()
-        throws Exception
-    {
-        File testDirectory = new File( basedir, "src/test/projects/optional-dep" );
-
-        File targetDirectory = new File( basedir, "target/projects/option-dep" );
-
-        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
-
-        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
-        
-        MavenExecutionResult result = mavenEmbedder.execute( request );
-        
-        if (result.hasExceptions() )
-        {
-            result.getExceptions().get( 0 ).printStackTrace();
-            fail( "Project didn't execute correctly.");
-        }
-    }
         
     /*MNG-3919*/
     public void testWithInvalidGoal()
