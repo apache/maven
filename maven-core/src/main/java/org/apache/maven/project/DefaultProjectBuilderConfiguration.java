@@ -52,7 +52,7 @@ public class DefaultProjectBuilderConfiguration
 
     public ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties )
     {
-        super.setExecutionProperties( executionProperties );
+        super.setSystemProperties( executionProperties );
         return this;
     }
 

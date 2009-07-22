@@ -71,9 +71,10 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
         super.tearDown();
     }
 
-    protected ProfileActivationContext newContext( final Properties executionProperties )
+    protected ProfileActivationContext newContext( final Properties userProperties, final Properties systemProperties )
     {
-        return new DefaultProfileActivationContext().setExecutionProperties( executionProperties );
+        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
+        return context.setUserProperties( userProperties ).setSystemProperties( systemProperties );
     }
 
 }

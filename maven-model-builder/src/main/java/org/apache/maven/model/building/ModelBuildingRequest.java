@@ -180,19 +180,40 @@ public interface ModelBuildingRequest
     ModelBuildingRequest setInactiveProfileIds( List<String> inactiveProfileIds );
 
     /**
-     * Gets the execution properties.
+     * Gets the system properties to use for interpolation and profile activation. The system properties are collected
+     * from the runtime environment like {@link System#getProperties()} and environment variables.
      * 
-     * @return The execution properties, never {@code null}.
+     * @return The system properties, never {@code null}.
      */
-    Properties getExecutionProperties();
+    Properties getSystemProperties();
 
     /**
-     * Sets the execution properties.
+     * Sets the system properties to use for interpolation and profile activation. The system properties are collected
+     * from the runtime environment like {@link System#getProperties()} and environment variables.
      * 
-     * @param executionProperties The execution properties, may be {@code null}.
+     * @param systemProperties The system properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setExecutionProperties( Properties executionProperties );
+    ModelBuildingRequest setSystemProperties( Properties systemProperties );
+
+    /**
+     * Gets the user properties to use for interpolation and profile activation. The user properties have been
+     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
+     * line.
+     * 
+     * @return The user properties, never {@code null}.
+     */
+    Properties getUserProperties();
+
+    /**
+     * Sets the user properties to use for interpolation and profile activation. The user properties have been
+     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
+     * line.
+     * 
+     * @param userProperties The user properties, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    ModelBuildingRequest setUserProperties( Properties userProperties );
 
     /**
      * Gets the start time of the build.

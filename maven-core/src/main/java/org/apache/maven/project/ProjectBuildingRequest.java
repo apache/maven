@@ -22,9 +22,41 @@ public interface ProjectBuildingRequest
 
     List<ArtifactRepository> getPluginArtifactRepositories();
 
-    ProjectBuildingRequest setExecutionProperties( Properties executionProperties );
+    /**
+     * Sets the system properties to use for interpolation and profile activation. The system properties are collected
+     * from the runtime environment like {@link System#getProperties()} and environment variables.
+     * 
+     * @param systemProperties The system properties, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    ProjectBuildingRequest setSystemProperties( Properties systemProperties );
 
-    Properties getExecutionProperties();
+    /**
+     * Gets the system properties to use for interpolation and profile activation. The system properties are collected
+     * from the runtime environment like {@link System#getProperties()} and environment variables.
+     * 
+     * @return The system properties, never {@code null}.
+     */
+    Properties getSystemProperties();
+
+    /**
+     * Sets the user properties to use for interpolation and profile activation. The user properties have been
+     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
+     * line.
+     * 
+     * @param userProperties The user properties, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    ProjectBuildingRequest setUserProperties( Properties userProperties );
+
+    /**
+     * Gets the user properties to use for interpolation and profile activation. The user properties have been
+     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
+     * line.
+     * 
+     * @return The user properties, never {@code null}.
+     */
+    Properties getUserProperties();
 
     void setTopLevelProjectForReactor(MavenProject mavenProject);
 

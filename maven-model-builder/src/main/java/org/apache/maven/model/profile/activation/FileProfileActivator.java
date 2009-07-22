@@ -109,7 +109,9 @@ public class FileProfileActivator
             return false;
         }
 
-        interpolator.addValueSource( new MapBasedValueSource( context.getExecutionProperties() ) );
+        interpolator.addValueSource( new MapBasedValueSource( context.getUserProperties() ) );
+
+        interpolator.addValueSource( new MapBasedValueSource( context.getSystemProperties() ) );
 
         try
         {

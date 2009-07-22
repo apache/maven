@@ -119,7 +119,7 @@ public class MavenMetadataSource
             // We don't care about processing plugins here, all we're interested in is the dependencies.
             configuration.setProcessPlugins( false );
             // FIXME: We actually need the execution properties here...
-            configuration.setExecutionProperties( System.getProperties() );
+            configuration.setSystemProperties( System.getProperties() );
 
             try
             {

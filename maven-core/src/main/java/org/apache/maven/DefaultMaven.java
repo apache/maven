@@ -77,7 +77,7 @@ public class DefaultMaven
         //TODO: Need a general way to inject standard properties
         if ( request.getStartTime() != null )
         {
-            request.getProperties().put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
+            request.getSystemProperties().put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
         }        
         
         request.setStartTime( new Date() );

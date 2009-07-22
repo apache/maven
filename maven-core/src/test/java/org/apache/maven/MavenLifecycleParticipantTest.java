@@ -65,7 +65,7 @@ public class MavenLifecycleParticipantTest
         @Override
         public void afterSessionStart( MavenSession session )
         {
-            session.getExecutionProperties().setProperty( "injected", "bar" );
+            session.getUserProperties().setProperty( "injected", "bar" );
         }
 
     }

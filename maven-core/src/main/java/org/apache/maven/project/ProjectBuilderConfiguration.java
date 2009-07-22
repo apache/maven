@@ -20,7 +20,7 @@ public interface ProjectBuilderConfiguration
 
     ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties );
 
-    Properties getExecutionProperties();
+    Properties getSystemProperties();
 
     void setTopLevelProjectForReactor(MavenProject mavenProject);
 

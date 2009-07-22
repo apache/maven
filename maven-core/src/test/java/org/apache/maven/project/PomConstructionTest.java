@@ -1677,7 +1677,8 @@ public class PomConstructionTest
         localRepoUrl = "file://" + localRepoUrl;
         config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null, null ) );
         config.setActiveProfileIds( Arrays.asList( profileIds ) );
-        config.setExecutionProperties( executionProperties );
+        config.setSystemProperties( executionProperties );
+        config.setUserProperties( executionProperties );
         config.setValidationLevel( lenientValidation ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                         : ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
 

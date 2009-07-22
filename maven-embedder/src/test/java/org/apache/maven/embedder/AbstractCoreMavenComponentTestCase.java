@@ -98,7 +98,7 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setRemoteRepositories( getRemoteRepositories() )
             .setPluginArtifactRepositories( getPluginArtifactRepositories() )
             .setGoals( Arrays.asList( new String[] { "package" } ) )
-            .setProperties( new Properties() );
+            .setSystemProperties( new Properties() );
 
         return request;
     }
@@ -121,7 +121,7 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( request.getRemoteRepositories() )
             .setPluginArtifactRepositories( request.getPluginArtifactRepositories() )
-            .setExecutionProperties( executionProperties );
+            .setSystemProperties( executionProperties );
 
         MavenProject project = null;
 

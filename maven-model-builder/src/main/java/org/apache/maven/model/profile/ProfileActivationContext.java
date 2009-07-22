@@ -62,19 +62,40 @@ public interface ProfileActivationContext
     ProfileActivationContext setInactiveProfileIds( List<String> inactiveProfileIds );
 
     /**
-     * Gets the execution properties.
+     * Gets the system properties to use for interpolation and profile activation. The system properties are collected
+     * from the runtime environment like {@link System#getProperties()} and environment variables.
      * 
      * @return The execution properties, never {@code null}.
      */
-    Properties getExecutionProperties();
+    Properties getSystemProperties();
 
     /**
-     * Sets the execution properties.
+     * Sets the system properties to use for interpolation and profile activation. The system properties are collected
+     * from the runtime environment like {@link System#getProperties()} and environment variables.
      * 
      * @param executionProperties The execution properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    ProfileActivationContext setExecutionProperties( Properties executionProperties );
+    ProfileActivationContext setSystemProperties( Properties executionProperties );
+
+    /**
+     * Gets the user properties to use for interpolation and profile activation. The user properties have been
+     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
+     * line.
+     * 
+     * @return The user properties, never {@code null}.
+     */
+    Properties getUserProperties();
+
+    /**
+     * Sets the user properties to use for interpolation and profile activation. The user properties have been
+     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
+     * line.
+     * 
+     * @param userProperties The user properties, may be {@code null}.
+     * @return This context, never {@code null}.
+     */
+    ProfileActivationContext setUserProperties( Properties userProperties );
 
     /**
      * Gets the base directory of the current project (if any).

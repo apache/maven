@@ -221,9 +221,9 @@ public final class CLIRequestUtils
             loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_INFO;
         }
 
-        Properties executionProperties = new Properties();
+        Properties systemProperties = new Properties();
         Properties userProperties = new Properties();
-        populateProperties( commandLine, executionProperties, userProperties );
+        populateProperties( commandLine, systemProperties, userProperties );
 
         File userToolchainsFile;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
@@ -238,7 +238,8 @@ public final class CLIRequestUtils
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setBaseDirectory( baseDirectory )
             .setGoals( goals )
-            .setProperties( executionProperties ) // optional
+            .setSystemProperties( systemProperties )
+            .setUserProperties( userProperties )
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setShowErrors( showErrors ) // default: false
@@ -297,7 +298,12 @@ public final class CLIRequestUtils
             request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_BOTH );
         }
 
-        String localRepoProperty = request.getProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+        String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+
+        if ( localRepoProperty == null )
+        {
+            localRepoProperty = request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+        }
 
         if ( localRepoProperty != null )
         {
@@ -311,7 +317,7 @@ public final class CLIRequestUtils
     // System properties handling
     // ----------------------------------------------------------------------
 
-    static void populateProperties( CommandLine commandLine, Properties executionProperties, Properties userProperties )
+    static void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
     {
         // add the env vars to the property set, with the "env." prefix
         // XXX support for env vars should probably be removed from the ModelInterpolator
@@ -320,7 +326,7 @@ public final class CLIRequestUtils
             Properties envVars = CommandLineUtils.getSystemEnvVars();
             for ( Entry<Object, Object> e : envVars.entrySet() )
             {
-                executionProperties.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
+                systemProperties.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
             }
         }
         catch ( IOException e )
@@ -345,14 +351,12 @@ public final class CLIRequestUtils
                     setCliProperty( defStrs[i], userProperties );
                 }
             }
-
-            executionProperties.putAll( userProperties );
         }
 
-        executionProperties.putAll( System.getProperties() );
+        systemProperties.putAll( System.getProperties() );
     }
 
-    private static void setCliProperty( String property, Properties executionProperties )
+    private static void setCliProperty( String property, Properties properties )
     {
         String name;
 
@@ -373,7 +377,7 @@ public final class CLIRequestUtils
             value = property.substring( i + 1 ).trim();
         }
 
-        executionProperties.setProperty( name, value );
+        properties.setProperty( name, value );
 
         // ----------------------------------------------------------------------
         // I'm leaving the setting of system properties here as not to break

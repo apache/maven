@@ -331,7 +331,7 @@ public class PluginParameterExpressionEvaluatorTest
         throws CycleDetectedException, DuplicateProjectException
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setProperties( properties )
+            .setSystemProperties( properties )
             .setGoals( Collections.EMPTY_LIST )
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );

@@ -55,9 +55,9 @@ public class CLIRequestUtilsTest
 
         MavenExecutionRequest request = CLIRequestUtils.buildRequest( commandLine, false, false, false );
 
-        Properties execProperties = request.getProperties();
+        Properties userProperties = request.getUserProperties();
 
-        assertEquals( value, execProperties.getProperty( key ) );
+        assertEquals( value, userProperties.getProperty( key ) );
 
         List goals = request.getGoals();
         assertTrue( ( goals == null ) || goals.isEmpty() );
@@ -93,8 +93,5 @@ public class CLIRequestUtilsTest
 
         assertEquals( "3.0", execProperties.getProperty( "test.property.3" ) );
         assertEquals( "3.0", userProperties.getProperty( "test.property.3" ) );
-
-        // sys props should override cmdline props
-        //assertEquals( "2.0", p.getProperty( "test.property.2" ) );
     }
 }

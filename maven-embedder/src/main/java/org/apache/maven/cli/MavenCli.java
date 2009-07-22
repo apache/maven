@@ -253,7 +253,7 @@ public class MavenCli
             configuration.setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
         }
 
-        String localRepoProperty = request.getProperties().getProperty( LOCAL_REPO_PROPERTY );
+        String localRepoProperty = request.getUserProperties().getProperty( LOCAL_REPO_PROPERTY );
 
         if ( localRepoProperty != null )
         {

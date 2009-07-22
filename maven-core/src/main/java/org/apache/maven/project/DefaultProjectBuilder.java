@@ -211,7 +211,8 @@ public class DefaultProjectBuilder
         request.setProfiles( configuration.getProfiles() );
         request.setActiveProfileIds( configuration.getActiveProfileIds() );
         request.setInactiveProfileIds( configuration.getInactiveProfileIds() );
-        request.setExecutionProperties( configuration.getExecutionProperties() );
+        request.setSystemProperties( configuration.getSystemProperties() );
+        request.setUserProperties( configuration.getUserProperties() );
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
 

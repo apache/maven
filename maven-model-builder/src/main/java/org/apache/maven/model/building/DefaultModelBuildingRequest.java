@@ -51,7 +51,9 @@ public class DefaultModelBuildingRequest
 
     private List<String> inactiveProfileIds;
 
-    private Properties executionProperties;
+    private Properties systemProperties;
+
+    private Properties userProperties;
 
     private Date buildStartTime;
 
@@ -179,26 +181,51 @@ public class DefaultModelBuildingRequest
         return this;
     }
 
-    public Properties getExecutionProperties()
+    public Properties getSystemProperties()
     {
-        if ( executionProperties == null )
+        if ( systemProperties == null )
         {
-            executionProperties = new Properties();
+            systemProperties = new Properties();
         }
 
-        return executionProperties;
+        return systemProperties;
     }
 
-    public DefaultModelBuildingRequest setExecutionProperties( Properties executionProperties )
+    public DefaultModelBuildingRequest setSystemProperties( Properties systemProperties )
     {
-        if ( executionProperties != null )
+        if ( systemProperties != null )
         {
-            this.executionProperties = new Properties();
-            this.executionProperties.putAll( executionProperties );
+            this.systemProperties = new Properties();
+            this.systemProperties.putAll( systemProperties );
         }
         else
         {
-            this.executionProperties = null;
+            this.systemProperties = null;
+        }
+
+        return this;
+    }
+
+    public Properties getUserProperties()
+    {
+        if ( userProperties == null )
+        {
+            userProperties = new Properties();
+        }
+
+        return userProperties;
+    }
+
+    public DefaultModelBuildingRequest setUserProperties( Properties userProperties )
+    {
+        if ( userProperties != null )
+        {
+            this.userProperties = new Properties();
+            this.userProperties.putAll( userProperties );
+        }
+        else
+        {
+            this.userProperties = null;
         }
 
         return this;

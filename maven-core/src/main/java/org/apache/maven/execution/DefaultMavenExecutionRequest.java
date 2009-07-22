@@ -91,7 +91,9 @@ public class DefaultMavenExecutionRequest
 
     private String makeBehavior;
 
-    private Properties properties;
+    private Properties systemProperties;
+
+    private Properties userProperties;
 
     private Date startTime;
 
@@ -143,7 +145,8 @@ public class DefaultMavenExecutionRequest
         copy.setGoals( original.getGoals() );
         copy.setRecursive( original.isRecursive() );
         copy.setPom( original.getPom() );
-        copy.setProperties( original.getProperties() );
+        copy.setSystemProperties( original.getSystemProperties() );
+        copy.setUserProperties( original.getUserProperties() );
         copy.setShowErrors( original.isShowErrors() );
         copy.setActiveProfiles( original.getActiveProfiles() );
         copy.setInactiveProfiles( original.getInactiveProfiles() );
@@ -186,14 +189,24 @@ public class DefaultMavenExecutionRequest
         return goals;
     }
 
-    public Properties getProperties()
+    public Properties getSystemProperties()
     {
-        if ( properties == null )
+        if ( systemProperties == null )
         {
-            properties = new Properties();
+            systemProperties = new Properties();
         }
 
-        return properties;
+        return systemProperties;
+    }
+
+    public Properties getUserProperties()
+    {
+        if ( userProperties == null )
+        {
+            userProperties = new Properties();
+        }
+
+        return userProperties;
     }
 
     public File getPom()
@@ -411,24 +424,32 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public MavenExecutionRequest setProperties( Properties properties )
+    public MavenExecutionRequest setSystemProperties( Properties properties )
     {
         if ( properties != null )
         {
-            this.properties = new Properties();
-            this.properties.putAll( properties );
+            this.systemProperties = new Properties();
+            this.systemProperties.putAll( properties );
         }
         else
         {
-            this.properties = null;
+            this.systemProperties = null;
         }
 
         return this;
     }
 
-    public MavenExecutionRequest setProperty( String key, String value )
+    public MavenExecutionRequest setUserProperties( Properties userProperties )
     {
-        getProperties().setProperty( key, value );
+        if ( userProperties != null )
+        {
+            this.userProperties = new Properties();
+            this.userProperties.putAll( userProperties );
+        }
+        else
+        {
+            this.userProperties = null;
+        }
 
         return this;
     }
@@ -868,7 +889,8 @@ public class DefaultMavenExecutionRequest
         {
             projectBuildingRequest = new DefaultProjectBuildingRequest();
             projectBuildingRequest.setLocalRepository( getLocalRepository() );
-            projectBuildingRequest.setExecutionProperties( getProperties() );
+            projectBuildingRequest.setSystemProperties( getSystemProperties() );
+            projectBuildingRequest.setUserProperties( getUserProperties() );
             projectBuildingRequest.setRemoteRepositories( getRemoteRepositories() );
             projectBuildingRequest.setPluginArtifactRepositories( getPluginArtifactRepositories() );
             projectBuildingRequest.setActiveProfileIds( getActiveProfiles() );

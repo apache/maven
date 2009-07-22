@@ -37,7 +37,9 @@ public class DefaultProfileActivationContext
 
     private List<String> inactiveProfileIds;
 
-    private Properties executionProperties;
+    private Properties systemProperties;
+
+    private Properties userProperties;
 
     private File projectDirectory;
 
@@ -89,26 +91,51 @@ public class DefaultProfileActivationContext
         return this;
     }
 
-    public Properties getExecutionProperties()
+    public Properties getSystemProperties()
     {
-        if ( executionProperties == null )
+        if ( systemProperties == null )
         {
-            executionProperties = new Properties();
+            systemProperties = new Properties();
         }
 
-        return executionProperties;
+        return systemProperties;
     }
 
-    public DefaultProfileActivationContext setExecutionProperties( Properties executionProperties )
+    public DefaultProfileActivationContext setSystemProperties( Properties systemProperties )
     {
-        if ( executionProperties != null )
+        if ( systemProperties != null )
         {
-            this.executionProperties = new Properties();
-            this.executionProperties.putAll( executionProperties );
+            this.systemProperties = new Properties();
+            this.systemProperties.putAll( systemProperties );
         }
         else
         {
-            this.executionProperties = null;
+            this.systemProperties = null;
+        }
+
+        return this;
+    }
+
+    public Properties getUserProperties()
+    {
+        if ( userProperties == null )
+        {
+            userProperties = new Properties();
+        }
+
+        return userProperties;
+    }
+
+    public DefaultProfileActivationContext setUserProperties( Properties userProperties )
+    {
+        if ( userProperties != null )
+        {
+            this.userProperties = new Properties();
+            this.userProperties.putAll( userProperties );
+        }
+        else
+        {
+            this.userProperties = null;
         }
 
         return this;

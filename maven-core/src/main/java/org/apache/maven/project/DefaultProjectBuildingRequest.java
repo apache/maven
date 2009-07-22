@@ -52,7 +52,9 @@ public class DefaultProjectBuildingRequest
 
     private List<String> inactiveProfileIds;
 
-    private Properties executionProperties;
+    private Properties systemProperties;
+
+    private Properties userProperties;
 
     private Date buildStartTime;
 
@@ -62,7 +64,8 @@ public class DefaultProjectBuildingRequest
         profiles = new ArrayList<Profile>();
         activeProfileIds = new ArrayList<String>();
         inactiveProfileIds = new ArrayList<String>();
-        executionProperties = new Properties();
+        systemProperties = new Properties();
+        userProperties = new Properties();
         remoteRepositories = new ArrayList<ArtifactRepository>();
         pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
     }
@@ -126,21 +129,41 @@ public class DefaultProjectBuildingRequest
         return this;
     }
 
-    public Properties getExecutionProperties()
+    public Properties getSystemProperties()
     {
-        return executionProperties;
+        return systemProperties;
     }
 
-    public ProjectBuildingRequest setExecutionProperties( Properties executionProperties )
+    public ProjectBuildingRequest setSystemProperties( Properties systemProperties )
     {
-        if ( executionProperties != null )
+        if ( systemProperties != null )
         {
-            this.executionProperties = new Properties();
-            this.executionProperties.putAll( executionProperties );
+            this.systemProperties = new Properties();
+            this.systemProperties.putAll( systemProperties );
         }
         else
         {
-            this.executionProperties.clear();
+            this.systemProperties.clear();
+        }
+
+        return this;
+    }
+
+    public Properties getUserProperties()
+    {
+        return userProperties;
+    }
+
+    public ProjectBuildingRequest setUserProperties( Properties userProperties )
+    {
+        if ( userProperties != null )
+        {
+            this.userProperties = new Properties();
+            this.userProperties.putAll( userProperties );
+        }
+        else
+        {
+            this.userProperties.clear();
         }
 
         return this;

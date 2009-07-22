@@ -315,7 +315,8 @@ public class DefaultModelBuilder
 
         context.setActiveProfileIds( request.getActiveProfileIds() );
         context.setInactiveProfileIds( request.getInactiveProfileIds() );
-        context.setExecutionProperties( request.getExecutionProperties() );
+        context.setSystemProperties( request.getSystemProperties() );
+        context.setUserProperties( request.getUserProperties() );
         context.setProjectDirectory( ( request.getPomFile() != null ) ? request.getPomFile().getParentFile() : null );
 
         return context;

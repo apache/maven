@@ -48,7 +48,12 @@ public class ProfileActivationContext
         this.isCustomActivatorFailureSuppressed = isCustomActivatorFailureSuppressed;
     }
 
-    public Properties getExecutionProperties()
+    public Properties getSystemProperties()
+    {
+        return executionProperties;
+    }
+
+    public Properties getUserProperties()
     {
         return executionProperties;
     }
@@ -169,12 +174,16 @@ public class ProfileActivationContext
         return this;
     }
 
-    public org.apache.maven.model.profile.ProfileActivationContext setExecutionProperties(
-                                                                                           Properties executionProperties )
+    public org.apache.maven.model.profile.ProfileActivationContext setSystemProperties( Properties systemProperties )
     {
         this.executionProperties.clear();
-        this.executionProperties.putAll( executionProperties );
+        this.executionProperties.putAll( systemProperties );
         return this;
+    }
+
+    public org.apache.maven.model.profile.ProfileActivationContext setUserProperties( Properties userProperties )
+    {
+        return setSystemProperties( userProperties );
     }
 
     public org.apache.maven.model.profile.ProfileActivationContext setInactiveProfileIds(

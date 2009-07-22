@@ -52,7 +52,7 @@ public class JdkVersionProfileActivator
 
             if ( jdk != null )
             {
-                String version = context.getExecutionProperties().getProperty( "java.version", "" );
+                String version = context.getSystemProperties().getProperty( "java.version", "" );
 
                 if ( version.length() <= 0 )
                 {

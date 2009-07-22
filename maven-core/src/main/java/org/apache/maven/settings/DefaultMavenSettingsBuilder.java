@@ -131,7 +131,9 @@ public class DefaultMavenSettingsBuilder
 
         RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
-        interpolator.addValueSource( new PropertiesBasedValueSource( request.getProperties() ) );
+        interpolator.addValueSource( new PropertiesBasedValueSource( request.getUserProperties() ) );
+
+        interpolator.addValueSource( new PropertiesBasedValueSource( request.getSystemProperties() ) );
 
         interpolator.addValueSource( new EnvarBasedValueSource() );
 

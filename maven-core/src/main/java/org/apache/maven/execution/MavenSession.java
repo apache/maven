@@ -45,7 +45,9 @@ public class MavenSession
     private MavenExecutionRequest request;
 
     private MavenExecutionResult result;
-    
+
+    private Properties executionProperties;
+
     private MavenProject currentProject;
         
     /**
@@ -109,9 +111,43 @@ public class MavenSession
         return request.getGoals();
     }
 
+    /**
+     * Gets the user properties to use for interpolation and profile activation. The user properties have been
+     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
+     * line.
+     * 
+     * @return The user properties, never {@code null}.
+     */
+    public Properties getUserProperties()
+    {
+        return request.getUserProperties();
+    }
+
+    /**
+     * Gets the system properties to use for interpolation and profile activation. The system properties are collected
+     * from the runtime environment like {@link System#getProperties()} and environment variables.
+     * 
+     * @return The system properties, never {@code null}.
+     */
+    public Properties getSystemProperties()
+    {
+        return request.getSystemProperties();
+    }
+
+    /**
+     * @deprecated Use either {@link #getUserProperties()} or {@link #getSystemProperties()}.
+     */
+    @Deprecated
     public Properties getExecutionProperties()
     {
-        return request.getProperties();
+        if ( executionProperties == null )
+        {
+            executionProperties = new Properties();
+            executionProperties.putAll( request.getSystemProperties() );
+            executionProperties.putAll( request.getUserProperties() );
+        }
+
+        return executionProperties;
     }
 
     public Settings getSettings()
