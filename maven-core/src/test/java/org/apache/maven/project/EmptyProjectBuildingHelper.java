@@ -44,7 +44,14 @@ public class EmptyProjectBuildingHelper
                                                                 List<ArtifactRepository> externalRepositories )
         throws InvalidRepositoryException
     {
-        return new ArrayList<ArtifactRepository>();
+        if ( externalRepositories != null )
+        {
+            return externalRepositories;
+        }
+        else
+        {
+            return new ArrayList<ArtifactRepository>();
+        }
     }
 
     public ClassRealm createProjectRealm( Model model, ArtifactRepository localRepository,
