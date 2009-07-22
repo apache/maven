@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.Build;
@@ -95,41 +94,6 @@ public class MavenEmbedderTest
         fail( "Encountered Exceptions in MavenExecutionResult during " + getName() );
     }
 
-    // ----------------------------------------------------------------------
-    // Goal/Phase execution tests
-    // ----------------------------------------------------------------------
-
-    public void testExecutionUsingABaseDirectory()
-        throws Exception
-    {
-        File testDirectory = new File( basedir, "src/test/embedder-test-project" );
-
-        File targetDirectory = new File( basedir, "target/embedder-test-project0" );
-
-        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
-
-        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
-
-        /*
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBaseDirectory( targetDirectory )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[]{"package"} ) );
-        */
-
-        MavenExecutionResult result = mavenEmbedder.execute( request );
-
-        assertNoExceptions( result );
-
-        MavenProject project = result.getProject();
-
-        assertEquals( "embedder-test-project", project.getArtifactId() );
-
-        File jar = new File( targetDirectory, "target/embedder-test-project-1.0-SNAPSHOT.jar" );
-
-        assertTrue( jar.exists() );
-    }
-
     public void testWithOptionalDependencies()
         throws Exception
     {
@@ -141,13 +105,6 @@ public class MavenEmbedderTest
 
         MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
         
-        /*
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBaseDirectory( targetDirectory )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[] { "install" } ) );
-        */
-
         MavenExecutionResult result = mavenEmbedder.execute( request );
         
         if (result.hasExceptions() )
@@ -156,8 +113,7 @@ public class MavenEmbedderTest
             fail( "Project didn't execute correctly.");
         }
     }
-    
-    
+        
     /*MNG-3919*/
     public void testWithInvalidGoal()
         throws Exception
@@ -168,10 +124,8 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBaseDirectory( targetDirectory )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[]{"validate"} ) );
+        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
+        request.setGoals( Arrays.asList( new String[]{"validate"} ) );
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
         List<Exception> exceptions = result.getExceptions();
@@ -193,12 +147,6 @@ public class MavenEmbedderTest
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
         MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
-
-        /*
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setPom( new File( targetDirectory, "pom.xml" ) ).setShowErrors( true )
-            .setGoals( Arrays.asList( new String[] { "package" } ) );
-        */
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
@@ -226,13 +174,6 @@ public class MavenEmbedderTest
 
         MavenExecutionRequest requestWithoutProfile = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
 
-        /*
-        MavenExecutionRequest requestWithoutProfile = new DefaultMavenExecutionRequest()
-            .setPom( new File( targetDirectory, "pom.xml" ) )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[] { "validate" } ) );
-        */
-
         MavenExecutionResult r0 = mavenEmbedder.execute( requestWithoutProfile );
 
         assertNoExceptions( r0 );
@@ -250,21 +191,10 @@ public class MavenEmbedderTest
         MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
         request.addActiveProfile( "embedderProfile" );
         
-        /*
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setPom( new File( targetDirectory, "pom.xml" ) )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[] { "validate" } ) )
-            .addActiveProfile( "embedderProfile" );
-        */
-
         MavenExecutionResult r1 = mavenEmbedder.execute( request );
 
         MavenProject p1 = r1.getProject();
 
-        System.out.println( p1 );
-        System.out.println( p1.getProperties() );
-        
         assertEquals( "true", p1.getProperties().getProperty( "embedderProfile" ) );
 
         assertEquals( "jason", p1.getProperties().getProperty( "name" ) );
@@ -303,11 +233,6 @@ public class MavenEmbedderTest
 
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
         
-        /*
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest().setPom( pom ).setShowErrors( true )
-            .setGoals( Arrays.asList( new String[] { "package" } ) );
-        */
-
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );
@@ -324,12 +249,7 @@ public class MavenEmbedderTest
         writer.close();
 
         request = createMavenExecutionRequest( pom );
-        
-        /*
-        request = new DefaultMavenExecutionRequest().setPom( pom ).setShowErrors( true )
-            .setGoals( Arrays.asList( new String[] { "package" } ) );
-        */
-            
+                    
         result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );

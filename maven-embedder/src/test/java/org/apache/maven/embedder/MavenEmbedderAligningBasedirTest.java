@@ -91,13 +91,6 @@ public class MavenEmbedderAligningBasedirTest
 
         MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
 
-        /*
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBaseDirectory( targetDirectory )
-            .setShowErrors( true )
-            .setGoals( Arrays.asList( new String[]{"package"} ) );
-        */
-
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );

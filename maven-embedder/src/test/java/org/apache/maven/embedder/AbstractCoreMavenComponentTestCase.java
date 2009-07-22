@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -36,11 +37,15 @@ public abstract class AbstractCoreMavenComponentTestCase
     @Requirement
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
 
+    @Requirement
+    protected Maven maven;
+    
     protected void setUp()
         throws Exception
     {
         repositorySystem = lookup( RepositorySystem.class );
         projectBuilder = lookup( org.apache.maven.project.ProjectBuilder.class );
+        maven = lookup( Maven.class );
     }
 
     @Override

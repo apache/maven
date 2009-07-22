@@ -36,8 +36,6 @@ public class MavenEmbedderCrappySettingsConfigurationTest
     public void testEmbedderWillStillStartupWhenTheSettingsConfigurationIsCrap()
         throws Exception
     {
-        // START SNIPPET: simple-embedder-example
-
         File projectDirectory = getTestFile( "src/examples/simple-project" );
 
         File user = new File( projectDirectory, "invalid-settings.xml" );
@@ -51,23 +49,10 @@ public class MavenEmbedderCrappySettingsConfigurationTest
 
         MavenEmbedder embedder = new MavenEmbedder( configuration );
 
-        //assertNotNull( embedder.getLocalRepository().getBasedir() );
-
         MavenExecutionRequest request = createMavenExecutionRequest( new File( projectDirectory, "pom.xml" ) );        
         
-        /*
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setBaseDirectory( projectDirectory )
-            .setGoals( Arrays.asList( new String[]{"validate"} ) );
-        */
-
         MavenExecutionResult result = embedder.execute( request );
-        
-        for ( Exception e : result.getExceptions() )
-        {
-            e.printStackTrace();
-        }
-        
+                
         assertFalse( result.hasExceptions() );
 
         assertNotNull( result.getProject() );
@@ -77,8 +62,6 @@ public class MavenEmbedderCrappySettingsConfigurationTest
         String environment = project.getProperties().getProperty( "environment" );
 
         assertEquals( "development", environment );
-
-        // END SNIPPET: simple-embedder-example
     }
 
     @Override
