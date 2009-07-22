@@ -19,9 +19,18 @@ package org.apache.maven.lifecycle.mapping;
  * under the License.
  */
 
+import java.util.List;
 import java.util.Map;
 
 public interface LifecycleMapping
 {        
-    Map<String,Lifecycle> getLifecycles();
+
+    Map<String, Lifecycle> getLifecycles();
+
+    @Deprecated
+    List<String> getOptionalMojos( String lifecycle );
+
+    @Deprecated
+    Map<String, String> getPhases( String lifecycle );
+
 }

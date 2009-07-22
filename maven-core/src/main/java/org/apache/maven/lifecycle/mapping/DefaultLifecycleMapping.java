@@ -22,15 +22,22 @@ import java.util.Map;
 public class DefaultLifecycleMapping
     implements LifecycleMapping
 {
+
     private List<Lifecycle> lifecycles;
 
     private Map<String, Lifecycle> lifecycleMap;
 
-    public Map<String,Lifecycle> getLifecycles()
+    /** @deprecated use lifecycles instead */
+    private Map<String, String> phases;
+
+    /**
+     * Populates the lifecycle map from the injected list of lifecycle mappings (if not already done).
+     */
+    private void initLifecycleMap()
     {
         if ( lifecycleMap == null )
         {
-            lifecycleMap = new HashMap<String,Lifecycle>();
+            lifecycleMap = new HashMap<String, Lifecycle>();
 
             if ( lifecycles != null )
             {
@@ -39,8 +46,62 @@ public class DefaultLifecycleMapping
                     lifecycleMap.put( lifecycle.getId(), lifecycle );
                 }
             }
+            else
+            {
+                /*
+                 * NOTE: This is to provide a migration path for implementors of the legacy API which did not know about
+                 * getLifecycles().
+                 */
+
+                String[] lifecycleIds = { "default", "clean", "site" };
+
+                for ( String lifecycleId : lifecycleIds )
+                {
+                    Map<String, String> phases = getPhases( lifecycleId );
+                    if ( phases != null )
+                    {
+                        Lifecycle lifecycle = new Lifecycle();
+
+                        lifecycle.setId( lifecycleId );
+                        lifecycle.setPhases( phases );
+
+                        lifecycleMap.put( lifecycleId, lifecycle );
+                    }
+                }
+            }
         }
+    }
+
+    public Map<String, Lifecycle> getLifecycles()
+    {
+        initLifecycleMap();
 
         return lifecycleMap;
     }
+
+    public List<String> getOptionalMojos( String lifecycle )
+    {
+        return null;
+    }
+
+    public Map<String, String> getPhases( String lifecycle )
+    {
+        initLifecycleMap();
+
+        Lifecycle lifecycleMapping = lifecycleMap.get( lifecycle );
+
+        if ( lifecycleMapping != null )
+        {
+            return lifecycleMapping.getPhases();
+        }
+        else if ( "default".equals( lifecycle ) )
+        {
+            return phases;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
 }
