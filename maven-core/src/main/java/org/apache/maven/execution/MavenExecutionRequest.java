@@ -207,6 +207,8 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setGlobalSettingsFile( File globalSettingsFile );
 
     MavenExecutionRequest addRemoteRepository( ArtifactRepository repository );
+    MavenExecutionRequest addPluginArtifactRepository( ArtifactRepository repository );
+    
     /**
      * Set a new list of remote repositories to use the execution request. This is necessary if you perform
      * transformations on the remote repositories being used. For example if you replace existing repositories with

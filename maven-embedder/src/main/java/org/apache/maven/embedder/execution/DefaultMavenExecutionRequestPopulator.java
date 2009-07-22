@@ -75,13 +75,13 @@ public class DefaultMavenExecutionRequestPopulator
             request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
         }
     }
-        
+
     private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
         request.addPluginGroup( "org.apache.maven.plugins" );
         request.addPluginGroup( "org.codehaus.mojo" );
     }
-    
+
     // Process plugin groups
     // Get profile models
     // Get active profiles
@@ -89,18 +89,18 @@ public class DefaultMavenExecutionRequestPopulator
         throws MavenEmbedderException
     {
         Settings settings = request.getSettings();
-        
+
         request.addPluginGroups( settings.getPluginGroups() );
 
         populateDefaultPluginGroups( request );
-        
+
         List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
 
         // We just need to keep track of what profiles are being activated by the settings. We don't need to process
         // them here. This should be taken care of by the project builder.
         //
-        request.addActiveProfiles( settings.getActiveProfiles() );        
-        
+        request.addActiveProfiles( settings.getActiveProfiles() );
+
         // We only need to take the profiles and make sure they are available when the calculation of the active profiles
         // is determined.
         //
@@ -108,11 +108,13 @@ public class DefaultMavenExecutionRequestPopulator
         {
             for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
             {
-                request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );                
+                request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
             }
         }
-        
+
         injectDefaultRepositories( request );
+        
+        injectDefaultPluginRepositories( request );        
 
         processRepositoriesInSettings( request );
     }
@@ -130,10 +132,35 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
-        {            
+        {
             try
             {
                 request.addRemoteRepository( repositorySystem.createDefaultRemoteRepository() );
+            }
+            catch ( InvalidRepositoryException e )
+            {
+                throw new MavenEmbedderException( "Cannot create default remote repository.", e );
+            }
+        }
+    }
+
+    private void injectDefaultPluginRepositories( MavenExecutionRequest request )
+        throws MavenEmbedderException
+    {
+        Set<String> definedRepositories = new HashSet<String>();
+        if ( request.getPluginArtifactRepositories() != null )
+        {
+            for ( ArtifactRepository repository : request.getPluginArtifactRepositories() )
+            {
+                definedRepositories.add( repository.getId() );
+            }
+        }
+
+        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
+        {
+            try
+            {
+                request.addPluginArtifactRepository( repositorySystem.createDefaultRemoteRepository() );
             }
             catch ( InvalidRepositoryException e )
             {
@@ -158,7 +185,7 @@ public class DefaultMavenExecutionRequestPopulator
         //      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
         //    </proxy>
         //  </proxies>
-        
+
         /*
         Proxy proxy = settings.getActiveProxy();
 
@@ -302,7 +329,7 @@ public class DefaultMavenExecutionRequestPopulator
         throws MavenEmbedderException
     {
         pom( request );
-        
+
         settings( request );
 
         localRepository( request );
@@ -310,7 +337,7 @@ public class DefaultMavenExecutionRequestPopulator
         toolchains( request );
 
         processSettings( request );
-                
+
         return request;
     }
 }
