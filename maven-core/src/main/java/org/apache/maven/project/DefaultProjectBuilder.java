@@ -140,8 +140,6 @@ public class DefaultProjectBuilder
 
             project.setOriginalModel( result.getRawModel() );
 
-//            project.setRemoteArtifactRepositories( configuration.getRemoteRepositories() );
-//            project.setPluginArtifactRepositories( configuration.getPluginArtifactRepositories() );
             project.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
             project.setPluginArtifactRepositories( listener.getPluginRepositories() );
 
@@ -153,7 +151,7 @@ public class DefaultProjectBuilder
                 {
                     lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(),
                                                                       configuration.getLocalRepository(),
-                                                                      configuration.getPluginArtifactRepositories() );
+                                                                      project.getPluginArtifactRepositories() );
                 }
             }
             catch ( LifecycleExecutionException e )
