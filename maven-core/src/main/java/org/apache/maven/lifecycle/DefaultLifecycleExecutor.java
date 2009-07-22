@@ -846,17 +846,22 @@ public class DefaultLifecycleExecutor
     {
         for ( StringTokenizer tok = new StringTokenizer( goals, "," ); tok.hasMoreTokens(); )
         {
+            // either <groupId>:<artifactId>:<goal> or <groupId>:<artifactId>:<version>:<goal>
             String goal = tok.nextToken().trim();
             String[] p = StringUtils.split( goal, ":" );
 
             PluginExecution execution = new PluginExecution();
-            execution.setId( "default-" + p[2] );
+            execution.setId( "default-" + p[p.length - 1] );
             execution.setPhase( phase );
-            execution.getGoals().add( p[2] );
+            execution.getGoals().add( p[p.length - 1] );
 
             Plugin plugin = new Plugin();
             plugin.setGroupId( p[0] );
             plugin.setArtifactId( p[1] );
+            if ( p.length >= 4 )
+            {
+                plugin.setVersion( p[2] );
+            }
 
             Plugin existing = plugins.get( plugin );
             if ( existing != null )
