@@ -117,47 +117,6 @@ public class MavenEmbedderTest
         }
     }
 
-    public void testExecutionUsingAProfileWhichSetsAProperty()
-        throws Exception
-    {
-        File testDirectory = new File( basedir, "src/test/embedder-test-project" );
-
-        File targetDirectory = new File( basedir, "target/embedder-test-project2" );
-
-        FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
-
-        // Check with profile not active
-
-        MavenExecutionRequest requestWithoutProfile = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
-
-        MavenExecutionResult r0 = mavenEmbedder.execute( requestWithoutProfile );
-
-        assertNoExceptions( r0 );
-
-        MavenProject p0 = r0.getProject();
-
-        assertNull( p0.getProperties().getProperty( "embedderProfile" ) );
-
-        assertNull( p0.getProperties().getProperty( "name" ) );
-
-        assertNull( p0.getProperties().getProperty( "occupation" ) );
-
-        // Check with profile activated
-
-        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
-        request.addActiveProfile( "embedderProfile" );
-        
-        MavenExecutionResult r1 = mavenEmbedder.execute( request );
-
-        MavenProject p1 = r1.getProject();
-
-        assertEquals( "true", p1.getProperties().getProperty( "embedderProfile" ) );
-
-        assertEquals( "jason", p1.getProperties().getProperty( "name" ) );
-
-        assertEquals( "somnambulance", p1.getProperties().getProperty( "occupation" ) );
-    }
-
     //TODO: This needs to be a separate test and we can't use production plugins for the test.
     /**
      * Test that two executions of the embedder don't share data that has changed, see MNG-3013
