@@ -19,7 +19,6 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -200,13 +199,18 @@ public class AbstractArtifactResolutionException
         sb.append( LS );
         sb.append( "  " + groupId + ":" + artifactId + ":" + type + ":" + version );
         sb.append( LS );
-        if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
+        if ( remoteRepositories != null )
         {
             sb.append( LS );
             sb.append( "from the specified remote repositories:" );
             sb.append( LS + "  " );
 
-            for ( Iterator<ArtifactRepository> i = new HashSet<ArtifactRepository>( remoteRepositories ).iterator(); i.hasNext(); )
+            if ( remoteRepositories.isEmpty() )
+            {
+                sb.append( "(none)" );
+            }
+
+            for ( Iterator<ArtifactRepository> i = remoteRepositories.iterator(); i.hasNext(); )
             {
                 ArtifactRepository remoteRepository = i.next();
 
@@ -229,7 +233,7 @@ public class AbstractArtifactResolutionException
                 sb.append( ")" );
                 if ( i.hasNext() )
                 {
-                    sb.append( ",\n  " );
+                    sb.append( "," ).append( LS ).append( "  " );
                 }
             }
         }
