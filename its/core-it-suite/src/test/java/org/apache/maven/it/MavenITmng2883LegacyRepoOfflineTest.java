@@ -47,7 +47,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
     public MavenITmng2883LegacyRepoOfflineTest()
     {
-        super( "(,3.0-alpha-1)" );
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,3.0-alpha-1)" );
     }
 
     public void testParentUnresolvable()
