@@ -28,7 +28,7 @@ import org.apache.maven.model.building.ModelBuildingEvent;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
- * Processes events from the model builder.
+ * Processes events from the model builder while building the effective model for a {@link MavenProject} instance.
  * 
  * @author Benjamin Bentmann
  */
@@ -64,16 +64,39 @@ class DefaultModelBuildingListener
         this.pluginRepositories = projectBuildingRequest.getPluginArtifactRepositories();
     }
 
+    /**
+     * Gets the project realm that hosts the build extensions.
+     * 
+     * @return The project realm or {@code null} if the project requires no extensions.
+     */
     public ClassRealm getProjectRealm()
     {
         return projectRealm;
     }
 
+    /**
+     * Gets the effective remote artifact repositories for the project. The repository list is created from the
+     * repositories given by {@link ProjectBuildingRequest#getRemoteRepositories()} and the repositories given in the
+     * POM, i.e. {@link Model#getRepositories()}. The POM repositories themselves also contain any repositories
+     * contributed by external profiles as specified in {@link ProjectBuildingRequest#getProfiles()}. Furthermore, the
+     * repositories have already been mirrored.
+     * 
+     * @return The remote artifact repositories for the project.
+     */
     public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
     }
 
+    /**
+     * Gets the effective remote plugin repositories for the project. The repository list is created from the
+     * repositories given by {@link ProjectBuildingRequest#getPluginArtifactRepositories()} and the repositories given
+     * in the POM, i.e. {@link Model#getPluginRepositories()}. The POM repositories themselves also contain any
+     * repositories contributed by external profiles as specified in {@link ProjectBuildingRequest#getProfiles()}.
+     * Furthermore, the repositories have already been mirrored.
+     * 
+     * @return The remote plugin repositories for the project.
+     */
     public List<ArtifactRepository> getPluginRepositories()
     {
         return pluginRepositories;
@@ -85,9 +108,11 @@ class DefaultModelBuildingListener
     {
         Model model = event.getModel();
 
-        remoteRepositories = projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories );
+        remoteRepositories =
+            projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories );
 
-        pluginRepositories = projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories );
+        pluginRepositories =
+            projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories );
 
         if ( event.getRequest().isProcessPlugins() )
         {
