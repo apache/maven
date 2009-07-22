@@ -59,7 +59,7 @@ class DefaultModelBuildingListener
         {
             throw new IllegalArgumentException( "project building request missing" );
         }
-        this.projectBuildingRequest = projectBuildingRequest;        
+        this.projectBuildingRequest = projectBuildingRequest;
         this.remoteRepositories = projectBuildingRequest.getRemoteRepositories();
         this.pluginRepositories = projectBuildingRequest.getPluginArtifactRepositories();
     }

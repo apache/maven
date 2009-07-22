@@ -63,7 +63,7 @@ public class AbstractArtifactResolutionException
                                                    String type,
                                                    String classifier,
                                                    List<ArtifactRepository> remoteRepositories,
-                                                   List path )
+                                                   List<String> path )
     {
         this( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, null );
     }
@@ -75,7 +75,7 @@ public class AbstractArtifactResolutionException
                                                    String type,
                                                    String classifier,
                                                    List<ArtifactRepository> remoteRepositories,
-                                                   List path,
+                                                   List<String> path,
                                                    Throwable t )
     {
         super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ), t );
@@ -150,7 +150,7 @@ public class AbstractArtifactResolutionException
         return this.path;
     }
 
-    public List getRemoteRepositories()
+    public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
     }
@@ -160,7 +160,7 @@ public class AbstractArtifactResolutionException
         return originalMessage;
     }
 
-    protected static String constructArtifactPath( List path,
+    protected static String constructArtifactPath( List<String> path,
                                                    String indentation )
     {
         StringBuilder sb = new StringBuilder();
@@ -172,7 +172,7 @@ public class AbstractArtifactResolutionException
             sb.append( "Path to dependency: " );
             sb.append( LS );
             int num = 1;
-            for ( Iterator i = path.iterator(); i.hasNext(); num++ )
+            for ( Iterator<String> i = path.iterator(); i.hasNext(); num++ )
             {
                 sb.append( indentation );
                 sb.append( "\t" );
@@ -191,8 +191,8 @@ public class AbstractArtifactResolutionException
                                                 String artifactId,
                                                 String version,
                                                 String type,
-                                                List remoteRepositories,
-                                                List path )
+                                                List<ArtifactRepository> remoteRepositories,
+                                                List<String> path )
     {
         StringBuilder sb = new StringBuilder();
 
@@ -206,9 +206,9 @@ public class AbstractArtifactResolutionException
             sb.append( "from the specified remote repositories:" );
             sb.append( LS + "  " );
 
-            for ( Iterator i = new HashSet( remoteRepositories ).iterator(); i.hasNext(); )
+            for ( Iterator<ArtifactRepository> i = new HashSet<ArtifactRepository>( remoteRepositories ).iterator(); i.hasNext(); )
             {
-                ArtifactRepository remoteRepository = (ArtifactRepository) i.next();
+                ArtifactRepository remoteRepository = i.next();
 
                 sb.append( remoteRepository.getId() );
                 sb.append( " (" );
@@ -247,7 +247,7 @@ public class AbstractArtifactResolutionException
                                                              String type,
                                                              String classifier,
                                                              String downloadUrl,
-                                                             List path )
+                                                             List<String> path )
     {
         StringBuilder sb = new StringBuilder( message );
 

@@ -31,8 +31,9 @@ import org.apache.maven.wagon.TransferFailedException;
 public class ArtifactResolutionException
     extends AbstractArtifactResolutionException
 {
-    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type, String classifier, List<ArtifactRepository> remoteRepositories, List path,
-                                        Throwable t )
+    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
+                                        String classifier, List<ArtifactRepository> remoteRepositories,
+                                        List<String> path, Throwable t )
     {
         super( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, t );
     }

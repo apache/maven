@@ -47,7 +47,7 @@ public class ArtifactNotFoundException
     }
 
     public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type, String classifier, List<ArtifactRepository> remoteRepositories,
-                                      String downloadUrl, List path, ResourceDoesNotExistException cause )
+                                      String downloadUrl, List<String> path, ResourceDoesNotExistException cause )
     {
         super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier, downloadUrl, path ), groupId, artifactId, version, type, classifier, remoteRepositories,
                null, cause );
@@ -56,7 +56,7 @@ public class ArtifactNotFoundException
     }
 
     private ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type, String classifier, List<ArtifactRepository> remoteRepositories,
-                                       String downloadUrl, List path )
+                                       String downloadUrl, List<String> path )
     {
         super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier, downloadUrl, path ), groupId, artifactId, version, type, classifier, remoteRepositories,
                null );
