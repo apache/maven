@@ -19,6 +19,8 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import static org.apache.maven.container.ContainerUtils.findChildComponentHints;
+
 import org.apache.maven.MavenArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -59,6 +61,7 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.project.path.PathTranslator;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.wagon.Wagon;
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.NoSuchRealmException;
 import org.codehaus.plexus.PlexusConstants;
@@ -70,6 +73,7 @@ import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.discovery.ComponentDiscoveryListener;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -1588,6 +1592,7 @@ public class DefaultPluginManager
         return pluginContainer.lookup( role, roleHint );
     }
 
+    @SuppressWarnings( "unchecked" )
     public Map getPluginComponents( Plugin plugin,
                                     String role )
         throws ComponentLookupException, PluginManagerException
@@ -1595,7 +1600,15 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
 
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
+        
+        Set<String> pluginHints = findChildComponentHints( role, container, pluginContainer );
+        Map<String, Object> components = new HashMap<String, Object>( pluginHints.size() );
+        for ( String hint : pluginHints )
+        {
+            getLogger().debug( "Looking up plugin component: " + role + " with hint: " + hint );
+            components.put( hint, pluginContainer.lookup( role, hint ) );
+        }
 
-        return pluginContainer.lookupMap( role );
+        return components;
     }
 }

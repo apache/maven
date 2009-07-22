@@ -19,7 +19,9 @@ package org.apache.maven.extension;
  * under the License.
  */
 
-import org.apache.maven.MavenArtifactFilterManager;
+import static org.apache.maven.container.ContainerUtils.findChildComponentHints;
+
+import org.apache.maven.MavenArtifactFilterManager; 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -46,7 +48,6 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -264,16 +265,15 @@ public class DefaultExtensionManager
         return child;
     }
 
-    @SuppressWarnings( "unchecked" )
     public void registerWagons()
     {
         if ( extensionContainer != null )
         {
-            Map<String, ComponentDescriptor> wagons = extensionContainer.getComponentDescriptorMap( Wagon.ROLE );
+            Set<String> wagons = findChildComponentHints( Wagon.ROLE, container, extensionContainer );
             if ( wagons != null && !wagons.isEmpty() )
             {
-                getLogger().debug( "Wagons to register: " + wagons.keySet() );
-                wagonManager.registerWagons( wagons.keySet(), extensionContainer );
+                getLogger().debug( "Wagons to register: " + wagons );
+                wagonManager.registerWagons( wagons, extensionContainer );
             }
         }
         else
