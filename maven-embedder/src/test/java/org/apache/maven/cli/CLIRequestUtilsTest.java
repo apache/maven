@@ -19,6 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,19 +33,23 @@ public class CLIRequestUtilsTest
     extends TestCase
 {
 
+    private CommandLine parse( String... args )
+        throws ParseException
+    {
+        return new CLIManager().parse( args );
+    }
+
     public void test_buildRequest_ParseCommandLineProperty()
         throws ParseException
     {
         String key = "key";
         String value = "value";
 
-        CLIManager cliManager = new CLIManager();
-
         String[] args = {
             "-D" + key + "=" + value
         };
 
-        CommandLine commandLine = cliManager.parse( args );
+        CommandLine commandLine = parse( args );
 
         assertTrue( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) );
 
@@ -59,7 +64,7 @@ public class CLIRequestUtilsTest
 
         assertEquals( value, userProperties.getProperty( key ) );
 
-        List goals = request.getGoals();
+        List<String> goals = request.getGoals();
         assertTrue( ( goals == null ) || goals.isEmpty() );
     }
 
@@ -71,10 +76,10 @@ public class CLIRequestUtilsTest
         Properties execProperties = new Properties();
         Properties userProperties = new Properties();
 
-        CLIRequestUtils.populateProperties( ( new CLIManager() ).parse( new String[] {
+        CLIRequestUtils.populateProperties( parse( 
             "-Dtest.property.2=2.1",
             "-Dtest.property.3=3.0"
-        } ), execProperties, userProperties );
+         ), execProperties, userProperties );
 
         // assume that everybody has a PATH env var
         String envPath = execProperties.getProperty( "env.PATH" );
@@ -94,4 +99,16 @@ public class CLIRequestUtilsTest
         assertEquals( "3.0", execProperties.getProperty( "test.property.3" ) );
         assertEquals( "3.0", userProperties.getProperty( "test.property.3" ) );
     }
+
+    public void testMavenRepoLocal()
+        throws Exception
+    {
+        String path = new File( "" ).getAbsolutePath();
+
+        MavenExecutionRequest request =
+            CLIRequestUtils.buildRequest( parse( "-Dmaven.repo.local=" + path ), false, false, false );
+
+        assertEquals( path, request.getLocalRepositoryPath().getAbsolutePath() );
+    }
+
 }
