@@ -23,6 +23,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.it.util.ResourceExtractor;
@@ -57,14 +58,24 @@ public class MavenITmng1830ShowVersionTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
-        String line = (String) verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false ).get( 1 );
-        assertTrue( line, line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) || line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" ) );
-
-        // check timestamp parses
-        String timestamp = line.substring( line.lastIndexOf( ';' ) + 1, line.length() - 1 ).trim();
-        SimpleDateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ssZ" );
-        Date date = fmt.parse( timestamp );
-        assertEquals( timestamp, fmt.format( date ) );
+                       
+        boolean apacheVersionInTheRightFormatWasFound = false;
+        List lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        for( Iterator i = lines.iterator(); i.hasNext(); )
+        {
+            String line = (String) i.next();
+            if ( line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) ||  line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" ) )
+            {
+                apacheVersionInTheRightFormatWasFound = true;
+                // check timestamp parses
+                String timestamp = line.substring( line.lastIndexOf( ';' ) + 1, line.length() - 1 ).trim();
+                SimpleDateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ssZ" );
+                Date date = fmt.parse( timestamp );
+                assertEquals( timestamp, fmt.format( date ) );
+                break;
+            }
+        }
+        
+        assertTrue( apacheVersionInTheRightFormatWasFound );
     }
 }
