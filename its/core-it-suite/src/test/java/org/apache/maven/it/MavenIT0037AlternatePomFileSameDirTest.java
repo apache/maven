@@ -30,10 +30,10 @@ import java.io.File;
  * @author John Casey
  * @version $Id$
  */
-public class MavenIT0037AlternatePomFileTest
+public class MavenIT0037AlternatePomFileSameDirTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0037AlternatePomFileTest()
+    public MavenIT0037AlternatePomFileSameDirTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

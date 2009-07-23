@@ -388,8 +388,8 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenIT0041ArtifactTypeFromPluginExtensionTest.class );
         suite.addTestSuite( MavenIT0040PackagingFromPluginExtensionTest.class );
         suite.addTestSuite( MavenIT0039ReleasePomInReactorTest.class );
-        suite.addTestSuite( MavenIT0038CustomPomFileTest.class );
-        suite.addTestSuite( MavenIT0037AlternatePomFileTest.class );
+        suite.addTestSuite( MavenIT0038AlternatePomFileDifferentDirTest.class );
+        suite.addTestSuite( MavenIT0037AlternatePomFileSameDirTest.class );
         suite.addTestSuite( MavenIT0036ReleasePomTest.class );
         suite.addTestSuite( MavenIT0032MavenPrerequisiteTest.class );
         suite.addTestSuite( MavenIT0030DepPomDepMngtInheritanceTest.class );

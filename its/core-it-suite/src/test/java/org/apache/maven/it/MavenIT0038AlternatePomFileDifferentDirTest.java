@@ -30,17 +30,16 @@ import java.io.File;
  * @author John Casey
  * @version $Id$
  */
-public class MavenIT0038CustomPomFileTest
+public class MavenIT0038AlternatePomFileDifferentDirTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0038CustomPomFileTest()
+    public MavenIT0038AlternatePomFileDifferentDirTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Test building project from outside the project directory using '-f'
-     * option
+     * Test building project from outside the project directory using '-f' option.
      */
     public void testit0038()
         throws Exception
