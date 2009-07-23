@@ -700,22 +700,24 @@ public class DefaultLifecycleExecutor
         }
 
         if ( artifactMetadataFile.exists() )
-        {                    
+        {
+            logger.debug( "Extracting version for plugin " + plugin.getKey() + " from " + artifactMetadataFile );
+
             try
             {
                 Metadata pluginMetadata = readMetadata( artifactMetadataFile );
 
                 String release = pluginMetadata.getVersioning().getRelease();
 
-                if ( release != null )
+                if ( StringUtils.isNotEmpty( release ) )
                 {
                     plugin.setVersion( release );
                 }
                 else
                 {
                     String latest = pluginMetadata.getVersioning().getLatest();
-                    
-                    if ( latest != null )
+
+                    if ( StringUtils.isNotEmpty( latest ) )
                     {
                         plugin.setVersion( latest );
                     }
@@ -726,7 +728,8 @@ public class DefaultLifecycleExecutor
                 logger.warn( "Error reading plugin metadata: ", e );
             }
         }
-        else
+
+        if ( StringUtils.isEmpty( plugin.getVersion() ) )
         {
             throw new PluginNotFoundException( plugin, remoteRepositories );
         }
