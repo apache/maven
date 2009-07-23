@@ -60,6 +60,8 @@ under the License.
     <module>maven-it-plugin-plexus-utils-new</module>
     <module>maven-it-plugin-plexus-component-api</module>
     <module>maven-it-plugin-log4j</module>
+    <module>maven-it-plugin-extension1</module>
+    <module>maven-it-plugin-extension2</module>
   </modules>
 
   <scm>

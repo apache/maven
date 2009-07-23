@@ -222,6 +222,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3536AppendedAbsolutePathsTest.class );
         suite.addTestSuite( MavenITmng3535SelfReferentialPropertiesTest.class );
         suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
+        suite.addTestSuite( MavenITmng3506ArtifactHandlersFromPluginsTest.class);
         suite.addTestSuite( MavenITmng3503Xpp3ShadingTest.class );
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
