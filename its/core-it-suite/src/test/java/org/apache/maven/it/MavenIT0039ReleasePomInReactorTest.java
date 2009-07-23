@@ -35,7 +35,7 @@ public class MavenIT0039ReleasePomInReactorTest
 {
     public MavenIT0039ReleasePomInReactorTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0,3.0-alpha-1)" );
     }
 
     /**
