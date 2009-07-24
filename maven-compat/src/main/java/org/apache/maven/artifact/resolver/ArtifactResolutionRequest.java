@@ -43,6 +43,11 @@ public class ArtifactResolutionRequest
 
     private boolean resolveTransitively = false;
         
+    public ArtifactResolutionRequest( )
+    {
+        // nothing here
+    }
+    
     public Artifact getArtifact()
     {
         return artifact;

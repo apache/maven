@@ -187,7 +187,8 @@ public class DefaultProjectBuildingHelper
         request.setFilter( artifactFilterManager.getCoreArtifactFilter() );
         request.setLocalRepository( localRepository );
         request.setRemoteRepostories( remoteRepositories );
-
+        // FIXME setTransferListener
+        
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         resolutionErrorHandler.throwErrors( request, result );

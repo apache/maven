@@ -23,9 +23,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.MavenTransferListener;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.wagon.events.TransferListener;
 
 public interface ProjectBuildingRequest
 {
@@ -140,5 +142,9 @@ public interface ProjectBuildingRequest
      * @return This request, never {@code null}.
      */
     void setBuildStartTime( Date buildStartTime );
+    
+    // TODO ? 
+    //TransferListener getTransferListener();
+    //void setTransferListener ( TransferListener transferListener );
 
 }

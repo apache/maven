@@ -133,7 +133,7 @@ public class DefaultPluginManager
             .setLocalRepository( localRepository )
             .setRemoteRepostories( remoteRepositories )
             .setResolveTransitively( false );
-
+        // FIXME setTransferListener
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         try
@@ -275,6 +275,7 @@ public class DefaultPluginManager
             .setFilter( filter )
             .setResolveTransitively( true );
             //.setResolveRoot( false );
+        //  FIXME setTransferListener
         
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );

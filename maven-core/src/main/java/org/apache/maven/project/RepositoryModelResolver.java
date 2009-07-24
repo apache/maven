@@ -116,7 +116,7 @@ class RepositoryModelResolver
         request.setArtifact( artifactParent );
         request.setLocalRepository( localRepository );
         request.setRemoteRepostories( remoteRepositories );
-
+        // FIXME setTransferListener
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         try

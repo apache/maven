@@ -231,7 +231,7 @@ public class DefaultProjectBuilder
             .setArtifact( artifact )
             .setLocalRepository( configuration.getLocalRepository() )
             .setRemoteRepostories( configuration.getRemoteRepositories() );
-        
+        // FIXME setTransferListener
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         try
@@ -307,7 +307,7 @@ public class DefaultProjectBuilder
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepostories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() );
-
+        // FIXME setTransferListener
         ArtifactResolutionResult result;
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();

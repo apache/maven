@@ -81,7 +81,8 @@ public class DefaultProjectDependenciesResolver
             .setRemoteRepostories( remoteRepositories )
             .setManagedVersionMap( project.getManagedVersionMap() )
             .setFilter( filter );
-    
+        // FIXME setTransferListener
+        
         ArtifactResolutionResult result = repositorySystem.resolve( request );                
         resolutionErrorHandler.throwErrors( request, result );
         project.setArtifacts( result.getArtifacts() );
