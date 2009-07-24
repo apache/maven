@@ -27,9 +27,9 @@ under the License.
   <name>Integration Test Executor</name>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/components/branches/maven-2.2.x/maven-core-it-runner</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/components/branches/maven-2.2.x/maven-core-it-runner</developerConnection>
-    <url>https://svn.apache.org/repos/asf/maven/components/branches/maven-2.2.x/maven-core-it-runner</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/maven-2/branches/maven-2.2.x/maven-core-it-runner</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/maven-2/branches/maven-2.2.x/maven-core-it-runner</developerConnection>
+    <url>http://svn.apache.org/viewvc/maven/maven-2/branches/maven-2.2.x/maven-core-it-runner</url>
   </scm>
 
   <repositories>
