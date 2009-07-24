@@ -218,6 +218,7 @@ under the License.
             <comparisonVersion>2.2.0</comparisonVersion>
             <excludes>
               <exclude>org/apache/maven/artifact/manager/WagonManager*</exclude>
+              <exclude>org/apache/maven/extension/ExtensionManager*</exclude>
             </excludes>
           </configuration>
         </plugin>
