@@ -50,7 +50,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dmaven.wagon.provider.http=coreit" );
-        cliOptions.add( "-X" );
+//        cliOptions.add( "-X" );
         cliOptions.add( "-V" );
         
         verifier.setCliOptions( cliOptions );
@@ -74,7 +74,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
-        cliOptions.add( "-X" );
+//        cliOptions.add( "-X" );
         cliOptions.add( "-V" );
 
         verifier.setCliOptions( cliOptions );
