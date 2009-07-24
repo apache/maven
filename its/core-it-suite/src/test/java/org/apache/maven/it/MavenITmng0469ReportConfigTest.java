@@ -46,6 +46,8 @@ public class MavenITmng0469ReportConfigTest
     public void testitReportConfigOverridesBuildDefaults()
         throws Exception
     {
+        requiresMavenVersion( "[2.0.0,3.0-alpha-1)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469/test0" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
