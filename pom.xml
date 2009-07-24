@@ -215,11 +215,9 @@ under the License.
           <version>2.2.1</version>
           <configuration>
             <!-- needed for release: default value "(,${project.version})" for 2.0.10 is 2.0.10-SNAPSHOT -->
-            <comparisonVersion>2.1.0</comparisonVersion>
+            <comparisonVersion>2.2.0</comparisonVersion>
             <excludes>
-              <exclude>org/apache/maven/project/artifact/ArtifactWithProject*</exclude>
-              <exclude>org/apache/maven/project/artifact/ProjectArtifactFactory*</exclude>
-              <exclude>org/apache/maven/project/artifact/VersionExpressionTransformation*</exclude>
+              <exclude>org/apache/maven/artifact/manager/WagonManager*</exclude>
             </excludes>
           </configuration>
         </plugin>
