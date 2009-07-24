@@ -33,7 +33,7 @@ public class ProfileActivationException
     /**
      * The profile which raised this error, can be {@code null}.
      */
-    private Profile profile;
+    private final Profile profile;
 
     /**
      * Creates a new exception with specified detail message and cause for the given profile.

@@ -33,12 +33,12 @@ public class ModelParseException
     /**
      * The one-based index of the line containing the error.
      */
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * The one-based index of the column containing the error.
      */
-    private int columnNumber;
+    private final int columnNumber;
 
     /**
      * Creates a new parser exception with the specified details.

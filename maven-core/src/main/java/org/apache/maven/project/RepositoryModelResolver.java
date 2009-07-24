@@ -126,7 +126,7 @@ class RepositoryModelResolver
         catch ( ArtifactResolutionException e )
         {
             throw new UnresolvableModelException( "Failed to resolve POM for " + groupId + ":" + artifactId + ":"
-                + version + " due to " + e.getMessage(), e );
+                + version + " due to " + e.getMessage(), groupId, artifactId, version, e );
         }
 
         return new FileModelSource( artifactParent.getFile() );

@@ -41,13 +41,13 @@ public class ModelProblem
 
     }
 
-    private String source;
+    private final String source;
 
-    private String message;
+    private final String message;
 
-    private Exception exception;
+    private final Exception exception;
 
-    private Severity severity;
+    private final Severity severity;
 
     /**
      * Creates a new problem with the specified message.
@@ -58,9 +58,7 @@ public class ModelProblem
      */
     public ModelProblem( String message, Severity severity, String source )
     {
-        this.message = message;
-        this.severity = ( severity != null ) ? severity : Severity.ERROR;
-        this.source = ( source != null ) ? source : "";
+        this( message, severity, source, null );
     }
 
     /**

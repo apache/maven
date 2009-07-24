@@ -35,7 +35,7 @@ public class ModelBuildingException
     extends Exception
 {
 
-    private List<ModelProblem> problems;
+    private final List<ModelProblem> problems;
 
     /**
      * Creates a new exception with the specified problems.

@@ -30,9 +30,9 @@ class DefaultModelBuildingEvent
     implements ModelBuildingEvent
 {
 
-    private Model model;
+    private final Model model;
 
-    private ModelBuildingRequest request;
+    private final ModelBuildingRequest request;
 
     public DefaultModelBuildingEvent( Model model, ModelBuildingRequest request )
     {
