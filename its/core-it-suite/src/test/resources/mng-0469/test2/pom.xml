@@ -50,7 +50,8 @@ under the License.
         <configuration>
           <outputFile>target/config.properties</outputFile>
           <expressions>
-            <expression>project/build/plugins/8/configuration</expression>
+            <expression>project/reporting/plugins/0</expression>
+            <expression>project/reporting/plugins/0/configuration</expression>
           </expressions>
         </configuration>
         <executions>
