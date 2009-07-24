@@ -53,25 +53,7 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         
-        // remove the artifact+POM that should be installed here.
-        verifier.deleteArtifact( GID, AID, VERSION, "pom" );
-        
-        // first child
-        verifier.deleteArtifact( GID, AID + ".1", VERSION, "pom" );
-        verifier.deleteArtifact( GID, AID + ".1", VERSION, TYPE );
-        
-        // shouldn't exist, but we want to make sure we're testing the current pass properly...
-        verifier.deleteArtifact( GID, AID + ".1", VERSION, BAD_TYPE1 );
-        verifier.deleteArtifact( GID, AID + ".1", VERSION, BAD_TYPE2 );
-        
-        
-        // second child
-        verifier.deleteArtifact( GID, AID + ".2", VERSION, "pom" );
-        verifier.deleteArtifact( GID, AID + ".2", VERSION, TYPE );
-        
-        // shouldn't exist, but we want to make sure we're testing the current pass properly...
-        verifier.deleteArtifact( GID, AID + ".2", VERSION, BAD_TYPE1 );
-        verifier.deleteArtifact( GID, AID + ".2", VERSION, BAD_TYPE2 );
+        verifier.deleteArtifacts( GID );
         
         verifier.executeGoal( "install" );
         
