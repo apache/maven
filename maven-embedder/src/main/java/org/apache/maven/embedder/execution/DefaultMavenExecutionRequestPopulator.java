@@ -122,14 +122,7 @@ public class DefaultMavenExecutionRequestPopulator
     private void injectDefaultRepositories( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
-        Set<String> definedRepositories = new HashSet<String>();
-        if ( request.getRemoteRepositories() != null )
-        {
-            for ( ArtifactRepository repository : request.getRemoteRepositories() )
-            {
-                definedRepositories.add( repository.getId() );
-            }
-        }
+        Set<String> definedRepositories = getRepoIds( request.getRemoteRepositories() );
 
         if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
         {
@@ -147,14 +140,7 @@ public class DefaultMavenExecutionRequestPopulator
     private void injectDefaultPluginRepositories( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
-        Set<String> definedRepositories = new HashSet<String>();
-        if ( request.getPluginArtifactRepositories() != null )
-        {
-            for ( ArtifactRepository repository : request.getPluginArtifactRepositories() )
-            {
-                definedRepositories.add( repository.getId() );
-            }
-        }
+        Set<String> definedRepositories = getRepoIds( request.getPluginArtifactRepositories() );
 
         if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
         {
@@ -167,6 +153,21 @@ public class DefaultMavenExecutionRequestPopulator
                 throw new MavenEmbedderException( "Cannot create default remote repository.", e );
             }
         }
+    }
+
+    private Set<String> getRepoIds( List<ArtifactRepository> repositories )
+    {
+        Set<String> repoIds = new HashSet<String>();
+
+        if ( repositories != null )
+        {
+            for ( ArtifactRepository repository : repositories )
+            {
+                repoIds.add( repository.getId() );
+            }
+        }
+
+        return repoIds;
     }
 
     private void processRepositoriesInSettings( MavenExecutionRequest request )
