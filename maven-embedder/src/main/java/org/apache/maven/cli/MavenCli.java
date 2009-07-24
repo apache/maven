@@ -1,22 +1,18 @@
 package org.apache.maven.cli;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
@@ -30,7 +26,6 @@ import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
-import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -61,8 +56,7 @@ public class MavenCli
         return cli.doMain( args, classWorld );
     }
 
-    public int doMain( String[] args,
-                       ClassWorld classWorld )
+    public int doMain( String[] args, ClassWorld classWorld )
     {
         // ----------------------------------------------------------------------
         // Setup the command line parser
@@ -154,7 +148,7 @@ public class MavenCli
         }
 
         MavenEmbedder mavenEmbedder;
-        
+
         try
         {
             mavenEmbedder = new MavenEmbedder( configuration );
@@ -178,22 +172,22 @@ public class MavenCli
         }
 
         // The exception handling should be handled in Maven itself.
-        
+
         if ( result.hasExceptions() )
         {
             ExceptionSummary es = result.getExceptionSummary();
-            
+
             if ( es == null )
             {
                 result.getExceptions().get( 0 ).printStackTrace();
             }
             else
             {
-            System.out.println( es.getMessage() );
-            
-            es.getException().printStackTrace();
+                System.out.println( es.getMessage() );
+
+                es.getException().printStackTrace();
             }
-            
+
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )
             {
                 System.out.println( "+ Build failures were ignored." );
@@ -235,16 +229,11 @@ public class MavenCli
             globalSettingsFile = MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE;
         }
 
-        Configuration configuration = new DefaultConfiguration()
-            .setUserSettingsFile( userSettingsFile )
-            .setGlobalSettingsFile( globalSettingsFile )
-            .setClassWorld( classWorld );
+        Configuration configuration = new DefaultConfiguration().setUserSettingsFile( userSettingsFile ).setGlobalSettingsFile( globalSettingsFile ).setClassWorld( classWorld );
 
         if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
-            File logFile = new File(
-                request.getBaseDirectory(),
-                commandLine.getOptionValue( CLIManager.LOG_FILE ) );
+            File logFile = new File( request.getBaseDirectory(), commandLine.getOptionValue( CLIManager.LOG_FILE ) );
 
             configuration.setMavenEmbedderLogger( new MavenEmbedderFileLogger( logFile ) );
         }
@@ -259,7 +248,7 @@ public class MavenCli
         {
             configuration.setLocalRepository( new File( localRepoProperty ) );
         }
-        
+
         return configuration;
     }
 

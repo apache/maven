@@ -367,7 +367,6 @@ public class DefaultArtifactResolver
             }
             catch ( ComponentLookupException e )
             {
-                e.printStackTrace();
                 // won't happen
             }
         }

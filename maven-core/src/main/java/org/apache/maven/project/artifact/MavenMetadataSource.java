@@ -84,6 +84,15 @@ public class MavenMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
+        //
+        // If we have a system scoped artifact then we do not want any searching in local or remote repositories
+        // and we want artifact resolution to only return the system scoped artifact itself.
+        //
+        if ( artifact.getScope() != null && artifact.getScope().equals( Artifact.SCOPE_SYSTEM ) )
+        {
+            return new ResolutionGroup( null, null, null );
+        }
+        
         ResolutionGroup cached = cache.get( artifact, localRepository, remoteRepositories );
 
         if ( cached != null )

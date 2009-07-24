@@ -107,15 +107,7 @@ public class DefaultMaven
         List<MavenProject> projects;
         try
         {
-            projects = getProjectsForMavenReactor( request );
-                                                
-            //TODO: We really need to get rid of this requirement in here. If we know there is no project present
-            if ( projects.isEmpty() )
-            {
-                MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingRequest() ); 
-                projects.add( project );
-                request.setProjectPresent( false );
-            }
+            projects = getProjectsForMavenReactor( request );                                                
         }
         catch ( ProjectBuildingException e )
         {
@@ -234,19 +226,20 @@ public class DefaultMaven
     private List<MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
+        List<MavenProject> projects =  new ArrayList<MavenProject>();
+
         // We have no POM file.
         //
         if ( request.getPom() == null || !request.getPom().exists() )
         {
-            return new ArrayList<MavenProject>();
+            MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingRequest() ); 
+            projects.add( project );
+            request.setProjectPresent( false );
+            return projects;
         }
         
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
-
-        List<MavenProject> projects = new ArrayList<MavenProject>();
-
+        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );        
         collectProjects( projects, files, request );
-
         return projects;
     }
 

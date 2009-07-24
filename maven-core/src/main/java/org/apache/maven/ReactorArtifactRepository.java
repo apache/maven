@@ -32,7 +32,7 @@ public class ReactorArtifactRepository
     public Artifact find( Artifact artifact )
     {
         String projectKey = ArtifactUtils.key( artifact );
-
+        
         MavenProject project = reactorProjects.get( projectKey );
 
         if ( project != null )
