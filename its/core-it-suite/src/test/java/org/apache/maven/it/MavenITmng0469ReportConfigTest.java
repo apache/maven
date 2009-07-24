@@ -90,8 +90,18 @@ public class MavenITmng0469ReportConfigTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-site:2.1-SNAPSHOT:generate" );
-        verifier.assertFilePresent( "target/site/info.properties" );
+        if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
+        {
+            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-site:2.1-SNAPSHOT:generate" );
+            verifier.assertFilePresent( "target/site/info.properties" );
+        }
+        else
+        {
+            verifier.executeGoal( "validate" );
+            Properties props = verifier.loadProperties( "target/config.properties" );
+            assertEquals( "maven-it-plugin-site", props.getProperty( "project.reporting.plugins.0.artifactId" ) );
+            assertFalse( "fail.properties".equals( props.getProperty( "project.reporting.plugins.0.configuration.children.infoFile.0.value" ) ) );
+        }
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
