@@ -171,6 +171,37 @@ public class DefaultModelBuilder
         resultModel = interpolateModel( resultModel, request, problems );
         resultData.setModel( resultModel );
 
+        resultData.setGroupId( resultModel.getGroupId() );
+        resultData.setArtifactId( resultModel.getArtifactId() );
+        resultData.setVersion( resultModel.getVersion() );
+
+        result.setProblems( problems );
+
+        result.setEffectiveModel( resultModel );
+
+        result.setActiveExternalProfiles( activeExternalProfiles );
+
+        for ( ModelData currentData : lineage )
+        {
+            String modelId = ( currentData != superData ) ? currentData.getId() : "";
+
+            result.addModelId( modelId );
+            result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
+            result.setRawModel( modelId, currentData.getRawModel() );
+        }
+
+        build( request, result );
+
+        return result;
+    }
+
+    public ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
+        throws ModelBuildingException
+    {
+        Model resultModel = result.getEffectiveModel();
+
+        List<ModelProblem> problems = result.getProblems();
+
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
         pluginManagementInjector.injectBasicManagement( resultModel, request );
@@ -201,25 +232,6 @@ public class DefaultModelBuilder
         if ( hasErrors( problems ) )
         {
             throw new ModelBuildingException( problems );
-        }
-
-        resultData.setGroupId( resultModel.getGroupId() );
-        resultData.setArtifactId( resultModel.getArtifactId() );
-        resultData.setVersion( resultModel.getVersion() );
-
-        result.setProblems( problems );
-
-        result.setEffectiveModel( resultModel );
-
-        result.setActiveExternalProfiles( activeExternalProfiles );
-
-        for ( ModelData currentData : lineage )
-        {
-            String modelId = ( currentData != superData ) ? currentData.getId() : "";
-
-            result.addModelId( modelId );
-            result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
-            result.setRawModel( modelId, currentData.getRawModel() );
         }
 
         return result;
@@ -625,7 +637,7 @@ public class DefaultModelBuilder
 
     private String toSourceHint( Model model )
     {
-        StringBuilder buffer = new StringBuilder( 128 );
+        StringBuilder buffer = new StringBuilder( 192 );
 
         buffer.append( toId( model ) );
 
@@ -640,72 +652,42 @@ public class DefaultModelBuilder
 
     private String toId( Model model )
     {
-        StringBuilder buffer = new StringBuilder( 64 );
-
-        if ( model.getGroupId() != null )
+        String groupId = model.getGroupId();
+        if ( groupId == null && model.getParent() != null )
         {
-            buffer.append( model.getGroupId() );
-        }
-        else if ( model.getParent() != null && model.getParent().getGroupId() != null )
-        {
-            buffer.append( model.getParent().getGroupId() );
-        }
-        else
-        {
-            buffer.append( "[unknown-group-id]" );
+            groupId = model.getParent().getGroupId();
         }
 
-        buffer.append( ':' );
+        String artifactId = model.getArtifactId();
 
-        if ( model.getArtifactId() != null )
+        String version = model.getVersion();
+        if ( version == null && model.getParent() != null )
         {
-            buffer.append( model.getArtifactId() );
-        }
-        else
-        {
-            buffer.append( "[unknown-artifact-id]" );
+            version = model.getParent().getVersion();
         }
 
-        buffer.append( ':' );
-
-        if ( model.getVersion() != null )
-        {
-            buffer.append( model.getVersion() );
-        }
-        else if ( model.getParent() != null && model.getParent().getVersion() != null )
-        {
-            buffer.append( model.getParent().getVersion() );
-        }
-        else
-        {
-            buffer.append( "[unknown-version]" );
-        }
-
-        return buffer.toString();
+        return toId( groupId, artifactId, version );
     }
 
     private String toId( Parent parent )
     {
-        StringBuilder buffer = new StringBuilder( 64 );
-
-        buffer.append( parent.getGroupId() );
-        buffer.append( ':' );
-        buffer.append( parent.getArtifactId() );
-        buffer.append( ':' );
-        buffer.append( parent.getVersion() );
-
-        return buffer.toString();
+        return toId( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
     }
 
     private String toId( Dependency dependency )
     {
-        StringBuilder buffer = new StringBuilder( 64 );
+        return toId( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+    }
 
-        buffer.append( dependency.getGroupId() );
+    private String toId( String groupId, String artifactId, String version )
+    {
+        StringBuilder buffer = new StringBuilder( 96 );
+
+        buffer.append( ( groupId != null ) ? groupId : "[unknown-group-id]" );
         buffer.append( ':' );
-        buffer.append( dependency.getArtifactId() );
+        buffer.append( ( artifactId != null ) ? artifactId : "[unknown-artifact-id]" );
         buffer.append( ':' );
-        buffer.append( dependency.getVersion() );
+        buffer.append( ( version != null ) ? version : "[unknown-version]" );
 
         return buffer.toString();
     }

@@ -198,7 +198,7 @@ class ModelData
      */
     public String getId()
     {
-        StringBuilder buffer = new StringBuilder( 64 );
+        StringBuilder buffer = new StringBuilder( 96 );
 
         buffer.append( getGroupId() ).append( ':' ).append( getArtifactId() ).append( ':' ).append( getVersion() );
 

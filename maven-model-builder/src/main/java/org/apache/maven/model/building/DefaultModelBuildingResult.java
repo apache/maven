@@ -20,7 +20,6 @@ package org.apache.maven.model.building;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,7 @@ class DefaultModelBuildingResult
 
     public List<String> getModelIds()
     {
-        return Collections.unmodifiableList( modelIds );
+        return modelIds;
     }
 
     public DefaultModelBuildingResult addModelId( String modelId )
@@ -111,8 +110,7 @@ class DefaultModelBuildingResult
 
     public List<Profile> getActivePomProfiles( String modelId )
     {
-        List<Profile> profiles = this.activePomProfiles.get( modelId );
-        return ( profiles != null ) ? Collections.unmodifiableList( profiles ) : null;
+        return activePomProfiles.get( modelId );
     }
 
     public DefaultModelBuildingResult setActivePomProfiles( String modelId, List<Profile> activeProfiles )
@@ -136,7 +134,7 @@ class DefaultModelBuildingResult
 
     public List<Profile> getActiveExternalProfiles()
     {
-        return Collections.unmodifiableList( activeExternalProfiles );
+        return activeExternalProfiles;
     }
 
     public DefaultModelBuildingResult setActiveExternalProfiles( List<Profile> activeProfiles )
@@ -155,7 +153,7 @@ class DefaultModelBuildingResult
 
     public List<ModelProblem> getProblems()
     {
-        return Collections.unmodifiableList( problems );
+        return problems;
     }
 
     public DefaultModelBuildingResult setProblems( List<ModelProblem> problems )
