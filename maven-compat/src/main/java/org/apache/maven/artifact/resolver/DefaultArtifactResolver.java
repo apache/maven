@@ -390,7 +390,7 @@ public class DefaultArtifactResolver
         // file reference. But this may be a Maven Plugin that we need to resolve from a remote repository
         // as well as its dependencies.
                         
-        if ( request.isResolveRoot() && rootArtifact.getFile() == null )
+        if ( request.isResolveRoot() /* && rootArtifact.getFile() == null */ )
         {            
             try
             {
