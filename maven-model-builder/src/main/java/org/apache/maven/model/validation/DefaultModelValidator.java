@@ -72,12 +72,12 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
-            validateDependencies( result, model.getDependencies(), "dependencies", request );
+            validateDependencies( result, model.getDependencies(), "dependencies.dependency", request );
 
             if ( model.getDependencyManagement() != null )
             {
                 validateDependencies( result, model.getDependencyManagement().getDependencies(),
-                                      "dependencyManagment.dependencies", request );
+                                      "dependencyManagement.dependencies.dependency", request );
             }
 
             validateRepositories( result, model.getRepositories(), "repositories.repository", request );
@@ -87,13 +87,13 @@ public class DefaultModelValidator
             for ( Profile profile : model.getProfiles() )
             {
                 validateDependencies( result, profile.getDependencies(), "profiles.profile[" + profile.getId()
-                    + "].dependencies", request );
+                    + "].dependencies.dependency", request );
 
                 if ( profile.getDependencyManagement() != null )
                 {
                     validateDependencies( result, profile.getDependencyManagement().getDependencies(),
-                                          "profiles.profile[" + profile.getId() + "].dependencyManagment.dependencies",
-                                          request );
+                                          "profiles.profile[" + profile.getId()
+                                              + "].dependencyManagement.dependencies.dependency", request );
                 }
 
                 validateRepositories( result, profile.getRepositories(), "profiles.profile[" + profile.getId()
@@ -277,6 +277,12 @@ public class DefaultModelValidator
         for ( Dependency dependency : dependencies )
         {
             String key = dependency.getManagementKey();
+
+            if ( "pom".equals( dependency.getType() ) && "import".equals( dependency.getScope() )
+                && StringUtils.isNotEmpty( dependency.getClassifier() ) )
+            {
+                addViolation( result, false, "'" + prefix + ".classifier' must be empty for imported POM: " + key );
+            }
 
             Dependency existing = index.get( key );
 
