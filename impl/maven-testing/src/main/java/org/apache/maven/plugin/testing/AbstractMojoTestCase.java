@@ -20,6 +20,7 @@ package org.apache.maven.plugin.testing;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.AccessibleObject;
@@ -33,7 +34,13 @@ import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
@@ -64,6 +71,8 @@ public abstract class AbstractMojoTestCase
     private ComponentConfigurator configurator;
     private DefaultPluginManager pluginManager;
 
+    private PlexusContainer container;
+    
     /*
      * for the harness I think we have decided against going the route of using the maven project builder.
      * instead I think we are going to try and make an instance of the localrespository and assign that
@@ -73,7 +82,6 @@ public abstract class AbstractMojoTestCase
     protected void setUp()
         throws Exception
     {
-        super.setUp();
 
         configurator = getContainer().lookup( ComponentConfigurator.class, "basic" );
         pluginManager = (DefaultPluginManager) getContainer().lookup( PluginManager.class );
@@ -87,6 +95,41 @@ public abstract class AbstractMojoTestCase
         }
     }
 
+    protected InputStream getPublicDescriptorStream()
+        throws Exception
+    {
+        String path = getBasedir() + "/target/classes/META-INF/maven/plugin.xml";
+        return new FileInputStream( new File( path ) );
+    }
+
+    
+    protected void setupContainer()
+    {
+        ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
+
+        ContainerConfiguration cc =
+            new DefaultContainerConfiguration().setClassWorld( classWorld ).setName( "embedder" );
+        try
+        {
+            container = new DefaultPlexusContainer( cc );
+        }
+        catch ( PlexusContainerException e )
+        {
+            e.printStackTrace();
+            fail( "Failed to create plexus container." );
+        }   
+    }
+    
+    protected PlexusContainer getContainer()
+    {
+        if ( container == null )
+        {
+            setupContainer();
+        }
+
+        return container;
+    }    
+    
     /**
      * Lookup the mojo leveraging the subproject pom
      *

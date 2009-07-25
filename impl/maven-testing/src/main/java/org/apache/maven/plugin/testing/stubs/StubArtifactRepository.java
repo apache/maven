@@ -23,7 +23,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.repository.Proxy;
 
 /**
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
@@ -177,33 +179,49 @@ public class StubArtifactRepository
         return null;
     }
 
+    public Authentication getAuthentication()
+    {
+        return null;
+    }
+
+    public Proxy getProxy()
+    {
+        return null;
+    }
+
+    public void setAuthentication( Authentication authentication )
+    {
+       
+    }
+
     public void setId( String id )
     {
-        // TODO Auto-generated method stub
         
     }
 
     public void setLayout( ArtifactRepositoryLayout layout )
     {
-        // TODO Auto-generated method stub
+        
+    }
+
+    public void setProxy( Proxy proxy )
+    {
         
     }
 
     public void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy )
     {
-        // TODO Auto-generated method stub
         
     }
 
     public void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy )
     {
-        // TODO Auto-generated method stub
         
     }
 
     public void setUrl( String url )
     {
-        // TODO Auto-generated method stub
         
     }
+
 }
