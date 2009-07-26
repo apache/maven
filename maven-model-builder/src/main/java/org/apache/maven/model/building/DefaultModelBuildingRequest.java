@@ -61,6 +61,8 @@ public class DefaultModelBuildingRequest
 
     private List<ModelBuildingListener> modelBuildingListeners;
 
+    private ModelCache modelCache;
+
     public File getPomFile()
     {
         return pomFile;
@@ -275,6 +277,18 @@ public class DefaultModelBuildingRequest
         {
             this.modelBuildingListeners = null;
         }
+
+        return this;
+    }
+
+    public ModelCache getModelCache()
+    {
+        return this.modelCache;
+    }
+
+    public DefaultModelBuildingRequest setModelCache( ModelCache modelCache )
+    {
+        this.modelCache = modelCache;
 
         return this;
     }

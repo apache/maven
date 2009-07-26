@@ -262,4 +262,20 @@ public interface ModelBuildingRequest
      */
     ModelBuildingRequest setModelBuildingListeners( List<? extends ModelBuildingListener> modelBuildingListeners );
 
+    /**
+     * Gets the model cache to use for reuse of previously built models.
+     * 
+     * @return The model cache or {@code null} if not set.
+     */
+    ModelCache getModelCache();
+
+    /**
+     * Sets the model cache to use for reuse of previously built models. This is an optional component that serves
+     * performance optimizations.
+     * 
+     * @param modelCache The model cache to use, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    ModelBuildingRequest setModelCache( ModelCache modelCache );
+
 }

@@ -424,11 +424,28 @@ public class DefaultModelBuilder
 
         if ( parent != null )
         {
-            parentData = readParentLocally( childModel, request, problems );
+            String groupId = parent.getGroupId();
+            String artifactId = parent.getArtifactId();
+            String version = parent.getVersion();
+
+            parentData = getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW );
 
             if ( parentData == null )
             {
-                parentData = readParentExternally( childModel, request, problems );
+                parentData = readParentLocally( childModel, request, problems );
+
+                if ( parentData == null )
+                {
+                    parentData = readParentExternally( childModel, request, problems );
+                }
+
+                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.RAW, parentData );
+            }
+            else
+            {
+                parentData =
+                    new ModelData( ModelUtils.cloneModel( parentData.getModel() ), parentData.getGroupId(),
+                                   parentData.getArtifactId(), parentData.getVersion() );
             }
         }
         else
@@ -497,23 +514,27 @@ public class DefaultModelBuilder
     {
         Parent parent = childModel.getParent();
 
+        String groupId = parent.getGroupId();
+        String artifactId = parent.getArtifactId();
+        String version = parent.getVersion();
+
         ModelResolver modelResolver = request.getModelResolver();
 
         if ( modelResolver == null )
         {
             throw new IllegalArgumentException( "no model resolver provided, cannot resolve parent POM "
-                + toId( parent ) + " for POM " + toSourceHint( childModel ) );
+                + toId( groupId, artifactId, version ) + " for POM " + toSourceHint( childModel ) );
         }
 
         ModelSource modelSource;
         try
         {
-            modelSource = modelResolver.resolveModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+            modelSource = modelResolver.resolveModel( groupId, artifactId, version );
         }
         catch ( UnresolvableModelException e )
         {
-            problems.add( new ModelProblem( "Non-resolvable parent POM " + toId( parent ) + " for POM "
-                + toSourceHint( childModel ) + ": " + e.getMessage(), ModelProblem.Severity.FATAL,
+            problems.add( new ModelProblem( "Non-resolvable parent POM " + toId( groupId, artifactId, version )
+                + " for POM " + toSourceHint( childModel ) + ": " + e.getMessage(), ModelProblem.Severity.FATAL,
                                             toSourceHint( childModel ), e ) );
             throw new ModelBuildingException( problems );
         }
@@ -557,58 +578,93 @@ public class DefaultModelBuilder
 
             it.remove();
 
-            if ( modelResolver == null )
-            {
-                throw new IllegalArgumentException( "no model resolver provided, cannot resolve import POM "
-                    + toId( dependency ) + " for POM " + toSourceHint( model ) );
-            }
+            String groupId = dependency.getGroupId();
+            String artifactId = dependency.getArtifactId();
+            String version = dependency.getVersion();
 
-            ModelSource importSource;
-            try
-            {
-                importSource =
-                    modelResolver.resolveModel( dependency.getGroupId(), dependency.getArtifactId(),
-                                                dependency.getVersion() );
-            }
-            catch ( UnresolvableModelException e )
-            {
-                problems.add( new ModelProblem( "Non-resolvable import POM " + toId( dependency ) + " for POM "
-                    + toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
-                                                toSourceHint( model ), e ) );
-                continue;
-            }
+            Model importModel =
+                getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.EFFECTIVE );
 
-            if ( importRequest == null )
+            if ( importModel == null )
             {
-                importRequest = new DefaultModelBuildingRequest();
-                importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+                if ( modelResolver == null )
+                {
+                    throw new IllegalArgumentException( "no model resolver provided, cannot resolve import POM "
+                        + toId( groupId, artifactId, version ) + " for POM " + toSourceHint( model ) );
+                }
+
+                ModelSource importSource;
+                try
+                {
+                    importSource = modelResolver.resolveModel( groupId, artifactId, version );
+                }
+                catch ( UnresolvableModelException e )
+                {
+                    problems.add( new ModelProblem( "Non-resolvable import POM " + toId( groupId, artifactId, version )
+                        + " for POM " + toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
+                                                    toSourceHint( model ), e ) );
+                    continue;
+                }
+
+                if ( importRequest == null )
+                {
+                    importRequest = new DefaultModelBuildingRequest();
+                    importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+                }
+
+                importRequest.setModelSource( importSource );
+                importRequest.setModelResolver( modelResolver.newCopy() );
+
+                ModelBuildingResult importResult;
+                try
+                {
+                    importResult = build( importRequest );
+                }
+                catch ( ModelBuildingException e )
+                {
+                    problems.addAll( e.getProblems() );
+                    continue;
+                }
+
+                problems.addAll( importResult.getProblems() );
+
+                importModel = importResult.getEffectiveModel();
+
+                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.EFFECTIVE, importModel );
             }
-
-            importRequest.setModelSource( importSource );
-            importRequest.setModelResolver( modelResolver.newCopy() );
-
-            ModelBuildingResult importResult;
-            try
+            else
             {
-                importResult = build( importRequest );
+                importModel = ModelUtils.cloneModel( importModel );
             }
-            catch ( ModelBuildingException e )
-            {
-                problems.addAll( e.getProblems() );
-                continue;
-            }
-
-            problems.addAll( importResult.getProblems() );
 
             if ( importModels == null )
             {
                 importModels = new ArrayList<Model>();
             }
 
-            importModels.add( importResult.getEffectiveModel() );
+            importModels.add( importModel );
         }
 
         dependencyManagementImporter.importManagement( model, importModels, request );
+    }
+
+    private <T> void putCache( ModelCache modelCache, String groupId, String artifactId, String version,
+                               ModelCacheTag<T> tag, T data )
+    {
+        if ( modelCache != null )
+        {
+            modelCache.put( groupId, artifactId, version, tag.getName(), data );
+        }
+    }
+
+    private <T> T getCache( ModelCache modelCache, String groupId, String artifactId, String version,
+                            ModelCacheTag<T> tag )
+    {
+        if ( modelCache != null )
+        {
+            return tag.getType().cast( modelCache.get( groupId, artifactId, version, tag.getName() ) );
+        }
+        return null;
     }
 
     private void fireBuildExtensionsAssembled( Model model, ModelBuildingRequest request, List<ModelProblem> problems )
@@ -667,16 +723,6 @@ public class DefaultModelBuilder
         }
 
         return toId( groupId, artifactId, version );
-    }
-
-    private String toId( Parent parent )
-    {
-        return toId( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
-    }
-
-    private String toId( Dependency dependency )
-    {
-        return toId( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
     }
 
     private String toId( String groupId, String artifactId, String version )
