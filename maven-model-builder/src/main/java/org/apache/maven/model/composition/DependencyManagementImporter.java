@@ -1,4 +1,4 @@
-package org.apache.maven.model.management;
+package org.apache.maven.model.composition;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
