@@ -135,6 +135,27 @@ public interface ModelBuildingRequest
     ModelBuildingRequest setProcessPlugins( boolean processPlugins );
 
     /**
+     * Indicates whether the model building should happen in two phases. If enabled, the initial invocation of the model
+     * builder will only produce an interim result which may be used to analyze inter-model dependencies before the
+     * final invocation of the model builder is performed.
+     * 
+     * @return {@code true} if two-phase building is enabled, {@code false} if the model should be build in a single
+     *         step.
+     */
+    boolean isTwoPhaseBuilding();
+
+    /**
+     * Enables/disables two-phase building. If enabled, the initial invocation of the model builder will only produce an
+     * interim result which may be used to analyze inter-model dependencies before the final invocation of the model
+     * builder is performed.
+     * 
+     * @param twoPhaseBuilding {@code true} to enable two-phase building, {@code false} if the model should be build in
+     *            a single step.
+     * @return This request, never {@code null}.
+     */
+    ModelBuildingRequest setTwoPhaseBuilding( boolean twoPhaseBuilding );
+
+    /**
      * Gets the external profiles that should be considered for model building.
      * 
      * @return The external profiles that should be considered for model building, never {@code null}.

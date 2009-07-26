@@ -190,7 +190,10 @@ public class DefaultModelBuilder
             result.setRawModel( modelId, currentData.getRawModel() );
         }
 
-        build( request, result );
+        if ( !request.isTwoPhaseBuilding() )
+        {
+            build( request, result );
+        }
 
         return result;
     }

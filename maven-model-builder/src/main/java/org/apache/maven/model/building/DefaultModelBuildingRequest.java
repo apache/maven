@@ -45,6 +45,8 @@ public class DefaultModelBuildingRequest
 
     private boolean processPlugins;
 
+    private boolean twoPhaseBuilding;
+
     private List<Profile> profiles;
 
     private List<String> activeProfileIds;
@@ -107,6 +109,18 @@ public class DefaultModelBuildingRequest
     public DefaultModelBuildingRequest setProcessPlugins( boolean processPlugins )
     {
         this.processPlugins = processPlugins;
+
+        return this;
+    }
+
+    public boolean isTwoPhaseBuilding()
+    {
+        return twoPhaseBuilding;
+    }
+
+    public DefaultModelBuildingRequest setTwoPhaseBuilding( boolean twoPhaseBuilding )
+    {
+        this.twoPhaseBuilding = twoPhaseBuilding;
 
         return this;
     }
