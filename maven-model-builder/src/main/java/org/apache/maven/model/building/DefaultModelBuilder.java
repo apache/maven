@@ -234,6 +234,9 @@ public class DefaultModelBuilder
             throw new ModelBuildingException( problems );
         }
 
+        putCache( request.getModelCache(), resultModel.getGroupId(), resultModel.getArtifactId(),
+                  resultModel.getVersion(), ModelCacheTag.EFFECTIVE, resultModel );
+
         return result;
     }
 
@@ -565,7 +568,7 @@ public class DefaultModelBuilder
 
         ModelBuildingRequest importRequest = null;
 
-        List<Model> importModels = null;
+        List<DependencyManagement> importMngts = null;
 
         for ( Iterator<Dependency> it = depMngt.getDependencies().iterator(); it.hasNext(); )
         {
@@ -581,6 +584,8 @@ public class DefaultModelBuilder
             String groupId = dependency.getGroupId();
             String artifactId = dependency.getArtifactId();
             String version = dependency.getVersion();
+
+            DependencyManagement importMngt;
 
             Model importModel =
                 getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.EFFECTIVE );
@@ -630,22 +635,27 @@ public class DefaultModelBuilder
 
                 importModel = importResult.getEffectiveModel();
 
-                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.EFFECTIVE, importModel );
+                importMngt = importModel.getDependencyManagement();
             }
             else
             {
-                importModel = ModelUtils.cloneModel( importModel );
+                importMngt = ModelUtils.cloneDependencyManagement( importModel.getDependencyManagement() );
             }
 
-            if ( importModels == null )
+            if ( importMngt == null )
             {
-                importModels = new ArrayList<Model>();
+                continue;
             }
 
-            importModels.add( importModel );
+            if ( importMngts == null )
+            {
+                importMngts = new ArrayList<DependencyManagement>();
+            }
+
+            importMngts.add( importMngt );
         }
 
-        dependencyManagementImporter.importManagement( model, importModels, request );
+        dependencyManagementImporter.importManagement( model, importMngts, request );
     }
 
     private <T> void putCache( ModelCache modelCache, String groupId, String artifactId, String version,

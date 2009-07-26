@@ -21,6 +21,7 @@ package org.apache.maven.model.composition;
 
 import java.util.List;
 
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 
@@ -33,12 +34,12 @@ public interface DependencyManagementImporter
 {
 
     /**
-     * Imports the dependency management of the specified source models into the given target model.
+     * Imports the specified dependency management sections into the given target model.
      * 
      * @param target The model into which to import the dependency management section, must not be <code>null</code>.
-     * @param sources The models from which to import the dependency management sections, may be <code>null</code>.
+     * @param sources The dependency management sections to import, may be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      */
-    void importManagement( Model target, List<? extends Model> sources, ModelBuildingRequest request );
+    void importManagement( Model target, List<? extends DependencyManagement> sources, ModelBuildingRequest request );
 
 }

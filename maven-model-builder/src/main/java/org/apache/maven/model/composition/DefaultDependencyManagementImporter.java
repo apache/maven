@@ -40,7 +40,8 @@ public class DefaultDependencyManagementImporter
     implements DependencyManagementImporter
 {
 
-    public void importManagement( Model target, List<? extends Model> sources, ModelBuildingRequest request )
+    public void importManagement( Model target, List<? extends DependencyManagement> sources,
+                                  ModelBuildingRequest request )
     {
         if ( sources != null && !sources.isEmpty() )
         {
@@ -61,19 +62,14 @@ public class DefaultDependencyManagementImporter
                 target.setDependencyManagement( depMngt );
             }
 
-            for ( Model source : sources )
+            for ( DependencyManagement source : sources )
             {
-                DependencyManagement depMngtImport = source.getDependencyManagement();
-
-                if ( depMngtImport != null )
+                for ( Dependency dependency : source.getDependencies() )
                 {
-                    for ( Dependency dependency : depMngtImport.getDependencies() )
+                    String key = dependency.getManagementKey();
+                    if ( !dependencies.containsKey( key ) )
                     {
-                        String key = dependency.getManagementKey();
-                        if ( !dependencies.containsKey( key ) )
-                        {
-                            dependencies.put( key, dependency );
-                        }
+                        dependencies.put( key, dependency );
                     }
                 }
             }
