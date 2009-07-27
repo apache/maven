@@ -309,22 +309,31 @@ public class DefaultProjectBuilder
             reactorModelPool.put( model.getGroupId(), model.getArtifactId(), model.getVersion(), model.getPomFile() );
         }
 
-        for ( InterimResult interimResult : interimResults )
+        ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
+
+        try
         {
-            try
+            for ( InterimResult interimResult : interimResults )
             {
-                ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
+                try
+                {
+                    ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
-                MavenProject project = toProject( result, config, interimResult.listener );
+                    MavenProject project = toProject( result, config, interimResult.listener );
 
-                results.add( new DefaultProjectBuildingResult( project, result.getProblems() ) );
+                    results.add( new DefaultProjectBuildingResult( project, result.getProblems() ) );
+                }
+                catch ( ModelBuildingException e )
+                {
+                    results.add( new DefaultProjectBuildingResult( interimResult.pomFile, e.getProblems() ) );
+
+                    errors = true;
+                }
             }
-            catch ( ModelBuildingException e )
-            {
-                results.add( new DefaultProjectBuildingResult( interimResult.pomFile, e.getProblems() ) );
-
-                errors = true;
-            }
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( oldContextClassLoader );
         }
 
         if ( errors )
