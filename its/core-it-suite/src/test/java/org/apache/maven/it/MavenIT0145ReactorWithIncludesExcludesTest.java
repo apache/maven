@@ -37,7 +37,8 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
 
     public MavenIT0145ReactorWithIncludesExcludesTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        // superseded by make-like reactor mode in 3.x (see also MNG-4260)
+        super( "[2.0,3.0-alpha-1)" );
     }
 
     /**
