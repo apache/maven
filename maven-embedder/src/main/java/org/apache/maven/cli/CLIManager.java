@@ -40,8 +40,6 @@ public class CLIManager
 
     public static final char OFFLINE = 'o';
 
-    public static final char REACTOR = 'r';
-
     public static final char QUIET = 'q';
 
     public static final char DEBUG = 'X';
@@ -108,7 +106,6 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "quiet" ).withDescription( "Quiet output - only show errors" ).create( QUIET ) );
         options.addOption( OptionBuilder.withLongOpt( "debug" ).withDescription( "Produce execution debug output" ).create( DEBUG ) );
         options.addOption( OptionBuilder.withLongOpt( "errors" ).withDescription( "Produce execution error messages" ).create( ERRORS ) );
-        options.addOption( OptionBuilder.withLongOpt( "reactor" ).withDescription( "Execute goals for project found in the reactor" ).create( REACTOR ) );
         options.addOption( OptionBuilder.withLongOpt( "non-recursive" ).withDescription( "Do not recurse into sub-projects" ).create( NON_RECURSIVE ) );
         options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription( "Forces a check for updated releases and snapshots on remote repositories" ).create( UPDATE_SNAPSHOTS ) );
         options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription( "Comma-delimited list of profiles to activate" ).hasArg().create( ACTIVATE_PROFILES ) );

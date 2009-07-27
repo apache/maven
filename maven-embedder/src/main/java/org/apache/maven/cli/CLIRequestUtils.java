@@ -189,14 +189,6 @@ public final class CLIRequestUtils
 
         transferListener.setShowChecksumEvents( false );
 
-        // This means to scan a directory structure for POMs and process them.
-        boolean useReactor = false;
-
-        if ( commandLine.hasOption( CLIManager.REACTOR ) )
-        {
-            useReactor = true;
-        }
-
         String alternatePomFile = null;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
         {
