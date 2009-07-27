@@ -37,8 +37,7 @@ public class MavenITmng3810BadProfileActivationTest
 
     public MavenITmng3810BadProfileActivationTest()
     {
-        // TODO: implement for 3.0
-        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1)" ); // 2.0.11+, 2.1.0-M2+
+        super( "(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // 2.0.11+, 2.1.0-M2+
     }
 
     public void testitMNG3810Property()
