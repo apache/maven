@@ -43,9 +43,9 @@ public interface ModelBuildingResult
     List<String> getModelIds();
 
     /**
-     * Gets the fully assembled model.
+     * Gets the assembled model.
      * 
-     * @return The fully assembled model, never {@code null}.
+     * @return The assembled model, never {@code null}.
      */
     Model getEffectiveModel();
 

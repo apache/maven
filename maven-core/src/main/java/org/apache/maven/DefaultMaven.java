@@ -16,7 +16,6 @@ package org.apache.maven;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,13 +41,13 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
@@ -288,58 +287,12 @@ public class DefaultMaven
     private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
-        for ( File file : files )
+        List<ProjectBuildingResult> results =
+            projectBuilder.build( files, request.isRecursive(), request.getProjectBuildingRequest() );
+
+        for ( ProjectBuildingResult result : results )
         {
-            MavenProject project = projectBuilder.build( file, request.getProjectBuildingRequest() );
-
-            projects.add( project );
-            
-            if ( ( project.getModules() != null ) && !project.getModules().isEmpty() && request.isRecursive() )
-            {
-                File basedir = file.getParentFile();
-
-                List<File> moduleFiles = new ArrayList<File>();
-                
-                for ( String name : project.getModules() )
-                {
-                    if ( StringUtils.isEmpty( StringUtils.trim( name ) ) )
-                    {
-                        continue;
-                    }
-
-                    File moduleFile = new File( basedir, name );
-                    
-                    if ( !moduleFile.exists() )
-                    {
-                        throw new MissingModuleException( name, moduleFile, file );
-                    }
-                    else if ( moduleFile.isDirectory() )
-                    {
-                        moduleFile = new File( basedir, name + "/" + Maven.POMv4 );
-                    }
-
-                    if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
-                    {
-                        // we don't canonicalize on unix to avoid interfering with symlinks
-                        try
-                        {
-                            moduleFile = moduleFile.getCanonicalFile();
-                        }
-                        catch ( IOException e )
-                        {
-                            throw new MavenExecutionException( "Unable to canonicalize file name " + moduleFile, e );
-                        }
-                    }
-                    else
-                    {
-                        moduleFile = new File( moduleFile.toURI().normalize() );
-                    }
-
-                    moduleFiles.add( moduleFile );
-                }
-
-                collectProjects( projects, moduleFiles, request );
-            }
+            projects.add( result.getProject() );
         }
     }
 

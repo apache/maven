@@ -19,6 +19,7 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +39,7 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.repository.RepositorySystem;
 
 /**
- * Implements a model resolver backed by the Maven Repository API.
+ * Implements a model resolver backed by the Maven Repository API and the reactor.
  * 
  * @author Benjamin Bentmann
  */
@@ -54,8 +55,11 @@ class RepositoryModelResolver
 
     private List<ArtifactRepository> remoteRepositories;
 
+    private ReactorModelPool reactorModelPool;
+
     public RepositoryModelResolver( RepositorySystem repositorySystem, ResolutionErrorHandler resolutionErrorHandler,
-                                    ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+                                    ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                                    ReactorModelPool reactorModelPool )
     {
         if ( repositorySystem == null )
         {
@@ -80,12 +84,14 @@ class RepositoryModelResolver
             throw new IllegalArgumentException( "no remote repositories specified" );
         }
         this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
+
+        this.reactorModelPool = reactorModelPool;
     }
 
     public ModelResolver newCopy()
     {
         return new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, localRepository,
-                                            remoteRepositories );
+                                            remoteRepositories, reactorModelPool );
     }
 
     public void addRepository( Repository repository )
@@ -110,26 +116,38 @@ class RepositoryModelResolver
     public ModelSource resolveModel( String groupId, String artifactId, String version )
         throws UnresolvableModelException
     {
-        Artifact artifactParent = repositorySystem.createProjectArtifact( groupId, artifactId, version );
+        File pomFile = null;
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
-        request.setArtifact( artifactParent );
-        request.setLocalRepository( localRepository );
-        request.setRemoteRepostories( remoteRepositories );
-        // FIXME setTransferListener
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-
-        try
+        if ( reactorModelPool != null )
         {
-            resolutionErrorHandler.throwErrors( request, result );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new UnresolvableModelException( "Failed to resolve POM for " + groupId + ":" + artifactId + ":"
-                + version + " due to " + e.getMessage(), groupId, artifactId, version, e );
+            pomFile = reactorModelPool.get( groupId, artifactId, version );
         }
 
-        return new FileModelSource( artifactParent.getFile() );
+        if ( pomFile == null )
+        {
+            Artifact artifactParent = repositorySystem.createProjectArtifact( groupId, artifactId, version );
+
+            ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+            request.setArtifact( artifactParent );
+            request.setLocalRepository( localRepository );
+            request.setRemoteRepostories( remoteRepositories );
+            // FIXME setTransferListener
+            ArtifactResolutionResult result = repositorySystem.resolve( request );
+
+            try
+            {
+                resolutionErrorHandler.throwErrors( request, result );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new UnresolvableModelException( "Failed to resolve POM for " + groupId + ":" + artifactId + ":"
+                    + version + " due to " + e.getMessage(), groupId, artifactId, version, e );
+            }
+
+            pomFile = artifactParent.getFile();
+        }
+
+        return new FileModelSource( pomFile );
     }
 
 }

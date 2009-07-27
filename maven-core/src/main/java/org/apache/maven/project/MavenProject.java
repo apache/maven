@@ -225,7 +225,6 @@ public class MavenProject
      * @throws InvalidRepositoryException
      */
     public MavenProject( Model model, RepositorySystem repositorySystem, ProjectBuilder mavenProjectBuilder, ProjectBuildingRequest projectBuilderConfiguration )
-        throws InvalidRepositoryException
     {
         if ( model == null )
         {

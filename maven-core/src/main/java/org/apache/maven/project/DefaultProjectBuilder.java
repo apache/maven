@@ -16,13 +16,14 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -46,6 +47,7 @@ import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -86,7 +88,7 @@ public class DefaultProjectBuilder
     private MavenProject build( File pomFile, boolean localProject, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        ModelBuildingRequest request = getModelBuildingRequest( configuration );
+        ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
 
         DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, configuration );
         request.setModelBuildingListeners( Arrays.asList( listener ) );
@@ -135,48 +137,7 @@ public class DefaultProjectBuilder
                 logger.warn( "" );
             }
 
-            File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();
-            MavenProject project = fromModelToMavenProject( model, parentPomFile, configuration, model.getPomFile() );
-
-            project.setOriginalModel( result.getRawModel() );
-
-            project.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
-            project.setPluginArtifactRepositories( listener.getPluginRepositories() );
-
-            project.setClassRealm( listener.getProjectRealm() );
-
-            try
-            {
-                if ( configuration.isProcessPlugins() )
-                {
-                    lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(),
-                                                                      configuration.getLocalRepository(),
-                                                                      project.getPluginArtifactRepositories() );
-                }
-            }
-            catch ( LifecycleExecutionException e )
-            {
-                throw new ProjectBuildingException( project.getId(), e.getMessage(), e );
-            }
-
-            Build build = project.getBuild();
-            // NOTE: setting this script-source root before path translation, because
-            // the plugin tools compose basedir and scriptSourceRoot into a single file.
-            project.addScriptSourceRoot( build.getScriptSourceDirectory() );
-            project.addCompileSourceRoot( build.getSourceDirectory() );
-            project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
-            project.setFile( pomFile );
-
-            List<Profile> activeProfiles = new ArrayList<Profile>();
-            activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
-            activeProfiles.addAll( result.getActiveExternalProfiles() );
-            project.setActiveProfiles( activeProfiles );
-
-            project.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
-            for ( String modelId : result.getModelIds() )
-            {
-                project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
-            }
+            MavenProject project = toProject( result, configuration, listener );
 
             return project;
         }
@@ -198,11 +159,12 @@ public class DefaultProjectBuilder
         return ids;
     }
 
-    private ModelBuildingRequest getModelBuildingRequest( ProjectBuildingRequest configuration )
+    private ModelBuildingRequest getModelBuildingRequest( ProjectBuildingRequest configuration,
+                                                          ReactorModelPool reactorModelPool )
     {
         ModelResolver resolver =
             new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, configuration.getLocalRepository(),
-                                         configuration.getRemoteRepositories() );
+                                         configuration.getRemoteRepositories(), reactorModelPool );
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
 
@@ -255,7 +217,7 @@ public class DefaultProjectBuilder
     public MavenProject buildStandaloneSuperProject( ProjectBuildingRequest config )
         throws ProjectBuildingException
     {
-        ModelBuildingRequest request = getModelBuildingRequest( config );
+        ModelBuildingRequest request = getModelBuildingRequest( config, null );
 
         DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, config );
         request.setModelBuildingListeners( Arrays.asList( listener ) );
@@ -272,16 +234,7 @@ public class DefaultProjectBuilder
             throw new ProjectBuildingException( "[standalone]", "Failed to build standalone project", e );
         }
 
-        MavenProject standaloneProject;
-
-        try
-        {
-            standaloneProject = new MavenProject( result.getEffectiveModel(), repositorySystem, this, config );
-        }
-        catch ( InvalidRepositoryException e )
-        {
-            throw new IllegalStateException( e );
-        }
+        MavenProject standaloneProject = new MavenProject( result.getEffectiveModel(), repositorySystem, this, config );
 
         standaloneProject.setActiveProfiles( result.getActiveExternalProfiles() );
         standaloneProject.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
@@ -339,24 +292,215 @@ public class DefaultProjectBuilder
         return new MavenProjectBuildingResult( project, result );
     }
 
-    private MavenProject fromModelToMavenProject( Model model, File parentFile, ProjectBuildingRequest config, File projectDescriptor )
-        throws InvalidProjectModelException
+    public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest config )
+        throws ProjectBuildingException
     {
-        MavenProject project;
+        List<ProjectBuildingResult> results = new ArrayList<ProjectBuildingResult>();
+
+        List<InterimResult> interimResults = new ArrayList<InterimResult>();
+
+        ReactorModelPool reactorModelPool = new ReactorModelPool();
+
+        boolean errors = build( results, interimResults, pomFiles, recursive, config, reactorModelPool );
+
+        for ( InterimResult interimResult : interimResults )
+        {
+            Model model = interimResult.result.getEffectiveModel();
+            reactorModelPool.put( model.getGroupId(), model.getArtifactId(), model.getVersion(), model.getPomFile() );
+        }
+
+        for ( InterimResult interimResult : interimResults )
+        {
+            try
+            {
+                ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
+
+                MavenProject project = toProject( result, config, interimResult.listener );
+
+                results.add( new DefaultProjectBuildingResult( project, result.getProblems() ) );
+            }
+            catch ( ModelBuildingException e )
+            {
+                results.add( new DefaultProjectBuildingResult( interimResult.pomFile, e.getProblems() ) );
+
+                errors = true;
+            }
+        }
+
+        if ( errors )
+        {
+            throw new ProjectBuildingException( results );
+        }
+
+        return results;
+    }
+
+    private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults, List<File> pomFiles,
+                        boolean recursive, ProjectBuildingRequest config, ReactorModelPool reactorModelPool )
+    {
+        boolean errors = false;
+        
+        for ( File pomFile : pomFiles )
+        {
+            ModelBuildingRequest request = getModelBuildingRequest( config, reactorModelPool );
+
+            request.setPomFile( pomFile );
+            request.setTwoPhaseBuilding( true );
+
+            DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, config );
+            request.setModelBuildingListeners( Arrays.asList( listener ) );
+
+            try
+            {
+                ModelBuildingResult result = modelBuilder.build( request );
+
+                Model model = result.getEffectiveModel();
+
+                interimResults.add( new InterimResult( pomFile, request, result, listener ) );
+
+                if ( recursive && !model.getModules().isEmpty() )
+                {
+                    File basedir = pomFile.getParentFile();
+
+                    List<File> moduleFiles = new ArrayList<File>();
+
+                    for ( String module : model.getModules() )
+                    {
+                        if ( StringUtils.isEmpty( module ) )
+                        {
+                            continue;
+                        }
+
+                        File moduleFile = new File( basedir, module );
+
+                        if ( moduleFile.isDirectory() )
+                        {
+                            moduleFile = new File( moduleFile, Maven.POMv4 );
+                        }
+
+                        if ( !moduleFile.isFile() )
+                        {
+                            String source = toSourceHint( model );
+                            ModelProblem problem =
+                                new ModelProblem( "Child module " + moduleFile + " of " + source + " does not exist",
+                                                  ModelProblem.Severity.ERROR, source );
+                            result.getProblems().add( problem );
+
+                            errors = true;
+
+                            continue;
+                        }
+
+                        if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+                        {
+                            // we don't canonicalize on unix to avoid interfering with symlinks
+                            try
+                            {
+                                moduleFile = moduleFile.getCanonicalFile();
+                            }
+                            catch ( IOException e )
+                            {
+                                moduleFile = moduleFile.getAbsoluteFile();
+                            }
+                        }
+                        else
+                        {
+                            moduleFile = new File( moduleFile.toURI().normalize() );
+                        }
+
+                        moduleFiles.add( moduleFile );
+                    }
+
+                    errors =
+                        build( results, interimResults, moduleFiles, recursive, config, reactorModelPool ) || errors;
+                }
+            }
+            catch ( ModelBuildingException e )
+            {
+                results.add( new DefaultProjectBuildingResult( pomFile, e.getProblems() ) );
+
+                errors = true;
+            }
+        }
+
+        return errors;
+    }
+
+    static class InterimResult
+    {
+
+        File pomFile;
+
+        ModelBuildingRequest request;
+
+        ModelBuildingResult result;
+
+        DefaultModelBuildingListener listener;
+
+        InterimResult( File pomFile, ModelBuildingRequest request, ModelBuildingResult result,
+                       DefaultModelBuildingListener listener )
+        {
+            this.pomFile = pomFile;
+            this.request = request;
+            this.result = result;
+            this.listener = listener;
+        }
+
+    }
+
+    private MavenProject toProject( ModelBuildingResult result, ProjectBuildingRequest configuration,
+                                    DefaultModelBuildingListener listener )
+        throws ProjectBuildingException
+    {
+        Model model = result.getEffectiveModel();
+
+        MavenProject project = new MavenProject( model, repositorySystem, this, configuration );
+
+        project.setFile( model.getPomFile() );
+
+        File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();
+        project.setParentFile( parentPomFile );
+
+        Artifact projectArtifact =
+            repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null,
+                                             project.getPackaging() );
+        project.setArtifact( projectArtifact );
+
+        project.setOriginalModel( result.getRawModel() );
+
+        project.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
+        project.setPluginArtifactRepositories( listener.getPluginRepositories() );
+
+        project.setClassRealm( listener.getProjectRealm() );
 
         try
         {
-            project = new MavenProject( model, repositorySystem, this, config );
-
-            Artifact projectArtifact = repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging() );
-            project.setArtifact( projectArtifact );
-
-            project.setParentFile( parentFile );
+            if ( configuration.isProcessPlugins() )
+            {
+                lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(),
+                                                                  configuration.getLocalRepository(),
+                                                                  project.getPluginArtifactRepositories() );
+            }
         }
-        catch ( InvalidRepositoryException e )
+        catch ( LifecycleExecutionException e )
         {
-            String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
-            throw new InvalidProjectModelException( projectId, e.getMessage(), projectDescriptor, e );
+            throw new ProjectBuildingException( project.getId(), e.getMessage(), e );
+        }
+
+        Build build = project.getBuild();
+        project.addScriptSourceRoot( build.getScriptSourceDirectory() );
+        project.addCompileSourceRoot( build.getSourceDirectory() );
+        project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
+
+        List<Profile> activeProfiles = new ArrayList<Profile>();
+        activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
+        activeProfiles.addAll( result.getActiveExternalProfiles() );
+        project.setActiveProfiles( activeProfiles );
+
+        project.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
+        for ( String modelId : result.getModelIds() )
+        {
+            project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
         }
 
         return project;
@@ -379,6 +523,25 @@ public class DefaultProjectBuilder
         }
 
         return ArtifactUtils.versionlessKey( gid, aid );
+    }
+
+    private String toSourceHint( Model model )
+    {
+        StringBuilder buffer = new StringBuilder( 192 );
+
+        buffer.append( model.getGroupId() );
+        buffer.append( ':' );
+        buffer.append( model.getArtifactId() );
+        buffer.append( ':' );
+        buffer.append( model.getVersion() );
+
+        File pomFile = model.getPomFile();
+        if ( pomFile != null )
+        {
+            buffer.append( " (" ).append( pomFile ).append( ")" );
+        }
+
+        return buffer.toString();
     }
 
 }
