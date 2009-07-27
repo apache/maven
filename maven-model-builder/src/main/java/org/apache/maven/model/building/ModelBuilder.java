@@ -37,4 +37,18 @@ public interface ModelBuilder
     ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException;
 
+    /**
+     * Builds the effective model by completing the specified interim result which was produced by a previous call to
+     * {@link #build(ModelBuildingRequest)} with {@link ModelBuildingRequest#isTwoPhaseBuilding()} being {@code true}.
+     * The model building request passed to this method must be the same as the one used for the first phase of the
+     * model building.
+     * 
+     * @param request The model building request that holds the parameters, must not be {@code null}.
+     * @param result The interim result of the first phase of model building, must not be {@code null}.
+     * @return The result of the model building, never {@code null}.
+     * @throws ModelBuildingException If the effective model could not be built.
+     */
+    ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
+        throws ModelBuildingException;
+
 }
