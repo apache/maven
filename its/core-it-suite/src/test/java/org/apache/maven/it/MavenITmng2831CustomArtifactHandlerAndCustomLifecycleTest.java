@@ -30,7 +30,7 @@ public class MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest
 
     public MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest()
     {
-        super( "(2.0.1,2.0.5),(2.0.6,3.0-alpha-1)" ); //extension support removed from 3.0
+        super( "(2.0.1,2.0.5),(2.0.6,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
     /**
