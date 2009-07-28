@@ -1,5 +1,6 @@
 package org.apache.maven;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 
@@ -63,21 +64,28 @@ public class ReactorArtifactRepository
 
                     artifact.setResolved( true );
                 }
-
-                /*
-                
-                TODO: This is being left out because Maven 2.x does not set this internally and it is only done by the compiler
-                plugin and not done generally. This should be done generally but currently causes problems with MNG-3023
-                
-                else if ( new File( project.getBuild().getOutputDirectory() ).exists() )
+                else
                 {
-                    artifact.setFile( new File( project.getBuild().getOutputDirectory() ) );
+                    File classesDir;
 
-                    artifact.setFromAuthoritativeRepository( true );
+                    if ( isTestArtifact( artifact ) )
+                    {
+                        classesDir = new File( project.getBuild().getTestOutputDirectory() );
+                    }
+                    else
+                    {
+                        classesDir = new File( project.getBuild().getOutputDirectory() );
+                    }
 
-                    artifact.setResolved( true );
+                    if ( classesDir.isDirectory() )
+                    {
+                        artifact.setFile( classesDir );
+
+                        artifact.setFromAuthoritativeRepository( true );
+
+                        artifact.setResolved( true );
+                    }
                 }
-                */
             }
         }
 
@@ -180,6 +188,25 @@ public class ReactorArtifactRepository
             buffer.append( ':' ).append( artifact.getClassifier() );
         }
         return buffer.toString();
+    }
+
+    /**
+     * Determines whether the specified artifact refers to test classes.
+     * 
+     * @param artifact The artifact to check, must not be {@code null}.
+     * @return {@code true} if the artifact refers to test classes, {@code false} otherwise.
+     */
+    private static boolean isTestArtifact( Artifact artifact )
+    {
+        if ( "test-jar".equals( artifact.getType() ) )
+        {
+            return true;
+        }
+        else if ( "jar".equals( artifact.getType() ) && "tests".equals( artifact.getClassifier() ) )
+        {
+            return true;
+        }
+        return false;
     }
 
     @Override
