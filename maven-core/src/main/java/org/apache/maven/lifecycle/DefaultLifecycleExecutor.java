@@ -707,19 +707,22 @@ public class DefaultLifecycleExecutor
             {
                 Metadata pluginMetadata = readMetadata( artifactMetadataFile );
 
-                String release = pluginMetadata.getVersioning().getRelease();
-
-                if ( StringUtils.isNotEmpty( release ) )
+                if ( pluginMetadata.getVersioning() != null )
                 {
-                    plugin.setVersion( release );
-                }
-                else
-                {
-                    String latest = pluginMetadata.getVersioning().getLatest();
+                    String release = pluginMetadata.getVersioning().getRelease();
 
-                    if ( StringUtils.isNotEmpty( latest ) )
+                    if ( StringUtils.isNotEmpty( release ) )
                     {
-                        plugin.setVersion( latest );
+                        plugin.setVersion( release );
+                    }
+                    else
+                    {
+                        String latest = pluginMetadata.getVersioning().getLatest();
+
+                        if ( StringUtils.isNotEmpty( latest ) )
+                        {
+                            plugin.setVersion( latest );
+                        }
                     }
                 }
             }
