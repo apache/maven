@@ -244,35 +244,6 @@ public class DefaultMaven
     private ReactorManager doExecute( MavenExecutionRequest request, EventDispatcher dispatcher )
         throws MavenExecutionException, BuildFailureException, LifecycleExecutionException
     {
-        if ( request.getSettings().isOffline() )
-        {
-            getLogger().info( SystemWarnings.getOfflineWarning() );
-
-            WagonManager wagonManager = null;
-
-            try
-            {
-                wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-
-                wagonManager.setOnline( false );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new MavenExecutionException( "Cannot retrieve WagonManager in order to set offline mode.", e );
-            }
-            finally
-            {
-                try
-                {
-                    container.release( wagonManager );
-                }
-                catch ( ComponentLifecycleException e )
-                {
-                    getLogger().warn( "Cannot release WagonManager.", e );
-                }
-            }
-        }
-
         try
         {
             resolveParameters( request.getSettings(), request.getExecutionProperties() );
@@ -663,6 +634,13 @@ public class DefaultMaven
         {
             DefaultWagonManager wagonManager = (DefaultWagonManager) container.lookup( WagonManager.ROLE );
             
+            if ( settings.isOffline() )
+            {
+                getLogger().info( SystemWarnings.getOfflineWarning() );
+
+                wagonManager.setOnline( false );
+            }
+
             String oldUserAgent = wagonManager.getHttpUserAgent();
             int firstSpace = oldUserAgent == null ? -1 : oldUserAgent.indexOf( " " );
             
