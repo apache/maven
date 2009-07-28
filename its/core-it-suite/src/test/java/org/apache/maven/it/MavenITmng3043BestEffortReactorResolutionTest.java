@@ -36,7 +36,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest
 
     public MavenITmng3043BestEffortReactorResolutionTest()
     {
-        super( "[2.1.0,)" );
+        super( "[3.0-alpha-3,)" );
     }
 
     /**
@@ -94,7 +94,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest
     }
 
     /**
-     * Test that dependency resolution still uses to the actual artifact files once these have been
+     * Test that dependency resolution still uses the actual artifact files once these have been
      * assembled/attached in the "package" phase. This ensures the class path is accurate and not locked to
      * the output directories of the best effort model from above.
      */
