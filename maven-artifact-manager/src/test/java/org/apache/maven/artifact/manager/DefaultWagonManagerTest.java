@@ -566,6 +566,39 @@ public class DefaultWagonManagerTest
         assertEquals( "Check configuration for wagon, protocol=" + protocol, s, wagon.getConfigurableField() );
     }
 
+    public void testWagonWithImplHint()
+        throws Exception
+    {
+        Repository repository = new Repository();
+
+        repository.setId( "id" );
+
+        repository.setProtocol( "a" );
+
+        Xpp3Dom conf = new Xpp3Dom( "configuration" );
+
+        Xpp3Dom configurableField = new Xpp3Dom( "wagonProvider" );
+
+        configurableField.setValue( "foo" );
+
+        conf.addChild( configurableField );
+
+        wagonManager.addConfiguration( repository.getId(), conf );
+
+        WagonMock wagon = (WagonMock) wagonManager.getWagon( repository );
+
+        assertNotNull( "Check wagon", wagon );
+
+        assertEquals( "Check configuration for wagon", WagonAWithImplementationHint.class, wagon.getClass() );
+
+        // try again to check configuration alterations don't modify behaviour
+        wagon = (WagonMock) wagonManager.getWagon( repository );
+
+        assertNotNull( "Check wagon", wagon );
+
+        assertEquals( "Check configuration for wagon", WagonAWithImplementationHint.class, wagon.getClass() );
+    }
+
     private final class ArtifactRepositoryLayoutStub
         implements ArtifactRepositoryLayout
     {

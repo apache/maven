@@ -103,6 +103,8 @@ public class DefaultWagonManager
     /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
     private Map<String, XmlPlexusConfiguration> serverConfigurationMap = new HashMap<String, XmlPlexusConfiguration>();
 
+    private Map<String, String> serverWagonProviderMap = new HashMap<String, String>();
+
     private TransferListener downloadMonitor;
 
     private boolean online = true;
@@ -170,28 +172,18 @@ public class DefaultWagonManager
         // TODO: Implement a better way to get the hint, via settings.xml or something.
         String impl = null;
         
-        if ( repositoryId != null && serverConfigurationMap.containsKey( repositoryId ) )
+        if ( repositoryId != null && serverWagonProviderMap.containsKey( repositoryId ) )
         {
-            XmlPlexusConfiguration config = serverConfigurationMap.get( repositoryId );
-            
-            Xpp3Dom dom = config.getXpp3Dom();
-            for ( int i = 0; i < dom.getChildCount(); i++ )
-            {
-                Xpp3Dom domChild = dom.getChild( i );
-                if ( WAGON_PROVIDER_CONFIGURATION.equals( domChild.getName() ) )
-                {
-                    impl = domChild.getValue();
-                    dom.removeChild( i );
-                    break;
-                }
-                
-                i++;
-            }
+            impl = serverWagonProviderMap.get( repositoryId );
+            getLogger().debug( "Using Wagon implementation " + impl + " from settings for server " + repositoryId );
         }
-        
-        if ( impl == null )
+        else
         {
             impl = providerMapping.getWagonProvider( protocol );
+            if ( impl != null )
+            {
+                getLogger().debug( "Using Wagon implementation " + impl + " from default mapping for protocol " + protocol );
+            }
         }
         
         return impl == null ? protocol : protocol + "-" + impl;
@@ -1202,6 +1194,19 @@ public class DefaultWagonManager
         }
 
         final XmlPlexusConfiguration xmlConf = new XmlPlexusConfiguration( configuration );
+
+        for ( int i = 0; i < configuration.getChildCount(); i++ )
+        {
+            Xpp3Dom domChild = configuration.getChild( i );
+            if ( WAGON_PROVIDER_CONFIGURATION.equals( domChild.getName() ) )
+            {
+                serverWagonProviderMap.put( repositoryId, domChild.getValue() );
+                configuration.removeChild( i );
+                break;
+            }
+            
+            i++;
+        }
 
         serverConfigurationMap.put( repositoryId, xmlConf );
     }

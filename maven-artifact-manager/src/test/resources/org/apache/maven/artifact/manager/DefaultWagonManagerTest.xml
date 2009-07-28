@@ -26,6 +26,11 @@ under the License.
     </component>
     <component>
       <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>a-foo</role-hint>
+      <implementation>org.apache.maven.artifact.manager.WagonAWithImplementationHint</implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.wagon.Wagon</role>
       <role-hint>b1</role-hint>
       <implementation>org.apache.maven.artifact.manager.WagonB</implementation>
     </component>
