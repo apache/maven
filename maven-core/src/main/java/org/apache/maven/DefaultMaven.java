@@ -629,171 +629,176 @@ public class DefaultMaven
     private void resolveParameters( Settings settings, Properties executionProperties )
         throws ComponentLookupException, ComponentLifecycleException, SettingsConfigurationException
     {
-        // TODO: remove when components.xml can be used to configure this instead
+        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
+
         try
         {
-            DefaultWagonManager wagonManager = (DefaultWagonManager) container.lookup( WagonManager.ROLE );
-            
             if ( settings.isOffline() )
             {
                 getLogger().info( SystemWarnings.getOfflineWarning() );
-
+    
                 wagonManager.setOnline( false );
             }
 
-            String oldUserAgent = wagonManager.getHttpUserAgent();
-            int firstSpace = oldUserAgent == null ? -1 : oldUserAgent.indexOf( " " );
-            
-            StringBuffer buffer = new StringBuffer();
-            
-            buffer.append( "Apache-Maven/" );
-            
-            ArtifactVersion version = runtimeInformation.getApplicationVersion();
-            if ( version != null )
-            {
-                buffer.append( version.getMajorVersion() );
-                buffer.append( '.' );
-                buffer.append( version.getMinorVersion() );
-            }
-            else
-            {
-                buffer.append( "unknown" );
-            }
-            
-            buffer.append( ' ' );
-            if ( firstSpace > -1 )
-            {
-                buffer.append( oldUserAgent.substring( firstSpace + 1 ) );
-                buffer.append( ' ' );
-                buffer.append( oldUserAgent.substring( 0, firstSpace ) );
-            }
-            else
-            {
-                buffer.append( oldUserAgent );
-            }
-            
-            wagonManager.setHttpUserAgent(  buffer.toString() );
-        }
-        catch ( ClassCastException e )
-        {
-            // ignore
-        }
-
-        WagonManager wagonManager = (WagonManager) container.lookup( WagonManager.ROLE );
-
-        SecDispatcher sd = null;
-        
-        try
-        {
-            Proxy proxy = settings.getActiveProxy();
-            
             try
             {
-                sd = (SecDispatcher) container.lookup( SecDispatcher.ROLE, "maven" );
-            }
-            catch (Exception e)
-            {
-                getLogger().warn( "Security features are disabled. Cannot find plexus component "+SecDispatcher.ROLE + ":maven" );
-                
-                line();
-            }
-
-            if ( proxy != null )
-            {
-                if ( proxy.getHost() == null )
-                {
-                    throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
-                }
-                
-                String pass = proxy.getPassword();
-                
-                if ( sd != null )
-                {
-                    try
-                    {
-                        pass = sd.decrypt( pass );
-                    }
-                    catch ( SecDispatcherException e )
-                    {
-                        reportSecurityConfigurationError( "password for proxy '" + proxy.getId() + "'", e );
-                    }
-                }
-
-                wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
-                                       pass, proxy.getNonProxyHosts() );
-            }
+                DefaultWagonManager wm = (DefaultWagonManager) wagonManager;
             
-            for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
-            {
-                Server server = (Server) i.next();
-                
-                String passWord = server.getPassword();
-
-                if ( sd != null )
-                {
-                    try
-                    {
-                        passWord = sd.decrypt( passWord );
-                    }
-                    catch ( SecDispatcherException e )
-                    {
-                        reportSecurityConfigurationError( "password for server '" + server.getId() + "'", e );
-                    }
-                }
-                
-                String passPhrase = server.getPassphrase();
-
-                if ( sd != null )
-                {
-                    try
-                    {
-                        passPhrase = sd.decrypt( passPhrase );
-                    }
-                    catch ( SecDispatcherException e )
-                    {
-                        reportSecurityConfigurationError( "passphrase for server '" + server.getId() + "'", e );
-                    }
-                }
-
-                wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), passWord,
-                                                    server.getPrivateKey(), passPhrase );
-
-                wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
-                                                server.getDirectoryPermissions() );
-
-                if ( server.getConfiguration() != null )
-                {
-                    wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
-                }
-            }
-
-            for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
-            {
-                Mirror mirror = (Mirror) i.next();
-
-                wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
-            }
+                String oldUserAgent = wm.getHttpUserAgent();
+                int firstSpace = oldUserAgent == null ? -1 : oldUserAgent.indexOf( " " );
             
-            for ( Object k: executionProperties.keySet() )
-            {
-                String key = (String) k;
-                if ( key.startsWith( "maven.wagon.provider." ) )
+                StringBuffer buffer = new StringBuffer();
+            
+                buffer.append( "Apache-Maven/" );
+            
+                ArtifactVersion version = runtimeInformation.getApplicationVersion();
+                if ( version != null )
                 {
-                    String provider = executionProperties.getProperty( key );
-                    key = key.substring( "maven.wagon.provider.".length() );
+                    buffer.append( version.getMajorVersion() );
+                    buffer.append( '.' );
+                    buffer.append( version.getMinorVersion() );
+                }
+                else
+                {
+                    buffer.append( "unknown" );
+                }
+                
+                buffer.append( ' ' );
+                if ( firstSpace > -1 )
+                {
+                    buffer.append( oldUserAgent.substring( firstSpace + 1 ) );
+                    buffer.append( ' ' );
+                    buffer.append( oldUserAgent.substring( 0, firstSpace ) );
+                }
+                else
+                {
+                    buffer.append( oldUserAgent );
+                }
+                
+                wm.setHttpUserAgent( buffer.toString() );
+            }
+            catch ( ClassCastException e )
+            {
+                // ignore
+            }
+
+            SecDispatcher sd = null;
+        
+            try
+            {
+                Proxy proxy = settings.getActiveProxy();
+            
+                try
+                {
+                    sd = (SecDispatcher) container.lookup( SecDispatcher.ROLE, "maven" );
+                }
+                catch (Exception e)
+                {
+                    getLogger().warn( "Security features are disabled. Cannot find plexus component "+SecDispatcher.ROLE + ":maven" );
                     
-                    wagonManager.setWagonProvider( key, provider );
+                    line();
+                }
+    
+                if ( proxy != null )
+                {
+                    if ( proxy.getHost() == null )
+                    {
+                        throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
+                    }
+                    
+                    String pass = proxy.getPassword();
+                    
+                    if ( sd != null )
+                    {
+                        try
+                        {
+                            pass = sd.decrypt( pass );
+                        }
+                        catch ( SecDispatcherException e )
+                        {
+                            reportSecurityConfigurationError( "password for proxy '" + proxy.getId() + "'", e );
+                        }
+                    }
+    
+                    wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+                                           pass, proxy.getNonProxyHosts() );
                 }
                 
+                for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
+                {
+                    Server server = (Server) i.next();
+                    
+                    String passWord = server.getPassword();
+    
+                    if ( sd != null )
+                    {
+                        try
+                        {
+                            passWord = sd.decrypt( passWord );
+                        }
+                        catch ( SecDispatcherException e )
+                        {
+                            reportSecurityConfigurationError( "password for server '" + server.getId() + "'", e );
+                        }
+                    }
+                    
+                    String passPhrase = server.getPassphrase();
+    
+                    if ( sd != null )
+                    {
+                        try
+                        {
+                            passPhrase = sd.decrypt( passPhrase );
+                        }
+                        catch ( SecDispatcherException e )
+                        {
+                            reportSecurityConfigurationError( "passphrase for server '" + server.getId() + "'", e );
+                        }
+                    }
+    
+                    wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), passWord,
+                                                        server.getPrivateKey(), passPhrase );
+    
+                    wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
+                                                    server.getDirectoryPermissions() );
+    
+                    if ( server.getConfiguration() != null )
+                    {
+                        wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
+                    }
+                }
+    
+                for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
+                {
+                    Mirror mirror = (Mirror) i.next();
+    
+                    wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
+                }
+                
+                for ( Object k: executionProperties.keySet() )
+                {
+                    String key = (String) k;
+                    if ( key.startsWith( "maven.wagon.provider." ) )
+                    {
+                        String provider = executionProperties.getProperty( key );
+                        key = key.substring( "maven.wagon.provider.".length() );
+                        
+                        wagonManager.setWagonProvider( key, provider );
+                    }
+                    
+                }
+            }
+            finally
+            {
+                if ( sd != null )
+                {
+                    container.release( sd );
+                }
             }
         }
         finally
         {
             container.release( wagonManager );
-            if ( sd != null )
-            {
-                container.release( sd );
-            }
         }
         
         // Would be better in settings.xml, but it is not extensible yet
