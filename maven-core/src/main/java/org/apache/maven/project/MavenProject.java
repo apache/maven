@@ -584,24 +584,10 @@ public class MavenProject
         {            
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {                
-                File file = a.getFile();
-                                                
-                if ( file == null )
-                {
-                    throw new DependencyResolutionRequiredException( a );
-                }
-                list.add( file.getPath() );
+                addArtifactPath( a, list );
             }
         }
-        
-        /*
-        System.out.println( "TEST CLASSPATH: ");
-        for( String s : list )
-        {
-            System.out.println( ">>>>> " + s );
-        }
-        */
-        
+
         return list;
     }
 
@@ -663,12 +649,7 @@ public class MavenProject
                 // TODO: let the scope handler deal with this
                 if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
                 {
-                    File file = a.getFile();
-                    if ( file == null )
-                    {
-                        throw new DependencyResolutionRequiredException( a );
-                    }
-                    list.add( file.getPath() );
+                    addArtifactPath( a, list );
                 }
             }
         }
@@ -1911,47 +1892,25 @@ public class MavenProject
         }
     }
 
-    private void addArtifactPath( Artifact a, List<String> list )
+    private void addArtifactPath( Artifact artifact, List<String> classpath )
         throws DependencyResolutionRequiredException
     {
-        File file = a.getFile();
-        if ( file != null )
+        File file = artifact.getFile();
+        if ( file == null )
         {
-            list.add( file.getPath() );
+            throw new DependencyResolutionRequiredException( artifact );
         }
         else
         {
-            String refId = getProjectReferenceId( a.getGroupId(), a.getArtifactId(), a.getVersion() );
-            MavenProject project = projectReferences.get( refId );
-
-            boolean projectDirFound = false;
-            if ( project != null )
-            {
-                if ( "test-jar".equals( a.getType() ) )
-                {
-                    File testOutputDir = new File( project.getBuild().getTestOutputDirectory() );
-                    if ( testOutputDir.exists() )
-                    {
-                        list.add( testOutputDir.getAbsolutePath() );
-                        projectDirFound = true;
-                    }
-                }
-                else
-                {
-                    list.add( project.getBuild().getOutputDirectory() );
-                    projectDirFound = true;
-                }
-            }
-            if ( !projectDirFound )
-            {
-                throw new DependencyResolutionRequiredException( a );
-            }
+            classpath.add( file.getPath() );
         }
     }
 
     private static String getProjectReferenceId( String groupId, String artifactId, String version )
     {
-        return groupId + ":" + artifactId + ":" + version;
+        StringBuilder buffer = new StringBuilder( 128 );
+        buffer.append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( version );
+        return buffer.toString();
     }
 
     /**
