@@ -113,8 +113,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
      * location should be present in the compile classpath output from the 
      * maven-it-plugin-dependency-resolution:compile mojo execution.
      * 
-     * Afterwards, the a separate Maven call to the 'initialize' phase should succeed, since the
-     * dependency artifact has been installed locally. This second execution should use the jar file
+     * Afterwards, the projects are cleaned and a separate Maven call to the 'initialize' phase should succeed, since
+     * the dependency artifact has been installed locally. This second execution should use the jar file
      * from the local repository in its classpath output.
      */
     public void testitMNG3023C()
@@ -137,9 +137,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
         assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
 
-        // The IT doesn't actually run the compiler but merely mimics its effect, i.e. the creation of the output dir
-        new File( testDir, "dependency/dependency-classes" ).mkdirs();
-        
+        verifier.deleteDirectory( "dependency/dependency-classes" );
         verifier.deleteDirectory( "consumer/target" );
         verifier.setLogFileName( "log-c-2.txt" );
         verifier.executeGoal( "validate" );
