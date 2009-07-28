@@ -151,8 +151,8 @@ public class CoreItHttpWagon
 
         try
         {
-	          new File( "target" ).mkdirs();
-	
+            new File( "target" ).mkdirs();
+    
             OutputStream os = new FileOutputStream( "target/wagon.properties" );
             try
             {
