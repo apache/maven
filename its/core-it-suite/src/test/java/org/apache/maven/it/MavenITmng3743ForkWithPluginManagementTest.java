@@ -49,6 +49,7 @@ public class MavenITmng3743ForkWithPluginManagementTest
         File projectDir = new File( testDir, "project" );
 
         Verifier verifier = new Verifier( pluginsDir.getAbsolutePath() );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3743" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
