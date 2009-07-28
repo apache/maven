@@ -21,6 +21,7 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.manager.WagonConfigurationException;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.manager.WagonProviderMapping;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -40,6 +41,8 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.providers.http.HttpWagon;
+import org.apache.maven.wagon.providers.http.LightweightHttpWagon;
+import org.apache.maven.wagon.providers.http.LightweightHttpsWagon;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
@@ -57,6 +60,8 @@ public class WagonSelectorTest
     extends PlexusTestCase
 {
 
+    private WagonProviderMapping mapping;
+
     private WagonManager manager;
 
     private ArtifactRepository localRepository;
@@ -69,7 +74,10 @@ public class WagonSelectorTest
         throws Exception
     {
         super.setUp();
-        manager = (WagonManager) lookup( WagonManager.class.getName() );
+
+        mapping = (WagonProviderMapping) lookup( WagonProviderMapping.ROLE );
+
+        manager = (WagonManager) lookup( WagonManager.ROLE );
 
         ArtifactRepositoryLayout layout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.class.getName(), "default" );
@@ -81,6 +89,7 @@ public class WagonSelectorTest
     public void tearDown()
         throws Exception
     {
+        release( mapping );
         release( manager );
         super.tearDown();
         
@@ -96,10 +105,34 @@ public class WagonSelectorTest
         }
     }
 
+    public void testSelectHttpWagonFromDefault()
+        throws Exception
+    {
+        Properties executionProperties = new Properties();
+
+        MavenExecutionRequest req = createMavenRequest( executionProperties );
+
+        Wagon wagon = manager.getWagon( new Repository( "id", "http://www.google.com/" ) );
+
+        assertTrue( "Should use " + LightweightHttpWagon.class.getName(), wagon instanceof LightweightHttpWagon );
+    }
+
+    public void testSelectHttpsWagonFromDefault()
+        throws Exception
+    {
+        Properties executionProperties = new Properties();
+
+        MavenExecutionRequest req = createMavenRequest( executionProperties );
+
+        Wagon wagon = manager.getWagon( new Repository( "id", "https://www.google.com/" ) );
+
+        assertTrue( "Should use " + LightweightHttpsWagon.class.getName(), wagon instanceof LightweightHttpsWagon );
+    }
+
     public void testSelectHttpclientWagonFromSimulatedMavenCliConfiguration()
         throws WagonConfigurationException, UnsupportedProtocolException
     {
-        manager.setWagonProvider( "http", "httpclient" );
+        mapping.setWagonProvider( "http", "httpclient" );
 
         Wagon wagon = manager.getWagon( new Repository( "id", "http://www.google.com/" ) );
 
@@ -122,6 +155,18 @@ public class WagonSelectorTest
 
     public void testSelectHttpclientWagonFromMavenCLIParameter()
         throws WagonConfigurationException, UnsupportedProtocolException, MavenExecutionException, IOException
+    {
+        Properties executionProperties = new Properties();
+        executionProperties.setProperty( "maven.wagon.provider.http", "httpclient" );
+
+        MavenExecutionRequest req = createMavenRequest( executionProperties );
+
+        Wagon wagon = manager.getWagon( new Repository( "id", "http://www.google.com/" ) );
+        assertTrue( "Should use " + HttpWagon.class.getName(), wagon instanceof HttpWagon );
+    }
+
+    public MavenExecutionRequest createMavenRequest( Properties executionProperties )
+        throws IOException, MavenExecutionException
     {
         Settings settings = new Settings();
         EventDispatcher eventDispatcher = new DefaultEventDispatcher();
@@ -159,9 +204,6 @@ public class WagonSelectorTest
         boolean showErrors = false;
         Properties userProperties = new Properties();
 
-        Properties executionProperties = new Properties();
-        executionProperties.setProperty( "maven.wagon.provider.http", "httpclient" );
-
         MavenExecutionRequest req =
             new DefaultMavenExecutionRequest( localRepository, settings, eventDispatcher, goals, baseDirectory,
                                               globalProfileManager, executionProperties, userProperties, showErrors );
@@ -170,8 +212,7 @@ public class WagonSelectorTest
 
         maven.execute( req );
 
-        Wagon wagon = manager.getWagon( new Repository( "id", "http://www.google.com/" ) );
-        assertTrue( "Should use " + HttpWagon.class.getName(), wagon instanceof HttpWagon );
+        return req;
     }
 
     public static final class TestRuntimeInformation

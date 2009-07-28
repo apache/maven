@@ -1211,11 +1211,6 @@ public class DefaultWagonManager
         serverConfigurationMap.put( repositoryId, xmlConf );
     }
     
-    public void setWagonProvider( String protocol, String provider )
-    {
-        providerMapping.setWagonProvider( protocol, provider );
-    }
-
     public void setDefaultRepositoryPermissions( RepositoryPermissions defaultRepositoryPermissions )
     {
         this.defaultRepositoryPermissions = defaultRepositoryPermissions;

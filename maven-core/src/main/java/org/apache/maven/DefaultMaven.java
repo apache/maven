@@ -37,6 +37,7 @@ import java.util.TimeZone;
 
 import org.apache.maven.artifact.manager.DefaultWagonManager;
 import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.manager.WagonProviderMapping;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -774,19 +775,6 @@ public class DefaultMaven
     
                     wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
                 }
-                
-                for ( Object k: executionProperties.keySet() )
-                {
-                    String key = (String) k;
-                    if ( key.startsWith( "maven.wagon.provider." ) )
-                    {
-                        String provider = executionProperties.getProperty( key );
-                        key = key.substring( "maven.wagon.provider.".length() );
-                        
-                        wagonManager.setWagonProvider( key, provider );
-                    }
-                    
-                }
             }
             finally
             {
@@ -801,6 +789,30 @@ public class DefaultMaven
             container.release( wagonManager );
         }
         
+        WagonProviderMapping mapping = (WagonProviderMapping) container.lookup( WagonProviderMapping.ROLE );
+        try
+        {
+            // set defaults
+            mapping.setWagonProvider( "http", "lightweight" );
+            mapping.setWagonProvider( "https", "lightweight" );
+
+            for ( Object k: executionProperties.keySet() )
+            {
+                String key = (String) k;
+                if ( key.startsWith( "maven.wagon.provider." ) )
+                {
+                    String provider = executionProperties.getProperty( key );
+                    key = key.substring( "maven.wagon.provider.".length() );
+                    
+                    mapping.setWagonProvider( key, provider );
+                }
+            }
+        }
+        finally
+        {
+            container.release( mapping );
+        }
+
         // Would be better in settings.xml, but it is not extensible yet
         String numThreads = System.getProperty( "maven.artifact.threads" );
         if ( numThreads != null )

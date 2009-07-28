@@ -126,11 +126,4 @@ public interface WagonManager
     void setDefaultRepositoryPermissions( RepositoryPermissions permissions );
 
     ArtifactRepository getMirrorRepository( ArtifactRepository repository );
-    
-    /**
-     * Set the provider name for selecting one Wagon from a range of possible implementations for
-     * the give protocol. This provider name is combined with the protocol to form the role-hint
-     * for Wagon lookup, using the format: <code>[protocol]-[provider]</code>.
-     */
-    void setWagonProvider( String protocol, String provider );
 }
