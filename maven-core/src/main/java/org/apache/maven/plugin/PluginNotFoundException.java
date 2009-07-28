@@ -46,8 +46,9 @@ public class PluginNotFoundException
 
     public PluginNotFoundException( Plugin plugin, List<ArtifactRepository> remoteRepositories )
     {
-        super( "Plugin could not be found, please check its coordinates for typos", plugin.getGroupId(),
-               plugin.getArtifactId(), plugin.getVersion(), "maven-plugin", null, remoteRepositories, null );
+        super( "Plugin could not be found, please check its coordinates for typos and ensure the required"
+            + " plugin repositories are defined in the POM", plugin.getGroupId(), plugin.getArtifactId(),
+               plugin.getVersion(), "maven-plugin", null, remoteRepositories, null );
         this.plugin = plugin;
     }
 
