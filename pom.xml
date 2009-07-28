@@ -25,7 +25,7 @@
   <version>3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Apache Maven</name>
+  <name>Apache Maven 3.x</name>
   <description>Maven is a project development management and
     comprehension tool. Based on the concept of a project object model:
     builds, dependency management, documentation creation, site
@@ -289,11 +289,13 @@
         <artifactId>plexus-plugin-manager</artifactId>
         <version>${plexusPluginManagerVersion}</version>
       </dependency>
+      <!--
       <dependency>
         <groupId>org.jsecurity</groupId>
     	<artifactId>jsecurity</artifactId>
     	<version>0.9.0-RC2</version>
       </dependency>      
+      -->
       <!--bootstrap-start-comment-->
       <dependency>
         <groupId>easymock</groupId>
