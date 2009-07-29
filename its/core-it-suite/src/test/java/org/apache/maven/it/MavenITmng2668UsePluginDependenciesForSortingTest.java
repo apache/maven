@@ -30,8 +30,7 @@ public class MavenITmng2668UsePluginDependenciesForSortingTest
 
     public MavenITmng2668UsePluginDependenciesForSortingTest()
     {
-        // TODO: fix for 3.0+
-        super( "(2.1.0-M1,3.0-alpha-1)" ); // 2.1.0-M2+
+        super( "(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // 2.1.0-M2+
     }
 
     public void testitMNG2668()
