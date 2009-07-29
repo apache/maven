@@ -76,7 +76,6 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenITmng4048VersionRangeReactorResolutionTest.class );
         // suite.addTestSuite( MavenITmng3890TransitiveDependencyScopeUpdateTest.class );
-        // suite.addTestSuite( MavenITmng3814BogusProjectCycleTest.class );
         // suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
         // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
         // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
@@ -181,6 +180,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3822BasedirAlignedInterpolationTest.class );
         suite.addTestSuite( MavenITmng3821EqualPluginExecIdsTest.class );
         suite.addTestSuite( MavenITmng3819PluginDepPlexusUtilsTest.class );
+        suite.addTestSuite( MavenITmng3814BogusProjectCycleTest.class );
         suite.addTestSuite( MavenITmng3813PluginClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3811ReportingPluginConfigurationInheritanceTest.class );
         suite.addTestSuite( MavenITmng3810BadProfileActivationTest.class );

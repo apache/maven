@@ -36,7 +36,7 @@ public class MavenITmng3814BogusProjectCycleTest
 
     public MavenITmng3814BogusProjectCycleTest()
     {
-        super( "(4,)" );
+        super( "[3.0-alpha-3,)" );
     }
 
     /**
