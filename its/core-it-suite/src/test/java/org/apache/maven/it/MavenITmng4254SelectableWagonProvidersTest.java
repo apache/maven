@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3506">MNG-3506</a>.
@@ -50,7 +51,6 @@ public class MavenITmng4254SelectableWagonProvidersTest
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dmaven.wagon.provider.http=coreit" );
-//        cliOptions.add( "-X" );
         cliOptions.add( "-V" );
         
         verifier.setCliOptions( cliOptions );
@@ -62,6 +62,8 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.resetStreams();
 
         assertTrue( "target/wagon.properties should exist.", new File( testDir, "target/wagon.properties" ).exists() );
+        Properties props = verifier.loadProperties( "target/wagon-impl.properties" );
+        assertEquals( "org.apache.maven.wagon.providers.coreit.CoreItHttpWagon", props.getProperty( "wagon.class" ) );
     }
 
     public void testSettingsUsage()
@@ -74,7 +76,6 @@ public class MavenITmng4254SelectableWagonProvidersTest
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
         cliOptions.add( "settings.xml" );
-//        cliOptions.add( "-X" );
         cliOptions.add( "-V" );
 
         verifier.setCliOptions( cliOptions );
@@ -86,5 +87,53 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.resetStreams();
 
         assertTrue( "target/wagon.properties should exist.", new File( testDir, "target/wagon.properties" ).exists() );
+        Properties props = verifier.loadProperties( "target/wagon-impl.properties" );
+        assertEquals( "org.apache.maven.wagon.providers.coreit.CoreItHttpWagon", props.getProperty( "wagon.class" ) );
     }
+
+    public void testDefaultHttpWagon()
+        throws IOException, VerificationException
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+
+        List cliOptions = new ArrayList();
+        cliOptions.add( "-V" );
+
+        verifier.setCliOptions( cliOptions );
+        
+        verifier.setLogFileName( "log-default-http.txt" );
+        verifier.executeGoal( "validate" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/wagon-impl.properties" );
+        assertEquals( "org.apache.maven.wagon.providers.http.LightweightHttpWagon", props.getProperty( "wagon.class" ) );
+    }
+
+    public void testDefaultHttpsWagon()
+        throws IOException, VerificationException
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+
+        List cliOptions = new ArrayList();
+        cliOptions.add( "-V" );
+        cliOptions.add( "-DwagonProtocol=https" );
+
+        verifier.setCliOptions( cliOptions );
+        
+        verifier.setLogFileName( "log-default-https.txt" );
+        verifier.executeGoal( "validate" );
+
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/wagon-impl.properties" );
+        assertEquals( "org.apache.maven.wagon.providers.http.LightweightHttpsWagon", props.getProperty( "wagon.class" ) );
+    }
+
 }

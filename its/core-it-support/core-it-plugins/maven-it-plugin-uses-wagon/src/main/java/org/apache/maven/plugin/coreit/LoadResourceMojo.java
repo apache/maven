@@ -23,6 +23,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.wagon.repository.Repository;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -70,6 +71,13 @@ public class LoadResourceMojo
     private String wagonProtocol;
 
     /**
+     * The repository to load the wagon for, if applicable.
+     * 
+     * @parameter expression="${wagon.repositoryId}"
+     */
+    private String repositoryId;
+
+    /**
      * The set of resources to load. For each specified absolute resource path <code>ARP</code> that was successfully
      * loaded, the generated properties files will contain a key named <code>ARP</code> whose value gives the URL to the
      * resource. In addition, the keys <code>ARP.count</code>, <code>ARP.0</code>, <code>ARP.1</code> etc. will
@@ -92,7 +100,14 @@ public class LoadResourceMojo
         Object wagon;
         try
         {
-            wagon = wagonManager.getWagon( wagonProtocol );
+            if ( repositoryId != null )
+            {
+                wagon = wagonManager.getWagon( new Repository( repositoryId, wagonProtocol + "://host/path" ) );
+            }
+            else
+            {
+                wagon = wagonManager.getWagon( wagonProtocol );
+            }
         }
         catch ( Exception e )
         {
@@ -104,31 +119,35 @@ public class LoadResourceMojo
         getLog().info( "[MAVEN-CORE-IT-LOG] Using class loader " + classLoader );
 
         Properties loaderProperties = new Properties();
+        loaderProperties.setProperty( "wagon.class", wagon.getClass().getName() );
 
-        for ( int i = 0; i < resourcePaths.length; i++ )
+        if ( resourcePaths != null )
         {
-            String path = resourcePaths[i];
-            getLog().info( "[MAVEN-CORE-IT-LOG] Loading resource " + path );
-
-            URL url = classLoader.getResource( path );
-            getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded resource from " + url );
-            if ( url != null )
+            for ( int i = 0; i < resourcePaths.length; i++ )
             {
-                loaderProperties.setProperty( path, url.toString() );
-            }
-
-            try
-            {
-                List urls = Collections.list( classLoader.getResources( path ) );
-                loaderProperties.setProperty( path + ".count", "" + urls.size() );
-                for ( int j = 0; j < urls.size(); j++ )
+                String path = resourcePaths[i];
+                getLog().info( "[MAVEN-CORE-IT-LOG] Loading resource " + path );
+    
+                URL url = classLoader.getResource( path );
+                getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded resource from " + url );
+                if ( url != null )
                 {
-                    loaderProperties.setProperty( path + "." + j, urls.get( j ).toString() );
+                    loaderProperties.setProperty( path, url.toString() );
                 }
-            }
-            catch ( IOException e )
-            {
-                throw new MojoExecutionException( "Resources could not be enumerated: " + path, e );
+    
+                try
+                {
+                    List urls = Collections.list( classLoader.getResources( path ) );
+                    loaderProperties.setProperty( path + ".count", "" + urls.size() );
+                    for ( int j = 0; j < urls.size(); j++ )
+                    {
+                        loaderProperties.setProperty( path + "." + j, urls.get( j ).toString() );
+                    }
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( "Resources could not be enumerated: " + path, e );
+                }
             }
         }
 
