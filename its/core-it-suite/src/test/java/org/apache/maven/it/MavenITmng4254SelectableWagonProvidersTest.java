@@ -56,12 +56,11 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.setCliOptions( cliOptions );
 
         verifier.setLogFileName( "log-cli.txt" );
-        verifier.executeGoal( "deploy" );
+        verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertTrue( "target/wagon.properties should exist.", new File( testDir, "target/wagon.properties" ).exists() );
         Properties props = verifier.loadProperties( "target/wagon-impl.properties" );
         assertEquals( "org.apache.maven.wagon.providers.coreit.CoreItHttpWagon", props.getProperty( "wagon.class" ) );
     }
@@ -81,12 +80,11 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.setCliOptions( cliOptions );
         
         verifier.setLogFileName( "log-settings.txt" );
-        verifier.executeGoal( "deploy" );
+        verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertTrue( "target/wagon.properties should exist.", new File( testDir, "target/wagon.properties" ).exists() );
         Properties props = verifier.loadProperties( "target/wagon-impl.properties" );
         assertEquals( "org.apache.maven.wagon.providers.coreit.CoreItHttpWagon", props.getProperty( "wagon.class" ) );
     }
