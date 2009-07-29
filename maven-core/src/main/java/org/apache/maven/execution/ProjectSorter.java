@@ -29,10 +29,15 @@ import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Extension;
+import org.apache.maven.model.Parent;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
+import org.codehaus.plexus.util.dag.Vertex;
 
 public class ProjectSorter
 {
@@ -70,81 +75,88 @@ public class ProjectSorter
     {
         dag = new DAG();
 
-        Map<String,MavenProject> projectMap = new HashMap<String,MavenProject>();
+        // groupId:artifactId:version -> project
+        Map<String, MavenProject> projectMap = new HashMap<String, MavenProject>( projects.size() * 2 );
+
+        // groupId:artifactId -> (version -> vertex)
+        Map<String, Map<String, Vertex>> vertexMap = new HashMap<String, Map<String, Vertex>>( projects.size() * 2 );
 
         for ( MavenProject project : projects )
         {
-            String id = getId( project );
+            String projectId = getId( project );
 
-            if ( dag.getVertex( id ) != null )
+            MavenProject conflictingProject = projectMap.put( projectId, project );
+
+            if ( conflictingProject != null )
             {
-                MavenProject conflictingProject = projectMap.get( id );
-
-                throw new DuplicateProjectException( id, conflictingProject.getFile(), project.getFile(), "Project '" + id + "' is duplicated in the reactor" );
+                throw new DuplicateProjectException( projectId, conflictingProject.getFile(), project.getFile(),
+                                                     "Project '" + projectId + "' is duplicated in the reactor" );
             }
 
-            dag.addVertex( id );
+            String projectKey = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
-            projectMap.put( id, project );
+            Map<String, Vertex> vertices = vertexMap.get( projectKey );
+            if ( vertices == null )
+            {
+                vertices = new HashMap<String, Vertex>( 2, 1 );
+                vertexMap.put( projectKey, vertices );
+            }
+            vertices.put( project.getVersion(), dag.addVertex( projectId ) );
         }
 
-        for ( MavenProject project : projects )
+        for ( Vertex projectVertex : (List<Vertex>) dag.getVerticies() )
         {
-            String id = getId( project );
+            String projectId = projectVertex.getLabel();
 
-            for( Dependency dependency : project.getDependencies() )
+            MavenProject project = projectMap.get( projectId );
+
+            for ( Dependency dependency : project.getDependencies() )
             {
-                String dependencyId = ArtifactUtils.versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
-
-                if ( dag.getVertex( dependencyId ) != null )
-                {
-                    project.addProjectReference( projectMap.get( dependencyId ) );
-
-                    dag.addEdge( id, dependencyId );
-                }
+                addEdge( projectMap, vertexMap, project, projectVertex, dependency.getGroupId(),
+                         dependency.getArtifactId(), dependency.getVersion(), false, false );
             }
 
-            MavenProject parent = project.getParent();
-            
+            Parent parent = project.getModel().getParent();
+
             if ( parent != null )
             {
-                String parentId = ArtifactUtils.versionlessKey( parent.getGroupId(), parent.getArtifactId() );
-                if ( dag.getVertex( parentId ) != null )
-                {
-                    // Parent is added as an edge, but must not cause a cycle - so we remove any other edges it has in conflict
-                    if ( dag.hasEdge( parentId, id ) )
-                    {
-                        dag.removeEdge( parentId, id );
-                    }
-                    
-                    dag.addEdge( id, parentId );
-                }
+                // Parent is added as an edge, but must not cause a cycle - so we remove any other edges it has in conflict
+                addEdge( projectMap, vertexMap, null, projectVertex, parent.getGroupId(), parent.getArtifactId(),
+                         parent.getVersion(), true, false );
             }
-            
-            /*
-            
-            TODO: Now that the build plan is fully fleshed out we have cycles
-            
-            if ( project.getBuildPlugins() != null )
+
+            List<Plugin> buildPlugins = project.getBuildPlugins();
+            if ( buildPlugins != null )
             {
-                for( Plugin plugin : project.getBuildPlugins() )
+                for ( Plugin plugin : buildPlugins )
                 {
-                    String pluginId = ArtifactUtils.versionlessKey( plugin.getGroupId(), plugin.getArtifactId() );
-                    
-                    if ( ( dag.getVertex( pluginId ) != null ) && !pluginId.equals( id ) )
+                    addEdge( projectMap, vertexMap, project, projectVertex, plugin.getGroupId(),
+                             plugin.getArtifactId(), plugin.getVersion(), false, true );
+
+                    for ( Dependency dependency : plugin.getDependencies() )
                     {
-                        addEdgeWithParentCheck( projectMap, pluginId, project, id );
+                        addEdge( projectMap, vertexMap, project, projectVertex, dependency.getGroupId(),
+                                 dependency.getArtifactId(), dependency.getVersion(), false, true );
                     }
                 }
             }
-            */
+
+            List<Extension> buildExtensions = project.getBuildExtensions();
+            if ( buildExtensions != null )
+            {
+                for ( Extension extension : buildExtensions )
+                {
+                    addEdge( projectMap, vertexMap, project, projectVertex, extension.getGroupId(),
+                             extension.getArtifactId(), extension.getVersion(), false, true );
+                }
+            }
         }
 
-        List<MavenProject> sortedProjects = new ArrayList<MavenProject>();
+        List<MavenProject> sortedProjects = new ArrayList<MavenProject>( projects.size() );
 
         List<String> sortedProjectLabels = TopologicalSorter.sort( dag );
-         
-        for( String id : sortedProjectLabels )
+
+        for ( String id : sortedProjectLabels )
         {
             sortedProjects.add( projectMap.get( id ) );
         }
@@ -152,28 +164,71 @@ public class ProjectSorter
         this.sortedProjects = Collections.unmodifiableList( sortedProjects );
     }
 
-    private void addEdgeWithParentCheck( Map<String,MavenProject> projectMap, String projectRefId, MavenProject project, String id )
+    private void addEdge( Map<String, MavenProject> projectMap, Map<String, Map<String, Vertex>> vertexMap,
+                          MavenProject project, Vertex projectVertex, String groupId, String artifactId,
+                          String version, boolean force, boolean safe )
         throws CycleDetectedException
     {
-        MavenProject extProject = projectMap.get( projectRefId );
+        String projectKey = ArtifactUtils.versionlessKey( groupId, artifactId );
 
-        if ( extProject == null )
+        Map<String, Vertex> vertices = vertexMap.get( projectKey );
+
+        if ( vertices != null )
+        {
+            if ( isSpecificVersion( version ) )
+            {
+                Vertex vertex = vertices.get( version );
+                if ( vertex != null )
+                {
+                    addEdge( projectVertex, vertex, project, projectMap, force, safe );
+                }
+            }
+            else
+            {
+                for ( Vertex vertex : vertices.values() )
+                {
+                    addEdge( projectVertex, vertex, project, projectMap, force, safe );
+                }
+            }
+        }
+    }
+
+    private void addEdge( Vertex fromVertex, Vertex toVertex, MavenProject fromProject,
+                          Map<String, MavenProject> projectMap, boolean force, boolean safe )
+        throws CycleDetectedException
+    {
+        if ( fromVertex.equals( toVertex ) )
         {
             return;
         }
 
-        project.addProjectReference( extProject );
-
-        MavenProject extParent = extProject.getParent();
-        if ( extParent != null )
+        if ( fromProject != null )
         {
-            String parentId = ArtifactUtils.versionlessKey( extParent.getGroupId(), extParent.getArtifactId() );
-            // Don't add edge from parent to extension if a reverse edge already exists
-            if ( !dag.hasEdge( projectRefId, id ) || !parentId.equals( id ) )
+            MavenProject toProject = projectMap.get( toVertex.getLabel() );
+            fromProject.addProjectReference( toProject );
+        }
+
+        if ( force && toVertex.getChildren().contains( fromVertex ) )
+        {
+            dag.removeEdge( toVertex, fromVertex );
+        }
+
+        try
+        {
+            dag.addEdge( fromVertex, toVertex );
+        }
+        catch ( CycleDetectedException e )
+        {
+            if ( !safe )
             {
-                dag.addEdge( id, projectRefId );
+                throw e;
             }
         }
+    }
+
+    private boolean isSpecificVersion( String version )
+    {
+        return !( StringUtils.isEmpty( version ) || version.startsWith( "[" ) || version.startsWith( "(" ) );
     }
 
     // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
@@ -216,7 +271,7 @@ public class ProjectSorter
 
     public static String getId( MavenProject project )
     {
-        return ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
+        return ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
     }
 
 }
