@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3506">MNG-3506</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4254">MNG-4254</a>.
  * 
  * @author John Casey
  * @version $Id$
@@ -49,6 +49,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dmaven.wagon.provider.http=coreit" );
@@ -73,6 +74,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
@@ -98,6 +100,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-V" );
@@ -121,6 +124,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-V" );
