@@ -108,6 +108,7 @@ public class CoreItHttpWagon
         File f = new File( "target/wagon-data" );
         try
         {
+            f.getParentFile().mkdirs();
             f.createNewFile();
         }
         catch ( IOException e )
