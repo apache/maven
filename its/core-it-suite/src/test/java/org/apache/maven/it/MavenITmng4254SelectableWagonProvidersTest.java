@@ -48,6 +48,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-Dmaven.wagon.provider.http=coreit" );
@@ -71,6 +72,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "--settings" );
@@ -95,6 +97,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-V" );
@@ -117,6 +120,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         List cliOptions = new ArrayList();
         cliOptions.add( "-V" );
