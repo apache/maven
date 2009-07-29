@@ -1713,11 +1713,20 @@ public class MavenProject
      * @since 2.0.9
      */
     @Override
-    public Object clone()
-        throws CloneNotSupportedException
+    public MavenProject clone()
     {
-        MavenProject clone = (MavenProject) super.clone();
+        MavenProject clone;
+        try
+        {
+            clone = (MavenProject) super.clone();
+        }
+        catch ( CloneNotSupportedException e )
+        {
+            throw new UnsupportedOperationException( e );
+        }
+
         clone.deepCopy( this );
+
         return clone;
     }
 

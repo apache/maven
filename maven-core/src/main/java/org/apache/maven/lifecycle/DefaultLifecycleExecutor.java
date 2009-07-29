@@ -44,7 +44,10 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.PluginManagerException;
@@ -192,9 +195,8 @@ public class DefaultLifecycleExecutor
 
                 for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                 {
-                    logger.info( executionDescription( mojoExecution, currentProject ) );
-                    pluginManager.executeMojo( session, mojoExecution );
-                }                         
+                    execute( currentProject, session, mojoExecution );
+                }
                 
             }
             catch ( Exception e )
@@ -229,7 +231,39 @@ public class DefaultLifecycleExecutor
             }
         }        
     }        
-        
+
+    private void execute( MavenProject project, MavenSession session, MojoExecution mojoExecution )
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
+    {
+        MavenProject executionProject = null;
+
+        List<MojoExecution> forkedExecutions = mojoExecution.getForkedExecutions();
+
+        if ( !forkedExecutions.isEmpty() )
+        {
+            executionProject = project.clone();
+
+            session.setCurrentProject( executionProject );
+            try
+            {
+                for ( MojoExecution forkedExecution : forkedExecutions )
+                {
+                    execute( executionProject, session, forkedExecution );
+                }
+            }
+            finally
+            {
+                session.setCurrentProject( project );
+            }
+        }
+
+        project.setExecutionProject( executionProject );
+
+        logger.info( executionDescription( mojoExecution, project ) );
+
+        pluginManager.executeMojo( session, mojoExecution );
+    }
+
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginManagerException
     {
@@ -268,19 +302,34 @@ public class DefaultLifecycleExecutor
                 pluginDescriptor.setClassRealm( pluginManager.getPluginRealm( session, pluginDescriptor ) );
             }
 
-            if ( StringUtils.isNotEmpty( mojoDescriptor.isDependencyResolutionRequired() ) )
-            {
-                requiredDependencyResolutionScopes.add( mojoDescriptor.isDependencyResolutionRequired() );
-            }
-
             mojoExecution.setMojoDescriptor( mojoDescriptor );
 
             populateMojoExecutionConfiguration( project, mojoExecution, false );
+
+            calculateForkedExecutions( mojoExecution, project, new HashSet<MojoDescriptor>() );
+
+            collectDependencyResolutionScopes( requiredDependencyResolutionScopes, mojoExecution );
         }
 
         return new MavenExecutionPlan( lifecyclePlan, requiredDependencyResolutionScopes );
     }      
-    
+
+    private void collectDependencyResolutionScopes( Collection<String> requiredDependencyResolutionScopes,
+                                                    MojoExecution mojoExecution )
+    {
+        String requiredDependencyResolutionScope = mojoExecution.getMojoDescriptor().isDependencyResolutionRequired();
+
+        if ( StringUtils.isNotEmpty( requiredDependencyResolutionScope ) )
+        {
+            requiredDependencyResolutionScopes.add( requiredDependencyResolutionScope );
+        }
+
+        for ( MojoExecution forkedExecution : mojoExecution.getForkedExecutions() )
+        {
+            collectDependencyResolutionScopes( requiredDependencyResolutionScopes, forkedExecution );
+        }
+    }
+
     private void calculateExecutionForIndividualGoal( MavenSession session, List<MojoExecution> lifecyclePlan, String goal ) 
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
     {
@@ -451,6 +500,44 @@ public class DefaultLifecycleExecutor
             }
         }
     }   
+
+    private void calculateForkedExecutions( MojoExecution mojoExecution, MavenProject project,
+                                            Collection<MojoDescriptor> alreadyForkedExecutions )
+        throws MojoNotFoundException
+    {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+        if ( !alreadyForkedExecutions.add( mojoDescriptor ) )
+        {
+            return;
+        }
+
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+
+        if ( StringUtils.isNotEmpty( mojoDescriptor.getExecutePhase() ) )
+        {
+            // TODO
+
+        }
+        else if ( StringUtils.isNotEmpty( mojoDescriptor.getExecuteGoal() ) )
+        {
+            String forkedGoal = mojoDescriptor.getExecuteGoal();
+
+            MojoDescriptor forkedMojoDescriptor = pluginDescriptor.getMojo( forkedGoal );
+            if ( forkedMojoDescriptor == null )
+            {
+                throw new MojoNotFoundException( forkedGoal, pluginDescriptor );
+            }
+
+            MojoExecution forkedExecution = new MojoExecution( forkedMojoDescriptor, forkedGoal );
+
+            populateMojoExecutionConfiguration( project, forkedExecution, true );
+
+            calculateForkedExecutions( forkedExecution, project, alreadyForkedExecutions );
+
+            mojoExecution.addForkedExecution( forkedExecution );
+        }
+    }
 
     private String executionDescription( MojoExecution me, MavenProject project )
     {

@@ -19,6 +19,9 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -41,7 +44,9 @@ public class MojoExecution
      * this mojo execution is going to run in.
      */
     private String lifecyclePhase;
-    
+
+    private List<MojoExecution> forkedExecutions = new ArrayList<MojoExecution>();
+
     public MojoExecution( Plugin plugin, String goal, String executionId )
     {
         this.plugin = plugin;
@@ -176,4 +181,20 @@ public class MojoExecution
     {
         this.mojoDescriptor = mojoDescriptor;
     }
+
+    public List<MojoExecution> getForkedExecutions()
+    {
+        return forkedExecutions;
+    }
+
+    public void addForkedExecution( MojoExecution forkedExecution )
+    {
+        if ( forkedExecution == null )
+        {
+            throw new IllegalArgumentException( "forked execution missing" );
+        }
+
+        forkedExecutions.add( forkedExecution );
+    }
+
 }
