@@ -30,13 +30,31 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 public final class ArtifactUtils
 {
+
+    public static boolean isSnapshot( String version )
+    {
+        if ( version != null )
+        {
+            if ( version.regionMatches( true, version.length() - Artifact.SNAPSHOT_VERSION.length(),
+                                        Artifact.SNAPSHOT_VERSION, 0, Artifact.SNAPSHOT_VERSION.length() ) )
+            {
+                return true;
+            }
+            else if ( Artifact.VERSION_FILE_PATTERN.matcher( version ).matches() )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String toSnapshotVersion( String version )
     {
-    	if(version == null)
-    	{
-    		throw new IllegalArgumentException("version: null");
-    	}
-    	
+        if ( version == null )
+        {
+            throw new IllegalArgumentException( "version: null" );
+        }
+
         Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
         if ( m.matches() )
         {
@@ -47,7 +65,7 @@ public final class ArtifactUtils
             return version;
         }
     }
-        
+
     public static String versionlessKey( Artifact artifact )
     {
         return versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
