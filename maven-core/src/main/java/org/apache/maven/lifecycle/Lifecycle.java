@@ -46,4 +46,11 @@ public class Lifecycle
     {
         return defaultPhases;
     }
+
+    @Override
+    public String toString()
+    {
+        return id + " -> " + phases;
+    }
+
 }
