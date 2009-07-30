@@ -237,9 +237,6 @@ public class DefaultModelBuilder
             throw new ModelBuildingException( problems );
         }
 
-        putCache( request.getModelCache(), resultModel.getGroupId(), resultModel.getArtifactId(),
-                  resultModel.getVersion(), ModelCacheTag.EFFECTIVE, resultModel );
-
         return result;
     }
 
@@ -449,9 +446,23 @@ public class DefaultModelBuilder
             }
             else
             {
-                parentData =
-                    new ModelData( ModelUtils.cloneModel( parentData.getModel() ), parentData.getGroupId(),
-                                   parentData.getArtifactId(), parentData.getVersion() );
+                /*
+                 * NOTE: This is a sanity check of the cache hit. If the cached parent POM was locally resolved, the
+                 * child's <relativePath> should point at that parent, too. If it doesn't, we ignore the cache and
+                 * resolve externally, to mimic the behavior if the cache didn't exist in the first place. Otherwise,
+                 * the cache would obscure a bad POM.
+                 */
+
+                File pomFile = parentData.getModel().getPomFile();
+                if ( pomFile != null )
+                {
+                    File expectedParentFile = getParentPomFile( childModel );
+
+                    if ( !pomFile.equals( expectedParentFile ) )
+                    {
+                        parentData = readParentExternally( childModel, request, problems );
+                    }
+                }
             }
         }
         else
@@ -465,20 +476,9 @@ public class DefaultModelBuilder
     private ModelData readParentLocally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
         throws ModelBuildingException
     {
-        File projectDirectory = childModel.getProjectDirectory();
-        if ( projectDirectory == null )
-        {
-            return null;
-        }
+        File pomFile = getParentPomFile( childModel );
 
-        Parent parent = childModel.getParent();
-
-        File pomFile = new File( new File( projectDirectory, parent.getRelativePath() ).toURI().normalize() );
-        if ( pomFile.isDirectory() )
-        {
-            pomFile = new File( pomFile, "pom.xml" );
-        }
-        if ( !pomFile.isFile() )
+        if ( pomFile == null || !pomFile.isFile() )
         {
             return null;
         }
@@ -497,6 +497,8 @@ public class DefaultModelBuilder
             version = candidateModel.getParent().getVersion();
         }
 
+        Parent parent = childModel.getParent();
+
         if ( groupId == null || !groupId.equals( parent.getGroupId() ) )
         {
             return null;
@@ -513,6 +515,27 @@ public class DefaultModelBuilder
         ModelData parentData = new ModelData( candidateModel, groupId, artifactId, version );
 
         return parentData;
+    }
+
+    private File getParentPomFile( Model childModel )
+    {
+        File projectDirectory = childModel.getProjectDirectory();
+
+        if ( projectDirectory == null )
+        {
+            return null;
+        }
+
+        String parentPath = childModel.getParent().getRelativePath();
+
+        File pomFile = new File( new File( projectDirectory, parentPath ).toURI().normalize() );
+
+        if ( pomFile.isDirectory() )
+        {
+            pomFile = new File( pomFile, "pom.xml" );
+        }
+
+        return pomFile;
     }
 
     private ModelData readParentExternally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
@@ -588,12 +611,10 @@ public class DefaultModelBuilder
             String artifactId = dependency.getArtifactId();
             String version = dependency.getVersion();
 
-            DependencyManagement importMngt;
+            DependencyManagement importMngt =
+                getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT );
 
-            Model importModel =
-                getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.EFFECTIVE );
-
-            if ( importModel == null )
+            if ( importMngt == null )
             {
                 if ( modelResolver == null )
                 {
@@ -636,18 +657,16 @@ public class DefaultModelBuilder
 
                 problems.addAll( importResult.getProblems() );
 
-                importModel = importResult.getEffectiveModel();
+                Model importModel = importResult.getEffectiveModel();
 
                 importMngt = importModel.getDependencyManagement();
-            }
-            else
-            {
-                importMngt = ModelUtils.cloneDependencyManagement( importModel.getDependencyManagement() );
-            }
 
-            if ( importMngt == null )
-            {
-                continue;
+                if ( importMngt == null )
+                {
+                    importMngt = new DependencyManagement();
+                }
+
+                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMngt );
             }
 
             if ( importMngts == null )
@@ -666,7 +685,7 @@ public class DefaultModelBuilder
     {
         if ( modelCache != null )
         {
-            modelCache.put( groupId, artifactId, version, tag.getName(), data );
+            modelCache.put( groupId, artifactId, version, tag.getName(), tag.intoCache( data ) );
         }
     }
 
@@ -675,7 +694,11 @@ public class DefaultModelBuilder
     {
         if ( modelCache != null )
         {
-            return tag.getType().cast( modelCache.get( groupId, artifactId, version, tag.getName() ) );
+            Object data = modelCache.get( groupId, artifactId, version, tag.getName() );
+            if ( data != null )
+            {
+                return tag.fromCache( tag.getType().cast( data ) );
+            }
         }
         return null;
     }

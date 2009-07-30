@@ -19,11 +19,12 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 
 /**
- * Describes a tag used by the model builder to access a {@link ModelCache}. This interface simply aggregates a name and
- * a class to provide some type safety when working with the otherwise untyped cache.
+ * Describes a tag used by the model builder to access a {@link ModelCache}. This interface basically aggregates a name
+ * and a class to provide some type safety when working with the otherwise untyped cache.
  * 
  * @author Benjamin Bentmann
  * @param <T> The type of data associated with the tag.
@@ -46,6 +47,24 @@ interface ModelCacheTag<T>
     Class<T> getType();
 
     /**
+     * Creates a copy of the data suitable for storage in the cache. The original data to store can be mutated after the
+     * cache is populated but the state of the cache must not change so we need to make a copy.
+     * 
+     * @param data The data to store in the cache, must not be {@code null}.
+     * @return The data being stored in the cache, never {@code null}.
+     */
+    T intoCache( T data );
+
+    /**
+     * Creates a copy of the data suitable for retrieval from the cache. The retrieved data can be mutated after the
+     * cache is queried but the state of the cache must not change so we need to make a copy.
+     * 
+     * @param data The data to retrieve from the cache, must not be {@code null}.
+     * @return The data being retrieved from the cache, never {@code null}.
+     */
+    T fromCache( T data );
+
+    /**
      * The tag used to denote raw model data.
      */
     public static final ModelCacheTag<ModelData> RAW = new ModelCacheTag<ModelData>()
@@ -61,23 +80,44 @@ interface ModelCacheTag<T>
             return ModelData.class;
         }
 
+        public ModelData intoCache( ModelData data )
+        {
+            Model model = ModelUtils.cloneModel( data.getModel() );
+            return new ModelData( model, data.getGroupId(), data.getArtifactId(), data.getVersion() );
+        }
+
+        public ModelData fromCache( ModelData data )
+        {
+            return intoCache( data );
+        }
+
     };
 
     /**
-     * The tag used to denote an effective model.
+     * The tag used to denote an effective dependency management section from an imported model.
      */
-    public static final ModelCacheTag<Model> EFFECTIVE = new ModelCacheTag<Model>()
+    public static final ModelCacheTag<DependencyManagement> IMPORT = new ModelCacheTag<DependencyManagement>()
     {
 
         public String getName()
         {
-            return "effective";
+            return "import";
         }
 
-        public Class<Model> getType()
+        public Class<DependencyManagement> getType()
         {
-            return Model.class;
+            return DependencyManagement.class;
         }
+
+        public DependencyManagement intoCache( DependencyManagement data )
+        {
+            return ModelUtils.cloneDependencyManagement( data );
+        };
+
+        public DependencyManagement fromCache( DependencyManagement data )
+        {
+            return intoCache( data );
+        };
 
     };
 

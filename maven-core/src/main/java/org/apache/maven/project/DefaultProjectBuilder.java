@@ -301,7 +301,9 @@ public class DefaultProjectBuilder
 
         ReactorModelPool reactorModelPool = new ReactorModelPool();
 
-        boolean errors = build( results, interimResults, pomFiles, recursive, config, reactorModelPool );
+        ReactorModelCache modelCache = new ReactorModelCache();
+
+        boolean errors = build( results, interimResults, pomFiles, recursive, config, reactorModelPool, modelCache );
 
         for ( InterimResult interimResult : interimResults )
         {
@@ -344,17 +346,19 @@ public class DefaultProjectBuilder
         return results;
     }
 
-    private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults, List<File> pomFiles,
-                        boolean recursive, ProjectBuildingRequest config, ReactorModelPool reactorModelPool )
+    private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
+                           List<File> pomFiles, boolean recursive, ProjectBuildingRequest config,
+                           ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
     {
         boolean errors = false;
-        
+
         for ( File pomFile : pomFiles )
         {
             ModelBuildingRequest request = getModelBuildingRequest( config, reactorModelPool );
 
             request.setPomFile( pomFile );
             request.setTwoPhaseBuilding( true );
+            request.setModelCache( modelCache );
 
             DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, config );
             request.setModelBuildingListeners( Arrays.asList( listener ) );
@@ -421,7 +425,8 @@ public class DefaultProjectBuilder
                     }
 
                     errors =
-                        build( results, interimResults, moduleFiles, recursive, config, reactorModelPool ) || errors;
+                        build( results, interimResults, moduleFiles, recursive, config, reactorModelPool, modelCache )
+                            || errors;
                 }
             }
             catch ( ModelBuildingException e )
