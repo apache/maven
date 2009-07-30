@@ -103,6 +103,14 @@ public class EvalMojo
     private Object project;
 
     /**
+     * The forked Maven project against which expressions are evaluated.
+     * 
+     * @parameter default-value="${executedProject}"
+     * @readonly
+     */
+    private Object executedProject;
+
+    /**
      * The merged user/global settings of the current build against which expressions are evaluated.
      * 
      * @parameter default-value="${settings}"
@@ -160,6 +168,7 @@ public class EvalMojo
         {
             Map contexts = new HashMap();
             contexts.put( "project", project );
+            contexts.put( "executedProject", executedProject );
             contexts.put( "pom", project );
             contexts.put( "settings", settings );
             contexts.put( "session", session );
