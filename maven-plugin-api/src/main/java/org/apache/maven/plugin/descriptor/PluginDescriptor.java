@@ -386,7 +386,7 @@ public class PluginDescriptor
         File pluginFile = ( pluginArtifact != null ) ? pluginArtifact.getFile() : null;
         if ( pluginFile == null )
         {
-            throw new IllegalStateException( "plugin main artifact has not been resolved" );
+            throw new IllegalStateException( "plugin main artifact has not been resolved for " + getId() );
         }
 
         if ( pluginFile.isFile() )
