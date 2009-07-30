@@ -144,6 +144,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3947PluginDefaultExecutionConfigTest.class );
         suite.addTestSuite( MavenITmng3944BasedirInterpolationTest.class );
         suite.addTestSuite( MavenITmng3943PluginExecutionInheritanceTest.class );
+        suite.addTestSuite( MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest.class );
         suite.addTestSuite( MavenITmng3940EnvVarInterpolationTest.class );
         suite.addTestSuite( MavenITmng3938MergePluginExecutionsTest.class );
         suite.addTestSuite( MavenITmng3937MergedPluginExecutionGoalsTest.class );
