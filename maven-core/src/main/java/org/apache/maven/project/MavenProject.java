@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -155,8 +154,6 @@ public class MavenProject
     private boolean executionRoot;
 
     private Map<String, String> moduleAdjustments;
-
-    private Stack<MavenProject> previousExecutionProjects = new Stack<MavenProject>();
 
     private ProjectBuilder mavenProjectBuilder;
 
@@ -1479,11 +1476,6 @@ public class MavenProject
 
     public void setExecutionProject( MavenProject executionProject )
     {
-        if ( this.executionProject != null )
-        {
-            previousExecutionProjects.push( this.executionProject );
-        }
-
         this.executionProject = executionProject;
     }
 
@@ -1655,18 +1647,6 @@ public class MavenProject
     public String getDefaultGoal()
     {
         return getBuild() != null ? getBuild().getDefaultGoal() : null;
-    }
-   
-    public void clearExecutionProject()
-    {
-        if ( !previousExecutionProjects.isEmpty() )
-        {
-            executionProject = (MavenProject) previousExecutionProjects.pop();
-        }
-        else
-        {
-            executionProject = null;
-        }
     }
 
     public Plugin getPlugin( String pluginKey )
