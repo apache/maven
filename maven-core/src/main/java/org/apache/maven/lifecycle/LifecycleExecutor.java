@@ -49,7 +49,10 @@ public interface LifecycleExecutor
      * @throws LifecycleExecutionException
      */
     MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginManagerException;
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException,
+        InvalidPluginDescriptorException, PluginManagerException, LifecyclePhaseNotFoundException,
+        LifecycleNotFoundException;
         
     // For a given project packaging find all the plugins that are bound to any registered
     // lifecycles. The project builder needs to now what default plugin information needs to be

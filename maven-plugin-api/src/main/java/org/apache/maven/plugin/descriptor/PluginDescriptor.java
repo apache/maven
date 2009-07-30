@@ -19,7 +19,15 @@ package org.apache.maven.plugin.descriptor;
  * under the License.
  */
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +36,14 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.lifecycle.Lifecycle;
+import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
+import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * @author Jason van Zyl
@@ -37,6 +51,9 @@ import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 public class PluginDescriptor
     extends ComponentSetDescriptor
 {
+
+    private static final String LIFECYCLE_DESCRIPTOR = "META-INF/maven/lifecycle.xml";
+
     private String groupId;
 
     private String artifactId;
@@ -49,14 +66,14 @@ public class PluginDescriptor
 
     private boolean inheritedByDefault = true;
 
-    private List artifacts;
+    private List<Artifact> artifacts;
 
     private ClassRealm classRealm;
 
     // calculated on-demand.
-    private Map artifactMap;
+    private Map<String, Artifact> artifactMap;
 
-    private Set introducedDependencyArtifacts;
+    private Set<Artifact> introducedDependencyArtifacts;
 
     private String name;
 
@@ -65,6 +82,8 @@ public class PluginDescriptor
     private Plugin plugin;
 
     private Artifact pluginArtifact;
+
+    private Map<String, Lifecycle> lifecycleMappings;
 
     // ----------------------------------------------------------------------
     //
@@ -208,12 +227,12 @@ public class PluginDescriptor
         this.inheritedByDefault = inheritedByDefault;
     }
 
-    public List getArtifacts()
+    public List<Artifact> getArtifacts()
     {
         return artifacts;
     }
 
-    public void setArtifacts( List artifacts )
+    public void setArtifacts( List<Artifact> artifacts )
     {
         this.artifacts = artifacts;
 
@@ -221,7 +240,7 @@ public class PluginDescriptor
         artifactMap = null;
     }
 
-    public Map getArtifactMap()
+    public Map<String, Artifact> getArtifactMap()
     {
         if ( artifactMap == null )
         {
@@ -280,14 +299,15 @@ public class PluginDescriptor
         return classRealm;
     }
 
-    public void setIntroducedDependencyArtifacts( Set introducedDependencyArtifacts )
+    public void setIntroducedDependencyArtifacts( Set<Artifact> introducedDependencyArtifacts )
     {
         this.introducedDependencyArtifacts = introducedDependencyArtifacts;
     }
 
-    public Set getIntroducedDependencyArtifacts()
+    public Set<Artifact> getIntroducedDependencyArtifacts()
     {
-        return introducedDependencyArtifacts != null ? introducedDependencyArtifacts : Collections.EMPTY_SET;
+        return ( introducedDependencyArtifacts != null ) ? introducedDependencyArtifacts
+                        : Collections.<Artifact> emptySet();
     }
 
     public void setName( String name )
@@ -329,4 +349,61 @@ public class PluginDescriptor
     {
         this.pluginArtifact = pluginArtifact;
     }
+
+    public Lifecycle getLifecycleMapping( String lifecycleId )
+        throws IOException, XmlPullParserException
+    {
+        if ( lifecycleMappings == null )
+        {
+            LifecycleConfiguration lifecycleConfiguration;
+
+            Reader reader = null;
+            try
+            {
+                reader = ReaderFactory.newXmlReader( getDescriptorStream( LIFECYCLE_DESCRIPTOR ) );
+
+                lifecycleConfiguration = new LifecycleMappingsXpp3Reader().read( reader );
+            }
+            finally
+            {
+                IOUtil.close( reader );
+            }
+
+            lifecycleMappings = new HashMap<String, Lifecycle>();
+
+            for ( Lifecycle lifecycle : lifecycleConfiguration.getLifecycles() )
+            {
+                lifecycleMappings.put( lifecycle.getId(), lifecycle );
+            }
+        }
+
+        return lifecycleMappings.get( lifecycleId );
+    }
+
+    private InputStream getDescriptorStream( String descriptor )
+        throws IOException
+    {
+        File pluginFile = ( pluginArtifact != null ) ? pluginArtifact.getFile() : null;
+        if ( pluginFile == null )
+        {
+            throw new IllegalStateException( "plugin main artifact has not been resolved" );
+        }
+
+        if ( pluginFile.isFile() )
+        {
+            try
+            {
+                return new URL( "jar:" + pluginFile.toURI() + "!/" + descriptor ).openStream();
+            }
+            catch ( MalformedURLException e )
+            {
+                throw new IllegalStateException( e );
+            }
+        }
+        else
+        {
+            return new FileInputStream( new File( pluginFile, descriptor ) );
+        }
+    }
+
 }
