@@ -303,6 +303,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2201PluginConfigInterpolationTest.class );
         suite.addTestSuite( MavenITmng2196ParentResolutionTest.class );
         suite.addTestSuite( MavenITmng2174PluginDepsManagedByParentProfileTest.class );
+        suite.addTestSuite( MavenITmng2140ReactorAwareDepResolutionWhenForkTest.class );
         suite.addTestSuite( MavenITmng2136ActiveByDefaultProfileTest.class );
         suite.addTestSuite( MavenITmng2130ParentLookupFromReactorCacheTest.class );
         suite.addTestSuite( MavenITmng2124PomInterpolationWithParentValuesTest.class );
