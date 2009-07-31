@@ -150,8 +150,5 @@ public interface Artifact
 
     boolean isSelectedVersionKnown()
         throws OverConstrainedVersionException;
-    
-    void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository );
-    
-    boolean isFromAuthoritativeRepository();
+
 }

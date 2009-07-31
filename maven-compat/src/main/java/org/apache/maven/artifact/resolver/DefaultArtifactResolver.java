@@ -136,7 +136,7 @@ public class DefaultArtifactResolver
 
             artifact = localRepository.find( artifact );
             
-            if ( artifact.isFromAuthoritativeRepository() )
+            if ( artifact.isResolved() )
             {
                 return;
             }

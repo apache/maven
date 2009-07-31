@@ -27,7 +27,6 @@ public class TestIdeWorkspaceRepository
         {
             artifact.setFile( ARTIFACT_FILE );
             artifact.setResolved( true );
-            artifact.setFromAuthoritativeRepository( true );
         }
         return artifact;
     }

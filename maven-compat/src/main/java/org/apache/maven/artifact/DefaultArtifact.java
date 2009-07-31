@@ -593,18 +593,5 @@ public class DefaultArtifact
     {
         this.optional = optional;
     }
-    
-    //
-    
-    private boolean fromAuthoritativeRepository;
-    
-    public void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository )
-    {
-        this.fromAuthoritativeRepository = fromAuthoritativeRepository;
-    }
-    
-    public boolean isFromAuthoritativeRepository()
-    {
-        return fromAuthoritativeRepository;
-    }
+
 }

@@ -42,8 +42,6 @@ public class ReactorArtifactRepository
             {
                 artifact.setFile( project.getFile() );
 
-                artifact.setFromAuthoritativeRepository( true );
-
                 artifact.setResolved( true );
             }
             else
@@ -59,8 +57,6 @@ public class ReactorArtifactRepository
                     // we shouldn't even take the archive anyway.
 
                     artifact.setFile( projectArtifact.getFile() );
-
-                    artifact.setFromAuthoritativeRepository( true );
 
                     artifact.setResolved( true );
                 }
@@ -82,8 +78,6 @@ public class ReactorArtifactRepository
 //                    if ( classesDir.isDirectory() )
 //                    {
 //                        artifact.setFile( classesDir );
-//
-//                        artifact.setFromAuthoritativeRepository( true );
 //
 //                        artifact.setResolved( true );
 //                    }
