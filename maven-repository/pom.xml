@@ -52,10 +52,6 @@
       <artifactId>wagon-file</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.jsecurity</groupId>
-      <artifactId>jsecurity</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
