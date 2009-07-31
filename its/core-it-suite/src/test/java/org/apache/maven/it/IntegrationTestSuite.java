@@ -89,6 +89,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4269BadReactorResolutionFromOutDirTest.class );
         suite.addTestSuite( MavenITmng4262MakeLikeReactorDottedPathTest.class );
         suite.addTestSuite( MavenITmng4254SelectableWagonProvidersTest.class );
         suite.addTestSuite( MavenITmng4238ArtifactHandlerExtensionUsageTest.class );
