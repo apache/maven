@@ -140,19 +140,12 @@ public class DefaultArtifactResolver
             {
                 return;
             }
-            
-            if ( artifact.isSnapshot() && artifact.isResolved() )
-            {
-                return;
-            }
-            
+
             transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
 
             boolean localCopy = isLocalCopy( artifact );
 
             destination = artifact.getFile();
-
-            boolean resolved = false;
 
             if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) )
             {
@@ -182,8 +175,6 @@ public class DefaultArtifactResolver
                 {
                     throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories, e );
                 }
-
-                resolved = true;
             }
 
             if ( destination.exists() )
@@ -193,7 +184,7 @@ public class DefaultArtifactResolver
                                         
             // 1.0-SNAPSHOT
             //
-            // 1)         pom = 1.0-SoNAPSHOT
+            // 1)         pom = 1.0-SNAPSHOT
             // 2)         pom = 1.0-yyyymmdd.hhmmss
             // 3) baseVersion = 1.0-SNAPSHOT
             if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
@@ -209,7 +200,8 @@ public class DefaultArtifactResolver
                 // if the timestamped version was resolved or the copy doesn't exist then copy a version
                 // of the file like 1.0-SNAPSHOT. Even if there is a timestamped version the non-timestamped
                 // version will be created.
-                if ( resolved || !copy.exists() )
+                if ( !copy.exists() || copy.lastModified() != destination.lastModified()
+                    || copy.length() != destination.length() )
                 {
                     // recopy file if it was reresolved, or doesn't exist.
                     try
@@ -227,7 +219,7 @@ public class DefaultArtifactResolver
                 // We are only going to use the 1.0-SNAPSHOT version
                 artifact.setFile( copy );
 
-                // Set the version to the 1.0-SNAPSHOT version
+                // Set the version to the 1.0-yyyymmdd.hhmmss version
                 artifact.selectVersion( version );
             }
         }
