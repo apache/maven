@@ -54,7 +54,6 @@ public class DefaultArtifactFilterManager
         artifacts.add( "classworlds" );
         artifacts.add( "plexus-classworlds" );
         artifacts.add( "commons-cli" );
-        artifacts.add( "jsch" );
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
         artifacts.add( "maven-build-context" );
@@ -75,13 +74,10 @@ public class DefaultArtifactFilterManager
         artifacts.add( "maven-toolchain" );
         artifacts.add( "plexus-component-api" );
         artifacts.add( "plexus-container-default" );
-        artifacts.add( "plexus-interactivity-api" );
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
         artifacts.add( "wagon-manager" );
-        artifacts.add( "wagon-ssh" );
-        artifacts.add( "wagon-ssh-external" );
 
         DEFAULT_EXCLUSIONS = artifacts;
     }
