@@ -64,28 +64,30 @@ public class ReactorArtifactRepository
 
                     artifact.setResolved( true );
                 }
-                else
-                {
-                    File classesDir;
-
-                    if ( isTestArtifact( artifact ) )
-                    {
-                        classesDir = new File( project.getBuild().getTestOutputDirectory() );
-                    }
-                    else
-                    {
-                        classesDir = new File( project.getBuild().getOutputDirectory() );
-                    }
-
-                    if ( classesDir.isDirectory() )
-                    {
-                        artifact.setFile( classesDir );
-
-                        artifact.setFromAuthoritativeRepository( true );
-
-                        artifact.setResolved( true );
-                    }
-                }
+// TODO: The code below supports MNG-3043 & MNG-2871 but in its current form causes MNG-4269. 
+//       We need to consider the state of the reactor before handing out directories.
+//                else
+//                {
+//                    File classesDir;
+//
+//                    if ( isTestArtifact( artifact ) )
+//                    {
+//                        classesDir = new File( project.getBuild().getTestOutputDirectory() );
+//                    }
+//                    else
+//                    {
+//                        classesDir = new File( project.getBuild().getOutputDirectory() );
+//                    }
+//
+//                    if ( classesDir.isDirectory() )
+//                    {
+//                        artifact.setFile( classesDir );
+//
+//                        artifact.setFromAuthoritativeRepository( true );
+//
+//                        artifact.setResolved( true );
+//                    }
+//                }
             }
         }
 
