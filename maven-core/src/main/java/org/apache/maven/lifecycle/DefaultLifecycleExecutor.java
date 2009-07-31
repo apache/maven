@@ -19,22 +19,11 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.StringTokenizer;
-
 import org.apache.maven.BuildFailureException;
 import org.apache.maven.ConfigurationInterpolationException;
 import org.apache.maven.ConfigurationInterpolator;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -85,6 +74,16 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.StringTokenizer;
+
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
@@ -129,7 +128,7 @@ public class DefaultLifecycleExecutor
      * @param rm
      * @param dispatcher
      */
-    public void execute( MavenSession session, ReactorManager rm, EventDispatcher dispatcher )
+    public void execute( final MavenSession session, final ReactorManager rm, final EventDispatcher dispatcher )
         throws BuildFailureException, LifecycleExecutionException
     {
         // TODO: This is dangerous, particularly when it's just a collection of loose-leaf projects being built
@@ -181,7 +180,7 @@ public class DefaultLifecycleExecutor
         executeTaskSegments( taskSegments, rm, session, rootProject, dispatcher );
     }
 
-    private void findExtensions( MavenSession session )
+    private void findExtensions( final MavenSession session )
         throws LifecycleExecutionException
     {
         // TODO: MNG-4081. What about extensions within the current reactor??
@@ -243,8 +242,8 @@ public class DefaultLifecycleExecutor
         artifactHandlerManager.addHandlers( handlers );
     }
 
-    private void executeTaskSegments( List taskSegments, ReactorManager rm, MavenSession session,
-                                      MavenProject rootProject, EventDispatcher dispatcher )
+    private void executeTaskSegments( final List taskSegments, final ReactorManager rm, final MavenSession session,
+                                      final MavenProject rootProject, final EventDispatcher dispatcher )
         throws LifecycleExecutionException, BuildFailureException
     {
         for ( Iterator it = taskSegments.iterator(); it.hasNext(); )
@@ -378,9 +377,9 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeGoalAndHandleFailures( String task, MavenSession session, MavenProject project,
-                                               EventDispatcher dispatcher, String event, ReactorManager rm,
-                                               long buildStartTime, String target )
+    private void executeGoalAndHandleFailures( final String task, final MavenSession session, final MavenProject project,
+                                               final EventDispatcher dispatcher, final String event, final ReactorManager rm,
+                                               final long buildStartTime, final String target )
         throws BuildFailureException, LifecycleExecutionException
     {
         try
@@ -407,8 +406,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private boolean handleExecutionFailure( ReactorManager rm, MavenProject project, Exception e, String task,
-                                            long buildStartTime )
+    private boolean handleExecutionFailure( final ReactorManager rm, final MavenProject project, final Exception e, final String task,
+                                            final long buildStartTime )
     {
         rm.registerBuildFailure( project, e, task, System.currentTimeMillis() - buildStartTime );
 
@@ -424,7 +423,7 @@ public class DefaultLifecycleExecutor
         return false;
     }
 
-    private List segmentTaskListByAggregationNeeds( List tasks, MavenSession session, MavenProject project )
+    private List segmentTaskListByAggregationNeeds( final List tasks, final MavenSession session, final MavenProject project )
         throws LifecycleExecutionException, BuildFailureException
     {
         List segments = new ArrayList();
@@ -521,7 +520,7 @@ public class DefaultLifecycleExecutor
         return segments;
     }
 
-    private void executeGoal( String task, MavenSession session, MavenProject project )
+    private void executeGoal( final String task, final MavenSession session, final MavenProject project )
         throws LifecycleExecutionException, BuildFailureException
     {
         try
@@ -546,8 +545,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeGoalWithLifecycle( String task, Stack forkEntryPoints, MavenSession session,
-                                           Map lifecycleMappings, MavenProject project, Lifecycle lifecycle )
+    private void executeGoalWithLifecycle( final String task, final Stack forkEntryPoints, final MavenSession session,
+                                           final Map lifecycleMappings, final MavenProject project, final Lifecycle lifecycle )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         List goals = processGoalChain( task, lifecycleMappings, lifecycle );
@@ -562,7 +561,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void executeStandaloneGoal( String task, Stack forkEntryPoints, MavenSession session, MavenProject project )
+    private void executeStandaloneGoal( final String task, final Stack forkEntryPoints, final MavenSession session, final MavenProject project )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         // guaranteed to come from the CLI and not be part of a phase
@@ -571,7 +570,7 @@ public class DefaultLifecycleExecutor
                       forkEntryPoints, session, project );
     }
 
-    private void executeGoals( List goals, Stack forkEntryPoints, MavenSession session, MavenProject project )
+    private void executeGoals( final List goals, final Stack forkEntryPoints, final MavenSession session, final MavenProject project )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         for ( Iterator i = goals.iterator(); i.hasNext(); )
@@ -726,7 +725,7 @@ public class DefaultLifecycleExecutor
         }
     }
     
-    private void createExecutionProject( MavenProject project, MavenSession session, boolean processProjectReferences )
+    private void createExecutionProject( final MavenProject project, final MavenSession session, final boolean processProjectReferences )
         throws LifecycleExecutionException
     {
         MavenProject executionProject = new MavenProject( project );
@@ -736,7 +735,7 @@ public class DefaultLifecycleExecutor
         project.setExecutionProject( executionProject );
     }
 
-    private boolean usesSessionOrReactorProjects( PlexusConfiguration configuration )
+    private boolean usesSessionOrReactorProjects( final PlexusConfiguration configuration )
     {
         String value = configuration != null ? String.valueOf( configuration ) : null;
         
@@ -751,7 +750,7 @@ public class DefaultLifecycleExecutor
         return false;
     }
 
-    private void calculateConcreteConfiguration( MojoExecution mojoExecution, MavenProject project, MavenSession session )
+    private void calculateConcreteConfiguration( final MojoExecution mojoExecution, final MavenProject project, final MavenSession session )
         throws LifecycleExecutionException
     {
         if ( mojoExecution.getConfiguration() == null )
@@ -773,7 +772,7 @@ public class DefaultLifecycleExecutor
         }
     }
     
-    private void calculateAllConcreteStates( MavenSession session )
+    private void calculateAllConcreteStates( final MavenSession session )
         throws LifecycleExecutionException
     {
         List projects = session.getSortedProjects();
@@ -786,7 +785,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void calculateConcreteState( MavenProject project, MavenSession session, boolean processReferences )
+    private void calculateConcreteState( final MavenProject project, final MavenSession session, final boolean processReferences )
         throws LifecycleExecutionException
     {
         if ( mavenProjectBuilder != null && project != null )
@@ -830,7 +829,7 @@ public class DefaultLifecycleExecutor
 //        }
 //    }
 
-    private List getReportExecutions( MavenProject project, Stack forkEntryPoints, MojoExecution mojoExecution, MavenSession session )
+    private List getReportExecutions( final MavenProject project, final Stack forkEntryPoints, final MojoExecution mojoExecution, final MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         List reportPlugins = project.getReportPlugins();
@@ -918,12 +917,12 @@ public class DefaultLifecycleExecutor
         return reports;
     }
     
-    private List getReportExecutions( ReportPlugin reportPlugin,
-                             Stack forkEntryPoints,
-                             ReportSet reportSet,
-                             MavenProject project,
-                             MavenSession session,
-                             MojoExecution mojoExecution )
+    private List getReportExecutions( final ReportPlugin reportPlugin,
+                             final Stack forkEntryPoints,
+                             final ReportSet reportSet,
+                             final MavenProject project,
+                             final MavenSession session,
+                             final MojoExecution mojoExecution )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = verifyReportPlugin( reportPlugin, project, session );
@@ -968,7 +967,7 @@ public class DefaultLifecycleExecutor
         return reports;
     }
 
-    private List getReports( List reportExecutions, MavenProject project, MojoExecution mojoExecution, MavenSession session )
+    private List getReports( final List reportExecutions, final MavenProject project, final MojoExecution mojoExecution, final MavenSession session )
         throws LifecycleExecutionException
     {
         List reports = new ArrayList();
@@ -1012,8 +1011,8 @@ public class DefaultLifecycleExecutor
         return reports;
     }
 
-    private void forkLifecycle( MojoDescriptor mojoDescriptor, Stack ancestorLifecycleForkers, MavenSession session,
-                                MavenProject project, String executionId )
+    private void forkLifecycle( final MojoDescriptor mojoDescriptor, final Stack ancestorLifecycleForkers, final MavenSession session,
+                                final MavenProject project, final String executionId )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
@@ -1040,8 +1039,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void forkProjectLifecycle( MojoDescriptor mojoDescriptor, Stack forkEntryPoints, MavenSession session,
-                                       MavenProject project, String executionId )
+    private void forkProjectLifecycle( final MojoDescriptor mojoDescriptor, final Stack forkEntryPoints, final MavenSession session,
+                                       MavenProject project, final String executionId )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         project = project.getExecutionProject();
@@ -1213,7 +1212,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private Lifecycle getLifecycleForPhase( String phase )
+    private Lifecycle getLifecycleForPhase( final String phase )
         throws BuildFailureException, LifecycleExecutionException
     {
         Lifecycle lifecycle = (Lifecycle) getPhaseToLifecycleMap().get( phase );
@@ -1225,7 +1224,7 @@ public class DefaultLifecycleExecutor
         return lifecycle;
     }
 
-    private MojoDescriptor getMojoDescriptor( PluginDescriptor pluginDescriptor, String goal )
+    private MojoDescriptor getMojoDescriptor( final PluginDescriptor pluginDescriptor, final String goal )
         throws LifecycleExecutionException
     {
         MojoDescriptor desc = pluginDescriptor.getMojo( goal );
@@ -1248,7 +1247,7 @@ public class DefaultLifecycleExecutor
         return desc;
     }
 
-    private void removeFromLifecycle( Stack lifecycleForkers, Map lifecycleMappings )
+    private void removeFromLifecycle( final Stack lifecycleForkers, final Map lifecycleMappings )
     {
         for ( Iterator lifecycleIterator = lifecycleMappings.values().iterator(); lifecycleIterator.hasNext(); )
         {
@@ -1268,8 +1267,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private Map constructLifecycleMappings( MavenSession session, String selectedPhase, MavenProject project,
-                                            Lifecycle lifecycle )
+    private Map constructLifecycleMappings( final MavenSession session, final String selectedPhase, final MavenProject project,
+                                            final Lifecycle lifecycle )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         // first, bind those associated with the packaging
@@ -1286,8 +1285,8 @@ public class DefaultLifecycleExecutor
         return lifecycleMappings;
     }
 
-    private Map bindLifecycleForPackaging( MavenSession session, String selectedPhase, MavenProject project,
-                                           Lifecycle lifecycle )
+    private Map bindLifecycleForPackaging( final MavenSession session, final String selectedPhase, final MavenProject project,
+                                           final Lifecycle lifecycle )
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         Map mappings = findMappingsForLifecycle( session, project, lifecycle );
@@ -1338,7 +1337,7 @@ public class DefaultLifecycleExecutor
         return lifecycleMappings;
     }
 
-    private Map findMappingsForLifecycle( MavenSession session, MavenProject project, Lifecycle lifecycle )
+    private Map findMappingsForLifecycle( final MavenSession session, final MavenProject project, final Lifecycle lifecycle )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         String packaging = project.getPackaging();
@@ -1385,7 +1384,7 @@ public class DefaultLifecycleExecutor
         return mappings;
     }
 
-    private List findOptionalMojosForLifecycle( MavenSession session, MavenProject project, Lifecycle lifecycle )
+    private List findOptionalMojosForLifecycle( final MavenSession session, final MavenProject project, final Lifecycle lifecycle )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         String packaging = project.getPackaging();
@@ -1420,7 +1419,7 @@ public class DefaultLifecycleExecutor
         return optionalMojos;
     }
 
-    private Object findExtension( MavenProject project, String role, String roleHint, MavenSession session )
+    private Object findExtension( final MavenProject project, final String role, final String roleHint, final MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         Object pluginComponent = null;
@@ -1456,7 +1455,7 @@ public class DefaultLifecycleExecutor
      * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
      * lookup directly, or have them passed in
      */
-    private Map<String, ArtifactHandler> findArtifactTypeHandlersInPlugins( MavenProject project, MavenSession session )
+    private Map<String, ArtifactHandler> findArtifactTypeHandlersInPlugins( final MavenProject project, final MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         Map<String, ArtifactHandler> map = new HashMap<String, ArtifactHandler>();
@@ -1466,7 +1465,7 @@ public class DefaultLifecycleExecutor
 
             if ( plugin.isExtensions() )
             {
-                verifyPlugin( plugin, project, session );
+                loadPluginFully( plugin, project, session );
 
                 // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
                 try
@@ -1496,7 +1495,7 @@ public class DefaultLifecycleExecutor
      * @param project
      * @param session
      */
-    private void bindPluginToLifecycle( Plugin plugin, MavenSession session, Map phaseMap, MavenProject project )
+    private void bindPluginToLifecycle( final Plugin plugin, final MavenSession session, final Map phaseMap, final MavenProject project )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         Settings settings = session.getSettings();
@@ -1530,7 +1529,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
+    private PluginDescriptor verifyPlugin( final Plugin plugin, final MavenProject project, final MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor;
@@ -1572,7 +1571,7 @@ public class DefaultLifecycleExecutor
         return pluginDescriptor;
     }
 
-    private PluginDescriptor loadPluginFully( Plugin plugin, MavenProject project, MavenSession session )
+    private PluginDescriptor loadPluginFully( final Plugin plugin, final MavenProject project, final MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor;
@@ -1614,7 +1613,7 @@ public class DefaultLifecycleExecutor
         return pluginDescriptor;
     }
 
-    private PluginDescriptor verifyReportPlugin( ReportPlugin plugin, MavenProject project, MavenSession session )
+    private PluginDescriptor verifyReportPlugin( final ReportPlugin plugin, final MavenProject project, final MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor;
@@ -1654,8 +1653,8 @@ public class DefaultLifecycleExecutor
         return pluginDescriptor;
     }
 
-    private void bindExecutionToLifecycle( PluginDescriptor pluginDescriptor, Map phaseMap, PluginExecution execution,
-                                           Settings settings )
+    private void bindExecutionToLifecycle( final PluginDescriptor pluginDescriptor, final Map phaseMap, final PluginExecution execution,
+                                           final Settings settings )
         throws LifecycleExecutionException
     {
         for ( Iterator i = execution.getGoals().iterator(); i.hasNext(); )
@@ -1696,8 +1695,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void addToLifecycleMappings( Map lifecycleMappings, String phase, MojoExecution mojoExecution,
-                                         Settings settings )
+    private void addToLifecycleMappings( final Map lifecycleMappings, final String phase, final MojoExecution mojoExecution,
+                                         final Settings settings )
     {
         List goals = (List) lifecycleMappings.get( phase );
 
@@ -1719,7 +1718,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private List processGoalChain( String task, Map phaseMap, Lifecycle lifecycle )
+    private List processGoalChain( final String task, final Map phaseMap, final Lifecycle lifecycle )
     {
         List goals = new ArrayList();
 
@@ -1740,8 +1739,8 @@ public class DefaultLifecycleExecutor
         return goals;
     }
 
-    private MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project,
-                                              String invokedVia, boolean canUsePrefix, boolean isOptionalMojo )
+    private MojoDescriptor getMojoDescriptor( final String task, final MavenSession session, final MavenProject project,
+                                              final String invokedVia, final boolean canUsePrefix, final boolean isOptionalMojo )
         throws BuildFailureException, LifecycleExecutionException, PluginNotFoundException
     {
         String goal;
@@ -1929,14 +1928,14 @@ public class DefaultLifecycleExecutor
     {
         private boolean aggregate;
 
-        private List tasks = new ArrayList();
+        private final List tasks = new ArrayList();
 
         TaskSegment()
         {
 
         }
 
-        TaskSegment( boolean aggregate )
+        TaskSegment( final boolean aggregate )
         {
             this.aggregate = aggregate;
         }
@@ -1974,7 +1973,7 @@ public class DefaultLifecycleExecutor
             return aggregate;
         }
 
-        void add( String task )
+        void add( final String task )
         {
             tasks.add( task );
         }
@@ -2038,7 +2037,7 @@ public class DefaultLifecycleExecutor
         }
     }
     
-    private void warnOfIncompleteComponentConfiguration( String role )
+    private void warnOfIncompleteComponentConfiguration( final String role )
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append( "\n************ WARNING ************" );
@@ -2056,7 +2055,7 @@ public class DefaultLifecycleExecutor
 
     private PlexusContainer container;
 
-    public void contextualize( Context context )
+    public void contextualize( final Context context )
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
