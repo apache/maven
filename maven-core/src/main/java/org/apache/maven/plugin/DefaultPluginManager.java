@@ -332,6 +332,12 @@ public class DefaultPluginManager
         {
             throw new PluginExecutionException( mojoExecution, project, e );
         }
+        catch ( LinkageError e )
+        {
+            pluginRealm.display();
+
+            throw e;
+        }
         finally
         {
             if ( mojo != null )
