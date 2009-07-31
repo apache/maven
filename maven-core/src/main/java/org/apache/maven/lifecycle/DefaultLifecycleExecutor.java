@@ -220,7 +220,7 @@ public class DefaultLifecycleExecutor
         {
             try
             {
-                handlers.putAll( findArtifactTypeHandlersInPlugins( project, session.getSettings(), session.getLocalRepository() ) );
+                handlers.putAll( findArtifactTypeHandlersInPlugins( project, session ) );
 
                 // shudder...
                 for ( ArtifactHandler handler : handlers.values() )
@@ -1135,8 +1135,7 @@ public class DefaultLifecycleExecutor
                                 Plugin plugin = new Plugin();
                                 plugin.setGroupId( groupId );
                                 plugin.setArtifactId( artifactId );
-                                lifecyclePluginDescriptor = verifyPlugin( plugin, project, session.getSettings(),
-                                                                          session.getLocalRepository() );
+                                lifecyclePluginDescriptor = verifyPlugin( plugin, project, session );
                                 if ( lifecyclePluginDescriptor == null )
                                 {
                                     throw new LifecycleExecutionException(
@@ -1345,8 +1344,7 @@ public class DefaultLifecycleExecutor
         String packaging = project.getPackaging();
         Map mappings = null;
 
-        LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging,
-                                                               session.getSettings(), session.getLocalRepository() );
+        LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging, session );
         if ( m != null )
         {
             mappings = m.getPhases( lifecycle.getId() );
@@ -1393,8 +1391,7 @@ public class DefaultLifecycleExecutor
         String packaging = project.getPackaging();
         List optionalMojos = null;
 
-        LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging, session
-            .getSettings(), session.getLocalRepository() );
+        LifecycleMapping m = (LifecycleMapping) findExtension( project, LifecycleMapping.ROLE, packaging, session );
 
         if ( m != null )
         {
@@ -1423,8 +1420,7 @@ public class DefaultLifecycleExecutor
         return optionalMojos;
     }
 
-    private Object findExtension( MavenProject project, String role, String roleHint, Settings settings,
-                                  ArtifactRepository localRepository )
+    private Object findExtension( MavenProject project, String role, String roleHint, MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         Object pluginComponent = null;
@@ -1435,7 +1431,7 @@ public class DefaultLifecycleExecutor
 
             if ( plugin.isExtensions() )
             {
-                verifyPlugin( plugin, project, settings, localRepository );
+                loadPluginFully( plugin, project, session );
 
                 // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
                 try
@@ -1460,8 +1456,7 @@ public class DefaultLifecycleExecutor
      * @todo Not particularly happy about this. Would like WagonManager and ArtifactTypeHandlerManager to be able to
      * lookup directly, or have them passed in
      */
-    private Map<String, ArtifactHandler> findArtifactTypeHandlersInPlugins( MavenProject project, Settings settings,
-                                                                            ArtifactRepository localRepository )
+    private Map<String, ArtifactHandler> findArtifactTypeHandlersInPlugins( MavenProject project, MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         Map<String, ArtifactHandler> map = new HashMap<String, ArtifactHandler>();
@@ -1471,7 +1466,7 @@ public class DefaultLifecycleExecutor
 
             if ( plugin.isExtensions() )
             {
-                verifyPlugin( plugin, project, settings, localRepository );
+                verifyPlugin( plugin, project, session );
 
                 // TODO: if moved to the plugin manager we already have the descriptor from above and so do can lookup the container directly
                 try
@@ -1507,7 +1502,7 @@ public class DefaultLifecycleExecutor
         Settings settings = session.getSettings();
 
         PluginDescriptor pluginDescriptor =
-            verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
+            verifyPlugin( plugin, project, session );
 
         if ( pluginDescriptor.getMojos() != null && !pluginDescriptor.getMojos().isEmpty() )
         {
@@ -1535,8 +1530,7 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
-                                           ArtifactRepository localRepository )
+    private PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, MavenSession session )
         throws LifecycleExecutionException, PluginNotFoundException
     {
         PluginDescriptor pluginDescriptor;
@@ -1544,7 +1538,49 @@ public class DefaultLifecycleExecutor
         {
             // TODO: MNG-4081...need to flush this plugin once we look at it, to avoid using an external
             // version of a plugin when a newer version will be created in the current reactor...
-            pluginDescriptor = pluginManager.verifyPlugin( plugin, project, settings, localRepository );
+            pluginDescriptor = pluginManager.loadPluginDescriptor( plugin, project, session );
+        }
+        catch ( PluginManagerException e )
+        {
+            throw new LifecycleExecutionException(
+                "Internal error in the plugin manager getting plugin '" + plugin.getKey() + "': " + e.getMessage(), e );
+        }
+        catch ( PluginVersionResolutionException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( InvalidPluginException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        catch ( PluginVersionNotFoundException e )
+        {
+            throw new LifecycleExecutionException( e.getMessage(), e );
+        }
+        return pluginDescriptor;
+    }
+
+    private PluginDescriptor loadPluginFully( Plugin plugin, MavenProject project, MavenSession session )
+        throws LifecycleExecutionException, PluginNotFoundException
+    {
+        PluginDescriptor pluginDescriptor;
+        try
+        {
+            // TODO: MNG-4081...need to flush this plugin once we look at it, to avoid using an external
+            // version of a plugin when a newer version will be created in the current reactor...
+            pluginDescriptor = pluginManager.loadPluginFully( plugin, project, session );
         }
         catch ( PluginManagerException e )
         {
@@ -1750,7 +1786,7 @@ public class DefaultLifecycleExecutor
                         Plugin buildPlugin = (Plugin) i.next();
 
                         PluginDescriptor desc =
-                            verifyPlugin( buildPlugin, project, session.getSettings(), session.getLocalRepository() );
+                            verifyPlugin( buildPlugin, project, session );
                         if ( prefix.equals( desc.getGoalPrefix() ) )
                         {
                             plugin = buildPlugin;
@@ -1813,7 +1849,7 @@ public class DefaultLifecycleExecutor
 
             if ( pluginDescriptor == null )
             {
-                pluginDescriptor = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
+                pluginDescriptor = verifyPlugin( plugin, project, session );
             }
 
             // this has been simplified from the old code that injected the plugin management stuff, since

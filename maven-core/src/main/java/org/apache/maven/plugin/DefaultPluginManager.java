@@ -161,6 +161,9 @@ public class DefaultPluginManager
                                                  session.getLocalRepository() );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public PluginDescriptor verifyPlugin( Plugin plugin,
                                           MavenProject project,
                                           Settings settings,
@@ -1588,7 +1591,7 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
 
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
-
+        
         return pluginContainer.lookup( role, roleHint );
     }
 
@@ -1610,5 +1613,32 @@ public class DefaultPluginManager
         }
 
         return components;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public PluginDescriptor loadPluginFully( Plugin plugin, MavenProject project, MavenSession session )
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException
+    {
+        PluginDescriptor pd = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
+        
+        PlexusContainer pluginContainer = getPluginContainer( pd );
+        ensurePluginContainerIsComplete( pd, pluginContainer, project, session );
+        
+        return pd;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public PluginDescriptor loadPluginDescriptor( Plugin plugin, MavenProject project, MavenSession session )
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException
+    {
+        return verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
     }
 }

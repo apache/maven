@@ -57,6 +57,9 @@ public interface PluginManager
 
     Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project );
 
+    /**
+     * @deprecated Use {@link PluginManager#loadPluginDescriptor(Plugin, MavenProject, MavenSession)} instead.
+     */
     PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
                                    ArtifactRepository localRepository )
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
@@ -73,5 +76,21 @@ public interface PluginManager
 
     Map getPluginComponents( Plugin plugin, String role )
         throws ComponentLookupException, PluginManagerException;
+    
+    /**
+     * @since 2.2.1
+     */
+    PluginDescriptor loadPluginDescriptor( Plugin plugin, MavenProject project, MavenSession session )
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException;
+    
+    /**
+     * @since 2.2.1
+     */
+    PluginDescriptor loadPluginFully( Plugin plugin, MavenProject project, MavenSession session )
+        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
+        PluginVersionNotFoundException;
 
 }
