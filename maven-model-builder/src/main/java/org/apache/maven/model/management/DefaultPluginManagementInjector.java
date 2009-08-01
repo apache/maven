@@ -104,6 +104,10 @@ public class DefaultPluginManagementInjector
                         {
                             mergePlugin_Version( element, managedPlugin, false, context );
                             mergePlugin_Extensions( element, managedPlugin, false, context );
+                            if ( element.isExtensions() )
+                            {
+                                mergePlugin_Dependencies( element, managedPlugin, false, context );
+                            }
                         }
                         else
                         {

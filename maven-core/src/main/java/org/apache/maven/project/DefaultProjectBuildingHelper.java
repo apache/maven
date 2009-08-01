@@ -21,7 +21,9 @@ package org.apache.maven.project;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
@@ -32,6 +34,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -155,14 +158,20 @@ public class DefaultProjectBuildingHelper
                 repositorySystem.createArtifact( extension.getGroupId(), extension.getArtifactId(),
                                                  extension.getVersion(), "jar" );
 
-            populateRealm( projectRealm, artifact, localRepository, remoteRepositories );
+            populateRealm( projectRealm, artifact, null, localRepository, remoteRepositories );
         }
 
         for ( Plugin plugin : extensionPlugins )
         {
             Artifact artifact = repositorySystem.createPluginArtifact( plugin );
 
-            populateRealm( projectRealm, artifact, localRepository, remoteRepositories );
+            Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
+            for ( Dependency dependency : plugin.getDependencies() )
+            {
+                dependencies.add( repositorySystem.createDependencyArtifact( dependency ) );
+            }
+
+            populateRealm( projectRealm, artifact, dependencies, localRepository, remoteRepositories );
         }
 
         try
@@ -177,18 +186,19 @@ public class DefaultProjectBuildingHelper
         return projectRealm;
     }
 
-    private void populateRealm( ClassRealm realm, Artifact artifact, ArtifactRepository localRepository,
-                                List<ArtifactRepository> remoteRepositories )
+    private void populateRealm( ClassRealm realm, Artifact artifact, Set<Artifact> dependencies,
+                                ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactResolutionException
     {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setArtifact( artifact );
+        request.setArtifactDependencies( dependencies );
         request.setResolveTransitively( true );
         request.setFilter( artifactFilterManager.getCoreArtifactFilter() );
         request.setLocalRepository( localRepository );
         request.setRemoteRepostories( remoteRepositories );
         // FIXME setTransferListener
-        
+
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         resolutionErrorHandler.throwErrors( request, result );
