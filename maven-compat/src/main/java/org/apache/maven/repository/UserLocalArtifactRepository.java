@@ -65,12 +65,6 @@ public class UserLocalArtifactRepository
     {
         return localRepository.pathOf( artifact );
     }
-    
-    @Override
-    public boolean isAuthoritative()
-    {
-        return false;
-    }
 
     @Override
     public boolean hasLocalMetadata()

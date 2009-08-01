@@ -37,10 +37,4 @@ public class TestIdeWorkspaceRepository
         return false;
     }
 
-    @Override
-    public boolean isAuthoritative()
-    {
-        return true;
-    }
-
 }

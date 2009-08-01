@@ -95,12 +95,6 @@ public class ReactorArtifactRepository
     }
 
     @Override
-    public boolean isAuthoritative()
-    {
-        return true;
-    }
-
-    @Override
     public boolean hasLocalMetadata()
     {
         return false;
