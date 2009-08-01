@@ -41,6 +41,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -51,12 +52,8 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
@@ -90,6 +87,9 @@ public class DefaultPluginManager
 
     @Requirement
     protected PlexusContainer container;
+
+    @Requirement
+    private ClassRealmManager classRealmManager;
 
     @Requirement
     protected ArtifactFilterManager coreArtifactFilterManager;
@@ -450,45 +450,8 @@ public class DefaultPluginManager
      * Creates ClassRealm with unique id for the given plugin
      */
     private ClassRealm createPluginRealm( Plugin plugin ) 
-        throws PluginManagerException
     {
-        ClassWorld world = ((MutablePlexusContainer) container).getClassWorld();
-
-        String baseRealmId = constructPluginKey( plugin );
-        String realmId = baseRealmId;
-
-        synchronized ( world )
-        {
-            for ( int i = 0; i < 100; i++ )
-            {
-                try
-                {
-                    ClassRealm pluginRealm = world.newRealm( realmId );
-                    pluginRealm.setParentRealm( container.getContainerRealm() );
-
-                    String coreRealmId = container.getContainerRealm().getId();
-                    try
-                    {
-                        pluginRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.Xpp3Dom" );
-                        pluginRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlPullParser" );
-                        pluginRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlPullParserException" );
-                        pluginRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlSerializer" );
-                    }
-                    catch ( NoSuchRealmException e )
-                    {
-                        throw new IllegalStateException( e );
-                    }
-
-                    return pluginRealm;
-                }
-                catch ( DuplicateRealmException e )
-                {
-                    realmId = baseRealmId + "-" + i;
-                }
-            }
-        }
-
-        throw new PluginManagerException( plugin, "Could not create ClassRealm for plugin " + baseRealmId, (Throwable) null );
+        return classRealmManager.createPluginRealm( plugin );
     }
 
     private Mojo getConfiguredMojo( MavenSession session, MavenProject project, MojoExecution mojoExecution, ClassRealm pluginRealm )

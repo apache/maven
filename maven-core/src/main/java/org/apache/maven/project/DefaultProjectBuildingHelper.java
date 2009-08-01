@@ -33,6 +33,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
@@ -40,17 +41,16 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * Assists the project builder.
+ * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for
+ * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
+ * prior notice.
  * 
  * @author Benjamin Bentmann
  */
@@ -64,6 +64,9 @@ public class DefaultProjectBuildingHelper
 
     @Requirement
     private PlexusContainer container;
+
+    @Requirement
+    private ClassRealmManager classRealmManager;
 
     @Requirement
     private RepositorySystem repositorySystem;
@@ -125,32 +128,7 @@ public class DefaultProjectBuildingHelper
             return projectRealm;
         }
 
-        String realmId = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
-
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "Creating project realm " + realmId );
-        }
-
-        ClassWorld world = ( (MutablePlexusContainer) container ).getClassWorld();
-
-        synchronized ( world )
-        {
-            projectRealm = world.getClassRealm( realmId );
-
-            if ( projectRealm == null )
-            {
-                try
-                {
-                    projectRealm = world.newRealm( realmId );
-                    projectRealm.setParentRealm( container.getContainerRealm() );
-                }
-                catch ( DuplicateRealmException e )
-                {
-                    throw new IllegalStateException( "Failed to create project realm " + realmId, e );
-                }
-            }
-        }
+        projectRealm = classRealmManager.createProjectRealm( model );
 
         for ( Extension extension : build.getExtensions() )
         {
@@ -180,7 +158,8 @@ public class DefaultProjectBuildingHelper
         }
         catch ( Exception e )
         {
-            throw new IllegalStateException( "Failed to discover components in project realm " + realmId, e );
+            throw new IllegalStateException( "Failed to discover components in project realm " + projectRealm.getId(),
+                                             e );
         }
 
         return projectRealm;
