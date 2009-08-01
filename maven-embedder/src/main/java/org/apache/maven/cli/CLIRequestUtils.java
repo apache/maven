@@ -37,7 +37,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 
-public final class CLIRequestUtils
+final class CLIRequestUtils
 {
 
     private CLIRequestUtils()
