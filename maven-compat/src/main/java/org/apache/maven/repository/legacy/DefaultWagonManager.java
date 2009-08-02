@@ -350,9 +350,12 @@ public class DefaultWagonManager
 
                 if ( downloaded )
                 {
-                    
-                    logger.info( "Downloaded " + repository.getUrl() + remotePath  );
-                    
+                    if ( logger.isInfoEnabled() )
+                    {
+                        String url = String.valueOf( repository.getUrl() );
+                        logger.info( "Downloaded " + url + ( url.endsWith( "/" ) ? "" : "/" ) + remotePath );
+                    }
+
                     // keep the checksum files from showing up on the download monitor...
                     if ( downloadMonitor != null )
                     {
