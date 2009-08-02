@@ -59,6 +59,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "maven-compat" );
         artifacts.add( "maven-core" );
         artifacts.add( "maven-error-diagnoser" );
+        artifacts.add( "maven-error-diagnostics" );
         artifacts.add( "maven-lifecycle" );
         artifacts.add( "maven-model" );
         artifacts.add( "maven-monitor" );
@@ -76,6 +77,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "wagon-provider-api" );
         artifacts.add( "wagon-file" );
         artifacts.add( "wagon-http-lightweight" );
+        artifacts.add( "wagon-http-shared" );
         artifacts.add( "wagon-manager" );
 
         DEFAULT_EXCLUSIONS = artifacts;
