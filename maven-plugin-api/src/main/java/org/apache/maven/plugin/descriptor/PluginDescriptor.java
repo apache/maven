@@ -227,6 +227,12 @@ public class PluginDescriptor
         this.inheritedByDefault = inheritedByDefault;
     }
 
+    /**
+     * Gets the artifacts that make up the plugin's class realm, excluding artifacts shadowed by the Maven core realm
+     * like {@code maven-project}.
+     * 
+     * @return The plugin artifacts, never {@code null}.
+     */
     public List<Artifact> getArtifacts()
     {
         return artifacts;
@@ -277,7 +283,7 @@ public class PluginDescriptor
 
         MojoDescriptor mojoDescriptor = null;
         
-        for ( Iterator i = getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
+        for ( Iterator<?> i = getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
         {
             MojoDescriptor desc = (MojoDescriptor) i.next();
                         

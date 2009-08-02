@@ -299,6 +299,7 @@ public class DefaultPluginManager
             else
             {
                 artifact.setFile( null );
+                artifact.setResolved( false );
             }
         }
 
@@ -432,6 +433,8 @@ public class DefaultPluginManager
             logger.debug( "Populating plugin realm for " + constructPluginKey( plugin ) );
         }
 
+        List<Artifact> exposedPluginArtifacts = new ArrayList<Artifact>();
+
         for ( Artifact a : pluginArtifacts )
         {
             if ( a.getFile() != null )
@@ -440,6 +443,8 @@ public class DefaultPluginManager
                 {
                     logger.debug( "  Included: " + a.getId() );
                 }
+
+                exposedPluginArtifacts.add( a );
 
                 try
                 {
@@ -460,8 +465,8 @@ public class DefaultPluginManager
         }
 
         pluginDescriptor.setClassRealm( pluginRealm );
-        pluginDescriptor.setArtifacts( pluginArtifacts );
-        
+        pluginDescriptor.setArtifacts( exposedPluginArtifacts );
+
         try
         {
             for ( ComponentDescriptor componentDescriptor : pluginDescriptor.getComponents() )
@@ -481,8 +486,8 @@ public class DefaultPluginManager
             throw new PluginManagerException( plugin, e.getMessage(), e );
         }
 
-        pluginCache.put( plugin, localRepository, remoteRepositories, pluginRealm, pluginArtifacts );
-        
+        pluginCache.put( plugin, localRepository, remoteRepositories, pluginRealm, exposedPluginArtifacts );
+
         return pluginRealm;
     }
 
