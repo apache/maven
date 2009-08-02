@@ -33,7 +33,8 @@ public class MavenITmng3428PluginDescriptorArtifactsIncompleteTest
 {
     public MavenITmng3428PluginDescriptorArtifactsIncompleteTest()
     {
-        super( "(2.0.8,)" ); // 2.0.8+
+        // core artifacts are deliberately excluded in 3.x (see MNG-4277)
+        super( "(2.0.8,3.0-alpha-1)" ); // 2.0.8+
     }
 
     public void testitMNG3428 ()
