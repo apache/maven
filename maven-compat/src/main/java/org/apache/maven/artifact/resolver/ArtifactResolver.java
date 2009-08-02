@@ -35,6 +35,8 @@ import org.apache.maven.wagon.events.TransferListener;
 // Just hide the one method we want behind the RepositorySystem interface.
 public interface ArtifactResolver
 {
+    ArtifactResolutionResult collect( ArtifactResolutionRequest request );
+
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     // The rest is deprecated

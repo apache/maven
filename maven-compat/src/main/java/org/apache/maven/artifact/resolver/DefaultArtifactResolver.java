@@ -339,8 +339,18 @@ public class DefaultArtifactResolver
     // ------------------------------------------------------------------------
     //
     // ------------------------------------------------------------------------
-    
+
+    public ArtifactResolutionResult collect( ArtifactResolutionRequest request )
+    {
+        return resolve( request, true );
+    }
+
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
+    {
+        return resolve( request, false );
+    }
+
+    private ArtifactResolutionResult resolve( ArtifactResolutionRequest request, boolean collectOnly )
     {
         Artifact rootArtifact = request.getArtifact();
         Set<Artifact> artifacts = request.getArtifactDependencies();
@@ -382,7 +392,7 @@ public class DefaultArtifactResolver
         // file reference. But this may be a Maven Plugin that we need to resolve from a remote repository
         // as well as its dependencies.
                         
-        if ( request.isResolveRoot() /* && rootArtifact.getFile() == null */ )
+        if ( !collectOnly && request.isResolveRoot() /* && rootArtifact.getFile() == null */ )
         {            
             try
             {
@@ -457,7 +467,7 @@ public class DefaultArtifactResolver
             return result;
         }
                 
-        if ( result.getArtifacts() != null )
+        if ( !collectOnly && result.getArtifacts() != null )
         {
             for ( Artifact artifact : result.getArtifacts() )
             {
