@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Properties;
 
 /**
@@ -38,7 +36,7 @@ public class MavenITmng4274PluginRealmArtifactsTest
 
     public MavenITmng4274PluginRealmArtifactsTest()
     {
-        super( "[2.0.6,)" );
+        super( "[3.0-alpha-3,)" );
     }
 
     /**
@@ -53,15 +51,20 @@ public class MavenITmng4274PluginRealmArtifactsTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifact( "org.apache.maven", "maven-core", "2.0.4274", "jar" );
+        verifier.deleteArtifact( "org.apache.maven", "maven-core", "2.0.4274", "pom" );
+        verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "1.1.4274", "jar" );
+        verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "1.1.4274", "pom" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/class.properties" );
-        String prop = props.getProperty( "org.codehaus.plexus.util.Expand.methods", "" );
-        Collection methods = Arrays.asList( prop.split( "," ) );
-        assertTrue( methods.toString(), methods.contains( "normalize" ) );
-        assertTrue( methods.toString(), methods.contains( "resolveFile" ) );
+        assertNotNull( props.getProperty( "org.apache.maven.its.mng4274.CoreIt" ) );
     }
 
 }
