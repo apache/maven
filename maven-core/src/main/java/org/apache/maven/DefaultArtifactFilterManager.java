@@ -53,7 +53,6 @@ public class DefaultArtifactFilterManager
 
         artifacts.add( "classworlds" );
         artifacts.add( "plexus-classworlds" );
-        artifacts.add( "commons-cli" );
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
         artifacts.add( "maven-build-context" );
