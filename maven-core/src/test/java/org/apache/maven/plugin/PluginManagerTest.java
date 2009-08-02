@@ -226,7 +226,6 @@ public class PluginManagerTest
         */
         
         List<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getPluginArtifactRepositories() );   
-        assertEquals( 4, artifacts.size() );
         
         for ( Artifact a : artifacts )
         {

@@ -33,6 +33,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -173,7 +174,6 @@ public class DefaultProjectBuildingHelper
         request.setArtifact( artifact );
         request.setArtifactDependencies( dependencies );
         request.setResolveTransitively( true );
-        request.setFilter( artifactFilterManager.getCoreArtifactFilter() );
         request.setLocalRepository( localRepository );
         request.setRemoteRepostories( remoteRepositories );
         // FIXME setTransferListener
@@ -182,21 +182,33 @@ public class DefaultProjectBuildingHelper
 
         resolutionErrorHandler.throwErrors( request, result );
 
+        ArtifactFilter filter = artifactFilterManager.getCoreArtifactFilter();
+
         for ( Artifact resultArtifact : result.getArtifacts() )
         {
-            if ( logger.isDebugEnabled() )
+            if ( filter.include( resultArtifact ) )
             {
-                logger.debug( "  " + resultArtifact.getFile() );
-            }
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "  Included: " + resultArtifact.getId() );
+                }
 
-            try
-            {
-                realm.addURL( resultArtifact.getFile().toURI().toURL() );
+                try
+                {
+                    realm.addURL( resultArtifact.getFile().toURI().toURL() );
+                }
+                catch ( MalformedURLException e )
+                {
+                    throw new IllegalStateException( "Failed to populate project realm " + realm.getId() + " with "
+                        + artifact.getFile(), e );
+                }
             }
-            catch ( MalformedURLException e )
+            else
             {
-                throw new IllegalStateException( "Failed to populate project realm " + realm.getId() + " with "
-                    + artifact.getFile(), e );
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "  Excluded: " + resultArtifact.getId() );
+                }
             }
         }
     }

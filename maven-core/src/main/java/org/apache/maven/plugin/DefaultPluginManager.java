@@ -39,7 +39,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
-import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
@@ -237,12 +237,15 @@ public class DefaultPluginManager
 
     // TODO: Turn this into a component so it can be tested.
     //
+    /**
+     * Gets all artifacts required for the class realm of the specified plugin. An artifact in the result list that has
+     * no file set is meant to be excluded from the plugin realm in favor of the equivalent library from the current
+     * core distro.
+     */
     List<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedInPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactNotFoundException, ArtifactResolutionException
     {
-        AndArtifactFilter filter = new AndArtifactFilter();
-        filter.add( coreArtifactFilterManager.getCoreArtifactFilter() );
-        filter.add( new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM ) );
+        ArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
 
         Set<Artifact> dependenciesToResolveForPlugin = new LinkedHashSet<Artifact>();
 
@@ -273,16 +276,33 @@ public class DefaultPluginManager
             .setLocalRepository( localRepository )
             .setRemoteRepostories( remoteRepositories )
             .setFilter( filter )
+            .setResolveRoot( true )
             .setResolveTransitively( true );
-            //.setResolveRoot( false );
         //  FIXME setTransferListener
         
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        ArtifactResolutionResult result = repositorySystem.collect( request );
         resolutionErrorHandler.throwErrors( request, result );
 
-        logger.debug( "Using the following artifacts for classpath of: " + pluginArtifact.getId() + ":\n\n" + result.getArtifacts().toString().replace( ',', '\n' ) );
+        List<Artifact> pluginArtifacts = new ArrayList<Artifact>( result.getArtifacts() );
 
-        return new ArrayList<Artifact>( result.getArtifacts() );
+        request.setResolveRoot( true ).setResolveTransitively( false ).setArtifactDependencies( null );
+
+        filter = coreArtifactFilterManager.getCoreArtifactFilter();
+
+        for ( Artifact artifact : pluginArtifacts )
+        {
+            if ( filter.include( artifact ) )
+            {
+                result = repositorySystem.resolve( request.setArtifact( artifact ) );
+                resolutionErrorHandler.throwErrors( request, result );
+            }
+            else
+            {
+                artifact.setFile( null );
+            }
+        }
+
+        return pluginArtifacts;
     }
 
     // ----------------------------------------------------------------------
@@ -407,15 +427,35 @@ public class DefaultPluginManager
             throw new IllegalStateException( e ); // XXX
         }
 
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Populating plugin realm for " + constructPluginKey( plugin ) );
+        }
+
         for ( Artifact a : pluginArtifacts )
         {
-            try
+            if ( a.getFile() != null )
             {
-                pluginRealm.addURL( a.getFile().toURI().toURL() );
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "  Included: " + a.getId() );
+                }
+
+                try
+                {
+                    pluginRealm.addURL( a.getFile().toURI().toURL() );
+                }
+                catch ( MalformedURLException e )
+                {
+                    // Not going to happen
+                }
             }
-            catch ( MalformedURLException e )
+            else
             {
-                // Not going to happen
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "  Excluded: " + a.getId() );
+                }
             }
         }
 
