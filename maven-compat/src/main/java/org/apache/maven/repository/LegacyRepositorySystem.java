@@ -308,7 +308,7 @@ public class LegacyRepositorySystem
             // no ide workspace artifact resolution
         }
 
-        return artifactResolver.resolve( request );
+        return artifactResolver.collect( request );
     }
 
     public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
