@@ -46,6 +46,7 @@ public class MavenITmng4279WagonProviderFailoverTest
         
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
+        
         verifier.executeGoal( "deploy" );
         
         verifier.verifyErrorFreeLog();

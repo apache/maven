@@ -18,8 +18,18 @@
   
   <distributionManagement>
     <repository>
-      <id>central</id>
-      <url>file:///${java.io.tmpdir}/${project.artifactId}</url>
+      <id>test</id>
+      <url>coreit://foo.com/deploy</url>
     </repository>
   </distributionManagement>
+  
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its</groupId>
+        <artifactId>core-it-wagon</artifactId>
+        <version>2.1-SNAPSHOT</version>
+      </extension>
+    </extensions>
+  </build>
 </project>

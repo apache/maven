@@ -1,9 +1,9 @@
 <settings>
   <servers>
     <server>
-      <id>central</id>
+      <id>test</id>
       <configuration>
-        <wagonProvider>lightweight</wagonProvider>
+        <wagonProvider>foo</wagonProvider>
       </configuration>
     </server>
   </servers>
