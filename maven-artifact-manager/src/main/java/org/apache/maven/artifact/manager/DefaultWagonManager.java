@@ -193,6 +193,10 @@ public class DefaultWagonManager
             PlexusContainer container = getWagonContainer( hint );
             if ( container == null || !container.hasComponent( Wagon.ROLE, hint ) )
             {
+                getLogger().debug(
+                                   "Cannot find wagon for protocol-provider hint: '" + hint
+                                       + "', configured for repository: '" + repositoryId + "'. Using protocol hint: '"
+                                       + protocol + "' instead." );
                 hint = protocol;
             }
         }
