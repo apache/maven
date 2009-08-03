@@ -165,7 +165,7 @@ public class DefaultMaven
         // User Local Repository
         try
         {
-            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( getProjectMap( session.getProjects() ) ) );
+            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( getProjectMap( session.getProjects() ), session ) );
         }
         catch ( MavenExecutionException e )
         {

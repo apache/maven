@@ -6,6 +6,9 @@ import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.execution.BuildSuccess;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.LocalArtifactRepository;
 
@@ -21,11 +24,14 @@ public class ReactorArtifactRepository
 {
     private Map<String, MavenProject> reactorProjects;
 
+    private MavenExecutionResult executionResult;
+
     private final int hashCode;
 
-    public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects )
+    public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects, MavenSession session )
     {
         this.reactorProjects = reactorProjects;
+        this.executionResult = ( session != null ) ? session.getResult() : null;
         hashCode = ( reactorProjects != null ) ? reactorProjects.keySet().hashCode() : 0;
     }
 
@@ -60,28 +66,26 @@ public class ReactorArtifactRepository
 
                     artifact.setResolved( true );
                 }
-// TODO: The code below supports MNG-3043 & MNG-2871 but in its current form causes MNG-4269. 
-//       We need to consider the state of the reactor before handing out directories.
-//                else
-//                {
-//                    File classesDir;
-//
-//                    if ( isTestArtifact( artifact ) )
-//                    {
-//                        classesDir = new File( project.getBuild().getTestOutputDirectory() );
-//                    }
-//                    else
-//                    {
-//                        classesDir = new File( project.getBuild().getOutputDirectory() );
-//                    }
-//
-//                    if ( classesDir.isDirectory() )
-//                    {
-//                        artifact.setFile( classesDir );
-//
-//                        artifact.setResolved( true );
-//                    }
-//                }
+                else if ( isProjectOutputValid( project ) )
+                {
+                    File classesDir;
+
+                    if ( isTestArtifact( artifact ) )
+                    {
+                        classesDir = new File( project.getBuild().getTestOutputDirectory() );
+                    }
+                    else
+                    {
+                        classesDir = new File( project.getBuild().getOutputDirectory() );
+                    }
+
+                    if ( classesDir.isDirectory() )
+                    {
+                        artifact.setFile( classesDir );
+
+                        artifact.setResolved( true );
+                    }
+                }
             }
         }
 
@@ -178,6 +182,18 @@ public class ReactorArtifactRepository
             buffer.append( ':' ).append( artifact.getClassifier() );
         }
         return buffer.toString();
+    }
+
+    /**
+     * Determines whether the output directories of the specified project have valid contents and can be used for
+     * artifact resolution.
+     * 
+     * @param project The project to check, must not be {@code null}.
+     * @return {@code true} if the output directories are valid, {@code false} otherwise.
+     */
+    private boolean isProjectOutputValid( MavenProject project )
+    {
+        return executionResult != null && executionResult.getBuildSummary( project ) instanceof BuildSuccess;
     }
 
     /**
