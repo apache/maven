@@ -48,7 +48,7 @@ public class DefaultModelValidator
     ///////////////////////////////////////////////////////////////////////////
     // ModelValidator Implementation
 
-    public ModelValidationResult validate( Model model )
+    public ModelValidationResult validate( final Model model )
     {
         ModelValidationResult result = new ModelValidationResult();
 
@@ -149,6 +149,20 @@ public class DefaultModelValidator
                     result.addMessage(
                         "For managed dependency " + d + ": only dependency with system scope can specify systemPath." );
                 }
+                else if ( Artifact.SCOPE_IMPORT.equals( d.getScope() ) )
+                {
+                    if ( !"pom".equals( d.getType() ) )
+                    {
+                        result.addMessage( "For managed dependency " + d
+                            + ": dependencies with import scope must have type 'pom'." );
+                    }
+                    else if ( d.getClassifier() != null )
+                    {
+                        result.addMessage( "For managed dependency " + d
+                            + ": dependencies with import scope must NOT have a classifier." );
+                    }
+
+                }
             }
         }
 
@@ -201,7 +215,7 @@ public class DefaultModelValidator
         return result;
     }
 
-    private boolean validateId( String fieldName, ModelValidationResult result, String id )
+    private boolean validateId( final String fieldName, final ModelValidationResult result, final String id )
     {
         if ( !validateStringNotEmpty( fieldName, result, id ) )
         {
@@ -218,7 +232,7 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateRepositories( ModelValidationResult result, List repositories, String prefix )
+    private void validateRepositories( final ModelValidationResult result, final List repositories, final String prefix )
     {
         for ( Iterator it = repositories.iterator(); it.hasNext(); )
         {
@@ -230,7 +244,7 @@ public class DefaultModelValidator
         }
     }
 
-    private void forcePluginExecutionIdCollision( Model model, ModelValidationResult result )
+    private void forcePluginExecutionIdCollision( final Model model, final ModelValidationResult result )
     {
         Build build = model.getBuild();
 
@@ -263,7 +277,7 @@ public class DefaultModelValidator
     // Field validation
     // ----------------------------------------------------------------------
 
-    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string )
+    private boolean validateStringNotEmpty( final String fieldName, final ModelValidationResult result, final String string )
     {
         return validateStringNotEmpty( fieldName, result, string, null );
     }
@@ -276,7 +290,7 @@ public class DefaultModelValidator
      * <li><code>string.length > 0</code>
      * </ul>
      */
-    private boolean validateStringNotEmpty( String fieldName, ModelValidationResult result, String string, String sourceHint )
+    private boolean validateStringNotEmpty( final String fieldName, final ModelValidationResult result, final String string, final String sourceHint )
     {
         if ( !validateNotNull( fieldName, result, string, sourceHint ) )
         {
@@ -309,8 +323,8 @@ public class DefaultModelValidator
      * <li><code>string.length > 0</code>
      * </ul>
      */
-    private boolean validateSubElementStringNotEmpty( Object subElementInstance, String fieldName,
-                                                      ModelValidationResult result, String string )
+    private boolean validateSubElementStringNotEmpty( final Object subElementInstance, final String fieldName,
+                                                      final ModelValidationResult result, final String string )
     {
         if ( !validateSubElementNotNull( subElementInstance, fieldName, result, string ) )
         {
@@ -334,7 +348,7 @@ public class DefaultModelValidator
      * <li><code>string != null</code>
      * </ul>
      */
-    private boolean validateNotNull( String fieldName, ModelValidationResult result, Object object, String sourceHint )
+    private boolean validateNotNull( final String fieldName, final ModelValidationResult result, final Object object, final String sourceHint )
     {
         if ( object != null )
         {
@@ -360,8 +374,8 @@ public class DefaultModelValidator
      * <li><code>string != null</code>
      * </ul>
      */
-    private boolean validateSubElementNotNull( Object subElementInstance, String fieldName,
-                                               ModelValidationResult result, Object object )
+    private boolean validateSubElementNotNull( final Object subElementInstance, final String fieldName,
+                                               final ModelValidationResult result, final Object object )
     {
         if ( object != null )
         {
