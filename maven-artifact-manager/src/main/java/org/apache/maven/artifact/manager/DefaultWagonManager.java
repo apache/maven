@@ -186,7 +186,22 @@ public class DefaultWagonManager
             }
         }
         
-        return impl == null ? protocol : protocol + "-" + impl;
+        String hint;
+        if ( impl != null )
+        {
+            hint = protocol + "-" + impl;
+            PlexusContainer container = getWagonContainer( hint );
+            if ( container == null || !container.hasComponent( Wagon.ROLE, hint ) )
+            {
+                hint = protocol;
+            }
+        }
+        else
+        {
+            hint = protocol;
+        }
+        
+        return hint;
     }
 
     private PlexusContainer getWagonContainer( String hint )
