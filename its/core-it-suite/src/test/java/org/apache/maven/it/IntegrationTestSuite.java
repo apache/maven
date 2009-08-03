@@ -86,6 +86,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4279WagonProviderFailoverTest.class );
         suite.addTestSuite( MavenITmng4276WrongTransitivePlexusUtilsTest.class );
         suite.addTestSuite( MavenITmng4274PluginRealmArtifactsTest.class );
         suite.addTestSuite( MavenITmng4273RestrictedCoreRealmAccessForPluginTest.class );
