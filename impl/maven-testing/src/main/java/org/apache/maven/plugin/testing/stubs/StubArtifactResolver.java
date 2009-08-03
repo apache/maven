@@ -184,17 +184,21 @@ public class StubArtifactResolver
         // nop
     }
 
-    public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository,
                          TransferListener downloadMonitor )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         // TODO Auto-generated method stub
         
+    }
+    
+    public ArtifactResolutionResult collect( ArtifactResolutionRequest request )
+    {
+        return null;
+    }
+
+    public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
+    {
+        return null;
     }
 }
