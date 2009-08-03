@@ -219,6 +219,7 @@ under the License.
             <excludes>
               <exclude>org/apache/maven/artifact/manager/WagonManager*</exclude>
               <exclude>org/apache/maven/extension/ExtensionManager*</exclude>
+              <exclude>org/apache/maven/plugin/PluginManager*</exclude>
             </excludes>
           </configuration>
         </plugin>
