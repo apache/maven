@@ -1115,7 +1115,7 @@ public class DefaultLifecycleExecutor
             }
             catch ( PluginNotFoundException e )
             {
-                throw new LifecycleExecutionException( "Error resolving version for plugin " + plugin, e );
+                throw new LifecycleExecutionException( "Error resolving version for plugin " + plugin.getKey(), e );
             }
         }
 

@@ -315,8 +315,12 @@ public class ProjectBuildingException
         {
             for ( ModelProblem problem : result.getProblems() )
             {
-                writer.print( "o " );
-                writer.println( problem.getMessage() );
+                writer.print( "[" );
+                writer.print( problem.getSeverity() );
+                writer.print( "] " );
+                writer.print( problem.getMessage() );
+                writer.print( " @ " );
+                writer.println( problem.getSource() );
             }
         }
         writer.close();

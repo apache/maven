@@ -185,7 +185,10 @@ public class MavenCli
             {
                 System.out.println( es.getMessage() );
 
-                es.getException().printStackTrace();
+                if ( showErrors )
+                {
+                    es.getException().printStackTrace();
+                }
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )

@@ -510,9 +510,9 @@ public class DefaultModelBuilder
         catch ( UnresolvableModelException e )
         {
             problems.add( new ModelProblem( "Non-resolvable parent POM "
-                + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
-                + ModelProblemUtils.toSourceHint( childModel ) + ": " + e.getMessage(), ModelProblem.Severity.FATAL,
-                                            ModelProblemUtils.toSourceHint( childModel ), e ) );
+                + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(),
+                                            ModelProblem.Severity.FATAL, ModelProblemUtils.toSourceHint( childModel ),
+                                            e ) );
             throw new ModelBuildingException( problems.getProblems() );
         }
 

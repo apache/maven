@@ -75,8 +75,12 @@ public class ModelBuildingException
 
         for ( ModelProblem problem : problems )
         {
-            writer.print( "o " );
-            writer.println( problem.getMessage() );
+            writer.print( "[" );
+            writer.print( problem.getSeverity() );
+            writer.print( "] " );
+            writer.print( problem.getMessage() );
+            writer.print( " @ " );
+            writer.println( problem.getSource() );
         }
 
         return buffer.toString();

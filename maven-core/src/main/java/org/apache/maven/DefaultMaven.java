@@ -38,6 +38,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.execution.ProjectSorter;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -293,6 +294,27 @@ public class DefaultMaven
         for ( ProjectBuildingResult result : results )
         {
             projects.add( result.getProject() );
+
+            if ( !result.getProblems().isEmpty() && logger.isWarnEnabled() )
+            {
+                logger.warn( "" );
+                logger.warn( "Some problems were encountered while building the effective model for "
+                    + result.getProject().getId() );
+                logger.warn( "" );
+
+                for ( ModelProblem problem : result.getProblems() )
+                {
+                    logger.warn( problem.getMessage() + " @ " + problem.getSource() );
+                }
+
+                logger.warn( "" );
+                logger.warn( "It is highly recommended to fix these problems"
+                    + " because they threaten the stability of your build." );
+                logger.warn( "" );
+                logger.warn( "For this reason, future Maven versions will no"
+                    + " longer support building such malformed projects." );
+                logger.warn( "" );
+            }
         }
     }
 
