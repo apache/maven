@@ -57,7 +57,9 @@ public class DefaultLifecycleBindingsInjector
 
         Collection<Plugin> defaultPlugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles( packaging );
 
-        if ( !defaultPlugins.isEmpty() )
+        // TODO: A bad packaging is a model error, we need to report this as such!
+
+        if ( defaultPlugins != null && !defaultPlugins.isEmpty() )
         {
             Model lifecycleModel = new Model();
             lifecycleModel.setBuild( new Build() );

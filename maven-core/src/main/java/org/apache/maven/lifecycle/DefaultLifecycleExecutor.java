@@ -1025,17 +1025,19 @@ public class DefaultLifecycleExecutor
     //
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
+        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
+
+        if ( lifecycleMappingForPackaging == null )
+        {
+            return null;
+        }
+
         Map<Plugin, Plugin> plugins = new LinkedHashMap<Plugin, Plugin>();
-        
+
         for ( Lifecycle lifecycle : lifecycles )
         {
-            LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
-
-            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration = null;
-            if ( lifecycleMappingForPackaging != null )
-            {
-                lifecycleConfiguration = lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
-            }
+            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration =
+                lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
 
             if ( lifecycleConfiguration != null )
             {
