@@ -35,7 +35,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.execution.BuildFailure;
+import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Dependency;
@@ -122,7 +125,7 @@ public class DefaultLifecycleExecutor
     {
         // TODO: Use a listener here instead of loggers
         
-        logger.info(  "Build Order:" );
+        logger.info( "Build Order:" );
         
         logger.info( "" );
         
@@ -148,7 +151,9 @@ public class DefaultLifecycleExecutor
         }
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
-                
+
+        MavenExecutionResult result = session.getResult();
+
         for ( MavenProject currentProject : session.getProjects() )
         {
             if ( session.isBlackListed( currentProject ) )
@@ -161,6 +166,8 @@ public class DefaultLifecycleExecutor
 
             logger.info( "Building " + currentProject.getName() );
 
+            long buildStartTime = System.currentTimeMillis();
+
             try
             {
                 session.setCurrentProject( currentProject );
@@ -171,7 +178,8 @@ public class DefaultLifecycleExecutor
                     Thread.currentThread().setContextClassLoader( projectRealm );
                 }
 
-                MavenExecutionPlan executionPlan = calculateExecutionPlan( session, goals.toArray( new String[] {} ) );
+                MavenExecutionPlan executionPlan =
+                    calculateExecutionPlan( session, goals.toArray( new String[goals.size()] ) );
 
                 //TODO: once we have calculated the build plan then we should accurately be able to download
                 // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
@@ -199,11 +207,18 @@ public class DefaultLifecycleExecutor
                 {
                     execute( currentProject, session, mojoExecution );
                 }
-                
+
+                long buildEndTime = System.currentTimeMillis();
+
+                result.addBuildSummary( new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
             }
             catch ( Exception e )
             {
-                session.getResult().addException( e );
+                result.addException( e );
+
+                long buildEndTime = System.currentTimeMillis();
+
+                result.addBuildSummary( new BuildFailure( currentProject, buildEndTime - buildStartTime, e ) );
 
                 if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( session.getReactorFailureBehavior() ) )
                 {
@@ -298,16 +313,24 @@ public class DefaultLifecycleExecutor
             //
             // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
             //                        
-            MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(), session
-                .getLocalRepository(), project.getPluginArtifactRepositories() );
+
+            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+            if ( mojoDescriptor == null )
+            {
+                mojoDescriptor =
+                    pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
+                                                     session.getLocalRepository(),
+                                                     project.getPluginArtifactRepositories() );
+
+                mojoExecution.setMojoDescriptor( mojoDescriptor );
+            }
 
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
             if ( pluginDescriptor.getPlugin().isExtensions() )
             {
                 pluginDescriptor.setClassRealm( pluginManager.getPluginRealm( session, pluginDescriptor ) );
             }
-
-            mojoExecution.setMojoDescriptor( mojoDescriptor );
 
             populateMojoExecutionConfiguration( project, mojoExecution, false );
 

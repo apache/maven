@@ -52,4 +52,20 @@ public interface MavenExecutionResult
         
     MavenExecutionResult setExceptionSummary( ExceptionSummary exceptionSummary );
     ExceptionSummary getExceptionSummary();
+
+    /**
+     * Gets the build summary for the specified project.
+     * 
+     * @param project The project to get the build summary for, must not be {@code null}.
+     * @return The build summary for the project or {@code null} if the project has not been built (yet).
+     */
+    BuildSummary getBuildSummary( MavenProject project );
+
+    /**
+     * Add the specified build summary.
+     * 
+     * @param summary The build summary to add, must not be {@code null}.
+     */
+    void addBuildSummary( BuildSummary summary );
+
 }

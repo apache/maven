@@ -21,7 +21,9 @@ package org.apache.maven.execution;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.exception.ExceptionSummary;
@@ -40,7 +42,9 @@ public class DefaultMavenExecutionResult
     private List<Throwable> exceptions;
 
     private ExceptionSummary exceptionSummary;
-    
+
+    private Map<MavenProject, BuildSummary> buildSummaries;
+
     public MavenExecutionResult setProject( MavenProject project )
     {
         this.project = project;
@@ -110,4 +114,19 @@ public class DefaultMavenExecutionResult
     {
         return exceptionSummary;
     }
+
+    public BuildSummary getBuildSummary( MavenProject project )
+    {
+        return ( buildSummaries != null ) ? buildSummaries.get( project ) : null;
+    }
+
+    public void addBuildSummary( BuildSummary summary )
+    {
+        if ( buildSummaries == null )
+        {
+            buildSummaries = new IdentityHashMap<MavenProject, BuildSummary>();
+        }
+        buildSummaries.put( summary.getProject(), summary );
+    }
+
 }
