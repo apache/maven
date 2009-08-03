@@ -32,9 +32,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
-import org.apache.maven.model.building.ModelBuildingProblems;
-import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelProblemUtils;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -54,7 +52,7 @@ public class DefaultLifecycleBindingsInjector
     @Requirement
     private LifecycleExecutor lifecycle;
 
-    public void injectLifecycleBindings( Model model, ModelBuildingProblems problems )
+    public void injectLifecycleBindings( Model model, ModelProblemCollector problems )
     {
         String packaging = model.getPackaging();
 
@@ -62,9 +60,7 @@ public class DefaultLifecycleBindingsInjector
 
         if ( defaultPlugins == null )
         {
-            String source = ModelProblemUtils.toSourceHint( model );
-            problems.add( new ModelProblem( "Invalid POM " + source + ": Unknown packaging: " + packaging,
-                                            ModelProblem.Severity.ERROR, source ) );
+            problems.addError( "Unknown packaging: " + packaging );
         }
         else if ( !defaultPlugins.isEmpty() )
         {

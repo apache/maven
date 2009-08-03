@@ -28,7 +28,7 @@ import org.apache.maven.model.Model;
  * 
  * @author Benjamin Bentmann
  */
-public class ModelProblemUtils
+class ModelProblemUtils
 {
 
     /**

@@ -115,10 +115,11 @@ public class DefaultModelBuilder
     {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
-        DefaultModelBuildingProblems problems = new DefaultModelBuildingProblems( null );
+        DefaultModelProblemCollector problems = new DefaultModelProblemCollector( null );
 
         ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
+        problems.setSourceHint( "(external profiles)" );
         List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
 
         Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems.getProblems() );
@@ -135,6 +136,8 @@ public class DefaultModelBuilder
 
             Model rawModel = ModelUtils.cloneModel( tmpModel );
             currentData.setRawModel( rawModel );
+
+            problems.setSourceHint( tmpModel );
 
             modelNormalizer.mergeDuplicates( tmpModel, request );
 
@@ -167,6 +170,8 @@ public class DefaultModelBuilder
         assembleInheritance( lineage, request );
 
         Model resultModel = resultData.getModel();
+
+        problems.setSourceHint( resultModel );
 
         resultModel = interpolateModel( resultModel, request, problems );
         resultData.setModel( resultModel );
@@ -203,7 +208,8 @@ public class DefaultModelBuilder
     {
         Model resultModel = result.getEffectiveModel();
 
-        DefaultModelBuildingProblems problems = new DefaultModelBuildingProblems( result.getProblems() );
+        DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result.getProblems() );
+        problems.setSourceHint( resultModel );
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
@@ -338,42 +344,41 @@ public class DefaultModelBuilder
     }
 
     private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request, ProfileActivationContext context,
-                                                     ModelBuildingProblems problems )
+                                                     ModelProblemCollector problems )
     {
         ProfileSelectionResult result = profileSelector.getActiveProfiles( request.getProfiles(), context );
 
         for ( ProfileActivationException e : result.getActivationExceptions() )
         {
-            problems.add( new ModelProblem( "Invalid activation condition for external profile "
-                + e.getProfile().getId() + ": " + e.getMessage(), ModelProblem.Severity.ERROR, "(external profiles)", e ) );
+            problems.addError( "Invalid activation condition for external profile " + e.getProfile().getId() + ": "
+                + e.getMessage(), e );
         }
 
         return result.getActiveProfiles();
     }
 
     private List<Profile> getActivePomProfiles( Model model, ProfileActivationContext context,
-                                                ModelBuildingProblems problems )
+                                                ModelProblemCollector problems )
     {
         ProfileSelectionResult result = profileSelector.getActiveProfiles( model.getProfiles(), context );
 
         for ( ProfileActivationException e : result.getActivationExceptions() )
         {
-            problems.add( new ModelProblem(
-                                            "Invalid activation condition for project profile "
-                                                + e.getProfile().getId() + " in POM "
-                                                + ModelProblemUtils.toSourceHint( model ) + ": " + e.getMessage(),
-                                            ModelProblem.Severity.ERROR, ModelProblemUtils.toSourceHint( model ), e ) );
+            problems.addError( "Invalid activation condition for project profile " + e.getProfile().getId() + ": "
+                + e.getMessage(), e );
         }
 
         return result.getActiveProfiles();
     }
 
-    private void configureResolver( ModelResolver modelResolver, Model model, ModelBuildingProblems problems )
+    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems )
     {
         if ( modelResolver == null )
         {
             return;
         }
+
+        problems.setSourceHint( model );
 
         List<Repository> repositories = model.getRepositories();
         Collections.reverse( repositories );
@@ -386,9 +391,7 @@ public class DefaultModelBuilder
             }
             catch ( InvalidRepositoryException e )
             {
-                problems.add( new ModelProblem( "Invalid repository " + repository.getId() + " in POM "
-                    + ModelProblemUtils.toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
-                                                ModelProblemUtils.toSourceHint( model ), e ) );
+                problems.addError( "Invalid repository " + repository.getId() + ": " + e.getMessage(), e );
             }
         }
     }
@@ -403,7 +406,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private Model interpolateModel( Model model, ModelBuildingRequest request, ModelBuildingProblems problems )
+    private Model interpolateModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         try
         {
@@ -413,8 +416,7 @@ public class DefaultModelBuilder
         }
         catch ( ModelInterpolationException e )
         {
-            problems.add( new ModelProblem( "Invalid expression in POM " + ModelProblemUtils.toSourceHint( model )
-                + ": " + e.getMessage(), ModelProblem.Severity.ERROR, ModelProblemUtils.toSourceHint( model ), e ) );
+            problems.addError( "Invalid expression: " + e.getMessage(), e );
 
             return model;
         }
@@ -585,7 +587,8 @@ public class DefaultModelBuilder
         return ModelUtils.cloneModel( superPomProvider.getSuperModel( "4.0.0" ) );
     }
 
-    private void importDependencyManagement( Model model, ModelBuildingRequest request, ModelBuildingProblems problems )
+    private void importDependencyManagement( Model model, ModelBuildingRequest request,
+                                             DefaultModelProblemCollector problems )
     {
         DependencyManagement depMngt = model.getDependencyManagement();
 
@@ -634,10 +637,8 @@ public class DefaultModelBuilder
                 }
                 catch ( UnresolvableModelException e )
                 {
-                    problems.add( new ModelProblem( "Non-resolvable import POM "
-                        + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
-                        + ModelProblemUtils.toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
-                                                    ModelProblemUtils.toSourceHint( model ), e ) );
+                    problems.addError( "Non-resolvable import POM "
+                        + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), e );
                     continue;
                 }
 
@@ -657,11 +658,11 @@ public class DefaultModelBuilder
                 }
                 catch ( ModelBuildingException e )
                 {
-                    problems.addAll( e.getProblems() );
+                    problems.getProblems().addAll( e.getProblems() );
                     continue;
                 }
 
-                problems.addAll( importResult.getProblems() );
+                problems.getProblems().addAll( importResult.getProblems() );
 
                 Model importModel = importResult.getEffectiveModel();
 
@@ -709,7 +710,7 @@ public class DefaultModelBuilder
         return null;
     }
 
-    private void fireBuildExtensionsAssembled( Model model, ModelBuildingRequest request, ModelBuildingProblems problems )
+    private void fireBuildExtensionsAssembled( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
         throws ModelBuildingException
     {
         if ( request.getModelBuildingListeners().isEmpty() )
@@ -727,8 +728,7 @@ public class DefaultModelBuilder
             }
             catch ( Exception e )
             {
-                problems.add( new ModelProblem( "Invalid build extensions: " + e.getMessage(),
-                                                ModelProblem.Severity.ERROR, ModelProblemUtils.toSourceHint( model ), e ) );
+                problems.addError( "Invalid build extensions: " + e.getMessage(), e );
             }
         }
     }

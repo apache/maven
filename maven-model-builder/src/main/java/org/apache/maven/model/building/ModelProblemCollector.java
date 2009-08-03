@@ -19,28 +19,42 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.util.Collection;
-
 /**
- * Collects the problems that are encountered during model building.
+ * Collects problems that are encountered during model building.
  * 
  * @author Benjamin Bentmann
  */
-public interface ModelBuildingProblems
+public interface ModelProblemCollector
 {
 
     /**
-     * Adds the specified problem.
+     * Adds the specified error.
      * 
-     * @param problem The problem to add, must not be {@code null}.
+     * @param message The detail message of the error, may be {@code null}.
      */
-    void add( ModelProblem problem );
+    void addError( String message );
 
     /**
-     * Adds the specified problems.
+     * Adds the specified error.
      * 
-     * @param problems The problems to add, must not be {@code null} nor contain {@code null} elements.
+     * @param message The detail message of the error, may be {@code null}.
+     * @param cause The cause of the error, may be {@code null}.
      */
-    void addAll( Collection<ModelProblem> problems );
+    void addError( String message, Exception cause );
+
+    /**
+     * Adds the specified warning.
+     * 
+     * @param message The detail message of the warning, may be {@code null}.
+     */
+    void addWarning( String message );
+
+    /**
+     * Adds the specified warning.
+     * 
+     * @param message The detail message of the warning, may be {@code null}.
+     * @param cause The cause of the warning, may be {@code null}.
+     */
+    void addWarning( String message, Exception cause );
 
 }
