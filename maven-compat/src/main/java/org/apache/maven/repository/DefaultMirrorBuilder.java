@@ -182,7 +182,7 @@ public class DefaultMirrorBuilder
                 // see if this is a negative match
                 if ( repo.length() > 1 && repo.startsWith( "!" ) )
                 {
-                    if ( originalId.equals( repo.substring( 1 ) ) )
+                    if ( repo.substring( 1 ).equals( originalId ) )
                     {
                         // explicitly exclude. Set result and stop processing.
                         result = false;
@@ -190,7 +190,7 @@ public class DefaultMirrorBuilder
                     }
                 }
                 // check for exact match
-                else if ( originalId.equals( repo ) )
+                else if ( repo.equals( originalId ) )
                 {
                     result = true;
                     break;

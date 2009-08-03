@@ -57,6 +57,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author Jason van Zyl
@@ -564,7 +565,17 @@ public class LegacyRepositorySystem
         {
             String id = repo.getId();
 
+            if ( StringUtils.isEmpty( id ) )
+            {
+                throw new InvalidRepositoryException( "Repository identifier missing", "" );
+            }
+
             String url = repo.getUrl();
+
+            if ( StringUtils.isEmpty( url ) )
+            {
+                throw new InvalidRepositoryException( "URL missing for repository " + id, id );
+            }
 
             ArtifactRepositoryPolicy snapshots = buildArtifactRepositoryPolicy( repo.getSnapshots() );
 

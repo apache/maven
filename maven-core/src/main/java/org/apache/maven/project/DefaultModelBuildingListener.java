@@ -21,7 +21,6 @@ package org.apache.maven.project;
 
 import java.util.List;
 
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
@@ -114,7 +113,7 @@ class DefaultModelBuildingListener
             remoteRepositories =
                 projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories );
         }
-        catch ( InvalidRepositoryException e )
+        catch ( Exception e )
         {
             event.getProblems().addError( "Invalid artifact repository: " + e.getMessage(), e );
         }
@@ -124,7 +123,7 @@ class DefaultModelBuildingListener
             pluginRepositories =
                 projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories );
         }
-        catch ( InvalidRepositoryException e )
+        catch ( Exception e )
         {
             event.getProblems().addError( "Invalid plugin repository: " + e.getMessage(), e );
         }
