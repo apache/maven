@@ -25,7 +25,8 @@ import java.util.Arrays;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.model.validation.ModelValidationResult;
+import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -135,17 +136,13 @@ public abstract class AbstractMavenProjectTestCase
         }
         catch ( Exception e )
         {
-            if ( e instanceof InvalidProjectModelException )
+            Throwable cause = e.getCause();
+            if ( cause instanceof ModelBuildingException )
             {
-                ModelValidationResult validationResult = ( (InvalidProjectModelException) e ).getValidationResult();
-                String message = "In: " + pom + "(" + ( (ProjectBuildingException) e ).getProjectId() + ")\n\n";
-                for ( String error : validationResult.getErrors() )
+                String message = "In: " + pom + "\n\n";
+                for ( ModelProblem problem : ( (ModelBuildingException) cause ).getProblems() )
                 {
-                    message += "  [ERROR] " + error + "\n";
-                }
-                for ( String warning : validationResult.getWarnings() )
-                {
-                    message += "  [WARNING] " + warning + "\n";
+                    message += problem + "\n";
                 }
                 System.out.println( message );
                 fail( message );
