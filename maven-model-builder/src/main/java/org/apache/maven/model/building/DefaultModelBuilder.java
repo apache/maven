@@ -47,9 +47,7 @@ import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationException;
 import org.apache.maven.model.profile.ProfileInjector;
-import org.apache.maven.model.profile.ProfileSelectionResult;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
@@ -120,7 +118,8 @@ public class DefaultModelBuilder
         ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
         problems.setSourceHint( "(external profiles)" );
-        List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
+        List<Profile> activeExternalProfiles =
+            profileSelector.getActiveProfiles( request.getProfiles(), profileActivationContext, problems );
 
         Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems.getProblems() );
 
@@ -141,7 +140,8 @@ public class DefaultModelBuilder
 
             modelNormalizer.mergeDuplicates( tmpModel, request );
 
-            List<Profile> activePomProfiles = getActivePomProfiles( rawModel, profileActivationContext, problems );
+            List<Profile> activePomProfiles =
+                profileSelector.getActiveProfiles( rawModel.getProfiles(), profileActivationContext, problems );
             currentData.setActiveProfiles( activePomProfiles );
 
             for ( Profile activeProfile : activePomProfiles )
@@ -341,34 +341,6 @@ public class DefaultModelBuilder
         context.setProjectDirectory( ( request.getPomFile() != null ) ? request.getPomFile().getParentFile() : null );
 
         return context;
-    }
-
-    private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request, ProfileActivationContext context,
-                                                     ModelProblemCollector problems )
-    {
-        ProfileSelectionResult result = profileSelector.getActiveProfiles( request.getProfiles(), context );
-
-        for ( ProfileActivationException e : result.getActivationExceptions() )
-        {
-            problems.addError( "Invalid activation condition for external profile " + e.getProfile().getId() + ": "
-                + e.getMessage(), e );
-        }
-
-        return result.getActiveProfiles();
-    }
-
-    private List<Profile> getActivePomProfiles( Model model, ProfileActivationContext context,
-                                                ModelProblemCollector problems )
-    {
-        ProfileSelectionResult result = profileSelector.getActiveProfiles( model.getProfiles(), context );
-
-        for ( ProfileActivationException e : result.getActivationExceptions() )
-        {
-            problems.addError( "Invalid activation condition for project profile " + e.getProfile().getId() + ": "
-                + e.getMessage(), e );
-        }
-
-        return result.getActiveProfiles();
     }
 
     private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems )

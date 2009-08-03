@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -43,7 +44,8 @@ public class DefaultProfileSelector
     @Requirement( role = ProfileActivator.class )
     private List<ProfileActivator> activators;
 
-    public ProfileSelectionResult getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context )
+    public List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context,
+                                            ModelProblemCollector problems )
     {
         Collection<String> activatedIds = new HashSet<String>( context.getActiveProfileIds() );
         Collection<String> deactivatedIds = new HashSet<String>( context.getInactiveProfileIds() );
@@ -52,13 +54,11 @@ public class DefaultProfileSelector
         List<Profile> activePomProfilesByDefault = new ArrayList<Profile>();
         boolean activatedPomProfileNotByDefault = false;
 
-        List<ProfileActivationException> activationExceptions = new ArrayList<ProfileActivationException>();
-
         for ( Profile profile : profiles )
         {
             if ( !deactivatedIds.contains( profile.getId() ) )
             {
-                if ( activatedIds.contains( profile.getId() ) || isActive( profile, context, activationExceptions ) )
+                if ( activatedIds.contains( profile.getId() ) || isActive( profile, context, problems ) )
                 {
                     activeProfiles.add( profile );
 
@@ -87,15 +87,10 @@ public class DefaultProfileSelector
             activeProfiles.addAll( activePomProfilesByDefault );
         }
 
-        ProfileSelectionResult result = new ProfileSelectionResult();
-        result.setActiveProfiles( activeProfiles );
-        result.setActivationExceptions( activationExceptions );
-
-        return result;
+        return activeProfiles;
     }
 
-    private boolean isActive( Profile profile, ProfileActivationContext context,
-                              List<ProfileActivationException> exceptions )
+    private boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         for ( ProfileActivator activator : activators )
         {
@@ -108,7 +103,8 @@ public class DefaultProfileSelector
             }
             catch ( ProfileActivationException e )
             {
-                exceptions.add( e );
+                problems.addError( "Invalid activation condition for profile " + profile.getId() + ": "
+                    + e.getMessage() );
             }
         }
         return false;

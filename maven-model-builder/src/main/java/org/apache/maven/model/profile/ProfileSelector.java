@@ -20,8 +20,10 @@ package org.apache.maven.model.profile;
  */
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Calculates the active profiles among a given collection of profiles.
@@ -38,8 +40,10 @@ public interface ProfileSelector
      * @param profiles The profiles whose activation status should be determined, must not be {@code null}.
      * @param context The environmental context used to determine the activation status of a profile, must not be
      *            {@code null}.
-     * @return The result of the selection process, never {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @return The profiles that have been activated, never {@code null}.
      */
-    ProfileSelectionResult getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context );
+    List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context,
+                                     ModelProblemCollector problems );
 
 }
