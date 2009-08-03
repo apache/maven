@@ -115,13 +115,13 @@ public class DefaultModelBuilder
     {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
-        List<ModelProblem> problems = new ArrayList<ModelProblem>();
+        DefaultModelBuildingProblems problems = new DefaultModelBuildingProblems( null );
 
         ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
         List<Profile> activeExternalProfiles = getActiveExternalProfiles( request, profileActivationContext, problems );
 
-        Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+        Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems.getProblems() );
 
         ModelData resultData = new ModelData( inputModel );
 
@@ -156,7 +156,7 @@ public class DefaultModelBuilder
 
             configureResolver( request.getModelResolver(), tmpModel, problems );
 
-            currentData = readParent( tmpModel, request, problems );
+            currentData = readParent( tmpModel, request, problems.getProblems() );
         }
 
         ModelData superData = new ModelData( getSuperModel() );
@@ -175,7 +175,7 @@ public class DefaultModelBuilder
         resultData.setArtifactId( resultModel.getArtifactId() );
         resultData.setVersion( resultModel.getVersion() );
 
-        result.setProblems( problems );
+        result.setProblems( problems.getProblems() );
 
         result.setEffectiveModel( resultModel );
 
@@ -203,7 +203,7 @@ public class DefaultModelBuilder
     {
         Model resultModel = result.getEffectiveModel();
 
-        List<ModelProblem> problems = result.getProblems();
+        DefaultModelBuildingProblems problems = new DefaultModelBuildingProblems( result.getProblems() );
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
@@ -213,7 +213,7 @@ public class DefaultModelBuilder
 
         if ( request.isProcessPlugins() )
         {
-            lifecycleBindingsInjector.injectLifecycleBindings( resultModel );
+            lifecycleBindingsInjector.injectLifecycleBindings( resultModel, problems );
         }
 
         pluginManagementInjector.injectManagement( resultModel, request );
@@ -230,11 +230,11 @@ public class DefaultModelBuilder
         }
 
         ModelValidationResult validationResult = modelValidator.validateEffectiveModel( resultModel, request );
-        addProblems( resultModel, validationResult, problems );
+        addProblems( resultModel, validationResult, problems.getProblems() );
 
-        if ( hasErrors( problems ) )
+        if ( hasErrors( problems.getProblems() ) )
         {
-            throw new ModelBuildingException( problems );
+            throw new ModelBuildingException( problems.getProblems() );
         }
 
         return result;
@@ -308,7 +308,7 @@ public class DefaultModelBuilder
     {
         if ( !result.getWarnings().isEmpty() || !result.getErrors().isEmpty() )
         {
-            String source = toSourceHint( model );
+            String source = ModelProblemUtils.toSourceHint( model );
 
             for ( String message : result.getWarnings() )
             {
@@ -338,7 +338,7 @@ public class DefaultModelBuilder
     }
 
     private List<Profile> getActiveExternalProfiles( ModelBuildingRequest request, ProfileActivationContext context,
-                                                     List<ModelProblem> problems )
+                                                     ModelBuildingProblems problems )
     {
         ProfileSelectionResult result = profileSelector.getActiveProfiles( request.getProfiles(), context );
 
@@ -352,21 +352,23 @@ public class DefaultModelBuilder
     }
 
     private List<Profile> getActivePomProfiles( Model model, ProfileActivationContext context,
-                                                List<ModelProblem> problems )
+                                                ModelBuildingProblems problems )
     {
         ProfileSelectionResult result = profileSelector.getActiveProfiles( model.getProfiles(), context );
 
         for ( ProfileActivationException e : result.getActivationExceptions() )
         {
-            problems.add( new ModelProblem( "Invalid activation condition for project profile "
-                + e.getProfile().getId() + " in POM " + toSourceHint( model ) + ": " + e.getMessage(),
-                                            ModelProblem.Severity.ERROR, toSourceHint( model ), e ) );
+            problems.add( new ModelProblem(
+                                            "Invalid activation condition for project profile "
+                                                + e.getProfile().getId() + " in POM "
+                                                + ModelProblemUtils.toSourceHint( model ) + ": " + e.getMessage(),
+                                            ModelProblem.Severity.ERROR, ModelProblemUtils.toSourceHint( model ), e ) );
         }
 
         return result.getActiveProfiles();
     }
 
-    private void configureResolver( ModelResolver modelResolver, Model model, List<ModelProblem> problems )
+    private void configureResolver( ModelResolver modelResolver, Model model, ModelBuildingProblems problems )
     {
         if ( modelResolver == null )
         {
@@ -385,8 +387,8 @@ public class DefaultModelBuilder
             catch ( InvalidRepositoryException e )
             {
                 problems.add( new ModelProblem( "Invalid repository " + repository.getId() + " in POM "
-                    + toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
-                                                toSourceHint( model ), e ) );
+                    + ModelProblemUtils.toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
+                                                ModelProblemUtils.toSourceHint( model ), e ) );
             }
         }
     }
@@ -401,7 +403,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private Model interpolateModel( Model model, ModelBuildingRequest request, List<ModelProblem> problems )
+    private Model interpolateModel( Model model, ModelBuildingRequest request, ModelBuildingProblems problems )
     {
         try
         {
@@ -411,8 +413,8 @@ public class DefaultModelBuilder
         }
         catch ( ModelInterpolationException e )
         {
-            problems.add( new ModelProblem( "Invalid expression in POM " + toSourceHint( model ) + ": "
-                + e.getMessage(), ModelProblem.Severity.ERROR, toSourceHint( model ), e ) );
+            problems.add( new ModelProblem( "Invalid expression in POM " + ModelProblemUtils.toSourceHint( model )
+                + ": " + e.getMessage(), ModelProblem.Severity.ERROR, ModelProblemUtils.toSourceHint( model ), e ) );
 
             return model;
         }
@@ -552,7 +554,8 @@ public class DefaultModelBuilder
         if ( modelResolver == null )
         {
             throw new IllegalArgumentException( "no model resolver provided, cannot resolve parent POM "
-                + toId( groupId, artifactId, version ) + " for POM " + toSourceHint( childModel ) );
+                + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
+                + ModelProblemUtils.toSourceHint( childModel ) );
         }
 
         ModelSource modelSource;
@@ -562,9 +565,10 @@ public class DefaultModelBuilder
         }
         catch ( UnresolvableModelException e )
         {
-            problems.add( new ModelProblem( "Non-resolvable parent POM " + toId( groupId, artifactId, version )
-                + " for POM " + toSourceHint( childModel ) + ": " + e.getMessage(), ModelProblem.Severity.FATAL,
-                                            toSourceHint( childModel ), e ) );
+            problems.add( new ModelProblem( "Non-resolvable parent POM "
+                + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
+                + ModelProblemUtils.toSourceHint( childModel ) + ": " + e.getMessage(), ModelProblem.Severity.FATAL,
+                                            ModelProblemUtils.toSourceHint( childModel ), e ) );
             throw new ModelBuildingException( problems );
         }
 
@@ -581,7 +585,7 @@ public class DefaultModelBuilder
         return ModelUtils.cloneModel( superPomProvider.getSuperModel( "4.0.0" ) );
     }
 
-    private void importDependencyManagement( Model model, ModelBuildingRequest request, List<ModelProblem> problems )
+    private void importDependencyManagement( Model model, ModelBuildingRequest request, ModelBuildingProblems problems )
     {
         DependencyManagement depMngt = model.getDependencyManagement();
 
@@ -619,7 +623,8 @@ public class DefaultModelBuilder
                 if ( modelResolver == null )
                 {
                     throw new IllegalArgumentException( "no model resolver provided, cannot resolve import POM "
-                        + toId( groupId, artifactId, version ) + " for POM " + toSourceHint( model ) );
+                        + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
+                        + ModelProblemUtils.toSourceHint( model ) );
                 }
 
                 ModelSource importSource;
@@ -629,9 +634,10 @@ public class DefaultModelBuilder
                 }
                 catch ( UnresolvableModelException e )
                 {
-                    problems.add( new ModelProblem( "Non-resolvable import POM " + toId( groupId, artifactId, version )
-                        + " for POM " + toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
-                                                    toSourceHint( model ), e ) );
+                    problems.add( new ModelProblem( "Non-resolvable import POM "
+                        + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
+                        + ModelProblemUtils.toSourceHint( model ) + ": " + e.getMessage(), ModelProblem.Severity.ERROR,
+                                                    ModelProblemUtils.toSourceHint( model ), e ) );
                     continue;
                 }
 
@@ -703,7 +709,7 @@ public class DefaultModelBuilder
         return null;
     }
 
-    private void fireBuildExtensionsAssembled( Model model, ModelBuildingRequest request, List<ModelProblem> problems )
+    private void fireBuildExtensionsAssembled( Model model, ModelBuildingRequest request, ModelBuildingProblems problems )
         throws ModelBuildingException
     {
         if ( request.getModelBuildingListeners().isEmpty() )
@@ -722,56 +728,9 @@ public class DefaultModelBuilder
             catch ( Exception e )
             {
                 problems.add( new ModelProblem( "Invalid build extensions: " + e.getMessage(),
-                                                ModelProblem.Severity.ERROR, toSourceHint( model ), e ) );
+                                                ModelProblem.Severity.ERROR, ModelProblemUtils.toSourceHint( model ), e ) );
             }
         }
-    }
-
-    private String toSourceHint( Model model )
-    {
-        StringBuilder buffer = new StringBuilder( 192 );
-
-        buffer.append( toId( model ) );
-
-        File pomFile = model.getPomFile();
-        if ( pomFile != null )
-        {
-            buffer.append( " (" ).append( pomFile ).append( ")" );
-        }
-
-        return buffer.toString();
-    }
-
-    private String toId( Model model )
-    {
-        String groupId = model.getGroupId();
-        if ( groupId == null && model.getParent() != null )
-        {
-            groupId = model.getParent().getGroupId();
-        }
-
-        String artifactId = model.getArtifactId();
-
-        String version = model.getVersion();
-        if ( version == null && model.getParent() != null )
-        {
-            version = model.getParent().getVersion();
-        }
-
-        return toId( groupId, artifactId, version );
-    }
-
-    private String toId( String groupId, String artifactId, String version )
-    {
-        StringBuilder buffer = new StringBuilder( 96 );
-
-        buffer.append( ( groupId != null ) ? groupId : "[unknown-group-id]" );
-        buffer.append( ':' );
-        buffer.append( ( artifactId != null ) ? artifactId : "[unknown-artifact-id]" );
-        buffer.append( ':' );
-        buffer.append( ( version != null ) ? version : "[unknown-version]" );
-
-        return buffer.toString();
     }
 
 }

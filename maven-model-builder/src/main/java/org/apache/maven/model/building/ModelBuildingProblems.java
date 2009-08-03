@@ -1,4 +1,4 @@
-package org.apache.maven.model.plugin;
+package org.apache.maven.model.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,24 +19,28 @@ package org.apache.maven.model.plugin;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelBuildingProblems;
+import java.util.Collection;
 
 /**
- * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
+ * Collects the problems that are encountered during model building.
  * 
  * @author Benjamin Bentmann
  */
-public interface LifecycleBindingsInjector
+public interface ModelBuildingProblems
 {
 
     /**
-     * Injects plugin executions induced by lifecycle bindings into the specified model.
+     * Adds the specified problem.
      * 
-     * @param model The model into which to inject the default plugin executions for its packaging, must not be
-     *            <code>null</code>.
-     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @param problem The problem to add, must not be {@code null}.
      */
-    void injectLifecycleBindings( Model model, ModelBuildingProblems problems );
+    void add( ModelProblem problem );
+
+    /**
+     * Adds the specified problems.
+     * 
+     * @param problems The problems to add, must not be {@code null} nor contain {@code null} elements.
+     */
+    void addAll( Collection<ModelProblem> problems );
 
 }
