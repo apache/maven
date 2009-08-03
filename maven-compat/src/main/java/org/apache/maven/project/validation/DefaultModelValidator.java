@@ -22,6 +22,7 @@ package org.apache.maven.project.validation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -34,7 +35,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class DefaultModelValidator
     implements ModelValidator
 {
-    
+
     @Requirement
     private org.apache.maven.model.validation.ModelValidator modelValidator;
 
@@ -45,12 +46,44 @@ public class DefaultModelValidator
         ModelBuildingRequest request =
             new DefaultModelBuildingRequest().setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
 
-        for ( String message : modelValidator.validateEffectiveModel( model, request ).getErrors() )
+        SimpleModelProblemCollector problems = new SimpleModelProblemCollector( result );
+
+        modelValidator.validateEffectiveModel( model, request, problems );
+
+        return result;
+    }
+
+    private static class SimpleModelProblemCollector
+        implements ModelProblemCollector
+    {
+
+        ModelValidationResult result;
+
+        public SimpleModelProblemCollector( ModelValidationResult result )
+        {
+            this.result = result;
+        }
+
+        public void addError( String message )
         {
             result.addMessage( message );
         }
 
-        return result;
+        public void addError( String message, Exception cause )
+        {
+            result.addMessage( message );
+        }
+
+        public void addWarning( String message )
+        {
+            // not supported
+        }
+
+        public void addWarning( String message, Exception cause )
+        {
+            // not supported
+        }
+
     }
 
 }

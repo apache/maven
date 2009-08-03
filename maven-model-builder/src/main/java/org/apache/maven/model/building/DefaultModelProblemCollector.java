@@ -74,6 +74,11 @@ class DefaultModelProblemCollector
         return sourceHint;
     }
 
+    public void add( ModelProblem problem )
+    {
+        problems.add( problem );
+    }
+
     public void addError( String message )
     {
         problems.add( new ModelProblem( message, ModelProblem.Severity.ERROR, getSourceHint() ) );

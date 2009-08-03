@@ -20,11 +20,13 @@ package org.apache.maven.model.validation;
  */
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -38,6 +40,46 @@ public class DefaultModelValidatorTest
 
     private DefaultModelValidator validator;
 
+    private static class SimpleProblemCollector
+        implements ModelProblemCollector
+    {
+
+        private List<String> warnings = new ArrayList<String>();
+
+        private List<String> errors = new ArrayList<String>();
+
+        public void addError( String message )
+        {
+            errors.add( message );
+        }
+
+        public void addError( String message, Exception cause )
+        {
+            addError( message );
+        }
+
+        public void addWarning( String message )
+        {
+            warnings.add( message );
+        }
+
+        public void addWarning( String message, Exception cause )
+        {
+            addWarning( message );
+        }
+
+        public List<String> getWarnings()
+        {
+            return warnings;
+        }
+
+        public List<String> getErrors()
+        {
+            return errors;
+        }
+
+    }
+
     private Model read( String pom )
         throws Exception
     {
@@ -47,26 +89,34 @@ public class DefaultModelValidatorTest
         return new MavenXpp3Reader().read( is );
     }
 
-    private ModelValidationResult validate( String pom )
+    private SimpleProblemCollector validate( String pom )
         throws Exception
     {
         return validateEffective( pom, ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
     }
 
-    private ModelValidationResult validateEffective( String pom, int level )
+    private SimpleProblemCollector validateEffective( String pom, int level )
         throws Exception
     {
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
 
-        return validator.validateEffectiveModel( read( pom ), request );
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        validator.validateEffectiveModel( read( pom ), request, problems );
+
+        return problems;
     }
 
-    private ModelValidationResult validateRaw( String pom, int level )
+    private SimpleProblemCollector validateRaw( String pom, int level )
         throws Exception
     {
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
 
-        return validator.validateRawModel( read( pom ), request );
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        validator.validateRawModel( read( pom ), request, problems );
+
+        return problems;
     }
 
     @Override
@@ -87,7 +137,7 @@ public class DefaultModelValidatorTest
         super.tearDown();
     }
 
-    private void assertViolations( ModelValidationResult result, int errors, int warnings )
+    private void assertViolations( SimpleProblemCollector result, int errors, int warnings )
     {
         assertEquals( errors, result.getErrors().size() );
         assertEquals( warnings, result.getWarnings().size() );
@@ -96,7 +146,7 @@ public class DefaultModelValidatorTest
     public void testMissingModelVersion()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-modelVersion-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-modelVersion-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -106,7 +156,7 @@ public class DefaultModelValidatorTest
     public void testMissingArtifactId()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-artifactId-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-artifactId-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -116,7 +166,7 @@ public class DefaultModelValidatorTest
     public void testMissingGroupId()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-groupId-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-groupId-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -126,7 +176,7 @@ public class DefaultModelValidatorTest
     public void testInvalidIds()
         throws Exception
     {
-        ModelValidationResult result = validate( "invalid-ids-pom.xml" );
+        SimpleProblemCollector result = validate( "invalid-ids-pom.xml" );
 
         assertViolations( result, 2, 0 );
 
@@ -138,7 +188,7 @@ public class DefaultModelValidatorTest
     public void testMissingType()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-type-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-type-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -148,7 +198,7 @@ public class DefaultModelValidatorTest
     public void testMissingVersion()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-version-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-version-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -158,7 +208,7 @@ public class DefaultModelValidatorTest
     public void testInvalidAggregatorPackaging()
         throws Exception
     {
-        ModelValidationResult result = validate( "invalid-aggregator-packaging-pom.xml" );
+        SimpleProblemCollector result = validate( "invalid-aggregator-packaging-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -168,7 +218,7 @@ public class DefaultModelValidatorTest
     public void testMissingDependencyArtifactId()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-dependency-artifactId-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-dependency-artifactId-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -178,7 +228,7 @@ public class DefaultModelValidatorTest
     public void testMissingDependencyGroupId()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-dependency-groupId-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-dependency-groupId-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -188,7 +238,7 @@ public class DefaultModelValidatorTest
     public void testMissingDependencyVersion()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-dependency-version-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-dependency-version-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -198,7 +248,7 @@ public class DefaultModelValidatorTest
     public void testMissingDependencyManagementArtifactId()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-dependency-mgmt-artifactId-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-dependency-mgmt-artifactId-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -209,7 +259,7 @@ public class DefaultModelValidatorTest
     public void testMissingDependencyManagementGroupId()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-dependency-mgmt-groupId-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-dependency-mgmt-groupId-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -220,7 +270,7 @@ public class DefaultModelValidatorTest
     public void testMissingAll()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-1-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-1-pom.xml" );
 
         assertViolations( result, 4, 0 );
 
@@ -236,7 +286,7 @@ public class DefaultModelValidatorTest
     public void testMissingPluginArtifactId()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-plugin-artifactId-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-plugin-artifactId-pom.xml" );
 
         assertViolations( result, 1, 0 );
 
@@ -246,7 +296,7 @@ public class DefaultModelValidatorTest
     public void testMissingPluginVersion()
         throws Exception
     {
-        ModelValidationResult result =
+        SimpleProblemCollector result =
             validateEffective( "missing-plugin-version-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
         assertViolations( result, 1, 0 );
@@ -262,7 +312,7 @@ public class DefaultModelValidatorTest
     public void testMissingRepositoryId()
         throws Exception
     {
-        ModelValidationResult result =
+        SimpleProblemCollector result =
             validateRaw( "missing-repository-id-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
 
         assertViolations( result, 4, 0 );
@@ -279,7 +329,7 @@ public class DefaultModelValidatorTest
     public void testMissingResourceDirectory()
         throws Exception
     {
-        ModelValidationResult result = validate( "missing-resource-directory-pom.xml" );
+        SimpleProblemCollector result = validate( "missing-resource-directory-pom.xml" );
 
         assertViolations( result, 2, 0 );
 

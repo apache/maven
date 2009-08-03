@@ -53,7 +53,6 @@ import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.superpom.SuperPomProvider;
-import org.apache.maven.model.validation.ModelValidationResult;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -121,7 +120,7 @@ public class DefaultModelBuilder
         List<Profile> activeExternalProfiles =
             profileSelector.getActiveProfiles( request.getProfiles(), profileActivationContext, problems );
 
-        Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems.getProblems() );
+        Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
         ModelData resultData = new ModelData( inputModel );
 
@@ -159,7 +158,7 @@ public class DefaultModelBuilder
 
             configureResolver( request.getModelResolver(), tmpModel, problems );
 
-            currentData = readParent( tmpModel, request, problems.getProblems() );
+            currentData = readParent( tmpModel, request, problems );
         }
 
         ModelData superData = new ModelData( getSuperModel() );
@@ -235,8 +234,7 @@ public class DefaultModelBuilder
             pluginConfigurationExpander.expandPluginConfiguration( resultModel, request );
         }
 
-        ModelValidationResult validationResult = modelValidator.validateEffectiveModel( resultModel, request );
-        addProblems( resultModel, validationResult, problems.getProblems() );
+        modelValidator.validateEffectiveModel( resultModel, request, problems );
 
         if ( hasErrors( problems.getProblems() ) )
         {
@@ -247,7 +245,7 @@ public class DefaultModelBuilder
     }
 
     private Model readModel( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
-                             List<ModelProblem> problems )
+                             DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         Model model;
@@ -277,19 +275,18 @@ public class DefaultModelBuilder
         {
             problems.add( new ModelProblem( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
                                             ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
-            throw new ModelBuildingException( problems );
+            throw new ModelBuildingException( problems.getProblems() );
         }
         catch ( IOException e )
         {
             problems.add( new ModelProblem( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(),
                                             ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
-            throw new ModelBuildingException( problems );
+            throw new ModelBuildingException( problems.getProblems() );
         }
 
         model.setPomFile( pomFile );
 
-        ModelValidationResult validationResult = modelValidator.validateRawModel( model, request );
-        addProblems( model, validationResult, problems );
+        modelValidator.validateRawModel( model, request, problems );
 
         return model;
     }
@@ -308,26 +305,6 @@ public class DefaultModelBuilder
         }
 
         return false;
-    }
-
-    private void addProblems( Model model, ModelValidationResult result, List<ModelProblem> problems )
-    {
-        if ( !result.getWarnings().isEmpty() || !result.getErrors().isEmpty() )
-        {
-            String source = ModelProblemUtils.toSourceHint( model );
-
-            for ( String message : result.getWarnings() )
-            {
-                problems.add( new ModelProblem( "Invalid POM " + source + ": " + message,
-                                                ModelProblem.Severity.WARNING, source ) );
-            }
-
-            for ( String message : result.getErrors() )
-            {
-                problems.add( new ModelProblem( "Invalid POM " + source + ": " + message, ModelProblem.Severity.ERROR,
-                                                source ) );
-            }
-        }
     }
 
     private ProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
@@ -394,7 +371,7 @@ public class DefaultModelBuilder
         }
     }
 
-    private ModelData readParent( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
+    private ModelData readParent( Model childModel, ModelBuildingRequest request, DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         ModelData parentData;
@@ -449,7 +426,8 @@ public class DefaultModelBuilder
         return parentData;
     }
 
-    private ModelData readParentLocally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
+    private ModelData readParentLocally( Model childModel, ModelBuildingRequest request,
+                                         DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         File pomFile = getParentPomFile( childModel );
@@ -514,7 +492,8 @@ public class DefaultModelBuilder
         return pomFile;
     }
 
-    private ModelData readParentExternally( Model childModel, ModelBuildingRequest request, List<ModelProblem> problems )
+    private ModelData readParentExternally( Model childModel, ModelBuildingRequest request,
+                                            DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         Parent parent = childModel.getParent();
@@ -543,7 +522,7 @@ public class DefaultModelBuilder
                 + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
                 + ModelProblemUtils.toSourceHint( childModel ) + ": " + e.getMessage(), ModelProblem.Severity.FATAL,
                                             ModelProblemUtils.toSourceHint( childModel ), e ) );
-            throw new ModelBuildingException( problems );
+            throw new ModelBuildingException( problems.getProblems() );
         }
 
         Model parentModel = readModel( modelSource, null, request, problems );

@@ -21,6 +21,7 @@ package org.apache.maven.model.validation;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Checks the model for missing or invalid values.
@@ -37,9 +38,9 @@ public interface ModelValidator
      * 
      * @param model The model to validate, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
-     * @return The result of the validation, never {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    ModelValidationResult validateRawModel( Model model, ModelBuildingRequest request );
+    void validateRawModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
 
     /**
      * Checks the specified (effective) model for missing or invalid values. The effective model is fully assembled and
@@ -47,8 +48,8 @@ public interface ModelValidator
      * 
      * @param model The model to validate, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
-     * @return The result of the validation, never {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    ModelValidationResult validateEffectiveModel( Model model, ModelBuildingRequest request );
+    void validateEffectiveModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }
