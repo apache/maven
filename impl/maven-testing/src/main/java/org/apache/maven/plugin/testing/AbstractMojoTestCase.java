@@ -69,6 +69,7 @@ public abstract class AbstractMojoTestCase
     extends PlexusTestCase
 {
     private ComponentConfigurator configurator;
+    // this is a little ugly using impl prior the interface 
     private DefaultPluginManager pluginManager;
 
     private PlexusContainer container;
@@ -98,10 +99,14 @@ public abstract class AbstractMojoTestCase
     protected InputStream getPublicDescriptorStream()
         throws Exception
     {
-        String path = getBasedir() + "/target/classes/META-INF/maven/plugin.xml";
-        return new FileInputStream( new File( path ) );
+        return new FileInputStream( new File( getPluginDescriptorPath() ) );
     }
 
+    protected String getPluginDescriptorPath()
+    {
+        return getBasedir() + "/target/classes/META-INF/maven/plugin.xml";
+    }
+    
     
     protected void setupContainer()
     {
