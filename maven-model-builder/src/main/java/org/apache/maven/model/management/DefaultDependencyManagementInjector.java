@@ -30,6 +30,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -45,7 +46,7 @@ public class DefaultDependencyManagementInjector
 
     private ManagementModelMerger merger = new ManagementModelMerger();
 
-    public void injectManagement( Model model, ModelBuildingRequest request )
+    public void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         merger.mergeManagedDependencies( model );
     }

@@ -22,6 +22,7 @@ package org.apache.maven.model.profile;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles profile injection into the model.
@@ -38,7 +39,8 @@ public interface ProfileInjector
      * @param model The model into which to merge the values defined by the profile, must not be <code>null</code>.
      * @param profile The (read-only) profile whose values should be injected, may be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectProfile( Model model, Profile profile, ModelBuildingRequest request );
+    void injectProfile( Model model, Profile profile, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }

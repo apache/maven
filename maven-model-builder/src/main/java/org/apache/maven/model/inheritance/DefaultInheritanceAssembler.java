@@ -32,6 +32,7 @@ import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -47,7 +48,8 @@ public class DefaultInheritanceAssembler
 
     private InheritanceModelMerger merger = new InheritanceModelMerger();
 
-    public void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request )
+    public void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
+                                          ModelProblemCollector problems )
     {
         Map<Object, Object> hints = new HashMap<Object, Object>();
         hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent ) );

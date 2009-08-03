@@ -33,6 +33,7 @@ import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -48,12 +49,12 @@ public class DefaultPluginManagementInjector
 
     private ManagementModelMerger merger = new ManagementModelMerger();
 
-    public void injectManagement( Model model, ModelBuildingRequest request )
+    public void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         merger.mergeManagedBuildPlugins( model, false );
     }
 
-    public void injectBasicManagement( Model model, ModelBuildingRequest request )
+    public void injectBasicManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         merger.mergeManagedBuildPlugins( model, true );
     }

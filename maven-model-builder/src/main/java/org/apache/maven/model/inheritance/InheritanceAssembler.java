@@ -21,6 +21,7 @@ package org.apache.maven.model.inheritance;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles inheritance of model values.
@@ -39,7 +40,9 @@ public interface InheritanceAssembler
      *            <code>null</code>.
      * @param parent The (read-only) parent model from which to inherit the values, may be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request );
+    void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
+                                   ModelProblemCollector problems );
 
 }

@@ -36,6 +36,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -51,7 +52,8 @@ public class DefaultProfileInjector
 
     private ProfileModelMerger merger = new ProfileModelMerger();
 
-    public void injectProfile( Model model, Profile profile, ModelBuildingRequest request )
+    public void injectProfile( Model model, Profile profile, ModelBuildingRequest request,
+                               ModelProblemCollector problems )
     {
         if ( profile != null )
         {

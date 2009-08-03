@@ -21,6 +21,7 @@ package org.apache.maven.model.management;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles injection of dependency management into the model.
@@ -36,7 +37,8 @@ public interface DependencyManagementInjector
      * @param child The model into which to merge the values specified by its dependency management sections, must not
      *            be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectManagement( Model child, ModelBuildingRequest request );
+    void injectManagement( Model child, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }

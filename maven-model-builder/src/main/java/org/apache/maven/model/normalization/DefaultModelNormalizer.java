@@ -30,6 +30,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
@@ -46,7 +47,7 @@ public class DefaultModelNormalizer
 
     private DuplicateMerger merger = new DuplicateMerger();
 
-    public void mergeDuplicates( Model model, ModelBuildingRequest request )
+    public void mergeDuplicates( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Build build = model.getBuild();
         if ( build != null )
@@ -95,7 +96,7 @@ public class DefaultModelNormalizer
 
     }
 
-    public void injectDefaultValues( Model model, ModelBuildingRequest request )
+    public void injectDefaultValues( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         injectDependencyDefaults( model.getDependencies() );
 

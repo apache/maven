@@ -21,6 +21,7 @@ package org.apache.maven.model.interpolation;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -187,8 +188,8 @@ public abstract class AbstractStringBasedModelInterpolator
     }
     
     protected String interpolateInternal( String src, List<? extends ValueSource> valueSources,
-                                          List<? extends InterpolationPostProcessor> postProcessors )
-        throws ModelInterpolationException
+                                          List<? extends InterpolationPostProcessor> postProcessors,
+                                          ModelProblemCollector problems )
     {
         if ( src.indexOf( "${" ) < 0 )
         {
@@ -215,9 +216,9 @@ public abstract class AbstractStringBasedModelInterpolator
                 {
                     result = interpolator.interpolate( result, recursionInterceptor );
                 }
-                catch( InterpolationException e )
+                catch ( InterpolationException e )
                 {
-                    throw new ModelInterpolationException( e.getMessage(), e );
+                    problems.addError( e.getMessage(), e );
                 }
 
                 interpolator.clearFeedback();

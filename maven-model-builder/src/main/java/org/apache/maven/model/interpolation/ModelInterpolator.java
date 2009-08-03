@@ -21,6 +21,7 @@ package org.apache.maven.model.interpolation;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 
 import java.io.File;
 
@@ -44,11 +45,9 @@ public interface ModelInterpolator
      * @param projectDir The project directory, may be {@code null} if the model does not belong to a local project but
      *            to some artifact's metadata.
      * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      * @return The interpolated model, never {@code null}.
-     * @throws ModelInterpolationException If the model could not be interpolated (e.g. due to expressions with cyclic
-     *             references).
      */
-    Model interpolateModel( Model model, File projectDir, ModelBuildingRequest request )
-        throws ModelInterpolationException;
+    Model interpolateModel( Model model, File projectDir, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }

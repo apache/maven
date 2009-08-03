@@ -27,6 +27,7 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -40,7 +41,7 @@ public class DefaultPluginConfigurationExpander
     implements PluginConfigurationExpander
 {
 
-    public void expandPluginConfiguration( Model model, ModelBuildingRequest request )
+    public void expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Build build = model.getBuild();
         Reporting reporting = model.getReporting();

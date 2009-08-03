@@ -35,7 +35,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
-import org.apache.maven.model.interpolation.ModelInterpolationException;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
@@ -137,7 +136,7 @@ public class DefaultModelBuilder
 
             problems.setSourceHint( tmpModel );
 
-            modelNormalizer.mergeDuplicates( tmpModel, request );
+            modelNormalizer.mergeDuplicates( tmpModel, request, problems );
 
             List<Profile> activePomProfiles =
                 profileSelector.getActiveProfiles( rawModel.getProfiles(), profileActivationContext, problems );
@@ -145,14 +144,14 @@ public class DefaultModelBuilder
 
             for ( Profile activeProfile : activePomProfiles )
             {
-                profileInjector.injectProfile( tmpModel, activeProfile, request );
+                profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
             }
 
             if ( currentData == resultData )
             {
                 for ( Profile activeProfile : activeExternalProfiles )
                 {
-                    profileInjector.injectProfile( tmpModel, activeProfile, request );
+                    profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
             }
 
@@ -166,7 +165,7 @@ public class DefaultModelBuilder
         superData.setActiveProfiles( Collections.<Profile> emptyList() );
         lineage.add( superData );
 
-        assembleInheritance( lineage, request );
+        assembleInheritance( lineage, request, problems );
 
         Model resultModel = resultData.getModel();
 
@@ -212,7 +211,7 @@ public class DefaultModelBuilder
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
-        pluginManagementInjector.injectBasicManagement( resultModel, request );
+        pluginManagementInjector.injectBasicManagement( resultModel, request, problems );
 
         fireBuildExtensionsAssembled( resultModel, request, problems );
 
@@ -221,17 +220,17 @@ public class DefaultModelBuilder
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, problems );
         }
 
-        pluginManagementInjector.injectManagement( resultModel, request );
+        pluginManagementInjector.injectManagement( resultModel, request, problems );
 
         importDependencyManagement( resultModel, request, problems );
 
-        dependencyManagementInjector.injectManagement( resultModel, request );
+        dependencyManagementInjector.injectManagement( resultModel, request, problems );
 
-        modelNormalizer.injectDefaultValues( resultModel, request );
+        modelNormalizer.injectDefaultValues( resultModel, request, problems );
 
         if ( request.isProcessPlugins() )
         {
-            pluginConfigurationExpander.expandPluginConfiguration( resultModel, request );
+            pluginConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
         }
 
         modelValidator.validateEffectiveModel( resultModel, request, problems );
@@ -345,30 +344,22 @@ public class DefaultModelBuilder
         }
     }
 
-    private void assembleInheritance( List<ModelData> lineage, ModelBuildingRequest request )
+    private void assembleInheritance( List<ModelData> lineage, ModelBuildingRequest request,
+                                      ModelProblemCollector problems )
     {
         for ( int i = lineage.size() - 2; i >= 0; i-- )
         {
             Model parent = lineage.get( i + 1 ).getModel();
             Model child = lineage.get( i ).getModel();
-            inheritanceAssembler.assembleModelInheritance( child, parent, request );
+            inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
         }
     }
 
     private Model interpolateModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
-        try
-        {
-            Model result = modelInterpolator.interpolateModel( model, model.getProjectDirectory(), request );
-            result.setPomFile( model.getPomFile() );
-            return result;
-        }
-        catch ( ModelInterpolationException e )
-        {
-            problems.addError( "Invalid expression: " + e.getMessage(), e );
-
-            return model;
-        }
+        Model result = modelInterpolator.interpolateModel( model, model.getProjectDirectory(), request, problems );
+        result.setPomFile( model.getPomFile() );
+        return result;
     }
 
     private ModelData readParent( Model childModel, ModelBuildingRequest request, DefaultModelProblemCollector problems )
@@ -635,7 +626,7 @@ public class DefaultModelBuilder
             importMngts.add( importMngt );
         }
 
-        dependencyManagementImporter.importManagement( model, importMngts, request );
+        dependencyManagementImporter.importManagement( model, importMngts, request, problems );
     }
 
     private <T> void putCache( ModelCache modelCache, String groupId, String artifactId, String version,

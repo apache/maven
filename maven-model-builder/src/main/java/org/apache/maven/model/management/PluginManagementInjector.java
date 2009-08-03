@@ -21,6 +21,7 @@ package org.apache.maven.model.management;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles injection of plugin management into the model.
@@ -36,8 +37,9 @@ public interface PluginManagementInjector
      * @param child The model into which to merge the values specified by its plugin management section, must not be
      *            <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectManagement( Model child, ModelBuildingRequest request );
+    void injectManagement( Model child, ModelBuildingRequest request, ModelProblemCollector problems );
 
     /**
      * Merges important default values from the plugin management section of the given model into itself. In detail,
@@ -47,7 +49,8 @@ public interface PluginManagementInjector
      * @param child The model into which to merge the values specified by its plugin management section, must not be
      *            <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectBasicManagement( Model child, ModelBuildingRequest request );
+    void injectBasicManagement( Model child, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }

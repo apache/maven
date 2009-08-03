@@ -28,6 +28,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -41,7 +42,7 @@ public class DefaultDependencyManagementImporter
 {
 
     public void importManagement( Model target, List<? extends DependencyManagement> sources,
-                                  ModelBuildingRequest request )
+                                  ModelBuildingRequest request, ModelProblemCollector problems )
     {
         if ( sources != null && !sources.isEmpty() )
         {
