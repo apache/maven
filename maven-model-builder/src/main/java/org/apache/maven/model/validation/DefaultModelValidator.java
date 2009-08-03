@@ -302,7 +302,7 @@ public class DefaultModelValidator
         {
             validateStringNotEmpty( prefix + ".id", problems, false, repository.getId() );
 
-            validateStringNotEmpty( prefix + ".url", problems, false, repository.getUrl() );
+            validateStringNotEmpty( prefix + "[" + repository.getId() + "].url", problems, false, repository.getUrl() );
 
             String key = repository.getId();
 

@@ -319,11 +319,11 @@ public class DefaultModelValidatorTest
 
         assertEquals( "'repositories.repository.id' is missing.", result.getErrors().get( 0 ) );
 
-        assertEquals( "'repositories.repository.url' is missing.", result.getErrors().get( 1 ) );
+        assertEquals( "'repositories.repository[null].url' is missing.", result.getErrors().get( 1 ) );
 
         assertEquals( "'pluginRepositories.pluginRepository.id' is missing.", result.getErrors().get( 2 ) );
 
-        assertEquals( "'pluginRepositories.pluginRepository.url' is missing.", result.getErrors().get( 3 ) );
+        assertEquals( "'pluginRepositories.pluginRepository[null].url' is missing.", result.getErrors().get( 3 ) );
     }
 
     public void testMissingResourceDirectory()
