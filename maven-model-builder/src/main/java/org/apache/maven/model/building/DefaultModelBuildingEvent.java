@@ -34,10 +34,13 @@ class DefaultModelBuildingEvent
 
     private final ModelBuildingRequest request;
 
-    public DefaultModelBuildingEvent( Model model, ModelBuildingRequest request )
+    private final ModelProblemCollector problems;
+
+    public DefaultModelBuildingEvent( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         this.model = model;
         this.request = request;
+        this.problems = problems;
     }
 
     public Model getModel()
@@ -48,6 +51,11 @@ class DefaultModelBuildingEvent
     public ModelBuildingRequest getRequest()
     {
         return request;
+    }
+
+    public ModelProblemCollector getProblems()
+    {
+        return problems;
     }
 
 }

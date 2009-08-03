@@ -21,7 +21,9 @@ package org.apache.maven.project;
 
 import java.util.List;
 
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
 import org.apache.maven.model.building.ModelBuildingEvent;
@@ -104,21 +106,41 @@ class DefaultModelBuildingListener
 
     @Override
     public void buildExtensionsAssembled( ModelBuildingEvent event )
-        throws Exception
     {
         Model model = event.getModel();
 
-        remoteRepositories =
-            projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories );
+        try
+        {
+            remoteRepositories =
+                projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories );
+        }
+        catch ( InvalidRepositoryException e )
+        {
+            event.getProblems().addError( "Invalid artifact repository: " + e.getMessage(), e );
+        }
 
-        pluginRepositories =
-            projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories );
+        try
+        {
+            pluginRepositories =
+                projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories );
+        }
+        catch ( InvalidRepositoryException e )
+        {
+            event.getProblems().addError( "Invalid plugin repository: " + e.getMessage(), e );
+        }
 
         if ( event.getRequest().isProcessPlugins() )
         {
-            projectRealm =
-                projectBuildingHelper.createProjectRealm( model, projectBuildingRequest.getLocalRepository(),
-                                                          pluginRepositories );
+            try
+            {
+                projectRealm =
+                    projectBuildingHelper.createProjectRealm( model, projectBuildingRequest.getLocalRepository(),
+                                                              pluginRepositories );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                event.getProblems().addError( "Unresolveable build extensions: " + e.getMessage(), e );
+            }
 
             if ( projectRealm != null )
             {

@@ -20,9 +20,8 @@ package org.apache.maven.model.building;
  */
 
 /**
- * Defines events that the model builder fires during construction of the effective model. Unless otherwise noted, an
- * exception thrown by the listener during processing of the event will be treated as a fatal error and aborts building
- * of the corresponding model.
+ * Defines events that the model builder fires during construction of the effective model. When a listener encounteres
+ * errors while processing the event, it can report these problems via {@link ModelBuildingEvent#getProblems()}.
  * 
  * @author Benjamin Bentmann
  */
@@ -33,9 +32,7 @@ public interface ModelBuildingListener
      * Notifies the listener that the model has been constructed to the extent where build extensions can be processed.
      * 
      * @param event The details about the event.
-     * @throws Exception If the listener encountered an error.
      */
-    void buildExtensionsAssembled( ModelBuildingEvent event )
-        throws Exception;
+    void buildExtensionsAssembled( ModelBuildingEvent event );
 
 }

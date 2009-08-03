@@ -29,7 +29,6 @@ public class AbstractModelBuildingListener
 {
 
     public void buildExtensionsAssembled( ModelBuildingEvent event )
-        throws Exception
     {
         // default does nothing
     }

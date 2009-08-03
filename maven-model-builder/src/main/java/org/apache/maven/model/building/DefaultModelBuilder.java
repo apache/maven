@@ -718,18 +718,11 @@ public class DefaultModelBuilder
             return;
         }
 
-        ModelBuildingEvent event = new DefaultModelBuildingEvent( model, request );
+        ModelBuildingEvent event = new DefaultModelBuildingEvent( model, request, problems );
 
         for ( ModelBuildingListener listener : request.getModelBuildingListeners() )
         {
-            try
-            {
-                listener.buildExtensionsAssembled( event );
-            }
-            catch ( Exception e )
-            {
-                problems.addError( "Invalid build extensions: " + e.getMessage(), e );
-            }
+            listener.buildExtensionsAssembled( event );
         }
     }
 
