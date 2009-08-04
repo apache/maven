@@ -332,7 +332,8 @@ public class DefaultLifecycleExecutor
                 pluginDescriptor.setClassRealm( pluginManager.getPluginRealm( session, pluginDescriptor ) );
             }
 
-            populateMojoExecutionConfiguration( project, mojoExecution, false );
+            populateMojoExecutionConfiguration( project, mojoExecution,
+                                                MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
 
             calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
 
@@ -361,8 +362,6 @@ public class DefaultLifecycleExecutor
     private void calculateExecutionForIndividualGoal( MavenSession session, List<MojoExecution> lifecyclePlan, String goal ) 
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
     {
-        MavenProject project = session.getCurrentProject();
-        
         // If this is a goal like "mvn modello:java" and the POM looks like the following:
         //
         // <project>
@@ -395,9 +394,7 @@ public class DefaultLifecycleExecutor
         
         MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session );
 
-        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-cli" );
-        
-        populateMojoExecutionConfiguration( project, mojoExecution, true );
+        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-cli", MojoExecution.Source.CLI );
 
         lifecyclePlan.add( mojoExecution );        
     }
@@ -674,7 +671,8 @@ public class DefaultLifecycleExecutor
         return sb.toString();
     }
         
-    private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution, boolean directInvocation )
+    private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution,
+                                                     boolean allowPluginLevelConfig )
     {
         String g = mojoExecution.getGroupId();
 
@@ -702,7 +700,7 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        if ( directInvocation )
+        if ( allowPluginLevelConfig )
         {
             Xpp3Dom defaultDom = convert( mojoExecution.getMojoDescriptor() );
 

@@ -38,7 +38,26 @@ public class MojoExecution
     private MojoDescriptor mojoDescriptor;
 
     private Xpp3Dom configuration;
-        
+
+    /**
+     * Describes the source of an execution.
+     */
+    public enum Source
+    {
+
+        /**
+         * An execution that originates from the direct invocation of a goal from the CLI.
+         */
+        CLI,
+
+        /**
+         * An execution that originates from a goal bound to a lifecycle phase.
+         */
+        LIFECYCLE,
+    }
+
+    private Source source;
+
     /**
      * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase
      * this mojo execution is going to run in.
@@ -61,6 +80,14 @@ public class MojoExecution
         this.configuration = null;
     }
 
+    public MojoExecution( MojoDescriptor mojoDescriptor, String executionId, Source source )
+    {
+        this.mojoDescriptor = mojoDescriptor;
+        this.executionId = executionId;
+        this.configuration = null;
+        this.source = source;
+    }
+
     public MojoExecution( MojoDescriptor mojoDescriptor, String executionId )
     {
         this.mojoDescriptor = mojoDescriptor;
@@ -73,6 +100,16 @@ public class MojoExecution
         this.mojoDescriptor = mojoDescriptor;
         this.configuration = configuration;
         this.executionId = null;
+    }
+
+    /**
+     * Gets the source of this execution.
+     * 
+     * @return The source of this execution or {@code null} if unknown.
+     */
+    public Source getSource()
+    {
+        return source;
     }
 
     public String getExecutionId()
