@@ -258,6 +258,11 @@ public class DefaultLifecycleExecutor
 
         if ( !forkedExecutions.isEmpty() )
         {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Forking execution for " + mojoExecution.getMojoDescriptor().getId() );
+            }
+
             executionProject = project.clone();
 
             session.setCurrentProject( executionProject );
@@ -271,6 +276,11 @@ public class DefaultLifecycleExecutor
             finally
             {
                 session.setCurrentProject( project );
+            }
+
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Completed forked execution for " + mojoExecution.getMojoDescriptor().getId() );
             }
         }
 
@@ -334,6 +344,8 @@ public class DefaultLifecycleExecutor
 
             populateMojoExecutionConfiguration( project, mojoExecution,
                                                 MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
+
+            extractMojoConfiguration( mojoExecution );
 
             calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
 
@@ -621,12 +633,11 @@ public class DefaultLifecycleExecutor
                         {
                             for ( MojoExecution forkedExecution : forkedExecutions )
                             {
-                                Xpp3Dom executionConfiguration = forkedExecution.getConfiguration();
+                                Xpp3Dom forkedConfiguration = forkedExecution.getConfiguration();
 
-                                Xpp3Dom mergedConfiguration =
-                                    Xpp3Dom.mergeXpp3Dom( phaseConfiguration, executionConfiguration );
+                                forkedConfiguration = Xpp3Dom.mergeXpp3Dom( phaseConfiguration, forkedConfiguration );
 
-                                forkedExecution.setConfiguration( mergedConfiguration );
+                                forkedExecution.setConfiguration( forkedConfiguration );
                             }
                         }
                     }
@@ -637,6 +648,8 @@ public class DefaultLifecycleExecutor
             {
                 for ( MojoExecution forkedExecution : forkedExecutions )
                 {
+                    extractMojoConfiguration( forkedExecution );
+
                     calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
 
                     mojoExecution.addForkedExecution( forkedExecution );
@@ -656,6 +669,8 @@ public class DefaultLifecycleExecutor
             MojoExecution forkedExecution = new MojoExecution( forkedMojoDescriptor, forkedGoal );
 
             populateMojoExecutionConfiguration( project, forkedExecution, true );
+
+            extractMojoConfiguration( forkedExecution );
 
             calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
 
@@ -690,7 +705,7 @@ public class DefaultLifecycleExecutor
                 {
                     Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
 
-                    Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoDescriptor );
+                    Xpp3Dom mojoConfiguration = new Xpp3Dom( executionConfiguration );
 
                     mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
 
@@ -722,7 +737,7 @@ public class DefaultLifecycleExecutor
             if ( plugin != null && plugin.getConfiguration() != null )
             {
                 Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
-                pluginConfiguration = extractMojoConfiguration( pluginConfiguration, mojoDescriptor );
+                pluginConfiguration = new Xpp3Dom( pluginConfiguration );
                 mojoConfiguration = Xpp3Dom.mergeXpp3Dom( pluginConfiguration, defaultConfiguration, Boolean.TRUE );
             }
 
@@ -732,6 +747,15 @@ public class DefaultLifecycleExecutor
         }
     }
 
+    private void extractMojoConfiguration( MojoExecution mojoExecution )
+    {
+        Xpp3Dom configuration = mojoExecution.getConfiguration();
+
+        configuration = extractMojoConfiguration( configuration, mojoExecution.getMojoDescriptor() );
+
+        mojoExecution.setConfiguration( configuration );
+    }
+
     /**
      * Extracts the configuration for a single mojo from the specified execution configuration by discarding any
      * non-applicable parameters. This is necessary because a plugin execution can have multiple goals with different
@@ -739,56 +763,42 @@ public class DefaultLifecycleExecutor
      * underlying configurator will error out when trying to configure a mojo parameter that is specified in the
      * configuration but not present in the mojo instance.
      * 
-     * @param executionConfiguration The configuration from the plugin execution, must not be {@code null}.
+     * @param executionConfiguration The configuration from the plugin execution, may be {@code null}.
      * @param mojoDescriptor The descriptor for the mojo being configured, must not be {@code null}.
      * @return The configuration for the mojo, never {@code null}.
      */
     private Xpp3Dom extractMojoConfiguration( Xpp3Dom executionConfiguration, MojoDescriptor mojoDescriptor )
     {
-        Xpp3Dom mojoConfiguration = new Xpp3Dom( executionConfiguration.getName() );
+        Xpp3Dom mojoConfiguration = null;
 
-        Map<String, Parameter> mojoParameters = mojoDescriptor.getParameterMap();
-
-        Map<String, String> aliases = new HashMap<String, String>();
-        if ( mojoDescriptor.getParameters() != null )
+        if ( executionConfiguration != null )
         {
-            for ( Parameter parameter : mojoDescriptor.getParameters() )
+            mojoConfiguration = new Xpp3Dom( executionConfiguration.getName() );
+
+            if ( mojoDescriptor.getParameters() != null )
             {
-                String alias = parameter.getAlias();
-                if ( StringUtils.isNotEmpty( alias ) )
+                for ( Parameter parameter : mojoDescriptor.getParameters() )
                 {
-                    aliases.put( alias, parameter.getName() );
+                    Xpp3Dom parameterConfiguration = executionConfiguration.getChild( parameter.getName() );
+
+                    if ( parameterConfiguration == null )
+                    {
+                        parameterConfiguration = executionConfiguration.getChild( parameter.getAlias() );
+                    }
+
+                    if ( parameterConfiguration != null )
+                    {
+                        parameterConfiguration = new Xpp3Dom( parameterConfiguration, parameter.getName() );
+
+                        if ( StringUtils.isNotEmpty( parameter.getImplementation() ) )
+                        {
+                            parameterConfiguration.setAttribute( "implementation", parameter.getImplementation() );
+                        }
+
+                        mojoConfiguration.addChild( parameterConfiguration );
+                    }
                 }
             }
-        }
-
-        for ( int i = 0; i < executionConfiguration.getChildCount(); i++ )
-        {
-            Xpp3Dom executionDom = executionConfiguration.getChild( i );
-            String paramName = executionDom.getName();
-
-            Xpp3Dom mojoDom;
-
-            if ( mojoParameters.containsKey( paramName ) )
-            {
-                mojoDom = new Xpp3Dom( executionDom );
-            }
-            else if ( aliases.containsKey( paramName ) )
-            {
-                mojoDom = new Xpp3Dom( executionDom, aliases.get( paramName ) );
-            }
-            else
-            {
-                continue;
-            }
-
-            String implementation = mojoParameters.get( mojoDom.getName() ).getImplementation();
-            if ( StringUtils.isNotEmpty( implementation ) )
-            {
-                mojoDom.setAttribute( "implementation", implementation );
-            }
-
-            mojoConfiguration.addChild( mojoDom );
         }
 
         return mojoConfiguration;
