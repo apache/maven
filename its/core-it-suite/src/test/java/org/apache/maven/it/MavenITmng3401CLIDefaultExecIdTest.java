@@ -1,3 +1,5 @@
+package org.apache.maven.it;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,57 +19,53 @@
  * under the License.
  */
 
-package org.apache.maven.it;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Properties;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.it.AbstractMavenIntegrationTestCase;
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3401">MNG-3401</a>.
- *
- * @todo Fill in a better description of what this test verifies!
  * 
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- * 
  */
 public class MavenITmng3401CLIDefaultExecIdTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3401CLIDefaultExecIdTest()
-        throws InvalidVersionSpecificationException
     {
-        super( "(2.1.99,)" );
+        super( "[2.2.0,)" );
     }
 
-    public void testitMNG3401 ()
+    /**
+     * Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
+     * invocations of a goal as well.
+     */
+    public void testitMNG3401()
         throws Exception
     {
-        // The testdir is computed from the location of this
-        // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3401" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-
-		try
-		{
-	        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-
-	        verifier.verifyErrorFreeLog();
-	        fail( "Failed to incorporate 'default-cli' execution for touch mojo." );
-		}
-		catch ( VerificationException e )
-		{
-			// expected
-		}
-
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );
+        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/config.properties" );
+
+        assertEquals( "PASSED", props.getProperty( "stringParam" ) );
+
+        assertEquals( "4", props.getProperty( "stringParams" ) );
+        assertEquals( "a", props.getProperty( "stringParams.0" ) );
+        assertEquals( "c", props.getProperty( "stringParams.1" ) );
+        assertEquals( "b", props.getProperty( "stringParams.2" ) );
+        assertEquals( "d", props.getProperty( "stringParams.3" ) );
+
+        assertEquals( "maven-core-it", props.getProperty( "defaultParam" ) );
     }
+
 }
