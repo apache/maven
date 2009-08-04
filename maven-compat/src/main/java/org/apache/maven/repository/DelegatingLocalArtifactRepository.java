@@ -82,7 +82,7 @@ public class DelegatingLocalArtifactRepository
 
     public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
     {
-        return userLocalArtifactRepository.pathOfLocalRepositoryMetadata( metadata, userLocalArtifactRepository );
+        return userLocalArtifactRepository.pathOfLocalRepositoryMetadata( metadata, repository );
     }
 
     public String getId()
