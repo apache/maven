@@ -680,6 +680,8 @@ public class DefaultLifecycleExecutor
 
         Plugin plugin = project.getPlugin( g + ":" + a );
 
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
         if ( plugin != null && StringUtils.isNotEmpty( mojoExecution.getExecutionId() ) )
         {
             for ( PluginExecution e : plugin.getExecutions() )
@@ -688,12 +690,23 @@ public class DefaultLifecycleExecutor
                 {
                     Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
 
-                    Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoExecution.getMojoDescriptor() );
+                    Xpp3Dom mojoConfiguration = extractMojoConfiguration( executionConfiguration, mojoDescriptor );
 
-                    Xpp3Dom mergedConfiguration =
-                        Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
+                    mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
 
-                    mojoExecution.setConfiguration( mergedConfiguration );
+                    /*
+                     * The model only contains the default configuration for those goals that are present in the plugin
+                     * execution. For goals invoked from the CLI or a forked execution, we need to grab the default
+                     * parameter values explicitly.
+                     */
+                    if ( !e.getGoals().contains( mojoExecution.getGoal() ) )
+                    {
+                        Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
+
+                        mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoConfiguration, defaultConfiguration );
+                    }
+
+                    mojoExecution.setConfiguration( mojoConfiguration );
 
                     return;
                 }
@@ -702,20 +715,20 @@ public class DefaultLifecycleExecutor
 
         if ( allowPluginLevelConfig )
         {
-            Xpp3Dom defaultDom = convert( mojoExecution.getMojoDescriptor() );
+            Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
 
-            Xpp3Dom mojoDom = defaultDom;
+            Xpp3Dom mojoConfiguration = defaultConfiguration;
 
             if ( plugin != null && plugin.getConfiguration() != null )
             {
-                Xpp3Dom projectDom = (Xpp3Dom) plugin.getConfiguration();
-                projectDom = extractMojoConfiguration( projectDom, mojoExecution.getMojoDescriptor() );
-                mojoDom = Xpp3Dom.mergeXpp3Dom( projectDom, defaultDom, Boolean.TRUE );
+                Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
+                pluginConfiguration = extractMojoConfiguration( pluginConfiguration, mojoDescriptor );
+                mojoConfiguration = Xpp3Dom.mergeXpp3Dom( pluginConfiguration, defaultConfiguration, Boolean.TRUE );
             }
 
-            mojoDom = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoDom );
+            mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
 
-            mojoExecution.setConfiguration( mojoDom );
+            mojoExecution.setConfiguration( mojoConfiguration );
         }
     }
 
@@ -1170,7 +1183,7 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
         } 
         
-        return convert( mojoDescriptor );
+        return getMojoConfiguration( mojoDescriptor );
     }
     
     public Xpp3Dom getMojoConfiguration( MojoDescriptor mojoDescriptor )
