@@ -121,6 +121,8 @@ public class DefaultModelBuilder
 
         Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
+        problems.setRootModel( inputModel );
+
         ModelData resultData = new ModelData( inputModel );
 
         List<ModelData> lineage = new ArrayList<ModelData>();
@@ -170,6 +172,7 @@ public class DefaultModelBuilder
         Model resultModel = resultData.getModel();
 
         problems.setSourceHint( resultModel );
+        problems.setRootModel( resultModel );
 
         resultModel = interpolateModel( resultModel, request, problems );
         resultData.setModel( resultModel );
@@ -208,6 +211,7 @@ public class DefaultModelBuilder
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result.getProblems() );
         problems.setSourceHint( resultModel );
+        problems.setRootModel( resultModel );
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
@@ -237,7 +241,7 @@ public class DefaultModelBuilder
 
         if ( hasErrors( problems.getProblems() ) )
         {
-            throw new ModelBuildingException( problems.getProblems() );
+            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
         return result;
@@ -274,13 +278,13 @@ public class DefaultModelBuilder
         {
             problems.add( new ModelProblem( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
                                             ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
-            throw new ModelBuildingException( problems.getProblems() );
+            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
         catch ( IOException e )
         {
             problems.add( new ModelProblem( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(),
                                             ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
-            throw new ModelBuildingException( problems.getProblems() );
+            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
         model.setPomFile( pomFile );
@@ -517,11 +521,9 @@ public class DefaultModelBuilder
         }
         catch ( UnresolvableModelException e )
         {
-            problems.add( new ModelProblem( "Non-resolvable parent POM "
-                + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(),
-                                            ModelProblem.Severity.FATAL, ModelProblemUtils.toSourceHint( childModel ),
-                                            e ) );
-            throw new ModelBuildingException( problems.getProblems() );
+            problems.addFatalError( "Non-resolvable parent POM "
+                + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), e );
+            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
         Model parentModel = readModel( modelSource, null, request, problems );

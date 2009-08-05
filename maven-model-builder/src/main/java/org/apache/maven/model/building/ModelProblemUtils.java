@@ -34,11 +34,16 @@ class ModelProblemUtils
     /**
      * Creates a user-friendly source hint for the specified model.
      * 
-     * @param model The model to create a source hint for, must not be {@code null}.
+     * @param model The model to create a source hint for, may be {@code null}.
      * @return The user-friendly source hint, never {@code null}.
      */
     public static String toSourceHint( Model model )
     {
+        if ( model == null )
+        {
+            return "";
+        }
+
         StringBuilder buffer = new StringBuilder( 192 );
 
         buffer.append( toId( model ) );
@@ -52,8 +57,13 @@ class ModelProblemUtils
         return buffer.toString();
     }
 
-    private static String toId( Model model )
+    public static String toId( Model model )
     {
+        if ( model == null )
+        {
+            return "";
+        }
+
         String groupId = model.getGroupId();
         if ( groupId == null && model.getParent() != null )
         {

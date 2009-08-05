@@ -33,6 +33,15 @@ public interface ProjectBuildingResult
 {
 
     /**
+     * Gets the identifier of the project that could not be built. The general format of the identifier is {@code
+     * <groupId>:<artifactId>:<version>} but some of these coordinates may still be unknown at the point the exception
+     * is thrown so this information is merely meant to assist the user.
+     * 
+     * @return The identifier of the project or an empty string if not known, never {@code null}.
+     */
+    String getProjectId();
+
+    /**
      * Gets the POM file from which the project was built.
      * 
      * @return The POM file or {@code null} if unknown.

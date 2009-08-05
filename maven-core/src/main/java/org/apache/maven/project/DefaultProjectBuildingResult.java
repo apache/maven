@@ -34,6 +34,8 @@ class DefaultProjectBuildingResult
     implements ProjectBuildingResult
 {
 
+    private String projectId;
+
     private File pomFile;
 
     private MavenProject project;
@@ -48,6 +50,7 @@ class DefaultProjectBuildingResult
      */
     public DefaultProjectBuildingResult( MavenProject project, List<ModelProblem> problems )
     {
+        this.projectId = ( project != null ) ? project.getId() : "";
         this.pomFile = ( project != null ) ? project.getFile() : null;
         this.project = project;
         this.problems = problems;
@@ -56,13 +59,20 @@ class DefaultProjectBuildingResult
     /**
      * Creates a new result with the specified contents.
      * 
+     * @param projectId The
      * @param pomFile The POM file from which the project was built, may be {@code null}.
      * @param problems The problems that were encouterned, may be {@code null}.
      */
-    public DefaultProjectBuildingResult( File pomFile, List<ModelProblem> problems )
+    public DefaultProjectBuildingResult( String projectId, File pomFile, List<ModelProblem> problems )
     {
+        this.projectId = ( projectId != null ) ? projectId : "";
         this.pomFile = pomFile;
         this.problems = problems;
+    }
+
+    public String getProjectId()
+    {
+        return projectId;
     }
 
     public File getPomFile()

@@ -113,7 +113,7 @@ public class DefaultProjectBuilder
             }
             catch ( ModelBuildingException e )
             {
-                throw new ProjectBuildingException( "[unknown]", "Encountered POM errors", pomFile, e );
+                throw new ProjectBuildingException( e.getModelId(), "Encountered POM errors", pomFile, e );
             }
 
             Model model = result.getEffectiveModel();
@@ -327,7 +327,8 @@ public class DefaultProjectBuilder
                 }
                 catch ( ModelBuildingException e )
                 {
-                    results.add( new DefaultProjectBuildingResult( interimResult.pomFile, e.getProblems() ) );
+                    results.add( new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile,
+                                                                   e.getProblems() ) );
 
                     errors = true;
                 }
@@ -431,7 +432,7 @@ public class DefaultProjectBuilder
             }
             catch ( ModelBuildingException e )
             {
-                results.add( new DefaultProjectBuildingResult( pomFile, e.getProblems() ) );
+                results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
 
                 errors = true;
             }

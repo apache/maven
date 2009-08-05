@@ -43,6 +43,8 @@ class DefaultModelProblemCollector
 
     private Model sourceModel;
 
+    private Model rootModel;
+
     public DefaultModelProblemCollector( List<ModelProblem> problems )
     {
         this.problems = ( problems != null ) ? problems : new ArrayList<ModelProblem>();
@@ -74,9 +76,34 @@ class DefaultModelProblemCollector
         return sourceHint;
     }
 
+    public void setRootModel( Model rootModel )
+    {
+        this.rootModel = rootModel;
+    }
+
+    public Model getRootModel()
+    {
+        return rootModel;
+    }
+
+    public String getRootModelId()
+    {
+        return ModelProblemUtils.toId( rootModel );
+    }
+
     public void add( ModelProblem problem )
     {
         problems.add( problem );
+    }
+
+    public void addFatalError( String message )
+    {
+        problems.add( new ModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint() ) );
+    }
+
+    public void addFatalError( String message, Exception cause )
+    {
+        problems.add( new ModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint(), cause ) );
     }
 
     public void addError( String message )

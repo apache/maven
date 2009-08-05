@@ -35,16 +35,21 @@ public class ModelBuildingException
     extends Exception
 {
 
+    private final String modelId;
+
     private final List<ModelProblem> problems;
 
     /**
      * Creates a new exception with the specified problems.
      * 
+     * @param modelId The identifier of the model that could not be built, may be {@code null}.
      * @param problems The problems that causes this exception, may be {@code null}.
      */
-    public ModelBuildingException( List<ModelProblem> problems )
+    public ModelBuildingException( String modelId, List<ModelProblem> problems )
     {
-        super( toMessage( problems ) );
+        super( toMessage( modelId, problems ) );
+
+        this.modelId = ( modelId != null ) ? modelId : "";
 
         this.problems = new ArrayList<ModelProblem>();
         if ( problems != null )
@@ -54,16 +59,28 @@ public class ModelBuildingException
     }
 
     /**
+     * Gets the identifier of the POM whose effective model could not be built. The general format of the identifier is
+     * {@code <groupId>:<artifactId>:<version>} but some of these coordinates may still be unknown at the point the
+     * exception is thrown so this information is merely meant to assist the user.
+     * 
+     * @return The identifier of the POM or an empty string if not known, never {@code null}.
+     */
+    public String getModelId()
+    {
+        return modelId;
+    }
+
+    /**
      * Gets the problems that caused this exception.
      * 
      * @return The problems that caused this exception, never {@code null}.
      */
     public List<ModelProblem> getProblems()
     {
-        return this.problems;
+        return problems;
     }
 
-    private static String toMessage( List<ModelProblem> problems )
+    private static String toMessage( String modelId, List<ModelProblem> problems )
     {
         StringWriter buffer = new StringWriter( 1024 );
 
@@ -71,7 +88,13 @@ public class ModelBuildingException
 
         writer.print( problems.size() );
         writer.print( ( problems.size() == 1 ) ? " problem was " : " problems were " );
-        writer.println( "encountered during construction of the effective model:" );
+        writer.print( "encountered while building the effective model" );
+        if ( modelId != null && modelId.length() > 0 )
+        {
+            writer.print( " for " );
+            writer.print( modelId );
+        }
+        writer.println();
 
         for ( ModelProblem problem : problems )
         {
