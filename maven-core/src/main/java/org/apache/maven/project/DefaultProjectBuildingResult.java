@@ -59,7 +59,7 @@ class DefaultProjectBuildingResult
     /**
      * Creates a new result with the specified contents.
      * 
-     * @param projectId The
+     * @param projectId The identifier of the project, may be {@code null}.
      * @param pomFile The POM file from which the project was built, may be {@code null}.
      * @param problems The problems that were encouterned, may be {@code null}.
      */
