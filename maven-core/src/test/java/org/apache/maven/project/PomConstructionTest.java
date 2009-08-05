@@ -1636,6 +1636,20 @@ public class PomConstructionTest
         assertEquals( "PASSED", pom.getValue( "properties/interpolatedProperty" ) );
     }
 
+    public void testParentPomPackagingMustBePom()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "parent-pom-packaging/sub" );
+            fail( "Wrong packaging of parent POM was not rejected" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
+    }
+
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
@@ -1649,7 +1663,7 @@ public class PomConstructionTest
     }
     
     private PomTestWrapper buildPom( String pomPath, String... profileIds )
-        throws Exception
+        throws ProjectBuildingException
     {
         return buildPom( pomPath, null, profileIds );
     }

@@ -408,6 +408,14 @@ public class DefaultModelBuilder
                     }
                 }
             }
+
+            Model parentModel = parentData.getModel();
+
+            if ( !"pom".equals( parentModel.getPackaging() ) )
+            {
+                problems.addError( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
+                    + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" );
+            }
         }
         else
         {

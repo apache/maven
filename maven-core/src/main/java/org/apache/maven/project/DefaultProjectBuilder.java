@@ -113,7 +113,7 @@ public class DefaultProjectBuilder
             }
             catch ( ModelBuildingException e )
             {
-                throw new ProjectBuildingException( "[unknown]", "Failed to build project for " + pomFile, pomFile, e );
+                throw new ProjectBuildingException( "[unknown]", "Encountered POM errors", pomFile, e );
             }
 
             Model model = result.getEffectiveModel();
