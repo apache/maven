@@ -295,6 +295,8 @@ public class DefaultArtifactCollector
                 if ( !child.isResolved() && ( !child.getArtifact().isOptional() || child.isChildOfRootNode() ) )
                 {
                     Artifact artifact = child.getArtifact();
+                    artifact.setDependencyTrail( node.getDependencyTrail() );
+                    
                     List childRemoteRepositories = child.getRemoteRepositories();
                     try
                     {
@@ -362,9 +364,6 @@ public class DefaultArtifactCollector
 
                                     if ( version == null )
                                     {
-                                        // Getting the dependency trail so it can be logged in the exception
-                                        artifact.setDependencyTrail( node.getDependencyTrail() );
-
                                         if ( versions.isEmpty() )
                                         {
                                             throw new OverConstrainedVersionException(
@@ -405,7 +404,6 @@ public class DefaultArtifactCollector
                             continue;
                         }
 
-                        artifact.setDependencyTrail( node.getDependencyTrail() );
                         ResolutionGroup rGroup = source.retrieve( artifact, localRepository, childRemoteRepositories );
 
                         //TODO might be better to have source.retrieve() throw a specific exception for this situation
