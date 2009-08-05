@@ -4,6 +4,7 @@
   <groupId>org.apache.maven.mercury</groupId>
   <artifactId>mercury-parent</artifactId>
   <version>1.0.0-alpha-3-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <build>
     <plugins>
       <plugin>

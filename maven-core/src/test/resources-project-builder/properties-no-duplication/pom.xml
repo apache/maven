@@ -5,6 +5,7 @@
   <groupId>org.apache.maven.its</groupId>
   <artifactId>test-parent</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <properties>
     <pomProfile>parent</pomProfile>
   </properties>

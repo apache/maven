@@ -4,6 +4,7 @@
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
   <version>8-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <build>
     <pluginManagement>
       <plugins>

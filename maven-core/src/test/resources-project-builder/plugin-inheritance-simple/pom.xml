@@ -3,6 +3,7 @@
     <groupId>gid</groupId>
     <artifactId>aid</artifactId>
 	<version>1.0</version>
+	<packaging>pom</packaging>
 	<build>
 		<plugins>
 			<plugin>

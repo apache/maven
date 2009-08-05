@@ -25,6 +25,7 @@ under the License.
     <groupId>mng3984</groupId>
     <artifactId>test-1</artifactId>
     <version>0.1</version>
+    <packaging>pom</packaging>
 
     <name>MNG-3984</name>
    <repositories>
