@@ -90,6 +90,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4281PreferLocalSnapshotTest.class );
         suite.addTestSuite( MavenITmng4279WagonProviderFailoverTest.class );
         suite.addTestSuite( MavenITmng4276WrongTransitivePlexusUtilsTest.class );
+        suite.addTestSuite( MavenITmng4275RelocationWarningTest.class );
         suite.addTestSuite( MavenITmng4274PluginRealmArtifactsTest.class );
         suite.addTestSuite( MavenITmng4273RestrictedCoreRealmAccessForPluginTest.class );
         suite.addTestSuite( MavenITmng4270ArtifactHandlersFromPluginDepsTest.class );
