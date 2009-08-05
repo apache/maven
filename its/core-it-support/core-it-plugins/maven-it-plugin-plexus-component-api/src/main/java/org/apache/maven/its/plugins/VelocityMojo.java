@@ -46,7 +46,11 @@ public class VelocityMojo
         {
             // velocityComponent engine should not be null
             // this is the real test to check that we got the right Initializable interface in both Plexus and the component
-            velocityComponent.getEngine().getTemplate( "/template.vm" );
+            /*
+             * NOTE: There's a bug in the plexus-velocity:1.1.7 component that fails to transform "/template.vm" into
+             * a proper resource name before searching the context class loader so we avoid the leading slash here.
+             */
+            velocityComponent.getEngine().getTemplate( "template.vm" );
         }
         catch ( Exception e )
         {
