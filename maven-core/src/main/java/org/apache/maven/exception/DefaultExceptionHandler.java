@@ -30,6 +30,7 @@ import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 
 /*
 
@@ -124,10 +125,20 @@ public class DefaultExceptionHandler
         else if ( exception instanceof MojoFailureException )
         {
             message = ((MojoFailureException)exception).getLongMessage();
+
+            if ( StringUtils.isEmpty( message ) )
+            {
+                message = exception.getMessage();
+            }
         }
         else if ( exception instanceof MojoExecutionException )
         {
             message = ((MojoExecutionException)exception).getLongMessage();
+
+            if ( StringUtils.isEmpty( message ) )
+            {
+                message = exception.getMessage();
+            }
         }
         
         else
