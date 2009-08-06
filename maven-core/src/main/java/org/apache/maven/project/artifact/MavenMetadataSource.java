@@ -42,7 +42,9 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.Relocation;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
@@ -99,7 +101,7 @@ public class MavenMetadataSource
         {
             return cached;
         }
-                
+
         List<Dependency> dependencies;
 
         Artifact pomArtifact;
@@ -114,35 +116,26 @@ public class MavenMetadataSource
         }
         else
         {
-            pomArtifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-
-            if ( "pom".equals( artifact.getType() ) )
+            ProjectRelocation rel = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
+            
+            if ( rel == null )
             {
-                pomArtifact.setFile( artifact.getFile() );
+                return null;
             }
 
-            ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-            configuration.setLocalRepository( localRepository );
-            configuration.setRemoteRepositories( remoteRepositories );
-            configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-            // We don't care about processing plugins here, all we're interested in is the dependencies.
-            configuration.setProcessPlugins( false );
-            // FIXME: We actually need the execution properties here...
-            configuration.setSystemProperties( System.getProperties() );
+            pomArtifact = rel.pomArtifact;
 
-            try
-            {
-                dependencies = getProjectBuilder().build( pomArtifact, configuration ).getDependencies();
-            }
-            catch ( ProjectBuildingException e )
+            if ( rel.project == null )
             {
                 // When this happens we have a Maven 1.x POM, or some invalid POM. There is still a pile of
                 // shit in the Maven 2.x repository that should have never found its way into the repository
                 // but it did.
-                logger.debug( "Failed to resolve artifact dependencies: " + e.getMessage() );
-                
-                return new ResolutionGroup( pomArtifact, Collections.<Artifact>emptySet(), remoteRepositories );                            
-            }            
+                dependencies = Collections.emptyList();
+            }
+            else
+            {
+                dependencies = rel.project.getDependencies();
+            }
         }
 
         Set<Artifact> artifacts = Collections.<Artifact>emptySet();       
@@ -341,7 +334,7 @@ public class MavenMetadataSource
         return artifacts;
     }
 
-    public ProjectBuilder getProjectBuilder()
+    private ProjectBuilder getProjectBuilder()
     {
         if ( projectBuilder != null )
         {
@@ -359,4 +352,191 @@ public class MavenMetadataSource
 
         return projectBuilder;
     }
+
+    public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository,
+                                               List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+
+        ProjectRelocation rel = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
+
+        if ( rel == null )
+        {
+            return artifact;
+        }
+
+        MavenProject project = rel.project;
+        if ( project == null || getRelocationKey( artifact ).equals( getRelocationKey( project.getArtifact() ) ) )
+        {
+            return artifact;
+        }
+
+        // NOTE: Using artifact information here, since some POMs are deployed
+        // to central with one version in the filename, but another in the <version> string!
+        // Case in point: org.apache.ws.commons:XmlSchema:1.1:pom.
+        //
+        // Since relocation triggers a reconfiguration of the artifact's information
+        // in retrieveRelocatedProject(..), this is safe to do.
+        Artifact result = null;
+        if ( artifact.getClassifier() != null )
+        {
+            result =
+                repositorySystem.createArtifactWithClassifier( artifact.getGroupId(), artifact.getArtifactId(),
+                                                               artifact.getVersion(), artifact.getType(),
+                                                               artifact.getClassifier() );
+        }
+        else
+        {
+            result =
+                repositorySystem.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                 artifact.getVersion(), artifact.getScope(), artifact.getType() );
+        }
+
+        result.setResolved( artifact.isResolved() );
+        result.setFile( artifact.getFile() );
+
+        result.setScope( artifact.getScope() );
+        result.setArtifactHandler( artifact.getArtifactHandler() );
+        result.setDependencyFilter( artifact.getDependencyFilter() );
+        result.setDependencyTrail( artifact.getDependencyTrail() );
+        result.setOptional( artifact.isOptional() );
+        result.setRelease( artifact.isRelease() );
+
+        return result;
+    }
+
+    private String getRelocationKey( Artifact artifact )
+    {
+        return artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getVersion();
+    }
+
+    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository,
+                                                        List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        MavenProject project = null;
+
+        Artifact pomArtifact;
+        boolean done = false;
+        do
+        {
+            // TODO: can we just modify the original?
+            pomArtifact =
+                repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                        artifact.getVersion(), artifact.getScope() );
+
+            if ( "pom".equals( artifact.getType() ) )
+            {
+                pomArtifact.setFile( artifact.getFile() );
+            }
+
+            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+            {
+                done = true;
+            }
+            else
+            {
+                try
+                {
+
+                    ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+                    configuration.setLocalRepository( localRepository );
+                    configuration.setRemoteRepositories( remoteRepositories );
+                    configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+                    configuration.setProcessPlugins( false );
+                    configuration.setSystemProperties( System.getProperties() );
+
+                    project = getProjectBuilder().build( pomArtifact, configuration );
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    // bad/incompatible POM
+                    logger.debug( "Invalid artifact metadata for " + artifact.getId() + ": " + e.getMessage() );
+                }
+
+                if ( project != null )
+                {
+                    Relocation relocation = null;
+
+                    DistributionManagement distMgmt = project.getDistributionManagement();
+                    if ( distMgmt != null )
+                    {
+                        relocation = distMgmt.getRelocation();
+
+                        artifact.setDownloadUrl( distMgmt.getDownloadUrl() );
+                        pomArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
+                    }
+
+                    if ( relocation != null )
+                    {
+                        if ( relocation.getGroupId() != null )
+                        {
+                            artifact.setGroupId( relocation.getGroupId() );
+                            project.setGroupId( relocation.getGroupId() );
+                        }
+                        if ( relocation.getArtifactId() != null )
+                        {
+                            artifact.setArtifactId( relocation.getArtifactId() );
+                            project.setArtifactId( relocation.getArtifactId() );
+                        }
+                        if ( relocation.getVersion() != null )
+                        {
+                            // note: see MNG-3454. This causes a problem, but fixing it may break more.
+                            artifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
+                            project.setVersion( relocation.getVersion() );
+                        }
+
+                        if ( artifact.getDependencyFilter() != null
+                            && !artifact.getDependencyFilter().include( artifact ) )
+                        {
+                            return null;
+                        }
+
+                        // MNG-2861: the artifact data has changed. If the available versions where previously
+                        // retrieved, we need to update it.
+                        // TODO: shouldn't the versions be merged across relocations?
+                        List<ArtifactVersion> available = artifact.getAvailableVersions();
+                        if ( available != null && !available.isEmpty() )
+                        {
+                            artifact.setAvailableVersions( retrieveAvailableVersions( artifact, localRepository,
+                                                                                      remoteRepositories ) );
+
+                        }
+
+                        String message =
+                            "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
+                                + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
+
+                        if ( relocation.getMessage() != null )
+                        {
+                            message += "  " + relocation.getMessage() + "\n";
+                        }
+                    }
+                    else
+                    {
+                        done = true;
+                    }
+                }
+                else
+                {
+                    done = true;
+                }
+            }
+        }
+        while ( !done );
+
+        ProjectRelocation rel = new ProjectRelocation();
+        rel.project = project;
+        rel.pomArtifact = pomArtifact;
+
+        return rel;
+    }
+
+    private static final class ProjectRelocation
+    {
+        private MavenProject project;
+
+        private Artifact pomArtifact;
+    }
+
 }

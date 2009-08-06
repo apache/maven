@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -45,6 +44,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -479,6 +479,16 @@ public class DefaultLegacyArtifactCollector
 
                                     artifact.selectVersion( version.toString() );
                                     fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
+                                }
+
+                                Artifact relocated =
+                                    source.retrieveRelocatedArtifact( artifact, localRepository,
+                                                                      childRemoteRepositories );
+                                if ( relocated != null && !artifact.equals( relocated ) )
+                                {
+                                    relocated.setDependencyFilter( artifact.getDependencyFilter() );
+                                    artifact = relocated;
+                                    child.setArtifact( artifact );
                                 }
                             }
                             while( !childKey.equals( child.getKey() ) );
