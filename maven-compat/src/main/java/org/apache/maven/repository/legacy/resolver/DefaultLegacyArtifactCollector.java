@@ -382,6 +382,8 @@ public class DefaultLegacyArtifactCollector
         {
             fireEvent( ResolutionListener.PROCESS_CHILDREN, listeners, node );
 
+            Artifact parentArtifact = node.getArtifact();
+
             for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
             {
                 ResolutionNode child = (ResolutionNode) i.next();
@@ -492,6 +494,17 @@ public class DefaultLegacyArtifactCollector
                                 }
                             }
                             while( !childKey.equals( child.getKey() ) );
+
+                            if ( parentArtifact != null && parentArtifact.getDependencyFilter() != null
+                                && !parentArtifact.getDependencyFilter().include( artifact ) )
+                            {
+                                // MNG-3769: the [probably relocated] artifact is excluded. 
+                                // We could process exclusions on relocated artifact details in the
+                                // MavenMetadataSource.createArtifacts(..) step, BUT that would
+                                // require resolving the POM from the repository very early on in
+                                // the build.
+                                continue;
+                            }
 
                             artifact.setDependencyTrail( node.getDependencyTrail() );
 
