@@ -395,6 +395,7 @@ public class DefaultLegacyArtifactCollector
                     if ( !child.isResolved() && ( !child.getArtifact().isOptional() || child.isChildOfRootNode() ) )
                     {
                         Artifact artifact = child.getArtifact();
+                        artifact.setDependencyTrail( node.getDependencyTrail() );
                         List<ArtifactRepository> childRemoteRepositories = child.getRemoteRepositories();
 
                         try
@@ -458,9 +459,6 @@ public class DefaultLegacyArtifactCollector
 
                                         if ( version == null )
                                         {
-                                            // Getting the dependency trail so it can be logged in the exception
-                                            artifact.setDependencyTrail( node.getDependencyTrail() );
-
                                             if ( versions.isEmpty() )
                                             {
                                                 throw new OverConstrainedVersionException(
@@ -505,8 +503,6 @@ public class DefaultLegacyArtifactCollector
                                 // the build.
                                 continue;
                             }
-
-                            artifact.setDependencyTrail( node.getDependencyTrail() );
 
                             ResolutionGroup rGroup = source.retrieve( artifact, localRepository, childRemoteRepositories );
 

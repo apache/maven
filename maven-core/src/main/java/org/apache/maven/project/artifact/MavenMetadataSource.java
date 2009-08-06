@@ -568,6 +568,17 @@ public class MavenMetadataSource
                         {
                             message += "  " + relocation.getMessage() + "\n";
                         }
+
+                        if ( artifact.getDependencyTrail() != null && artifact.getDependencyTrail().size() == 1 )
+                        {
+                            logger.warn( "While downloading " + pomArtifact.getGroupId() + ":"
+                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                        }
+                        else
+                        {
+                            logger.debug( "While downloading " + pomArtifact.getGroupId() + ":"
+                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                        }
                     }
                     else
                     {
