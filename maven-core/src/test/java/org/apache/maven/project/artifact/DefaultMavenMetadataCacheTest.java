@@ -71,8 +71,8 @@ public class DefaultMavenMetadataCacheTest
         assertNotSame( lr1, lr2 );
         assertNotSame( rr1, rr2 );
 
-        CacheKey k1 = new CacheKey( a1, lr1, Collections.singletonList( rr1 ) );
-        CacheKey k2 = new CacheKey( a2, lr2, Collections.singletonList( rr2 ) );
+        CacheKey k1 = new CacheKey( a1, false, lr1, Collections.singletonList( rr1 ) );
+        CacheKey k2 = new CacheKey( a2, false, lr2, Collections.singletonList( rr2 ) );
         
         assertEquals(k1.hashCode(), k2.hashCode());
     }

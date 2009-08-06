@@ -19,8 +19,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -42,6 +44,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
@@ -51,6 +54,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -82,8 +86,23 @@ public class MavenMetadataSource
 
     @Requirement
     private MavenMetadataCache cache;    
-    
-    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+
+    public ResolutionGroup retrieve( MetadataResolutionRequest request )
+        throws ArtifactMetadataRetrievalException
+    {
+        return retrieve( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories(),
+                         request.isResolveManagedVersions() );
+    }
+
+    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                     List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        return retrieve( artifact, localRepository, remoteRepositories, false );
+    }
+
+    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                     List<ArtifactRepository> remoteRepositories, boolean resolveManagedVersions )
         throws ArtifactMetadataRetrievalException
     {
         //
@@ -95,7 +114,7 @@ public class MavenMetadataSource
             return new ResolutionGroup( null, null, null );
         }
         
-        ResolutionGroup cached = cache.get( artifact, localRepository, remoteRepositories );
+        ResolutionGroup cached = cache.get( artifact, resolveManagedVersions, localRepository, remoteRepositories );
 
         if ( cached != null )
         {
@@ -103,6 +122,8 @@ public class MavenMetadataSource
         }
 
         List<Dependency> dependencies;
+
+        List<Dependency> managedDependencies = null;
 
         Artifact pomArtifact;
 
@@ -112,7 +133,9 @@ public class MavenMetadataSource
         {
             pomArtifact = artifact;
 
-            dependencies = ((ArtifactWithDependencies)artifact).getDependencies();
+            dependencies = ( (ArtifactWithDependencies) artifact ).getDependencies();
+
+            managedDependencies = ( (ArtifactWithDependencies) artifact ).getManagedDependencies();
         }
         else
         {
@@ -135,6 +158,9 @@ public class MavenMetadataSource
             else
             {
                 dependencies = rel.project.getDependencies();
+
+                DependencyManagement depMngt = rel.project.getDependencyManagement();
+                managedDependencies = ( depMngt != null ) ? depMngt.getDependencies() : null;
             }
         }
 
@@ -144,72 +170,79 @@ public class MavenMetadataSource
         {
             artifacts = new LinkedHashSet<Artifact>();
 
-            ArtifactFilter dependencyFilter = artifact.getDependencyFilter();
-
-            for ( Dependency d : dependencies )
+            for ( Dependency dependency : dependencies )
             {
-                String effectiveScope = getEffectiveScope( d.getScope(), artifact.getScope() );
+                Artifact dependencyArtifact = createDependencyArtifact( dependency, artifact, pomArtifact );
 
-                if ( effectiveScope != null )
+                if ( dependencyArtifact != null )
                 {
-                    Artifact dependencyArtifact;
-
-                    VersionRange versionRange;
-                    try
-                    {
-                        versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
-                    }
-                    catch ( InvalidVersionSpecificationException e )
-                    {
-                        throw new ArtifactMetadataRetrievalException( "Invalid version for dependency "
-                            + d.getManagementKey() + ": " + e.getMessage(), e, pomArtifact );
-                    }
-
-                    dependencyArtifact =
-                        repositorySystem.createDependencyArtifact( d.getGroupId(), d.getArtifactId(), versionRange,
-                                                                   d.getType(), d.getClassifier(), effectiveScope,
-                                                                   d.isOptional() );
-
-                    if ( dependencyFilter == null || dependencyFilter.include( dependencyArtifact ) )
-                    {
-                        dependencyArtifact.setOptional( d.isOptional() );
-
-                        if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
-                        {
-                            dependencyArtifact.setFile( new File( d.getSystemPath() ) );
-                        }
-
-                        ArtifactFilter newFilter = dependencyFilter;
-
-                        if ( !d.getExclusions().isEmpty() )
-                        {
-                            List<String> exclusions = new ArrayList<String>();
-
-                            for ( Exclusion e : d.getExclusions() )
-                            {
-                                exclusions.add( e.getGroupId() + ":" + e.getArtifactId() );
-                            }
-
-                            newFilter = new ExcludesArtifactFilter( exclusions );
-                            if ( dependencyFilter != null )
-                            {
-                                newFilter = new AndArtifactFilter( Arrays.asList( dependencyFilter, newFilter ) );
-                            }
-                        }
-
-                        dependencyArtifact.setDependencyFilter( newFilter );
-
-                        artifacts.add( dependencyArtifact );
-                    }
+                    artifacts.add( dependencyArtifact );
                 }
             }
         }
 
-        ResolutionGroup result = new ResolutionGroup( pomArtifact, artifacts, remoteRepositories );
+        Map<String, Artifact> managedVersions = null;
 
-        cache.put( artifact, localRepository, remoteRepositories, result );
+        if ( managedDependencies != null && resolveManagedVersions )
+        {
+            managedVersions = new HashMap<String, Artifact>();
+
+            for ( Dependency managedDependency : managedDependencies )
+            {
+                Artifact managedArtifact = createDependencyArtifact( managedDependency, null, pomArtifact );
+
+                managedVersions.put( managedDependency.getManagementKey(), managedArtifact );
+            }
+        }
+
+        ResolutionGroup result = new ResolutionGroup( pomArtifact, artifacts, managedVersions, remoteRepositories );
+
+        cache.put( artifact, resolveManagedVersions, localRepository, remoteRepositories, result );
 
         return result;
+    }
+
+    private Artifact createDependencyArtifact( Dependency dependency, Artifact owner, Artifact pom )
+        throws ArtifactMetadataRetrievalException
+    {
+        String effectiveScope = getEffectiveScope( dependency.getScope(), ( owner != null ) ? owner.getScope() : null );
+
+        if ( effectiveScope == null )
+        {
+            return null;
+        }
+
+        VersionRange versionRange;
+        try
+        {
+            versionRange = VersionRange.createFromVersionSpec( dependency.getVersion() );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            throw new ArtifactMetadataRetrievalException( "Invalid version for dependency "
+                + dependency.getManagementKey() + ": " + e.getMessage(), e, pom );
+        }
+
+        Artifact dependencyArtifact =
+            repositorySystem.createDependencyArtifact( dependency.getGroupId(), dependency.getArtifactId(),
+                                                       versionRange, dependency.getType(), dependency.getClassifier(),
+                                                       effectiveScope, dependency.isOptional() );
+
+        ArtifactFilter dependencyFilter = ( owner != null ) ? owner.getDependencyFilter() : null;
+
+        if ( dependencyFilter != null && !dependencyFilter.include( dependencyArtifact ) )
+        {
+            return null;
+        }
+
+        if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
+        {
+            dependencyArtifact.setFile( new File( dependency.getSystemPath() ) );
+        }
+
+        dependencyArtifact.setDependencyFilter( createDependencyFilter( dependency, dependencyFilter ) );
+
+        return dependencyArtifact;
     }
 
     private String getEffectiveScope( String originalScope, String inheritedScope )
@@ -251,6 +284,30 @@ public class MavenMetadataSource
         }
 
         return effectiveScope;
+    }
+
+    private ArtifactFilter createDependencyFilter( Dependency dependency, ArtifactFilter inheritedFilter )
+    {
+        ArtifactFilter effectiveFilter = inheritedFilter;
+
+        if ( !dependency.getExclusions().isEmpty() )
+        {
+            List<String> exclusions = new ArrayList<String>();
+
+            for ( Exclusion e : dependency.getExclusions() )
+            {
+                exclusions.add( e.getGroupId() + ':' + e.getArtifactId() );
+            }
+
+            effectiveFilter = new ExcludesArtifactFilter( exclusions );
+
+            if ( inheritedFilter != null )
+            {
+                effectiveFilter = new AndArtifactFilter( Arrays.asList( inheritedFilter, effectiveFilter ) );
+            }
+        }
+
+        return effectiveFilter;
     }
 
     public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )

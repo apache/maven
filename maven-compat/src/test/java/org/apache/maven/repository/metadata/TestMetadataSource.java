@@ -11,6 +11,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadataSource;
+import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.ResolutionGroup;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -76,4 +77,11 @@ public class TestMetadataSource
     {
         return artifact;
     }
+
+    public ResolutionGroup retrieve( MetadataResolutionRequest request )
+        throws ArtifactMetadataRetrievalException
+    {
+        return retrieve( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories() );
+    }
+
 }

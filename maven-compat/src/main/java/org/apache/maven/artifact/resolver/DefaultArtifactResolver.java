@@ -29,6 +29,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
@@ -37,6 +38,8 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadata;
+import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
+import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -412,9 +415,23 @@ public class DefaultArtifactResolver
         
         if ( request.isResolveTransitively() )
         {
+            MetadataResolutionRequest metadataRequest = new DefaultMetadataResolutionRequest();
+
+            metadataRequest.setArtifact( rootArtifact );
+            metadataRequest.setLocalRepository( localRepository );
+            metadataRequest.setRemoteRepositories( remoteRepositories );
+            metadataRequest.setResolveManagedVersions( managedVersions == null );
+
             try
             {
-                Set<Artifact> directArtifacts = source.retrieve( rootArtifact, localRepository, remoteRepositories ).getArtifacts();
+                ResolutionGroup resolutionGroup = source.retrieve( metadataRequest );
+
+                if ( managedVersions == null )
+                {
+                    managedVersions = resolutionGroup.getManagedVersions();
+                }
+
+                Set<Artifact> directArtifacts = resolutionGroup.getArtifacts();
 
                 if ( artifacts == null || artifacts.isEmpty() )
                 {

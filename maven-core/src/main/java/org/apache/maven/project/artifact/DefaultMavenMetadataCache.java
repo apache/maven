@@ -19,6 +19,7 @@ package org.apache.maven.project.artifact;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,17 +39,21 @@ public class DefaultMavenMetadataCache
     public static class CacheKey 
     {
         private final Artifact artifact;
+        private final boolean resolveManagedVersions;
         private final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
         private final int hashCode;
 
-        public CacheKey( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        public CacheKey( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
+                         List<ArtifactRepository> remoteRepositories )
         {
             this.artifact = ArtifactUtils.copyArtifact( artifact );
+            this.resolveManagedVersions = resolveManagedVersions;
             this.repositories.add( localRepository );
             this.repositories.addAll( remoteRepositories );
 
             int hash = 17;
             hash = hash * 31 + artifactHashCode( artifact );
+            hash = hash * 31 + ( resolveManagedVersions ? 1 : 2 );
             hash = hash * 31 + repositories.hashCode();
             this.hashCode = hash;
         }
@@ -74,7 +79,8 @@ public class DefaultMavenMetadataCache
             
             CacheKey other = (CacheKey) o;
             
-            return artifactEquals( artifact, other.artifact ) && repositories.equals( other.repositories );
+            return artifactEquals( artifact, other.artifact ) && resolveManagedVersions == other.resolveManagedVersions
+                && repositories.equals( other.repositories );
         }
     }
 
@@ -121,17 +127,24 @@ public class DefaultMavenMetadataCache
     {
         private Artifact pomArtifact;
         private List<Artifact> artifacts;
+        private Map<String, Artifact> managedVersions;
         private List<ArtifactRepository> remoteRepositories;
 
         private long length;
         private long timestamp;
 
-        CacheRecord(Artifact pomArtifact, Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories)
+        CacheRecord(Artifact pomArtifact, Set<Artifact> artifacts, Map<String, Artifact> managedVersions, List<ArtifactRepository> remoteRepositories)
         {
             this.pomArtifact = ArtifactUtils.copyArtifact( pomArtifact );
             this.artifacts = ArtifactUtils.copyArtifacts( artifacts, new ArrayList<Artifact>() );
             this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
 
+            this.managedVersions = managedVersions;
+            if ( managedVersions != null )
+            {
+                this.managedVersions =
+                    ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<String, Artifact>() );
+            }
 
             File pomFile = pomArtifact.getFile();
             if ( pomFile != null && pomFile.canRead() )
@@ -156,6 +169,11 @@ public class DefaultMavenMetadataCache
             return artifacts;
         }
 
+        public Map<String, Artifact> getManagedVersions()
+        {
+            return managedVersions;
+        }
+
         public List<ArtifactRepository> getRemoteRepositories()
         {
             return remoteRepositories;
@@ -175,18 +193,24 @@ public class DefaultMavenMetadataCache
 
     protected Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
-    public ResolutionGroup get( Artifact artifact, ArtifactRepository localRepository,
+    public ResolutionGroup get( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
                                 List<ArtifactRepository> remoteRepositories )
     {
-        CacheKey cacheKey = new CacheKey( artifact, localRepository, remoteRepositories );
+        CacheKey cacheKey = new CacheKey( artifact, resolveManagedVersions, localRepository, remoteRepositories );
 
         CacheRecord cacheRecord = cache.get( cacheKey );
 
         if ( cacheRecord != null && !cacheRecord.isStale() )
         {
             Artifact pomArtifact = ArtifactUtils.copyArtifact( cacheRecord.getArtifact() );
-            Set<Artifact> artifacts = ArtifactUtils.copyArtifacts( cacheRecord.getArtifacts(), new LinkedHashSet<Artifact>() );
-            return new ResolutionGroup( pomArtifact, artifacts , cacheRecord.getRemoteRepositories() );
+            Set<Artifact> artifacts =
+                ArtifactUtils.copyArtifacts( cacheRecord.getArtifacts(), new LinkedHashSet<Artifact>() );
+            Map<String, Artifact> managedVersions = cacheRecord.getManagedVersions();
+            if ( managedVersions != null )
+            {
+                managedVersions = ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<String, Artifact>() );
+            }
+            return new ResolutionGroup( pomArtifact, artifacts, managedVersions, cacheRecord.getRemoteRepositories() );
         }
 
         cache.remove( cacheKey );
@@ -194,11 +218,13 @@ public class DefaultMavenMetadataCache
         return null;
     }
 
-    public void put( Artifact artifact, ArtifactRepository localRepository,
+    public void put( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
                      List<ArtifactRepository> remoteRepositories, ResolutionGroup result )
     {
-        CacheKey cacheKey = new CacheKey( artifact, localRepository, remoteRepositories );
-        CacheRecord cacheRecord = new CacheRecord( result.getPomArtifact(), result.getArtifacts(), result.getResolutionRepositories() );
+        CacheKey cacheKey = new CacheKey( artifact, resolveManagedVersions, localRepository, remoteRepositories );
+        CacheRecord cacheRecord =
+            new CacheRecord( result.getPomArtifact(), result.getArtifacts(), result.getManagedVersions(),
+                             result.getResolutionRepositories() );
 
         cache.put( cacheKey, cacheRecord );
     }

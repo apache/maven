@@ -34,6 +34,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 
 // It would be cool if there was a hook that i could use to setup a test environment.
 // I want to setup a local/remote repositories for testing but i don't want to have
@@ -222,6 +223,12 @@ public class ArtifactResolverTest
                 throws ArtifactMetadataRetrievalException
             {
                 return artifact;
+            }
+
+            public ResolutionGroup retrieve( MetadataResolutionRequest request )
+                throws ArtifactMetadataRetrievalException
+            {
+                return retrieve( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories() );
             }
         };
 

@@ -34,6 +34,10 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  */
 public interface ArtifactMetadataSource
 {
+
+    ResolutionGroup retrieve( MetadataResolutionRequest request )
+        throws ArtifactMetadataRetrievalException;
+
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 

@@ -19,11 +19,13 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.project.MavenProject;
 
 public class ProjectArtifact
@@ -49,7 +51,13 @@ public class ProjectArtifact
     {
         return project.getDependencies();
     }
-    
+
+    public List<Dependency> getManagedDependencies()
+    {
+        DependencyManagement depMngt = project.getDependencyManagement();
+        return ( depMngt != null ) ? depMngt.getDependencies() : Collections.<Dependency> emptyList();
+    }
+
     static class PomArtifactHandler
         implements ArtifactHandler
     {

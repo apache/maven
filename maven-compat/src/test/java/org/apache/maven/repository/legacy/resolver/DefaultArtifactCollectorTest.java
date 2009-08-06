@@ -47,6 +47,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.apache.maven.repository.legacy.resolver.LegacyArtifactCollector;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -974,6 +975,12 @@ public class DefaultArtifactCollectorTest
             throws ArtifactMetadataRetrievalException
         {
             return artifact;
+        }
+
+        public ResolutionGroup retrieve( MetadataResolutionRequest request )
+            throws ArtifactMetadataRetrievalException
+        {
+            return retrieve( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories() );
         }
     }
 }

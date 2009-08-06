@@ -19,6 +19,7 @@ package org.apache.maven.project.artifact;
  * under the License.
  */
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -45,7 +46,12 @@ public class PluginArtifact
     {
         return plugin.getDependencies();
     }
-    
+
+    public List<Dependency> getManagedDependencies()
+    {
+        return Collections.emptyList();
+    }
+
     static class PluginArtifactHandler
         implements ArtifactHandler
     {
