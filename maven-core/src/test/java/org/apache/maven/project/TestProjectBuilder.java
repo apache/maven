@@ -35,7 +35,9 @@ public class TestProjectBuilder
         }
         if ( artifact.getFile() == null )
         {
-            return new MavenProject();
+            MavenProject project = new MavenProject();
+            project.setArtifact( artifact );
+            return project;
         }
         return build( artifact.getFile(), request );
     }
