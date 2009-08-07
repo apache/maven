@@ -132,6 +132,8 @@ public class DefaultModelValidator
 
         validateStringNotEmpty( "version", problems, false, model.getVersion() );
 
+        boolean warnOnBadBoolean = request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
+
         for ( Dependency d : model.getDependencies() )
         {
             validateId( "dependencies.dependency.artifactId", problems, d.getArtifactId() );
@@ -164,6 +166,12 @@ public class DefaultModelValidator
             {
                 addViolation( problems, false,
                     "For dependency " + d + ": only dependency with system scope can specify systemPath." );
+            }
+
+            if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+            {
+                validateBoolean( "dependencies.dependency.optional", problems, warnOnBadBoolean, d.getOptional(),
+                                 d.getManagementKey() );
             }
         }
 
@@ -201,6 +209,12 @@ public class DefaultModelValidator
                     addViolation( problems, false,
                         "For managed dependency " + d + ": only dependency with system scope can specify systemPath." );
                 }
+
+                if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+                {
+                    validateBoolean( "dependencyManagement.dependencies.dependency.optional", problems,
+                                     warnOnBadBoolean, d.getOptional(), d.getManagementKey() );
+                }
             }
         }
 
@@ -220,11 +234,17 @@ public class DefaultModelValidator
 
                     validateStringNotEmpty( "build.plugins.plugin.version", problems, warnOnMissingPluginVersion,
                                             p.getVersion(), p.getKey() );
+
+                    validateBoolean( "build.plugins.plugin.inherited", problems, warnOnBadBoolean, p.getInherited(),
+                                     p.getKey() );
+
+                    validateBoolean( "build.plugins.plugin.extensions", problems, warnOnBadBoolean, p.getExtensions(),
+                                     p.getKey() );
                 }
 
-                validateResources( problems, build.getResources(), "build.resources.resource" );
+                validateResources( problems, build.getResources(), "build.resources.resource", request );
 
-                validateResources( problems, build.getTestResources(), "build.testResources.testResource" );
+                validateResources( problems, build.getTestResources(), "build.testResources.testResource", request );
             }
 
             Reporting reporting = model.getReporting();
@@ -322,11 +342,16 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateResources( ModelProblemCollector problems, List<Resource> resources, String prefix )
+    private void validateResources( ModelProblemCollector problems, List<Resource> resources, String prefix, ModelBuildingRequest request )
     {
+        boolean warnOnBadBoolean = request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
+
         for ( Resource resource : resources )
         {
             validateStringNotEmpty( prefix + ".directory", problems, false, resource.getDirectory() );
+
+            validateBoolean( prefix + ".filtering", problems, warnOnBadBoolean, resource.getFiltering(),
+                             resource.getDirectory() );
         }
     }
 
@@ -388,11 +413,11 @@ public class DefaultModelValidator
 
         if ( sourceHint != null )
         {
-            addViolation( problems, false, "'" + fieldName + "' is missing for " + sourceHint );
+            addViolation( problems, warning, "'" + fieldName + "' is missing for " + sourceHint );
         }
         else
         {
-            addViolation( problems, false, "'" + fieldName + "' is missing." );
+            addViolation( problems, warning, "'" + fieldName + "' is missing." );
         }
 
         return false;
@@ -466,6 +491,31 @@ public class DefaultModelValidator
         }
 
         addViolation( problems, false, "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
+
+        return false;
+    }
+
+    private boolean validateBoolean( String fieldName, ModelProblemCollector problems, boolean warning, String string,
+                                     String sourceHint )
+    {
+        if ( string == null || string.length() <= 0 )
+        {
+            return true;
+        }
+
+        if ( "true".equalsIgnoreCase( string ) || "false".equalsIgnoreCase( string ) )
+        {
+            return true;
+        }
+
+        if ( sourceHint != null )
+        {
+            addViolation( problems, warning, "'" + fieldName + "' must be 'true' or 'false' for " + sourceHint );
+        }
+        else
+        {
+            addViolation( problems, warning, "'" + fieldName + "' must be 'true' or 'false'." );
+        }
 
         return false;
     }
