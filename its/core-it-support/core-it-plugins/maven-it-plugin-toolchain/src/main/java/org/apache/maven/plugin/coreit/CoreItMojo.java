@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
@@ -87,15 +89,7 @@ public class CoreItMojo
     public void execute()
         throws MojoExecutionException
     {
-        ToolchainPrivate[] tcs;
-        try
-        {
-            tcs = toolchainManager.getToolchainsForType( type );
-        }
-        catch ( MisconfiguredToolchainException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
+        ToolchainPrivate[] tcs = getToolchains();
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Toolchains in plugin: " + Arrays.asList( tcs ) );
 
@@ -145,4 +139,42 @@ public class CoreItMojo
             }
         }
     }
+
+    private ToolchainPrivate[] getToolchains()
+        throws MojoExecutionException
+    {
+        Class managerClass = toolchainManager.getClass();
+
+        try
+        {
+            try
+            {
+                // try 2.x style API
+                Method oldMethod = managerClass.getMethod( "getToolchainsForType", new Class[] { String.class } );
+
+                return (ToolchainPrivate[]) oldMethod.invoke( toolchainManager, new Object[] { type } );
+            }
+            catch ( NoSuchMethodException e )
+            {
+                // try 3.x style API
+                Method newMethod =
+                    managerClass.getMethod( "getToolchainsForType", new Class[] { String.class, MavenSession.class } );
+
+                return (ToolchainPrivate[]) newMethod.invoke( toolchainManager, new Object[] { type, session } );
+            }
+        }
+        catch ( NoSuchMethodException e )
+        {
+            throw new MojoExecutionException( "Incompatible toolchain API", e );
+        }
+        catch ( IllegalAccessException e )
+        {
+            throw new MojoExecutionException( "Incompatible toolchain API", e );
+        }
+        catch ( InvocationTargetException e )
+        {
+            throw new MojoExecutionException( "Incompatible toolchain API", e );
+        }
+    }
+
 }
