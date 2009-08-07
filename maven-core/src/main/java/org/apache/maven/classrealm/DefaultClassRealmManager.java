@@ -121,9 +121,6 @@ public class DefaultClassRealmManager
      */
     private void importMavenApi( ClassRealm importingRealm )
     {
-        // components.xml
-        importingRealm.importFromParent( "META-INF/plexus" );
-
         // maven-*
         importingRealm.importFromParent( "org.apache.maven" );
 
