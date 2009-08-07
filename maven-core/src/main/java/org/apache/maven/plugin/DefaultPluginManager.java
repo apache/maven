@@ -525,8 +525,23 @@ public class DefaultPluginManager
             }
             catch ( ComponentLookupException e )
             {
+                Throwable cause = e.getCause();
+                while ( cause != null && !( cause instanceof LinkageError )
+                    && !( cause instanceof ClassNotFoundException ) )
+                {
+                    cause = cause.getCause();
+                }
+
+                if ( ( cause instanceof NoClassDefFoundError ) || ( cause instanceof ClassNotFoundException ) )
+                {
+                    throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to load the mojo '"
+                        + mojoDescriptor.getGoal() + "' in the plugin '" + pluginDescriptor.getId()
+                        + "'. A required class is missing: " + cause.getMessage(), e );
+                }
+
                 throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to find the mojo '"
-                    + mojoDescriptor.getGoal() + "' in the plugin '" + pluginDescriptor.getId() + "'", e );
+                    + mojoDescriptor.getGoal() + "' (or one of its required components) in the plugin '"
+                    + pluginDescriptor.getId() + "'", e );
             }
     
             if ( mojo instanceof ContextEnabled )
