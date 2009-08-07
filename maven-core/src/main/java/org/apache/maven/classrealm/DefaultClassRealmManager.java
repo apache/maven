@@ -29,7 +29,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -88,97 +87,14 @@ public class DefaultClassRealmManager
                 }
             }
 
-            classRealm.setParentRealm( getApiRealm() );
+            classRealm.setParentRealm( container.getContainerRealm() );
 
             importXpp3Dom( classRealm );
 
+            importMavenApi( classRealm );
+
             return classRealm;
         }
-    }
-
-    /**
-     * Gets the class realm that holds the Maven API classes that we intend to share with plugins and extensions. The
-     * API realm is basically a subset of the core realm and hides internal utility/implementation classes from
-     * plugins/extensions.
-     * 
-     * @return The class realm for the Maven API, never {@code null}.
-     */
-    private ClassRealm getApiRealm()
-    {
-        return container.getContainerRealm();
-
-// TODO: MNG-4273, currently non-functional because the core artifact filter wipes out transitive plugin dependencies
-//       like plexus-utils, too. We need to filter the result set of the plugin artifacts, not the graph.
-//
-//        ClassWorld world = getClassWorld();
-//
-//        String realmId = "maven.api";
-//
-//        ClassRealm apiRealm;
-//
-//        synchronized ( world )
-//        {
-//            apiRealm = world.getClassRealm( realmId );
-//
-//            if ( apiRealm == null )
-//            {
-//                try
-//                {
-//                    apiRealm = world.newRealm( realmId );
-//                }
-//                catch ( DuplicateRealmException e )
-//                {
-//                    throw new IllegalStateException( "Failed to create API realm " + realmId, e );
-//                }
-//
-//                String coreRealmId = container.getContainerRealm().getId();
-//                try
-//                {
-//                    // components.xml
-//                    apiRealm.importFrom( coreRealmId, "META-INF/plexus" );
-//
-//                    // maven-*
-//                    apiRealm.importFrom( coreRealmId, "org.apache.maven." );
-//
-//                    // plexus-classworlds
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.classworlds" );
-//
-//                    // plexus-container, plexus-component-annotations
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.component" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.configuration" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.container" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.context" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.lifecycle" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.logging" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.personality" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.ComponentRegistry" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.ContainerConfiguration" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.DefaultComponentRegistry" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.DefaultContainerConfiguration" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.DefaultPlexusContainer" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.DuplicateChildContainerException" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.MutablePlexusContainer" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.PlexusConstants" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.PlexusContainer" );
-//                    apiRealm.importFrom( coreRealmId, "org.codehaus.plexus.PlexusContainerException" );
-//                }
-//                catch ( NoSuchRealmException e )
-//                {
-//                    throw new IllegalStateException( e );
-//                }
-//
-//                try
-//                {
-//                    container.discoverComponents( apiRealm );
-//                }
-//                catch ( Exception e )
-//                {
-//                    throw new IllegalStateException( "Failed to discover components in API realm " + realmId, e );
-//                }
-//            }
-//        }
-//
-//        return apiRealm;
     }
 
     /**
@@ -190,18 +106,48 @@ public class DefaultClassRealmManager
      */
     private void importXpp3Dom( ClassRealm importingRealm )
     {
-        String coreRealmId = container.getContainerRealm().getId();
-        try
-        {
-            importingRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.Xpp3Dom" );
-            importingRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlPullParser" );
-            importingRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlPullParserException" );
-            importingRealm.importFrom( coreRealmId, "org.codehaus.plexus.util.xml.pull.XmlSerializer" );
-        }
-        catch ( NoSuchRealmException e )
-        {
-            throw new IllegalStateException( e );
-        }
+        ClassRealm coreRealm = container.getContainerRealm();
+
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.Xpp3Dom" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.pull.XmlPullParser" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.pull.XmlPullParserException" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.pull.XmlSerializer" );
+    }
+
+    /**
+     * Imports the classes/resources constituting the Maven API into the specified realm.
+     * 
+     * @param importingRealm The realm into which to import the Maven API, must not be {@code null}.
+     */
+    private void importMavenApi( ClassRealm importingRealm )
+    {
+        // components.xml
+        importingRealm.importFromParent( "META-INF/plexus" );
+
+        // maven-*
+        importingRealm.importFromParent( "org.apache.maven" );
+
+        // plexus-classworlds
+        importingRealm.importFromParent( "org.codehaus.plexus.classworlds" );
+
+        // plexus-container, plexus-component-annotations
+        importingRealm.importFromParent( "org.codehaus.plexus.component" );
+        importingRealm.importFromParent( "org.codehaus.plexus.configuration" );
+        importingRealm.importFromParent( "org.codehaus.plexus.container" );
+        importingRealm.importFromParent( "org.codehaus.plexus.context" );
+        importingRealm.importFromParent( "org.codehaus.plexus.lifecycle" );
+        importingRealm.importFromParent( "org.codehaus.plexus.logging" );
+        importingRealm.importFromParent( "org.codehaus.plexus.personality" );
+        importingRealm.importFromParent( "org.codehaus.plexus.ComponentRegistry" );
+        importingRealm.importFromParent( "org.codehaus.plexus.ContainerConfiguration" );
+        importingRealm.importFromParent( "org.codehaus.plexus.DefaultComponentRegistry" );
+        importingRealm.importFromParent( "org.codehaus.plexus.DefaultContainerConfiguration" );
+        importingRealm.importFromParent( "org.codehaus.plexus.DefaultPlexusContainer" );
+        importingRealm.importFromParent( "org.codehaus.plexus.DuplicateChildContainerException" );
+        importingRealm.importFromParent( "org.codehaus.plexus.MutablePlexusContainer" );
+        importingRealm.importFromParent( "org.codehaus.plexus.PlexusConstants" );
+        importingRealm.importFromParent( "org.codehaus.plexus.PlexusContainer" );
+        importingRealm.importFromParent( "org.codehaus.plexus.PlexusContainerException" );
     }
 
     public ClassRealm createProjectRealm( Model model )

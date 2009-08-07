@@ -38,11 +38,11 @@
   <inceptionYear>2001</inceptionYear>
 
   <properties>
-    <classWorldsVersion>1.5.0</classWorldsVersion>
+    <classWorldsVersion>2.0.0</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
-    <plexusVersion>1.0.0</plexusVersion>
+    <plexusVersion>1.1.0</plexusVersion>
     <plexusInterpolationVersion>1.11</plexusInterpolationVersion>
     <plexusPluginManagerVersion>1.0-alpha-1</plexusPluginManagerVersion>
     <plexusUtilsVersion>1.5.15</plexusUtilsVersion>
