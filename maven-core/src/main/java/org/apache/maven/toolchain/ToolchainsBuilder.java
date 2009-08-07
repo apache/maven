@@ -35,18 +35,12 @@ public interface ToolchainsBuilder
     /**
      * Builds the toolchains model from the configured toolchain files.
      * 
-     * @return The toolchains model or <code>null</code> if no toolchain file was configured or the configured files do
-     *         not exist.
-     * @throws MisconfiguredToolchainException If the toolchain files exist but cannot be parsed.
-     */
-    PersistedToolchains build()
-        throws MisconfiguredToolchainException;
-
-    /**
-     * Sets the path to the file from which to read the available toolchains.
-     * 
      * @param userToolchainsFile The path to the toolchains file, may be <code>null</code> to disable parsing.
+     * @return The toolchains model or <code>null</code> if no toolchain file was configured or the configured file does
+     *         not exist.
+     * @throws MisconfiguredToolchainException If the toolchain file exists but cannot be parsed.
      */
-    void setUserToolchainsFile( File userToolchainsFile );
+    PersistedToolchains build( File userToolchainsFile )
+        throws MisconfiguredToolchainException;
 
 }

@@ -29,16 +29,16 @@ import org.apache.maven.execution.MavenSession;
  */
 public interface ToolchainManagerPrivate
 {
+
     /**
      * Retrieves the toolchains of given type from the user settings.
      */
-    ToolchainPrivate[] getToolchainsForType( String type )
+    ToolchainPrivate[] getToolchainsForType( String type, MavenSession context )
         throws MisconfiguredToolchainException;
 
     /**
      * Stores the toolchain into build context.
      */
-    void storeToolchainToBuildContext( ToolchainPrivate toolchain,
-                                       MavenSession context );
-    
+    void storeToolchainToBuildContext( ToolchainPrivate toolchain, MavenSession context );
+
 }

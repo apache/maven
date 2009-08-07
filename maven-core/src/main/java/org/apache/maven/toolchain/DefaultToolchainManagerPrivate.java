@@ -41,10 +41,10 @@ public class DefaultToolchainManagerPrivate
     @Requirement
     private ToolchainsBuilder toolchainsBuilder;
 
-    public ToolchainPrivate[] getToolchainsForType( String type )
+    public ToolchainPrivate[] getToolchainsForType( String type, MavenSession context )
         throws MisconfiguredToolchainException
     {
-        PersistedToolchains pers = toolchainsBuilder.build();
+        PersistedToolchains pers = toolchainsBuilder.build( context.getRequest().getUserToolchainsFile() );
 
         List<ToolchainPrivate> toRet = new ArrayList<ToolchainPrivate>();
 

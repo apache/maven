@@ -41,12 +41,7 @@ public class DefaultToolchainsBuilder
     @Requirement
     private Logger logger;
 
-    /**
-     * The path to the user's toolchains file or <code>null</code> if not configured.
-     */
-    private File userToolchainsFile;
-
-    public PersistedToolchains build()
+    public PersistedToolchains build( File userToolchainsFile )
         throws MisconfiguredToolchainException
     {
         PersistedToolchains toolchains = null;
@@ -75,11 +70,6 @@ public class DefaultToolchainsBuilder
         }
 
         return toolchains;
-    }
-
-    public void setUserToolchainsFile( File userToolchainsFile )
-    {
-        this.userToolchainsFile = userToolchainsFile;
     }
 
 }

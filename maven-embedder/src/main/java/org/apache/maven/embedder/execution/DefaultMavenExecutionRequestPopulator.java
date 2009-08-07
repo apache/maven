@@ -318,12 +318,6 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void toolchains( MavenExecutionRequest request )
-    {
-        // FIXME individual requests must not change global state
-        toolchainsBuilder.setUserToolchainsFile( request.getUserToolchainsFile() );
-    }
-
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
@@ -332,8 +326,6 @@ public class DefaultMavenExecutionRequestPopulator
         settings( request );
 
         localRepository( request );
-
-        toolchains( request );
 
         processSettings( request );
 
