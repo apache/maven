@@ -35,18 +35,21 @@ public class ResolutionGroup
 
     private final Artifact pomArtifact;
 
+    private final Artifact relocatedArtifact;
+
     private final Map<String, Artifact> managedVersions;
 
     public ResolutionGroup( Artifact pomArtifact, Set<Artifact> artifacts,
                             List<ArtifactRepository> resolutionRepositories )
     {
-        this( pomArtifact, artifacts, null, resolutionRepositories );
+        this( pomArtifact, null, artifacts, null, resolutionRepositories );
     }
 
-    public ResolutionGroup( Artifact pomArtifact, Set<Artifact> artifacts, Map<String, Artifact> managedVersions,
-                            List<ArtifactRepository> resolutionRepositories )
+    public ResolutionGroup( Artifact pomArtifact, Artifact relocatedArtifact, Set<Artifact> artifacts,
+                            Map<String, Artifact> managedVersions, List<ArtifactRepository> resolutionRepositories )
     {
         this.pomArtifact = pomArtifact;
+        this.relocatedArtifact = relocatedArtifact;
         this.artifacts = artifacts;
         this.managedVersions = managedVersions;
         this.resolutionRepositories = resolutionRepositories;
@@ -55,6 +58,11 @@ public class ResolutionGroup
     public Artifact getPomArtifact()
     {
         return pomArtifact;
+    }
+
+    public Artifact getRelocatedArtifact()
+    {
+        return relocatedArtifact;
     }
 
     public Set<Artifact> getArtifacts()

@@ -217,14 +217,6 @@ public class ArtifactResolverTest
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }
 
-            public Artifact retrieveRelocatedArtifact( Artifact artifact,
-                                                       ArtifactRepository localRepository,
-                                                       List<ArtifactRepository> remoteRepositories )
-                throws ArtifactMetadataRetrievalException
-            {
-                return artifact;
-            }
-
             public ResolutionGroup retrieve( MetadataResolutionRequest request )
                 throws ArtifactMetadataRetrievalException
             {

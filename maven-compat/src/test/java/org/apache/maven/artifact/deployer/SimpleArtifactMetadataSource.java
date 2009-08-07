@@ -57,14 +57,6 @@ public class SimpleArtifactMetadataSource
         return Collections.<ArtifactVersion>singletonList( new DefaultArtifactVersion( "10.1.3" ) );
     }
 
-    public Artifact retrieveRelocatedArtifact( Artifact artifact,
-                                               ArtifactRepository localRepository,
-                                               List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
-        return artifact;
-    }
-
     public ResolutionGroup retrieve( MetadataResolutionRequest request )
         throws ArtifactMetadataRetrievalException
     {

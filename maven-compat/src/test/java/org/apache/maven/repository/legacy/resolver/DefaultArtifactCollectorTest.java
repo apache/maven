@@ -969,14 +969,6 @@ public class DefaultArtifactCollectorTest
             return artifactVersions;
         }
 
-        public Artifact retrieveRelocatedArtifact( Artifact artifact,
-                                                   ArtifactRepository localRepository,
-                                                   List<ArtifactRepository> remoteRepositories )
-            throws ArtifactMetadataRetrievalException
-        {
-            return artifact;
-        }
-
         public ResolutionGroup retrieve( MetadataResolutionRequest request )
             throws ArtifactMetadataRetrievalException
         {

@@ -126,6 +126,7 @@ public class DefaultMavenMetadataCache
     public class CacheRecord
     {
         private Artifact pomArtifact;
+        private Artifact relocatedArtifact;
         private List<Artifact> artifacts;
         private Map<String, Artifact> managedVersions;
         private List<ArtifactRepository> remoteRepositories;
@@ -133,9 +134,11 @@ public class DefaultMavenMetadataCache
         private long length;
         private long timestamp;
 
-        CacheRecord(Artifact pomArtifact, Set<Artifact> artifacts, Map<String, Artifact> managedVersions, List<ArtifactRepository> remoteRepositories)
+        CacheRecord( Artifact pomArtifact, Artifact relocatedArtifact, Set<Artifact> artifacts,
+                     Map<String, Artifact> managedVersions, List<ArtifactRepository> remoteRepositories )
         {
             this.pomArtifact = ArtifactUtils.copyArtifact( pomArtifact );
+            this.relocatedArtifact = ArtifactUtils.copyArtifactSafe( relocatedArtifact );
             this.artifacts = ArtifactUtils.copyArtifacts( artifacts, new ArrayList<Artifact>() );
             this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
 
@@ -158,10 +161,15 @@ public class DefaultMavenMetadataCache
                 this.timestamp = -1;
             }
         }
-        
+
         public Artifact getArtifact()
         {
             return pomArtifact;
+        }
+
+        public Artifact getRelocatedArtifact()
+        {
+            return relocatedArtifact;
         }
 
         public List<Artifact> getArtifacts()
@@ -203,6 +211,7 @@ public class DefaultMavenMetadataCache
         if ( cacheRecord != null && !cacheRecord.isStale() )
         {
             Artifact pomArtifact = ArtifactUtils.copyArtifact( cacheRecord.getArtifact() );
+            Artifact relocatedArtifact = ArtifactUtils.copyArtifactSafe( cacheRecord.getRelocatedArtifact() );
             Set<Artifact> artifacts =
                 ArtifactUtils.copyArtifacts( cacheRecord.getArtifacts(), new LinkedHashSet<Artifact>() );
             Map<String, Artifact> managedVersions = cacheRecord.getManagedVersions();
@@ -210,7 +219,8 @@ public class DefaultMavenMetadataCache
             {
                 managedVersions = ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<String, Artifact>() );
             }
-            return new ResolutionGroup( pomArtifact, artifacts, managedVersions, cacheRecord.getRemoteRepositories() );
+            return new ResolutionGroup( pomArtifact, relocatedArtifact, artifacts, managedVersions,
+                                        cacheRecord.getRemoteRepositories() );
         }
 
         cache.remove( cacheKey );
@@ -223,8 +233,8 @@ public class DefaultMavenMetadataCache
     {
         CacheKey cacheKey = new CacheKey( artifact, resolveManagedVersions, localRepository, remoteRepositories );
         CacheRecord cacheRecord =
-            new CacheRecord( result.getPomArtifact(), result.getArtifacts(), result.getManagedVersions(),
-                             result.getResolutionRepositories() );
+            new CacheRecord( result.getPomArtifact(), result.getRelocatedArtifact(), result.getArtifacts(),
+                             result.getManagedVersions(), result.getResolutionRepositories() );
 
         cache.put( cacheKey, cacheRecord );
     }

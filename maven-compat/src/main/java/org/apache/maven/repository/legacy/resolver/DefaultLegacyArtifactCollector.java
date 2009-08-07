@@ -400,6 +400,8 @@ public class DefaultLegacyArtifactCollector
 
                         try
                         {
+                            ResolutionGroup rGroup;
+
                             Object childKey;
                             do
                             {
@@ -481,9 +483,14 @@ public class DefaultLegacyArtifactCollector
                                     fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                                 }
 
-                                Artifact relocated =
-                                    source.retrieveRelocatedArtifact( artifact, localRepository,
-                                                                      childRemoteRepositories );
+                                rGroup = source.retrieve( artifact, localRepository, childRemoteRepositories );
+
+                                if ( rGroup == null )
+                                {
+                                    break;
+                                }
+
+                                Artifact relocated = rGroup.getRelocatedArtifact();
                                 if ( relocated != null && !artifact.equals( relocated ) )
                                 {
                                     relocated.setDependencyFilter( artifact.getDependencyFilter() );
@@ -503,8 +510,6 @@ public class DefaultLegacyArtifactCollector
                                 // the build.
                                 continue;
                             }
-
-                            ResolutionGroup rGroup = source.retrieve( artifact, localRepository, childRemoteRepositories );
 
                             // TODO might be better to have source.retrieve() throw a specific exception for this
                             // situation

@@ -122,6 +122,11 @@ public final class ArtifactUtils
         return artifactMap;
     }
 
+    public static Artifact copyArtifactSafe( Artifact artifact )
+    {
+        return ( artifact != null ) ? copyArtifact( artifact ) : null;
+    }
+
     public static Artifact copyArtifact( Artifact artifact )
     {
         VersionRange range = artifact.getVersionRange();

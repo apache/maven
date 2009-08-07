@@ -72,11 +72,4 @@ public interface ArtifactMetadataSource
     List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )                                                                            
         throws ArtifactMetadataRetrievalException;
 
-    /**
-     * Resolve all relocations in the POM for this artifact, and return the new artifact coordinate.
-     */
-    Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository,
-                                        List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException;
-
 }

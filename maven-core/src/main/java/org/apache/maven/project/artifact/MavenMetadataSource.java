@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -127,6 +128,8 @@ public class MavenMetadataSource
 
         Artifact pomArtifact;
 
+        Artifact relocatedArtifact = null;
+
         //TODO: Not even sure this is really required as the project will be cached in the builder, we'll see this
         // is currently the biggest hotspot
         if ( artifact instanceof ArtifactWithDependencies )
@@ -157,6 +160,8 @@ public class MavenMetadataSource
             }
             else
             {
+                relocatedArtifact = rel.relocatedArtifact;
+
                 dependencies = rel.project.getDependencies();
 
                 DependencyManagement depMngt = rel.project.getDependencyManagement();
@@ -195,7 +200,8 @@ public class MavenMetadataSource
             }
         }
 
-        ResolutionGroup result = new ResolutionGroup( pomArtifact, artifacts, managedVersions, remoteRepositories );
+        ResolutionGroup result =
+            new ResolutionGroup( pomArtifact, relocatedArtifact, artifacts, managedVersions, remoteRepositories );
 
         cache.put( artifact, resolveManagedVersions, localRepository, remoteRepositories, result );
 
@@ -410,63 +416,6 @@ public class MavenMetadataSource
         return projectBuilder;
     }
 
-    public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository,
-                                               List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
-
-        ProjectRelocation rel = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
-
-        if ( rel == null )
-        {
-            return artifact;
-        }
-
-        MavenProject project = rel.project;
-        if ( project == null || getRelocationKey( artifact ).equals( getRelocationKey( project.getArtifact() ) ) )
-        {
-            return artifact;
-        }
-
-        // NOTE: Using artifact information here, since some POMs are deployed
-        // to central with one version in the filename, but another in the <version> string!
-        // Case in point: org.apache.ws.commons:XmlSchema:1.1:pom.
-        //
-        // Since relocation triggers a reconfiguration of the artifact's information
-        // in retrieveRelocatedProject(..), this is safe to do.
-        Artifact result = null;
-        if ( artifact.getClassifier() != null )
-        {
-            result =
-                repositorySystem.createArtifactWithClassifier( artifact.getGroupId(), artifact.getArtifactId(),
-                                                               artifact.getVersion(), artifact.getType(),
-                                                               artifact.getClassifier() );
-        }
-        else
-        {
-            result =
-                repositorySystem.createArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                 artifact.getVersion(), artifact.getScope(), artifact.getType() );
-        }
-
-        result.setResolved( artifact.isResolved() );
-        result.setFile( artifact.getFile() );
-
-        result.setScope( artifact.getScope() );
-        result.setArtifactHandler( artifact.getArtifactHandler() );
-        result.setDependencyFilter( artifact.getDependencyFilter() );
-        result.setDependencyTrail( artifact.getDependencyTrail() );
-        result.setOptional( artifact.isOptional() );
-        result.setRelease( artifact.isRelease() );
-
-        return result;
-    }
-
-    private String getRelocationKey( Artifact artifact )
-    {
-        return artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getVersion();
-    }
-
     private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository,
                                                         List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
@@ -474,20 +423,21 @@ public class MavenMetadataSource
         MavenProject project = null;
 
         Artifact pomArtifact;
+        Artifact relocatedArtifact = artifact;
         boolean done = false;
         do
         {
-            // TODO: can we just modify the original?
             pomArtifact =
-                repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                        artifact.getVersion(), artifact.getScope() );
+                repositorySystem.createProjectArtifact( relocatedArtifact.getGroupId(),
+                                                        relocatedArtifact.getArtifactId(),
+                                                        relocatedArtifact.getVersion(), relocatedArtifact.getScope() );
 
-            if ( "pom".equals( artifact.getType() ) )
+            if ( "pom".equals( relocatedArtifact.getType() ) )
             {
-                pomArtifact.setFile( artifact.getFile() );
+                pomArtifact.setFile( relocatedArtifact.getFile() );
             }
 
-            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+            if ( Artifact.SCOPE_SYSTEM.equals( relocatedArtifact.getScope() ) )
             {
                 done = true;
             }
@@ -495,7 +445,6 @@ public class MavenMetadataSource
             {
                 try
                 {
-
                     ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
                     configuration.setLocalRepository( localRepository );
                     configuration.setRemoteRepositories( remoteRepositories );
@@ -520,31 +469,36 @@ public class MavenMetadataSource
                     {
                         relocation = distMgmt.getRelocation();
 
-                        artifact.setDownloadUrl( distMgmt.getDownloadUrl() );
+                        relocatedArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                         pomArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                     }
 
                     if ( relocation != null )
                     {
+                        if ( relocatedArtifact == artifact )
+                        {
+                            relocatedArtifact = ArtifactUtils.copyArtifact( artifact );
+                        }
+
                         if ( relocation.getGroupId() != null )
                         {
-                            artifact.setGroupId( relocation.getGroupId() );
+                            relocatedArtifact.setGroupId( relocation.getGroupId() );
                             project.setGroupId( relocation.getGroupId() );
                         }
                         if ( relocation.getArtifactId() != null )
                         {
-                            artifact.setArtifactId( relocation.getArtifactId() );
+                            relocatedArtifact.setArtifactId( relocation.getArtifactId() );
                             project.setArtifactId( relocation.getArtifactId() );
                         }
                         if ( relocation.getVersion() != null )
                         {
                             // note: see MNG-3454. This causes a problem, but fixing it may break more.
-                            artifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
+                            relocatedArtifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
                             project.setVersion( relocation.getVersion() );
                         }
 
                         if ( artifact.getDependencyFilter() != null
-                            && !artifact.getDependencyFilter().include( artifact ) )
+                            && !artifact.getDependencyFilter().include( relocatedArtifact ) )
                         {
                             return null;
                         }
@@ -555,14 +509,14 @@ public class MavenMetadataSource
                         List<ArtifactVersion> available = artifact.getAvailableVersions();
                         if ( available != null && !available.isEmpty() )
                         {
-                            artifact.setAvailableVersions( retrieveAvailableVersions( artifact, localRepository,
-                                                                                      remoteRepositories ) );
-
+                            available =
+                                retrieveAvailableVersions( relocatedArtifact, localRepository, remoteRepositories );
+                            relocatedArtifact.setAvailableVersions( available );
                         }
 
                         String message =
-                            "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
-                                + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
+                            "\n  This artifact has been relocated to " + relocatedArtifact.getGroupId() + ":"
+                                + relocatedArtifact.getArtifactId() + ":" + relocatedArtifact.getVersion() + ".\n";
 
                         if ( relocation.getMessage() != null )
                         {
@@ -596,6 +550,7 @@ public class MavenMetadataSource
         ProjectRelocation rel = new ProjectRelocation();
         rel.project = project;
         rel.pomArtifact = pomArtifact;
+        rel.relocatedArtifact = ( relocatedArtifact == artifact ) ? null : relocatedArtifact;
 
         return rel;
     }
@@ -605,6 +560,8 @@ public class MavenMetadataSource
         private MavenProject project;
 
         private Artifact pomArtifact;
+
+        private Artifact relocatedArtifact;
     }
 
 }

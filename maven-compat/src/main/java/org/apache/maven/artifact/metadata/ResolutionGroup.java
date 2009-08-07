@@ -33,10 +33,10 @@ public class ResolutionGroup
         super( pomArtifact, artifacts, resolutionRepositories );
     }
 
-    public ResolutionGroup( Artifact pomArtifact, Set<Artifact> artifacts, Map<String, Artifact> managedVersions,
-                            List<ArtifactRepository> resolutionRepositories )
+    public ResolutionGroup( Artifact pomArtifact, Artifact relocatedArtifact, Set<Artifact> artifacts,
+                            Map<String, Artifact> managedVersions, List<ArtifactRepository> resolutionRepositories )
     {
-        super( pomArtifact, artifacts, managedVersions, resolutionRepositories );
+        super( pomArtifact, relocatedArtifact, artifacts, managedVersions, resolutionRepositories );
     }
 
 }
