@@ -47,7 +47,6 @@
     <plexusPluginManagerVersion>1.0-alpha-1</plexusPluginManagerVersion>
     <plexusUtilsVersion>1.5.15</plexusUtilsVersion>
     <wagonVersion>1.0-beta-6</wagonVersion>
-    <modelBuilderVersion>1.8</modelBuilderVersion>
     <securityDispatcherVersion>1.2</securityDispatcherVersion>
     <modelloVersion>1.0.1</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
