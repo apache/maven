@@ -78,7 +78,7 @@ public class LegacyRepositorySystemTest
             .setArtifact( artifact )
             .setResolveRoot( true )
             .setResolveTransitively( true )
-            .setRemoteRepostories( Arrays.asList( new ArtifactRepository[]{ repositorySystem.createDefaultRemoteRepository() } ) )
+            .setRemoteRepositories( Arrays.asList( new ArtifactRepository[]{ repositorySystem.createDefaultRemoteRepository() } ) )
             .setLocalRepository( repositorySystem.createDefaultLocalRepository() );            
                             
         ArtifactResolutionResult result = repositorySystem.resolve( request );

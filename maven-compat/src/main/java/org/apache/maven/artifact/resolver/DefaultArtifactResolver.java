@@ -318,7 +318,7 @@ public class DefaultArtifactResolver
             .setArtifactDependencies( artifacts )            
             .setManagedVersionMap( managedVersions )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( remoteRepositories )
+            .setRemoteRepositories( remoteRepositories )
             .setFilter( filter )
             .setListeners( listeners );
 

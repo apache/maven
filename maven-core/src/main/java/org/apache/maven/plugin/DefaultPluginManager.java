@@ -131,7 +131,7 @@ public class DefaultPluginManager
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( pluginArtifact )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( remoteRepositories )
+            .setRemoteRepositories( remoteRepositories )
             .setResolveTransitively( false );
         // FIXME setTransferListener
         ArtifactResolutionResult result = repositorySystem.resolve( request );
@@ -274,7 +274,7 @@ public class DefaultPluginManager
             // So this in fact are overrides ... 
             .setArtifactDependencies( dependenciesToResolveForPlugin )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( remoteRepositories )
+            .setRemoteRepositories( remoteRepositories )
             .setFilter( filter )
             .setResolveRoot( true )
             .setResolveTransitively( true );

@@ -192,7 +192,7 @@ public class DefaultProjectBuilder
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
             .setLocalRepository( configuration.getLocalRepository() )
-            .setRemoteRepostories( configuration.getRemoteRepositories() );
+            .setRemoteRepositories( configuration.getRemoteRepositories() );
         // FIXME setTransferListener
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
@@ -258,7 +258,7 @@ public class DefaultProjectBuilder
             .setResolveRoot( false )
             .setResolveTransitively( true )
             .setLocalRepository( request.getLocalRepository() )
-            .setRemoteRepostories( project.getRemoteArtifactRepositories() )
+            .setRemoteRepositories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() );
         // FIXME setTransferListener
         ArtifactResolutionResult result;

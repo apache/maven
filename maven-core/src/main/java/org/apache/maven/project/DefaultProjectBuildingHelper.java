@@ -175,7 +175,7 @@ public class DefaultProjectBuildingHelper
         request.setArtifactDependencies( dependencies );
         request.setResolveTransitively( true );
         request.setLocalRepository( localRepository );
-        request.setRemoteRepostories( remoteRepositories );
+        request.setRemoteRepositories( remoteRepositories );
         // FIXME setTransferListener
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );

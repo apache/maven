@@ -48,7 +48,7 @@ public class IdeWorkspaceRepositoryTest
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setArtifact( artifact );
         request.setLocalRepository( localRepository );
-        request.setRemoteRepostories( new ArrayList<ArtifactRepository>() );
+        request.setRemoteRepositories( new ArrayList<ArtifactRepository>() );
 
         repositorySystem.resolve( request );
 
@@ -69,7 +69,7 @@ public class IdeWorkspaceRepositoryTest
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setArtifact( artifact );
         request.setLocalRepository( delegatingLocalArtifactRepository );
-        request.setRemoteRepostories( new ArrayList<ArtifactRepository>() );
+        request.setRemoteRepositories( new ArrayList<ArtifactRepository>() );
 
         repositorySystem.resolve( request );
 

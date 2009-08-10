@@ -78,7 +78,7 @@ public class DefaultProjectDependenciesResolver
             .setResolveRoot( false )
             .setResolveTransitively( true )
             .setLocalRepository( localRepository )
-            .setRemoteRepostories( remoteRepositories )
+            .setRemoteRepositories( remoteRepositories )
             .setManagedVersionMap( project.getManagedVersionMap() )
             .setFilter( filter );
         // FIXME setTransferListener

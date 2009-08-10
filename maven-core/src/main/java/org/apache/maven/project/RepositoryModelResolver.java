@@ -130,7 +130,7 @@ class RepositoryModelResolver
             ArtifactResolutionRequest request = new ArtifactResolutionRequest();
             request.setArtifact( artifactParent );
             request.setLocalRepository( localRepository );
-            request.setRemoteRepostories( remoteRepositories );
+            request.setRemoteRepositories( remoteRepositories );
             // FIXME setTransferListener
             ArtifactResolutionResult result = repositorySystem.resolve( request );
 

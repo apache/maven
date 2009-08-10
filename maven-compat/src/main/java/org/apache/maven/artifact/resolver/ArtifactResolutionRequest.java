@@ -108,9 +108,9 @@ public class ArtifactResolutionRequest
         return remoteRepositories;
     }
 
-    public ArtifactResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )
+    public ArtifactResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
-        this.remoteRepositories = remoteRepostories;
+        this.remoteRepositories = remoteRepositories;
 
         return this;
     }
