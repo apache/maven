@@ -69,14 +69,14 @@ public class DefaultResolutionErrorHandler
         if ( result.hasMissingArtifacts() )
         {
             throw new MultipleArtifactsNotFoundException( request.getArtifact(), toList( result.getArtifacts() ),
-                                                          result.getMissingArtifacts(), request.getRemoteRepostories() );
+                                                          result.getMissingArtifacts(), request.getRemoteRepositories() );
         }
 
         // this should never happen since we checked all possible error sources before but better be sure
         if ( result.hasExceptions() )
         {
             throw new ArtifactResolutionException( "Unknown error during artifact resolution, " + request + ", "
-                + result.getExceptions(), request.getArtifact(), request.getRemoteRepostories() );
+                + result.getExceptions(), request.getArtifact(), request.getRemoteRepositories() );
         }
     }
 

@@ -359,7 +359,7 @@ public class DefaultArtifactResolver
         Set<Artifact> artifacts = request.getArtifactDependencies();
         Map managedVersions = request.getManagedVersionMap();
         ArtifactRepository localRepository = request.getLocalRepository();
-        List<ArtifactRepository> remoteRepositories = request.getRemoteRepostories();
+        List<ArtifactRepository> remoteRepositories = request.getRemoteRepositories();
         List<ResolutionListener> listeners = request.getListeners();
         ArtifactFilter filter = request.getFilter();                       
         

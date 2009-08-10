@@ -103,7 +103,7 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public List<ArtifactRepository> getRemoteRepostories()
+    public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
     }
