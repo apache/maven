@@ -46,9 +46,6 @@ public class MavenITmng0449PluginVersionResolutionTest
     public void testitLifecycleInvocation()
         throws Exception
     {
-        // automatic version resolution no longer supported in 3.x (see MNG-4173)
-        requiresMavenVersion( "(,3.0-alpha-1)" );
-
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0449" );
         testDir = new File( testDir, "lifecycle" );
 
@@ -63,8 +60,17 @@ public class MavenITmng0449PluginVersionResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch-release.txt" );
-        verifier.assertFilePresent( "target/touch-snapshot.txt" );
+        // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
+        if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
+        {
+            verifier.assertFileNotPresent( "target/touch-release.txt" );
+            verifier.assertFilePresent( "target/touch-snapshot.txt" );
+        }
+        else
+        {
+            verifier.assertFilePresent( "target/touch-release.txt" );
+            verifier.assertFileNotPresent( "target/touch-snapshot.txt" );
+        }
         verifier.assertFilePresent( "target/package.txt" );
     }
 
