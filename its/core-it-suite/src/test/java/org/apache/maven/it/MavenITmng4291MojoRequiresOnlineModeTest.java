@@ -57,7 +57,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
         {
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-online:2.1-SNAPSHOT:touch" );
             verifier.verifyErrorFreeLog();
-            fail( "Invalid packaging of parent POM did not fail the build." );
+            fail( "Request to execute online mojo during offline mode did not fail the build." );
         }
         catch ( VerificationException e )
         {
@@ -71,7 +71,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
 
     /**
      * Test that the mojo annotation @requiresOnline is recognized. For a mojo invocation bound to a lifecycle phase,
-     * this means to skip the mojo when Maven is in offline mode but the mojo requires online model.
+     * this means to skip the mojo when Maven is in offline mode but the mojo requires online mode.
      */
     public void testitLifecycleInvocation()
         throws Exception
