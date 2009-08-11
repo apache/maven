@@ -37,6 +37,9 @@ public interface ArtifactMetadataSource
     ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
+    List<ArtifactVersion> retrieveAvailableVersions( MetadataResolutionRequest request )
+        throws ArtifactMetadataRetrievalException;
+
     List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 

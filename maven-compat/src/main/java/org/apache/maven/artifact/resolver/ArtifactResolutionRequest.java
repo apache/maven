@@ -26,6 +26,8 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.wagon.events.TransferListener;
 
@@ -36,7 +38,9 @@ import org.apache.maven.wagon.events.TransferListener;
  * @author Jason van Zyl
  */
 public class ArtifactResolutionRequest
+    implements RepositoryRequest
 {
+
     private Artifact artifact;
 
     // Needs to go away
@@ -47,6 +51,8 @@ public class ArtifactResolutionRequest
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
+
+    private RepositoryCache cache;
 
     private ArtifactFilter filter;
 
@@ -61,12 +67,19 @@ public class ArtifactResolutionRequest
     private boolean resolveRoot = true;
 
     private boolean resolveTransitively = false;
-        
-    public ArtifactResolutionRequest( )
+
+    public ArtifactResolutionRequest()
     {
         // nothing here
     }
-    
+
+    public ArtifactResolutionRequest( RepositoryRequest request )
+    {
+        setLocalRepository( request.getLocalRepository() );
+        setRemoteRepositories( request.getRemoteRepositories() );
+        setCache( request.getCache() );
+    }
+
     public Artifact getArtifact()
     {
         return artifact;
@@ -204,4 +217,17 @@ public class ArtifactResolutionRequest
         
         return sb.toString();
     }
+
+    public RepositoryCache getCache()
+    {
+        return cache;
+    }
+
+    public ArtifactResolutionRequest setCache( RepositoryCache cache )
+    {
+        this.cache = cache;
+
+        return this;
+    }
+
 }

@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
@@ -255,6 +256,9 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest setPluginArtifactRepositories( List<ArtifactRepository> repositories );
     List<ArtifactRepository> getPluginArtifactRepositories();
+
+    MavenExecutionRequest setRepositoryCache( RepositoryCache repositoryCache );
+    RepositoryCache getRepositoryCache();
 
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );

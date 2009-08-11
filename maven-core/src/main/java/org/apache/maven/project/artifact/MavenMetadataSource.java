@@ -32,6 +32,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
@@ -55,6 +56,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -88,13 +90,6 @@ public class MavenMetadataSource
     @Requirement
     private MavenMetadataCache cache;    
 
-    public ResolutionGroup retrieve( MetadataResolutionRequest request )
-        throws ArtifactMetadataRetrievalException
-    {
-        return retrieve( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories(),
-                         request.isResolveManagedVersions() );
-    }
-
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
                                      List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
@@ -106,6 +101,19 @@ public class MavenMetadataSource
                                      List<ArtifactRepository> remoteRepositories, boolean resolveManagedVersions )
         throws ArtifactMetadataRetrievalException
     {
+        MetadataResolutionRequest request = new DefaultMetadataResolutionRequest();
+        request.setArtifact( artifact );
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        request.setResolveManagedVersions( resolveManagedVersions );
+        return retrieve( request );
+    }
+
+    public ResolutionGroup retrieve( MetadataResolutionRequest request )
+        throws ArtifactMetadataRetrievalException
+    {
+        Artifact artifact = request.getArtifact();
+
         //
         // If we have a system scoped artifact then we do not want any searching in local or remote repositories
         // and we want artifact resolution to only return the system scoped artifact itself.
@@ -114,8 +122,10 @@ public class MavenMetadataSource
         {
             return new ResolutionGroup( null, null, null );
         }
-        
-        ResolutionGroup cached = cache.get( artifact, resolveManagedVersions, localRepository, remoteRepositories );
+
+        ResolutionGroup cached =
+            cache.get( artifact, request.isResolveManagedVersions(), request.getLocalRepository(),
+                       request.getRemoteRepositories() );
 
         if ( cached != null )
         {
@@ -142,7 +152,7 @@ public class MavenMetadataSource
         }
         else
         {
-            ProjectRelocation rel = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
+            ProjectRelocation rel = retrieveRelocatedProject( artifact, request );
             
             if ( rel == null )
             {
@@ -188,7 +198,7 @@ public class MavenMetadataSource
 
         Map<String, Artifact> managedVersions = null;
 
-        if ( managedDependencies != null && resolveManagedVersions )
+        if ( managedDependencies != null && request.isResolveManagedVersions() )
         {
             managedVersions = new HashMap<String, Artifact>();
 
@@ -201,9 +211,10 @@ public class MavenMetadataSource
         }
 
         ResolutionGroup result =
-            new ResolutionGroup( pomArtifact, relocatedArtifact, artifacts, managedVersions, remoteRepositories );
+            new ResolutionGroup( pomArtifact, relocatedArtifact, artifacts, managedVersions, request.getRemoteRepositories() );
 
-        cache.put( artifact, resolveManagedVersions, localRepository, remoteRepositories, result );
+        cache.put( artifact, request.isResolveManagedVersions(), request.getLocalRepository(),
+                   request.getRemoteRepositories(), result );
 
         return result;
     }
@@ -319,15 +330,25 @@ public class MavenMetadataSource
     public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
+        MetadataResolutionRequest request = new DefaultMetadataResolutionRequest();
+        request.setArtifact( artifact );
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        return retrieveAvailableVersions( request );
+    }
+
+    public List<ArtifactVersion> retrieveAvailableVersions( MetadataResolutionRequest request )
+        throws ArtifactMetadataRetrievalException
+    {
+        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( request.getArtifact() );
 
         try
         {
-            repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );
+            repositoryMetadataManager.resolve( metadata, request );
         }
         catch ( RepositoryMetadataResolutionException e )
         {
-            throw new ArtifactMetadataRetrievalException( e.getMessage(), e, artifact );
+            throw new ArtifactMetadataRetrievalException( e.getMessage(), e, request.getArtifact() );
         }
 
         return retrieveAvailableVersionsFromMetadata( metadata.getMetadata() );
@@ -416,8 +437,7 @@ public class MavenMetadataSource
         return projectBuilder;
     }
 
-    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository,
-                                                        List<ArtifactRepository> remoteRepositories )
+    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, RepositoryRequest repositoryRequest )
         throws ArtifactMetadataRetrievalException
     {
         MavenProject project = null;
@@ -446,8 +466,9 @@ public class MavenMetadataSource
                 try
                 {
                     ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-                    configuration.setLocalRepository( localRepository );
-                    configuration.setRemoteRepositories( remoteRepositories );
+                    configuration.setRepositoryCache( repositoryRequest.getCache() );
+                    configuration.setLocalRepository( repositoryRequest.getLocalRepository() );
+                    configuration.setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
                     configuration.setSystemProperties( System.getProperties() );
@@ -509,8 +530,10 @@ public class MavenMetadataSource
                         List<ArtifactVersion> available = artifact.getAvailableVersions();
                         if ( available != null && !available.isEmpty() )
                         {
-                            available =
-                                retrieveAvailableVersions( relocatedArtifact, localRepository, remoteRepositories );
+                            MetadataResolutionRequest metadataRequest =
+                                new DefaultMetadataResolutionRequest( repositoryRequest );
+                            metadataRequest.setArtifact( relocatedArtifact );
+                            available = retrieveAvailableVersions( metadataRequest );
                             relocatedArtifact.setAvailableVersions( available );
                         }
 

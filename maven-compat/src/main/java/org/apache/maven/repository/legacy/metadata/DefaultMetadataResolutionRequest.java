@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 
 /**
  * Forms a request to retrieve artifact metadata.
@@ -39,7 +41,21 @@ public class DefaultMetadataResolutionRequest
 
     private List<ArtifactRepository> remoteRepositories;
 
+    private RepositoryCache cache;
+
     private boolean resolveManagedVersions;
+
+    public DefaultMetadataResolutionRequest()
+    {
+        // does nothing
+    }
+
+    public DefaultMetadataResolutionRequest( RepositoryRequest request )
+    {
+        setLocalRepository( request.getLocalRepository() );
+        setRemoteRepositories( request.getRemoteRepositories() );
+        setCache( request.getCache() );
+    }
 
     public Artifact getArtifact()
     {
@@ -85,6 +101,18 @@ public class DefaultMetadataResolutionRequest
     public MetadataResolutionRequest setResolveManagedVersions( boolean resolveManagedVersions )
     {
         this.resolveManagedVersions = resolveManagedVersions;
+        return this;
+    }
+
+    public RepositoryCache getCache()
+    {
+        return cache;
+    }
+
+    public MetadataResolutionRequest setCache( RepositoryCache cache )
+    {
+        this.cache = cache;
+
         return this;
     }
 

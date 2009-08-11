@@ -82,6 +82,11 @@ public class SnapshotArtifactRepositoryMetadata
         return artifact.isSnapshot();
     }
 
+    public ArtifactRepository getRepository()
+    {
+        return artifact.getRepository();
+    }
+
     public void setRepository( ArtifactRepository remoteRepository )
     {
         artifact.setRepository( remoteRepository );

@@ -15,9 +15,7 @@ package org.apache.maven.plugin;
  * the License.
  */
 
-import java.util.List;
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -30,15 +28,15 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 public interface PluginManager
 {
     // igorf: Way too many declared exceptions!
-    PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    PluginDescriptor loadPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException;
 
     // igorf: Way too many declared exceptions!
-    MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
 
     // igorf: Way too many declared exceptions!
-    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
 
     void executeMojo( MavenSession session, MojoExecution execution )

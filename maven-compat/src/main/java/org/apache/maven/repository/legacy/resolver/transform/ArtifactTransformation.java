@@ -25,6 +25,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
@@ -36,6 +37,17 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 public interface ArtifactTransformation
 {
     String ROLE = ArtifactTransformation.class.getName();
+
+    /**
+     * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
+     * transformation has occured the original artifact is returned.
+     *
+     * @param artifact           Artifact to be transformed.
+     * @param request the repositories to check
+     * @param localRepository    the local repository
+     */
+    void transformForResolve( Artifact artifact, RepositoryRequest request )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * Take in a artifact and return the transformed artifact for locating in the remote repository. If no

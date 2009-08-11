@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -34,6 +35,8 @@ import org.apache.maven.wagon.events.TransferListener;
 public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
 {
+
+    private RepositoryCache repositoryCache = new SessionRepositoryCache();
 
     private ArtifactRepository localRepository;
     
@@ -156,6 +159,7 @@ public class DefaultMavenExecutionRequest
         copy.setUpdateSnapshots( original.isUpdateSnapshots() );
         copy.setRemoteRepositories( original.getRemoteRepositories() );
         copy.setPluginArtifactRepositories( original.getPluginArtifactRepositories() );
+        copy.setRepositoryCache( original.getRepositoryCache() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         return original;        
     }
@@ -893,6 +897,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setUserProperties( getUserProperties() );
             projectBuildingRequest.setRemoteRepositories( getRemoteRepositories() );
             projectBuildingRequest.setPluginArtifactRepositories( getPluginArtifactRepositories() );
+            projectBuildingRequest.setRepositoryCache( getRepositoryCache() );
             projectBuildingRequest.setActiveProfileIds( getActiveProfiles() );
             projectBuildingRequest.setInactiveProfileIds( getInactiveProfiles() );
             projectBuildingRequest.setProfiles( getProfiles() );
@@ -919,6 +924,18 @@ public class DefaultMavenExecutionRequest
         }
 
         getProfiles().add( profile );
+
+        return this;
+    }
+
+    public RepositoryCache getRepositoryCache()
+    {
+        return repositoryCache;
+    }
+
+    public MavenExecutionRequest setRepositoryCache( RepositoryCache repositoryCache )
+    {
+        this.repositoryCache = repositoryCache;
 
         return this;
     }

@@ -75,4 +75,10 @@ public class TestMetadataSource
         return retrieve( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories() );
     }
 
+    public List<ArtifactVersion> retrieveAvailableVersions( MetadataResolutionRequest request )
+        throws ArtifactMetadataRetrievalException
+    {
+        return retrieveAvailableVersions( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories() );
+    }
+
 }

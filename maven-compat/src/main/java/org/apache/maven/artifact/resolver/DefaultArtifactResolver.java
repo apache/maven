@@ -31,6 +31,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
@@ -86,16 +88,22 @@ public class DefaultArtifactResolver
     public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener resolutionListener )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        resolve( artifact, remoteRepositories, localRepository, resolutionListener, false );
+        RepositoryRequest request = new DefaultRepositoryRequest();
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        resolve( artifact, request, resolutionListener, false );
     }
 
     public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        resolve( artifact, remoteRepositories, localRepository, null, true );
+        RepositoryRequest request = new DefaultRepositoryRequest();
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        resolve( artifact, request, null, true );
     }
 
-    private void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor, boolean force )
+    private void resolve( Artifact artifact, RepositoryRequest request, TransferListener downloadMonitor, boolean force )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( artifact == null )
@@ -128,7 +136,11 @@ public class DefaultArtifactResolver
             
             return;
         }
-        
+
+        ArtifactRepository localRepository = request.getLocalRepository();
+
+        List<ArtifactRepository> remoteRepositories = request.getRemoteRepositories();
+
         if ( !artifact.isResolved() )
         {
             // ----------------------------------------------------------------------
@@ -144,7 +156,7 @@ public class DefaultArtifactResolver
                 return;
             }
 
-            transformationManager.transformForResolve( artifact, remoteRepositories, localRepository );
+            transformationManager.transformForResolve( artifact, request );
 
             boolean localCopy = isLocalCopy( artifact );
 
@@ -358,8 +370,6 @@ public class DefaultArtifactResolver
         Artifact rootArtifact = request.getArtifact();
         Set<Artifact> artifacts = request.getArtifactDependencies();
         Map managedVersions = request.getManagedVersionMap();
-        ArtifactRepository localRepository = request.getLocalRepository();
-        List<ArtifactRepository> remoteRepositories = request.getRemoteRepositories();
         List<ResolutionListener> listeners = request.getListeners();
         ArtifactFilter filter = request.getFilter();                       
         
@@ -399,7 +409,7 @@ public class DefaultArtifactResolver
         {            
             try
             {
-                resolve( rootArtifact, remoteRepositories, localRepository );
+                resolve( rootArtifact, request, request.getTransferListener(), false );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -415,11 +425,9 @@ public class DefaultArtifactResolver
         
         if ( request.isResolveTransitively() )
         {
-            MetadataResolutionRequest metadataRequest = new DefaultMetadataResolutionRequest();
+            MetadataResolutionRequest metadataRequest = new DefaultMetadataResolutionRequest( request );
 
             metadataRequest.setArtifact( rootArtifact );
-            metadataRequest.setLocalRepository( localRepository );
-            metadataRequest.setRemoteRepositories( remoteRepositories );
             metadataRequest.setResolveManagedVersions( managedVersions == null );
 
             try
@@ -473,7 +481,7 @@ public class DefaultArtifactResolver
         } 
 
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
-        result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, localRepository, remoteRepositories, source, filter, listeners, null );
+        result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, request, source, filter, listeners, null );
                         
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
@@ -490,7 +498,7 @@ public class DefaultArtifactResolver
             {
                 try
                 {
-                    resolve( artifact, remoteRepositories, localRepository, request.getTransferListener() );
+                    resolve( artifact, request, request.getTransferListener(), false );
                 }
                 catch ( ArtifactNotFoundException anfe )
                 {

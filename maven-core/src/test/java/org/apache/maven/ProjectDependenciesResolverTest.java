@@ -7,6 +7,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.MavenProject;
@@ -38,6 +41,15 @@ public class ProjectDependenciesResolverTest
         return "src/test/projects/project-dependencies-resolver";
     }
 
+    protected RepositoryRequest getRepositoryRequest()
+        throws InvalidRepositoryException
+    {
+        RepositoryRequest request = new DefaultRepositoryRequest();
+        request.setLocalRepository( getLocalRepository() );
+        request.setRemoteRepositories( getRemoteRepositories() );
+        return request;
+    }
+
     public void testExclusionsInDependencies()
         throws Exception
     {
@@ -50,13 +62,11 @@ public class ProjectDependenciesResolverTest
             .get();        
         
         Set<Artifact> artifactDependencies =
-            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getLocalRepository(),
-                              getRemoteRepositories() );
+            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getRepositoryRequest() );
         assertEquals( 0, artifactDependencies.size() );
         
         artifactDependencies =
-            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_RUNTIME ), getLocalRepository(),
-                              getRemoteRepositories() );
+            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_RUNTIME ), getRepositoryRequest() );
         assertEquals( 1, artifactDependencies.size() );
         assertEquals( "maven-core-it-support" , artifactDependencies.iterator().next().getArtifactId() );
     }
@@ -69,8 +79,7 @@ public class ProjectDependenciesResolverTest
             .get();
 
         Set<Artifact> artifactDependencies =
-            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getLocalRepository(),
-                              getRemoteRepositories() );                
+            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getRepositoryRequest() );                
         assertEquals( 1, artifactDependencies.size() );        
     }  
     
@@ -85,8 +94,7 @@ public class ProjectDependenciesResolverTest
         MavenSession session = createMavenSession( pom, eps );
         MavenProject project = session.getCurrentProject();
 
-        resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getLocalRepository(),
-                          getRemoteRepositories() );                
+        resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getRepositoryRequest() );                
                 
         List<String> elements = project.getCompileClasspathElements();
         assertEquals( 2, elements.size() );

@@ -28,12 +28,15 @@ import java.util.TimeZone;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
@@ -53,8 +56,17 @@ public class SnapshotTransformation
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
+    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
+                                     ArtifactRepository localRepository )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        RepositoryRequest request = new DefaultRepositoryRequest();
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        transformForResolve( artifact, request );
+    }
 
-    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact, RepositoryRequest request )
         throws ArtifactResolutionException
     {
         // Only select snapshots that are unresolved (eg 1.0-SNAPSHOT, not 1.0-20050607.123456)
@@ -62,8 +74,8 @@ public class SnapshotTransformation
         {
             try
             {
-                String version = resolveVersion( artifact, localRepository, remoteRepositories );
-                artifact.updateVersion( version, localRepository );
+                String version = resolveVersion( artifact, request );
+                artifact.updateVersion( version, request.getLocalRepository() );
             }
             catch ( RepositoryMetadataResolutionException e )
             {
@@ -173,4 +185,5 @@ public class SnapshotTransformation
         utcDateFormatter.setTimeZone( UTC_TIME_ZONE );
         return utcDateFormatter;
     }
+
 }

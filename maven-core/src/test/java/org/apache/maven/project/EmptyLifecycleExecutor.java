@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
@@ -75,7 +76,7 @@ public class EmptyLifecycleExecutor
         return Collections.emptySet();
     }
 
-    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )
         throws LifecycleExecutionException
     {
     }

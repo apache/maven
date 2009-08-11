@@ -23,9 +23,14 @@ import java.util.List;
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 
 public interface RepositoryMetadataManager
 {
+
+    void resolve( RepositoryMetadata repositoryMetadata, RepositoryRequest repositoryRequest )
+        throws RepositoryMetadataResolutionException;
+
     void resolve( RepositoryMetadata repositoryMetadata, List<ArtifactRepository> repositories, ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException;
 

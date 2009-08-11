@@ -82,6 +82,11 @@ public class ArtifactRepositoryMetadata
         return false;
     }
 
+    public ArtifactRepository getRepository()
+    {
+        return artifact.getRepository();
+    }
+
     public void setRepository( ArtifactRepository remoteRepository )
     {
         artifact.setRepository( remoteRepository );

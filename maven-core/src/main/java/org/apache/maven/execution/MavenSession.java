@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -99,6 +100,11 @@ public class MavenSession
     public PlexusContainer getContainer()
     {
         return container;
+    }
+
+    public RepositoryCache getRepositoryCache()
+    {
+        return request.getRepositoryCache();
     }
 
     public ArtifactRepository getLocalRepository()

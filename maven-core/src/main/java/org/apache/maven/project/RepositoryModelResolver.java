@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -51,14 +52,14 @@ class RepositoryModelResolver
 
     private ResolutionErrorHandler resolutionErrorHandler;
 
-    private ArtifactRepository localRepository;
+    private RepositoryRequest repositoryRequest;
 
     private List<ArtifactRepository> remoteRepositories;
 
     private ReactorModelPool reactorModelPool;
 
     public RepositoryModelResolver( RepositorySystem repositorySystem, ResolutionErrorHandler resolutionErrorHandler,
-                                    ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                                    RepositoryRequest repositoryRequest, List<ArtifactRepository> remoteRepositories,
                                     ReactorModelPool reactorModelPool )
     {
         if ( repositorySystem == null )
@@ -73,11 +74,11 @@ class RepositoryModelResolver
         }
         this.resolutionErrorHandler = resolutionErrorHandler;
 
-        if ( localRepository == null )
+        if ( repositoryRequest == null )
         {
-            throw new IllegalArgumentException( "no local repository specified" );
+            throw new IllegalArgumentException( "no repository request specified" );
         }
-        this.localRepository = localRepository;
+        this.repositoryRequest = repositoryRequest;
 
         if ( remoteRepositories == null )
         {
@@ -90,7 +91,7 @@ class RepositoryModelResolver
 
     public ModelResolver newCopy()
     {
-        return new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, localRepository,
+        return new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, repositoryRequest,
                                             remoteRepositories, reactorModelPool );
     }
 
@@ -127,9 +128,8 @@ class RepositoryModelResolver
         {
             Artifact artifactParent = repositorySystem.createProjectArtifact( groupId, artifactId, version );
 
-            ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+            ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
             request.setArtifact( artifactParent );
-            request.setLocalRepository( localRepository );
             request.setRemoteRepositories( remoteRepositories );
             // FIXME setTransferListener
             ArtifactResolutionResult result = repositorySystem.resolve( request );

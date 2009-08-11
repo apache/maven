@@ -32,6 +32,8 @@ import java.util.StringTokenizer;
 
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
@@ -154,6 +156,10 @@ public class DefaultLifecycleExecutor
 
         MavenExecutionResult result = session.getResult();
 
+        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+        repositoryRequest.setLocalRepository( session.getLocalRepository() );
+        repositoryRequest.setCache( session.getRepositoryCache() );
+
         for ( MavenProject currentProject : session.getProjects() )
         {
             if ( session.isBlackListed( currentProject ) )
@@ -185,7 +191,8 @@ public class DefaultLifecycleExecutor
                 // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
                 // later by looking at the build plan. Would be better to just batch download everything required by the reactor.
 
-                projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(), session.getLocalRepository(), currentProject.getRemoteArtifactRepositories() );
+                repositoryRequest.setRemoteRepositories( currentProject.getRemoteArtifactRepositories() );
+                projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(), repositoryRequest );
 
                 if ( logger.isDebugEnabled() )
                 {
@@ -330,8 +337,7 @@ public class DefaultLifecycleExecutor
             {
                 mojoDescriptor =
                     pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
-                                                     session.getLocalRepository(),
-                                                     project.getPluginArtifactRepositories() );
+                                                     getRepositoryRequest( session, project ) );
 
                 mojoExecution.setMojoDescriptor( mojoDescriptor );
             }
@@ -354,6 +360,16 @@ public class DefaultLifecycleExecutor
 
         return new MavenExecutionPlan( lifecyclePlan, requiredDependencyResolutionScopes );
     }      
+    private RepositoryRequest getRepositoryRequest( MavenSession session, MavenProject project )
+    {
+        RepositoryRequest request = new DefaultRepositoryRequest();
+
+        request.setCache( session.getRepositoryCache() );
+        request.setLocalRepository( session.getLocalRepository() );
+        request.setRemoteRepositories( project.getPluginArtifactRepositories() );
+
+        return request;
+    }
 
     private void collectDependencyResolutionScopes( Collection<String> requiredDependencyResolutionScopes,
                                                     MojoExecution mojoExecution )
@@ -511,8 +527,7 @@ public class DefaultLifecycleExecutor
                     for ( String goal : execution.getGoals() )
                     {
                         MojoDescriptor mojoDescriptor =
-                            pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(),
-                                                             project.getPluginArtifactRepositories() );
+                            pluginManager.getMojoDescriptor( plugin, goal, getRepositoryRequest( session, project ) );
 
                         List<MojoExecution> mojoExecutions = lifecycleMappings.get( mojoDescriptor.getPhase() );
                         if ( mojoExecutions != null )
@@ -557,8 +572,7 @@ public class DefaultLifecycleExecutor
                     {
                         MojoDescriptor forkedMojoDescriptor =
                             pluginManager.getMojoDescriptor( forkedExecution.getPlugin(), forkedExecution.getGoal(),
-                                                             session.getLocalRepository(),
-                                                             project.getPluginArtifactRepositories() );
+                                                             getRepositoryRequest( session, project ) );
 
                         forkedExecution.setMojoDescriptor( forkedMojoDescriptor );
                     }
@@ -875,20 +889,24 @@ public class DefaultLifecycleExecutor
 
         injectPluginDeclarationFromProject( plugin, project );
 
+        RepositoryRequest repositoryRequest = getRepositoryRequest( session, project );
+
         // If there is no version to be found then we need to look in the repository metadata for
         // this plugin and see what's specified as the latest release.
         //
         if ( plugin.getVersion() == null )
         {
-            resolvePluginVersion( plugin, session.getLocalRepository(), project.getPluginArtifactRepositories() );
+            resolvePluginVersion( plugin, repositoryRequest );
         }
-        
-        return pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), project.getPluginArtifactRepositories() );
+
+        return pluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
     }
 
-    private void resolvePluginVersion( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    private void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException
     {
+        ArtifactRepository localRepository = repositoryRequest.getLocalRepository();
+
         File artifactMetadataFile = null;
         
         String localPath; 
@@ -899,7 +917,7 @@ public class DefaultLifecycleExecutor
         //
         //TODO: we should cycle through the repositories but take the repository which actually
         // satisfied the prefix.
-        for ( ArtifactRepository repository : remoteRepositories )
+        for ( ArtifactRepository repository : repositoryRequest.getRemoteRepositories() )
         {
             localPath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-" + repository.getId() + ".xml";
 
@@ -974,7 +992,7 @@ public class DefaultLifecycleExecutor
 
         if ( StringUtils.isEmpty( plugin.getVersion() ) )
         {
-            throw new PluginNotFoundException( plugin, remoteRepositories );
+            throw new PluginNotFoundException( plugin, repositoryRequest.getRemoteRepositories() );
         }
     }
 
@@ -1125,14 +1143,14 @@ public class DefaultLifecycleExecutor
         }
     }
     
-    private void populateDefaultConfigurationForPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+    private void populateDefaultConfigurationForPlugin( Plugin plugin, RepositoryRequest repositoryRequest ) 
         throws LifecycleExecutionException
     {
         if ( plugin.getVersion() == null )
         {
             try
             {
-                resolvePluginVersion( plugin, localRepository, remoteRepositories );
+                resolvePluginVersion( plugin, repositoryRequest );
             }
             catch ( PluginNotFoundException e )
             {
@@ -1144,29 +1162,29 @@ public class DefaultLifecycleExecutor
         {
             for( String goal : pluginExecution.getGoals() )
             {
-                Xpp3Dom dom = getDefaultPluginConfiguration( plugin, goal, localRepository, remoteRepositories );
+                Xpp3Dom dom = getDefaultPluginConfiguration( plugin, goal, repositoryRequest );
                 pluginExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pluginExecution.getConfiguration(), dom, Boolean.TRUE ) );
             }
         }
     }
     
-    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest ) 
         throws LifecycleExecutionException
     {
         for( Plugin plugin : plugins )
         {            
-            populateDefaultConfigurationForPlugin( plugin, localRepository, remoteRepositories );
+            populateDefaultConfigurationForPlugin( plugin, repositoryRequest );
         }
     }    
     
-    private Xpp3Dom getDefaultPluginConfiguration( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories ) 
+    private Xpp3Dom getDefaultPluginConfiguration( Plugin plugin, String goal, RepositoryRequest repositoryRequest ) 
         throws LifecycleExecutionException
     {
         MojoDescriptor mojoDescriptor;
         
         try
         {
-            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, localRepository, remoteRepositories );
+            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
         }
         catch ( PluginNotFoundException e )
         {
@@ -1252,13 +1270,13 @@ public class DefaultLifecycleExecutor
 
         if ( project != null )
         {
+            RepositoryRequest repositoryRequest = getRepositoryRequest( session, project );
+
             for ( Plugin buildPlugin : project.getBuildPlugins() )
             {
                 try
                 {
-                    PluginDescriptor pluginDescriptor =
-                        pluginManager.loadPlugin( buildPlugin, session.getLocalRepository(),
-                                                  project.getPluginArtifactRepositories() );
+                    PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( buildPlugin, repositoryRequest );
 
                     if ( prefix.equals( pluginDescriptor.getGoalPrefix() ) )
                     {

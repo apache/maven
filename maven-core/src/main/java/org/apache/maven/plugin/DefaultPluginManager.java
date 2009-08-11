@@ -34,6 +34,8 @@ import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -106,8 +108,7 @@ public class DefaultPluginManager
     /**
      * 
      * @param plugin
-     * @param localRepository
-     * @param remoteRepositories
+     * @param repositoryRequest
      * @return PluginDescriptor The component descriptor for the Maven plugin.
      * @throws PluginNotFoundException The plugin could not be found in any repositories.
      * @throws PluginResolutionException The plugin could be found but could not be resolved.
@@ -116,10 +117,12 @@ public class DefaultPluginManager
      *                                      happen but if someone has made a descriptor by hand it's possible.
      * @throws CycleDetectedInComponentGraphException A cycle has been detected in the component graph for a plugin that has been dynamically loaded.
      */
-    public synchronized PluginDescriptor loadPlugin( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public synchronized PluginDescriptor loadPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException
     {
-        PluginDescriptor pluginDescriptor = pluginCache.getPluginDescriptor( plugin, localRepository, remoteRepositories );
+        PluginDescriptor pluginDescriptor =
+            pluginCache.getPluginDescriptor( plugin, repositoryRequest.getLocalRepository(),
+                                             repositoryRequest.getRemoteRepositories() );
         
         if ( pluginDescriptor != null )
         {
@@ -128,10 +131,8 @@ public class DefaultPluginManager
 
         Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest )
             .setArtifact( pluginArtifact )
-            .setLocalRepository( localRepository )
-            .setRemoteRepositories( remoteRepositories )
             .setResolveTransitively( false );
         // FIXME setTransferListener
         ArtifactResolutionResult result = repositorySystem.resolve( request );
@@ -207,7 +208,8 @@ public class DefaultPluginManager
             pluginDescriptor.setPlugin( plugin );
             pluginDescriptor.setPluginArtifact( pluginArtifact );
 
-            pluginCache.putPluginDescriptor( plugin, localRepository, remoteRepositories, pluginDescriptor );
+            pluginCache.putPluginDescriptor( plugin, repositoryRequest.getLocalRepository(),
+                                             repositoryRequest.getRemoteRepositories(), pluginDescriptor );
 
             return pluginDescriptor;
         
@@ -242,7 +244,7 @@ public class DefaultPluginManager
      * no file set is meant to be excluded from the plugin realm in favor of the equivalent library from the current
      * core distro.
      */
-    List<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedInPom, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    List<Artifact> getPluginArtifacts( Artifact pluginArtifact, Plugin pluginAsSpecifiedInPom, RepositoryRequest repositoryRequest )
         throws ArtifactNotFoundException, ArtifactResolutionException
     {
         ArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
@@ -269,12 +271,10 @@ public class DefaultPluginManager
             dependenciesToResolveForPlugin.add( a );                            
         }
         
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest )
             .setArtifact( pluginArtifact )
             // So this in fact are overrides ... 
             .setArtifactDependencies( dependenciesToResolveForPlugin )
-            .setLocalRepository( localRepository )
-            .setRemoteRepositories( remoteRepositories )
             .setFilter( filter )
             .setResolveRoot( true )
             .setResolveTransitively( true );
@@ -396,6 +396,7 @@ public class DefaultPluginManager
         }
 
         Plugin plugin = pluginDescriptor.getPlugin();
+        
         ArtifactRepository localRepository = session.getLocalRepository();
         List<ArtifactRepository> remoteRepositories = session.getCurrentProject().getPluginArtifactRepositories();
 
@@ -417,7 +418,11 @@ public class DefaultPluginManager
 
         try
         {
-            pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, localRepository, remoteRepositories );
+            RepositoryRequest request = new DefaultRepositoryRequest();
+            request.setLocalRepository( localRepository );
+            request.setRemoteRepositories( remoteRepositories );
+            request.setCache( session.getRepositoryCache() );
+            pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, request );
         }
         catch ( ArtifactNotFoundException e )
         {
@@ -686,7 +691,7 @@ public class DefaultPluginManager
         }
     }
 
-    public MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException
     {
         Plugin plugin = new Plugin();
@@ -694,13 +699,13 @@ public class DefaultPluginManager
         plugin.setArtifactId( artifactId );
         plugin.setVersion( version );
         
-        return getMojoDescriptor( plugin, goal, localRepository, remoteRepositories );
+        return getMojoDescriptor( plugin, goal, repositoryRequest );
     }
         
-    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException
     {
-        PluginDescriptor pluginDescriptor = loadPlugin( plugin, localRepository, remoteRepositories );
+        PluginDescriptor pluginDescriptor = loadPlugin( plugin, repositoryRequest );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
 

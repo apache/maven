@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelEventListener;
@@ -32,6 +33,9 @@ import org.apache.maven.model.building.ModelEventListener;
 public class DefaultProjectBuildingRequest
     implements ProjectBuildingRequest
 {
+
+    private RepositoryCache repositoryCache;
+
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
@@ -78,6 +82,18 @@ public class DefaultProjectBuildingRequest
     public void setTopLevelProjectForReactor( MavenProject mavenProject )
     {
         this.topProject = mavenProject;
+    }
+
+    public ProjectBuildingRequest setRepositoryCache( RepositoryCache repositoryCache )
+    {
+        this.repositoryCache = repositoryCache;
+
+        return this;
+    }
+
+    public RepositoryCache getRepositoryCache()
+    {
+        return repositoryCache;
     }
 
     public ProjectBuildingRequest setLocalRepository( ArtifactRepository localRepository )

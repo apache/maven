@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
@@ -30,6 +32,8 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -51,7 +55,23 @@ public abstract class AbstractVersionTransformation
     @Requirement
     protected WagonManager wagonManager;
 
-    protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public void transformForResolve( Artifact artifact, RepositoryRequest request )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        transformForResolve( artifact, request.getRemoteRepositories(), request.getLocalRepository() );
+    }
+
+    protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository,
+                                     List<ArtifactRepository> remoteRepositories )
+        throws RepositoryMetadataResolutionException
+    {
+        RepositoryRequest request = new DefaultRepositoryRequest();
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        return resolveVersion( artifact, request );
+    }
+
+    protected String resolveVersion( Artifact artifact, RepositoryRequest request )
         throws RepositoryMetadataResolutionException
     {
         RepositoryMetadata metadata;
@@ -65,7 +85,7 @@ public abstract class AbstractVersionTransformation
             metadata = new SnapshotArtifactRepositoryMetadata( artifact );
         }
 
-        repositoryMetadataManager.resolve( metadata, remoteRepositories, localRepository );
+        repositoryMetadataManager.resolve( metadata, request );
 
         artifact.addMetadata( metadata );
 

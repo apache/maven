@@ -32,6 +32,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.CyclicDependencyException;
@@ -45,6 +47,8 @@ import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
+import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -74,6 +78,22 @@ public class DefaultLegacyArtifactCollector
                                              List<ResolutionListener> listeners,
                                              List<ConflictResolver> conflictResolvers )
     {
+        RepositoryRequest request = new DefaultRepositoryRequest();
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        return collect( artifacts, originatingArtifact, managedVersions, request, source, filter, listeners,
+                        conflictResolvers );
+    }
+
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, 
+                                             Artifact originatingArtifact,
+                                             Map managedVersions, 
+                                             RepositoryRequest repositoryRequest,
+                                             ArtifactMetadataSource source, 
+                                             ArtifactFilter filter,
+                                             List<ResolutionListener> listeners,
+                                             List<ConflictResolver> conflictResolvers )
+    {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
 
         result.ListOriginatingArtifact( originatingArtifact );
@@ -85,11 +105,11 @@ public class DefaultLegacyArtifactCollector
 
         Map<Object, List<ResolutionNode>> resolvedArtifacts = new LinkedHashMap<Object, List<ResolutionNode>>();
 
-        ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
+        ResolutionNode root = new ResolutionNode( originatingArtifact, repositoryRequest.getRemoteRepositories() );
 
         try
         {
-            root.addDependencies( artifacts, remoteRepositories, filter );
+            root.addDependencies( artifacts, repositoryRequest.getRemoteRepositories(), filter );
         }
         catch ( CyclicDependencyException e )
         {
@@ -108,7 +128,7 @@ public class DefaultLegacyArtifactCollector
 
         try
         {
-            recurse( result, root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter, listeners, conflictResolvers );
+            recurse( result, root, resolvedArtifacts, versionMap, repositoryRequest, source, filter, listeners, conflictResolvers );
         }
         catch ( CyclicDependencyException e )
         {
@@ -205,8 +225,7 @@ public class DefaultLegacyArtifactCollector
                           ResolutionNode node,
                           Map<Object, List<ResolutionNode>> resolvedArtifacts, 
                           ManagedVersionMap managedVersions,
-                          ArtifactRepository localRepository, 
-                          List<ArtifactRepository> remoteRepositories,
+                          RepositoryRequest request,
                           ArtifactMetadataSource source, 
                           ArtifactFilter filter, 
                           List<ResolutionListener> listeners,
@@ -275,13 +294,16 @@ public class DefaultLegacyArtifactCollector
                                     {
                                         try
                                         {
-                                            versions = source.retrieveAvailableVersions( resetArtifact, localRepository, remoteRepositories );
+                                            MetadataResolutionRequest metadataRequest =
+                                                new DefaultMetadataResolutionRequest( request );
+                                            metadataRequest.setArtifact( resetArtifact );
+                                            versions = source.retrieveAvailableVersions( metadataRequest );
                                             resetArtifact.setAvailableVersions( versions );
                                         }
                                         catch ( ArtifactMetadataRetrievalException e )
                                         {
                                             resetArtifact.setDependencyTrail( node.getDependencyTrail() );
-                                            throw new ArtifactResolutionException( "Unable to get dependency information: " + e.getMessage(), resetArtifact, remoteRepositories, e );
+                                            throw new ArtifactResolutionException( "Unable to get dependency information: " + e.getMessage(), resetArtifact, request.getRemoteRepositories(), e );
                                         }
                                     }
                                     // end hack
@@ -398,6 +420,11 @@ public class DefaultLegacyArtifactCollector
                         artifact.setDependencyTrail( node.getDependencyTrail() );
                         List<ArtifactRepository> childRemoteRepositories = child.getRemoteRepositories();
 
+                        MetadataResolutionRequest metadataRequest =
+                            new DefaultMetadataResolutionRequest( request );
+                        metadataRequest.setArtifact( artifact );
+                        metadataRequest.setRemoteRepositories( childRemoteRepositories );
+
                         try
                         {
                             ResolutionGroup rGroup;
@@ -449,7 +476,7 @@ public class DefaultLegacyArtifactCollector
                                         List<ArtifactVersion> versions = artifact.getAvailableVersions();
                                         if ( versions == null )
                                         {
-                                            versions = source.retrieveAvailableVersions( artifact, localRepository, childRemoteRepositories );
+                                            versions = source.retrieveAvailableVersions( metadataRequest );
                                             artifact.setAvailableVersions( versions );
                                         }
 
@@ -483,7 +510,7 @@ public class DefaultLegacyArtifactCollector
                                     fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
                                 }
 
-                                rGroup = source.retrieve( artifact, localRepository, childRemoteRepositories );
+                                rGroup = source.retrieve( metadataRequest );
 
                                 if ( rGroup == null )
                                 {
@@ -496,6 +523,7 @@ public class DefaultLegacyArtifactCollector
                                     relocated.setDependencyFilter( artifact.getDependencyFilter() );
                                     artifact = relocated;
                                     child.setArtifact( artifact );
+                                    metadataRequest.setArtifact( artifact );
                                 }
                             }
                             while( !childKey.equals( child.getKey() ) );
@@ -539,8 +567,8 @@ public class DefaultLegacyArtifactCollector
                                 + e.getMessage(), artifact, childRemoteRepositories, e );
                         }
 
-                        recurse( result, child, resolvedArtifacts, managedVersions, localRepository,
-                                 childRemoteRepositories, source, filter, listeners, conflictResolvers );
+                        recurse( result, child, resolvedArtifacts, managedVersions, metadataRequest, source, filter,
+                                 listeners, conflictResolvers );
                     }
                 }
                 catch ( OverConstrainedVersionException e )

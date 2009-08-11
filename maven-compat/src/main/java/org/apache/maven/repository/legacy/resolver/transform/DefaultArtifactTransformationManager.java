@@ -25,6 +25,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
@@ -39,6 +40,15 @@ public class DefaultArtifactTransformationManager
 {
     @Requirement(role=ArtifactTransformation.class, hints={"release", "latest", "snapshot"})
     private List<ArtifactTransformation> artifactTransformations;
+
+    public void transformForResolve( Artifact artifact, RepositoryRequest request )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        for ( ArtifactTransformation transform : artifactTransformations )
+        {
+            transform.transformForResolve( artifact, request );
+        }
+    }
 
     public void transformForResolve( Artifact artifact,
                                      List<ArtifactRepository> remoteRepositories,

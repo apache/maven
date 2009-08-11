@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionListener;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -41,6 +42,15 @@ import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 @Deprecated
 public interface LegacyArtifactCollector
 {
+
+    ArtifactResolutionResult collect( Set<Artifact> artifacts,
+                                      Artifact originatingArtifact,
+                                      Map managedVersions,
+                                      RepositoryRequest repositoryRequest,
+                                      ArtifactMetadataSource source,
+                                      ArtifactFilter filter,
+                                      List<ResolutionListener> listeners,
+                                      List<ConflictResolver> conflictResolvers );
 
     ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                       Artifact originatingArtifact,

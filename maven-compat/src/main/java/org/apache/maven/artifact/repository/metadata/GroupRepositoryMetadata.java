@@ -108,6 +108,11 @@ public class GroupRepositoryMetadata
         return false;
     }
 
+    public ArtifactRepository getRepository()
+    {
+        return null;
+    }
+
     public void setRepository( ArtifactRepository remoteRepository )
     {
         // intentionally blank

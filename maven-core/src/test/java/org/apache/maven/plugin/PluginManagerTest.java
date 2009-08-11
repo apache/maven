@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -38,7 +40,17 @@ public class PluginManagerTest
     {
         return "src/test/projects/plugin-manager";
     }
-                
+
+    private RepositoryRequest getRepositoryRequest( MavenSession session )
+    {
+        RepositoryRequest request = new DefaultRepositoryRequest();
+
+        request.setLocalRepository( session.getLocalRepository() );
+        request.setRemoteRepositories( session.getCurrentProject().getPluginArtifactRepositories() );
+
+        return request;
+    }
+
     public void testPluginLoading()
         throws Exception
     {
@@ -47,7 +59,7 @@ public class PluginManagerTest
         plugin.setGroupId( "org.codehaus.plexus" );
         plugin.setArtifactId( "plexus-component-metadata" );
         plugin.setVersion( plexusVersion );
-        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, getRepositoryRequest( session ) );
         assertNotNull( pluginDescriptor );
     }
     
@@ -61,7 +73,7 @@ public class PluginManagerTest
         plugin.setArtifactId( "plexus-component-metadata" );
         plugin.setVersion( plexusVersion );
         
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, getRepositoryRequest( session ) );        
         assertNotNull( mojoDescriptor );
         assertEquals( "generate-metadata", mojoDescriptor.getGoal() );
         // igorf: plugin realm comes later
@@ -225,7 +237,11 @@ public class PluginManagerTest
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         */
         
-        List<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getPluginArtifactRepositories() );   
+        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+        repositoryRequest.setLocalRepository( getLocalRepository() );
+        repositoryRequest.setRemoteRepositories( getPluginArtifactRepositories() );
+        
+        List<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, repositoryRequest );   
         
         for ( Artifact a : artifacts )
         {

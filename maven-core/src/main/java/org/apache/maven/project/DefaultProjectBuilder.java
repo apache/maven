@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -162,8 +164,12 @@ public class DefaultProjectBuilder
     private ModelBuildingRequest getModelBuildingRequest( ProjectBuildingRequest configuration,
                                                           ReactorModelPool reactorModelPool )
     {
+        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+        repositoryRequest.setCache( configuration.getRepositoryCache() );
+        repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
+
         ModelResolver resolver =
-            new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, configuration.getLocalRepository(),
+            new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, repositoryRequest,
                                          configuration.getRemoteRepositories(), reactorModelPool );
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
@@ -191,6 +197,7 @@ public class DefaultProjectBuilder
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setArtifact( artifact )
+            .setCache( configuration.getRepositoryCache() )
             .setLocalRepository( configuration.getLocalRepository() )
             .setRemoteRepositories( configuration.getRemoteRepositories() );
         // FIXME setTransferListener
@@ -257,6 +264,7 @@ public class DefaultProjectBuilder
             .setArtifact( artifact )
             .setResolveRoot( false )
             .setResolveTransitively( true )
+            .setCache( request.getRepositoryCache() )
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( project.getRemoteArtifactRepositories() )
             .setManagedVersionMap( project.getManagedVersionMap() );
@@ -492,9 +500,12 @@ public class DefaultProjectBuilder
         {
             if ( configuration.isProcessPlugins() )
             {
-                lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(),
-                                                                  configuration.getLocalRepository(),
-                                                                  project.getPluginArtifactRepositories() );
+                RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+                repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
+                repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
+                repositoryRequest.setCache( configuration.getRepositoryCache() );
+
+                lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(), repositoryRequest );
             }
         }
         catch ( LifecycleExecutionException e )

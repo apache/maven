@@ -20,12 +20,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.repository.legacy.UpdateCheckManager;
 import org.apache.maven.repository.legacy.WagonManager;
@@ -34,7 +38,6 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -56,6 +59,53 @@ public class DefaultRepositoryMetadataManager
     public void resolve( RepositoryMetadata metadata, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {
+        RepositoryRequest request = new DefaultRepositoryRequest();
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        resolve( metadata, request );
+    }
+
+    public void resolve( RepositoryMetadata metadata, RepositoryRequest request )
+        throws RepositoryMetadataResolutionException
+    {
+        RepositoryCache cache = request.getCache();
+
+        CacheKey cacheKey = null;
+
+        if ( cache != null )
+        {
+            cacheKey = new CacheKey( metadata, request );
+
+            CacheRecord cacheRecord = (CacheRecord) cache.get( request, cacheKey );
+
+            if ( cacheRecord != null )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Resolved metadata from cache: " + metadata );
+                }
+
+                metadata.setMetadata( MetadataUtils.cloneMetadata( cacheRecord.metadata ) );
+
+                if ( cacheRecord.repository != null )
+                {
+                    for ( ArtifactRepository repository : request.getRemoteRepositories() )
+                    {
+                        if ( cacheRecord.repository.equals( repository.getId() ) )
+                        {
+                            metadata.setRepository( repository );
+                            break;
+                        }
+                    }
+                }
+
+                return;
+            }
+        }
+
+        ArtifactRepository localRepository = request.getLocalRepository();
+        List<ArtifactRepository> remoteRepositories = request.getRemoteRepositories();
+
         for ( ArtifactRepository repository : remoteRepositories )
         {
             ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
@@ -114,6 +164,133 @@ public class DefaultRepositoryMetadataManager
         {
             throw new RepositoryMetadataResolutionException( "Unable to read local copy of metadata: " + e.getMessage(), e );
         }
+
+        if ( cache != null )
+        {
+            cache.put( request, cacheKey, new CacheRecord( metadata ) );
+        }
+    }
+
+    private static final class CacheKey
+    {
+
+        final Object metadataKey;
+
+        final ArtifactRepository localRepository;
+
+        final List<ArtifactRepository> remoteRepositories;
+
+        final int hashCode;
+
+        CacheKey( RepositoryMetadata metadata, RepositoryRequest request )
+        {
+            metadataKey = metadata.getKey();
+            localRepository = request.getLocalRepository();
+            remoteRepositories = request.getRemoteRepositories();
+
+            int hash = 17;
+            hash = hash * 31 + metadata.getKey().hashCode();
+            hash = hash * 31 + repoHashCode( localRepository );
+            for ( ArtifactRepository remoteRepository : remoteRepositories )
+            {
+                hash = hash * 31 + repoHashCode( remoteRepository );
+            }
+            hashCode = hash;
+        }
+
+        int repoHashCode( ArtifactRepository repository )
+        {
+            return ( repository != null && repository.getUrl() != null ) ? repository.getUrl().hashCode() : 0;
+        }
+
+        boolean repoEquals( ArtifactRepository repo1, ArtifactRepository repo2 )
+        {
+            if ( repo1 == repo2 )
+            {
+                return true;
+            }
+
+            if ( repo1 == null || repo2 == null )
+            {
+                return false;
+            }
+
+            return equal( repo1.getUrl(), repo2.getUrl() ) && repo1.getClass() == repo2.getClass();
+        }
+
+        private static <T> boolean equal( T s1, T s2 )
+        {
+            return s1 != null ? s1.equals( s2 ) : s2 == null;
+        }
+
+        @Override
+        public boolean equals( Object obj )
+        {
+            if ( this == obj )
+            {
+                return true;
+            }
+
+            if ( !( obj instanceof CacheKey ) )
+            {
+                return false;
+            }
+
+            CacheKey that = (CacheKey) obj;
+
+            if ( !this.metadataKey.equals( that.metadataKey ) )
+            {
+                return false;
+            }
+
+            if ( !repoEquals( this.localRepository, that.localRepository ) )
+            {
+                return false;
+            }
+
+            for ( Iterator<ArtifactRepository> it1 = this.remoteRepositories.iterator(), it2 =
+                that.remoteRepositories.iterator();; )
+            {
+                if ( !it1.hasNext() || !it2.hasNext() )
+                {
+                    if ( it1.hasNext() != it2.hasNext() )
+                    {
+                        return false;
+                    }
+                    break;
+                }
+                ArtifactRepository repo1 = it1.next();
+                ArtifactRepository repo2 = it2.next();
+                if ( !repoEquals( repo1, repo2 ) )
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return hashCode;
+        }
+
+    }
+
+    private static final class CacheRecord
+    {
+
+        final Metadata metadata;
+
+        final String repository;
+
+        CacheRecord( RepositoryMetadata metadata )
+        {
+            this.metadata = MetadataUtils.cloneMetadata( metadata.getMetadata() );
+            this.repository = ( metadata.getRepository() != null ) ? metadata.getRepository().getId() : null;
+        }
+
     }
 
     private void mergeMetadata( RepositoryMetadata metadata, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
@@ -355,4 +532,5 @@ public class DefaultRepositoryMetadataManager
             throw new RepositoryMetadataInstallationException( "Error installing metadata: " + e.getMessage(), e );
         }
     }
+
 }

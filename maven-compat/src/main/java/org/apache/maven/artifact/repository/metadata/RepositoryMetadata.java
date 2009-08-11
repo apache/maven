@@ -33,6 +33,13 @@ public interface RepositoryMetadata
     extends org.apache.maven.artifact.metadata.ArtifactMetadata
 {        
     /**
+     * Get the repository the metadata was located in.
+     *
+     * @return the repository
+     */
+    ArtifactRepository getRepository();
+
+    /**
      * Set the repository the metadata was located in.
      *
      * @param remoteRepository the repository
