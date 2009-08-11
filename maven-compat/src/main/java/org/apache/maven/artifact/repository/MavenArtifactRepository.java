@@ -187,18 +187,11 @@ public class MavenArtifactRepository
     public void setUrl( String url )
     {
         this.url = url;
+
+        this.protocol = protocol( url );
+        this.basedir = basedir( url );
     }
 
-    public void setBasedir( String basedir )
-    {
-        this.basedir = basedir;
-    }
-
-    public void setProtocol( String protocol )
-    {
-        this.protocol = protocol;
-    }
-    
     // Path Utils
     
     /**

@@ -1,5 +1,8 @@
 package org.apache.maven.repository;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
@@ -172,7 +175,20 @@ public class MirrorProcessorTest
         assertFalse( mirrorBuilder.matchPattern( getRepo( "c", "http://localhost" ), "!a,external:*" ) );
         assertTrue( mirrorBuilder.matchPattern( getRepo( "c", "http://somehost" ), "!a,external:*" ) );
     }     
-    
+
+    public void testMirrorProperUrlAndProtocolAndBasedir()
+    {
+        mirrorBuilder.addMirror( "mirror-id", "central", "file:///tmp", null );
+
+        List<ArtifactRepository> repos = Arrays.asList( getRepo( "central", "http://repo1.maven.org" ) );
+        repos = mirrorBuilder.getMirrors( repos );
+
+        ArtifactRepository repo = repos.get( 0 );
+        assertEquals( "file:///tmp", repo.getUrl() );
+        assertEquals( "file", repo.getProtocol() );
+        assertEquals( "/tmp", repo.getBasedir() );
+    }
+
     /**
      * Build an ArtifactRepository object.
      * 
