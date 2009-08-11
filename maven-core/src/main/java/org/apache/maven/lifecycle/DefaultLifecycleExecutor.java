@@ -925,7 +925,7 @@ public class DefaultLifecycleExecutor
         return pluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
     }
 
-    private void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
+    public void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException
     {
         ArtifactRepository localRepository = repositoryRequest.getLocalRepository();

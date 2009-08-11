@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
 import org.apache.maven.model.building.ModelBuildingEvent;
@@ -142,7 +142,7 @@ class DefaultModelBuildingListener
 
                 projectRealm = projectBuildingHelper.createProjectRealm( model, repositoryRequest );
             }
-            catch ( ArtifactResolutionException e )
+            catch ( AbstractArtifactResolutionException e )
             {
                 event.getProblems().addError( "Unresolveable build extensions: " + e.getMessage(), e );
             }

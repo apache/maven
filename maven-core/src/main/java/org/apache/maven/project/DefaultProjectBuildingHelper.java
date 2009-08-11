@@ -36,12 +36,14 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
+import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -79,6 +81,9 @@ public class DefaultProjectBuildingHelper
     @Requirement
     private ArtifactFilterManager artifactFilterManager;
 
+    @Requirement
+    private LifecycleExecutor lifecycleExecutor;
+
     public List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
                                                                 List<ArtifactRepository> externalRepositories )
         throws InvalidRepositoryException
@@ -103,7 +108,7 @@ public class DefaultProjectBuildingHelper
     }
 
     public ClassRealm createProjectRealm( Model model, RepositoryRequest repositoryRequest )
-        throws ArtifactResolutionException
+        throws ArtifactResolutionException, PluginNotFoundException
     {
         ClassRealm projectRealm = null;
 
@@ -142,6 +147,11 @@ public class DefaultProjectBuildingHelper
 
         for ( Plugin plugin : extensionPlugins )
         {
+            if ( plugin.getVersion() == null )
+            {
+                lifecycleExecutor.resolvePluginVersion( plugin, repositoryRequest );
+            }
+
             Artifact artifact = repositorySystem.createPluginArtifact( plugin );
 
             Set<Artifact> dependencies = new LinkedHashSet<Artifact>();

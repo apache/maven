@@ -80,4 +80,10 @@ public class EmptyLifecycleExecutor
         throws LifecycleExecutionException
     {
     }
+
+    public void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
+        throws PluginNotFoundException
+    {
+    }
+
 }

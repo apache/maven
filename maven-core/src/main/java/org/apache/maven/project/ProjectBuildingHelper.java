@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
+import org.apache.maven.plugin.PluginNotFoundException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
@@ -61,6 +62,6 @@ public interface ProjectBuildingHelper
      * @throws ArtifactResolutionException If any build extension could not be resolved.
      */
     ClassRealm createProjectRealm( Model model, RepositoryRequest repositoryRequest )
-        throws ArtifactResolutionException;
+        throws ArtifactResolutionException, PluginNotFoundException;
 
 }

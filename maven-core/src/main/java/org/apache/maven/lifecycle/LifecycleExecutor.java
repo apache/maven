@@ -20,10 +20,8 @@ package org.apache.maven.lifecycle;
  */
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -75,6 +73,9 @@ public interface LifecycleExecutor
     //
     void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )
         throws LifecycleExecutionException;
+
+    void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
+        throws PluginNotFoundException;
     
     void execute( MavenSession session );
 }
