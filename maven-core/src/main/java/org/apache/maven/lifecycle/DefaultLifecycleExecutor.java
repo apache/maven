@@ -738,7 +738,8 @@ public class DefaultLifecycleExecutor
                 {
                     Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
 
-                    Xpp3Dom mojoConfiguration = new Xpp3Dom( executionConfiguration );
+                    Xpp3Dom mojoConfiguration =
+                        ( executionConfiguration != null ) ? new Xpp3Dom( executionConfiguration ) : null;
 
                     mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
 
